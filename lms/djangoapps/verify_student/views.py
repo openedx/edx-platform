@@ -47,8 +47,6 @@ from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
 from openedx.core.djangoapps.user_api.errors import AccountValidationError, UserNotFound
 from openedx.core.lib.log_utils import audit_log
-from shoppingcart.models import CertificateItem, Order
-from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
 from student.models import CourseEnrollment
 from track import segment
 from util.db import outer_atomic
@@ -757,38 +755,6 @@ def checkout_with_ecommerce_service(user, course_key, course_mode, processor):
         )
 
 
-def checkout_with_shoppingcart(request, user, course_key, course_mode, amount):
-    """ Create an order and trigger checkout using shoppingcart."""
-    cart = Order.get_cart_for_user(user)
-    cart.clear()
-    enrollment_mode = course_mode.slug
-    CertificateItem.add_to_order(cart, course_key, amount, enrollment_mode)
-
-    # Change the order's status so that we don't accidentally modify it later.
-    # We need to do this to ensure that the parameters we send to the payment system
-    # match what we store in the database.
-    # (Ordinarily we would do this client-side when the user submits the form, but since
-    # the JavaScript on this page does that immediately, we make the change here instead.
-    # This avoids a second AJAX call and some additional complication of the JavaScript.)
-    # If a user later re-enters the verification / payment flow, she will create a new order.
-    cart.start_purchase()
-
-    callback_url = request.build_absolute_uri(
-        reverse("shoppingcart.views.postpay_callback")
-    )
-
-    payment_data = {
-        'payment_processor_name': settings.CC_PROCESSOR_NAME,
-        'payment_page_url': get_purchase_endpoint(),
-        'payment_form_data': get_signed_purchase_params(
-            cart,
-            callback_url=callback_url,
-            extra_data=[six.text_type(course_key), course_mode.slug]
-        ),
-    }
-    return payment_data
-
-
 @require_POST
 @login_required
 def create_order(request):
@@ -835,16 +801,13 @@ def create_order(request):
     if amount < current_mode.min_price:
         return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
 
-    if current_mode.sku:
-        # if request.POST doesn't contain 'processor' then the service's default payment processor will be used.
-        payment_data = checkout_with_ecommerce_service(
-            request.user,
-            course_id,
-            current_mode,
-            request.POST.get('processor')
-        )
-    else:
-        payment_data = checkout_with_shoppingcart(request, request.user, course_id, current_mode, amount)
+    # if request.POST doesn't contain 'processor' then the service's default payment processor will be used.
+    payment_data = checkout_with_ecommerce_service(
+        request.user,
+        course_id,
+        current_mode,
+        request.POST.get('processor')
+    )
 
     if 'processor' not in request.POST:
         # (XCOM-214) To be removed after release.
