@@ -1061,6 +1061,8 @@ def dates(request, course_id):
     Display the course's dates.html, or 404 if there is no such course.
     Assumes the course_id is in a valid format.
     """
+    from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
+
     course_key = CourseKey.from_string(course_id)
 
     # Enable NR tracing for this view based on course
@@ -1094,6 +1096,10 @@ def dates(request, course_id):
     user_timezone = user_timezone_locale['user_timezone']
     user_language = user_timezone_locale['user_language']
 
+    display_reset_dates_text = False
+    if RELATIVE_DATES_FLAG.is_enabled(course.id):
+        display_reset_dates_text = reset_deadlines_banner_should_display(course_key, request)
+
     context = {
         'course': course,
         'course_date_blocks': course_date_blocks,
@@ -1104,6 +1110,10 @@ def dates(request, course_id):
         'supports_preview_menu': True,
         'can_masquerade': can_masquerade,
         'masquerade': masquerade,
+        'display_reset_dates_text': display_reset_dates_text,
+        'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+        'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
+        'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
     }
 
     return render_to_response('courseware/dates.html', context)
