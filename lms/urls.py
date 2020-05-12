@@ -57,7 +57,6 @@ from util import views as util_views
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
-COURSE_DATES_NAME = 'dates'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()
@@ -487,7 +486,7 @@ urlpatterns += [
             settings.COURSE_ID_PATTERN,
         ),
         courseware_views.dates,
-        name=COURSE_DATES_NAME,
+        name='dates',
     ),
 
     # Takes optional student_id for instructor use--shows profile as that student sees it.

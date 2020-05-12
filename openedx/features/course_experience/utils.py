@@ -6,7 +6,6 @@ Common utilities for the course experience, including course outline.
 from datetime import timedelta
 
 from completion.models import BlockCompletion
-from django.db.models import Q
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
@@ -267,11 +266,9 @@ def reset_deadlines_banner_should_display(course_key, request):
         request.user and course_overview and has_access(request.user, 'staff', course_overview, course_overview.id)
     )
     if is_self_paced and (not is_course_staff) and (not course_end_date or timezone.now() < course_end_date):
-        if CourseEnrollment.objects.filter(
-            course=course_overview, user=request.user,
-        ).filter(
-            Q(mode=CourseMode.AUDIT) | Q(mode=CourseMode.VERIFIED)
-        ).exists():
+        if (CourseEnrollment.objects.filter(
+            course=course_overview, user=request.user, mode=CourseMode.VERIFIED
+        ).exists()):
             course_block_tree = get_course_outline_block_tree(
                 request, str(course_key), request.user
             )
