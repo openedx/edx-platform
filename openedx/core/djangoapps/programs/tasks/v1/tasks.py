@@ -520,3 +520,41 @@ def revoke_program_certificates(self, username, course_key):
         LOGGER.info(u'There is no program certificates for user %s to revoke', username)
 
     LOGGER.info(u'Successfully completed the task revoke_program_certificates for username %s', username)
+
+
+@task(bind=True, ignore_result=True, routing_key=PROGRAM_CERTIFICATES_ROUTING_KEY)
+def update_certificate_visible_date_on_course_update(self, course_key):
+    """
+    This task is designed to be called whenever a course is updated with
+    certificate_available_date so that visible_date is updated on credential
+    service as well.
+
+    It will get all users within the course that have a certificate and call
+    the credentials API to update all these certificates visible_date value
+    to keep certificates in sync on both sides.
+
+    Args:
+        course_key (str): The course identifier
+
+    Returns:
+        None
+
+    """
+    countdown = 2 ** self.request.retries
+    # If the credentials config model is disabled for this
+    # feature, it may indicate a condition where processing of such tasks
+    # has been temporarily disabled.  Since this is a recoverable situation,
+    # mark this task for retry instead of failing it altogether.
+
+    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+        LOGGER.info(
+            'Task update_certificate_visible_date_on_course_update cannot be executed when credentials issuance is '
+            'disabled in API config',
+        )
+        raise self.retry(countdown=countdown, max_retries=MAX_RETRIES)
+
+    users_with_certificates_in_course = GeneratedCertificate.eligible_available_certificates.filter(
+        course_id=course_key).values_list('user__username', flat=True)
+
+    for user in users_with_certificates_in_course:
+        award_course_certificate.delay(user, str(course_key))
