@@ -6,7 +6,7 @@
     <div class="video-col date-col"><%- created %></div>
     <div class="video-col video-id-col"><%- edx_video_id %></div>
     <div class="video-col transcripts-col"></div>
-    <div class="video-col status-col"><%- status %></div>
+    <div class="video-col status-col"></div>
     <div class="video-col actions-col">
         <ul class="actions-list">
             <li class="action-item action-remove">

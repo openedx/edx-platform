@@ -58,7 +58,7 @@ define(
             it('should render status correctly', function() {
                 var testStatus = 'Test Status';
                 var $el = render({status: testStatus});
-                expect($el.find('.status-col').text()).toEqual(testStatus);
+                expect($el.find('.video-status').text()).toEqual(testStatus);
             });
 
             it('should render remove button correctly', function() {

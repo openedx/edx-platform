@@ -27,6 +27,10 @@
     cursor: pointer;
   }
 
+  .message-error {
+    color: $red;
+  }
+
   .video-transcripts-wrapper {
     display: block;
 
@@ -486,7 +490,7 @@
       }
 
       .name-col {
-        width: 25%;
+        width: 23%;
       }
 
       .transcripts-col {
@@ -500,7 +504,7 @@
 
       .date-col,
       .status-col {
-        width: 10%;
+        width: 15%;
       }
 
       .actions-col {
