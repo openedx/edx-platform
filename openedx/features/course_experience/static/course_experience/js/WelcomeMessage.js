@@ -42,7 +42,7 @@ export class WelcomeMessage {  // eslint-disable-line import/prefer-default-expo
     // "Show More" support for welcome messages
     const messageContent = document.querySelector('#welcome-message-content');
     const fullText = messageContent.innerHTML;
-    if (options.shortenWelcomeMessage && clampHtmlByWords(messageContent, 100) < 0) {
+    if (clampHtmlByWords(messageContent, 100) < 0) {
       const showMoreButton = document.querySelector('#welcome-message-show-more');
       const shortText = messageContent.innerHTML;
 
