@@ -5,7 +5,7 @@
         </br>
         <span class='message-error'><%- error_description %></span>
     <% }%>
-<% } else { %>
+<% } else if (!transcripts.length){ %>
     <span class='transcripts-empty-text'><%- gettext('No transcript uploaded.') %></span>
 <% }%>
 </br>
