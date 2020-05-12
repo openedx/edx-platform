@@ -23,6 +23,7 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
     Base class for courseware API tests
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
