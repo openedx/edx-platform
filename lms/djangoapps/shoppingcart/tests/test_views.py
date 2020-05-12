@@ -1471,25 +1471,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             }
         )
 
-    def test_shopping_cart_navigation_link(self):
-        """
-        Tests shopping cart link is available in navigation header.
-        """
-        CourseEnrollment.enroll(self.user, self.course_key)
-        self.add_course_to_user_cart(self.testing_course.id)
-        resp = self.client.get(reverse('courseware', kwargs={'course_id': text_type(self.course.id)}))
-        self.assertContains(resp, '<a class="shopping-cart"')
-
-    def test_shopping_cart_navigation_link_and_not_on_courseware(self):
-        """
-        Tests shopping cart link is available in navigation header
-        and requested page is not courseware too.
-        """
-        CourseEnrollment.enroll(self.user, self.course_key)
-        self.add_course_to_user_cart(self.testing_course.id)
-        resp = self.client.get(reverse('dashboard'))
-        self.assertContains(resp, '<a class="shopping-cart"')
-
 
 class ReceiptRedirectTest(SharedModuleStoreTestCase):
     """Test special-case redirect from the receipt page. """
