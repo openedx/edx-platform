@@ -7,6 +7,7 @@ Tests for the teams API at the HTTP request level.
 import json
 import unittest
 from datetime import datetime
+from uuid import UUID
 
 import ddt
 import pytz
@@ -29,6 +30,7 @@ from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMM
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.teams_config import TeamsConfig
 from student.models import CourseEnrollment
+from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -500,7 +502,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         return self.build_membership_data_raw(self.users[username].username, team.team_id)
 
     @classmethod
-    def create_and_enroll_student(cls, courses=None, username=None, mode=None):
+    def create_and_enroll_student(cls, courses=None, username=None, mode=None, external_key=None):
         """ Creates a new student and enrolls that student in the course.
 
         Adds the new user to the cls.users dictionary with the username as the key.
@@ -515,6 +517,15 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         for course in courses:
             CourseEnrollment.enroll(user, course.id, mode=mode, check_access=True)
         cls.users[user.username] = user
+
+        if external_key is not None:
+            ProgramEnrollmentFactory(
+                user=user,
+                external_user_key=external_key,
+                program_uuid=UUID("88888888-4444-3333-1111-000000000000"),
+                curriculum_uuid=UUID("77777777-4444-2222-1111-000000000000"),
+                status='enrolled'
+            )
 
         return user.username
 
@@ -2748,3 +2759,38 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             user_id=self.users[username].id,
             team__name=nuclear_team_name
         ).exists())
+
+    def test_create_membership_via_upload_using_external_key(self):
+        self.create_and_enroll_student(username='a_user', external_key='a_user_external_key')
+        csv_content = 'user,mode,topic_0' + '\n'
+        csv_content += 'a_user_external_key,audit,team wind power'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        response = self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            201,
+            method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response_text['message'], '1 learners were affected.')
+
+    def test_create_membership_via_upload_using_external_key_invalid(self):
+        self.create_and_enroll_student(username='a_user', external_key='a_user_external_key')
+        csv_content = 'user,mode,topic_0' + '\n'
+        csv_content += 'a_user_external_key_invalid,audit,team wind power'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        response = self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            400,
+            method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(
+            response_text['errors'],
+            ['User name/email/external key: a_user_external_key_invalid does not exist.']
+        )

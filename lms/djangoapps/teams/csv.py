@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 
 from lms.djangoapps.teams.api import OrganizationProtectionStatus, user_organization_protection_status
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from lms.djangoapps.program_enrollments.models import ProgramEnrollment
 from student.models import CourseEnrollment
 from .utils import emit_team_event
 
@@ -420,6 +421,11 @@ class TeamMembershipImportManager(object):
             try:
                 return User.objects.get(email=user_name)
             except User.DoesNotExist:
-                self.validation_errors.append('User ' + user_name + ' does not exist.')
-                return None
-                # TODO - handle user key case
+                try:
+                    user = ProgramEnrollment.objects.get(external_user_key=user_name).user
+                    if user is None:
+                        return None
+                    return user
+                except ProgramEnrollment.DoesNotExist:
+                    self.validation_errors.append('User name/email/external key: ' + user_name + ' does not exist.')
+                    return None
