@@ -495,7 +495,7 @@ def use_registration_code(course_reg, user):
         applicable_cart_items = [
             cart_item for cart_item in cart_items
             if (
-                (isinstance(cart_item, PaidCourseRegistration) or isinstance(cart_item, CourseRegCodeItem))and cart_item.qty == 1
+                (isinstance(cart_item, PaidCourseRegistration) or isinstance(cart_item, CourseRegCodeItem)) and cart_item.qty == 1
             )
         ]
         if not applicable_cart_items:

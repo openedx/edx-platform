@@ -67,6 +67,7 @@ class DOTAccessTokenExchangeFormTestFacebook(
     """
     pass
 
+
 # This is necessary because cms does not implement third party auth
 @unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
