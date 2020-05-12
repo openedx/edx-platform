@@ -38,7 +38,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String
 
 import lms.djangoapps.courseware.views.views as views
-import shoppingcart
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
@@ -507,31 +506,6 @@ class ViewsTestCase(BaseViewsTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/courses/{}/about'.format(six.text_type(self.course_key)))
 
-    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
-    @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
-    def test_course_about_in_cart(self):
-        in_cart_span = '<span class="add-to-cart">'
-        # don't mock this course due to shopping cart existence checking
-        course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
-
-        self.client.logout()
-        response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
-        self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, in_cart_span)
-
-        # authenticated user with nothing in cart
-        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
-        response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
-        self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, in_cart_span)
-
-        # now add the course to the cart
-        cart = shoppingcart.models.Order.get_cart_for_user(self.user)
-        shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
-        response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, in_cart_span)
-
     def assert_enrollment_link_present(self, is_anonymous):
         """
         Prepare ecommerce checkout data and assert if the ecommerce link is contained in the response.
@@ -563,20 +537,6 @@ class ViewsTestCase(BaseViewsTestCase):
 
     @ddt.data(True, False)
     def test_ecommerce_checkout(self, is_anonymous):
-        if not is_anonymous:
-            self.assert_enrollment_link_present(is_anonymous=is_anonymous)
-        else:
-            self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
-
-    @ddt.data(True, False)
-    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), 'Shopping Cart not enabled in settings')
-    @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
-    def test_ecommerce_checkout_shopping_cart_enabled(self, is_anonymous):
-        """
-        Two scenarios are being validated here -- authenticated/known user and unauthenticated/anonymous user
-        For a known user we expect the checkout link to point to Otto in a scenario where the CommerceConfiguration
-        is active and the course mode is PROFESSIONAL.
-        """
         if not is_anonymous:
             self.assert_enrollment_link_present(is_anonymous=is_anonymous)
         else:
