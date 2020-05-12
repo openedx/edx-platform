@@ -2366,6 +2366,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.philu_overrides',
 
     # Philu Features
+    'openedx.features.classrooms',
     'openedx.features.job_board',
     'openedx.features.partners',
     'openedx.features.philu_courseware',
