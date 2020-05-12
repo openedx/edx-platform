@@ -30,6 +30,7 @@ env:
     - TOXENV=py27-common
     - TOXENV=py27-lms-1
     - TOXENV=py27-lms-2
+    - TOXENV=py27-mte
     - TOXENV=py27-studio
 
 script:
