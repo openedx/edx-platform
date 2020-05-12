@@ -3302,6 +3302,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "email",
         "extended_profile",
         "gender",
+        "state",
         "goals",
         "is_active",
         "mailing_address",
