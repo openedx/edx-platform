@@ -254,7 +254,17 @@ def email_exists_or_retired(email):
     """
     Check an email against the User model for existence.
     """
-    return User.objects.filter(email=email).exists() or is_email_retired(email)
+    if settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS']:
+        # TODO: Refactor into `get_current_organization` helper.
+        current_site = get_current_site()
+        if current_site.id == settings.SITE_ID:
+            raise NotImplementedError('email_exists_or_retired expecting multi-tenant site')
+        # Using `get` is expected to fail when multiple-orgs found for a site
+        # TODO: Handle both MultipleObjectsReturned and DoesNotExist in a better way
+        current_org = current_site.organizations.get()
+        return current_org.userorganizationmapping_set.filter(user__email=email).exists() or is_email_retired(email)
+    else:
+        return User.objects.filter(email=email).exists() or is_email_retired(email)
 
 
 def get_retired_username_by_username(username):
