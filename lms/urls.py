@@ -814,12 +814,6 @@ if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATU
         url(r'^api/bulk_enroll/v1/', include('bulk_enroll.urls')),
     ]
 
-# Shopping cart
-urlpatterns += [
-    url(r'^shoppingcart/', include('shoppingcart.urls')),
-    url(r'^commerce/', include(('lms.djangoapps.commerce.urls', 'lms.djangoapps.commerce'), namespace='commerce')),
-]
-
 # Course goals
 urlpatterns += [
     url(r'^api/course_goals/', include(('lms.djangoapps.course_goals.urls', 'lms.djangoapps.course_goals'),
