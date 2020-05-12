@@ -12,10 +12,11 @@
         'common/js/components/utils/view_utils',
         'teams/js/views/team_utils',
         'text!teams/templates/team-profile.underscore',
-        'text!teams/templates/team-member.underscore'
+        'text!teams/templates/team-member.underscore',
+        'text!teams/templates/team-assignment.underscore'
     ],
         function(Backbone, _, gettext, HtmlUtils, TeamDiscussionView, ViewUtils, TeamUtils,
-                  teamTemplate, teamMemberTemplate) {
+                  teamTemplate, teamMemberTemplate, teamAssignmentTemplate) {
             var TeamProfileView = Backbone.View.extend({
 
                 errorMessage: gettext('An error occurred. Try again.'),
@@ -42,7 +43,8 @@
                         isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
                         isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
                         isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
-                        maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize);
+                        maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize),
+                        teamAssignments = this.context.teamAssignments;
 
                     var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 
@@ -67,10 +69,31 @@
                     });
                     this.discussionView.render();
 
+                    this.renderTeamAssignments(teamAssignments);
+
                     this.renderTeamMembers();
 
                     this.setFocusToHeaderFunc();
                     return this;
+                },
+
+                renderTeamAssignments: function(assignments) {
+                    var view = this;
+
+                    if (!assignments || !assignments.length) {
+                        view.$('#assignments').text(gettext('No assignments yet for team'));
+                        return;
+                    }
+
+                    _.each(assignments, function(assignment) {
+                        HtmlUtils.append(
+                            view.$('#assignments'),
+                            HtmlUtils.template(teamAssignmentTemplate)({
+                                displayName: assignment.displayName,
+                                linkLocation: assignment.linkLocation
+                            })
+                        );
+                    });
                 },
 
                 renderTeamMembers: function() {
