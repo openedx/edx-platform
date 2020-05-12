@@ -9,13 +9,13 @@ import opaque_keys.edx.django.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('courseware', '0007_remove_done_index'),
+        ('courseware', '0014_fix_nan_value_for_global_speed'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='studentmodule',
             name='module_state_key',
-            field=opaque_keys.edx.django.models.UsageKeyField(db_column=b'module_id', db_index=True, max_length=255),
+            field=opaque_keys.edx.django.models.UsageKeyField(db_column='module_id', db_index=True, max_length=255),
         ),
     ]
