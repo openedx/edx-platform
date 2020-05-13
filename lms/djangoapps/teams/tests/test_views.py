@@ -325,7 +325,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         cls.topics_count = 6
         cls.users = {
             'staff': AdminFactory.create(password=cls.test_password),
-            'course_staff': StaffFactory.create(course_key=cls.test_course_1.id, password=cls.test_password)
+            'course_staff': StaffFactory.create(course_key=cls.test_course_1.id, password=cls.test_password),
+            'admin': AdminFactory.create(password=cls.test_password)
         }
         cls.create_and_enroll_student(username='student_enrolled')
         cls.create_and_enroll_student(username='student_on_team_1_private_set_1', mode=CourseMode.MASTERS)
@@ -1293,28 +1294,54 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
         super(TestDeleteTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
-        (None, 401),
-        ('student_inactive', 401),
-        ('student_unenrolled', 403),
-        ('student_enrolled', 403),
         ('staff', 204),
         ('course_staff', 204),
-        ('community_ta', 204)
+        ('community_ta', 204),
+        ('admin', 204)
     )
     @ddt.unpack
     def test_access(self, user, status):
+        team_list = self.get_teams_list(user='course_staff', expected_status=200)
+        previous_count = team_list['count']
+        self.assertIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
         self.delete_team(self.solar_team.team_id, status, user=user)
-        if status == 204:
-            self.assert_event_emitted(
-                'edx.team.deleted',
-                team_id=self.solar_team.team_id,
-            )
-            self.assert_event_emitted(
-                'edx.team.learner_removed',
-                team_id=self.solar_team.team_id,
-                remove_method='team_deleted',
-                user_id=self.users['student_enrolled'].id
-            )
+
+        team_list = self.get_teams_list(user='course_staff', expected_status=200)
+        self.assertEqual(team_list['count'], previous_count - 1)
+        self.assertNotIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
+        self.assert_event_emitted(
+            'edx.team.deleted',
+            team_id=self.solar_team.team_id,
+        )
+        self.assert_event_emitted(
+            'edx.team.learner_removed',
+            team_id=self.solar_team.team_id,
+            remove_method='team_deleted',
+            user_id=self.users['student_enrolled'].id
+        )
+
+    @ddt.data(
+        ('student_unenrolled', 403),
+        ('student_enrolled', 403),
+    )
+    @ddt.unpack
+    def test_access_forbidden(self, user, status):
+        team_list = self.get_teams_list(user='course_staff', expected_status=200)
+        previous_count = team_list['count']
+        self.assertIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
+        self.delete_team(self.solar_team.team_id, status, user=user)
+
+        team_list = self.get_teams_list(user='course_staff', expected_status=200)
+        self.assertEqual(team_list['count'], previous_count)
+        self.assertIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
+
+    @ddt.data(
+        (None, 401),
+        ('student_inactive', 401),
+    )
+    @ddt.unpack
+    def test_access_unauthorized(self, user, status):
+        self.delete_team(self.solar_team.team_id, status, user=user)
 
     def test_does_not_exist(self):
         self.delete_team('nonexistent', 404)

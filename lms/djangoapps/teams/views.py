@@ -34,7 +34,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import has_discussion
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.core.lib.api.parsers import MergePatchParser
-from openedx.core.lib.api.permissions import IsStaffOrReadOnly
+from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
     ExpandableFieldViewMixin,
     RetrievePatchAPIView,
@@ -663,13 +663,14 @@ class IsEnrolledOrIsStaff(permissions.BasePermission):
 class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
     """
     Permission that checks to see if the user is global staff, course
-    staff, or has discussion privileges. If none of those conditions are
+    staff, course admin, or has discussion privileges. If none of those conditions are
     met, only read access will be granted.
     """
 
     def has_object_permission(self, request, view, obj):
         return (
             has_discussion_privileges(request.user, obj.course_id) or
+            IsCourseStaffInstructor.has_object_permission(self, request, view, obj) or
             super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj)
         )
 
