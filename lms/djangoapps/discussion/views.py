@@ -697,6 +697,8 @@ class DiscussionBoardFragmentView(EdxFragmentView):
     """
     Component implementation of the discussion board.
     """
+    _uses_pattern_library = False
+
     def render_to_fragment(
         self,
         request,
@@ -760,7 +762,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             log.warning('Forum is in maintenance mode')
             html = render_to_string('discussion/maintenance_fragment.html', {
                 'disable_courseware_js': True,
-                'uses_pattern_library': True,
+                'uses_bootstrap': True,
             })
             fragment = Fragment(html)
             self.add_fragment_resource_urls(fragment)
@@ -774,7 +776,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             )
             html = render_to_string('discussion/discussion_private_fragment.html', {
                 'disable_courseware_js': True,
-                'uses_pattern_library': True,
+                'uses_bootstrap': True,
             })
             fragment = Fragment(html)
             self.add_fragment_resource_urls(fragment)
