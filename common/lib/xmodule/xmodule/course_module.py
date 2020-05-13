@@ -539,7 +539,6 @@ class CourseFields(object):
             "Enter the heading that you want students to see above your course handouts on the Course Home page. "
             "Your course handouts appear in the right panel of the page."
         ),
-        deprecated=True,
         scope=Scope.settings, default=_('Course Handouts'))
     show_timezone = Boolean(
         help=_(

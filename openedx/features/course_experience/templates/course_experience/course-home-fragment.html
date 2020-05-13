@@ -163,7 +163,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
             % endif
             % if handouts_html:
                 <div class="section section-handouts">
-                    <h3 class="hd-6 section-title">${_("Course Handouts")}</h3>
+                    <h3 class="hd-6 section-title">${_(course.info_sidebar_name)}</h3>
                     ${HTML(handouts_html)}
                 </div>
             % endif
