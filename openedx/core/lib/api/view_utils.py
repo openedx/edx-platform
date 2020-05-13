@@ -148,17 +148,22 @@ def clean_errors(error):
         return {key: clean_errors(value) for key, value in error.items()}
 
 
-def add_serializer_errors(serializer, data, field_errors):
+def add_serializer_errors(serializer, data, field_errors, specify_user_message_for_fields=None):
     """Adds errors from serializer validation to field_errors. data is the original data to deserialize."""
     if not serializer.is_valid():
         errors = serializer.errors
         for key, error in iteritems(errors):
             error = clean_errors(error)
+            if specify_user_message_for_fields and key in specify_user_message_for_fields:
+                user_message = _(' '.join(error))
+            else:
+                user_message = _(u"This value is invalid.")
+
             field_errors[key] = {
                 'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=data.get(key, ''), field_name=key, error=error
                 ),
-                'user_message': _(u"This value is invalid."),
+                'user_message': user_message,
             }
     return field_errors
 

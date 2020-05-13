@@ -139,7 +139,7 @@ def update_account_settings(requesting_user, update, username=None):
     user_serializer = AccountUserSerializer(user, data=update)
     legacy_profile_serializer = AccountLegacyProfileSerializer(user_profile, data=update)
     for serializer in user_serializer, legacy_profile_serializer:
-        add_serializer_errors(serializer, update, field_errors)
+        add_serializer_errors(serializer, update, field_errors, specify_user_message_for_fields=['bio'])
 
     _validate_email_change(user, update, field_errors)
     _validate_secondary_email(user, update, field_errors)
