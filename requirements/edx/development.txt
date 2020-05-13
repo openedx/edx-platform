@@ -68,7 +68,7 @@ git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248e
 django-celery==3.3.1      # via -r requirements/edx/testing.txt
 django-classy-tags==1.0.0  # via -r requirements/edx/testing.txt, django-sekizai
 django-config-models==2.0.2  # via -r requirements/edx/testing.txt, edx-enterprise
-django-cookies-samesite==0.6.0  # via -r requirements/edx/testing.txt
+django-cookies-samesite==0.5.1  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-enterprise
 django-crum==0.7.6        # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring, edx-rbac, super-csv
@@ -266,7 +266,7 @@ radon==4.1.0              # via -r requirements/edx/testing.txt
 random2==1.0.1            # via -r requirements/edx/testing.txt
 recommender-xblock==1.4.8  # via -r requirements/edx/testing.txt
 redis==2.10.6             # via -r requirements/edx/testing.txt
-regex==2020.5.7           # via -r requirements/edx/testing.txt, nltk
+regex==2020.5.13          # via -r requirements/edx/testing.txt, nltk
 requests-oauthlib==1.3.0  # via -r requirements/edx/testing.txt, social-auth-core
 requests==2.23.0          # via -r requirements/edx/testing.txt, analytics-python, coreapi, django-oauth-toolkit, edx-analytics-data-api-client, edx-bulk-grades, edx-drf-extensions, edx-enterprise, edx-rest-api-client, geoip2, mailsnake, pyjwkest, python-swiftclient, requests-oauthlib, sailthru-client, slumber, social-auth-core, sphinx, transifex-client
 rest-condition==1.0.3     # via -r requirements/edx/testing.txt, edx-drf-extensions
