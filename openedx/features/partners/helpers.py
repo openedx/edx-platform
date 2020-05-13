@@ -1,3 +1,4 @@
+import operator
 import pytz
 
 from datetime import datetime
@@ -6,6 +7,7 @@ from logging import getLogger
 
 from course_action_state.models import CourseRerunState
 from custom_settings.models import CustomSettings
+from lms.djangoapps.onboarding.helpers import COUNTRIES
 from nodebb.tasks import task_join_group_on_nodebb
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.models.course_details import CourseDetails
@@ -13,7 +15,7 @@ from openedx.features.course_card.helpers import get_course_open_date, get_relat
 from openedx.features.course_card.models import CourseCard
 from student.models import CourseEnrollment
 
-from .constants import PERFORMANCE_PERM_FRMT
+from .constants import PERFORMANCE_PERM_FRMT, PARTNERS_TOP_REGISTRATION_COUNTRIES
 
 log = getLogger(__name__)
 
@@ -107,3 +109,13 @@ def get_partner_from_user(user):
 
 def user_has_performance_access(user, partner):
     return bool(partner and user.has_perm('partners.%s' % PERFORMANCE_PERM_FRMT.format(slug=partner.slug)))
+
+
+def get_partner_registration_countries(partner_slug):
+    sorted_countries = sorted(COUNTRIES.items(), key=operator.itemgetter(1))
+    top_registration_countries = PARTNERS_TOP_REGISTRATION_COUNTRIES.get(partner_slug, None)
+    if top_registration_countries:
+        top_countries = [(country[0], COUNTRIES.get(country[0], None)) for country in top_registration_countries]
+        return {'all_countries': sorted_countries, 'top_countries': top_countries}
+    else:
+        return {'all_countries': sorted_countries, 'top_countries': []}

@@ -114,8 +114,8 @@ class PartnerAccountCreationForm(forms.Form):
         registration_data.update(self.cleaned_data)
 
     def clean_country(self):
-        country = self.cleaned_data['country']
-        cleaned_country = next((code for code, label in COUNTRIES.items() if label.lower() == country.lower()), None)
+        country_code = self.cleaned_data['country']
+        cleaned_country = next((code for code in COUNTRIES.keys() if code == country_code), None)
         if cleaned_country:
             return cleaned_country
         raise ValidationError(_('Please select country.'))

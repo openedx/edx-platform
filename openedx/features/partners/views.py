@@ -3,7 +3,6 @@ from copy import deepcopy
 from datetime import datetime
 from logging import getLogger
 
-import analytics
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -14,29 +13,33 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import get_language
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
+from pytz import UTC
+
+import analytics
 from edxmako.shortcuts import render_to_response
 from eventtracking import tracker
-from notification_prefs.views import enable_notifications
-from pytz import UTC
-from rest_framework import status
-
-from openedx.core.djangoapps.user_api.views import RegistrationView
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, PartnerNetwork, UserExtendedProfile
-from nodebb.helpers import update_nodebb_for_user_status, set_user_activation_status_on_nodebb
+from nodebb.helpers import set_user_activation_status_on_nodebb, update_nodebb_for_user_status
+from notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.user_api.views import RegistrationView
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
-from openedx.features.partners.helpers import auto_join_partner_community, get_partner_recommended_courses
+from openedx.features.partners.helpers import (
+    auto_join_partner_community,
+    get_partner_recommended_courses,
+    get_partner_registration_countries
+)
 from openedx.features.partners.models import PartnerUser
 from openedx.features.student_account.helpers import save_user_utm_info
 from philu_overrides.user_api.views import LoginSessionViewCustom
+from rest_framework import status
 from student.models import Registration, UserProfile
 from student.views import password_change_request_handler
 
 from . import constants as partner_constants
-from .forms import PartnerAccountCreationForm
-from .forms import PartnerResetPasswordForm
+from .forms import PartnerAccountCreationForm, PartnerResetPasswordForm
 from .helpers import import_form_using_slug, user_has_performance_access
 from .models import Partner
 
@@ -47,8 +50,10 @@ AUDIT_LOG = getLogger('audit')
 def dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     courses = get_partner_recommended_courses(partner.slug, request.user)
+    registration_countries = get_partner_registration_countries(partner.slug)
     return render_to_response('features/partners/dashboard.html', {'recommended_courses': courses,
-                                                                   'slug': partner.slug, 'partner': partner})
+                                                                   'slug': partner.slug, 'partner': partner,
+                                                                   'registration_countries': registration_countries, })
 
 
 def performance_dashboard(request, slug):
@@ -359,4 +364,3 @@ class PartnerLoginSessionView(LoginSessionViewCustom):
                     user=user.username, partner=partner.slug, exp=str(ex))
                 )
         return response
-
