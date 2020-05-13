@@ -469,6 +469,11 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
             enrollment = schedule.enrollment
             course = schedule.enrollment.course
             user = enrollment.user
+            LOG.info(u'Received a schedule for user {} in course {} for date {}'.format(
+                user.username,
+                self.course_id,
+                target_date,
+            ))
 
             try:
                 week_highlights, week_num = get_next_section_highlights(user, course.id, target_date)
