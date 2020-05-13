@@ -18,7 +18,7 @@
     padding: 24px;
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
+    justify-content: space-between;
     max-width: $text-width-readability-max;
 
     .upgrade-banner-text {
@@ -26,6 +26,7 @@
       line-height: 24px;
       color: #414141;
       flex: 1 1 20em;
+      max-width: 70%;
     }
 
     .upgrade-button {
