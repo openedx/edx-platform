@@ -56,7 +56,7 @@ perms[CAN_LEARN_FROM_THIS_CONTENT_LIBRARY] = (
     # Regular users can learn if the library allows public learning:
     Attribute('allow_public_learning', True) |
     # Users/groups who are explicitly granted permission can learn from the library:
-    has_explicit_read_permission_for_library
+    (is_user_active & has_explicit_read_permission_for_library)
 )
 
 # Is the user allowed to create content libraries?
