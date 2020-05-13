@@ -22,22 +22,7 @@ class MarketplaceViewTests(TestCase):
         self.organization, _created = Organization.objects.get_or_create(label='Arbisoft')
         self.user.extended_profile.organization = self.organization
         self.user.extended_profile.save()
-
-    def test_get_marketplace_listing_page(self):
-        response = self.client.get(reverse('marketplace-listing'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_get_marketplace_make_request_page(self):
-        self.client.login(username=self.user.username, password='test')
-        response = self.client.get(reverse('marketplace-make-request'), follow=True)
-        self.assertEquals(response.status_code, 200)
-
-    def test_get_marketplace_details_page(self):
-        response = self.client.get(reverse('marketplace-details', kwargs=dict(pk=1)))
-        self.assertEqual(response.status_code, 200)
-
-    def test_marketplace_request_form(self):
-        payload = {
+        self.payload = {
             'organization': self.organization.id,
             'country': 'PK',
             'city': 'Lahore',
@@ -51,6 +36,23 @@ class MarketplaceViewTests(TestCase):
             'video_link': 'http://link-to-video.com',
             'user': self.user.id
         }
+
+    def test_get_marketplace_listing_page(self):
+        response = self.client.get(reverse('marketplace-listing'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_marketplace_make_request_page(self):
         self.client.login(username=self.user.username, password='test')
-        response = self.client.post(reverse('marketplace-make-request'), payload, follow=True)
+        response = self.client.get(reverse('marketplace-make-request'), follow=True)
+        self.assertEquals(response.status_code, 200)
+
+    def test_marketplace_request_form(self):
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.post(reverse('marketplace-make-request'), self.payload, follow=True)
         self.assertRedirects(response, reverse('marketplace-listing'))
+
+    def test_get_marketplace_details_page(self):
+        self.client.login(username=self.user.username, password='test')
+        self.client.post(reverse('marketplace-make-request'), self.payload, follow=True)
+        response = self.client.get(reverse('marketplace-details', kwargs=dict(pk=1)))
+        self.assertEqual(response.status_code, 200)

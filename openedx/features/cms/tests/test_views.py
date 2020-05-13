@@ -43,7 +43,10 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
          to login page
         """
         response = Client().get(path=self.rerun_path)
-        self.assertRedirects(response, '{}?next={}'.format(reverse('login'), self.rerun_path))
+        self.assertRedirects(
+            response,
+            '{sign_in}?next={next_url}'.format(sign_in=reverse('signin_user'), next_url=self.rerun_path)
+        )
 
     @mock.patch('openedx.features.cms.views.render_to_response')
     @mock.patch('openedx.features.cms.views.helpers.latest_course_reruns')

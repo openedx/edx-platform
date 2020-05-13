@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.shortcuts import get_object_or_404
-from edxmako.shortcuts import render_to_response
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 
-from .models import Idea
+from edxmako.shortcuts import render_to_response
+from lms.djangoapps.onboarding.helpers import COUNTRIES
 
+from .forms import IdeaCreationForm
 from .models import Idea
 
 
@@ -27,11 +33,26 @@ class IdeaListingView(ListView):
     template_engine = 'mako'
 
 
-class IdeaCreateView(View):
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class IdeaCreateView(LoginRequiredMixin, CreateView):
+    form_class = IdeaCreationForm
     template_name = 'features/idea/idea_form.html'
+    success_url = reverse_lazy('idea-listing')
 
-    def get(self, request, *args, **kwargs):
-        return render_to_response(self.template_name, {})
+    def get_initial(self, *args, **kwargs):
+        """Pre-fill form with initial data"""
+        initial = super(IdeaCreateView, self).get_initial(**kwargs)
+        user = self.request.user
+        user_organization = user.extended_profile.organization
+
+        if user_organization:
+            initial['organization_name'] = user_organization.label
+
+        initial['country_name'] = COUNTRIES.get(user.profile.country)
+        initial['city'] = user.profile.city
+        initial['user'] = user.profile.user
+
+        return initial
 
 
 class IdeaDetailView(View):

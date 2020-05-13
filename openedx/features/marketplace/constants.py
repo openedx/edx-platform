@@ -32,3 +32,5 @@ USER_SERVICES = (
     ('mentorship', _('Mentorship')),
     ('funding', _('Funding')),
 )
+
+PUBLISHED_DATE_FORMAT = '%B %d, %Y'

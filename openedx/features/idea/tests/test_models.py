@@ -2,6 +2,7 @@ from ddt import data, ddt, unpack
 from django.db import DataError, IntegrityError
 from django.test import TestCase
 
+from common.test.utils import MockS3Mixin
 from openedx.features.idea.constants import CITY_MAX_LENGTH, OVERVIEW_MAX_LENGTH, TITLE_MAX_LENGTH
 from openedx.features.idea.models import Idea
 
@@ -9,7 +10,7 @@ from .factories import IdeaFactory
 
 
 @ddt
-class IdeaModelTest(TestCase):
+class IdeaModelTest(MockS3Mixin, TestCase):
     """Test cases for Idea model"""
 
     def test_save_idea_model_with_mandatory_fields_successfully(self):

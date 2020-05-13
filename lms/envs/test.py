@@ -656,3 +656,7 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+FILE_UPLOAD_STORAGE_BUCKET_NAME = 'test_bucket'
+AWS_ACCESS_KEY_ID = 'test_access_Key'
+AWS_SECRET_ACCESS_KEY = 'test_secret_access_key'

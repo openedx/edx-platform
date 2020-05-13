@@ -1,12 +1,12 @@
 import factory
-from openedx.features.idea.tests.factories import OrganizationBaseFactory, LocationFactory
-from openedx.features.marketplace.models import MarketplaceRequest
 
 from lms.djangoapps.onboarding.tests.factories import UserFactory
+from openedx.features.idea.tests.factories import LocationFactory, OrganizationBaseFactory
+from openedx.features.marketplace.models import MarketplaceRequest
 
 
 class ChallengeFactory(OrganizationBaseFactory, LocationFactory):
-    """Factory for idea model. It contains fake data or sub-factories for all mandatory fields"""
+    """Factory for MarketplaceRequest model. It contains fake data or sub-factories for all mandatory fields"""
 
     class Meta:
         model = MarketplaceRequest
