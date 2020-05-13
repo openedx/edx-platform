@@ -69,6 +69,18 @@ if course is not None:
                 <ol class="tabs course-tabs">
                     <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
                     <%block name="extratabs" />
+                    <li class="tab links-dropdown">
+                        <div class="nav-item nav-item-dropdown" tabindex="-1">
+                            <div class="toggle-links-dropdown" role="button" aria-label=${_('Got a Question?')} aria-expanded="false" tabindex="0" aria-controls="links-menu">
+                                <span class="fa fa-globe" aria-hidden="true"></span> Got a Question? <span class="fa fa-caret-down" aria-hidden="true"></span>
+                            </div>
+                            <div class="dropdown-links-menu dropdown-user-menu hidden" aria-label=${_('Got a Question?')} role="menu" id="links-menu" tabindex="-1">
+                                <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="/courses/${course.id}/discussion/forum/" role="menuitem">${_("Lectures, homework, tools or materials for this course")}  <span class="fa fa-arrow-right" aria-hidden="true"></span></a></div>
+                                <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="https://support.edx.org/hc/en-us" role="menuitem">${_("edX verification, payment or other general topics")}  <span class="fa fa-arrow-right" aria-hidden="true"></span></a></div>
+                                <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="https://courses.edx.org/support/contact_us" role="menuitem">${_("Open a ticket with edX support")}  <span class="fa fa-arrow-right" aria-hidden="true"></span></a></div>
+                            </div>
+                        </div>
+                    </li>
                 </ol>
             </div>
         </nav>

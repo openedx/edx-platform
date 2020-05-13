@@ -75,6 +75,56 @@
   }
 }
 
+.links-dropdown {
+  float: right;
+}
+
+.toggle-user-dropdown {
+  padding: $baseline/2;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dropdown-links-menu {
+  border: 1px solid theme-color("secondary");
+  position: absolute;
+  background-color: theme-color("inverse");
+  color: theme-color("secondary");
+
+  @include right(30px);
+
+  top: 55px;
+  z-index: 10;
+
+  .dropdown-item {
+    cursor: pointer;
+    overflow: hidden;
+    padding: 0;
+
+    &:hover {
+      color: theme-color("dark");
+      background-color: theme-color("light");
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid theme-color("light");
+    }
+
+    a {
+      font-weight: $font-weight-base;
+      padding: $baseline/2 $baseline*0.75;
+      display: inline-block;
+      width: 100%;
+
+      &:focus {
+        outline: none;
+        color: theme-color("dark");
+        background-color: theme-color("light");
+      }
+    }
+  }
+}
+
 .header-global.slim {
   box-shadow: 0 1px 2px $shadow-l1;
   height: auto;
