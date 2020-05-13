@@ -30,5 +30,18 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
                     errorHandler(reason);
                 });
             };
+
+            this.setupOrgAutocomplete = function () {
+                $.getJSON('/organizations', function (data) {
+                    $.each(data, function (i, item) {
+                        $(selectors.org).append(
+                            $('<option>', {
+                                value: item,
+                                text: item,
+                            })
+                        );
+                    });
+                });
+            };
         };
     });

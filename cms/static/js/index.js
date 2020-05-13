@@ -154,6 +154,7 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
             $cancelButton.bind('click', makeCancelHandler('library'));
             CancelOnEscape($cancelButton);
 
+            CreateLibraryUtils.setupOrgAutocomplete();
             CreateLibraryUtils.configureHandlers();
         };
 
