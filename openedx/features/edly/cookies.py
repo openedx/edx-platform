@@ -57,7 +57,7 @@ def _get_edly_user_info_cookie_string(request):
         string
     """
     try:
-        edly_sub_organization = request.site.lms_site
+        edly_sub_organization = request.site.edly_sub_org_for_lms
         edly_user_info_cookie_data = {
             'edly-org': edly_sub_organization.edly_organization.slug,
             'edly-sub-org': edly_sub_organization.slug,
