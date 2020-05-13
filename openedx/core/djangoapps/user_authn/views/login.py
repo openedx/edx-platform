@@ -388,7 +388,7 @@ def login_user(request):
 
     set_custom_metric('login_user_course_id', request.POST.get('course_id'))
 
-    if not third_party_auth_requested:
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_ONLY_AUTH') and not third_party_auth_requested:
         return HttpResponseForbidden("First party login not supported")
     try:
         if third_party_auth_requested and not first_party_auth_requested:

@@ -441,6 +441,19 @@ FEATURES = {
     # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
 
+    # .. toggle_name: ENABLE_THIRD_PARTY_ONLY_AUTH
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to prevent using username/password login and registration and only allow authentication with third party auth
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2020-05-13
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: None
+    # .. toggle_status: supported
+    # .. toggle_warnings: Requires configuration of third party auth
+    'ENABLE_THIRD_PARTY_ONLY_AUTH': False,
+
     ### ORA Feature Flags ###
 
     # .. toggle_name: ENABLE_ORA_TEAM_SUBMISSIONS
