@@ -6,6 +6,7 @@ from datetime import datetime
 
 import ddt
 import mock
+from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 
 from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
@@ -35,6 +36,9 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
             emit_signals=True,
             modulestore=cls.store,
         )
+        cls.chapter = ItemFactory(parent=cls.course, category='chapter')
+        cls.sequence = ItemFactory(parent=cls.chapter, category='sequential', display_name='sequence')
+        cls.unit = ItemFactory.create(parent=cls.sequence, category='vertical', display_name="Vertical")
 
         cls.user = UserFactory(
             username='student',
@@ -114,9 +118,6 @@ class SequenceApiTestViews(BaseCoursewareTests):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        chapter = ItemFactory(parent=cls.course, category='chapter')
-        cls.sequence = ItemFactory(parent=chapter, category='sequential', display_name='sequence')
-        ItemFactory.create(parent=cls.sequence, category='vertical', display_name="Vertical")
         cls.url = '/api/courseware/sequence/{}'.format(cls.sequence.location)
 
     @classmethod
@@ -125,9 +126,33 @@ class SequenceApiTestViews(BaseCoursewareTests):
         super().tearDownClass()
 
     def test_sequence_metadata(self):
-        print(self.url)
-        print(self.course.location)
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.data['display_name'] == 'sequence'
         assert len(response.data['items']) == 1
+
+
+class ResumeApiTestViews(BaseCoursewareTests, CompletionWaffleTestMixin):
+    """
+    Tests for the resume API
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.url = '/api/courseware/resume/{}'.format(cls.course.id)
+
+    def test_resume_no_completion(self):
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['block_id'] is None
+        assert response.data['unit_id'] is None
+        assert response.data['section_id'] is None
+
+    def test_resume_with_completion(self):
+        self.override_waffle_switch(True)
+        submit_completions_for_testing(self.user, [self.unit.location])
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['block_id'] == str(self.unit.location)
+        assert response.data['unit_id'] == str(self.unit.location)
+        assert response.data['section_id'] == str(self.sequence.location)
