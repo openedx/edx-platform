@@ -8,6 +8,7 @@ from copy import deepcopy
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.urls import reverse
 from django_countries import countries
 from rest_framework import serializers
 
@@ -16,6 +17,7 @@ from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
 from openedx.core.lib.api.fields import ExpandableField
 from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
+from xmodule.modulestore.django import modulestore
 
 
 class CountryField(serializers.Field):
@@ -98,8 +100,23 @@ class CourseTeamSerializer(serializers.ModelSerializer):
         read_only_fields = ("course_id", "date_created", "discussion_topic_id", "last_activity_at", "team_assignments")
 
     def get_team_assignments(self, course_team):
-        return get_assignments_for_team(self.context, course_team)
+        """ Get info about team assignments for display in Team Assignments panel """
+        course_id = course_team.course_id
+        teamset_ora_blocks = get_assignments_for_team(course_team)
 
+        # Serialize info for display
+        return [{
+            'display_name': self._display_name_for_ora_block(block),
+            'location': self._jump_location_for_block(course_id, block.location)
+        } for block in teamset_ora_blocks]
+
+    def _display_name_for_ora_block(self, block):
+        """ Get the unit name where the ORA is located for better display naming """
+        return modulestore().get_item(block.parent).display_name
+
+    def _jump_location_for_block(self, course_id, location):
+        """ Get the URL for jumping to a designated XBlock in a course """
+        return reverse('jump_to', kwargs={'course_id': str(course_id), 'location': str(location)})
 
 class CourseTeamCreationSerializer(serializers.ModelSerializer):
     """Deserializes a CourseTeam for creation."""
