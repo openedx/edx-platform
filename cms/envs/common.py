@@ -546,12 +546,17 @@ MIDDLEWARE_CLASSES = [
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
 
+    'openedx.features.edly.middleware.EdlyOrganizationAccessMiddleware',
+
     # This must be last so that it runs first in the process_response chain
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
 
 # Edly Configuration
 ENABLE_EDLY_ORGANIZATIONS_SWITCH = 'enable_edly_organizations'
+EDLY_USER_INFO_COOKIE_NAME = 'edly-user-info'
+EDLY_COOKIE_SECRET_KEY = 'EDLY-COOKIE-SECRET-KEY'
+EDLY_JWT_ALGORITHM = 'HS256'
 
 # Clickjacking protection can be disabled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'

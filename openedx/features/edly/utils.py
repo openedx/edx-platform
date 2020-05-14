@@ -25,17 +25,22 @@ def user_has_edly_organization_access(request):
     Returns:
         bool: Returns True if User has Edly Organization Access Otherwise False.
     """
-    if not request.user.edly_profile:
+
+    if getattr(request.user, 'edly_profile', None) is None:
         return False
 
     current_site = request.site
-    edly_sub_org = EdlySubOrganization.objects.filter(
-        Q(lms_site=current_site) |
-        Q(studio_site=current_site)
-    ).first()
+
+    try:
+        edly_sub_org = EdlySubOrganization.objects.get(
+            Q(lms_site=current_site) |
+            Q(studio_site=current_site)
+        )
+    except EdlySubOrganization.DoesNotExist:
+        return False
 
     edly_user_info_cookie = request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, None)
-    if edly_sub_org and edly_sub_org.slug == get_edly_sub_org_from_cookie(edly_user_info_cookie):
+    if edly_sub_org.slug == get_edly_sub_org_from_cookie(edly_user_info_cookie):
         return True
 
     return False

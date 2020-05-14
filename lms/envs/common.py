@@ -1327,6 +1327,8 @@ MIDDLEWARE_CLASSES = [
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 
+    'openedx.features.edly.middleware.EdlyOrganizationAccessMiddleware',
+
     'edly_panel_app.middleware.EdlyUserActivityMiddleware',
 ]
 
