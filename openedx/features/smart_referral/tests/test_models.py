@@ -22,7 +22,7 @@ class SmartReferralModelTest(TestCase):
         referral_from_database = SmartReferral.objects.get(pk=referral.id)
 
         self.assertIsNotNone(referral_from_database)
-        self.assertEqual(referral.contact_email, referral.contact_email)
+        self.assertEqual(referral_from_database.contact_email, referral.contact_email)
         # test default value of is_contact_reg_completed
         self.assertFalse(referral_from_database.is_contact_reg_completed)
 
