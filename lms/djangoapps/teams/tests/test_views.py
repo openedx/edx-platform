@@ -966,6 +966,40 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             user='staff'
         )
 
+    def test_duplicates_and_nontopic_private_teamsets(self):
+        # create a team in a private teamset and add a user
+        unprotected_team_in_private_teamset = CourseTeamFactory.create(
+            name='unprotected_team_in_private_teamset',
+            description='unprotected_team_in_private_teamset',
+            course_id=self.test_course_1.id,
+            topic_id='private_topic_1_id',
+        )
+        unprotected_team_in_private_teamset.add_user(self.users['student_enrolled'])
+
+        # make some more users and put them in the solar team.
+        self.create_and_enroll_student(username='another_student')
+        self.create_and_enroll_student(username='yet_another_student')
+        self.solar_team.add_user(self.users['another_student'])
+        self.solar_team.add_user(self.users['yet_another_student'])
+
+        teams = self.get_teams_list(data={'topic_id': 'topic_0'}, user='student_enrolled')
+        team_names = [team['name'] for team in teams['results']]
+        team_names.sort()
+        self.assertEqual(team_names, [
+            self.solar_team.name,
+            self.solar_team.name,
+            self.solar_team.name,
+            unprotected_team_in_private_teamset.name,
+        ])
+
+        teams = self.get_teams_list(data={'topic_id': 'topic_0'}, user='staff')
+        team_names = [team['name'] for team in teams['results']]
+        team_names.sort()
+        self.assertEqual(team_names, [
+            self.solar_team.name,
+            self.masters_only_team.name,
+        ])
+
 
 @ddt.ddt
 class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
