@@ -47,7 +47,6 @@ from rest_framework.throttling import UserRateThrottle
 from six import text_type
 from web_fragments.fragment import Fragment
 
-import shoppingcart
 import survey.views
 from course_modes.models import CourseMode, get_course_prices
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
@@ -121,7 +120,6 @@ from openedx.features.course_experience.views.course_dates import CourseDatesFra
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from track import segment
 from util.cache import cache, cache_if_anonymous
@@ -927,21 +925,6 @@ def course_about(request, course_id):
             ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
         )
 
-        # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
-        in_cart = False
-        reg_then_add_to_cart_link = ""
-
-        _is_shopping_cart_enabled = is_shopping_cart_enabled()
-        if _is_shopping_cart_enabled:
-            if request.user.is_authenticated:
-                cart = shoppingcart.models.Order.get_cart_for_user(request.user)
-                in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
-                    shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
-
-            reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-                reg_url=reverse('register_user'), course_id=six.moves.urllib.parse.quote(str(course_id))
-            )
-
         # If the ecommerce checkout flow is enabled and the mode of the course is
         # professional or no id professional, we construct links for the enrollment
         # button to add the course to the ecommerce basket.
@@ -963,9 +946,6 @@ def course_about(request, course_id):
                 ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
 
         registration_price, course_price = get_course_prices(course)
-
-        # Determine which checkout workflow to use -- LMS shoppingcart or Otto basket
-        can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
@@ -1007,12 +987,10 @@ def course_about(request, course_id):
             'course_target': course_target,
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
-            'in_cart': in_cart,
             'ecommerce_checkout': ecommerce_checkout,
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
             'single_paid_mode': single_paid_mode,
-            'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
             'show_courseware_link': show_courseware_link,
             'is_course_full': is_course_full,
             'can_enroll': can_enroll,
@@ -1022,8 +1000,6 @@ def course_about(request, course_id):
             # We do not want to display the internal courseware header, which is used when the course is found in the
             # context. This value is therefor explicitly set to render the appropriate header.
             'disable_courseware_header': True,
-            'can_add_course_to_cart': can_add_course_to_cart,
-            'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
             'reviews_fragment_view': reviews_fragment_view,
@@ -1067,6 +1043,8 @@ def dates(request, course_id):
     Display the course's dates.html, or 404 if there is no such course.
     Assumes the course_id is in a valid format.
     """
+    from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
+
     course_key = CourseKey.from_string(course_id)
 
     # Enable NR tracing for this view based on course
@@ -1100,6 +1078,10 @@ def dates(request, course_id):
     user_timezone = user_timezone_locale['user_timezone']
     user_language = user_timezone_locale['user_language']
 
+    display_reset_dates_text = False
+    if RELATIVE_DATES_FLAG.is_enabled(course.id):
+        display_reset_dates_text = reset_deadlines_banner_should_display(course_key, request)
+
     context = {
         'course': course,
         'course_date_blocks': course_date_blocks,
@@ -1110,6 +1092,10 @@ def dates(request, course_id):
         'supports_preview_menu': True,
         'can_masquerade': can_masquerade,
         'masquerade': masquerade,
+        'display_reset_dates_text': display_reset_dates_text,
+        'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+        'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
+        'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
     }
 
     return render_to_response('courseware/dates.html', context)
