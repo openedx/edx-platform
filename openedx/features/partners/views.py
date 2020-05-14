@@ -26,13 +26,9 @@ from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.views import RegistrationView
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER, record_registration_attributions
-from openedx.features.partners.helpers import (
-    auto_join_partner_community,
-    get_partner_recommended_courses,
-    get_partner_registration_countries
-)
+from openedx.features.partners.helpers import auto_join_partner_community, get_partner_recommended_courses
 from openedx.features.partners.models import PartnerUser
-from openedx.features.student_account.helpers import save_user_utm_info
+from openedx.features.student_account.helpers import save_user_utm_info, get_registration_countries
 from philu_overrides.user_api.views import LoginSessionViewCustom
 from rest_framework import status
 from student.models import Registration, UserProfile
@@ -50,7 +46,7 @@ AUDIT_LOG = getLogger('audit')
 def dashboard(request, slug):
     partner = get_object_or_404(Partner, slug=slug)
     courses = get_partner_recommended_courses(partner.slug, request.user)
-    registration_countries = get_partner_registration_countries(partner.slug)
+    registration_countries = get_registration_countries()
     return render_to_response('features/partners/dashboard.html', {'recommended_courses': courses,
                                                                    'slug': partner.slug, 'partner': partner,
                                                                    'registration_countries': registration_countries, })

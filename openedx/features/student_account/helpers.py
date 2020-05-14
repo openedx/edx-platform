@@ -1,4 +1,5 @@
 import logging
+import operator
 
 from datetime import datetime
 from pytz import utc
@@ -7,7 +8,7 @@ import third_party_auth
 
 from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
 
-from constants import NON_ACTIVE_COURSE_NOTIFICATION
+from constants import NON_ACTIVE_COURSE_NOTIFICATION, TOP_REGISTRATION_COUNTRIES
 from student.models import CourseEnrollment
 from courseware.models import StudentModule
 
@@ -16,6 +17,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
 from openedx.core.lib.request_utils import safe_get_host
 
+from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
 from lms.djangoapps.philu_overrides.constants import ACTIVATION_ALERT_TYPE
 
@@ -163,3 +165,13 @@ def check_and_add_third_party_params(request, params):
             params['provider'] = running_pipeline.get('backend')
 
         params['access_token'] = running_pipeline['kwargs']['response']['access_token']
+
+
+def get_registration_countries():
+    countries_dict = {'all_countries': sorted(COUNTRIES.items(), key=operator.itemgetter(1)),
+                      'top_countries': []}
+    if TOP_REGISTRATION_COUNTRIES:
+        countries_dict.update({'top_countries': TOP_REGISTRATION_COUNTRIES})
+        return countries_dict
+    else:
+        return countries_dict

@@ -51,13 +51,3 @@ PERFORMANCE_PERM_FRMT = 'can_access_{slug}_performance'
 
 PARTNER_USER_STATUS_WAITING = 'waiting'
 PARTNER_USER_STATUS_APPROVED = 'approved'
-
-PARTNERS_TOP_REGISTRATION_COUNTRIES = {
-    'give2asia': (
-        ('NG', 'Nigeria'),
-        ('IN', 'India'),
-        ('PK', 'Pakistan'),
-        ('KE', 'Kenya'),
-        ('GH', 'Ghana'),
-    )
-}
