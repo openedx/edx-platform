@@ -23,6 +23,7 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.utils import can_show_verified_upgrade
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -86,6 +87,12 @@ class CoursewareMeta:
             user=self.effective_user,
             course_key=self.course_key,
         )
+
+    @property
+    def can_show_upgrade_sock(self):
+        enrollment = CourseEnrollment.get_enrollment(self.effective_user, self.course_key)
+        can_show = can_show_verified_upgrade(self.effective_user, enrollment)
+        return can_show
 
     @property
     def can_load_courseware(self):
