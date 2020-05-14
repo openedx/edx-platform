@@ -6,7 +6,7 @@ from openedx.features.smart_referral.models import SmartReferral
 
 class SmartReferralFactory(factory.django.DjangoModelFactory):
     """
-    Factory for SmartReferral model. It contains fake data or sub-factories for mandatory fields
+    Factory for SmartReferral model. It contains fake data and sub-factory for mandatory fields
     """
 
     class Meta:
