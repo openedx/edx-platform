@@ -118,8 +118,7 @@ class PartnerAccountCreationForm(forms.Form):
         if country_code in COUNTRIES.keys():
             return country_code
         else:
-            raise ValidationError(_('The given country is invalid.'))
-        raise ValidationError(_('Please select country.'))
+            raise ValidationError(_('The given country is invalid.') if country_code else _('Please select country.'))
 
     username = UsernameField()
     password = forms.CharField()
