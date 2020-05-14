@@ -3118,6 +3118,18 @@ class TestXBlockPublishingInfo(ItemTest):
         xblock_info = self._get_xblock_info(empty_chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.unscheduled)
 
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_chapter_self_paced_default_start_date(self, store_type):
+        course = CourseFactory.create(default_store=store_type)
+        course.self_paced = True
+        self.store.update_item(course, self.user.id)
+        chapter = self._create_child(course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._set_release_date(chapter.location, DEFAULT_START_DATE)
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)
+
     def test_empty_sequential(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         self._create_child(chapter, 'sequential', "Empty Sequential")

@@ -1428,10 +1428,10 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_cours
             return VisibilityState.live if is_live else VisibilityState.needs_attention
         else:
             return VisibilityState.ready if not is_unscheduled else VisibilityState.needs_attention
-    if is_unscheduled:
-        return VisibilityState.unscheduled
-    elif is_live:
+    if is_live:
         return VisibilityState.live
+    elif is_unscheduled:
+        return VisibilityState.unscheduled
     else:
         return VisibilityState.ready
 
