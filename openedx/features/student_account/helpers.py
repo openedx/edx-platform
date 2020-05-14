@@ -168,6 +168,7 @@ def check_and_add_third_party_params(request, params):
 
 
 def get_registration_countries():
-    return {'all_countries': sorted(COUNTRIES.items(), key=operator.itemgetter(1)),
-            'top_countries': TOP_REGISTRATION_COUNTRIES or []
-            }
+    return {
+        'all_countries': sorted(COUNTRIES.items(), key=operator.itemgetter(1)),
+        'top_countries': TOP_REGISTRATION_COUNTRIES or []
+    }

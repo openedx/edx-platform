@@ -48,9 +48,11 @@ def dashboard(request, slug):
     courses = get_partner_recommended_courses(partner.slug, request.user)
     registration_countries = get_registration_countries()
 
-    context = {'recommended_courses': courses,
-               'slug': partner.slug, 'partner': partner,
-               'registration_countries': registration_countries, }
+    context = {
+        'recommended_courses': courses,
+        'slug': partner.slug, 'partner': partner,
+        'registration_countries': registration_countries,
+    }
 
     return render_to_response('features/partners/dashboard.html', context)
 
