@@ -44,7 +44,7 @@
                         isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
                         isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
                         maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize),
-                        teamAssignments = this.context.teamAssignments;
+                        teamAssignments = this.model.get('team_assignments');
 
                     var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 
@@ -89,8 +89,8 @@
                         HtmlUtils.append(
                             view.$('#assignments'),
                             HtmlUtils.template(teamAssignmentTemplate)({
-                                displayName: assignment.displayName,
-                                linkLocation: assignment.linkLocation
+                                displayName: assignment.display_name,
+                                linkLocation: assignment.location
                             })
                         );
                     });

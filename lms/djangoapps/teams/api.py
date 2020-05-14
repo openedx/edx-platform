@@ -7,10 +7,13 @@ import logging
 from enum import Enum
 
 from django.db.models import Count
+from django.urls import reverse
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
+import lms.djangoapps.course_blocks.api as course_blocks_api
+from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
@@ -365,3 +368,32 @@ def anonymous_user_ids_for_team(user, team):
         anonymous_id_for_user(user=team_member, course_id=team.course_id, save=False)
         for team_member in team.users.all()
     ])
+
+
+def get_assignments_for_team(context, course_team):
+    """ Get serialized info needed for displaying team assignments """
+    user = context["request"].user
+    course_id = course_team.course_id
+
+    ora_blocks = get_open_response_assessments_for_course(user, course_id)
+
+    # TODO - filter by team
+
+    # Serialize info needed
+    return [{'display_name': block.display_name, 'location': _jump_location_for_block(course_id, block.location)} for block in ora_blocks]
+
+
+def get_open_response_assessments_for_course(user, course_id):
+    """ For a given user and course, return open response assessments (ORAs) """
+    # Get block structure
+    block_structure = get_course_in_cache(course_id)
+    usage_key = block_structure.root_block_usage_key
+    blocks = course_blocks_api.get_course_blocks(user, usage_key, collected_block_structure=block_structure)
+
+    # filter to only openassessment
+    return [block for block in blocks.itervalues() if block.category == 'openassessment']
+
+
+def _jump_location_for_block(course_id, location):
+    """ Get the URL for jumping to a designated XBlock in a course """
+    return reverse('jump_to', kwargs={'course_id': str(course_id), 'location': str(location)})

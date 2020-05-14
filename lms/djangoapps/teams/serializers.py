@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django_countries import countries
 from rest_framework import serializers
 
-from lms.djangoapps.teams.api import add_team_count, get_team_count_query_set
+from lms.djangoapps.teams.api import add_team_count, get_team_count_query_set, get_assignments_for_team
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
 from openedx.core.lib.api.fields import ExpandableField
@@ -76,6 +76,7 @@ class CourseTeamSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='team_id', read_only=True)  # pylint: disable=invalid-name
     membership = UserMembershipSerializer(many=True, read_only=True)
     country = CountryField()
+    team_assignments = serializers.SerializerMethodField()
 
     class Meta(object):
         model = CourseTeam
@@ -92,8 +93,12 @@ class CourseTeamSerializer(serializers.ModelSerializer):
             "last_activity_at",
             "membership",
             "organization_protected",
+            "team_assignments"
         )
-        read_only_fields = ("course_id", "date_created", "discussion_topic_id", "last_activity_at")
+        read_only_fields = ("course_id", "date_created", "discussion_topic_id", "last_activity_at", "team_assignments")
+
+    def get_team_assignments(self, course_team):
+        return get_assignments_for_team(self.context, course_team)
 
 
 class CourseTeamCreationSerializer(serializers.ModelSerializer):
