@@ -977,19 +977,21 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         unprotected_team_in_private_teamset.add_user(self.users['student_enrolled'])
 
         # make some more users and put them in the solar team.
-        self.create_and_enroll_student(username='another_student')
-        self.create_and_enroll_student(username='yet_another_student')
-        self.solar_team.add_user(self.users['another_student'])
-        self.solar_team.add_user(self.users['yet_another_student'])
+        another_student_username = 'another_student'
+        yet_another_student_username = 'yet_another_student'
+        self.create_and_enroll_student(username=another_student_username)
+        self.create_and_enroll_student(username=yet_another_student_username)
+        self.solar_team.add_user(self.users[another_student_username])
+        self.solar_team.add_user(self.users[yet_another_student_username])
 
-        teams = self.get_teams_list(data={'topic_id': 'topic_0'}, user='student_enrolled')
+        teams = self.get_teams_list(data={'topic_id': self.solar_team.topic_id}, user='student_enrolled')
         team_names = [team['name'] for team in teams['results']]
         team_names.sort()
         self.assertEqual(team_names, [
             self.solar_team.name,
         ])
 
-        teams = self.get_teams_list(data={'topic_id': 'topic_0'}, user='staff')
+        teams = self.get_teams_list(data={'topic_id': self.solar_team.topic_id}, user='staff')
         team_names = [team['name'] for team in teams['results']]
         team_names.sort()
         self.assertEqual(team_names, [
