@@ -101,8 +101,9 @@ class CourseTeamSerializer(serializers.ModelSerializer):
 
     def get_team_assignments(self, course_team):
         """ Get info about team assignments for display in Team Assignments panel """
+        user = self.context['request'].user
         course_id = course_team.course_id
-        teamset_ora_blocks = get_assignments_for_team(course_team)
+        teamset_ora_blocks = get_assignments_for_team(user, course_team)
 
         # Serialize info for display
         return [{

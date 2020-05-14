@@ -369,14 +369,22 @@ def anonymous_user_ids_for_team(user, team):
     ])
 
 
-def get_assignments_for_team(course_team):
+def get_assignments_for_team(user, team):
     """ Get openassessment XBlocks configured for the current teamset """
-    course_id = course_team.course_id
+    # Confirm access
+    if not has_specific_team_access(user, team):
+        raise Exception("User {user} is not permitted to access team info for {team}".format(
+            user=user.username,
+            team=team.team_id
+        ))
+
+    # Get openassessment blocks for the course
+    course_id = team.course_id
     ora_blocks = modulestore().get_items(course_id, qualifiers={'category': 'openassessment'})
 
     # Limit to team-enabled ORAs for the matching teamset
     return [
         block for block in ora_blocks
         if block.teams_enabled
-        and block.selected_teamset_id == course_team.topic_id
+        and block.selected_teamset_id == team.topic_id
     ]
