@@ -68,7 +68,7 @@ git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248e
 django-celery==3.3.1      # via -r requirements/edx/testing.txt
 django-classy-tags==1.0.0  # via -r requirements/edx/testing.txt, django-sekizai
 django-config-models==2.0.2  # via -r requirements/edx/testing.txt, edx-enterprise
-django-cookies-samesite==0.5.1  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
+django-cookies-samesite==0.6.1  # via -r requirements/edx/testing.txt
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-enterprise
 django-crum==0.7.6        # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring, edx-rbac, super-csv
@@ -311,6 +311,7 @@ tox==3.15.0               # via -r requirements/edx/testing.txt, tox-battery
 tqdm==4.46.0              # via -r requirements/edx/testing.txt, nltk
 transifex-client==0.13.4  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 typed-ast==1.4.1          # via -r requirements/edx/testing.txt, astroid
+ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
 unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest-plugin
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
