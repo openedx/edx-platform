@@ -43,7 +43,12 @@ def spaced_out_sections(course):
         relative time (timedelta): the amount of weeks to complete the section, since start of course
     """
     duration = get_expected_duration(course)
-    sections = course.get_children()
+    sections = [
+        section
+        for section
+        in course.get_children()
+        if not section.visible_to_staff_only
+    ]
     weeks_per_section = duration / len(sections)
     for idx, section in enumerate(sections):
         yield idx, section, weeks_per_section * (idx + 1)
