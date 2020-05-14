@@ -987,9 +987,6 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         team_names.sort()
         self.assertEqual(team_names, [
             self.solar_team.name,
-            self.solar_team.name,
-            self.solar_team.name,
-            unprotected_team_in_private_teamset.name,
         ])
 
         teams = self.get_teams_list(data={'topic_id': 'topic_0'}, user='staff')
