@@ -865,7 +865,7 @@ ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
 )
 
 # List of enterprise customer uuids to exclude from transition to use of enterprise-catalog
-ENV_TOKENS.get('ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG', ())
+ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG = ENV_TOKENS.get('ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG', ())
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
