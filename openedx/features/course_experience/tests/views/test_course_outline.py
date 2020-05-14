@@ -7,6 +7,7 @@ import datetime
 import json
 import re
 
+import ddt
 import six
 from completion import waffle
 from completion.models import BlockCompletion
@@ -23,6 +24,7 @@ from six import text_type
 from waffle.models import Switch
 from waffle.testutils import override_switch
 
+from course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.urls import RESET_COURSE_DEADLINES_NAME
 from gating import api as lms_gating_api
@@ -30,6 +32,7 @@ from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesA
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.lib.gating import api as gating_api
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.course_experience.views.course_outline import (
     DEFAULT_COMPLETION_TRACKING_START,
     CourseOutlineFragmentView
@@ -46,6 +49,7 @@ TEST_PASSWORD = 'test'
 GATING_NAMESPACE_QUALIFIER = '.gating'
 
 
+@ddt.ddt
 class TestCourseOutlinePage(SharedModuleStoreTestCase):
     """
     Test the course outline view.
@@ -163,6 +167,35 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         self.assertRegex(content, sequential.display_name + r'\s*</h4>')
         self.assertRegex(content, sequential2.display_name + r'\s*\(1 Question\)\s*</h4>')
         self.assertRegex(content, sequential3.display_name + r'\s*\(2 Questions\)\s*</h4>')
+
+    @RELATIVE_DATES_FLAG.override(active=True)
+    @ddt.data(
+        (CourseMode.AUDIT, False, True),
+        (CourseMode.VERIFIED, False, True),
+        (CourseMode.MASTERS, False, False),
+        (CourseMode.VERIFIED, True, False),
+    )
+    @ddt.unpack
+    def test_reset_course_deadlines_banner_shows_for_self_paced_course(
+        self,
+        enrollment_mode,
+        is_course_staff,
+        should_display
+    ):
+        course = self.courses[0]
+        enrollment = CourseEnrollment.objects.get(course_id=course.id)
+        enrollment.mode = enrollment_mode
+        enrollment.save()
+        self.user.is_staff = is_course_staff
+        self.user.save()
+
+        url = course_home_url(course)
+        response = self.client.get(url)
+
+        if should_display:
+            self.assertContains(response, '<div class="dates-banner-text"')
+        else:
+            self.assertNotContains(response, '<div class="dates-banner-text"')
 
     def test_reset_course_deadlines(self):
         course = self.courses[0]

@@ -319,6 +319,10 @@
 
 // Course outline for visual progress waffle switch
 .course-outline {
+  .dates-banner-wrapper {
+    display: none;
+  }
+
   .block-tree {
     margin: 0;
     padding: 0;

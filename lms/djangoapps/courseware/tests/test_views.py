@@ -2531,40 +2531,6 @@ class TestIndexView(ModuleStoreTestCase):
                 expected_should_show_enroll_button
             )
 
-    @RELATIVE_DATES_FLAG.override(active=True)
-    @ddt.data(True, False)
-    def test_reset_deadlines_banner_is_present_when_viewing_courseware(self, graded_section):
-        user = UserFactory()
-        course = CourseFactory.create(self_paced=True)
-        with self.store.bulk_operations(course.id):
-            chapter = ItemFactory.create(parent=course, category='chapter')
-            section = ItemFactory.create(
-                parent=chapter, category='sequential',
-                display_name="Sequence",
-                due=datetime.today() - timedelta(1),
-                graded=graded_section,
-            )
-
-        CourseOverview.load_from_module_store(course.id)
-        CourseEnrollmentFactory(user=user, course_id=course.id, mode=CourseMode.VERIFIED)
-        self.client.login(username=user.username, password='test')
-        response = self.client.get(
-            reverse(
-                'courseware_section',
-                kwargs={
-                    'course_id': six.text_type(course.id),
-                    'chapter': chapter.url_name,
-                    'section': section.url_name,
-                }
-            ) + '?activate_block_id=test_block_id'
-        )
-
-        banner = '<div class="reset-deadlines-banner">'
-        if graded_section:
-            self.assertContains(response, banner)
-        else:
-            self.assertNotContains(response, banner)
-
 
 @ddt.ddt
 class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin):
@@ -3114,7 +3080,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
         super(DatesTabTestCase, self).setUp()
 
         now = datetime.now(utc)
-        self.course = CourseFactory.create(start=now + timedelta(days=-1))
+        self.course = CourseFactory.create(start=now + timedelta(days=-1), self_paced=True)
         self.course.end = now + timedelta(days=3)
 
         CourseModeFactory(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
@@ -3188,6 +3154,23 @@ class DatesTabTestCase(ModuleStoreTestCase):
             self.assertNotContains(response, '<div class="pill due-next">')
             # Should have verified pills for audit enrollments
             self.assertContains(response, '<div class="pill verified">')
+
+    @RELATIVE_DATES_FLAG.override(active=True)
+    def test_reset_deadlines_banner_displays(self):
+        CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
+        now = datetime.now(utc)
+        with self.store.bulk_operations(self.course.id):
+            section = ItemFactory.create(category='chapter', parent_location=self.course.location)
+            ItemFactory.create(
+                category='sequential',
+                display_name='Released',
+                parent_location=section.location,
+                start=now - timedelta(days=1),
+                due=now - timedelta(days=1),  # Setting this to tomorrow so it'll show the 'Due Next' pill
+                graded=True,
+            )
+        response = self._get_response(self.course)
+        self.assertContains(response, 'div class="dates-banner-text"')
 
 
 class TestShowCoursewareMFE(TestCase):

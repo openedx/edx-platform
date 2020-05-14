@@ -15,7 +15,7 @@ from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course
 from lms.djangoapps.courseware.date_summary import TodaysDate, verified_upgrade_deadline_link
 from lms.djangoapps.course_home_api.dates.v1.serializers import DatesTabSerializer
 from openedx.core.djangoapps.enrollments.api import get_enrollment
-from openedx.features.course_experience.utils import reset_deadlines_banner_should_display
+from openedx.features.course_experience.utils import dates_banner_should_display
 
 
 class DatesTabView(RetrieveAPIView):
@@ -65,7 +65,7 @@ class DatesTabView(RetrieveAPIView):
         course_key = CourseKey.from_string(course_key_string)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         blocks = get_course_date_blocks(course, request.user, request, include_access=True, include_past_dates=True)
-        display_reset_dates_text = reset_deadlines_banner_should_display(course_key, request)
+        display_reset_dates_text, _ = dates_banner_should_display(course_key, request)
 
         learner_is_verified = False
         enrollment = get_enrollment(request.user.username, course_key_string)

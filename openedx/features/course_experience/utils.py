@@ -13,10 +13,12 @@ from six.moves import range
 
 from course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.api import get_blocks
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
@@ -253,38 +255,43 @@ def get_resume_block(block):
     return block
 
 
-def reset_deadlines_banner_should_display(course_key, request):
+def dates_banner_should_display(course_key, request):
     """
     Return whether or not the reset banner should display,
     determined by whether or not a course has any past-due,
-    incomplete sequentials
+    incomplete sequentials and which enrollment mode is being
+    dealt with for the current user and course.
     """
-    display_reset_dates_banner = False
-    course_overview = CourseOverview.objects.get(id=str(course_key))
-    course_end_date = getattr(course_overview, 'end_date', None)
-    is_self_paced = getattr(course_overview, 'self_paced', False)
-    is_course_staff = bool(
-        request.user and course_overview and has_access(request.user, 'staff', course_overview, course_overview.id)
-    )
-    if is_self_paced and (not is_course_staff) and (not course_end_date or timezone.now() < course_end_date):
-        if CourseEnrollment.objects.filter(
-            course=course_overview, user=request.user,
-        ).filter(
-            Q(mode=CourseMode.AUDIT) | Q(mode=CourseMode.VERIFIED)
-        ).exists():
-            course_block_tree = get_course_outline_block_tree(
-                request, str(course_key), request.user
-            )
-            course_sections = course_block_tree.get('children', [])
-            for section in course_sections:
-                if display_reset_dates_banner:
-                    break
-                for subsection in section.get('children', []):
-                    if (
-                        not subsection.get('complete', True)
-                        and subsection.get('graded', False)
-                        and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()
-                    ):
-                        display_reset_dates_banner = True
+    missed_deadlines = False
+    course_enrollment = None
+    if RELATIVE_DATES_FLAG.is_enabled(str(course_key)):
+        course_overview = CourseOverview.objects.get(id=str(course_key))
+        course_end_date = getattr(course_overview, 'end_date', None)
+        is_self_paced = getattr(course_overview, 'self_paced', False)
+        is_course_staff = bool(
+            request.user and course_overview and has_access(request.user, 'staff', course_overview, course_overview.id)
+        )
+        if is_self_paced and (not is_course_staff) and (not course_end_date or timezone.now() < course_end_date):
+            course_enrollment = CourseEnrollment.objects.filter(
+                course=course_overview, user=request.user,
+            ).filter(
+                Q(mode=CourseMode.AUDIT) | Q(mode=CourseMode.VERIFIED)
+            ).first()
+            if course_enrollment:
+                store = modulestore()
+                course_usage_key = store.make_course_usage_key(course_key)
+                block_data = get_course_blocks(request.user, course_usage_key, include_completion=True)
+                for section_key in block_data.get_children(course_usage_key):
+                    if missed_deadlines:
                         break
-    return display_reset_dates_banner
+                    for subsection_key in block_data.get_children(section_key):
+                        if (
+                            not block_data.get_xblock_field(subsection_key, 'complete', False)
+                            and block_data.get_xblock_field(subsection_key, 'graded', False)
+                            and block_data.get_xblock_field(
+                                subsection_key, 'due', timezone.now() + timedelta(1)) < timezone.now()
+                        ):
+                            missed_deadlines = True
+                            break
+
+    return missed_deadlines, getattr(course_enrollment, 'mode', None)
