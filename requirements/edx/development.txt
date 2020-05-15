@@ -115,7 +115,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/testing.txt
 edx-django-utils==3.2.2   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.0.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.2.12    # via -r requirements/edx/testing.txt
+edx-enterprise==3.2.13    # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
@@ -167,7 +167,7 @@ itypes==1.2.0             # via -r requirements/edx/testing.txt, coreapi
 jinja2-pluralize==0.3.0   # via -r requirements/edx/testing.txt, diff-cover
 jinja2==2.11.2            # via -r requirements/edx/testing.txt, code-annotations, coreschema, diff-cover, jinja2-pluralize, sphinx
 jmespath==0.10.0          # via -r requirements/edx/testing.txt, boto3, botocore
-joblib==0.14.1            # via -r requirements/edx/testing.txt, nltk
+joblib==0.14.1            # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, nltk
 jsondiff==1.2.0           # via -r requirements/edx/testing.txt, edx-enterprise
 jsonfield2==3.0.3         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-celeryutils, edx-enterprise, edx-proctoring, edx-submissions, ora2
 jsonschema==3.2.0         # via sphinxcontrib-openapi

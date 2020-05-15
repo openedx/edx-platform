@@ -13,7 +13,7 @@ click==7.1.2              # via -r requirements/edx-sandbox/shared.txt, nltk
 cryptography==2.9.2       # via -r requirements/edx-sandbox/shared.txt
 cycler==0.10.0            # via matplotlib
 decorator==4.4.2          # via networkx
-joblib==0.14.1            # via -r requirements/edx-sandbox/shared.txt, nltk
+joblib==0.14.1            # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt, nltk
 kiwisolver==1.1.0         # via -c requirements/edx-sandbox/../constraints.txt, matplotlib
 lxml==4.5.0               # via -r requirements/edx-sandbox/shared.txt
 markupsafe==1.1.1         # via chem
