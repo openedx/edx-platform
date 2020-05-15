@@ -16,6 +16,10 @@ $proctoring-banner-text-size: 14px;
     @extend %inner-wrapper;
 
     width: auto;
+
+    a.btn {
+      margin: 5px 0 5px 5px;
+    }
   }
 
   .preview-actions {
