@@ -51,6 +51,7 @@ from .api import (
     add_team_count,
     can_user_modify_team,
     can_user_create_team_in_topic,
+    get_assignments_for_team,
     has_course_staff_privileges,
     has_specific_team_access,
     has_specific_teamset_access,
@@ -198,6 +199,7 @@ class TeamsDashboardView(GenericAPIView):
             ),
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
+            "teams_assignments_url": reverse('teams_assignments', args=['team_id']),
             "teams_detail_url": reverse('teams_detail', args=['team_id']),
             "team_memberships_url": reverse('team_membership_list', request=request),
             "my_teams_url": reverse('teams_list', request=request),
@@ -819,6 +821,42 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
                 'user_id': member.user_id
             })
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TeamsAssignmentsView(GenericAPIView):
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsEnrolledOrIsStaff,
+        HasSpecificTeamAccess,
+        IsStaffOrPrivilegedOrReadOnly,
+    )
+
+    def get(self, request, team_id):
+        """GET v0/teams/{team_id_pattern}/assignments"""
+        course_team = CourseTeam.objects.get(team_id=team_id)
+        assignments = self.get_team_assignments(request, course_team)
+        return Response(assignments)
+
+    def get_team_assignments(self, request, course_team):
+        """ Get info about team assignments for display in Team Assignments panel """
+        user = request.user
+        course_id = course_team.course_id
+        teamset_ora_blocks = get_assignments_for_team(user, course_team)
+
+        # Serialize info for display
+        return [{
+            'display_name': self._display_name_for_ora_block(block),
+            'location': self._jump_location_for_block(course_id, block.location)
+        } for block in teamset_ora_blocks]
+
+    def _display_name_for_ora_block(self, block):
+        """ Get the unit name where the ORA is located for better display naming """
+        return modulestore().get_item(block.parent).display_name
+
+    def _jump_location_for_block(self, course_id, location):
+        """ Get the URL for jumping to a designated XBlock in a course """
+        return reverse('jump_to', kwargs={'course_id': str(course_id), 'location': str(location)})
 
 
 class TopicListView(GenericAPIView):
