@@ -48,7 +48,7 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):
         self.create_schedule()
         original_start = self.schedule.start_date
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(3):
             reset_self_paced_schedule(self.user, self.course.id, use_availability_date=False)
 
         self.schedule.refresh_from_db()
@@ -63,7 +63,7 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):
         self.create_schedule(offset=offset)
         expected_start = self.course.start + datetime.timedelta(days=expected_offset)
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(3):
             reset_self_paced_schedule(self.user, self.course.id, use_availability_date=True)
 
         self.schedule.refresh_from_db()
