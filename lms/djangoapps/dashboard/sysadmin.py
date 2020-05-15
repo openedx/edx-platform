@@ -362,14 +362,16 @@ class Courses(SysadminDashboardView):
     def make_datatable(self, courses=None):
         """Creates course information datatable"""
         data = []
-        mdb = git_import.open_mongo_connection()
-        if mdb is not None:
+        # mdb = git_import.open_mongo_connection()
+        # if mdb is not None:
+        if True:
             for course in self.get_courses():
                 gdir = course.id.course
                 data.append([course.display_name, text_type(course.id)]
-                            + self.git_info_for_course(gdir, course.id))
+                            + ['', '', ''])
+                            # + self.git_info_for_course(gdir, course.id))
 
-            mdb.disconnect()
+            # mdb.disconnect()
             return dict(header=[_('Course Name'),
                                 _('Directory/ID'),
                                 # Translators: "Git Commit" is a computer command; see http://gitref.org/basic/#commit
