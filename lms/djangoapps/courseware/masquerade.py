@@ -77,6 +77,11 @@ class MasqueradeView(View):
         to CourseMasquerade objects.
         """
         course_key = CourseKey.from_string(course_key_string)
+        is_staff = has_staff_roles(request.user, course_key)
+        if not is_staff:
+            return JsonResponse({
+                'success': False,
+            })
         masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
         request_json = request.json
         role = request_json.get('role', 'student')
