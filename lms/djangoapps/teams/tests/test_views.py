@@ -966,6 +966,43 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             user='staff'
         )
 
+    def test_duplicates_and_nontopic_private_teamsets(self):
+        """
+        Test for a bug where non-admin users would have their private memberships returned from this endpoint
+        despite the topic, and duplicate entries for teams in the topic that was being queried (EDUCATOR-5042)
+        """
+        # create a team in a private teamset and add a user
+        unprotected_team_in_private_teamset = CourseTeamFactory.create(
+            name='unprotected_team_in_private_teamset',
+            description='unprotected_team_in_private_teamset',
+            course_id=self.test_course_1.id,
+            topic_id='private_topic_1_id',
+        )
+        unprotected_team_in_private_teamset.add_user(self.users['student_enrolled'])
+
+        # make some more users and put them in the solar team.
+        another_student_username = 'another_student'
+        yet_another_student_username = 'yet_another_student'
+        self.create_and_enroll_student(username=another_student_username)
+        self.create_and_enroll_student(username=yet_another_student_username)
+        self.solar_team.add_user(self.users[another_student_username])
+        self.solar_team.add_user(self.users[yet_another_student_username])
+
+        teams = self.get_teams_list(data={'topic_id': self.solar_team.topic_id}, user='student_enrolled')
+        team_names = [team['name'] for team in teams['results']]
+        team_names.sort()
+        self.assertEqual(team_names, [
+            self.solar_team.name,
+        ])
+
+        teams = self.get_teams_list(data={'topic_id': self.solar_team.topic_id}, user='staff')
+        team_names = [team['name'] for team in teams['results']]
+        team_names.sort()
+        self.assertEqual(team_names, [
+            self.solar_team.name,
+            self.masters_only_team.name,
+        ])
+
 
 @ddt.ddt
 class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):

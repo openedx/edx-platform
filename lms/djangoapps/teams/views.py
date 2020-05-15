@@ -470,22 +470,11 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             # Non-staff users should not be able to see private_managed teams that they are not on.
             # Staff shouldn't have any excluded teams.
-
-            if not has_access(request.user, 'staff', course_key):
-                private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
-                excluded_team_ids = CourseTeam.objects.filter(
-                    course_id=course_key,
-                    topic_id__in=private_teamset_ids
-                ).exclude(
-                    membership__user=request.user
-                ).values_list('team_id', flat=True)
-                excluded_team_ids = set(excluded_team_ids)
-            else:
-                excluded_team_ids = set()
+            excluded_private_team_ids = self._get_private_team_ids_to_exclude(course_module)
 
             search_results['results'] = [
                 result for result in search_results['results']
-                if result['data']['id'] not in excluded_team_ids
+                if result['data']['id'] not in excluded_private_team_ids
             ]
             search_results['total'] = len(search_results['results'])
 
@@ -511,18 +500,10 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             'last_activity_at': ('-last_activity_at', 'team_size'),
         }
 
-        if not has_access(request.user, 'staff', course_key):
-            # hide private_managed courses from non-admin users that aren't members of those teams
-            private_topic_ids = [ts.teamset_id for ts in course_module.teamsets if
-                                 ts.is_private_managed]
-            public_teams = CourseTeam.objects.filter(**result_filter).exclude(
-                topic_id__in=private_topic_ids)
-            private_managed_teams_of_user = CourseTeam.objects.filter(topic_id__in=private_topic_ids,
-                                                                      membership__user__username=request.user)
-            queryset = public_teams | private_managed_teams_of_user
-        else:
-            queryset = CourseTeam.objects.filter(**result_filter)
+        # hide private_managed courses from non-staff users that aren't members of those teams
+        excluded_private_team_ids = self._get_private_team_ids_to_exclude(course_module)
 
+        queryset = CourseTeam.objects.filter(**result_filter).exclude(team_id__in=excluded_private_team_ids)
         order_by_input = request.query_params.get('order_by', 'name')
         if order_by_input not in ordering_schemes:
             return Response(
@@ -650,6 +631,24 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         page_kwarg = self.kwargs.get(self.paginator.page_query_param)
         page_query_param = self.request.query_params.get(self.paginator.page_query_param)
         return page_kwarg or page_query_param or 1
+
+    def _get_private_team_ids_to_exclude(self, course_module):
+        """
+        Get the list of team ids that should be excluded from the response.
+        Staff can see all private teams.
+        Users should not be able to see teams in private teamsets that they are not a member of.
+        """
+        if has_access(self.request.user, 'staff', course_module.id):
+            return set()
+
+        private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
+        excluded_team_ids = CourseTeam.objects.filter(
+            course_id=course_module.id,
+            topic_id__in=private_teamset_ids
+        ).exclude(
+            membership__user=self.request.user
+        ).values_list('team_id', flat=True)
+        return set(excluded_team_ids)
 
 
 class IsEnrolledOrIsStaff(permissions.BasePermission):
