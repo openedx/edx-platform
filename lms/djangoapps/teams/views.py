@@ -13,7 +13,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import Http404, HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
@@ -210,7 +210,7 @@ class TeamsDashboardView(GenericAPIView):
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
         }
-        return render_to_response("teams/teams.html", context)
+        return render(request, "teams/teams.html", context)
 
     def _serialize_and_paginate(self, pagination_cls, queryset, request, serializer_cls, serializer_ctx):
         """
