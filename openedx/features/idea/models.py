@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from functools import partial
-
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.db import models
@@ -15,8 +13,8 @@ from lms.djangoapps.onboarding.models import Organization
 from openedx.features.philu_utils.backend_storage import CustomS3Storage
 from openedx.features.philu_utils.utils import bytes_to_mb
 
+from util.philu_utils import UploadToPathAndRename
 from .constants import CITY_MAX_LENGTH, IDEA_FILE_MAX_SIZE, IDEA_IMAGE_MAX_SIZE, OVERVIEW_MAX_LENGTH, TITLE_MAX_LENGTH
-from .helpers import upload_to_path
 
 
 class Location(models.Model):
@@ -34,15 +32,14 @@ class Location(models.Model):
 class VisualAttachment(models.Model):
     video_link = models.URLField(blank=True, null=True, verbose_name=_('VIDEO LINK'))
     image = models.ImageField(
-        storage=CustomS3Storage(),
-        upload_to=partial(upload_to_path, folder='images'), blank=True, null=True,
-        validators=[FileExtensionValidator(['jpg', 'png'], )],
-        verbose_name=_('ADD IMAGE'),
+        storage=CustomS3Storage(), max_length=500, blank=True, null=True,
+        upload_to=UploadToPathAndRename(path='images', name_prefix='image', add_path_prefix=True),
+        validators=[FileExtensionValidator(['jpg', 'png'], )], verbose_name=_('ADD IMAGE'),
         help_text=_('Accepted extensions: .jpg, .png (maximum {mb} MB)'.format(mb=bytes_to_mb(IDEA_IMAGE_MAX_SIZE)))
     )
     file = models.FileField(
-        storage=CustomS3Storage(),
-        upload_to=partial(upload_to_path, folder='files'), blank=True, null=True,
+        storage=CustomS3Storage(), max_length=500, blank=True, null=True,
+        upload_to=UploadToPathAndRename(path='files', add_path_prefix=True),
         validators=[FileExtensionValidator(['docx', 'pdf', 'txt'])],
         verbose_name=_('ADD FILE'),
         help_text=_(
