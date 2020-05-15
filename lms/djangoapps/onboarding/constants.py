@@ -9,3 +9,4 @@ TAKE_ME_THERE_VAL = 'Take Me There'
 
 NOT_INTERESTED_KEY = 'NT'
 NOT_INTERESTED_VAL = "No Thanks, I'm Not Interested"
+ORG_SEARCH_TERM_LENGTH = 2

@@ -3564,3 +3564,4 @@ OEF_RENEWAL_DAYS = 180
 # CDN LINK
 
 CDN_LINK = "https://static.philanthropyu.org/"
+
