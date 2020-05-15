@@ -967,6 +967,10 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         )
 
     def test_duplicates_and_nontopic_private_teamsets(self):
+        """
+        Test for a bug where non-admin users would have their private memberships returned from this endpoint
+        despite the topic, and duplicate entries for teams in the topic that was being queried (EDUCATOR-5042)
+        """
         # create a team in a private teamset and add a user
         unprotected_team_in_private_teamset = CourseTeamFactory.create(
             name='unprotected_team_in_private_teamset',
