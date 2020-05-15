@@ -99,13 +99,13 @@ urlpatterns = [
     url(r'^idea/', include('openedx.features.idea.urls')),
 
     # temporary experiment urls block start.
-    url(r'^organizations/', TemplateView.as_view(template_name='features/experiments/organizations.html')),
-    url(r'^learners/', TemplateView.as_view(template_name='features/experiments/learners.html')),
+    url(r'^organizations/', TemplateView.as_view(template_name='main_django.html')),
+    url(r'^learners/', TemplateView.as_view(template_name='main_django.html')),
     url(r'^organizational-capacity-assessment/',
-        TemplateView.as_view(template_name='features/experiments/organizational-capacity-assessment.html')),
-    url(r'^course-development/', TemplateView.as_view(template_name='features/experiments/course-development.html')),
+        TemplateView.as_view(template_name='main_django.html')),
+    url(r'^course-development/', TemplateView.as_view(template_name='main_django.html')),
     url(r'^organization-onboarding/',
-        TemplateView.as_view(template_name='features/experiments/organization-onboarding.html')),
+        TemplateView.as_view(template_name='main_django.html')),
     # temporary experiment urls block End.
 
     # CloudSponge proxy url to lets the OAuth providers know, we are asking CloudSponge for address book
