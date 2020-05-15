@@ -33,7 +33,6 @@
                     this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries);
                     this.languages = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages);
                     this.topic = options.topic;
-
                     this.listenTo(this.model, 'change', this.render);
                 },
 
@@ -43,8 +42,7 @@
                         isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
                         isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
                         isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
-                        maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize),
-                        teamAssignments = this.model.get('team_assignments');
+                        maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize);
 
                     var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 
@@ -69,12 +67,25 @@
                     });
                     this.discussionView.render();
 
-                    this.renderTeamAssignments(teamAssignments);
+                    this.getTeamAssignments();
 
                     this.renderTeamMembers();
 
                     this.setFocusToHeaderFunc();
                     return this;
+                },
+
+                getTeamAssignments: function() {
+                    var view = this;
+
+                    $.ajax({
+                        type: 'GET',
+                        url: view.context.teamsAssignmentsUrl.replace('team_id', view.model.get('id'))
+                    }).done(function(data) {
+                        view.renderTeamAssignments(data);
+                    }).fail(function(data) {
+                        TeamUtils.parseAndShowMessage(data, view.errorMessage);
+                    });
                 },
 
                 renderTeamAssignments: function(assignments) {
