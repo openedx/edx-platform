@@ -209,7 +209,7 @@ pyyaml==5.3.1             # via -r requirements/edx/base.in, code-annotations, e
 random2==1.0.1            # via -r requirements/edx/base.in
 recommender-xblock==1.4.8  # via -r requirements/edx/base.in
 redis==2.10.6             # via -r requirements/edx/base.in
-regex==2020.5.13          # via -r requirements/edx/../edx-sandbox/shared.txt, nltk
+regex==2020.5.14          # via -r requirements/edx/../edx-sandbox/shared.txt, nltk
 requests-oauthlib==1.3.0  # via -r requirements/edx/base.in, social-auth-core
 requests==2.23.0          # via -r requirements/edx/paver.txt, analytics-python, coreapi, django-oauth-toolkit, edx-analytics-data-api-client, edx-bulk-grades, edx-drf-extensions, edx-enterprise, edx-rest-api-client, geoip2, mailsnake, pyjwkest, python-swiftclient, requests-oauthlib, sailthru-client, slumber, social-auth-core
 rest-condition==1.0.3     # via -r requirements/edx/base.in, edx-drf-extensions
