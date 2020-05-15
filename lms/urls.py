@@ -97,6 +97,11 @@ urlpatterns = [
     url(r'', include('openedx.features.specializations.urls')),
     url(r'^marketplace/', include('openedx.features.marketplace.urls')),
     url(r'^idea/', include('openedx.features.idea.urls')),
+    url(r'^organizations/', TemplateView.as_view(template_name='features/experiments/organizations.html')),
+    url(r'^learners/', TemplateView.as_view(template_name='features/experiments/learners.html')),
+    url(r'^organizational-capacity-assessment/', TemplateView.as_view(template_name='features/experiments/organizational-capacity-assessment.html')),
+    url(r'^course-development/', TemplateView.as_view(template_name='features/experiments/course-development.html')),
+    url(r'^organization-onboarding/', TemplateView.as_view(template_name='features/experiments/organization-onboarding.html')),
 
     # CloudSponge proxy url to lets the OAuth providers know, we are asking CloudSponge for address book
     url(r'^auth/proxy/cloudsponge/$', TemplateView.as_view(template_name='features/smart_referral/auth_proxy.html'),
