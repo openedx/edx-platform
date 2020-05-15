@@ -50,6 +50,9 @@ httpretty<1.0
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
 
+# 0.15.0 dropped support for Python 3.5
+joblib<0.15.0
+
 # jsonfield2 3.1.0 drops support for python 3.5
 jsonfield2<3.1.0
 
