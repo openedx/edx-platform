@@ -25,7 +25,9 @@ from openedx.core.djangolib.markup import HTML
 from student.models import CourseEnrollment
 from student.role_helpers import has_staff_roles
 from util.json_request import JsonResponse, expect_json
+from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 log = logging.getLogger(__name__)
 
@@ -68,6 +70,60 @@ class MasqueradeView(View):
     """
     Create an HTTP endpoint to manage masquerade settings
     """
+
+    def get(self, request, course_key_string):
+        """
+        Retrieve data on the active and available masquerade options
+        """
+        course_key = CourseKey.from_string(course_key_string)
+        is_staff = has_staff_roles(request.user, course_key)
+        if not is_staff:
+            return JsonResponse({
+                'success': False,
+            })
+        masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
+        course = masquerade_settings.get(course_key, None)
+        course = course or CourseMasquerade(
+            course_key,
+            role='staff',
+            user_partition_id=None,
+            group_id=None,
+            user_name=None,
+        )
+        descriptor = modulestore().get_course(course_key)
+        partitions = get_all_partitions_for_course(descriptor)
+        data = {
+            'success': True,
+            'active': {
+                'course_key': course_key_string,
+                'group_id': course.group_id,
+                'role': course.role,
+                'user_name': course.user_name or ' ',
+                'user_partition_id': course.user_partition_id,
+            },
+            'available': [
+                {
+                    'name': 'Staff',
+                    'role': 'staff',
+                },
+                {
+                    'name': 'Learner',
+                    'role': 'student',
+                },
+            ],
+        }
+        for partition in partitions:
+            if partition.active:
+                data['available'].extend([
+                    {
+                        'group_id': group.id,
+                        'name': group.name,
+                        'role': 'student',
+                        'user_partition_id': partition.id,
+                    }
+                    for group in partition.groups
+                ])
+        return JsonResponse(data)
 
     @method_decorator(expect_json)
     def post(self, request, course_key_string):
