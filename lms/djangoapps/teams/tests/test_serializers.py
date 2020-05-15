@@ -198,7 +198,7 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
         """
         with self.assertNumQueries(num_queries):
             page = Paginator(
-                self.course.teams_configuration.cleaned_data_old_format['topics'],
+                self.course.teams_configuration.cleaned_data['teamsets'],
                 self.PAGE_SIZE,
             ).page(1)
             # pylint: disable=not-callable
