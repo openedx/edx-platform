@@ -2794,3 +2794,17 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             response_text['errors'],
             ['User name/email/external key: a_user_external_key_invalid does not exist.']
         )
+
+    def test_upload_non_ascii(self):
+        csv_content = 'user,mode,topic_0' + '\n'
+        team_name = u'著文企臺個'
+        self.create_and_enroll_student(username=team_name)
+        csv_content += '{0}, audit, {0}'.format(team_name)
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            201, method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
