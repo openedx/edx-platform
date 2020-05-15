@@ -531,7 +531,7 @@ def convert_video_status(video, is_video_encodes_ready=False):
         ])
     elif video['status'] == 'invalid_token':
         status = StatusDisplayStrings.get('youtube_duplicate')
-    elif is_video_encodes_ready or video['status'] == 'transcript_ready':
+    elif is_video_encodes_ready:
         status = StatusDisplayStrings.get('file_complete')
     else:
         status = StatusDisplayStrings.get(video['status'])
@@ -553,26 +553,19 @@ def _get_videos(course, pagination_conf=None):
 
     # This is required to see if edx video pipeline is enabled while converting the video status.
     course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
-    # TODO: add 'transcript_ready' when we have moved to VEM to keep transcript and encode status separate
-    transcription_statuses = ['partial_failure', 'transcription_in_progress']
+    transcription_statuses = ['transcription_in_progress', 'transcript_ready', 'partial_failure', 'transcript_failed']
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
-        # If we are using "new video workflow" and status is `transcription_in_progress` then video encodes are ready.
+        # If we are using "new video workflow" and status is in `transcription_statuses` then video encodes are ready.
         # This is because Transcription starts once all the encodes are complete except for YT, but according to
         # "new video workflow" YT is disabled as well as deprecated. So, Its precise to say that the Transcription
         # starts once all the encodings are complete *for the new video workflow*.
-        # If the video status is 'partial_failure', it means during the transcription flow, some transcription jobs
-        # failed. As mentioned, transcript jobs start only when the encodes have finished
         is_video_encodes_ready = not course_video_upload_token and (video['status'] in transcription_statuses)
         # Update with transcript languages
         video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
-        # Transcription status should only be visible if 3rd party transcripts are pending.
-        # TODO: change logic to separate transcript status from video status
         video['transcription_status'] = (
-            StatusDisplayStrings.get(video['status'])
-            if not video['transcripts'] and is_video_encodes_ready else
-            ''
+            StatusDisplayStrings.get(video['status']) if is_video_encodes_ready else ''
         )
         # Convert the video status.
         video['status'] = convert_video_status(video, is_video_encodes_ready)
@@ -595,6 +588,7 @@ def _get_index_videos(course, pagination_conf=None):
     attrs = [
         'edx_video_id', 'client_video_id', 'created', 'duration',
         'status', 'courses', 'transcripts', 'transcription_status',
+        'error_description'
     ]
 
     def _get_values(video):

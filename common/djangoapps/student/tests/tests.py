@@ -26,7 +26,6 @@ from six import text_type
 from six.moves import range
 from six.moves.urllib.parse import quote
 
-import shoppingcart
 from bulk_email.models import Optout
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -389,74 +388,6 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         course_mode_info = complete_course_mode_info(self.course.id, enrollment)
         self.assertFalse(course_mode_info['show_upsell'])
         self.assertIsNone(course_mode_info['days_for_upsell'])
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch('lms.djangoapps.courseware.views.index.log.warning')
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
-    def test_blocked_course_scenario(self, log_warning):
-
-        self.client.login(username="jack", password="test")
-
-        #create testing invoice 1
-        sale_invoice_1 = shoppingcart.models.Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='Testw',
-            company_contact_email='test1@test.com', customer_reference_number='2Fwe23S',
-            recipient_name='Testw_1', recipient_email='test2@test.com', internal_reference="A",
-            course_id=self.course.id, is_valid=False
-        )
-        invoice_item = shoppingcart.models.CourseRegistrationCodeInvoiceItem.objects.create(
-            invoice=sale_invoice_1,
-            qty=1,
-            unit_price=1234.32,
-            course_id=self.course.id
-        )
-        course_reg_code = shoppingcart.models.CourseRegistrationCode(
-            code="abcde",
-            course_id=self.course.id,
-            created_by=self.user,
-            invoice=sale_invoice_1,
-            invoice_item=invoice_item,
-            mode_slug=CourseMode.DEFAULT_MODE_SLUG
-        )
-        course_reg_code.save()
-
-        cart = shoppingcart.models.Order.get_cart_for_user(self.user)
-        shoppingcart.models.PaidCourseRegistration.add_to_order(cart, self.course.id)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': course_reg_code.code})
-        self.assertEqual(resp.status_code, 200)
-
-        redeem_url = reverse('register_code_redemption', args=[course_reg_code.code])
-        response = self.client.get(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        # check button text
-        self.assertContains(response, 'Activate Course Enrollment')
-
-        #now activate the user by enrolling him/her to the course
-        response = self.client.post(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, 'You can no longer access this course because payment has not yet been received')
-        optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
-        self.assertEqual(len(optout_object), 1)
-
-        # Direct link to course redirect to user dashboard
-        self.client.get(reverse('courseware', kwargs={"course_id": text_type(self.course.id)}))
-        log_warning.assert_called_with(
-            u'User %s cannot access the course %s because payment has not yet been received',
-            self.user,
-            text_type(self.course.id),
-        )
-
-        # Now re-validating the invoice
-        invoice = shoppingcart.models.Invoice.objects.get(id=sale_invoice_1.id)
-        invoice.is_valid = True
-        invoice.save()
-
-        response = self.client.get(reverse('dashboard'))
-        self.assertNotContains(
-            response,
-            'You can no longer access this course because payment has not yet been received',
-        )
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_linked_in_add_to_profile_btn_not_appearing_without_config(self):

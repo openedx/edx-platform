@@ -4,6 +4,7 @@ Unit tests for instructor_dashboard.py.
 
 
 import datetime
+import re
 
 import ddt
 import six
@@ -161,6 +162,27 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             self.assertContains(response, download_section)
         else:
             self.assertNotContains(response, download_section)
+
+    @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
+    @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
+    def test_data_download_only(self):
+        """
+        Verify that only the data download tab is visible for data researchers.
+        """
+        user = UserFactory.create()
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role='data_researcher',
+            org=self.course.id.org
+        )
+        self.client.login(username=user.username, password="test")
+        response = self.client.get(self.url)
+        matches = re.findall(
+            rb'<li class="nav-item"><button type="button" class="btn-link .*" data-section=".*">.*',
+            response.content
+        )
+        assert len(matches) == 1
 
     @ddt.data(
         ("How to defeat the Road Runner", "2017", "001", "ACME"),

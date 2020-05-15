@@ -9,7 +9,7 @@
     border-bottom: 0;
   }
 
-  .upgrade-banner {
+  .dates-banner {
     border-radius: 4px;
     border: solid 1px #9cd2e6;
     background-color: #eff8fa;
@@ -18,15 +18,19 @@
     padding: 24px;
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
+    justify-content: space-between;
     max-width: $text-width-readability-max;
 
-    .upgrade-banner-text {
+    .dates-banner-text {
       font-size: 16px;
       line-height: 24px;
       color: #414141;
-      flex: 1 1 20em;
     }
+
+      .banner-has-button {
+          flex: 1 1 20em;
+          max-width: 70%;
+      }
 
     .upgrade-button {
       align-self: start;

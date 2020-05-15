@@ -14,6 +14,7 @@ from edx_ace.recipient import Recipient
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_django_utils.monitoring import function_trace, set_custom_metric
 from edx_when.api import get_schedules_with_due_date
+from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
@@ -426,7 +427,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
     async_send_task = attr.ib()
     site = attr.ib()
     target_datetime = attr.ib()
-    course_key = attr.ib()
+    course_id = attr.ib()
     override_recipient_email = attr.ib(default=None)
 
     log_prefix = 'Next Section Course Update'
@@ -447,7 +448,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
             LOG.info(
                 u'Sending email to user: {} for course-key: {}'.format(
                     user.username,
-                    self.course_key
+                    self.course_id
                 )
             )
             # TODO: Uncomment below when going live
@@ -455,8 +456,9 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
             #     self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
 
     def get_schedules(self):
+        course_key = CourseKey.from_string(self.course_id)
         target_date = self.target_datetime.date()
-        schedules = get_schedules_with_due_date(self.course_key, target_date).filter(
+        schedules = get_schedules_with_due_date(course_key, target_date).filter(
             self.experience_filter,
             active=True,
             enrollment__user__is_active=True,
@@ -467,9 +469,15 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
             enrollment = schedule.enrollment
             course = schedule.enrollment.course
             user = enrollment.user
+            start_date = schedule.start_date
+            LOG.info(u'Received a schedule for user {} in course {} for date {}'.format(
+                user.username,
+                self.course_id,
+                target_date,
+            ))
 
             try:
-                week_highlights, week_num = get_next_section_highlights(user, course.id, target_date)
+                week_highlights, week_num = get_next_section_highlights(user, course.id, start_date, target_date)
             except CourseUpdateDoesNotExist:
                 LOG.warning(
                     u'Weekly highlights for user {} of course {} does not exist or is disabled'.format(

@@ -348,6 +348,12 @@ def get_course_tab_list(user, course):
         if tab.type == 'static_tab' and tab.course_staff_only and \
                 not bool(user and has_access(user, 'staff', course, course.id)):
             continue
+        # We had initially created a CourseTab.load() for dates that ended up
+        # persisting the dates tab tomodulestore on Course Run creation, but
+        # ignoring any static dates tab here we can fix forward without
+        # allowing the bug to continue to surface
+        if tab.type == 'dates':
+            continue
         course_tab_list.append(tab)
 
     # Add in any dynamic tabs, i.e. those that are not persisted
