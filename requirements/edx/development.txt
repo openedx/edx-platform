@@ -266,7 +266,7 @@ radon==4.1.0              # via -r requirements/edx/testing.txt
 random2==1.0.1            # via -r requirements/edx/testing.txt
 recommender-xblock==1.4.8  # via -r requirements/edx/testing.txt
 redis==2.10.6             # via -r requirements/edx/testing.txt
-regex==2020.5.13          # via -r requirements/edx/testing.txt, nltk
+regex==2020.5.14          # via -r requirements/edx/testing.txt, nltk
 requests-oauthlib==1.3.0  # via -r requirements/edx/testing.txt, social-auth-core
 requests==2.23.0          # via -r requirements/edx/testing.txt, analytics-python, coreapi, django-oauth-toolkit, edx-analytics-data-api-client, edx-bulk-grades, edx-drf-extensions, edx-enterprise, edx-rest-api-client, geoip2, mailsnake, pyjwkest, python-swiftclient, requests-oauthlib, sailthru-client, slumber, social-auth-core, sphinx, transifex-client
 rest-condition==1.0.3     # via -r requirements/edx/testing.txt, edx-drf-extensions
