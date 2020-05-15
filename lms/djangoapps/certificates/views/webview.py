@@ -6,6 +6,7 @@ import logging
 import urllib
 from datetime import datetime
 from uuid import uuid4
+from courseware.models import StudentModule
 
 import pytz
 from django.conf import settings
@@ -298,6 +299,16 @@ def _update_social_context(request, context, course, user, user_certificate, pla
             user_certificate.mode,
             smart_str(share_url)
         )
+    course_target=unicode(str(course.id),"utf-8")
+    targetuser=user.username 
+
+    user_info=get_certificates_for_user(targetuser)
+
+    for i in range(len(user_info)):
+       if (str(user_info[i]['course_key'])==course_target):
+           target_row=i
+
+    context['studentgradeearned']=user_info[target_row]['grade']
 
 
 def _update_context_with_user_info(context, user, user_certificate):
