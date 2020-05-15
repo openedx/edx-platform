@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.forms.models import model_to_dict
 
-from openedx.features.edly.models import EdlySubOrganization
+from openedx.features.edly.models import EdlyUserProfile, EdlySubOrganization
 from util.organizations_helpers import get_organizations
 
 LOGGER = logging.getLogger(__name__)
@@ -108,3 +108,24 @@ def get_enabled_organizations(request):
         return []
 
     return [studio_site_edx_organization]
+
+
+def create_user_link_with_edly_sub_organization(request, user):
+    """
+    Create edly user profile link with edly sub organization.
+
+    Arguments:
+        request (WSGI Request): Django request object
+        user (object): User object.
+
+    Returns:
+        object: EdlyUserProfile object.
+
+    """
+    # User registration is possible only on LMS so we only get edly sub org for LMS site
+    edly_sub_org = request.site.edly_sub_org_for_lms
+    edly_user_profile, __ = EdlyUserProfile.objects.get_or_create(user=user)
+    edly_user_profile.edly_sub_organizations.add(edly_sub_org)
+    edly_user_profile.save()
+
+    return edly_user_profile

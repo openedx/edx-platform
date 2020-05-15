@@ -12,6 +12,7 @@ from django.test.client import RequestFactory
 from openedx.features.edly import cookies as cookies_api
 from openedx.features.edly.tests.factories import EdlySubOrganizationFactory, EdlyUserProfileFactory, SiteFactory
 from openedx.features.edly.utils import (
+    create_user_link_with_edly_sub_organization,
     decode_edly_user_info_cookie,
     encode_edly_user_info_cookie,
     get_edly_sub_org_from_cookie,
@@ -112,3 +113,13 @@ class UtilsTests(TestCase):
         edly_sub_organization = self._create_edly_sub_organization()
         edly_user_info_cookie = cookies_api._get_edly_user_info_cookie_string(self.request)
         assert edly_sub_organization.slug == get_edly_sub_org_from_cookie(edly_user_info_cookie)
+
+    def test_create_user_link_with_edly_sub_organization(self):
+        """
+        Test that "create_user_link_with_edly_sub_organization" method create "EdlyUserProfile" link with User.
+        """
+        user = UserFactory()
+        edly_sub_organization = self._create_edly_sub_organization()
+        edly_user_profile = create_user_link_with_edly_sub_organization(self.request, user)
+        assert edly_user_profile == user.edly_profile
+        assert edly_sub_organization.slug in user.edly_profile.get_linked_edly_sub_organizations
