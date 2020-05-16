@@ -614,6 +614,7 @@ class ReplaceUsernamesView(APIView):
                 {"current_username_2": "desired_username_2"}
             ]
         }
+
     """
 
     authentication_classes = (JwtAuthentication,)
