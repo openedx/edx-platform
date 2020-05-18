@@ -108,6 +108,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
           <span class="info-university">${course_overview.display_org_with_default} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default}</span>
           <%
+            enrollment_date = course_overview.self_paced and enrollment and enrollment.created
             if course_overview.start_date_is_still_default:
                 container_string = _("Coming Soon")
                 course_date = None
@@ -118,7 +119,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     course_date = course_overview.end
                 elif course_overview.has_started():
                     container_string = _("Started - {date}")
-                    course_date = course_overview.dashboard_start_display
+                    course_date = enrollment_date or course_overview.dashboard_start_display
                 elif course_overview.starts_within(days=5):
                     container_string = _("Starts - {date}")
                     course_date = course_overview.dashboard_start_display

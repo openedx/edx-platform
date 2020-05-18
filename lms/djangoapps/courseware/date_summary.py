@@ -248,7 +248,11 @@ class CourseStartDate(DateSummary):
 
     @property
     def date(self):
-        return self.course.start
+        if not self.course.self_paced:
+            return self.course.start
+        else:
+            enrollment = CourseEnrollment.get_enrollment(self.user, self.course_id)
+            return max(enrollment.created, self.course.start) if enrollment else self.course.start
 
     @property
     def date_type(self):
