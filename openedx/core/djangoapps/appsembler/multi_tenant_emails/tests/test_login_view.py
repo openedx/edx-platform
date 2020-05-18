@@ -12,10 +12,8 @@ from django.urls import reverse
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from organizations.models import UserOrganizationMapping
-from student.tests.factories import UserFactory
 
-from .test_utils import with_organization_context
+from .test_utils import with_organization_context, create_org_user
 
 
 @skip_unless_lms
@@ -66,9 +64,7 @@ class MultiTenantLoginTest(CacheIsolationTestCase):
         """
         Create one user and save it to the database.
         """
-        user = UserFactory.create(first_name='noderabbit', email=email, password=password)
-        UserOrganizationMapping.objects.create(user=user, organization=org)
-        return user
+        return create_org_user(org, first_name='noderabbit', email=email, password=password)
 
     def test_login_success(self):
         """
