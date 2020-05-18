@@ -1,7 +1,7 @@
 <div class="team-profile">
     <div class="page-content-main">
         <div class="team-assignments">
-            <h3><%- gettext("Team Assignments") %></h1>
+            <h3><%- gettext("Team Assignments") %></h3>
             <ul id="assignments"></ul>
         </div>
         <hr></hr>
