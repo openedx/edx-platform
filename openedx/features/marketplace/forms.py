@@ -24,5 +24,6 @@ class MarketplaceRequestForm(forms.ModelForm):
             'organizational_problems': _('Current Organizational Problems*'),
             'description': _('Brief Description of Challenges*'),
             'user_services': _('What help can you provide to other organizations?*'),
+            'file': _('Additional Attachments (Optional)'),
         }
         readonly_fields = ('organization',)
