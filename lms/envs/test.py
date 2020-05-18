@@ -571,6 +571,11 @@ COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "common/test/appsembler", REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
+# Appsembler: We have a single theme for all customers. We might want to undo this if it turns out that it fails
+#             More tests than it fixes. If we undo this, we need to
+#             add `@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase') to individual failed tests.
+DEFAULT_SITE_THEME = 'edx-theme-codebase'
+
 LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = "http://localhost:8000"
 
