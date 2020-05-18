@@ -69,7 +69,7 @@ class SiteConfiguration(models.Model):
         # When creating a new object, save default microsite values. Not implemented as a default method on the field
         # because it depends on other fields that should be already filled.
         if not self.id:
-            self.values = self._get_initial_microsite_values()
+            self.values = self.get_initial_microsite_values()
 
         # fix for a bug with some pages requiring uppercase platform_name variable
         self.values['PLATFORM_NAME'] = self.values.get('platform_name', '')
@@ -228,7 +228,7 @@ class SiteConfiguration(models.Model):
             return [(path, self.values.get('customer_sass_input', ''))]
         return None
 
-    def _get_initial_microsite_values(self):
+    def get_initial_microsite_values(self):
         domain_without_port_number = self.site.domain.split(':')[0]
         return {
             'platform_name': self.site.name,
