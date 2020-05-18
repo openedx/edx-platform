@@ -72,6 +72,20 @@ define([
                 )
             );
             AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockDiscussionResponse());
+
+            AjaxHelpers.expectRequest(
+                requests,
+                'GET',
+                interpolate( // eslint-disable-line no-undef
+                    '/api/team/v0/teams/%(teamId)s/assignments',
+                    {
+                        teamId: teamModel.id
+                    },
+                    true
+                )
+            );
+            AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamAssignments());
+
             return profileView;
         };
 

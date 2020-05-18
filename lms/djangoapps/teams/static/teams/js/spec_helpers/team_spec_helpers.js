@@ -73,6 +73,17 @@ define([
         );
     };
 
+    var createMockTeamAssignments = function(options) {
+        return _.extend([
+            {
+                display_name: 'Send me',
+                location: 'your location'
+            }
+        ],
+        options
+        );
+    };
+
     var createMockTeamMembershipsData = function(startIndex, stopIndex) {
         var teams = createMockTeamData(startIndex, stopIndex);
         return _.map(_.range(startIndex, stopIndex + 1), function(i) {
@@ -282,6 +293,7 @@ define([
         countries: testCountries,
         topicUrl: '/api/team/v0/topics/topic_id,' + testCourseID,
         teamsUrl: '/api/team/v0/teams/',
+        teamsAssignmentsUrl: '/api/team/v0/teams/team_id/assignments',
         teamsDetailUrl: '/api/team/v0/teams/team_id',
         teamMembershipsUrl: '/api/team/v0/team_memberships/',
         teamMembershipDetailUrl: '/api/team/v0/team_membership/team_id,' + testUser,
@@ -327,6 +339,7 @@ define([
         createMockTeamData: createMockTeamData,
         createMockTeamsResponse: createMockTeamsResponse,
         createMockTeams: createMockTeams,
+        createMockTeamAssignments: createMockTeamAssignments,
         createMockUserInfo: createMockUserInfo,
         createMockContext: createMockContext,
         createMockTopic: createMockTopic,
