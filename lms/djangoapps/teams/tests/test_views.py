@@ -34,7 +34,7 @@ from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
@@ -644,6 +644,13 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             'patch',
             json.dumps(data) if data else None,
             'application/merge-patch+json',
+            **kwargs
+        )
+
+    def get_team_assignments(self, team_id, **kwargs):
+        """ Get the open response assessments assigned to a team """
+        return self.make_call(
+            reverse('teams_assignments', args=[team_id]),
             **kwargs
         )
 
@@ -1496,6 +1503,44 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         if expected_status == 200:
             self.assertEqual(team['name'], 'foo')
 
+
+class TestTeamAssignmentsView(TeamAPITestCase):
+    """ Tests for the TeamAssignmentsView """
+
+    def _create_test_team_assignment(self):
+        """ Create an openassessment block for testing """
+        course = self.test_course_1
+        teamset_id = self.solar_team.topic_id
+
+        self.section = ItemFactory.create(
+            parent=course,
+            category='chapter',
+            display_name='Test Section'
+        )
+        self.open_assessment = ItemFactory.create(
+            parent=self.section,
+            category="openassessment",
+            display_name="untitled",
+            teams_enabled=True,
+            selected_teamset_id=teamset_id
+        )
+
+        return [self.open_assessment]
+
+    def test_get_assignments(self):
+        # Given a course with team-enabled open responses
+        test_assignments = self._create_test_team_assignment()
+
+        # When I get the assignments for a team
+        assignments = self.get_team_assignments(self.solar_team.team_id, user='student_enrolled')
+
+        # Then I get back the assignments for a team
+        self.assertEqual(len(assignments), len(test_assignments))
+
+        # ... with the given info
+        for assignment in assignments:
+            self.assertIn('display_name', assignment.keys())
+            self.assertIn('location', assignment.keys())
 
 @ddt.ddt
 class TestListTopicsAPI(TeamAPITestCase):
