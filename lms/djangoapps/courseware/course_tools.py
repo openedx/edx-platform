@@ -114,12 +114,14 @@ class FinancialAssistanceTool(CourseTool):
         if not request.user or not CourseEnrollment.is_enrolled(request.user, course_key):
             return False
 
-        # hide if there's a course_upgrade_enrollment in the past
+        # hide if there's no course_upgrade_deadline, or one with a value in the past
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
         if enrollment.course_upgrade_deadline:
             if now > enrollment.course_upgrade_deadline:
                 return False
-
+        else: 
+           return False
+        
         return bool(course_overview.eligible_for_financial_aid)
 
     @classmethod
