@@ -821,6 +821,15 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         self.assertEqual('private_topic_1_id', result['results'][0]['topic_id'])
         self.assertNotEqual([], result['results'])
 
+    def test_course_staff_getting_information_on_private_topic(self):
+        """
+        Verifies that when an admin browses to a private team set,
+         information about the teams in the teamset is returned even if the admin is not in any teams.
+        """
+        result = self.get_teams_list(data={'topic_id': 'private_topic_1_id'},
+                                     user='course_staff')
+        self.assertEqual(2, len(result['results']))
+
     @ddt.unpack
     @ddt.data(
         ('student_masters_not_on_team', 1),
