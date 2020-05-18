@@ -1370,7 +1370,16 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             'new_email': pec.new_email
         }
 
-        if len(User.objects.filter(email=pec.new_email)) != 0:
+        if settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS']:
+            current_site = theming_helpers.get_current_site()
+            if current_site.id == settings.SITE_ID:
+                raise NotImplementedError('APPSEMBLER_MULTI_TENANT_EMAILS: Cannot login user to the main site.')
+            current_org = current_site.organizations.get()
+            email_exists = len(current_org.userorganizationmapping_set.filter(user__email=pec.new_email)) != 0
+        else:
+            email_exists = len(User.objects.filter(email=pec.new_email)) != 0
+
+        if email_exists:
             response = render_to_response("email_exists.html", {})
             transaction.set_rollback(True)
             return response

@@ -6,6 +6,8 @@ import contextlib
 from organizations.models import Organization, UserOrganizationMapping
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
+from student.tests.factories import UserFactory
+
 
 @contextlib.contextmanager
 def with_organization_context(site_color, configs=None):
@@ -35,3 +37,12 @@ def with_organization_context(site_color, configs=None):
             )
             org.sites.add(site)
         yield org
+
+
+def create_org_user(organization, **kwargs):
+    """
+    Create one user and save it to the database.
+    """
+    user = UserFactory.create(**kwargs)
+    UserOrganizationMapping.objects.create(user=user, organization=organization)
+    return user
