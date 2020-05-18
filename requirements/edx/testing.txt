@@ -63,6 +63,7 @@ diff-cover==2.6.1         # via -r requirements/edx/coverage.txt
 distlib==0.3.0            # via virtualenv
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf  # via -r requirements/edx/base.txt, django-statici18n
 git+https://github.com/edx/django-babel-underscore.git@37705f7377a4d0a4e673f1431895ce28a8860cd7#egg=django-babel-underscore==0.6.0  # via -r requirements/edx/base.txt
+git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248eb0f185#egg=django-babel==0.6.3.dev0  # via -r requirements/edx/base.txt
 django-celery==3.3.1      # via -r requirements/edx/base.txt
 django-classy-tags==1.0.0  # via -r requirements/edx/base.txt, django-sekizai
 django-config-models==2.0.2  # via -r requirements/edx/base.txt, edx-enterprise
@@ -129,7 +130,6 @@ edx-user-state-client==1.2.0  # via -r requirements/edx/base.txt
 edx-when==1.2.3           # via -r requirements/edx/base.txt, edx-proctoring
 edxval==1.3.4             # via -r requirements/edx/base.txt
 elasticsearch==1.9.0      # via -r requirements/edx/base.txt, edx-search
-enmerkar==0.7.1           # via -r requirements/edx/base.txt
 enum34==1.1.10            # via -r requirements/edx/base.txt, edxval
 event-tracking==0.3.2     # via -r requirements/edx/base.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via pytest-xdist

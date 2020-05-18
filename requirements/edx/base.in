@@ -88,7 +88,6 @@ edx-submissions
 edx-user-state-client
 edx-when
 edxval
-enmerkar                            # Internationalization utilities
 event-tracking
 fs==2.0.18
 fs-s3fs==0.1.8
