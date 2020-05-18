@@ -73,15 +73,16 @@ define([
         );
     };
 
-    var createMockTeamAssignments = function(options) {
-        return _.extend([
-            {
-                display_name: 'Send me',
-                location: 'your location'
-            }
-        ],
-        options
-        );
+    var createMockTeamAssignments = function(assignments, options) {
+        if (_.isUndefined(assignments)) {
+            assignments = [ // eslint-disable-line no-param-reassign
+                {
+                    display_name: 'Send me',
+                    location: 'your location'
+                }
+            ];
+        }
+        return _.extend(assignments, options);
     };
 
     var createMockTeamMembershipsData = function(startIndex, stopIndex) {

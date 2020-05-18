@@ -84,7 +84,7 @@ define([
                     true
                 )
             );
-            AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamAssignments());
+            AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamAssignments(options.assignments));
 
             return profileView;
         };
@@ -114,6 +114,23 @@ define([
                 AjaxHelpers.expectNoRequests(requests);
             }
         };
+
+        describe('TeamAssignmentsView', function() {
+            it('can render itself', function() {
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments();
+                var requests = AjaxHelpers.requests(this),
+                    view = createTeamProfileView(requests, {});
+                expect(view.$('.team-assignment').length).toEqual(mockAssignments.length);
+            });
+
+            it('displays a message when no assignments are found', function() {
+                var mockAssignments = [];
+                var requests = AjaxHelpers.requests(this),
+                    view = createTeamProfileView(requests, {assignments: mockAssignments});
+                expect(view.$('#assignments').text()).toEqual('No assignments yet for team');
+                expect(view.$('.team-assignment').length).toEqual(0);
+            });
+        });
 
         describe('DiscussionsView', function() {
             it('can render itself', function() {
