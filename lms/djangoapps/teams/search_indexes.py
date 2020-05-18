@@ -48,7 +48,7 @@ class CourseTeamIndexer(object):
         """
         Uses the CourseTeamSerializer to create a serialized course_team object.
         Adds in additional text and pk fields.
-        Removes membership and assignments.
+        Removes membership relation.
 
         Returns serialized object with additional search fields.
         """
@@ -63,10 +63,8 @@ class CourseTeamIndexer(object):
 
         # Save the primary key so we can load the full objects easily after we search
         serialized_course_team['pk'] = self.course_team.pk
-
-        # Don't save the memberships or assignments in elasticsearch
+        # Don't save the membership relations in elasticsearch
         serialized_course_team.pop('membership', None)
-        serialized_course_team.pop('team_assignments', None)
 
         # add generally searchable content
         serialized_course_team['content'] = {
