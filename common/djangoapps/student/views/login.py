@@ -17,6 +17,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, load_backend, login as django_login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.core.validators import ValidationError, validate_email
@@ -37,6 +38,7 @@ from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
+from organizations.models import UserOrganizationMapping
 import openedx.core.djangoapps.external_auth.views
 import third_party_auth
 from django_comment_common.models import assign_role
@@ -140,6 +142,16 @@ def _do_third_party_auth(request):
         raise AuthFailedError(message)
 
 
+def _log_failed_get_user_by_email(email):
+    """
+    Log a failed login attempt.
+    """
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.warning(u"Login failed - Unknown user email")
+    else:
+        AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+
+
 def _get_user_by_email(request):
     """
     Finds a user object in the database based on the given request, ignores all fields except for email.
@@ -149,13 +161,22 @@ def _get_user_by_email(request):
 
     email = request.POST['email']
 
-    try:
-        return User.objects.get(email=email)
-    except User.DoesNotExist:
-        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email")
-        else:
-            AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+    if settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS']:
+        # In this case database-level email constrain is removed, so the search is done at the organization
+        # level.
+        try:
+            current_site = get_current_site(request)
+            if current_site.id == settings.SITE_ID:
+                raise NotImplementedError('APPSEMBLER_MULTI_TENANT_EMAILS: Cannot login user to the main site.')
+            current_org = current_site.organizations.get()
+            return current_org.userorganizationmapping_set.get(user__email=email).user
+        except UserOrganizationMapping.DoesNotExist:
+            _log_failed_get_user_by_email(email)
+    else:
+        try:
+            return User.objects.get(email=email)
+        except User.DoesNotExist:
+            _log_failed_get_user_by_email(email)
 
 
 def _check_shib_redirect(user):
@@ -451,6 +472,7 @@ def login_user(request):
             except AuthFailedError as e:
                 return HttpResponse(e.value, content_type="text/plain", status=403)
         else:
+            # Appsembler: _get_user_by_email make sure to return the correct user object, from the right organization.
             email_user = _get_user_by_email(request)
 
         _check_shib_redirect(email_user)
