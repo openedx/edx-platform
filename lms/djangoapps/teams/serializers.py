@@ -11,12 +11,11 @@ from django.contrib.auth.models import User
 from django_countries import countries
 from rest_framework import serializers
 
-from lms.djangoapps.teams.api import add_team_count, get_team_count_query_set, get_assignments_for_team
+from lms.djangoapps.teams.api import add_team_count, get_team_count_query_set
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
 from openedx.core.lib.api.fields import ExpandableField
 from openedx.core.lib.api.serializers import CollapsedReferenceSerializer
-from xmodule.modulestore.django import modulestore
 
 
 class CountryField(serializers.Field):
@@ -92,7 +91,7 @@ class CourseTeamSerializer(serializers.ModelSerializer):
             "language",
             "last_activity_at",
             "membership",
-            "organization_protected"
+            "organization_protected",
         )
         read_only_fields = ("course_id", "date_created", "discussion_topic_id", "last_activity_at")
 
