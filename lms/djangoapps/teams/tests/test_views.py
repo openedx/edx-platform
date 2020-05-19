@@ -1507,10 +1507,13 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 class TestTeamAssignmentsView(TeamAPITestCase):
     """ Tests for the TeamAssignmentsView """
 
-    def _create_test_team_assignment(self):
+    @classmethod
+    def setUpClass(cls):
         """ Create an openassessment block for testing """
-        course = self.test_course_1
-        teamset_id = self.solar_team.topic_id
+        super(TestTeamAssignmentsView, cls).setUpClass()
+    
+        course = cls.test_course_1
+        teamset_id = cls.solar_team.topic_id
 
         section = ItemFactory.create(
             parent=course,
@@ -1525,17 +1528,15 @@ class TestTeamAssignmentsView(TeamAPITestCase):
             selected_teamset_id=teamset_id
         )
 
-        return [open_assessment]
+        cls.team_assignments = [open_assessment]
 
     def test_get_assignments(self):
         # Given a course with team-enabled open responses
-        test_assignments = self._create_test_team_assignment()
-
         # When I get the assignments for a team
         assignments = self.get_team_assignments(self.solar_team.team_id, user='student_enrolled')
 
         # Then I get back the assignments for a team
-        self.assertEqual(len(assignments), len(test_assignments))
+        self.assertEqual(len(assignments), len(self.team_assignments))
 
         # ... with the given info
         for assignment in assignments:
