@@ -169,7 +169,8 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             download_url='www.google.com',
             grade="0.88",
         )
-
+        self.student.is_staff = True
+        self.student.save()
         self.namespaced_url = 'certificates_api:v0:certificates:list'
 
     def get_url(self, username):
@@ -204,13 +205,10 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
     @ddt.data(*list(AuthType))
     def test_another_user(self, auth_type, mock_log):
         """
-        Returns 200 with empty list for OAuth, Session, and JWT auth.
-        Returns 200 for jwt_restricted and user:me filter unset.
+        Returns 403 response for non-staff user on all auth types.
         """
         resp = self.get_response(auth_type, requesting_user=self.other_student)
-
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp.data), 0)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     @ddt.data(*list(AuthType))
     def test_another_user_with_certs_shared_public(self, auth_type):
@@ -226,7 +224,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             value='all_users',
         ).save()
 
-        resp = self.get_response(auth_type, requesting_user=self.other_student)
+        resp = self.get_response(auth_type, requesting_user=self.global_staff)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.data), 1)
@@ -250,7 +248,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             value='all_users',
         ).save()
 
-        resp = self.get_response(auth_type, requesting_user=self.other_student)
+        resp = self.get_response(auth_type, requesting_user=self.global_staff)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.data), 1)
@@ -259,7 +257,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
     @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_on_behalf_of_other_user(self, auth_type, mock_log):
         """ Returns 403 when scopes are enforced with JwtHasUserFilterForRequestedUser. """
-        jwt_token = self._create_jwt_token(self.other_student, auth_type, include_me_filter=True)
+        jwt_token = self._create_jwt_token(self.global_staff, auth_type, include_me_filter=True)
         resp = self.get_response(AuthType.jwt, token=jwt_token)
 
         if auth_type == AuthType.jwt_restricted:
@@ -267,7 +265,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             self._assert_in_log("JwtHasUserFilterForRequestedUser", mock_log.warning)
         else:
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
-            self.assertEqual(len(resp.data), 0)
+            self.assertEqual(len(resp.data), 1)
 
     @patch('edx_rest_framework_extensions.permissions.log')
     @ddt.data(*JWT_AUTH_TYPES)
@@ -278,7 +276,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         student_no_cert = UserFactory.create(password=self.user_password)
         resp = self.get_response(
             AuthType.session,
-            requesting_user=student_no_cert,
+            requesting_user=self.global_staff,
             requested_user=student_no_cert,
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -290,17 +288,17 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         with self.assertNumQueries(20):
             resp = self.get_response(
                 AuthType.jwt,
-                requesting_user=student_no_cert,
+                requesting_user=self.global_staff,
                 requested_user=student_no_cert,
             )
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
             self.assertEqual(len(resp.data), 0)
 
         # Test student with 1 certificate
-        with self.assertNumQueries(14):
+        with self.assertNumQueries(10):
             resp = self.get_response(
                 AuthType.jwt,
-                requesting_user=self.student,
+                requesting_user=self.global_staff,
                 requested_user=self.student,
             )
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -337,10 +335,10 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
             download_url='www.google.com',
             grade="0.88",
         )
-        with self.assertNumQueries(14):
+        with self.assertNumQueries(10):
             resp = self.get_response(
                 AuthType.jwt,
-                requesting_user=student_2_certs,
+                requesting_user=self.global_staff,
                 requested_user=student_2_certs,
             )
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -357,7 +355,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
 
         response = self.get_response(
             AuthType.jwt,
-            requesting_user=self.student,
+            requesting_user=self.global_staff,
             requested_user=self.student,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -368,7 +366,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
 
         response = self.get_response(
             AuthType.jwt,
-            requesting_user=self.student,
+            requesting_user=self.global_staff,
             requested_user=self.student,
         )
         kwargs = {"certificate_uuid": self.cert.verify_uuid}
@@ -394,7 +392,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
 
         response = self.get_response(
             AuthType.jwt,
-            requesting_user=self.student,
+            requesting_user=self.global_staff,
             requested_user=self.student,
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
