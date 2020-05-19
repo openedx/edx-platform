@@ -242,8 +242,9 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
                 # before ordering the blocks.
                 if current_children_blocks != current_selected_blocks:
                     logger.info(
-                        u'Mismatch between the children of %s in the stored state and the actual children',
-                        str(block_key)
+                        u'Mismatch between the children of %s in the stored state and the actual children for user %s',
+                        str(block_key),
+                        usage_info.user.username
                     )
                     previous_count = len(current_selected_blocks.intersection(current_children_blocks))
                     mode = block_structure.get_xblock_field(block_key, 'mode')
