@@ -58,6 +58,10 @@ class DateSummary(object):
         return ''
 
     @property
+    def date_type(self):
+        return 'event'
+
+    @property
     def title(self):
         """The title of this summary."""
         return ''
@@ -227,6 +231,10 @@ class TodaysDate(DateSummary):
         return self.current_time
 
     @property
+    def date_type(self):
+        return 'todays-date'
+
+    @property
     def title(self):
         return 'current_datetime'
 
@@ -241,6 +249,10 @@ class CourseStartDate(DateSummary):
     @property
     def date(self):
         return self.course.start
+
+    @property
+    def date_type(self):
+        return 'course-start-date'
 
     def register_alerts(self, request, course):
         """
@@ -305,6 +317,10 @@ class CourseEndDate(DateSummary):
 
         return self.course.end
 
+    @property
+    def date_type(self):
+        return 'course-end-date'
+
     def register_alerts(self, request, course):
         """
         Registers an alert if the end date is approaching.
@@ -344,6 +360,7 @@ class CourseAssignmentDate(DateSummary):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.assignment_date = None
+        self.assignment_link = ''
         self.assignment_title = None
         self.assignment_title_html = None
         self.contains_gated_content = False
@@ -357,6 +374,18 @@ class CourseAssignmentDate(DateSummary):
     @date.setter
     def date(self, date):
         self.assignment_date = date
+
+    @property
+    def date_type(self):
+        return 'assignment-due-date'
+
+    @property
+    def link(self):
+        return self.assignment_link
+
+    @link.setter
+    def link(self, link):
+        self.assignment_link = link
 
     @property
     def title(self):
@@ -386,6 +415,10 @@ class CourseExpiredDate(DateSummary):
         if not CourseDurationLimitConfig.enabled_for_enrollment(user=self.user, course_key=self.course_id):
             return
         return get_user_course_expiration_date(self.user, self.course)
+
+    @property
+    def date_type(self):
+        return 'course-expired-date'
 
     @property
     def description(self):
@@ -427,6 +460,10 @@ class CertificateAvailableDate(DateSummary):
     @property
     def date(self):
         return self.course.certificate_available_date
+
+    @property
+    def date_type(self):
+        return 'certificate-available-date'
 
     @property
     def has_certificate_modes(self):
@@ -498,6 +535,10 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
             return self.enrollment.upgrade_deadline
         else:
             return None
+
+    @property
+    def date_type(self):
+        return 'verified-upgrade-deadline'
 
     @property
     def title(self):
@@ -634,6 +675,10 @@ class VerificationDeadlineDate(DateSummary):
     @lazy
     def date(self):
         return VerificationDeadline.deadline_for_course(self.course_id)
+
+    @property
+    def date_type(self):
+        return 'verification-deadline-date'
 
     @lazy
     def is_enabled(self):
