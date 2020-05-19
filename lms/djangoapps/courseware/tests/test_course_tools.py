@@ -163,7 +163,6 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         self.enrollment_deadline_missing.course_upgrade_deadline = None
         self.enrollment_deadline_missing.save()
 
-
     def test_tool_visible_logged_in(self):
         self.course_financial_mode.save()
         self.assertTrue(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
