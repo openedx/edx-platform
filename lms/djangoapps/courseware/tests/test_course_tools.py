@@ -175,7 +175,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
     def test_not_visible_when_upgrade_deadline_has_passed(self, get_enrollment_mock):
         get_enrollment_mock.return_value = self.enrollment_deadline_past
         self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
-        
+
     # mock the response from get_enrollment to use enrollment with no course_upgrade_deadline
     @patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
     def test_not_visible_when_no_upgrade_deadline(self, get_enrollment_mock):

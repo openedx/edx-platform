@@ -119,9 +119,9 @@ class FinancialAssistanceTool(CourseTool):
         if enrollment.course_upgrade_deadline:
             if now > enrollment.course_upgrade_deadline:
                 return False
-        else: 
-           return False
-        
+        else:
+            return False
+
         return bool(course_overview.eligible_for_financial_aid)
 
     @classmethod
