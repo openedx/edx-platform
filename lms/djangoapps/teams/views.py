@@ -199,7 +199,7 @@ class TeamsDashboardView(GenericAPIView):
             ),
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
-            "teams_assignments_url": reverse('teams_assignments', args=['team_id']),
+            "teams_assignments_url": reverse('teams_assignments_list', args=['team_id']),
             "teams_detail_url": reverse('teams_detail', args=['team_id']),
             "team_memberships_url": reverse('team_membership_list', request=request),
             "my_teams_url": reverse('teams_list', request=request),

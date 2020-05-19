@@ -38,7 +38,7 @@ urlpatterns = [
             team_id_pattern=TEAM_ID_PATTERN,
         ),
         TeamsAssignmentsView.as_view(),
-        name="teams_assignments"
+        name="teams_assignments_list"
     ),
     url(
         r'^v0/topics/$',

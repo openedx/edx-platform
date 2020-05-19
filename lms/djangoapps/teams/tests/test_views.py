@@ -650,7 +650,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     def get_team_assignments(self, team_id, **kwargs):
         """ Get the open response assessments assigned to a team """
         return self.make_call(
-            reverse('teams_assignments', args=[team_id]),
+            reverse('teams_assignments_list', args=[team_id]),
             **kwargs
         )
 
