@@ -15,8 +15,10 @@
                 {% endfilter %}
                 <br />
             </p>
-            {# xss-lint: disable=django-trans-missing-escape #}
-            {% trans "Confirm Email Change" as course_cta_text %}
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Confirm Email Change{% endblocktrans %}
+            {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=confirm_link %}
 
             <p style="color: rgba(0,0,0,.75);">

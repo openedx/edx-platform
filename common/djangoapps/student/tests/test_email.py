@@ -14,6 +14,7 @@ from django.http import HttpResponse
 from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils.html import escape
 from mock import Mock, patch
 from six import text_type
 
@@ -600,9 +601,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         self._assert_email(
             subject=u'Confirm your recovery email for édX',
             body_fragments=[
-                u'You\'ve registered this recovery email address for édX.'.format(
-                    new_email=new_email,
-                ),
+                u'You\'ve registered this recovery email address for édX.',
                 u'If you set this email address, click "confirm email."',
                 u'If you didn\'t request this change, you can disregard this email.',
                 u'http://edx.org/activate_secondary_email/{key}'.format(key=registration_key),
@@ -623,6 +622,6 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
 
         assert message.subject == subject
 
-        for body in text, html:
-            for fragment in body_fragments:
-                assert fragment in body
+        for fragment in body_fragments:
+            assert fragment in text
+            assert escape(fragment) in html
