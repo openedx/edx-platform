@@ -1566,7 +1566,7 @@ class TestTeamAssignmentsView(TeamAPITestCase):
 
         # When I run the query, I get back a 404 error
         expected_status = 404
-        response = self.get_team_assignments(team_id, expected_status, user=user)
+        self.get_team_assignments(team_id, expected_status, user=user)
 
 
 @ddt.ddt
