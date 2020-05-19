@@ -1518,7 +1518,7 @@ class TestTeamAssignmentsView(TeamAPITestCase):
             display_name='Test Section'
         )
         open_assessment = ItemFactory.create(
-            parent=self.section,
+            parent=section,
             category="openassessment",
             display_name="untitled",
             teams_enabled=True,
