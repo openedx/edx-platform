@@ -15,7 +15,7 @@ from ratelimitbackend import admin
 from branding import views as branding_views
 from debug import views as debug_views
 from lms.djangoapps.certificates import views as certificates_views
-from lms.djangoapps.courseware.masquerade import handle_ajax as courseware_masquerade_handle_ajax
+from lms.djangoapps.courseware.masquerade import MasqueradeView
 from lms.djangoapps.courseware.module_render import (
     handle_xblock_callback,
     handle_xblock_callback_noauth,
@@ -721,7 +721,7 @@ if settings.FEATURES.get('ENABLE_MASQUERADE'):
             r'^courses/{}/masquerade$'.format(
                 settings.COURSE_KEY_PATTERN,
             ),
-            courseware_masquerade_handle_ajax,
+            MasqueradeView.as_view(),
             name='masquerade_update',
         ),
     ]
