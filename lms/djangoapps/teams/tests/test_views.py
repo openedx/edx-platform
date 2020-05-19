@@ -1512,12 +1512,12 @@ class TestTeamAssignmentsView(TeamAPITestCase):
         course = self.test_course_1
         teamset_id = self.solar_team.topic_id
 
-        self.section = ItemFactory.create(
+        section = ItemFactory.create(
             parent=course,
             category='chapter',
             display_name='Test Section'
         )
-        self.open_assessment = ItemFactory.create(
+        open_assessment = ItemFactory.create(
             parent=self.section,
             category="openassessment",
             display_name="untitled",
@@ -1525,7 +1525,7 @@ class TestTeamAssignmentsView(TeamAPITestCase):
             selected_teamset_id=teamset_id
         )
 
-        return [self.open_assessment]
+        return [open_assessment]
 
     def test_get_assignments(self):
         # Given a course with team-enabled open responses

@@ -824,6 +824,35 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
 
 
 class TeamsAssignmentsView(GenericAPIView):
+      """
+        **Use Cases**
+
+            Get a team's assignments
+
+        **Example Requests**:
+
+            GET /api/team/v0/teams/{team_id}/assignments
+
+        **Response Values for GET**
+
+            If the user is logged in, the response is an array of the following data strcuture:
+
+                * display_name: The name of the assignment to display (currently the Unit title)
+
+                * location: The jump link to a specific assignments
+
+            For all text fields, clients rendering the values should take care
+            to HTML escape them to avoid script injections, as the data is
+            stored exactly as specified. The intention is that plain text is
+            supported, not HTML.
+
+            If the user is not logged in, a 401 error is returned.
+
+            If the user is not course or global staff, a 403 error is returned.
+
+            If the specified team does not exist, a 404 error is returned.
+
+    """
     authentication_classes = (BearerAuthentication, SessionAuthentication)
     permission_classes = (
         permissions.IsAuthenticated,

@@ -11,8 +11,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
-import lms.djangoapps.course_blocks.api as course_blocks_api
-from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
