@@ -824,7 +824,7 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
 
 
 class TeamsAssignmentsView(GenericAPIView):
-      """
+    """
         **Use Cases**
 
             Get a team's assignments
