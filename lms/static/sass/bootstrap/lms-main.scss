@@ -20,6 +20,8 @@ $static-path: '../..';
 @import 'shared/help-tab';
 @import './elements/banners';
 @import './elements/progress-circle';
+@import './elements/program-card';
+@import 'elements/icons';
 
 // Features
 @import 'features/bookmarks';
@@ -36,6 +38,7 @@ $static-path: '../..';
 @import "views/entitlement-support-page";
 @import "views/course-entitlements";
 @import "views/program-details";
+@import 'views/program-list';
 
 // Responsive Design
 @import '../header';
