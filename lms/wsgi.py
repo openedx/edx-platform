@@ -32,4 +32,24 @@ modulestore()
 # This application object is used by the development server
 # as well as any WSGI server configured to use this file.
 from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
+_application = get_wsgi_application()
+
+
+import logging
+log = logging.getLogger(__name__)
+
+
+class WsgiApp:
+    def __init__(self, application):
+        self.application = application
+    def __call__(self, environ, start_response):
+        path_info = environ.get('PATH_INFO')
+        log.error("WsgiApp path_info={}".format(path_info))
+        raise Exception("WsgiApp path_info={}".format(path_info))
+        if path_info.rstrip('/') == '/foo':
+            environ['newrelic.app_name'] = 'foo'
+        elif path_info.rstrip('/') == '/bar':
+            environ['newrelic.app_name'] = 'bar'
+        return self.application(environ, start_response)
+
+application = WsgiApp(_application)
