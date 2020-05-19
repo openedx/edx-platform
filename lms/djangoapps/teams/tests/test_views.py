@@ -647,10 +647,11 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             **kwargs
         )
 
-    def get_team_assignments(self, team_id, **kwargs):
+    def get_team_assignments(self, team_id, expected_status=200, **kwargs):
         """ Get the open response assessments assigned to a team """
         return self.make_call(
             reverse('teams_assignments_list', args=[team_id]),
+            expected_status,
             **kwargs
         )
 
@@ -1504,6 +1505,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
             self.assertEqual(team['name'], 'foo')
 
 
+@ddt.ddt
 class TestTeamAssignmentsView(TeamAPITestCase):
     """ Tests for the TeamAssignmentsView """
 
@@ -1530,18 +1532,41 @@ class TestTeamAssignmentsView(TeamAPITestCase):
 
         cls.team_assignments = [open_assessment]
 
-    def test_get_assignments(self):
+    @ddt.unpack
+    @ddt.data(
+        (None, 401),
+        ('student_inactive', 401),
+        ('student_unenrolled', 403),
+        ('student_on_team_2_private_set_1', 404),
+        ('student_enrolled', 200),
+        ('staff', 200),
+        ('course_staff', 200),
+        ('community_ta', 200),
+    )
+    def test_get_assignments(self, user, expected_status):
         # Given a course with team-enabled open responses
+        team_id = self.solar_team.team_id
+
         # When I get the assignments for a team
-        assignments = self.get_team_assignments(self.solar_team.team_id, user='student_enrolled')
+        assignments = self.get_team_assignments(team_id, expected_status, user=user)
 
-        # Then I get back the assignments for a team
-        self.assertEqual(len(assignments), len(self.team_assignments))
+        if expected_status == 200:
+            # I successful, I get back the assignments for a team
+            self.assertEqual(len(assignments), len(self.team_assignments))
 
-        # ... with the given info
-        for assignment in assignments:
-            self.assertIn('display_name', assignment.keys())
-            self.assertIn('location', assignment.keys())
+            # ... with the right data structure
+            for assignment in assignments:
+                self.assertIn('display_name', assignment.keys())
+                self.assertIn('location', assignment.keys())
+
+    def test_get_assignments_bad_team(self):
+        # Given a bad team is supplied
+        user = 'student_enrolled'
+        team_id = 'bogus-team'
+
+        # When I run the query, I get back a 404 error
+        expected_status = 404
+        response = self.get_team_assignments(team_id, expected_status, user=user)
 
 
 @ddt.ddt

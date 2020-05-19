@@ -848,9 +848,10 @@ class TeamsAssignmentsView(GenericAPIView):
 
             If the user is not logged in, a 401 error is returned.
 
-            If the user is not course or global staff, a 403 error is returned.
+            If the user is unenrolled or does not have API access, a 403 error is returned.
 
-            If the specified team does not exist, a 404 error is returned.
+            If the supplied course/team is bad or the user is not permitted to
+            search in a protected team, a 404 error is returned as if the team does not exist.
 
     """
     authentication_classes = (BearerAuthentication, SessionAuthentication)
@@ -863,9 +864,16 @@ class TeamsAssignmentsView(GenericAPIView):
 
     def get(self, request, team_id):
         """GET v0/teams/{team_id_pattern}/assignments"""
-        course_team = CourseTeam.objects.get(team_id=team_id)
+        course_team = get_object_or_404(CourseTeam, team_id=team_id)
         user = request.user
         course_id = course_team.course_id
+
+        if not has_team_api_access(request.user, course_id):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        if not has_specific_team_access(user, course_team):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         teamset_ora_blocks = get_assignments_for_team(user, course_team)
 
         # Serialize info for display
