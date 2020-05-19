@@ -864,20 +864,17 @@ class TeamsAssignmentsView(GenericAPIView):
     def get(self, request, team_id):
         """GET v0/teams/{team_id_pattern}/assignments"""
         course_team = CourseTeam.objects.get(team_id=team_id)
-        assignments = self.get_team_assignments(request, course_team)
-        return Response(assignments)
-
-    def get_team_assignments(self, request, course_team):
-        """ Get info about team assignments for display in Team Assignments panel """
         user = request.user
         course_id = course_team.course_id
         teamset_ora_blocks = get_assignments_for_team(user, course_team)
 
         # Serialize info for display
-        return [{
+        assignments = [{
             'display_name': self._display_name_for_ora_block(block),
             'location': self._jump_location_for_block(course_id, block.location)
         } for block in teamset_ora_blocks]
+
+        return Response(assignments)
 
     def _display_name_for_ora_block(self, block):
         """ Get the unit name where the ORA is located for better display naming """
