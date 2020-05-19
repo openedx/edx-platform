@@ -1542,6 +1542,7 @@ class TestTeamAssignmentsView(TeamAPITestCase):
             self.assertIn('display_name', assignment.keys())
             self.assertIn('location', assignment.keys())
 
+
 @ddt.ddt
 class TestListTopicsAPI(TeamAPITestCase):
     """Test cases for the topic listing endpoint."""
