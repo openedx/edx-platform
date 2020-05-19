@@ -7,7 +7,6 @@ import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
 import django_countries.fields
-import functools
 import openedx.features.idea.helpers
 
 
@@ -28,8 +27,8 @@ class Migration(migrations.Migration):
                 ('country', django_countries.fields.CountryField(max_length=2)),
                 ('city', models.CharField(max_length=255)),
                 ('video_link', models.URLField(blank=True, null=True)),
-                ('image', models.ImageField(blank=True, help_text='Accepted extensions: .jpg, .png', null=True, upload_to=functools.partial(openedx.features.idea.helpers.upload_to_path, *(), **{b'folder': 'images'}), validators=[django.core.validators.FileExtensionValidator(['jpg', 'png'])])),
-                ('file', models.FileField(blank=True, help_text='Accepted extensions: .docx, .pdf, .txt', null=True, upload_to=functools.partial(openedx.features.idea.helpers.upload_to_path, *(), **{b'folder': 'files'}), validators=[django.core.validators.FileExtensionValidator(['docx', 'pdf', 'txt'])])),
+                ('image', models.ImageField(blank=True, help_text='Accepted extensions: .jpg, .png', null=True, validators=[django.core.validators.FileExtensionValidator(['jpg', 'png'])])),
+                ('file', models.FileField(blank=True, help_text='Accepted extensions: .docx, .pdf, .txt', null=True, validators=[django.core.validators.FileExtensionValidator(['docx', 'pdf', 'txt'])])),
                 ('organization_mission', models.TextField()),
                 ('title', models.CharField(max_length=50)),
                 ('overview', models.CharField(max_length=150)),
