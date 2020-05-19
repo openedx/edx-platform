@@ -21,6 +21,7 @@ from django.utils.translation import ngettext
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
@@ -34,6 +35,7 @@ from student.models import (
     DashboardConfiguration,
     LinkedInAddToProfileConfiguration,
     LoginFailures,
+    OrganizationalAccessRole,
     PendingNameChange,
     Registration,
     RegistrationCookieConfiguration,
@@ -175,6 +177,32 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.user = form.cleaned_data['email']
         super(CourseAccessRoleAdmin, self).save_model(request, obj, form, change)
+
+
+@admin.register(OrganizationalAccessRole)
+class OrgAccessRoleAdmin(CourseAccessRoleAdmin):
+    """
+    Admin view for organizational roles.
+    """
+    fieldsets = (
+        (None, {
+            'fields': ('email', 'org', 'role',)
+        }),
+    )
+
+    list_display = (
+        'id', 'user', 'org', 'role',
+    )
+    search_fields = (
+        'id', 'user__username', 'user__email', 'org', 'role',
+    )
+
+    def get_queryset(self, request):
+        """
+        Filter out the course roles.
+        """
+        qs = super().get_queryset(request)
+        return qs.filter(course_id=CourseKeyField.Empty)
 
 
 @admin.register(LinkedInAddToProfileConfiguration)

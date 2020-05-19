@@ -2263,7 +2263,6 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
 
 
 @total_ordering
-@python_2_unicode_compatible
 class CourseAccessRole(models.Model):
     """
     Maps users to org, courses, and roles. Used by student.roles.CourseRole and OrgRole.
@@ -2311,6 +2310,14 @@ class CourseAccessRole(models.Model):
 
     def __str__(self):
         return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
+
+
+class OrganizationalAccessRole(CourseAccessRole):
+    """
+    This model is needed for creating a second view in the django admin.
+    """
+    class Meta:
+        proxy = True
 
 
 #### Helper methods for use from python manage.py shell and other classes.
