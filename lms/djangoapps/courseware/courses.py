@@ -22,6 +22,8 @@ from opaque_keys.edx.keys import UsageKey
 from path import Path as path
 from six import text_type
 
+from openedx.core.lib.cache_utils import request_cached
+
 import branding
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
@@ -511,6 +513,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
     return date_blocks
 
 
+@request_cached()
 def get_course_assignments(course_key, user, request, include_access=False):
     """
     Returns a list of assignment (at the subsection/sequential level) due dates for the given course.

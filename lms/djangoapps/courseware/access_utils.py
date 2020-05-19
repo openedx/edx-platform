@@ -65,7 +65,7 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
     return start
 
 
-def check_start_date(user, days_early_for_beta, start, course_key, display_error_to_user=True):
+def check_start_date(user, days_early_for_beta, start, course_key, display_error_to_user=True, now=None):
     """
     Verifies whether the given user is allowed access given the
     start date and the Beta offset for the given course.
@@ -82,10 +82,11 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
     if start_dates_disabled and not masquerading_as_student:
         return ACCESS_GRANTED
     else:
-        now = datetime.now(UTC)
         if start is None or in_preview_mode() or get_course_masquerade(user, course_key):
             return ACCESS_GRANTED
 
+        if now is None:
+            now = datetime.now(UTC)
         effective_start = adjust_start_date(user, days_early_for_beta, start, course_key)
         if now > effective_start:
             return ACCESS_GRANTED

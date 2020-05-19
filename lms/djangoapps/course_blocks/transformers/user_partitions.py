@@ -81,6 +81,11 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
     def transform_block_filters(self, usage_info, block_structure):
         user = usage_info.user
         result_list = SplitTestTransformer().transform_block_filters(usage_info, block_structure)
+        staff_access = has_access(user, 'staff', usage_info.course_key)
+
+        # If you have staff access, you are allowed access to the entire result list
+        if staff_access:
+            return result_list
 
         user_partitions = block_structure.get_transformer_data(self, 'user_partitions')
         if not user_partitions:
@@ -97,7 +102,7 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
             )
             access_denying_partition = get_partition_from_id(user_partitions, access_denying_partition_id)
 
-            if not has_access(user, 'staff', block_key) and access_denying_partition:
+            if access_denying_partition:
                 user_group = user_groups.get(access_denying_partition.id)
                 allowed_groups = transformer_block_field.get_allowed_groups()[access_denying_partition.id]
                 access_denied_message = access_denying_partition.access_denied_message(
@@ -112,7 +117,6 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
 
         group_access_filter = block_structure.create_removal_filter(
             lambda block_key: (
-                not has_access(user, 'staff', block_key) and
                 block_structure.get_transformer_block_field(
                     block_key, self, 'merged_group_access'
                 ).get_access_denying_partition(user_groups) is not None and
@@ -120,6 +124,7 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
             )
         )
         result_list.append(group_access_filter)
+
         return result_list
 
 
