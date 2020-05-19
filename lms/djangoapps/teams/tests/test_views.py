@@ -1513,7 +1513,7 @@ class TestTeamAssignmentsView(TeamAPITestCase):
     def setUpClass(cls):
         """ Create an openassessment block for testing """
         super(TestTeamAssignmentsView, cls).setUpClass()
-    
+
         course = cls.test_course_1
         teamset_id = cls.solar_team.topic_id
 
