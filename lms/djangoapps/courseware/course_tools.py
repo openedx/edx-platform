@@ -120,7 +120,6 @@ class FinancialAssistanceTool(CourseTool):
         if enrollment.mode not in CourseMode.UPSELL_TO_VERIFIED_MODES:
             return False
 
-        # (Confirm: this block may no longer be needed once we're checking UPSELL_TO_VERIFIED_MODES)
         # hide if there's no course_upgrade_deadline, or one with a value in the past
         if enrollment.course_upgrade_deadline:
             if now > enrollment.course_upgrade_deadline:
