@@ -1,7 +1,7 @@
 <div class="wrapper-content-main payment-confirmation-step">
   <article class="content-main">
     <h3 class="title">
-      <%= interpolate(
+      <%- edx.StringUtils.interpolate(
             gettext( "Thank you %(full_name)s! We have received your payment for %(course_name)s."),
             { course_name: "<span class='course_name_placeholder'></span>",
               full_name: "<span class='full_name_placeholder'></span>"}, true
