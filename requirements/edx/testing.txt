@@ -172,7 +172,7 @@ lepl==5.1.3               # via -r requirements/edx/base.txt, rfc6266-parser
 libsass==0.10.0           # via -r requirements/edx/base.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/base.txt, ora2
 git+https://github.com/edx/xblock-lti-consumer.git@v1.2.6#egg=lti_consumer-xblock==1.2.6  # via -r requirements/edx/base.txt
-lxml==4.5.0               # via -r requirements/edx/base.txt, capa, edxval, lti-consumer-xblock, ora2, pyquery, safe-lxml, xblock, xmlsec
+lxml==4.5.1               # via -r requirements/edx/base.txt, capa, edxval, lti-consumer-xblock, ora2, pyquery, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.txt
 mako==1.0.2               # via -r requirements/edx/base.txt, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
 mando==0.6.4              # via radon
@@ -195,7 +195,7 @@ git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d926
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/base.txt
 git+https://github.com/edx/edx-ora2.git@2.6.25#egg=ora2==2.6.25  # via -r requirements/edx/base.txt
-packaging==20.3           # via -r requirements/edx/base.txt, bleach, drf-yasg, pytest, tox
+packaging==20.4           # via -r requirements/edx/base.txt, bleach, drf-yasg, pytest, tox
 pandas==0.22.0            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt
 path.py==12.4.0           # via -r requirements/edx/base.txt, edx-enterprise, edx-i18n-tools, ora2, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, path.py
