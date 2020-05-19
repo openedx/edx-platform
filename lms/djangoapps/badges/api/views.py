@@ -27,15 +27,15 @@ class InvalidCourseKeyError(APIException):
 
 class UserBadgeAssertions(generics.ListAPIView):
     """
-    ** Use cases **
+    **Use Cases**
 
         Request a list of assertions for a user, optionally constrained to a course.
 
-    ** Example Requests **
+    **Example Requests**
 
         GET /api/badges/v1/assertions/user/{username}/
 
-    ** Response Values **
+    **Response Values**
 
         Body comprised of a list of objects with the following fields:
 
@@ -53,7 +53,7 @@ class UserBadgeAssertions(generics.ListAPIView):
         * assertion_url: The URL to the OpenBadges BadgeAssertion object, for verification by compatible tools
           and software.
 
-    ** Params **
+    **Params**
 
         * slug (optional): The identifier for a particular badge class to filter by.
         * issuing_component (optional): The issuing component for a particular badge class to filter by
@@ -63,7 +63,7 @@ class UserBadgeAssertions(generics.ListAPIView):
           provided, and this field is not specified, assumes that the target badge has an empty course_id field.
           '*' may be used to get all badges with the specified slug, issuing_component combination across all courses.
 
-    ** Returns **
+    **Returns**
 
         * 200 on success, with a list of Badge Assertion objects.
         * 403 if a user who does not have permission to masquerade as

@@ -6,7 +6,7 @@
   // UI: basic layout
   .content-primary,
   .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   .content-primary {
@@ -27,7 +27,7 @@
 
   // UI: export controls
   .export-controls {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     @extend %ui-window;
 

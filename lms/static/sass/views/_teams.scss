@@ -179,7 +179,8 @@
     // STATE: hover, active, and focus
     &:hover,
     &:active,
-    &:focus {
+    &:focus,
+    &:focus-within {
       box-shadow: 0 0 5px 1px $m-blue-t1;
 
       .card-description {
@@ -742,6 +743,11 @@
       .u-field-description-message {
         color: $error-color !important;
       }
+    }
+
+    .teams-paging-header .listing-sort-select.input-select,
+    .topics-paging-header .listing-sort-select.input-select {
+      border: 1px solid $gray-l2;
     }
 
     .create-team.wrapper-msg {

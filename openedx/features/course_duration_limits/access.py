@@ -67,6 +67,10 @@ def get_user_course_duration(user, course):
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
         return None
 
+    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
+    if not verified_mode:
+        return None
+
     return get_expected_duration(course)
 
 

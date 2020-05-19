@@ -158,6 +158,7 @@ def update_account_settings(requesting_user, update, username=None):
         _notify_language_proficiencies_update_if_needed(update, user, user_profile, old_language_proficiencies)
         _store_old_name_if_needed(old_name, user_profile, requesting_user)
         _update_extended_profile_if_needed(update, user_profile)
+        _update_state_if_needed(update, user_profile)
 
     except PreferenceValidationError as err:
         raise AccountValidationError(err.preference_errors)
@@ -287,6 +288,13 @@ def _update_extended_profile_if_needed(data, user_profile):
             new_value = field['field_value']
             meta[field_name] = new_value
         user_profile.set_meta(meta)
+        user_profile.save()
+
+
+def _update_state_if_needed(data, user_profile):
+    # If the country was changed to something other than US, remove the state.
+    if "country" in data and data['country'] != UserProfile.COUNTRY_WITH_STATES:
+        user_profile.state = None
         user_profile.save()
 
 

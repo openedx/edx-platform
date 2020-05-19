@@ -61,6 +61,7 @@
 
 
   <div class="attachment-list">
+    # xss-lint: disable=django-trans-missing-escape
     <!--<p class="lead">{% trans "The following files are available for this article. Copy the markdown tag to directly refer to a file from the article text." %}</p>-->
     <ul>
       {% for attachment in attachments %}

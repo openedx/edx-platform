@@ -312,6 +312,7 @@ class CourseCcxCoachRole(CourseRole):
         super(CourseCcxCoachRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
+@register_access_role
 class CourseDataResearcherRole(CourseRole):
     """A Data Researcher"""
     ROLE = 'data_researcher'

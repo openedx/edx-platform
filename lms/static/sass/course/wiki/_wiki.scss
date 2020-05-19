@@ -150,8 +150,7 @@
     width: flex-grid(9);
     padding: 40px 0 40px 40px;
     color: $body-color;
-
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   &.view .main-article {
@@ -238,8 +237,7 @@
     float: left;
     width: flex-grid(3);
     padding: 40px;
-
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     .timestamp {
       margin-top: ($baseline*0.75);

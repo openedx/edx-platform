@@ -13,8 +13,15 @@
 # (although it is advertised in the changelog as 3.1.26.)
 celery>=3.1.25,<4.0.0
 
+# Constrain until https://github.com/datadriventests/ddt/issues/83 is fixed.
+ddt<1.4.0
+
 # Stay on the latest LTS release of Django
 Django<2.3
+
+# 0.6.0 has a missing dependency declaration on ua-parser: https://github.com/jotes/django-cookies-samesite/issues/25
+# 0.6.1 throws on some requests from iOS app: https://github.com/jotes/django-cookies-samesite/issues/28
+django-cookies-samesite<0.6.0
 
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
@@ -42,6 +49,9 @@ httpretty<1.0
 
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
+
+# 0.15.0 dropped support for Python 3.5
+joblib<0.15.0
 
 # jsonfield2 3.1.0 drops support for python 3.5
 jsonfield2<3.1.0

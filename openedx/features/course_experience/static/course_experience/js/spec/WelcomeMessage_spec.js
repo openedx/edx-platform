@@ -90,7 +90,6 @@ describe('Welcome Message factory', () => {
       loadFixtures('course_experience/fixtures/welcome-message-fragment.html');
       new WelcomeMessage({  // eslint-disable-line no-new
         dismissUrl: endpointUrl,
-        shortenWelcomeMessage: true,
       });
     });
 

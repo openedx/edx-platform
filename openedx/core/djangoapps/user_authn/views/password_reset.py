@@ -247,8 +247,11 @@ def password_reset(request):
 
     if password_reset_email_limiter.is_rate_limit_exceeded(request):
         AUDIT_LOG.warning("Password reset rate limit exceeded")
-        return HttpResponse(
-            _("Your previous request is in progress, please try again in a few moments."),
+        return JsonResponse(
+            {
+                'success': False,
+                'value': _("Your previous request is in progress, please try again in a few moments.")
+            },
             status=403
         )
 
@@ -273,7 +276,8 @@ def password_reset(request):
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
-        password_reset_email_limiter.tick_request_counter(request)
+
+    password_reset_email_limiter.tick_request_counter(request)
 
     return JsonResponse({
         'success': True,

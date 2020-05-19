@@ -3302,6 +3302,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "email",
         "extended_profile",
         "gender",
+        "state",
         "goals",
         "is_active",
         "mailing_address",
@@ -3681,6 +3682,9 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
+
+# List of enterprise customer uuids to exclude from transition to use of enterprise-catalog
+ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG = []
 
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance

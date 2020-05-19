@@ -727,14 +727,16 @@ class RegistrationValidationView(APIView):
         POST /api/user/v1/validation/registration/
 
         Expects request of the form
-        >>> {
-        >>>     "name": "Dan the Validator",
-        >>>     "username": "mslm",
-        >>>     "email": "mslm@gmail.com",
-        >>>     "confirm_email": "mslm@gmail.com",
-        >>>     "password": "password123",
-        >>>     "country": "PK"
-        >>> }
+        ```
+        {
+            "name": "Dan the Validator",
+            "username": "mslm",
+            "email": "mslm@gmail.com",
+            "confirm_email": "mslm@gmail.com",
+            "password": "password123",
+            "country": "PK"
+        }
+        ```
         where each key is the appropriate form field name and the value is
         user input. One may enter individual inputs if needed. Some inputs
         can get extra verification checks if entered along with others,

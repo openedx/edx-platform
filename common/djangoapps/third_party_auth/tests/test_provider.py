@@ -1,9 +1,12 @@
 """Unit tests for provider.py."""
 
 
+import re
 import unittest
 
 from django.contrib.sites.models import Site
+from django.db import connections, DEFAULT_DB_ALIAS
+from django.test.utils import CaptureQueriesContext
 from mock import Mock, patch
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
@@ -74,6 +77,24 @@ class RegistryTest(testutil.TestCase):
 
         with patch('third_party_auth.provider._PSA_OAUTH2_BACKENDS', backend_names):
             self.assertEqual(sorted(provider_names), [prov.name for prov in provider.Registry.enabled()])
+
+    def test_enabled_doesnt_query_site(self):
+        """Regression test for 1+N queries for django_site (ARCHBOM-1139)"""
+        re_django_site_query = re.compile(r'FROM\s+"django_site"')
+
+        self.enable_saml()
+        provider_count = 5
+        for i in range(provider_count):
+            self.configure_saml_provider(enabled=True, slug="saml-slug-%s" % i)
+
+        with CaptureQueriesContext(connections[DEFAULT_DB_ALIAS]) as cq:
+            enabled_slugs = {p.slug for p in provider.Registry.enabled()}
+
+        self.assertEqual(len(enabled_slugs), provider_count)
+        # Should not involve any queries for Site, or at least should not *scale* with number of providers
+        all_queries = [q['sql'] for q in cq.captured_queries]
+        django_site_queries = list(filter(re_django_site_query.search, all_queries))
+        self.assertEqual(len(django_site_queries), 0)  # previously was == provider_count (1 for each provider)
 
     def test_providers_displayed_for_login(self):
         """
@@ -146,48 +167,6 @@ class RegistryTest(testutil.TestCase):
         site_b = Site.objects.get_or_create(domain=SITE_DOMAIN_B, name=SITE_DOMAIN_B)[0]
         prov = self.configure_google_provider(visible=True, enabled=True, site=site_b)
         self.assertEqual(prov.enabled_for_current_site, False)
-
-    @with_site_configuration(SITE_DOMAIN_A)
-    @patch('edx_django_utils.monitoring.set_custom_metric')
-    def test_providers_with_same_key_independent_across_sites(self, mock_set_custom_metric):
-        """
-        Verify that having two providers configured with the same key
-        but for different sites do not shadow each other on retrieval.
-        """
-        site_a = Site.objects.get_or_create(domain=SITE_DOMAIN_A, name=SITE_DOMAIN_A)[0]
-        site_b = Site.objects.get_or_create(domain=SITE_DOMAIN_B, name=SITE_DOMAIN_B)[0]
-
-        self.enable_saml(site=site_a)
-        self.enable_saml(site=site_b)
-        configs = [
-            self.configure_saml_provider(enabled=True, site=site_b, slug="x", name="Site B first"),
-            self.configure_saml_provider(enabled=True, site=site_a, slug="x", name="Site A first"),
-            self.configure_saml_provider(enabled=True, site=site_a, slug="x", name="Site A second"),
-            self.configure_saml_provider(enabled=True, site=site_b, slug="x", name="Site B second"),
-        ]
-
-        # If sites are not partitioned in retrieval, a site_b record can appear
-        # to be the "current" config, and then be ignored by site_a (resulting
-        # in zero enabled providers for site_a).
-
-        # TODO(ARCHBOM-1139) Uncomment when finished with dark launch in provider.py
-        # self.assertEqual([p.name for p in provider.Registry.enabled()], ["Site A second"])
-        # Until then, just run the generator to its end and show that the dark launch would complain here
-        list(provider.Registry.enabled())
-        mock_set_custom_metric.assert_any_call('temp_tpa_enabled_all_dark_launch_mismatch',
-                                               'old[]new[%s]' % configs[2].id)
-
-    def test_mixed_providers(self):
-        """
-        Verify that multiple providers types can be configured at same time.
-        """
-        self.enable_saml()
-        self.configure_saml_provider(enabled=True, slug="saml-slug", name="Some SAML")
-        self.configure_google_provider(enabled=True)
-        self.configure_lti_provider(enabled=True)
-
-        configs = provider.Registry.enabled()
-        self.assertEqual({p.backend_name for p in configs}, {'tpa-saml', 'google-oauth2', 'lti'})
 
     def test_get_returns_enabled_provider(self):
         google_provider = self.configure_google_provider(enabled=True)

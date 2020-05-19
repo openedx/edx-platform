@@ -382,7 +382,7 @@ def enroll_in_masters_track(user, course_key, status):
     Arguments:
         user (User)
         course_key (CourseKey|str)
-        status (str): from ProgramCourseEnrollmenStatuses
+        status (str): from ProgramCourseEnrollmentStatuses
 
     Returns: CourseEnrollment
 
@@ -390,7 +390,7 @@ def enroll_in_masters_track(user, course_key, status):
     """
     _ensure_course_exists(course_key, user.id)
     if status not in ProgramCourseEnrollmentStatuses.__ALL__:
-        raise ValueError("invalid ProgramCourseEnrollmenStatus: {}".format(status))
+        raise ValueError("invalid ProgramCourseEnrollmentStatus: {}".format(status))
     if CourseEnrollment.is_enrolled(user, course_key):
         course_enrollment = CourseEnrollment.objects.get(
             user=user,

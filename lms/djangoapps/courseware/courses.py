@@ -52,13 +52,13 @@ from lms.djangoapps.courseware.access_utils import (
 )
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from openedx.features.course_experience.utils import get_course_outline_block_tree
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
 from survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
@@ -517,31 +517,34 @@ def get_course_assignments(course_key, user, request, include_access=False):
 
     Each returned object is a namedtuple with fields: title, url, date, contains_gated_content, complete, past_due
     """
-    assignments = []
-    # Ideally this function is always called with a request being passed in, but because it is also
-    # a subfunction of `get_course_date_blocks` which does not require a request, we are being defensive here.
-    if not request:
-        return assignments
+    store = modulestore()
+    course_usage_key = store.make_course_usage_key(course_key)
+    block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True)
 
     now = datetime.now(pytz.UTC)
-    course_root_block = get_course_outline_block_tree(request, str(course_key), user, allow_start_dates_in_future=True)
-    for section in course_root_block.get('children', []):
-        for subsection in section.get('children', []):
-            if not subsection.get('due') or not subsection.get('graded'):
+    assignments = []
+    for section_key in block_data.get_children(course_usage_key):
+        for subsection_key in block_data.get_children(section_key):
+            due = block_data.get_xblock_field(subsection_key, 'due')
+            graded = block_data.get_xblock_field(subsection_key, 'graded', False)
+            if not due or not graded:
                 continue
 
-            contains_gated_content = include_access and subsection.get('contains_gated_content', False)
-            title = subsection.get('display_name', _('Assignment'))
+            contains_gated_content = include_access and block_data.get_xblock_field(
+                subsection_key, 'contains_gated_content', False)
+            title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
 
             url = None
-            assignment_released = not subsection.get('start') or subsection.get('start') < now
+            start = block_data.get_xblock_field(subsection_key, 'start')
+            assignment_released = not start or start < now
             if assignment_released:
-                url = subsection.get('lms_web_url')
+                url = reverse('jump_to', args=[course_key, subsection_key])
+                url = request and request.build_absolute_uri(url)
 
-            complete = subsection.get('complete')
-            past_due = not complete and subsection.get('due', now + timedelta(1)) < now
+            complete = block_data.get_xblock_field(subsection_key, 'complete', False)
+            past_due = not complete and due < now
             assignments.append(_Assignment(
-                subsection.get('id'), title, url, subsection.get('due'), contains_gated_content, complete, past_due
+                subsection_key, title, url, due, contains_gated_content, complete, past_due
             ))
 
     return assignments

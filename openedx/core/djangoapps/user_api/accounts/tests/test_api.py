@@ -481,6 +481,23 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         self.assertIsNot(account_recovery, None)
         self.assertEqual(account_recovery.secondary_email, test_email)
 
+    def test_change_country_removes_state(self):
+        '''
+        Test that changing the country (to something other than a country with
+        states) removes the state
+        '''
+        # First set the country and state
+        update_account_settings(self.user, {"country": UserProfile.COUNTRY_WITH_STATES, "state": "MA"})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['country'], UserProfile.COUNTRY_WITH_STATES)
+        self.assertEqual(account_settings['state'], 'MA')
+
+        # Change the country and check that state is removed
+        update_account_settings(self.user, {"country": ""})
+        account_settings = get_account_settings(self.default_request)[0]
+        self.assertEqual(account_settings['country'], None)
+        self.assertEqual(account_settings['state'], None)
+
 
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
@@ -521,6 +538,7 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
             'mailing_address': u'',
             'year_of_birth': None,
             'country': None,
+            'state': None,
             'social_links': [],
             'bio': None,
             'profile_image': {

@@ -6,7 +6,7 @@
   // LAYOUT: page
   .content-primary,
   .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   .content-primary {
@@ -71,7 +71,7 @@
   .user-item,
   .item-metadata,
   .item-actions {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   .user-list {

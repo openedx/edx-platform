@@ -14,7 +14,9 @@
 
   footer#footer-openedx {
     @include clearfix();
-    @include box-sizing(border-box);
+
+    box-sizing: border-box;
+
     @include outer-container;
 
     margin: 0 auto;

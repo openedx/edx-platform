@@ -213,18 +213,18 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
-        target_date = (current_date - datetime.timedelta(days=day_offset)).date()
+        target_datetime = (current_date - datetime.timedelta(days=day_offset))
 
         if not cls.is_enqueue_enabled(site):
             cls.log_info(u'Message queuing disabled for site %s', site.domain)
             return
 
-        cls.log_info(u'Target date = %s', target_date.isoformat())
+        cls.log_info(u'Target date = %s', target_datetime.date().isoformat())
         for course_key in CourseOverview.get_all_course_keys():
             task_args = (
                 site.id,
-                serialize(target_date),
-                course_key,
+                serialize(target_datetime),  # Need to leave as a datetime for serialization purposes here
+                str(course_key),  # Needs to be a string for celery to properly process
                 override_recipient_email,
             )
             cls.log_info(u'Launching task with args = %r', task_args)
@@ -241,7 +241,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
                 self.async_send_task,
                 site,
                 deserialize(target_day_str),
-                course_key,
+                str(course_key),
                 override_recipient_email,
             ).send()
 
