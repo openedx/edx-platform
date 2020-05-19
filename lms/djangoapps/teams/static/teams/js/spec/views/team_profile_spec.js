@@ -117,18 +117,50 @@ define([
 
         describe('TeamAssignmentsView', function() {
             it('can render itself', function() {
-                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments();
-                var requests = AjaxHelpers.requests(this),
-                    view = createTeamProfileView(requests, {});
+                // Given a member of a team with team assignments
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
+                    options = {
+                        membership: DEFAULT_MEMBERSHIP
+                    },
+                    requests = AjaxHelpers.requests(this);
+
+                // When they go to the team profile view
+                var view = createTeamProfileView(requests, options);
+
+                // The Assignments section renders with their assignments
                 expect(view.$('.team-assignment').length).toEqual(mockAssignments.length);
             });
 
             it('displays a message when no assignments are found', function() {
-                var mockAssignments = [];
-                var requests = AjaxHelpers.requests(this),
-                    view = createTeamProfileView(requests, {assignments: mockAssignments});
+                // Given a member viewing a team with no assignments
+                var mockAssignments = [],
+                    options = {
+                        assignments: mockAssignments,
+                        membership: DEFAULT_MEMBERSHIP
+                    },
+                    requests = AjaxHelpers.requests(this);
+
+                // When they view the team
+                var view = createTeamProfileView(requests, options);
+
+                // There should be filler text that says there are no assignments
                 expect(view.$('#assignments').text()).toEqual('No assignments yet for team');
                 expect(view.$('.team-assignment').length).toEqual(0);
+            });
+
+            it('does not show at all for someone who is not on the team or staff', function() {
+                // Given a user who is not on a team viewing a team with assignments
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
+                    options = {
+                        assignments: mockAssignments
+                    },
+                    requests = AjaxHelpers.requests(this);
+
+                // When the user goes to the team detail page
+                var view = createTeamProfileView(requests, options);
+
+                // Then then assignments view does not appear on the page
+                expect(view.$('.team-assignments').length).toBe(0);
             });
         });
 

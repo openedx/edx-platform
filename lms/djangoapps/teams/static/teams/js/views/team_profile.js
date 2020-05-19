@@ -56,6 +56,7 @@
                             language: this.languages[this.model.get('language')],
                             membershipText: TeamUtils.teamCapacityText(memberships.length, maxTeamSize),
                             isMember: isMember,
+                            isAdminOrStaff: isAdminOrStaff,
                             showLeaveLink: showLeaveLink,
                             hasCapacity: maxTeamSize && (memberships.length < maxTeamSize),
                             hasMembers: memberships.length >= 1
