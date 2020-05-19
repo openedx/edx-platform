@@ -168,7 +168,8 @@ def sign_and_send_replace_result(assignment, xml):
         consumer_key,
         consumer_secret,
         signature_method='HMAC-SHA1',
-        force_include_body=True
+        force_include_body=True,
+        decoding=None,
     )
 
     headers = {'content-type': 'application/xml'}
