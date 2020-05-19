@@ -146,6 +146,13 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         )
         self.request.user = self.enrollment.user
 
+        # enrollment where learner has upgraded
+        self.enrollment_upgraded = CourseEnrollmentFactory(
+            course_id=self.course.id,
+            mode=CourseMode.VERIFIED,
+            course=self.course_overview,
+        )
+
         # course enrollment for mock: upgrade deadline in the past
         self.enrollment_deadline_past = self.enrollment
         self.enrollment_deadline_past.course_upgrade_deadline = self.now - datetime.timedelta(days=1)
@@ -156,6 +163,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         self.enrollment_deadline_missing.course_upgrade_deadline = None
         self.enrollment_deadline_missing.save()
 
+
     def test_tool_visible_logged_in(self):
         self.course_financial_mode.save()
         self.assertTrue(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
@@ -165,7 +173,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         self.course_overview.save()
         self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course_overview.id))
 
-    def test_tool_not_visible_when_user_not_unrolled(self):
+    def test_tool_not_visible_when_user_not_enrolled(self):
         self.course_financial_mode.save()
         self.request.user = None
         self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
@@ -186,3 +194,10 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         self.course_overview.end_date = self.now - datetime.timedelta(days=30)
         self.course_overview.save()
         self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course_overview.id))
+
+    # mock the response from get_enrollment to use enrollment where learner upgraded
+    @patch('lms.djangoapps.courseware.course_tools.CourseEnrollment.get_enrollment')
+    def test_tool_not_visible_when_already_upgraded(self, get_enrollment_mock):
+        self.course_financial_mode.save()
+        get_enrollment_mock.return_value = self.enrollment_upgraded
+        self.assertFalse(FinancialAssistanceTool().is_enabled(self.request, self.course.id))
