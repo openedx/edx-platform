@@ -34,9 +34,10 @@
                 {% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." as tmsg %}{{ tmsg | force_escape }}
                 <br />
             </p>
-            {# xss-lint: disable=django-trans-missing-escape #}
-            {% trans "Create Password" as course_cta_text %}
 
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Create Password{% endblocktrans %}
+            {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=reset_link %}
         </td>
     </tr>
