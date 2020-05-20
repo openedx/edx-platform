@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from ratelimit.decorators import ratelimit
 
 import third_party_auth
 from edxmako.shortcuts import render_to_response
@@ -124,6 +125,12 @@ def get_login_session_form(request):
 
 
 @require_http_methods(['GET'])
+@ratelimit(
+    key='openedx.core.djangoapps.util.ratelimit.real_ip',
+    rate=settings.LOGISTRATION_RATELIMIT_RATE,
+    method='GET',
+    block=True
+)
 @ensure_csrf_cookie
 @xframe_allow_whitelisted
 def login_and_registration_form(request, initial_mode="login"):
