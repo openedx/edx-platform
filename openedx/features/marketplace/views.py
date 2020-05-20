@@ -10,6 +10,7 @@ from django.views import View, generic
 from edxmako.shortcuts import render_to_response
 from openedx.features.marketplace.decorators import has_affiliated_user
 from openedx.features.marketplace.forms import MarketplaceRequestForm
+from openedx.features.user_leads.helpers import save_user_utm
 
 from .models import MarketplaceRequest
 
@@ -18,6 +19,7 @@ class MarketplaceListingView(View):
     template_name = 'features/marketplace/marketplace_listing.html'
 
     def get(self, request, *args, **kwargs):
+        save_user_utm(self.request)
         return render_to_response(self.template_name, {})
 
 
