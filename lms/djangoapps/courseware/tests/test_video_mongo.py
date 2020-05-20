@@ -827,8 +827,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         def side_effect(*args, **kwargs):
             cdn = {
-                'http://example.com/example.mp4': 'http://cdn-example.com/example.mp4',
-                'http://example.com/example.webm': 'http://cdn-example.com/example.webm',
+                'http://edx-video.net/example.mp4': 'http://cdn-edx-video.net/example.mp4',
+                'http://edx-video.net/example.webm': 'http://cdn-edx-video.net/example.webm',
             }
             return cdn.get(args[1])
 
@@ -850,14 +850,14 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'download_video': 'true',
             'source': 'example_source.mp4',
             'sources': """
-                <source src="http://example.com/example.mp4"/>
-                <source src="http://example.com/example.webm"/>
+                <source src="http://edx-video.net/example.mp4"/>
+                <source src="http://edx-video.net/example.webm"/>
             """,
             'result': {
-                'download_video_link': u'http://example.com/example.mp4',
+                'download_video_link': u'http://edx-video.net/example.mp4',
                 'sources': [
-                    u'http://cdn-example.com/example.mp4',
-                    u'http://cdn-example.com/example.webm'
+                    u'http://cdn-edx-video.net/example.mp4',
+                    u'http://cdn-edx-video.net/example.webm'
                 ],
             },
         }

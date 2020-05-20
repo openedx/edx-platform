@@ -340,9 +340,10 @@ class VideoBlock(
 
             if self.edx_video_id and edxval_api and video_status != u'external':
                 for index, source_url in enumerate(sources):
-                    new_url = rewrite_video_url(cdn_url, source_url)
-                    if new_url:
-                        sources[index] = new_url
+                    if any(cdn_prefix in source_url for cdn_prefix in ['edx-video.net', 'cloudfront.net']):
+                        new_url = rewrite_video_url(cdn_url, source_url)
+                        if new_url:
+                            sources[index] = new_url
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoBlock.
