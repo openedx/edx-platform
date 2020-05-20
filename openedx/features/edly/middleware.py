@@ -2,8 +2,11 @@
 Edly Organization Access Middleware.
 """
 from logging import getLogger
+from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404
 
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.edly.utils import user_has_edly_organization_access
 
 logger = getLogger(__name__)
@@ -24,3 +27,31 @@ class EdlyOrganizationAccessMiddleware(object):
         if user_is_authenticated and not user_is_superuser and not user_has_edly_organization_access(request):
             logger.exception('Edly user %s has no access for site %s.' % (request.user.email, request.site))
             raise Http404()
+
+
+class SettingsOverrideMiddleware(object):
+    """
+    Django middleware to override django settings from site configuration.
+    """
+
+    def process_request(self, request):
+        """
+        Override django settings from django site configuration.
+        """
+        current_site = get_current_site(request)
+        try:
+            current_site_configuration = current_site.configuration
+        except SiteConfiguration.DoesNotExist:
+            logger.warning('Site (%s) has no related site configuration.', current_site)
+            return None
+
+        if current_site_configuration.values:
+            django_settings_override_values = current_site_configuration.get_value('DJANGO_SETTINGS_OVERRIDE', None)
+            if django_settings_override_values:
+                for config_key, config_value in django_settings_override_values.items():
+                    setattr(settings, config_key, config_value)
+            else:
+                logger.warning('Site configuration for site (%s) has no django settings overrides.', current_site)
+
+        else:
+            logger.warning('Site configuration for site (%s) has no values set.', current_site)
