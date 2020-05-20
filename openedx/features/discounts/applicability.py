@@ -146,8 +146,8 @@ def _is_in_holdback(user):
     if datetime(2020, 8, 1, tzinfo=pytz.UTC) <= datetime.now(tz=pytz.UTC):
         return False
 
-    # Holdback is 50/50
-    bucket = stable_bucketing_hash_group(DISCOUNT_APPLICABILITY_HOLDBACK, 2, user.username)
+    # Holdback is 10%
+    bucket = stable_bucketing_hash_group(DISCOUNT_APPLICABILITY_HOLDBACK, 10, user.username)
 
     request = get_current_request()
     if hasattr(request, 'session') and DISCOUNT_APPLICABILITY_HOLDBACK not in request.session:
