@@ -8,17 +8,18 @@ from mock import patch
 from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.features.edly.tests.factories import (
   EdlyOrganizationFactory,
   EdlySubOrganizationFactory,
   SiteFactory,
 )
 from student.tests.factories import UserFactory
-from util.organizations_helpers import add_organization
 
 LOGGER_NAME = 'openedx.features.edly.utils'
 
 
+@skip_unless_cms
 @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
 @override_switch(settings.ENABLE_EDLY_ORGANIZATIONS_SWITCH, active=True)
 class TestEdlyOrganizationListing(TestCase):
