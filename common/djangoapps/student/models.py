@@ -254,7 +254,7 @@ def email_exists_or_retired(email):
     """
     Check an email against the User model for existence.
     """
-    if settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS']:
+    if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         # TODO: Refactor into `get_current_organization` helper.
         current_site = get_current_site()
         if current_site.id == settings.SITE_ID:

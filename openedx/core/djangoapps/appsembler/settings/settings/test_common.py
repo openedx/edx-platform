@@ -15,7 +15,7 @@ def plugin_settings(settings):
     settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'] = \
         getenv('TEST_APPSEMBLER_MULTI_TENANT_EMAILS', 'false') == 'true'
 
-    if settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS']:
+    if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS'):
         settings.INSTALLED_APPS += (
             'openedx.core.djangoapps.appsembler.multi_tenant_emails',
         )

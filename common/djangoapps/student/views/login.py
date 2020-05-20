@@ -161,7 +161,7 @@ def _get_user_by_email(request):
 
     email = request.POST['email']
 
-    if settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS']:
+    if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
         # In this case database-level email constrain is removed, so the search is done at the organization
         # level.
         try:
