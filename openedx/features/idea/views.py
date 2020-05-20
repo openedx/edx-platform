@@ -48,7 +48,7 @@ class IdeaCreateView(LoginRequiredMixin, CreateView):
         if user_organization:
             initial['organization_name'] = user_organization.label
 
-        initial['country_name'] = COUNTRIES.get(user.profile.country)
+        initial['country'] = user.profile.country
         initial['city'] = user.profile.city
         initial['user'] = user.profile.user
 
