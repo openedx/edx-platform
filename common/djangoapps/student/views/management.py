@@ -1370,7 +1370,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             'new_email': pec.new_email
         }
 
-        if settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS']:
+        if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
             current_site = theming_helpers.get_current_site()
             if current_site.id == settings.SITE_ID:
                 raise NotImplementedError('APPSEMBLER_MULTI_TENANT_EMAILS: Cannot login user to the main site.')
