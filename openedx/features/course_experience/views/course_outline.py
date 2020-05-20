@@ -45,6 +45,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
     """
     Course outline fragment to be shown in the unified course view.
     """
+    _uses_pattern_library = False
 
     def render_to_fragment(self, request, course_id, user_is_enrolled=True, **kwargs):  # pylint: disable=arguments-differ
         """
