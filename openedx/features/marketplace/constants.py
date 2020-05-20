@@ -11,7 +11,7 @@ ORGANIZATION_SECTOR_CHOICES = (
     ('work-and-economic-growth', _('Work & Economic Growth')),
     ('human-rights', _('Human Rights')),
     ('social-justice', _('Social Justice')),
-    ('art-and-culture', _('Art & Culture'))
+    ('art-and-culture', _('Arts & Culture'))
 )
 
 ORGANIZATIONAL_PROBLEM_CHOICES = (
@@ -27,7 +27,7 @@ ORGANIZATIONAL_PROBLEM_CHOICES = (
 USER_SERVICES = (
     ('healthcare-supplies', _('Healthcare Supplies')),
     ('people-power', _('People Power')),
-    ('online-training', _('Online Training')),
+    ('online-training', _('Online Training Tools')),
     ('delivery-services', _('Delivery Services')),
     ('mentorship', _('Mentorship')),
     ('funding', _('Funding')),
