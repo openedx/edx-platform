@@ -1080,6 +1080,8 @@ class TestCourseExportImportProblem(CourseTestCase):
         Asserts that problems' data is as expected with pre-tag content maintained.
         """
         problem_content = self.get_problem_content(course_location)
+        import pdb;pdb.set_trace()
+
         self.assertEqual(expected_problem_content, problem_content)
 
     @ddt.data(
@@ -1088,9 +1090,9 @@ class TestCourseExportImportProblem(CourseTestCase):
             '<pre><div><pre><code>x=10 print("hello \n")</code></pre></div></pre>'
             '<multiplechoiceresponse></multiplechoiceresponse></problem>',
 
-            '<problem>\n  <pre>\n    <code>x=10 print("hello \n")</code>\n  </pre>\n  <pre>\n''<div>\n      <pre>\n '
-            '  <code>x=10 print("hello \n")</code>\n''      </pre>\n    </div>\n  </pre>\n  '
-            '<multiplechoiceresponse/>\n</problem>\n '
+            '<problem>\n  <pre>\n    <code>x=10 print("hello \n")</code>\n  </pre>\n  <pre>\n    <div>\n      <pre>\n '
+            '       <code>x=10 print("hello \n")</code>\n      </pre>\n    </div>\n  </pre>\n  '
+            '<multiplechoiceresponse/>\n</problem>\n'
         ],
         [
             '<problem><pre><code>x=10 print("hello \n")</code></pre>'
@@ -1106,7 +1108,6 @@ class TestCourseExportImportProblem(CourseTestCase):
         Verify that problem content in destination matches expected problem content,
         specifically concerned with pre tag data with problem.
         """
-        # import pdb;pdb.set_trace()
         self._setup_source_course_with_problem_content(problem_data)
 
         dest_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
