@@ -15,7 +15,7 @@ cycler==0.10.0            # via matplotlib
 decorator==4.4.2          # via networkx
 joblib==0.14.1            # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt, nltk
 kiwisolver==1.1.0         # via -c requirements/edx-sandbox/../constraints.txt, matplotlib
-lxml==4.5.1               # via -r requirements/edx-sandbox/shared.txt
+lxml==4.5.0               # via -r requirements/edx-sandbox/shared.txt
 markupsafe==1.1.1         # via chem
 matplotlib==2.2.4         # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/py35.in
 mpmath==1.1.0             # via sympy
