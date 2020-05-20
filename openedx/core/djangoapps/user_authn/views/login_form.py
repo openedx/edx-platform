@@ -7,6 +7,7 @@ import logging
 import six
 from django.conf import settings
 from django.contrib import messages
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -34,6 +35,7 @@ from student.helpers import get_next_url_for_login_page
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
+from util.request_rate_limiter import BadRequestRateLimiter
 
 log = logging.getLogger(__name__)
 
@@ -135,6 +137,12 @@ def login_and_registration_form(request, initial_mode="login"):
         initial_mode (string): Either "login" or "register".
 
     """
+
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        log.warning("Rate limit exceeded in login and registration with initial mode [%s]", initial_mode)
+        return HttpResponseForbidden("Rate limit exceeded")
+
     # Determine the URL to redirect to following login/registration/third_party_auth
     redirect_to = get_next_url_for_login_page(request)
 
@@ -229,6 +237,8 @@ def login_and_registration_form(request, initial_mode="login"):
 
     response = render_to_response('student_account/login_and_register.html', context)
     handle_enterprise_cookies_for_logistration(request, response, context)
+
+    limiter.tick_request_counter(request)
 
     return response
 
