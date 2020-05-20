@@ -20,19 +20,15 @@ from openedx.features.discounts.applicability import (
     REV1008_EXPERIMENT_ID,
     can_receive_discount,
     discount_percentage,
-    get_discount_expiration_date,
-    _is_in_holdback
+    get_discount_expiration_date
 )
 
 
 def offer_banner_wrapper(user, block, view, frag, context):  # pylint: disable=W0613
     """
     A wrapper that prepends the First Purchase Discount banner if
-    the user hasn't upgraded yet and is not in the holdback.
+    the user hasn't upgraded yet.
     """
-    if _is_in_holdback(user):
-        return False
-
     if block.category != "vertical":
         return frag
 
