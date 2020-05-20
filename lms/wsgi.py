@@ -45,9 +45,9 @@ class WsgiApp:
     def __call__(self, environ, start_response):
         path_info = environ.get('PATH_INFO')
         log.error("WsgiApp path_info={}".format(path_info))
-        raise Exception("WsgiApp path_info={}".format(path_info))
-        if path_info.rstrip('/') == '/foo':
-            environ['newrelic.app_name'] = 'foo'
+        if path_info.rstrip('/') == '/login':
+            environ['newrelic.app_name'] = 'sandbox-robrap-edxapp-lms-login'
+            log.error('Trying to change newrelic app name')
         elif path_info.rstrip('/') == '/bar':
             environ['newrelic.app_name'] = 'bar'
         return self.application(environ, start_response)
