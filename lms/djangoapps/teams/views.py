@@ -886,7 +886,13 @@ class TeamsAssignmentsView(GenericAPIView):
 
     def _display_name_for_ora_block(self, block):
         """ Get the unit name where the ORA is located for better display naming """
-        return modulestore().get_item(block.parent).display_name
+        unit = modulestore().get_item(block.parent)
+        section = modulestore().get_item(unit.parent)
+
+        return "{section}: {unit}".format(
+            section=section.display_name,
+            unit=unit.display_name
+        )
 
     def _jump_location_for_block(self, course_id, location):
         """ Get the URL for jumping to a designated XBlock in a course """
