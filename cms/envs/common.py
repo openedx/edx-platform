@@ -494,6 +494,8 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
+    'openedx.features.edly.middleware.SettingsOverrideMiddleware',
+
     # Allows us to define redirects via Django admin
     'django_sites_extensions.middleware.RedirectMiddleware',
 

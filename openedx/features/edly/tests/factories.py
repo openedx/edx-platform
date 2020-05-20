@@ -8,6 +8,7 @@ from factory import SelfAttribute, Sequence, SubFactory
 from factory.django import DjangoModelFactory
 from organizations.tests.factories import OrganizationFactory
 
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.features.edly.models import EdlyOrganization, EdlySubOrganization, EdlyUserProfile
 from student.tests.factories import UserFactory
 
@@ -23,19 +24,6 @@ class EdlyOrganizationFactory(DjangoModelFactory):
 
     name = Sequence('Edly Organization {}'.format)
     slug = Sequence('edly-organization-{}'.format)
-
-
-class SiteFactory(DjangoModelFactory):
-    """
-    Factory class for "Site" model.
-    """
-
-    class Meta(object):
-        model = Site
-        django_get_or_create = ('domain',)
-
-    domain = Sequence('{}.testserver.fake'.format)
-    name = SelfAttribute('domain')
 
 
 class EdlySubOrganizationFactory(DjangoModelFactory):
