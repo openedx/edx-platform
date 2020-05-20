@@ -22,3 +22,8 @@ def configure_philu_theme():
     site.save()
     theme = SiteTheme(site=site, theme_dir_name='philu')
     theme.save()
+
+
+def clear_philu_theme():
+    Site.objects.filter(name='test').delete()
+    SiteTheme.objects.filter(theme_dir_name='philu').delete()

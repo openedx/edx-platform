@@ -7,6 +7,7 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
+from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 from rest_framework_swagger.views import get_swagger_view
 
@@ -73,6 +74,9 @@ handler404 = render_404
 handler500 = static_template_view_views.render_500
 
 urlpatterns = [
+
+    url(r'^', include('waffle.urls')),
+
     # URL for home page
     url(r'', include('homepage.urls', namespace='homepage')),
 
@@ -96,6 +100,20 @@ urlpatterns = [
     url(r'', include('openedx.features.specializations.urls')),
     url(r'^marketplace/', include('openedx.features.marketplace.urls')),
     url(r'^idea/', include('openedx.features.idea.urls')),
+
+    # temporary experiment urls block start.
+    url(r'^organizations/', TemplateView.as_view(template_name='main_django.html')),
+    url(r'^learners/', TemplateView.as_view(template_name='main_django.html')),
+    url(r'^organizational-capacity-assessment/',
+        TemplateView.as_view(template_name='main_django.html')),
+    url(r'^course-development/', TemplateView.as_view(template_name='main_django.html')),
+    url(r'^organization-onboarding/',
+        TemplateView.as_view(template_name='main_django.html')),
+    # temporary experiment urls block End.
+
+    # CloudSponge proxy url to lets the OAuth providers know, we are asking CloudSponge for address book
+    url(r'^auth/proxy/cloudsponge/$', TemplateView.as_view(template_name='features/smart_referral/auth_proxy.html'),
+        name='cloud_sponge_proxy'),
 
     # Event tracking endpoints
     url(r'', include('track.urls')),

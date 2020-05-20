@@ -2372,8 +2372,9 @@ INSTALLED_APPS = [
     'openedx.features.student_certificates',
     'openedx.features.marketplace',
     'openedx.features.idea',
+    'openedx.features.smart_referral',
 
-    #third party surveys
+    # third party surveys
     'lms.djangoapps.third_party_surveys',
 
     # timed notification and periodic tasks
@@ -3564,3 +3565,4 @@ OEF_RENEWAL_DAYS = 180
 # CDN LINK
 
 CDN_LINK = "https://static.philanthropyu.org/"
+

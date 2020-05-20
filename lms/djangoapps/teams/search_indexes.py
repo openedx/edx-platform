@@ -131,7 +131,9 @@ class CourseTeamIndexer(object):
         return settings.FEATURES.get(cls.ENABLE_SEARCH_KEY, False)
 
 
-@receiver(post_save, sender=CourseTeam, dispatch_uid='teams.signals.course_team_post_save_callback')
+# Disconnecting the receiver because during investigation on LP-1977 we came to know that indexing team
+# on elastic search is taking about 40 seconds and Philu is not using this index(elastic) at all.
+# @receiver(post_save, sender=CourseTeam, dispatch_uid='teams.signals.course_team_post_save_callback')
 def course_team_post_save_callback(**kwargs):
     """
     Reindex object after save.
@@ -142,7 +144,9 @@ def course_team_post_save_callback(**kwargs):
         pass
 
 
-@receiver(post_delete, sender=CourseTeam, dispatch_uid='teams.signals.course_team_post_delete_callback')
+# Disconnecting the receiver because during investigation on LP-1977 we came to know that indexing team
+# on elastic search is taking about 40 seconds and Philu is not using this index(elastic) at all.
+# @receiver(post_delete, sender=CourseTeam, dispatch_uid='teams.signals.course_team_post_delete_callback')
 def course_team_post_delete_callback(**kwargs):
     """
     Reindex object after delete.
