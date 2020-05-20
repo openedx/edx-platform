@@ -7,7 +7,7 @@ from openedx.features.marketplace.models import MarketplaceRequest
 class MarketplaceRequestForm(forms.ModelForm):
     def __init__(self,*args, **kwargs):
         super(MarketplaceRequestForm,self).__init__(*args, **kwargs)
-        self.label_suffix = ""
+
     class Meta:
         model = MarketplaceRequest
         fields = '__all__'
@@ -25,5 +25,6 @@ class MarketplaceRequestForm(forms.ModelForm):
             'description': _('Brief Description of Challenges*'),
             'user_services': _('What help can you provide to other organizations?*'),
             'file': _('Additional Attachments (Optional)'),
+            'image': _('Add Image'),
         }
         readonly_fields = ('organization',)
