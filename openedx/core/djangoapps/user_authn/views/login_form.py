@@ -28,7 +28,8 @@ from openedx.core.djangoapps.user_authn.views.registration_form import Registrat
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import (
     handle_enterprise_cookies_for_logistration,
-    update_logistration_context_for_enterprise
+    get_enterprise_slug_login_url,
+    update_logistration_context_for_enterprise,
 )
 from student.helpers import get_next_url_for_login_page
 from third_party_auth import pipeline
@@ -211,7 +212,8 @@ def login_and_registration_form(request, initial_mode="login"):
             'account_creation_allowed': configuration_helpers.get_value(
                 'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)),
             'is_account_recovery_feature_enabled': is_secondary_email_feature_enabled(),
-            'is_multiple_user_enterprises_feature_enabled': is_multiple_user_enterprises_feature_enabled()
+            'is_multiple_user_enterprises_feature_enabled': is_multiple_user_enterprises_feature_enabled(),
+            'enterprise_slug_login_url': get_enterprise_slug_login_url()
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,

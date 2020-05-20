@@ -18,6 +18,7 @@
                     requests = null,
                     authComplete = false,
                     PLATFORM_NAME = 'edX',
+                    ENTERPRISE_SLUG_LOGIN_URL = 'enterprise/login',
                     USER_DATA = {
                         email: 'xsy@edx.org',
                         password: 'xsyisawesome',
@@ -88,7 +89,8 @@
                         model: model,
                         resetModel: resetModel,
                         thirdPartyAuth: THIRD_PARTY_AUTH,
-                        platformName: PLATFORM_NAME
+                        platformName: PLATFORM_NAME,
+                        enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL
                     });
 
                 // Spy on AJAX requests
@@ -196,6 +198,13 @@
 
                 // Verify that the password reset link is displayed
                     expect($('.forgot-password')).toBeVisible();
+                });
+
+                it('displays a link to the enterprise slug login', function() {
+                    createLoginView(this);
+
+                // Verify that the enterprise login link is displayed
+                    expect($('.enterprise-login')).toBeVisible();
                 });
 
                 it('displays password reset success message after password reset request', function() {

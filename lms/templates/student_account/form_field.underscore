@@ -134,5 +134,6 @@
 
     <% if( form === 'login' && name === 'password' ) { %>
         <button type="button" class="forgot-password field-link"><%- gettext("Need help logging in?") %></button>
+        <button type="button" class="enterprise-login field-link"><%- gettext("Sign in with your company or school") %></button>
     <% } %>
 </div>
