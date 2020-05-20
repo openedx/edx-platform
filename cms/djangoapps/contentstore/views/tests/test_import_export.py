@@ -1080,8 +1080,6 @@ class TestCourseExportImportProblem(CourseTestCase):
         Asserts that problems' data is as expected with pre-tag content maintained.
         """
         problem_content = self.get_problem_content(course_location)
-        import pdb;pdb.set_trace()
-
         self.assertEqual(expected_problem_content, problem_content)
 
     @ddt.data(
