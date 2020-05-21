@@ -33,6 +33,7 @@ bleach                              # Allowed-list-based HTML sanitizing library
 boto==2.39.0                        # Deprecated version of the AWS SDK; we should stop using this
 boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
+bridgekeeper                        # Used for determining permissions for courseware.
 celery                              # Asynchronous task execution library
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
 defusedxml
