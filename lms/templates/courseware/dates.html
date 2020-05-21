@@ -26,57 +26,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 <h2 class="hd hd-2 date-title">
                     ${_("Important Dates")}
                 </h2>
-                % if not display_reset_dates_text:
-                    <div class="dates-banner">
-                        <div class="dates-banner-text">
-                            <strong>${_("We've built a suggested schedule to help you stay on track.")}</strong>
-                            ${_("But don't worry—it's flexible so you can learn at your own pace.")}
-                            ${_("If you happen to fall behind on our suggested dates, you'll be able to adjust them to keep yourself on track.")}
-                        </div>
-                    </div>
-                % endif
-                <% has_locked_assignments = any(hasattr(block, 'contains_gated_content') and block.contains_gated_content for block in course_date_blocks) %>
-                % if has_locked_assignments and verified_upgrade_link:
-                    <div class="dates-banner">
-                        <div class="dates-banner-text banner-has-button">
-                            <strong>${_('You are auditing this course,')}</strong>
-                            ${_(' which means that you are unable to participate in graded assignments.')}
-                            % if display_reset_dates_text:
-                                ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today.')}
-                            % else:
-                                ${_(' To complete graded assignments as part of this course, you can upgrade today.')}
-                            % endif
-                        </div>
-                        <div class="upgrade-button">
-                            <a href="${verified_upgrade_link}">
-                                <button type="button">
-                                    % if display_reset_dates_text:
-                                        ${_('Upgrade to shift due dates')}
-                                    % else:
-                                        ${_('Upgrade now')}
-                                    % endif
-                                </button>
-                            </a>
-                        </div>
-                    </div>
-                % endif
-                % if display_reset_dates_text and learner_is_verified:
-                    <div class="dates-banner">
-                        <div class="dates-banner-text banner-has-button">
-                            <strong>${_('It looks like you missed some important deadlines based on our suggested schedule.')}</strong>
-                            ${_('To keep yourself on track, you can update this schedule and shift the past due assignments into the future. Don’t worry—you won’t lose any of the progress you’ve made when you shift your due dates. ')}
-                        </div>
-                        <div class="upgrade-button">
-                            <form method="post" action="${reset_deadlines_url}">
-                                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                                <input type="hidden" name="reset_deadlines_redirect_url_base" value="${reset_deadlines_redirect_url_base}">
-                                <input type="hidden" name="reset_deadlines_redirect_url_id_dict" value="${reset_deadlines_redirect_url_id_dict}">
-                                <button class="upgrade-button">${_("Reset my deadlines")}</button>
-                            </form>
-                        </div>
-                    </div>
-                % endif
-
+                <%include file="/dates_banner.html" />
                 <% due_next_set = False %>
                 % for block in course_date_blocks:
                     <% block_is_verified = (hasattr(block, 'contains_gated_content') and block.contains_gated_content) or isinstance(block, VerificationDeadlineDate) %>

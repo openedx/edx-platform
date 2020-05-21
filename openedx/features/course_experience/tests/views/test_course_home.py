@@ -219,7 +219,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(75, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(77, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -1022,10 +1022,3 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
             response = self.client.get(self.url)
 
         self.assertContains(response, "<span>DISCOUNT_PRICE</span>")
-
-    @RELATIVE_DATES_FLAG.override(active=True)
-    def test_reset_deadline_banner_is_present_on_course_tab(self):
-        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)  # pylint: disable=no-member
-        response = self.client.get(self.url)
-
-        self.assertContains(response, '<div class="reset-deadlines-banner">')

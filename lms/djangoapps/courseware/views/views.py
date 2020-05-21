@@ -115,7 +115,7 @@ from openedx.features.course_experience import (
     course_home_url_name
 )
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-from openedx.features.course_experience.utils import reset_deadlines_banner_should_display
+from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
@@ -740,19 +740,6 @@ class CourseTabView(EdxFragmentView):
         else:
             masquerade = None
 
-        display_reset_dates_banner = False
-        if RELATIVE_DATES_FLAG.is_enabled(course.id):
-            course_overview = CourseOverview.get_from_id(course.id)
-            end_date = getattr(course_overview, 'end_date', None)
-            if (not end_date or timezone.now() < end_date and CourseEnrollment.objects.filter(
-                course=course_overview, user=request.user, mode=CourseMode.VERIFIED
-            ).exists()):
-                display_reset_dates_banner = True
-
-        reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME) if display_reset_dates_banner else None
-
-        reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME if reset_deadlines_url else None
-
         context = {
             'course': course,
             'tab': tab,
@@ -763,10 +750,6 @@ class CourseTabView(EdxFragmentView):
             'uses_bootstrap': uses_bootstrap,
             'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
-            'display_reset_dates_banner': display_reset_dates_banner,
-            'reset_deadlines_url': reset_deadlines_url,
-            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
-            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
         }
         # Avoid Multiple Mathjax loading on the 'user_profile'
         if 'profile_page_context' in kwargs:
@@ -1078,9 +1061,7 @@ def dates(request, course_id):
     user_timezone = user_timezone_locale['user_timezone']
     user_language = user_timezone_locale['user_language']
 
-    display_reset_dates_text = False
-    if RELATIVE_DATES_FLAG.is_enabled(course.id):
-        display_reset_dates_text = reset_deadlines_banner_should_display(course_key, request)
+    missed_deadlines, enrollment_mode = dates_banner_should_display(course_key, request)
 
     context = {
         'course': course,
@@ -1092,7 +1073,9 @@ def dates(request, course_id):
         'supports_preview_menu': True,
         'can_masquerade': can_masquerade,
         'masquerade': masquerade,
-        'display_reset_dates_text': display_reset_dates_text,
+        'on_dates_tab': True,
+        'missed_deadlines': missed_deadlines,
+        'enrollment_mode': enrollment_mode,
         'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
         'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
         'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
@@ -1678,9 +1661,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
                 }
 
-        display_reset_dates_banner = False
-        if RELATIVE_DATES_FLAG.is_enabled(course.id):
-            display_reset_dates_banner = reset_deadlines_banner_should_display(course_key, request)
+        missed_deadlines, enrollment_mode = dates_banner_should_display(course_key, request)
 
         context = {
             'fragment': block.render('student_view', context=student_view_context),
@@ -1694,8 +1675,11 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'edx_notes_enabled': is_feature_enabled(course, request.user),
             'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
-            'display_reset_dates_banner': display_reset_dates_banner,
+            'missed_deadlines': missed_deadlines,
+            'enrollment_mode': enrollment_mode,
             'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
+            'on_courseware_page': True,
+            'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL),
         }
         return render_to_response('courseware/courseware-chromeless.html', context)

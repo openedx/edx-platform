@@ -1,0 +1,92 @@
+## mako
+
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+
+from lms.djangoapps.courseware.date_summary import CourseAssignmentDate
+from course_modes.models import CourseMode
+%>
+
+% if on_dates_tab and not missed_deadlines and getattr(course, 'self_paced', False):
+    <div class="dates-banner">
+        <div class="dates-banner-text">
+            <strong>${_("We've built a suggested schedule to help you stay on track.")}</strong>
+            ${_("But don't worry—it's flexible so you can learn at your own pace. If you happen to fall behind on our suggested dates, you'll be able to adjust them to keep yourself on track.")}
+        </div>
+    </div>
+% endif
+<%
+has_locked_assignments = any(hasattr(block, 'contains_gated_content') and block.contains_gated_content for block in course_date_blocks if isinstance(block, CourseAssignmentDate)) if (course_date_blocks and on_dates_tab) else False
+on_dates_tab_as_audit = on_dates_tab and enrollment_mode == CourseMode.AUDIT
+on_dates_tab_as_verified = on_dates_tab and enrollment_mode == CourseMode.VERIFIED
+on_course_outline_page_as_audit = on_course_outline_page and enrollment_mode == CourseMode.AUDIT
+on_course_outline_page_as_verified = on_course_outline_page and enrollment_mode == CourseMode.VERIFIED
+on_courseware_page_as_audit = on_courseware_page and enrollment_mode == CourseMode.AUDIT
+on_courseware_page_as_verified = on_courseware_page and enrollment_mode == CourseMode.VERIFIED
+additional_styling_class = 'on-mobile' if web_app_course_url else 'has-button'
+%>
+% if (missed_deadlines and (on_dates_tab_as_verified or on_courseware_page_as_audit or on_courseware_page_as_verified)) or (on_dates_tab_as_audit and has_locked_assignments) or on_course_outline_page_as_audit or on_course_outline_page_as_verified:
+    <div class="dates-banner ${additional_styling_class}">
+        <div class="dates-banner-text">
+            % if web_app_course_url:
+                % if enrollment_mode == CourseMode.VERIFIED:
+                    ${_('It looks like you missed some important deadlines based on our suggested schedule. ')}
+                    ${_('To keep yourself on track, you can update this schedule and shift the past due assignments into the future by visiting ')}
+                    <a class="mobile-dates-link" href="${web_app_course_url}">edx.org</a>.
+                    ${_(' Don’t worry—you won’t lose any of the progress you’ve made when you shift your due dates.')}
+                % else:
+                    <strong>${_('You are auditing this course,')}</strong>
+                    ${_(' which means that you are unable to participate in graded assignments.')}
+                    ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
+                    <a class="mobile-dates-link" href="${verified_upgrade_link}">edx.org</a>.
+                % endif
+            % else:
+                % if on_course_outline_page_as_verified or (missed_deadlines and (on_dates_tab_as_verified or on_courseware_page_as_verified)):
+                    <strong>${_('It looks like you missed some important deadlines based on our suggested schedule.')}</strong>
+                    ${_('To keep yourself on track, you can update this schedule and shift the past due assignments into the future. Don’t worry—you won’t lose any of the progress you’ve made when you shift your due dates.')}
+                % endif
+                % if (on_dates_tab_as_audit and has_locked_assignments) or on_course_outline_page_as_audit or (on_courseware_page_as_audit and missed_deadlines):
+                    <strong>${_('You are auditing this course,')}</strong>
+                    ${_(' which means that you are unable to participate in graded assignments.')}
+                    % if on_dates_tab:
+                        % if missed_deadlines:
+                            ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today.')}
+                        % else:
+                            ${_(' To complete graded assignments as part of this course, you can upgrade today.')}
+                        % endif
+                    % else:
+                         ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today.')}
+                    % endif
+                % endif
+            % endif
+        </div>
+        % if not web_app_course_url:
+            <div class="upgrade-button">
+                % if on_course_outline_page_as_verified or (missed_deadlines and (on_dates_tab_as_verified or on_courseware_page_as_verified)):
+                    <form method="post" action="${reset_deadlines_url}">
+                        <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                        <input type="hidden" name="reset_deadlines_redirect_url_base" value="${reset_deadlines_redirect_url_base}">
+                        <input type="hidden" name="reset_deadlines_redirect_url_id_dict" value="${reset_deadlines_redirect_url_id_dict}">
+                        <button class="btn reset-deadlines-button">${_("Reset my deadlines")}</button>
+                    </form>
+                % endif:
+                % if (on_dates_tab_as_audit and has_locked_assignments) or on_course_outline_page_as_audit or (on_courseware_page_as_audit and missed_deadlines):
+                    <a href="${verified_upgrade_link}">
+                        <button type="button">
+                            % if on_dates_tab:
+                                % if missed_deadlines:
+                                    ${_('Upgrade to shift due dates')}
+                                % else:
+                                    ${_('Upgrade now')}
+                                % endif
+                            % else:
+                                ${_('Upgrade to shift due dates')}
+                            % endif
+                        </button>
+                    </a>
+                % endif
+            </div>
+        % endif
+    </div>
+% endif
