@@ -101,3 +101,11 @@ class PasswordResetEmailRateLimiter(RequestRateLimiter):
         """
         for key in self.keys_to_check(request):
             self.cache_incr(key)
+
+
+class LoginAndRegisterRateLimiter(RequestRateLimiter):
+    """
+    Rate limiting backend for login and register endpoint which
+    allows 50 requests per IP for every 5 minutes.
+    """
+    requests = 50
