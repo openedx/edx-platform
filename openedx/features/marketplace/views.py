@@ -19,7 +19,7 @@ class MarketplaceListingView(View):
     template_name = 'features/marketplace/marketplace_listing.html'
 
     def get(self, request, *args, **kwargs):
-        save_user_utm(self.request)
+        save_user_utm(request)
         return render_to_response(self.template_name, {})
 
 

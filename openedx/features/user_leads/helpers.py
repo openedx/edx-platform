@@ -9,9 +9,9 @@ def get_utm_params(request):
     utm_params = {}
 
     for key in UTM_PARAM_NAMES.values():
-        utm_param = request_get_params.get(key)
-        if utm_param:
-            utm_params.update({key: utm_param})
+        value = request_get_params.get(key)
+        if value:
+            utm_params.update({key: value})
 
     return utm_params
 
