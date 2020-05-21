@@ -1,36 +1,100 @@
 from django.utils.translation import ugettext as _
 
-ORGANIZATION_SECTOR_CHOICES = (
-    ('health-and-well-being', _('Health & Well-being')),
-    ('education', _('Education')),
-    ('gender-equality', _('Gender Equality')),
-    ('sanitation', _('Sanitation')),
-    ('climate-changes', _('Climate Change')),
-    ('clean-energy', _('Clean Energy')),
-    ('environmental-conservation', _('Environmental Conservation')),
-    ('work-and-economic-growth', _('Work & Economic Growth')),
-    ('human-rights', _('Human Rights')),
-    ('social-justice', _('Social Justice')),
-    ('art-and-culture', _('Art & Culture'))
-)
+DJANGO_COUNTRIES_KEY_INDEX = 0
+DJANGO_COUNTRIES_VALUE_INDEX = 1
+
+MARKETPLACE_PARAM_QUERY_KEY = 'query'
+MARKETPLACE_PARAM_COUNTRY_KEY = 'country'
+MARKETPLACE_PARAM_CITY_KEY = 'city'
+
+ORGANIZATIONAL_PROBLEM_TYPE_DELIVERY_SERVICES_KEY = 'delivery-services'
+ORGANIZATIONAL_PROBLEM_TYPE_FUNDING_KEY = 'funding'
+ORGANIZATIONAL_PROBLEM_TYPE_HEALTH_CARE_SUPPLIES_KEY = 'healthcare-supplies'
+ORGANIZATIONAL_PROBLEM_TYPE_HUMAN_RESOURCES_KEY = 'human-resources'
+ORGANIZATIONAL_PROBLEM_TYPE_MENTORSHIP_KEY = 'mentorship'
+ORGANIZATIONAL_PROBLEM_TYPE_ONLINE_TRAINING_KEY = 'online-training'
+ORGANIZATIONAL_PROBLEM_TYPE_OTHER_KEY = 'other-problem'
+ORGANIZATIONAL_PROBLEM_TYPE_REMOTE_WORKING_TOOLS_KEY = 'remote-working-tools'
 
 ORGANIZATIONAL_PROBLEM_CHOICES = (
-    ('healthcare-supplies', _('Healthcare Supplies')),
-    ('remote-working-tools', _('Remote Working Tools')),
-    ('online-training', _('Online Training')),
-    ('delivery-services', _('Delivery Services')),
-    ('mentorship', _('Mentorship')),
-    ('funding', _('Funding')),
-    ('human-resources', _('Human Resources')),
+    (ORGANIZATIONAL_PROBLEM_TYPE_HEALTH_CARE_SUPPLIES_KEY, 'Healthcare Supplies'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_REMOTE_WORKING_TOOLS_KEY, 'Remote Working Tools'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_ONLINE_TRAINING_KEY, 'Online Training'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_DELIVERY_SERVICES_KEY, 'Delivery Services'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_MENTORSHIP_KEY, 'Mentorship'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_FUNDING_KEY, 'Funding'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_HUMAN_RESOURCES_KEY, 'Human Resources'),
 )
 
+ORGANIZATIONAL_PROBLEM_CHOICES_VIEW = (
+    (ORGANIZATIONAL_PROBLEM_TYPE_HEALTH_CARE_SUPPLIES_KEY, 'Healthcare Supplies'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_REMOTE_WORKING_TOOLS_KEY, 'Remote Working Tools'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_ONLINE_TRAINING_KEY, 'Online Training'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_DELIVERY_SERVICES_KEY, 'Delivery Services'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_MENTORSHIP_KEY, 'Mentorship'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_FUNDING_KEY, 'Funding'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_HUMAN_RESOURCES_KEY, 'Human Resources'),
+    (ORGANIZATIONAL_PROBLEM_TYPE_OTHER_KEY, 'Other'),
+)
+
+ORGANIZATIONAL_SECTOR_HEALTH_AND_WELL_BEING = 'health-and-well-being'
+ORGANIZATIONAL_SECTOR_EDUCATION = 'education'
+ORGANIZATIONAL_SECTOR_GENDER_EQUALITY = 'gender-equality'
+ORGANIZATIONAL_SECTOR_SANITATION = 'sanitation'
+ORGANIZATIONAL_SECTOR_CLIMATE_CHANGES = 'climate-changes'
+ORGANIZATIONAL_SECTOR_CLEAN_ENERGY = 'clean-energy'
+ORGANIZATIONAL_SECTOR_ENVIRONMENTAL_CONSERVATION = 'environmental-conservation'
+ORGANIZATIONAL_SECTOR_WORK_AND_ECONOMIC_GROWTH = 'work-and-economic-growth'
+ORGANIZATIONAL_SECTOR_HUMAN_RIGHTS = 'human-rights'
+ORGANIZATIONAL_SECTOR_SOCIAL_JUSTICE = 'social-justice'
+ORGANIZATIONAL_SECTOR_ART_AND_CULTURE = 'art-and-culture'
+ORGANIZATIONAL_SECTOR_OTHER_KEY = 'other-sector'
+
+ORGANIZATION_SECTOR_CHOICES = (
+    (ORGANIZATIONAL_SECTOR_HEALTH_AND_WELL_BEING, _('Health & Well-being')),
+    (ORGANIZATIONAL_SECTOR_EDUCATION, _('Education')),
+    (ORGANIZATIONAL_SECTOR_GENDER_EQUALITY, _('Gender Equality')),
+    (ORGANIZATIONAL_SECTOR_SANITATION, _('Sanitation')),
+    (ORGANIZATIONAL_SECTOR_CLIMATE_CHANGES, _('Climate Change')),
+    (ORGANIZATIONAL_SECTOR_CLEAN_ENERGY, _('Clean Energy')),
+    (ORGANIZATIONAL_SECTOR_ENVIRONMENTAL_CONSERVATION, _('Environmental Conservation')),
+    (ORGANIZATIONAL_SECTOR_WORK_AND_ECONOMIC_GROWTH, _('Work & Economic Growth')),
+    (ORGANIZATIONAL_SECTOR_HUMAN_RIGHTS, _('Human Rights')),
+    (ORGANIZATIONAL_SECTOR_SOCIAL_JUSTICE, _('Social Justice')),
+    (ORGANIZATIONAL_SECTOR_ART_AND_CULTURE, _('Art & Culture'))
+)
+
+ORGANIZATION_SECTOR_CHOICES_VIEW = (
+    (ORGANIZATIONAL_SECTOR_HEALTH_AND_WELL_BEING, _('Health & Well-being')),
+    (ORGANIZATIONAL_SECTOR_EDUCATION, _('Education')),
+    (ORGANIZATIONAL_SECTOR_GENDER_EQUALITY, _('Gender Equality')),
+    (ORGANIZATIONAL_SECTOR_SANITATION, _('Sanitation')),
+    (ORGANIZATIONAL_SECTOR_CLIMATE_CHANGES, _('Climate Change')),
+    (ORGANIZATIONAL_SECTOR_CLEAN_ENERGY, _('Clean Energy')),
+    (ORGANIZATIONAL_SECTOR_ENVIRONMENTAL_CONSERVATION, _('Environmental Conservation')),
+    (ORGANIZATIONAL_SECTOR_WORK_AND_ECONOMIC_GROWTH, _('Work & Economic Growth')),
+    (ORGANIZATIONAL_SECTOR_HUMAN_RIGHTS, _('Human Rights')),
+    (ORGANIZATIONAL_SECTOR_SOCIAL_JUSTICE, _('Social Justice')),
+    (ORGANIZATIONAL_SECTOR_ART_AND_CULTURE, _('Art & Culture')),
+    (ORGANIZATIONAL_SECTOR_OTHER_KEY, 'Other'),
+)
+
+
+
+USER_SERVICES_DELIVERY_SERVICES_KEY = 'delivery-services'
+USER_SERVICES_FUNDING_KEY = 'funding'
+USER_SERVICES_HEALTH_CARE_SUPPLIES_KEY = 'healthcare-supplies'
+USER_SERVICES_MENTORSHIP_KEY = 'mentorship'
+USER_SERVICES_ONLINE_TRAINING_KEY = 'online-training'
+USER_SERVICES_PEOPLE_POWER_KEY = 'people-power'
+
 USER_SERVICES = (
-    ('healthcare-supplies', _('Healthcare Supplies')),
-    ('people-power', _('People Power')),
-    ('online-training', _('Online Training')),
-    ('delivery-services', _('Delivery Services')),
-    ('mentorship', _('Mentorship')),
-    ('funding', _('Funding')),
+    (USER_SERVICES_HEALTH_CARE_SUPPLIES_KEY, _('Healthcare Supplies')),
+    (USER_SERVICES_PEOPLE_POWER_KEY, _('People Power')),
+    (USER_SERVICES_ONLINE_TRAINING_KEY, _('Online Training')),
+    (USER_SERVICES_DELIVERY_SERVICES_KEY, _('Delivery Services')),
+    (USER_SERVICES_MENTORSHIP_KEY, _('Mentorship')),
+    (USER_SERVICES_FUNDING_KEY, _('Funding')),
 )
 
 PUBLISHED_DATE_FORMAT = '%B %d, %Y'
