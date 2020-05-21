@@ -53,7 +53,7 @@ class UserLeadsHelpersTest(TestCase):
         """
         Test that a dict is returned without the missing utm param
         """
-        utm_params = self.request_data.copy()
+        utm_params = self.request_data
         del utm_params[random.choice(list(utm_params.keys()))]
 
         request = RequestFactory().get(self.url_path, utm_params)
@@ -79,7 +79,8 @@ class UserLeadsHelpersTest(TestCase):
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
         self.assertTrue(existing_lead_count == 1)
 
-    def test_save_user_utm_registered_user_existing_lead(self):
+    @patch('openedx.features.user_leads.helpers.UserLeads.objects.get_or_create')
+    def test_save_user_utm_registered_user_existing_lead(self, mocked_user_leads_get_or_create_method):
         """
         Test that for a registered user, who has an existing lead against
         the current page, an exception is thrown when trying to insert
@@ -90,16 +91,22 @@ class UserLeadsHelpersTest(TestCase):
         request.resolver_match = ResolverMatch('get', (), {})
         request.resolver_match.url_name = self.url_name
 
-        UserLeads.objects.create(user=self.user, origin=self.url_name, **self.request_data)
+        user_lead = UserLeads.objects.create(user=self.user, origin=self.url_name, **self.request_data)
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
         self.assertTrue(existing_lead_count == 1)
 
-        self.assertRaises(IntegrityError, save_user_utm(request))
+        save_user_utm(request)
 
-    @patch('openedx.features.user_leads.helpers.UserLeads.objects.create')
-    @patch('openedx.features.user_leads.helpers.UserLeads.objects.filter')
-    def test_save_user_utm_anon_user(self,mocked_user_leads_object_filter_method,
-                                     mocked_user_leads_object_create_method):
+        mocked_user_leads_get_or_create_method.assert_called_with(user=self.user,
+                                                                  origin=self.url_name,
+                                                                  **self.request_data)
+
+        existing_user_lead = UserLeads.objects.filter(user=self.user, origin=self.url_name).first()
+        self.assertTrue(user_lead.pk == existing_user_lead.pk)
+
+
+    @patch('openedx.features.user_leads.helpers.UserLeads.objects.get_or_create')
+    def test_save_user_utm_anonymous_user(self, mocked_user_leads_get_or_create_method):
         """
         Test that for an anonymous user a lead is not stored in the UserLeads table.
         """
@@ -110,5 +117,4 @@ class UserLeadsHelpersTest(TestCase):
 
         save_user_utm(request)
 
-        mocked_user_leads_object_create_method.assert_not_called()
-        mocked_user_leads_object_filter_method.assert_not_called()
+        mocked_user_leads_get_or_create_method.assert_not_called()

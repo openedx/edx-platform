@@ -1,5 +1,3 @@
-from django.db import IntegrityError, transaction
-
 from .constants import UTM_PARAM_NAMES
 from .models import UserLeads
 
@@ -22,8 +20,4 @@ def save_user_utm(request):
     utm_params = get_utm_params(request)
 
     if not user.is_anonymous():
-        try:
-            with transaction.atomic():
-                UserLeads.objects.create(user=user, origin=origin, **utm_params)
-        except IntegrityError:
-            pass
+        UserLeads.objects.get_or_create(user=user, origin=origin, **utm_params)
