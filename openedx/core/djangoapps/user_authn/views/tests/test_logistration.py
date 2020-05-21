@@ -75,10 +75,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     def test_login_and_registration_form_ratelimited(self):
         """
-        Test that login enpoint allow only 30 requests for every 5 minutes.
+        Test that login enpoint allow only 50 requests for every 5 minutes.
         """
         login_url = reverse('signin_user')
-        for i in range(30):
+        for i in range(50):
             response = self.client.get(login_url)
             self.assertEqual(response.status_code, 200)
 
