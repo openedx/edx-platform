@@ -40,6 +40,7 @@ class IdeaCreationForm(ModelForm):
             'organization_mission': 'Organization Mission*',
             'overview': 'Idea Overview*',
             'title': 'Idea Title*',
+            'video_link': 'Video Link:',
         }
 
         widgets = {
