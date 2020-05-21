@@ -376,13 +376,9 @@ def get_assignments_for_team(user, team):
             team=team.team_id
         ))
 
-    # Get openassessment blocks for the course
-    course_id = team.course_id
-    ora_blocks = modulestore().get_items(course_id, qualifiers={'category': 'openassessment'})
-
-    # Limit to team-enabled ORAs for the matching teamset
-    return [
-        block for block in ora_blocks
-        if block.teams_enabled
-        and block.selected_teamset_id == team.topic_id
-    ]
+    # Limit to team-enabled ORAs for the matching teamset in the course
+    return modulestore().get_items(
+        team.course_id,
+        qualifiers={'category': 'openassessment'},
+        settings={'teams_enabled': True, 'selected_teamset_id': team.topic_id}
+    )
