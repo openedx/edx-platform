@@ -497,16 +497,21 @@ class UserExtendedProfile(TimeStampedModel):
 
     history = HistoricalRecords()
 
-    # Onboarding model optimization - new fields
-    hear_about_philanthropyu = MultiSelectWithOtherField(choices=choices.HEAR_ABOUT_PHILANTHROPY_LABELS,
+    # TODO: Populate this newly added field by performing ETL on existing fields hear_about_philanthropy and
+    #  hear_about_philanthropy_other
+    hear_about_philanthropyu = MultiSelectWithOtherField(choices=choices.HEAR_ABOUT_PHILANTHROPY,
                                                          other_max_length=255,
                                                          max_choices=1,
                                                          null=True,
                                                          blank=True)
-    function_areas = MultiSelectField(choices=choices.FUNCTIONS_LABELS, null=True, blank=True)
-    interests = MultiSelectField(choices=choices.INTERESTS_LABELS, null=True, blank=True)
-    learners_related = MultiSelectField(choices=choices.INTERESTED_LEARNERS_LABELS, null=True, blank=True)
-    goals = MultiSelectField(choices=choices.GOALS_LABELS, null=True, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing functions related fields
+    function_areas = MultiSelectField(choices=choices.FUNCTIONS, null=True, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing interests related fields
+    interests = MultiSelectField(choices=choices.INTERESTS, null=True, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing learners related fields
+    learners_related = MultiSelectField(choices=choices.INTERESTED_LEARNERS, null=True, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing goals related fields
+    goals = MultiSelectField(choices=choices.GOALS, null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
