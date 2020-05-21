@@ -35,7 +35,7 @@ from student.helpers import get_next_url_for_login_page
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
-from util.request_rate_limiter import LoginAndRegisterRateLimiter
+from util.request_rate_limiter import BadRequestRateLimiter
 
 log = logging.getLogger(__name__)
 
@@ -138,7 +138,7 @@ def login_and_registration_form(request, initial_mode="login"):
 
     """
 
-    limiter = LoginAndRegisterRateLimiter()
+    limiter = BadRequestRateLimiter()
     if limiter.is_rate_limit_exceeded(request):
         log.warning("Rate limit exceeded in login and registration with initial mode [%s]", initial_mode)
         return HttpResponseForbidden("Rate limit exceeded")
