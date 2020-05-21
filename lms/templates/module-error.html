@@ -13,10 +13,7 @@ from openedx.core.djangolib.markup import HTML, Text
   </h1>
   <p>
     ${Text(_("We're sorry, this module is temporarily unavailable. Our staff is working "
-    "to fix it as soon as possible. Please email us at {tech_support_email} to "
-    "report any problems or downtime.")).format(
-        tech_support_email=HTML(u"<a href=\"mailto:{0}\">{0}</a>").format(static.get_tech_support_email_address())
-    )}
+    "to fix it as soon as possible. " )) }
   </p>
 
 % if staff_access:
