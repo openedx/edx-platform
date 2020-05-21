@@ -40,7 +40,7 @@ class BaseCourseHomeTests(SharedModuleStoreTestCase):
             modulestore=cls.store,
         )
         chapter = ItemFactory(parent=cls.course, category='chapter')
-        ItemFactory(parent=chapter, category='sequential', display_name='sequence')
+        ItemFactory(parent=chapter, category='sequential')
 
         CourseModeFactory(course_id=cls.course.id, mode_slug=CourseMode.AUDIT)
         CourseModeFactory(

@@ -1,3 +1,4 @@
+# pylint: disable=abstract-method
 """
 Dates Tab Serializers. Represents the relevant dates for a Course.
 """
