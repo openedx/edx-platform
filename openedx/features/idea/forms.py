@@ -8,15 +8,15 @@ from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso
 from lms.djangoapps.onboarding.models import Organization
 from openedx.features.philu_utils.utils import validate_file_size
 
-from .constants import COUNTRY_MAX_LENGTH, IDEA_FILE_MAX_SIZE, IDEA_IMAGE_MAX_SIZE, ORGANIZATION_NAME_MAX_LENGTH
+from .constants import IDEA_FILE_MAX_SIZE, IDEA_IMAGE_MAX_SIZE, ORGANIZATION_NAME_MAX_LENGTH
 from .helpers import validate_image_dimensions
 from .models import Idea
 
 
 class IdeaCreationForm(ModelForm):
     """
-    A model form to create new Idea. Separate fields for organization_name and country_name are used
-    to make model field organization and country work with custom widget on frontend.
+    A model form to create new Idea. Separate fields for organization_name is used
+    to make model field organization work with custom widget on frontend.
     """
 
     prefix = 'idea'
@@ -24,21 +24,24 @@ class IdeaCreationForm(ModelForm):
 
     organization_name = CharField(
         max_length=ORGANIZATION_NAME_MAX_LENGTH,
-        label=_('Organization Name'),
-        required=True,
-        widget=TextInput(),
-    )
-
-    country_name = CharField(
-        max_length=COUNTRY_MAX_LENGTH,
-        label=_('Country'),
+        label=_('Organization Name*'),
         required=True,
         widget=TextInput(),
     )
 
     class Meta:
         model = Idea
-        exclude = ('user', 'favorites', 'organization', 'country',)
+        exclude = ('user', 'favorites', 'organization',)
+
+        labels = {
+            'city': 'City:',
+            'country': 'Country:',
+            'description': 'Idea Description*',
+            'organization_mission': 'Organization Mission*',
+            'overview': 'Idea Overview*',
+            'title': 'Idea Title*',
+            'video_link': 'Video Link:',
+        }
 
         widgets = {
             'overview': Textarea(),
@@ -51,7 +54,7 @@ class IdeaCreationForm(ModelForm):
         initial_arguments = kwargs.get('initial', {})
         self.user = initial_arguments.get('user', None)
         self.disable_field('organization_name', initial_arguments)
-        self.disable_field('country_name', initial_arguments)
+        self.disable_field('country', initial_arguments)
         self.disable_field('city', initial_arguments)
 
         self.fields['image'].widget.attrs.update(
@@ -63,15 +66,6 @@ class IdeaCreationForm(ModelForm):
         initial_field_arguments = initial_arguments.get(field_name, None)
         # django will save initial values even if disabled fields are tampered with
         self.fields[field_name].disabled = True if initial_field_arguments else False
-
-    def clean_country_name(self):
-        all_countries = COUNTRIES.values()
-        country = self.cleaned_data['country_name']
-
-        if country in all_countries:
-            return country
-
-        raise ValidationError(_('Please select valid country'))
 
     def clean_image(self):
         image = self.cleaned_data['image']
@@ -95,8 +89,7 @@ class IdeaCreationForm(ModelForm):
         if not organization:
             organization = Organization(label=organization_name)
 
-        country_name = self.cleaned_data.get('country_name')
-        idea.country = get_country_iso(country_name)
+        idea.country = self.cleaned_data.get('country')
 
         is_userprofile_updated = False
         userprofile = idea.user.profile
