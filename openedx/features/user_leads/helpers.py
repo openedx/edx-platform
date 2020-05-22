@@ -20,4 +20,7 @@ def save_user_utm(request):
     utm_params = get_utm_params(request)
 
     if not user.is_anonymous():
-        UserLeads.objects.get_or_create(user=user, origin=origin, **utm_params)
+        try:
+            UserLeads.objects.get(user=user, origin=origin)
+        except UserLeads.DoesNotExist:
+            UserLeads.objects.create(user=user, origin=origin, **utm_params)

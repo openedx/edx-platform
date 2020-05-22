@@ -1,6 +1,5 @@
 import random
 
-from django.db import IntegrityError
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import ResolverMatch
@@ -79,8 +78,10 @@ class UserLeadsHelpersTest(TestCase):
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
         self.assertTrue(existing_lead_count == 1)
 
-    @patch('openedx.features.user_leads.helpers.UserLeads.objects.get_or_create')
-    def test_save_user_utm_registered_user_existing_lead(self, mocked_user_leads_get_or_create_method):
+    @patch('openedx.features.user_leads.helpers.UserLeads.objects.get')
+    @patch('openedx.features.user_leads.helpers.UserLeads.objects.create')
+    def test_save_user_utm_registered_user_existing_lead(self, mocked_user_leads_create_method,
+                                                         mocked_user_leads_get_method):
         """
         Test that for a registered user, who has an existing lead against
         the current page, an exception is thrown when trying to insert
@@ -91,22 +92,23 @@ class UserLeadsHelpersTest(TestCase):
         request.resolver_match = ResolverMatch('get', (), {})
         request.resolver_match.url_name = self.url_name
 
-        user_lead = UserLeads.objects.create(user=self.user, origin=self.url_name, **self.request_data)
+        user_lead = UserLeads(user=self.user, origin=self.url_name, **self.request_data)
+        user_lead.save()
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
         self.assertTrue(existing_lead_count == 1)
 
         save_user_utm(request)
 
-        mocked_user_leads_get_or_create_method.assert_called_with(user=self.user,
-                                                                  origin=self.url_name,
-                                                                  **self.request_data)
+        mocked_user_leads_get_method.assert_called_with(user=self.user, origin=self.url_name)
+        mocked_user_leads_create_method.assert_not_called()
 
         existing_user_lead = UserLeads.objects.filter(user=self.user, origin=self.url_name).first()
         self.assertTrue(user_lead.pk == existing_user_lead.pk)
 
-
-    @patch('openedx.features.user_leads.helpers.UserLeads.objects.get_or_create')
-    def test_save_user_utm_anonymous_user(self, mocked_user_leads_get_or_create_method):
+    @patch('openedx.features.user_leads.helpers.UserLeads.objects.get')
+    @patch('openedx.features.user_leads.helpers.UserLeads.objects.create')
+    def test_save_user_utm_anonymous_user(self, mocked_user_leads_create_method,
+                                          mocked_user_leads_get_method):
         """
         Test that for an anonymous user a lead is not stored in the UserLeads table.
         """
@@ -117,4 +119,5 @@ class UserLeadsHelpersTest(TestCase):
 
         save_user_utm(request)
 
-        mocked_user_leads_get_or_create_method.assert_not_called()
+        mocked_user_leads_get_method.assert_not_called()
+        mocked_user_leads_create_method.assert_not_called()
