@@ -3,7 +3,10 @@ Custom event processors and other functionality for the Segment backend.
 """
 
 from django.conf import settings
+
 from openedx.core.djangoapps.site_configuration import helpers
+
+from . import exceptions, utils
 
 
 class SegmentTopLevelPropertiesProcessor(object):
@@ -25,7 +28,7 @@ class SegmentTopLevelPropertiesProcessor(object):
         'block_name': 'Section 1',
         'completion_percent': 33.3333333333333,
         'course_id': 'course-v1:foo+101+forever',
-        'course_name': 'CompletionTest',
+        'course_name': 'CompletionTest',foo
         'label': 'chapter Section 1 started'
     },
     'name': 'edx.bi.completion.user.chapter.started',
@@ -60,12 +63,19 @@ class SegmentTopLevelPropertiesProcessor(object):
     """
 
     def __call__(self, event):
-        if not helpers.get_value(
-            'COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL',
-            settings.COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL
-        ):
-            # processor disabled, but keep processing
+        """
+        Process only if processor is enabled for Site.
+        """
+        try:
+            siteconfig = utils.get_site_config_for_event(event['data'])
+            if not siteconfig.get_value(
+                'COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL',
+                settings.COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL
+            ):
+                return event
+        except exceptions.EventProcessingError:
             return event
+
         try:
             for key, val in event['data'].items():
                 if key in event:

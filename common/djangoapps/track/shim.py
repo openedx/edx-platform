@@ -1,6 +1,7 @@
 """Map new event context values to old top-level field values. Ensures events can be parsed by legacy parsers."""
 
 import json
+import logging
 import uuid
 import copy
 
@@ -8,6 +9,7 @@ import analytics
 from analytics.client import Client
 
 from openedx.core.djangoapps.site_configuration import helpers
+from openedx.core.djangoapps.appsembler.eventtracking import exceptions, utils
 
 from .transformers import EventTransformerRegistry
 
@@ -20,6 +22,8 @@ CONTEXT_FIELDS_TO_INCLUDE = [
     'referer',
     'accept_language'
 ]
+
+logger = logging.getLogger(__name__)
 
 
 class LegacyFieldMappingProcessor(object):
@@ -131,6 +135,33 @@ class DefaultMultipleSegmentClient(object):
                 params[param] = getattr(analytics, param)
         return Client(write_key, **params)
 
+    def _get_site_segment_key(self, *args):
+        """
+        Find the Site-specific Segment writekey by possible strategies.
+        """
+
+        # Preferentially, by site from request middleware if request available in thread
+        site_segment_key = helpers.get_value('SEGMENT_KEY')
+        if not site_segment_key:
+            try:
+                # this code should only ever run on TRACK events which
+                # will pass args like (user_id, event name, event dict)
+                event_props = args[2]
+                siteconfig = utils.get_site_config_for_event(event_props)
+                if siteconfig:
+                    site_segment_key = siteconfig.get_value('SEGMENT_KEY', None)
+            except (IndexError, exceptions.EventProcessingError) as e:
+                try:
+                    event_name = args[1]
+                except IndexError:
+                    event_name = '(unknown event name)'
+                logger.warn(
+                    "Error retrieving Site SEGMENT_KEY. Cannot send event {} to "
+                    "Site's Segment account. Sending only to main Segment client. "
+                    "Error was {}".format(event_name, e.msg)
+                )
+            return site_segment_key
+
     def __getattr__(self, name, *args, **kwargs):
 
         def proxy(*args, **kwargs):
@@ -138,15 +169,7 @@ class DefaultMultipleSegmentClient(object):
 
             site_client = None
 
-            from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-            site_segment_key = helpers.get_value('SEGMENT_KEY')
-            try:
-                if not site_segment_key and 'org' in args[2]:
-                    org_name = args[2]['org']
-                    site_segment_key = SiteConfiguration.get_value_for_org(org_name, 'SEGMENT_KEY')
-            except (IndexError, TypeError):
-                pass
-
+            site_segment_key = self._get_site_segment_key(*args)
             if site_segment_key:
                 site_client = self._create_client(site_segment_key)
 
