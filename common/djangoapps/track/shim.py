@@ -140,27 +140,25 @@ class DefaultMultipleSegmentClient(object):
         Find the Site-specific Segment writekey by possible strategies.
         """
 
-        # Preferentially, by site from request middleware if request available in thread
-        site_segment_key = helpers.get_value('SEGMENT_KEY')
-        if not site_segment_key:
+        site_segment_key = None
+        try:
+            # this code should only ever run on TRACK events which
+            # will pass args like (user_id, event name, event dict)
+            event_props = args[2]
+            siteconfig = utils.get_site_config_for_event(event_props)
+            if siteconfig:
+                site_segment_key = siteconfig.get_value('SEGMENT_KEY', None)
+        except (IndexError, exceptions.EventProcessingError) as e:
             try:
-                # this code should only ever run on TRACK events which
-                # will pass args like (user_id, event name, event dict)
-                event_props = args[2]
-                siteconfig = utils.get_site_config_for_event(event_props)
-                if siteconfig:
-                    site_segment_key = siteconfig.get_value('SEGMENT_KEY', None)
-            except (IndexError, exceptions.EventProcessingError) as e:
-                try:
-                    event_name = args[1]
-                except IndexError:
-                    event_name = '(unknown event name)'
-                logger.warn(
-                    "Error retrieving Site SEGMENT_KEY. Cannot send event {} to "
-                    "Site's Segment account. Sending only to main Segment client. "
-                    "Error was {}".format(event_name, e.msg)
-                )
-            return site_segment_key
+                event_name = args[1]
+            except IndexError:
+                event_name = '(unknown event name)'
+            logger.warn(
+                "Error retrieving Site SEGMENT_KEY. Cannot send event {} to "
+                "Site's Segment account. Sending only to main Segment client. "
+                "Error was {}".format(event_name, e.msg)
+            )
+        return site_segment_key
 
     def __getattr__(self, name, *args, **kwargs):
 
