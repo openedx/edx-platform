@@ -132,13 +132,23 @@ class DefaultMultipleSegmentClient(object):
         return Client(write_key, **params)
 
     def __getattr__(self, name, *args, **kwargs):
-        site_client = None
-        site_segment_key = helpers.get_value('SEGMENT_KEY')
-        if site_segment_key:
-            site_client = self._create_client(site_segment_key)
 
         def proxy(*args, **kwargs):
             result = getattr(self._main_client, name)(*args, **kwargs)
+
+            site_client = None
+
+            from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+            site_segment_key = helpers.get_value('SEGMENT_KEY')
+            try:
+                if not site_segment_key and 'org' in args[2]:
+                    org_name = args[2]['org']
+                    site_segment_key = SiteConfiguration.get_value_for_org(org_name, 'SEGMENT_KEY')
+            except (IndexError, TypeError):
+                pass
+
+            if site_segment_key:
+                site_client = self._create_client(site_segment_key)
 
             if not site_client:
                 return result
