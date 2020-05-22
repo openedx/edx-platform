@@ -18,5 +18,5 @@ pluggy==0.13.1            # via diff-cover
 pygments==2.6.1           # via diff-cover
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, pandas
 pytz==2020.1              # via pandas
-six==1.14.0               # via diff-cover, python-dateutil
+six==1.15.0               # via diff-cover, python-dateutil
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, importlib-metadata

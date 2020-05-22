@@ -15,7 +15,7 @@ cycler==0.10.0            # via matplotlib
 decorator==4.4.2          # via networkx
 joblib==0.14.1            # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt, nltk
 kiwisolver==1.1.0         # via -c requirements/edx-sandbox/../constraints.txt, matplotlib
-lxml==4.5.0               # via -r requirements/edx-sandbox/shared.txt
+lxml==4.5.1               # via -r requirements/edx-sandbox/shared.txt
 markupsafe==1.1.1         # via chem
 matplotlib==2.2.4         # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/py35.in
 mpmath==1.1.0             # via sympy
@@ -29,7 +29,7 @@ pytz==2020.1              # via matplotlib
 random2==1.0.1            # via -r requirements/edx-sandbox/py35.in
 regex==2020.5.14          # via -r requirements/edx-sandbox/shared.txt, nltk
 scipy==1.2.1              # via -r requirements/edx-sandbox/py35.in, calc, chem
-six==1.14.0               # via -r requirements/edx-sandbox/shared.txt, calc, cryptography, cycler, matplotlib, python-dateutil
+six==1.15.0               # via -r requirements/edx-sandbox/shared.txt, calc, cryptography, cycler, matplotlib, python-dateutil
 sympy==1.4                # via -r requirements/edx-sandbox/py35.in, symmath
 tqdm==4.46.0              # via -r requirements/edx-sandbox/shared.txt, nltk
 
