@@ -223,9 +223,9 @@ class ProviderConfig(ConfigurationModel):
         abstract = True
 
     def clean(self):
-        """ Ensure that either `icon_class` or `icon_image` is set """
+        """ Ensure that at most `icon_class` or `icon_image` is set """
         super(ProviderConfig, self).clean()
-        if bool(self.icon_class) == bool(self.icon_image):
+        if bool(self.icon_class) and bool(self.icon_image):
             raise ValidationError('Either an icon class or an icon image must be given (but not both)')
 
     @property
