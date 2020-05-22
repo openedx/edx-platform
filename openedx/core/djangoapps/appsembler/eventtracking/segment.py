@@ -73,7 +73,7 @@ class SegmentTopLevelPropertiesProcessor(object):
                 settings.COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL
             ):
                 return event
-        except exceptions.EventProcessingError:
+        except (AttributeError, exceptions.EventProcessingError):
             return event
 
         try:
