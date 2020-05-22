@@ -28,7 +28,7 @@ class SegmentTopLevelPropertiesProcessor(object):
         'block_name': 'Section 1',
         'completion_percent': 33.3333333333333,
         'course_id': 'course-v1:foo+101+forever',
-        'course_name': 'CompletionTest',foo
+        'course_name': 'CompletionTest',
         'label': 'chapter Section 1 started'
     },
     'name': 'edx.bi.completion.user.chapter.started',
@@ -73,7 +73,7 @@ class SegmentTopLevelPropertiesProcessor(object):
                 settings.COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL
             ):
                 return event
-        except exceptions.EventProcessingError:
+        except (AttributeError, exceptions.EventProcessingError):
             return event
 
         try:

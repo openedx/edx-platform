@@ -12,9 +12,6 @@ def get_site_config_for_event(event_props):
     Try multiple strategies to find a SiteConfiguration object to use
     for evaluating and processing an event.
 
-    This will only be called if the SiteConfiguration cannot be retrieved
-    via the request on the thread.
-
     Return a SiteConfiguration object if found; otherwise, None.
     """
     from openedx.core.djangoapps.appsembler.sites import utils
