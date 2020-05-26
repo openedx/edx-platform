@@ -61,7 +61,12 @@ class PollModuleTest(LogicTest):
         output.save()
 
         xml = output.definition_to_xml(None)
+        from lxml import etree
+        print("$%$%$%$%$%$%$%$%$%$%")
+        print(repr(etree.tostring(xml)))
+        print("$%$%$%$%$%$%$%$%$%$%")
         # Extract texts of all children.
         child_texts = xml.xpath('//text()')
         # Last index of child_texts contains text of answer tag.
         self.assertEqual(child_texts[-1], '< 18')
+        1/0
