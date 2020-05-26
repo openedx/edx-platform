@@ -144,7 +144,7 @@ define([
                 var view = createTeamProfileView(requests, options);
 
                 // There should be filler text that says there are no assignments
-                expect(view.$('#assignments').text()).toEqual('No assignments yet for team');
+                expect(view.$('#assignments').text()).toEqual('No assignments for team');
                 expect(view.$('.team-assignment').length).toEqual(0);
             });
 

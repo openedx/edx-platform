@@ -93,7 +93,7 @@
                     var view = this;
 
                     if (!assignments || !assignments.length) {
-                        view.$('#assignments').text(gettext('No assignments yet for team'));
+                        view.$('#assignments').text(gettext('No assignments for team'));
                         return;
                     }
 
