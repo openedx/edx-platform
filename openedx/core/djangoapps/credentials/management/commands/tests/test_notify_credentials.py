@@ -127,6 +127,7 @@ class TestNotifyCredentials(TestCase):
         call_command(Command(), '--start-date', '2017-02-01')
         self.assertEqual(mock_grade_cert_change.call_count, 2)
         self.assertEqual(mock_grade_interesting.call_count, 2)
+        self.assertEqual(mock_program_changed.call_count, 2)
 
     @mock.patch(COMMAND_MODULE + '.time')
     def test_delay(self, mock_time):
@@ -153,13 +154,15 @@ class TestNotifyCredentials(TestCase):
         self.assertEqual(len(connection.queries), baseline + 2)  # one extra page query each for certs & grades
 
     @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
-    def test_site(self, mock_grade_interesting):
+    @mock.patch(COMMAND_MODULE + '.handle_cert_change')
+    def test_site(self, mock_grade_interesting, mock_cert_change):
         site_config = SiteConfigurationFactory.create(
             site_values={'course_org_filter': ['testX']}
         )
 
         call_command(Command(), '--site', site_config.site.domain, '--start-date', '2017-01-01')
         self.assertEqual(mock_grade_interesting.call_count, 1)
+        self.assertEqual(mock_cert_change.call_count, 1)
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_args_from_database(self, mock_send):

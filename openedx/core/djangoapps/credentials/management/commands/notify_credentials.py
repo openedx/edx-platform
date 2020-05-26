@@ -212,7 +212,6 @@ class Command(BaseCommand):
     def send_notifications(self, certs, grades, site_config=None, delay=0, page_size=0, verbose=False):
         """ Run actual handler commands for the provided certs and grades. """
 
-        course_cert_info = {}
         # First, do certs
         for i, cert in paged_query(certs, delay, page_size):
             if site_config and not site_config.has_org(cert.course_id.org):
@@ -232,14 +231,8 @@ class Command(BaseCommand):
                 'status': cert.status,
                 'verbose': verbose,
             }
-
-            data = {
-                'mode': cert.mode,
-                'status': cert.status
-            }
-
-            course_cert_info[(cert.user.id, str(cert.course_id))] = data
             handle_course_cert_changed(**signal_args)
+            handle_cert_change(**signal_args)
 
         # Then do grades
         for i, grade in paged_query(grades, delay, page_size):
@@ -253,21 +246,14 @@ class Command(BaseCommand):
             )
 
             user = User.objects.get(id=grade.user_id)
-
-            # Grab mode/status from cert call
-            if course_cert_info:
-                key = (user.id, str(grade.course_id))
-                mode = course_cert_info[key].get('mode', None)
-                status = course_cert_info[key].get('status', None)
-
             send_grade_if_interesting(
                 user,
                 grade.course_id,
-                mode,
-                status,
+                None,
+                None,
                 grade.letter_grade,
                 grade.percent_grade,
-                verbose=verbose,
+                verbose=verbose
             )
 
     def get_course_keys(self, courses=None):
