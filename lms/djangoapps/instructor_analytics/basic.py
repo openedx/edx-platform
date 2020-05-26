@@ -110,7 +110,7 @@ def enrolled_students_features(course_key, features):
 
     if include_team_column:
         students = students.prefetch_related('teams')
-    
+
     ####### EOL ###############
     if include_run_column and settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE:
         students = students.prefetch_related('edxloginuser')
@@ -142,14 +142,14 @@ def enrolled_students_features(course_key, features):
         ########### EOL ##########################
         if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE:
             try:
-                from uchileedxlogin.models import EdxLoginUser                
+                from uchileedxlogin.models import EdxLoginUser
                 student_dict['run'] = student.edxloginuser.run
             except EdxLoginUser.DoesNotExist:
                 student_dict['run'] = ""
         ###########################################
         student_dict_aux = dict((feature, extract_attr(student, feature))
                             for feature in student_features)
-        
+
         student_dict.update(student_dict_aux)
         profile = student.profile
         if profile is not None:

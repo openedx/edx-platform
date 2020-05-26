@@ -439,10 +439,10 @@ class CourseGradeReport(object):
         Returns a list of all applicable column headers for this grade report.
         """
         aux = ["Student ID", "Email", "Username"]
-        
-        if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE:                              
+
+        if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE:
             aux = ["Student ID", "Run", "Email", "Username"]
-        
+
         return (
             aux +
             self._grades_header(context) +
@@ -500,7 +500,9 @@ class CourseGradeReport(object):
         Returns the applicable grades-related headers for this report.
         """
         graded_assignments = context.graded_assignments
-        grades_header = ["Grade"]
+        # EOL
+        grades_header = ["Grade", "Grade Scaled"]
+        # EOL
         for assignment_info in six.itervalues(graded_assignments):
             if assignment_info['separate_subsection_avg_headers']:
                 grades_header.extend(six.itervalues(assignment_info['subsection_headers']))
@@ -692,12 +694,12 @@ class CourseGradeReport(object):
         Returns a list of rows for the given users for this report.
         """
         user_runs= {}
-        if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE: 
+        if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE:
             from uchileedxlogin.models import EdxLoginUser
             edxlogin_user = EdxLoginUser.objects.all().values('user_id','run')
             for x in edxlogin_user:
                 user_runs[x['user_id']] = x['run']
-            
+
         with modulestore().bulk_operations(context.course_id):
             bulk_context = _CourseGradeBulkContext(context, users)
 
@@ -713,12 +715,12 @@ class CourseGradeReport(object):
                     error_rows.append([user.id, user.username, text_type(error)])
                 else:
                     aux = [user.id, user.email, user.username]
-                    ########### EOL ##########################                    
-                    if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE: 
+                    ########### EOL ##########################
+                    if settings.UCHILEEDXLOGIN_TASK_RUN_ENABLE:
                         if user.id in user_runs:
-                            aux = [user.id, user_runs[user.id], user.email, user.username] 
+                            aux = [user.id, user_runs[user.id], user.email, user.username]
                         else:
-                            aux = [user.id, "", user.email, user.username] 
+                            aux = [user.id, "", user.email, user.username]
                     ###########################################
 
                     success_rows.append(

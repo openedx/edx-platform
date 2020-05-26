@@ -5,12 +5,12 @@ services:
     restart: unless-stopped
 
   mongodb:
-    image: mongo:3.2.16
+    image: mongo:3.6.16
     command: mongod --smallfiles --nojournal --storageEngine wiredTiger
     restart: unless-stopped
 
   lms:
-    image: eoluchile/edx-platform:testing
+    image: eoluchile/edx-platform:testing-juniper
     depends_on:
       - memcached
       - mongodb
