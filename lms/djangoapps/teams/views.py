@@ -213,7 +213,7 @@ class TeamsDashboardView(GenericAPIView):
         }
 
         # Assignments are feature-flagged
-        if are_team_submissions_enabled():
+        if are_team_submissions_enabled(course_key):
             context["teams_assignments_url"] = reverse('teams_assignments_list', args=['team_id'])
 
         return render(request, "teams/teams.html", context)
@@ -870,12 +870,12 @@ class TeamsAssignmentsView(GenericAPIView):
 
     def get(self, request, team_id):
         """GET v0/teams/{team_id_pattern}/assignments"""
-        if not are_team_submissions_enabled():
-            return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
         course_team = get_object_or_404(CourseTeam, team_id=team_id)
         user = request.user
         course_id = course_team.course_id
+
+        if not are_team_submissions_enabled(course_id):
+            return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         if not has_team_api_access(request.user, course_id):
             return Response(status=status.HTTP_403_FORBIDDEN)

@@ -4,6 +4,7 @@ Utility methods related to teams.
 
 from django.conf import settings
 from eventtracking import tracker
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 from track import contexts
 
@@ -18,11 +19,21 @@ def emit_team_event(event_name, course_key, event_data):
         tracker.emit(event_name, event_data)
 
 
-def are_team_submissions_enabled():
+def are_team_submissions_enabled(course_key):
     """
-    Checks to see if the Django setting for team submissions is enabled
+    Checks to see if the CourseWaffleFlag or Django setting for team submissions is enabled
 
     Returns:
         Boolean value representing switch status
     """
-    return settings.FEATURES.get('ENABLE_ORA_TEAM_SUBMISSIONS', False)
+    waffle_namespace = 'openresponseassessment'
+    switch_name = 'team_submissions'
+
+    if CourseWaffleFlag(waffle_namespace, switch_name).is_enabled(course_key):
+        return True
+
+    feature_name = 'ENABLE_ORA_TEAM_SUBMISSIONS'
+    if settings.FEATURES.get(feature_name, False):
+        return True
+
+    return False
