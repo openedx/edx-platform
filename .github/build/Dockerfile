@@ -1,16 +1,19 @@
 FROM ubuntu:16.04 as base
 
 ############ common to lms & cms
+ARG EDX_PLATFORM_VERSION=undefined
 
 # Install system requirements
 RUN apt update && \
     # Global requirements
-    apt install -y language-pack-en git python-virtualenv build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev python-pip libmysqlclient-dev python-apt python-dev libxmlsec1-dev libfreetype6-dev swig gcc g++ \
+    apt install -y language-pack-en git build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev libmysqlclient-dev libxmlsec1-dev libfreetype6-dev libssl-dev swig gcc g++ \
     # openedx requirements
-    gettext gfortran graphviz graphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng12-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev nodejs npm ntp pkg-config lynx \
+    gettext gfortran graphviz libgraphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev ntp pkg-config python3.5 python3-pip python3-dev sqlite3 lynx \
     # Our requirements
     mysql-client locales unzip \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s /usr/bin/pip3 /usr/bin/pip \
+    && ln -s /usr/bin/python3 /usr/bin/python
 
 # Setup system locales, this is used to fix accent in code
 RUN locale-gen en_US.UTF-8
@@ -31,16 +34,17 @@ WORKDIR /openedx/edx-platform
 # Install python requirements (clone source repos in a separate dir, otherwise
 # they will be overwritten when we mount edx-platform)
 ENV NO_PYTHON_UNINSTALL 1
-RUN pip install --src ../venv/src -r requirements/edx/base.txt
+RUN pip3 install pip==20.0.2 \
+  && pip3 install --src ../venv/src -r requirements/edx/base.txt
 
 # Remove the original versions of ora2 and edx-sga
-RUN pip uninstall -y ora2 edx-sga
+RUN pip3 uninstall -y ora2 edx-sga
 
 # Manually update pytz (Timezones)
-RUN pip install pytz --upgrade
+RUN pip3 install pytz --upgrade
 
 # Install a recent version of nodejs
-RUN nodeenv /openedx/nodeenv --node=8.9.3 --prebuilt
+RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
 ENV PATH /openedx/nodeenv/bin:${PATH}
 
 # Install nodejs requirements
@@ -56,8 +60,13 @@ ENV PATH /openedx/bin:${PATH}
 # the settings files.
 COPY .github/build/settings/lms/*.py ./lms/envs/prod/
 COPY .github/build/settings/cms/*.py ./cms/envs/prod/
-RUN mkdir -p /openedx/config ./lms/envs/prod ./cms/envs/prod
+RUN mkdir -p /openedx/config ./lms/envs/prod ./cms/envs/prod \
+  && echo ${EDX_PLATFORM_VERSION} > /openedx/config/revision.yml
+
 ENV CONFIG_ROOT /openedx/config
+ENV LMS_CFG /openedx/config/lms.yml
+ENV CMS_CFG /openedx/config/cms.yml
+ENV REVISION_CFG /openedx/config/revision.yml
 
 # Collect production assets. By default, only assets from the default theme
 # will be processed. This makes the docker image lighter and faster to build.
@@ -86,5 +95,5 @@ FROM base as testing
 
 # Install testing packages
 RUN grep -v -x -f /openedx/edx-platform/requirements/edx/base.txt /openedx/edx-platform/requirements/edx/development.txt > /tmp/requirements.txt \
-    && pip install -r /tmp/requirements.txt \
+    && pip3 install -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
