@@ -160,8 +160,6 @@ EXECUTIVE_SUMMARY_DATA = (
 INSTRUCTOR_GET_ENDPOINTS = set([
     'get_anon_ids',
     'get_issued_certificates',
-    'get_sale_order_records',
-    'get_sale_records',
 ])
 INSTRUCTOR_POST_ENDPOINTS = set([
     'add_users_to_cohorts',
@@ -178,12 +176,10 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'get_student_progress_url',
     'get_students_features',
     'get_students_who_may_enroll',
-    'get_user_invoice_preference',
     'list_background_email_tasks',
     'list_course_role_members',
     'list_email_content',
     'list_entrance_exam_instructor_tasks',
-    'list_financial_report_downloads',
     'list_forum_members',
     'list_instructor_tasks',
     'list_report_downloads',
@@ -195,11 +191,9 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'reset_due_date',
     'reset_student_attempts',
     'reset_student_attempts_for_entrance_exam',
-    'sale_validation',
     'show_student_extensions',
     'show_unit_extensions',
     'send_email',
-    'spent_registration_codes',
     'students_update_enrollment',
     'update_forum_role_membership',
     'override_problem_score',
@@ -448,7 +442,6 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('list_instructor_tasks', {}),
             ('list_background_email_tasks', {}),
             ('list_report_downloads', {}),
-            ('list_financial_report_downloads', {}),
             ('calculate_grades_csv', {}),
             ('get_students_features', {}),
             ('get_enrollment_report', {}),
@@ -1044,32 +1037,6 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Verify enrollment modes to be 'honor'
         for enrollment in manual_enrollments:
             self.assertEqual(enrollment.enrollment.mode, CourseMode.HONOR)
-
-    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
-    def test_default_shopping_cart_enrollment_mode_for_white_label(self):
-        """
-        Test that enrollment mode for white label courses (paid courses) is DEFAULT_SHOPPINGCART_MODE_SLUG.
-        """
-        # Login white label course instructor
-        self.client.login(username=self.white_label_course_instructor.username, password='test')
-
-        csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
-        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
-
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(len(data['row_errors']), 0)
-        self.assertEqual(len(data['warnings']), 0)
-        self.assertEqual(len(data['general_errors']), 0)
-
-        manual_enrollments = ManualEnrollmentAudit.objects.all()
-        self.assertEqual(manual_enrollments.count(), 1)
-        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-
-        # Verify enrollment modes to be CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
-        for enrollment in manual_enrollments:
-            self.assertEqual(enrollment.enrollment.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
 
 
 @ddt.ddt
@@ -2595,20 +2562,6 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         self.instructor = InstructorFactory(course_key=self.course.id)
         CourseDataResearcherRole(self.course.id).add_users(self.instructor)
         self.client.login(username=self.instructor.username, password='test')
-        self.cart = Order.get_cart_for_user(self.instructor)
-
-        # Create testing invoice 1
-        self.sale_invoice_1 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
-            recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
-            internal_reference="A", course_id=self.course.id, is_valid=True
-        )
-        self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
-            invoice=self.sale_invoice_1,
-            qty=1,
-            unit_price=1234.32,
-            course_id=self.course.id
-        )
 
         self.students = [UserFactory() for _ in range(6)]
         for student in self.students:
@@ -2619,76 +2572,6 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             CourseEnrollmentAllowed.objects.create(
                 email=student.email, course_id=self.course.id
             )
-
-    def register_with_redemption_code(self, user, code):
-        """
-        enroll user using a registration code
-        """
-        redeem_url = reverse('register_code_redemption', args=[code], is_dashboard_endpoint=False)
-        self.client.login(username=user.username, password='test')
-        response = self.client.get(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        # check button text
-        self.assertContains(response, 'Activate Course Enrollment')
-
-        response = self.client.post(redeem_url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_invalidate_sale_record(self):
-        """
-        Testing the sale invalidating scenario.
-        """
-        for i in range(2):
-            course_registration_code = CourseRegistrationCode(
-                code='sale_invoice{}'.format(i),
-                course_id=text_type(self.course.id),
-                created_by=self.instructor,
-                invoice=self.sale_invoice_1,
-                invoice_item=self.invoice_item,
-                mode_slug='honor'
-            )
-            course_registration_code.save()
-
-        data = {'invoice_number': self.sale_invoice_1.id, 'event_type': "invalidate"}
-        url = reverse('sale_validation', kwargs={'course_id': text_type(self.course.id)})
-        self.assert_request_status_code(200, url, method="POST", data=data)
-
-        #Now try to fetch data against not existing invoice number
-        test_data_1 = {'invoice_number': 100, 'event_type': "invalidate"}
-        self.assert_request_status_code(404, url, method="POST", data=test_data_1)
-
-        # Now invalidate the same invoice number and expect an Bad request
-        response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertContains(
-            response,
-            "The sale associated with this invoice has already been invalidated.",
-            status_code=400,
-        )
-
-        # now re_validate the invoice number
-        data['event_type'] = "re_validate"
-        self.assert_request_status_code(200, url, method="POST", data=data)
-
-        # Now re_validate the same active invoice number and expect an Bad request
-        response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertContains(response, "This invoice is already active.", status_code=400)
-
-        test_data_2 = {'invoice_number': self.sale_invoice_1.id}
-        response = self.assert_request_status_code(400, url, method="POST", data=test_data_2)
-        self.assertContains(response, "Missing required event_type parameter", status_code=400)
-
-        test_data_3 = {'event_type': "re_validate"}
-        response = self.assert_request_status_code(400, url, method="POST", data=test_data_3)
-        self.assertContains(response, "Missing required invoice_number parameter", status_code=400)
-
-        # submitting invalid invoice number
-        data['invoice_number'] = 'testing'
-        response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertContains(
-            response,
-            u"invoice_number must be an integer, {value} provided".format(value=data['invoice_number']),
-            status_code=400,
-        )
 
     def test_get_problem_responses_invalid_location(self):
         """
@@ -2907,7 +2790,6 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         decorated_func(request, text_type(self.course.id))
         self.assertTrue(func.called)
-
 
     @patch('lms.djangoapps.instructor.views.api.anonymous_id_for_user', Mock(return_value='42'))
     @patch('lms.djangoapps.instructor.views.api.unique_id_for_user', Mock(return_value='41'))
