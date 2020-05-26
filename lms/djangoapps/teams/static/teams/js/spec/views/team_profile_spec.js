@@ -48,7 +48,7 @@ define([
                 el: $('.profile-view'),
                 teamEvents: TeamSpecHelpers.teamEvents,
                 courseID: TeamSpecHelpers.testCourseID,
-                context: TeamSpecHelpers.testContext,
+                context: options.context || TeamSpecHelpers.testContext,
                 model: teamModel,
                 topic: isInstructorManagedTopic ?
                     TeamSpecHelpers.createMockInstructorManagedTopic() :
@@ -73,18 +73,21 @@ define([
             );
             AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockDiscussionResponse());
 
-            AjaxHelpers.expectRequest(
-                requests,
-                'GET',
-                interpolate( // eslint-disable-line no-undef
-                    '/api/team/v0/teams/%(teamId)s/assignments',
-                    {
-                        teamId: teamModel.id
-                    },
-                    true
-                )
-            );
-            AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamAssignments(options.assignments));
+            // Assignments are feature-flagged
+            if (profileView.context.teamsAssignmentsUrl) {
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    interpolate( // eslint-disable-line no-undef
+                        '/api/team/v0/teams/%(teamId)s/assignments',
+                        {
+                            teamId: teamModel.id
+                        },
+                        true
+                    )
+                );
+                AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamAssignments(options.assignments));
+            }
 
             return profileView;
         };
@@ -158,6 +161,27 @@ define([
 
                 // When the user goes to the team detail page
                 var view = createTeamProfileView(requests, options);
+
+                // Then then assignments view does not appear on the page
+                expect(view.$('.team-assignments').length).toBe(0);
+            });
+
+            it('does not show at all when the feature flag is turned off', function() {
+                // Given the team submissions feature is turned off
+                // (teamAsssignmentsUrl isn't surfaced to user)
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
+                    options = {
+                        assignments: mockAssignments,
+                        membership: DEFAULT_MEMBERSHIP,
+                        context: Object.assign({}, TeamSpecHelpers.testContext)
+                    },
+                    requests = AjaxHelpers.requests(this),
+                    view;
+
+                delete options.context.teamsAssignmentsUrl;
+
+                // When the user goes to the team detail page
+                view = createTeamProfileView(requests, options);
 
                 // Then then assignments view does not appear on the page
                 expect(view.$('.team-assignments').length).toBe(0);

@@ -42,7 +42,8 @@
                         isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
                         isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
                         isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
-                        maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize);
+                        maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize),
+                        showAssignments = !!this.context.teamsAssignmentsUrl;
 
                     var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 
@@ -58,6 +59,7 @@
                             isMember: isMember,
                             isAdminOrStaff: isAdminOrStaff,
                             showLeaveLink: showLeaveLink,
+                            showAssignments: showAssignments,
                             hasCapacity: maxTeamSize && (memberships.length < maxTeamSize),
                             hasMembers: memberships.length >= 1
                         })
@@ -68,7 +70,9 @@
                     });
                     this.discussionView.render();
 
-                    this.getTeamAssignments();
+                    if (showAssignments) {
+                        this.getTeamAssignments();
+                    }
 
                     this.renderTeamMembers();
 

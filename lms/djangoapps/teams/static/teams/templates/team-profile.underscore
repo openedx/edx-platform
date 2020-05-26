@@ -1,6 +1,6 @@
 <div class="team-profile">
     <div class="page-content-main">
-        <% if (isMember || isAdminOrStaff) { %>
+        <% if (showAssignments && (isMember || isAdminOrStaff)) { %>
             <div class="team-assignments">
                 <h3><%- gettext("Team Assignments") %></h3>
                 <ul id="assignments"></ul>

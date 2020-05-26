@@ -68,7 +68,7 @@ from .serializers import (
     MembershipSerializer,
     TopicSerializer
 )
-from .utils import emit_team_event
+from .utils import emit_team_event, are_team_submissions_enabled
 
 TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
@@ -199,7 +199,6 @@ class TeamsDashboardView(GenericAPIView):
             ),
             "topics_url": reverse('topics_list', request=request),
             "teams_url": reverse('teams_list', request=request),
-            "teams_assignments_url": reverse('teams_assignments_list', args=['team_id']),
             "teams_detail_url": reverse('teams_detail', args=['team_id']),
             "team_memberships_url": reverse('team_membership_list', request=request),
             "my_teams_url": reverse('teams_list', request=request),
@@ -212,6 +211,11 @@ class TeamsDashboardView(GenericAPIView):
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
         }
+
+        # Assignments are feature-flagged
+        if are_team_submissions_enabled():
+            context["teams_assignments_url"] = reverse('teams_assignments_list', args=['team_id'])
+
         return render(request, "teams/teams.html", context)
 
     def _serialize_and_paginate(self, pagination_cls, queryset, request, serializer_cls, serializer_ctx):
@@ -846,6 +850,8 @@ class TeamsAssignmentsView(GenericAPIView):
             stored exactly as specified. The intention is that plain text is
             supported, not HTML.
 
+            If team assignments are not enabled for course, a 503 is returned.
+
             If the user is not logged in, a 401 error is returned.
 
             If the user is unenrolled or does not have API access, a 403 error is returned.
@@ -864,6 +870,9 @@ class TeamsAssignmentsView(GenericAPIView):
 
     def get(self, request, team_id):
         """GET v0/teams/{team_id_pattern}/assignments"""
+        if not are_team_submissions_enabled():
+            return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
         course_team = get_object_or_404(CourseTeam, team_id=team_id)
         user = request.user
         course_id = course_team.course_id

@@ -1505,6 +1505,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
             self.assertEqual(team['name'], 'foo')
 
 
+@patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': True})
 @ddt.ddt
 class TestTeamAssignmentsView(TeamAPITestCase):
     """ Tests for the TeamAssignmentsView """
@@ -1566,6 +1567,17 @@ class TestTeamAssignmentsView(TeamAPITestCase):
 
         # When I run the query, I get back a 404 error
         expected_status = 404
+        self.get_team_assignments(team_id, expected_status, user=user)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': False})
+    def test_get_assignments_feature_not_enabled(self):
+        # Given the team submissions feature is not enabled
+        user = 'student_enrolled'
+        team_id = self.solar_team.team_id
+
+        # When I try to get assignments
+        # Then I get back a 503 error
+        expected_status = 503
         self.get_team_assignments(team_id, expected_status, user=user)
 
 
