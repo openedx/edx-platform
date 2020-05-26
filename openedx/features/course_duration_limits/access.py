@@ -91,26 +91,10 @@ def get_user_course_expiration_date(user, course):
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
         return None
 
-    try:
-        # Content availability date is equivalent to max(enrollment date, course start date)
-        # for most people. Using the schedule date will provide flexibility to deal with
-        # more complex business rules in the future.
-        content_availability_date = enrollment.schedule.start_date
-        # We have anecdotally observed a case where the schedule.start_date was
-        # equal to the course start, but should have been equal to the enrollment start
-        # https://openedx.atlassian.net/browse/PROD-58
-        # This section is meant to address that case
-        if enrollment.created and course.start:
-            if (content_availability_date.date() == course.start.date() and
-               course.start < enrollment.created < timezone.now()):
-                content_availability_date = enrollment.created
-            # If course teams change the course start date, set the content_availability_date
-            # to max of enrollment or course start date
-            elif (content_availability_date.date() < course.start.date() and
-                  content_availability_date.date() < enrollment.created.date()):
-                content_availability_date = max(enrollment.created, course.start)
-    except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
-        content_availability_date = max(enrollment.created, course.start)
+    # We reset schedule.start in order to change a user's computed deadlines.
+    # But their expiration date shouldn't change when we adjust their schedule (they don't
+    # get additional time), so we need to based the expiration date on a fixed start date.
+    content_availability_date = max(enrollment.created, course.start)
 
     return content_availability_date + access_duration
 
