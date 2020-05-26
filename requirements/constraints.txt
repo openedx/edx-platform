@@ -29,6 +29,9 @@ django-cors-headers<3.0.0
 # It seems like django-countries > 5.5 may cause performance issues for us.
 django-countries==5.5
 
+# 2.0.0 dropped support for Python 3.5
+django-pipeline<2.0.0
+
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
@@ -58,6 +61,10 @@ jsonfield2<3.1.0
 
 # kiwisolver 1.2.0 requires Python 3.6+
 kiwisolver<1.2.0
+
+# 4.5.1 introduced a bug when used together with xmlsec: https://bugs.launchpad.net/lxml/+bug/1880251
+# Tests passed, but hit a problem in stage
+lxml<4.5.1
 
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to the latest release
 Markdown==2.6.11
