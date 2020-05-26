@@ -39,6 +39,7 @@ from edxval.api import (
 )
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
@@ -746,7 +747,7 @@ def videos_post(course, request):
     if error:
         return JsonResponse({'error': error}, status=400)
 
-    bucket = storage_service_bucket()
+    storage = storage_service()
     req_files = data['files']
     resp_files = []
 
@@ -760,12 +761,11 @@ def videos_post(course, request):
             return JsonResponse({'error': error_msg}, status=400)
 
         edx_video_id = six.text_type(uuid4())
-        key = storage_service_key(bucket, file_name=edx_video_id)
 
-        metadata_list = [
-            ('client_video_id', file_name),
-            ('course_key', six.text_type(course.id)),
-        ]
+        metadata = {
+            "client_video_id": file_name,
+            "course_key": six.text_type(course.id),
+        }
 
         deprecate_youtube = waffle_flags()[DEPRECATE_YOUTUBE]
         course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
@@ -773,20 +773,24 @@ def videos_post(course, request):
         # Only include `course_video_upload_token` if youtube has not been deprecated
         # for this course.
         if not deprecate_youtube.is_enabled(course.id) and course_video_upload_token:
-            metadata_list.append(('course_video_upload_token', course_video_upload_token))
+            metadata["course_video_upload_token"] = course_video_upload_token
 
         is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
         if is_video_transcript_enabled:
             transcript_preferences = get_transcript_preferences(six.text_type(course.id))
             if transcript_preferences is not None:
-                metadata_list.append(('transcript_preferences', json.dumps(transcript_preferences)))
+                metadata["transcript_preferences"] = json.dumps(transcript_preferences)
 
-        for metadata_name, value in metadata_list:
-            key.set_metadata(metadata_name, value)
-        upload_url = key.generate_url(
-            KEY_EXPIRATION_IN_SECONDS,
-            'PUT',
-            headers={'Content-Type': req_file['content_type']}
+        upload_url = storage.connection.meta.client.generate_presigned_url(
+            "put_object",
+            Params={
+                "Bucket": storage.bucket.name,
+                # TODO: adding metadata does not work and results in failed signature verification
+                # "Metadata": metadata,
+                "Key": storage_service_key(edx_video_id),
+                "ContentType": req_file['content_type'],
+            },
+            ExpiresIn=KEY_EXPIRATION_IN_SECONDS,
         )
 
         # persist edx_video_id in VAL
@@ -804,10 +808,11 @@ def videos_post(course, request):
     return JsonResponse({'files': resp_files}, status=200)
 
 
-def storage_service_bucket():
+def storage_service():
     """
-    Returns an S3 bucket for video uploads.
+    Returns an S3 storage object for video uploads.
     """
+    params = {}
     if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
         credentials = AssumeRole.get_instance().credentials
         params = {
@@ -815,29 +820,21 @@ def storage_service_bucket():
             'aws_secret_access_key': credentials['secret_key'],
             'security_token': credentials['session_token']
         }
-    else:
-        params = {
-            'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
-            'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
-        }
 
-    conn = s3.connection.S3Connection(**params)
-    # We don't need to validate our bucket, it requires a very permissive IAM permission
-    # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
-    # meaning it would need ListObjects on the whole bucket, not just the path used in each
-    # environment (since we share a single bucket for multiple deployments in some configurations)
-    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"], validate=False)
+    return S3Boto3Storage(bucket_name=settings.VIDEO_UPLOAD_PIPELINE["BUCKET"], **params)
 
 
-def storage_service_key(bucket, file_name):
+def storage_service_key(file_name):
     """
     Returns an S3 key to the given file in the given bucket.
     """
-    key_name = "{}/{}".format(
-        settings.VIDEO_UPLOAD_PIPELINE.get("ROOT_PATH", ""),
+    root_path = settings.VIDEO_UPLOAD_PIPELINE.get("ROOT_PATH", "")
+    if root_path:
+        root_path += "/"
+    return "{}{}".format(
+        root_path,
         file_name
     )
-    return s3.key.Key(bucket, key_name)
 
 
 def send_video_status_update(updates):
