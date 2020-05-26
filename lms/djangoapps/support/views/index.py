@@ -15,14 +15,6 @@ SUPPORT_INDEX_URLS = [
         "name": _("Certificates"),
         "description": _("View and regenerate certificates."),
     },
-
-    # DEPRECATION WARNING: We can remove this end-point
-    # once shoppingcart has been replaced by the E-Commerce service.
-    {
-        "url": reverse_lazy("support:refund"),
-        "name": _("Manual Refund"),
-        "description": _("Track refunds issued directly through CyberSource."),
-    },
     {
         "url": reverse_lazy("support:enrollment"),
         "name": _("Enrollment"),

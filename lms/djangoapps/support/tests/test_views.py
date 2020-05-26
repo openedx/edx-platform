@@ -128,7 +128,6 @@ class SupportViewAccessTests(SupportViewTestCase):
         in itertools.product((
             'support:index',
             'support:certificates',
-            'support:refund',
             'support:enrollment',
             'support:enrollment_list',
             'support:manage_user',
@@ -156,7 +155,6 @@ class SupportViewAccessTests(SupportViewTestCase):
     @ddt.data(
         "support:index",
         "support:certificates",
-        "support:refund",
         "support:enrollment",
         "support:enrollment_list",
         "support:manage_user",
@@ -185,7 +183,6 @@ class SupportViewIndexTests(SupportViewTestCase):
 
     EXPECTED_URL_NAMES = [
         "support:certificates",
-        "support:refund",
         "support:link_program_enrollments",
     ]
 
