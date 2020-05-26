@@ -56,7 +56,9 @@ class DatesTabView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = DatesTabSerializer
 
-    def get(self, request, course_key_string):
+    def get(self, request, *args, **kwargs):
+        course_key_string = kwargs.get('course_key_string')
+
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_metric('course_id', course_key_string)
         monitoring_utils.set_custom_metric('user_id', request.user.id)
