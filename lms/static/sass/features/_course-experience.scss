@@ -181,9 +181,9 @@
   h1,
   h2,
   h3 {
-    font-size: font-size(large);
     font-weight: $font-bold;
     color: $black;
+    margin-bottom: $baseline;
   }
 
   img {
@@ -197,8 +197,9 @@
     @include float(right);
 
     .btn-link {
-      color: palette(grayscale, base);
+      color: $gray-800;
       border-color: transparent;
+      cursor: pointer;
     }
   }
 
