@@ -3916,3 +3916,17 @@ GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
 
 ##################### SUPPORT URL ############################
 SUPPORT_HOW_TO_UNENROLL_LINK = ''
+
+################### MONITORING ###############################
+# .. toggle_name: NEWRELIC_PATH_TO_APP_NAME_SUFFIX_HANDLER
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: None
+# .. toggle_description: Dot notation path to a function that maps request paths to a NewRelic app name suffix.
+# .. toggle_category: monitoring
+# .. toggle_use_cases: open_edx, incremental_release
+# .. toggle_creation_date: 2020-05-26
+# .. toggle_expiration_date: None
+# .. toggle_tickets: None
+# .. toggle_status: supported
+# .. toggle_warnings: None
+NEWRELIC_PATH_TO_APP_NAME_SUFFIX_HANDLER = None
