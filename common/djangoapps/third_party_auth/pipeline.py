@@ -714,6 +714,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
         field_mapping.update({
             'fullname': (user.profile, 'name'),
             'country': (user.profile, 'country'),
+            'gender': (user.profile, 'gender'),
         })
 
         # Remove username from list of fields for update
