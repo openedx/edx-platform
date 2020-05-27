@@ -2632,7 +2632,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=722 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=723 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2919,21 +2919,6 @@ CREATE TABLE `edxval_thirdpartytranscriptcredentialsstate` (
   `has_creds` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `edxval_thirdpartytranscr_org_provider_188f7ddf_uniq` (`org`,`provider`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `edxval_transcriptcredentials`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `edxval_transcriptcredentials` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created` datetime(6) NOT NULL,
-  `modified` datetime(6) NOT NULL,
-  `org` varchar(50) NOT NULL,
-  `provider` varchar(50) NOT NULL,
-  `api_key` longblob NOT NULL,
-  `api_secret` longblob NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `edxval_transcriptcredentials_org_provider_7c5dbd2d_uniq` (`org`,`provider`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `edxval_transcriptpreference`;
