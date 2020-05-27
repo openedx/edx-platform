@@ -19,7 +19,7 @@ Decision
 
 We will employ a "hacked" solution to set the NewRelic app name per transaction. This is considered a reasonable "hack" by NewRelic, but NewRelic dashboards are their more general recommendation.
 
-We will define the mappings from request path to new app name in code. This mapping handler can be configured using a new setting, ``NEWRELIC_PATH_TO_APP_NAME_SUFFIX_HANDLER``.  The handler should take a request path and return None for the default mapping, or a suffix to be appended to the default app name. Providing the mapping as a setting enables quick rollback, and enables mapping overrides for the Open edX community.
+We will define the mappings from request path to new app name in code using a configurable mapping handler function. This mapping handler can be configured using a new setting, ``NEWRELIC_PATH_TO_APP_NAME_SUFFIX_HANDLER``, which will contain a string path to the handler function. The handler will take a request path and return None for the default mapping, or a suffix to be appended to the default app name. Providing the mapping as a setting enables quick rollback, and enables alternate mapping overrides for the Open edX community.
 
 Consequences
 ============
@@ -28,13 +28,15 @@ In order for this solution to work, we must disable gunicorn instrumentation. Th
 
 Additionally, the mapping code from request path to NewRelic app name happens before the transaction is initiated, and the time taken for the mapping is **not** accounted for in the transaction time. We will ensure this code performs well via unit tests.
 
+By allowing the mapping handler to only return a suffix, it means that the original app name will be used as part of the final app name.
+
 Rejected Alternatives
 =====================
 
-Defining mapping code in config
--------------------------------
+Defining mapping in config
+--------------------------
 
-Defining the mapping code in code, rather than in config directly, has the following pros/cons::
+An alternative to providing mappings through a handler function could have been to provide the mapping in configuration as a list of regex strings and their corresponding suffix. The proposed solution of defining the mappings through a handler function has the following pros/cons:
 
 **Pros:**
 
