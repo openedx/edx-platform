@@ -105,8 +105,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
         context['reset_deadlines_redirect_url_base'] = reset_deadlines_redirect_url_base
         context['reset_deadlines_redirect_url_id_dict'] = {'course_id': str(course.id)}
         context['enrollment_mode'] = getattr(course_enrollment, 'mode', None)
-        context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course),
-        context['on_course_outline_page'] = True,
+        context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course)
+        context['on_course_outline_page'] = True
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
