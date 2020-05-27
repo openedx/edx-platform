@@ -2094,15 +2094,6 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
 
-############################ TRANSCRIPT PROVIDERS SETTINGS ########################
-
-# Note: These settings will also exist in video-encode-manager, so any update here
-# should also be done there.
-CIELO24_SETTINGS = {
-    'CIELO24_API_VERSION': 1,
-    'CIELO24_BASE_API_URL': "https://api.cielo24.com/api",
-    'CIELO24_LOGIN_URL': "https://api.cielo24.com/api/account/login"
-}
 
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'billing@example.com'
