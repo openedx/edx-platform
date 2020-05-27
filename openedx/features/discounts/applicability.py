@@ -96,9 +96,6 @@ def can_receive_discount(user, course, discount_expiration_date=None):
             return False
 
     # TODO: Add additional conditions to return False here
-    # Turn holdback on
-    if _is_in_holdback(user):
-        return False
 
     # Check if discount has expired
     if not discount_expiration_date:
@@ -137,6 +134,10 @@ def can_receive_discount(user, course, discount_expiration_date=None):
     from openedx.features.enterprise_support.utils import is_enterprise_learner
     # Don't give discount to enterprise users
     if is_enterprise_learner(user):
+        return False
+
+    # Turn holdback on
+    if _is_in_holdback(user):
         return False
 
     return True
