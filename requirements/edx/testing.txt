@@ -193,7 +193,7 @@ nodeenv==1.3.5            # via -r requirements/edx/base.txt
 numpy==1.18.4             # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, chem, openedx-calc, pandas, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/base.txt
-git+https://github.com/edx/edx-ora2.git@2.7.6#egg=ora2==2.7.6  # via -r requirements/edx/base.txt
+git+https://github.com/edx/edx-ora2.git@2.7.7#egg=ora2==2.7.7  # via -r requirements/edx/base.txt
 packaging==20.4           # via -r requirements/edx/base.txt, bleach, drf-yasg, pytest, tox
 pandas==0.22.0            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt
 path.py==12.4.0           # via -r requirements/edx/base.txt, edx-enterprise, edx-i18n-tools, ora2, xmodule
