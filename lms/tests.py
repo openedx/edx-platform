@@ -8,7 +8,6 @@ from django.conf import settings
 from django.test import TestCase
 
 from edxmako import LOOKUP, add_lookup
-from wsgi import application
 
 log = logging.getLogger(__name__)
 
@@ -31,9 +30,3 @@ class LmsModuleTests(TestCase):
         response = self.client.get('/api-docs/')
         self.assertEqual(200, response.status_code)
 
-
-class WsgiTests(TestCase):
-    """
-    Tests set up of the WSGI Application.
-    """
-    # TODO: Implement tests

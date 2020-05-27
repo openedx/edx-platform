@@ -32,15 +32,11 @@ modulestore()
 # This application object is used by the development server
 # as well as any WSGI server configured to use this file.
 import logging
-import time
 from django.core.wsgi import get_wsgi_application
-from edx_django_utils.monitoring import set_custom_metric
-
-from lms.lib.monitoring import get_configured_newrelic_app_name_suffix_handler
+from lms.lib.monitoring import set_new_relic_app_name
 
 log = logging.getLogger(__name__)
 _application = get_wsgi_application()
-_newrelic_app_name_suffix_handler = get_configured_newrelic_app_name_suffix_handler()
 
 
 class WsgiApp:
@@ -50,33 +46,9 @@ class WsgiApp:
     def __init__(self, application):
         self.application = application
 
-    def _set_new_relic_app_name(self):
-        """
-        Sets the NewRelic app name based on the path, when path is mapped to a suffix.
-        """
-        if not _newrelic_app_name_suffix_handler:
-            return
-
-        try:
-            request_path = environ.get('PATH_INFO')
-            before_time = time.perf_counter()
-            suffix = _newrelic_app_name_suffix_handler(request_path)
-            if suffix:
-                new_app_name = "{}-{}".format(environ['newrelic.app_name'], suffix)
-                environ['newrelic.app_name'] = new_app_name
-                # We may remove this metric later, but for now, it can be used to confirm that
-                # the updated_app_name matches the app name, and that these set_custom_metric
-                # calls are making it to the appropriate transaction.
-                set_custom_metric('updated_app_name', new_app_name)
-            after_time = time.perf_counter()
-            # Tracking the time can be used to enable alerting if this ever gets too large.
-            set_custom_metric('suffix_mapping_time', after_time - before_time)
-        except Exception as e:
-            set_custom_metric('suffix_mapping_error', e)
-
     def __call__(self, environ, start_response):
         try:
-            self._set_new_relic_app_name()
+            set_new_relic_app_name(environ)
         except Exception:
             log.exception("Unexpected error setting the NewRelic app name.")
         return self.application(environ, start_response)

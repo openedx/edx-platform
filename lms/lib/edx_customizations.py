@@ -6,7 +6,20 @@ Note: In order to enable rollout of new mappings from request path to
   implementations (the current and the last).  This enables quick rollback
   via config.
 
-TODO: Move this file out of edx-platform and into a plugin.
+TODO:
+1. Move this file out of edx-platform and into a plugin.
+2. The following may move into an ADR at that time.
+
+Decisions:
+
+* We’ll start with a team-based split of the LMS at first, rather than domain based.
+  * We can always change it to a different orientation if that has issues.
+* All new apps should have apdex and error alerting routed to a team.
+
+Goals:
+
+* Enables simpler alerting and on-call configuration for team ownership inside edx-platform.
+* All parts of edx-platform should be owned and nothing should end up in the default app.
 
 """
 import re
