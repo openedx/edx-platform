@@ -779,9 +779,6 @@ EVENT_TRACKING_BACKENDS = {
                     }
                 },
                 {
-                    'ENGINE': 'openedx.core.djangoapps.appsembler.eventtracking.segment.SegmentTopLevelPropertiesProcessor'
-                },
-                {
                     'ENGINE': 'track.shim.GoogleAnalyticsProcessor'
                 }
             ]
