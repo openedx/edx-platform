@@ -91,7 +91,11 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
         % if is_mobile_app:
             <strong>${_('You are auditing this course,')}</strong>
             ${_(' which means that you are unable to participate in graded assignments.')}
-            ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
+            % if missed_deadlines:
+                ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
+            % else:
+                ${_(' To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
+            % endif
             <a class="mobile-dates-link" href="${verified_upgrade_link}">edx.org</a>.
         % else:
             <strong>${_('You are auditing this course,')}</strong>
