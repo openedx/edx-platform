@@ -352,9 +352,6 @@ def login_user(request):
 
         possibly_authenticated_user = user
 
-        if not is_edly_user_allowed_to_login(request, possibly_authenticated_user):
-            raise AuthFailedError(_('You are not allowed to login on this site.'))
-
         if not is_user_third_party_authenticated:
             possibly_authenticated_user = _authenticate_first_party(request, user)
             if possibly_authenticated_user and password_policy_compliance.should_enforce_compliance_on_login():
@@ -363,6 +360,9 @@ def login_user(request):
 
         if possibly_authenticated_user is None or not possibly_authenticated_user.is_active:
             _handle_failed_authentication(user, possibly_authenticated_user)
+
+        if not is_edly_user_allowed_to_login(request, possibly_authenticated_user):
+            raise AuthFailedError(_('You are not allowed to login on this site.'))
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 
