@@ -118,53 +118,11 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
     % endif
 </div>
 % elif on_course_outline_page and (is_audit or is_verified):
-<div class="dates-banner ${additional_styling_class}">
-    <div class="dates-banner-text">
-        % if is_mobile_app:
-            % if is_verified:
-                ${_('It looks like you missed some important deadlines based on our suggested schedule. ')}
-                ${_('To keep yourself on track, you can update this schedule and shift the past due assignments into the future by visiting ')}
-                <a class="mobile-dates-link" href="${web_app_course_url}">edx.org</a>.
-                ${_(' Don’t worry—you won’t lose any of the progress you’ve made when you shift your due dates.')}
-            % else:
-                <strong>${_('You are auditing this course,')}</strong>
-                ${_(' which means that you are unable to participate in graded assignments.')}
-                ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
-                <a class="mobile-dates-link" href="${verified_upgrade_link}">edx.org</a>.
-            % endif
-        % else:
-            % if is_verified:
-                <strong>${_('It looks like you missed some important deadlines based on our suggested schedule.')}</strong>
-                ${_('To keep yourself on track, you can update this schedule and shift the past due assignments into the future. Don’t worry—you won’t lose any of the progress you’ve made when you shift your due dates.')}
-            % endif
-            % if is_audit:
-                <strong>${_('You are auditing this course,')}</strong>
-                ${_(' which means that you are unable to participate in graded assignments.')}
-                     ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today.')}
-                % endif
-            % endif
-        % endif
-    </div>
-    % if not is_mobile_app:
-        <div class="upgrade-button">
-            % if is_verified:
-                <form method="post" action="${reset_deadlines_url}">
-                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                    <input type="hidden" name="reset_deadlines_redirect_url_base" value="${reset_deadlines_redirect_url_base}">
-                    <input type="hidden" name="reset_deadlines_redirect_url_id_dict" value="${reset_deadlines_redirect_url_id_dict}">
-                    <button class="btn reset-deadlines-button">${_("Reset my deadlines")}</button>
-                </form>
-            % endif
-            % if is_audit:
-                <a href="${verified_upgrade_link}">
-                    <button type="button">
-                            ${_('Upgrade to shift due dates')}
-                        % endif
-                    </button>
-                </a>
-            % endif
-        </div>
+## The outline page uses javascript to show the dates banner, so everything below is only displayed when a user has actually missed deadlines
+    % if is_verified:
+        ${reset_dates_banner()}
+    % elif is_audit:
+        ${upgrade_to_reset_banner()}
     % endif
-</div>
 % endif
 
