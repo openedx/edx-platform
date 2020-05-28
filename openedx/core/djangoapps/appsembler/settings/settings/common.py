@@ -37,3 +37,5 @@ def plugin_settings(settings):
 
     settings.CUSTOM_DOMAINS_REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
     settings.CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX = 'custom_domains_redirects'
+
+    settings.COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL = False
