@@ -3097,6 +3097,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2017, 1, 1))
 
     def _get_response(self, course):
         """ Returns the HTML for the progress page """

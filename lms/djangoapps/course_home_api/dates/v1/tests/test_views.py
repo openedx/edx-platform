@@ -2,7 +2,7 @@
 Tests for Dates Tab API in the Course Home API
 """
 
-
+from datetime import datetime
 import ddt
 
 from django.urls import reverse
@@ -10,6 +10,7 @@ from django.urls import reverse
 from course_modes.models import CourseMode
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.models import CourseEnrollment
 
 
@@ -22,6 +23,7 @@ class DatesTabTestViews(BaseCourseHomeTests):
     def setUpClass(cls):
         BaseCourseHomeTests.setUpClass()
         cls.url = reverse('course-home-dates-tab', args=[cls.course.id])
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2017, 1, 1))
 
     @COURSE_HOME_MICROFRONTEND.override(active=True)
     @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)
@@ -33,7 +35,7 @@ class DatesTabTestViews(BaseCourseHomeTests):
 
         # Pulling out the date blocks to check learner has access.
         date_blocks = response.data.get('course_date_blocks')
-        self.assertEqual(response.data.get('learner_is_verified'), enrollment_mode == CourseMode.VERIFIED)
+        self.assertEqual(response.data.get('learner_is_full_access'), enrollment_mode == CourseMode.VERIFIED)
         self.assertTrue(all(block.get('learner_has_access') for block in date_blocks))
 
     @COURSE_HOME_MICROFRONTEND.override(active=True)
@@ -41,7 +43,7 @@ class DatesTabTestViews(BaseCourseHomeTests):
     def test_get_authenticated_user_not_enrolled(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.data.get('learner_is_verified'))
+        self.assertFalse(response.data.get('learner_is_full_access'))
 
     def test_get_unauthenticated_user(self):
         self.client.logout()
