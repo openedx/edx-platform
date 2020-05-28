@@ -33,6 +33,12 @@ def get_site_config_for_event(event_props):
                 org = orgcourse.organization
             site = utils.get_site_by_organization(org)
             site_configuration = site.configuration
-        except (AttributeError, TypeError, MultipleObjectsReturned) as e:
+        except (
+            AttributeError,
+            TypeError,
+            MultipleObjectsReturned,
+            models.Organization.DoesNotExist,
+            models.OrganizationCourse.DoesNotExist
+        ) as e:
             raise exceptions.EventProcessingError(e)
     return site_configuration
