@@ -31,30 +31,34 @@ def update_3rd_party_transcription_service_credentials(**credentials_payload):
     pipeline_integration = VideoPipelineIntegration.current()
     if pipeline_integration.enabled:
         try:
-            video_pipeline_user = pipeline_integration.get_service_user()
             oauth_client = Application.objects.get(name=pipeline_integration.client_name)
         except ObjectDoesNotExist:
             return error_response, is_updated
 
         client = create_video_pipeline_api_client(
-            user=video_pipeline_user,
-            api_client_id=oauth_client.client_id,
-            api_client_secret=oauth_client.client_secret,
-            api_url=pipeline_integration.api_url
+            oauth_client.client_id,
+            oauth_client.client_secret
         )
-
+        error_message = "Unable to update transcript credentials -- org={}, provider={}, response={}"
         try:
-            client.transcript_credentials.post(credentials_payload)
-            is_updated = True
+            response = client.request("POST", pipeline_integration.api_url, json=credentials_payload)
+            if response.ok:
+                is_updated = True
+            else:
+                is_updated = False
+                error_response = json.loads(response.text)
+                log.error(error_message.format(
+                    credentials_payload.get('org'),
+                    credentials_payload.get('provider'),
+                    response.text
+                ))
         except HttpClientError as ex:
             is_updated = False
-            log.exception(
-                ('[video-pipeline-service] Unable to update transcript credentials '
-                 u'-- org=%s -- provider=%s -- response=%s.'),
+            log.exception(error_message.format(
                 credentials_payload.get('org'),
                 credentials_payload.get('provider'),
-                ex.content,
-            )
+                ex.content
+            ))
             error_response = json.loads(ex.content)
 
     return error_response, is_updated

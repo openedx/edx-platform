@@ -34,15 +34,6 @@ class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
         __, is_updated = update_3rd_party_transcription_service_credentials()
         self.assertFalse(is_updated)
 
-    def test_update_transcription_service_credentials_with_unknown_user(self):
-        """
-        Test updating the credentials when expected service user is not registered.
-        """
-        self.pipeline_integration.service_username = 'non_existent_user'
-        self.pipeline_integration.save()
-        __, is_updated = update_3rd_party_transcription_service_credentials()
-        self.assertFalse(is_updated)
-
     def test_update_transcription_service_credentials_with_unknown_oauth_client(self):
         """
         Test updating the credentials when expected oauth cleint is not present.
@@ -63,33 +54,31 @@ class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
         }
     )
     @patch('openedx.core.djangoapps.video_pipeline.api.log')
-    @patch('openedx.core.djangoapps.video_pipeline.utils.EdxRestApiClient')
+    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient')
     def test_update_transcription_service_credentials(self, credentials_payload, mock_client, mock_logger):
         """
         Tests that the update transcription service credentials api util works as expected.
         """
-        # Mock the post request
-        mock_credentials_endpoint = mock_client.return_value.transcript_credentials
+        mock_client.request.return_value.ok = True
+
         # Try updating the transcription service credentials
         error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
 
-        mock_credentials_endpoint.post.assert_called_with(credentials_payload)
         # Making sure log.exception is not called.
         self.assertDictEqual(error_response, {})
         self.assertFalse(mock_logger.exception.called)
         self.assertTrue(is_updated)
 
     @patch('openedx.core.djangoapps.video_pipeline.api.log')
-    @patch('openedx.core.djangoapps.video_pipeline.utils.EdxRestApiClient')
+    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient')
     def test_update_transcription_service_credentials_exceptions(self, mock_client, mock_logger):
         """
         Tests that the update transcription service credentials logs the exception occurring
         during communication with edx-video-pipeline.
         """
         error_content = '{"error_type": "1"}'
-        # Mock the post request
-        mock_credentials_endpoint = mock_client.return_value.transcript_credentials
-        mock_credentials_endpoint.post = Mock(side_effect=HttpClientError(content=error_content))
+        mock_client.return_value.request = Mock(side_effect=HttpClientError(content=error_content))
+
         # try updating the transcription service credentials
         credentials_payload = {
             'org': 'mit',
@@ -98,13 +87,13 @@ class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
         }
         error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
 
-        mock_credentials_endpoint.post.assert_called_with(credentials_payload)
         # Assert the results.
         self.assertFalse(is_updated)
         self.assertDictEqual(error_response, json.loads(error_content))
         mock_logger.exception.assert_called_with(
-            u'[video-pipeline-service] Unable to update transcript credentials -- org=%s -- provider=%s -- response=%s.',
-            credentials_payload['org'],
-            credentials_payload['provider'],
-            error_content
+            'Unable to update transcript credentials -- org={}, provider={}, response={}'.format(
+                credentials_payload['org'],
+                credentials_payload['provider'],
+                error_content
+            )
         )
