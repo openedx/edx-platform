@@ -79,6 +79,31 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
         % endif
     </div>
 </%def>
+<%def name="upgrade_to_complete_graded_banner()">
+    <div class="dates-banner ${additional_styling_class}">
+        <div class="dates-banner-text">
+            % if is_mobile_app:
+                <strong>${_('You are auditing this course,')}</strong>
+                ${_(' which means that you are unable to participate in graded assignments.')}
+                ${_(' To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
+                <a class="mobile-dates-link" href="${verified_upgrade_link}">edx.org</a>.
+            % else:
+                <strong>${_('You are auditing this course,')}</strong>
+                ${_(' which means that you are unable to participate in graded assignments.')}
+                ${_(' To complete graded assignments as part of this course, you can upgrade today.')}
+            % endif
+        </div>
+        % if not is_mobile_app:
+            <div class="upgrade-button">
+                <a href="${verified_upgrade_link}">
+                    <button type="button">
+                        ${_('Upgrade now')}
+                    </button>
+                </a>
+            </div>
+        % endif
+    </div>
+</%def>
 % if (missed_deadlines and (on_dates_tab_as_verified or on_courseware_page)):
     % if is_verified:
         ${reset_dates_banner()}
@@ -86,41 +111,11 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
         ${upgrade_to_reset_banner()}
     % endif
 % elif on_dates_tab_as_audit and has_locked_assignments:
-<div class="dates-banner ${additional_styling_class}">
-    <div class="dates-banner-text">
-        % if is_mobile_app:
-            <strong>${_('You are auditing this course,')}</strong>
-            ${_(' which means that you are unable to participate in graded assignments.')}
-            % if missed_deadlines:
-                ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
-            % else:
-                ${_(' To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
-            % endif
-            <a class="mobile-dates-link" href="${verified_upgrade_link}">edx.org</a>.
-        % else:
-            <strong>${_('You are auditing this course,')}</strong>
-            ${_(' which means that you are unable to participate in graded assignments.')}
-            % if missed_deadlines:
-                ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today.')}
-            % else:
-                ${_(' To complete graded assignments as part of this course, you can upgrade today.')}
-            % endif
-        % endif
-    </div>
-    % if not is_mobile_app:
-        <div class="upgrade-button">
-            <a href="${verified_upgrade_link}">
-                <button type="button">
-                    % if missed_deadlines:
-                        ${_('Upgrade to shift due dates')}
-                    % else:
-                        ${_('Upgrade now')}
-                    % endif
-                </button>
-            </a>
-        </div>
+    % if missed_deadlines:
+        ${upgrade_to_reset_banner()}
+    % else:
+        ${upgrade_to_complete_graded_banner()}
     % endif
-</div>
 % elif on_course_outline_page and (is_audit or is_verified):
 ## The outline page uses javascript to show the dates banner, so everything below is only displayed when a user has actually missed deadlines
     % if is_verified:
