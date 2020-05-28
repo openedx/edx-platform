@@ -94,6 +94,7 @@ USER_PROFILE_PII = {
     'city': None,
     'country': None,
     'bio': None,
+    'phone_number': None,
 }
 
 
