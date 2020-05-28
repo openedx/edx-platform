@@ -3,7 +3,7 @@ Options for Extending the edX Platform
 
 Open edX platform development follows the `Open-Closed Principle`_: we want Open edX to be an extensible platform that allows developers to build extensions that integrate with the core of the platform. This allows the core to remain small, while volatile extensions remain in the periphery.
 
-As you can see in this document, there are many different ways to integrate with Open edX. However, we know that there are still some features/integrations that are not possible today without modifying the core. If you have such a need, please consider proposing a new extension point in the core that would make possible the functionality you have in mind. When submit a pull request for a new extension point, be sure to include a change to this file to document your new extension point. (Doing so will also notify reviewers that want to help with making the platform more extensible.)
+As you can see in this document, there are many different ways to integrate with Open edX. However, we know that there are still some features/integrations that are not possible today without modifying the core. If you have such a need, please consider proposing a new extension point in the core that would make possible the functionality you have in mind. When you submit a pull request for a new extension point, be sure to include a change to this file to document your new extension point. (Doing so will also notify reviewers that want to help with making the platform more extensible.)
 
 
 .. _Open-Closed Principle: https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle
@@ -123,8 +123,8 @@ Here are the different integration points that python plugins can use:
 |                     |                                          | to learn more.                                              |
 +---------------------+------------------------------------------+-------------------------------------------------------------+
 | XBlock              | ``xblock.v1``                            | An XBlock provides a new type of learnable content that can |
-|                     |                                          | be used in courses, content libraries, etc. See "Content    |
-|                     |                                          | Integrations" above.                                        |
+|                     |                                          | be used in courses, content libraries, etc. See             |
+|                     |                                          | `Content Integrations`_.                                    |
 +---------------------+------------------------------------------+-------------------------------------------------------------+
 | XBlock unit tests   | ``xblock.test.v0``                       | XBlocks can also install test code that will then be run    |
 |                     |                                          | alongside the platform's usual python unit tests. It's      |
@@ -149,7 +149,7 @@ Platform Look & Feel
 Themes ("Comprehensive Theming")
 ********************************
 
-Changing the look and feel of the edX platform is generally done by creating a new "theme". See `Changing Themes for an Open edX Site`_ for documentation. Note that most theming documentation applies to the legacy UI components used in edX, which are .html files (django/mako templates) rendered by the backend and styled using either the "v1" or "v2" (a.k.a. "Pattern Library") stylesheets. However, the platform UI is slowly being replaced by new React-based "MicroFrontEnds" (MFEs), and a different approach is required for theming MFEs.
+Changing the look and feel of the edX platform is generally done by creating a new "theme". See `Changing Themes for an Open edX Site`_ for documentation. Note that most theming documentation applies to the legacy UI components used in edX, which are .html files (django/mako templates) rendered by the backend and styled using either the "v1" or "v2" (a.k.a. "Pattern Library") stylesheets. However, the platform UI is slowly being replaced by new React-based "MicroFrontEnds" (MFEs), and a different approach is required for theming MFEs (see `Theming Microfrontends`_).
 
 Theming Microfrontends
 **********************
