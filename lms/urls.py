@@ -102,8 +102,10 @@ urlpatterns = [
     url(r'^idea/', include('openedx.features.idea.urls')),
 
     # temporary experiment urls block start.
-    url(r'^organizations/', TemplateView.as_view(template_name='main_django.html')),
-    url(r'^learners/', TemplateView.as_view(template_name='main_django.html')),
+    url(r'^organizations/', TemplateView.as_view(template_name='main_django.html'),
+        name='experiment-organizations'),
+    url(r'^learners/', TemplateView.as_view(template_name='main_django.html'),
+        name='experiment-learners'),
     url(r'^organizational-capacity-assessment/',
         TemplateView.as_view(template_name='main_django.html')),
     url(r'^course-development/', TemplateView.as_view(template_name='main_django.html')),
