@@ -68,4 +68,5 @@ class ContentTypeGateTransformer(BlockStructureTransformer):
                     [settings.CONTENT_TYPE_GATE_GROUP_IDS['full_access']]
                 )
                 block_structure.override_xblock_field(block_key, 'group_access', current_access)
-                self._set_contains_gated_content_on_parents(block_structure, block_key)
+                if current_access[CONTENT_GATING_PARTITION_ID] == [settings.CONTENT_TYPE_GATE_GROUP_IDS['full_access']]:
+                    self._set_contains_gated_content_on_parents(block_structure, block_key)
