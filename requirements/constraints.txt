@@ -78,9 +78,6 @@ mock<4.0.0
 # oauthlib>3.0.1 causes test failures
 oauthlib==3.0.1
 
-# Version 0.23.0 requires python-dateutil>=2.5.0
-pandas==0.22.0
-
 # path 13.2.0 drops support for Python 3.5
 path<13.2.0
 
