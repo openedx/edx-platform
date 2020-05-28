@@ -51,8 +51,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
             % if is_mobile_app:
                 <strong>${_('You are auditing this course,')}</strong>
                 ${_(' which means that you are unable to participate in graded assignments.')}
-                ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
-                <a class="mobile-dates-link" href="${verified_upgrade_link}">edx.org</a>.
+                ${_(' It looks like you missed some important deadlines based on our suggested schedule. Graded assignments and schedule adjustment are available to Verified Track learners.')}
             % else:
                 <strong>${_('You are auditing this course,')}</strong>
                 ${_(' which means that you are unable to participate in graded assignments.')}
@@ -76,8 +75,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
             % if is_mobile_app:
                 <strong>${_('You are auditing this course,')}</strong>
                 ${_(' which means that you are unable to participate in graded assignments.')}
-                ${_(' To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today by visiting ')}
-                <a class="mobile-dates-link" href="${verified_upgrade_link}">edx.org</a>.
+                ${_('Graded assignments are available to Verified Track learners.')}
             % else:
                 <strong>${_('You are auditing this course,')}</strong>
                 ${_(' which means that you are unable to participate in graded assignments.')}
