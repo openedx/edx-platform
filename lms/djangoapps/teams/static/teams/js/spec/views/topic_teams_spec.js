@@ -7,17 +7,14 @@ define([
 ], function(Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function() {
-        var createTopicTeamsView = function(options, isInstructorManagedTopic) {
-            var myTeamsCollection;
+        var createTopicTeamsView = function(options, isInstructorManagedTopic, showActions=true) {
             options = options || {}; // eslint-disable-line no-param-reassign
-            myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
             return new TopicTeamsView({
                 el: '.teams-container',
                 model: isInstructorManagedTopic ?
                     TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
-                collection: options.teams || TeamSpecHelpers.createMockTeams(),
-                myTeamsCollection: myTeamsCollection,
-                showActions: true,
+                collection: options.teams || TeamSpecHelpers.createMockTeams({ results: [] }),
+                showActions: showActions,
                 context: _.extend({}, TeamSpecHelpers.testContext, options)
             }).render();
         };
@@ -51,7 +48,8 @@ define([
                 teamsView = createTopicTeamsView({
                     teams: TeamSpecHelpers.createMockTeams({
                         results: testTeamData
-                    })
+                    }),
+                    showTeams: false,
                 });
             var footerEl = teamsView.$('.teams-paging-footer');
             expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
@@ -59,7 +57,7 @@ define([
             expect(footerEl).not.toHaveClass('hidden');
 
             TeamSpecHelpers.verifyCards(teamsView, testTeamData);
-            verifyActions(teamsView);
+            verifyActions(teamsView, { showOptions: false });
         });
 
         it('can browse all teams', function() {
@@ -85,10 +83,10 @@ define([
             );
         });
 
-        it('does not show actions for a user already in a team', function() {
-            var options = {myTeamsCollection: TeamSpecHelpers.createMockTeams()};
+        it('does not show actions for a user already in a team in the teamset', function() {
+            var options = {collection: TeamSpecHelpers.createMockTeams()};
             var teamsView = createTopicTeamsView(options);
-            verifyActions(teamsView, {showActions: false});
+            verifyActions(teamsView);
         });
 
         it('does not show actions for a student in an instructor managed topic', function() {
@@ -102,7 +100,7 @@ define([
                     privileged: true,
                     staff: false
                 },
-                myTeamsCollection: TeamSpecHelpers.createMockTeams()
+                collection: TeamSpecHelpers.createMockTeams()
             };
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: true});
@@ -114,7 +112,7 @@ define([
                     privileged: false,
                     staff: true
                 },
-                myTeamsCollection: TeamSpecHelpers.createMockTeams()
+                collection: TeamSpecHelpers.createMockTeams()
             };
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: true});
