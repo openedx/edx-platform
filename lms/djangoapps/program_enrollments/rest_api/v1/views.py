@@ -2,6 +2,8 @@
 """
 ProgramEnrollment Views
 """
+import logging
+
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.core.management import call_command
@@ -70,6 +72,8 @@ from .utils import (
     verify_program_exists,
     verify_user_enrolled_in_program
 )
+
+logger = logging.getLogger(__name__)
 
 
 class EnrollmentWriteMixin(object):
@@ -707,6 +711,11 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
         programs = []
         requested_program_type = normalize_program_type(request.GET.get('type', self.DEFAULT_PROGRAM_TYPE))
 
+        logger.info(
+            'User %s is requesting the program_enrollments for learner portal display',
+            request_user.id,
+        )
+
         if request_user.is_staff:
             programs = get_programs_by_type(request.site, requested_program_type)
         elif self.is_course_staff(request_user):
@@ -716,7 +725,17 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
                 user=request.user,
                 program_enrollment_statuses=ProgramEnrollmentStatuses.__ACTIVE__,
             )
+            logger.info(
+                'User %s is enrolled into %s programs',
+                request_user.id,
+                len(program_enrollments)
+            )
             uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+            logger.info(
+                'The program UUIDs the user %s is enrolled into are: %s',
+                request_user.id,
+                ','.join([str(uuid) for uuid in uuids])
+            )
             programs = get_programs(uuids=uuids) or []
 
         programs_in_which_user_has_access = [
