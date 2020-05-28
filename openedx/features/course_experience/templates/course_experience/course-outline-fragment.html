@@ -27,7 +27,7 @@ dates_banner_displayed = False
 %>
 <main role="main" class="course-outline" id="main" tabindex="-1">
     <div class="dates-banner-wrapper">
-        % if enrollment_mode and relative_dates_flag_is_enabled and self_paced and not is_course_staff:
+        % if relative_dates_flag_is_enabled and self_paced and not is_course_staff:
             <%include file="/dates_banner.html" />
         % endif
     </div>

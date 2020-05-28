@@ -112,6 +112,9 @@ class CourseOutlineFragmentView(EdxFragmentView):
             user=request.user,
             course_key=course_key
         )
+        # We use javascript to check whether to actually display this banner, so we let the banner assume
+        # that deadlines have been missed.
+        context['missed_deadlines'] = True
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)

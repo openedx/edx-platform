@@ -104,20 +104,9 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
         % endif
     </div>
 </%def>
-% if (missed_deadlines and (on_dates_tab_as_verified or on_courseware_page)):
-    % if is_verified:
-        ${reset_dates_banner()}
-    % elif is_audit:
-        ${upgrade_to_reset_banner()}
-    % endif
-% elif on_dates_tab_as_audit and has_locked_assignments:
-    % if missed_deadlines:
-        ${upgrade_to_reset_banner()}
-    % else:
-        ${upgrade_to_complete_graded_banner()}
-    % endif
-% elif on_course_outline_page and (is_audit or is_verified):
-## The outline page uses javascript to show the dates banner, so everything below is only displayed when a user has actually missed deadlines
+% if on_dates_tab and is_audit and has_locked_assignments and not missed_deadlines:
+    ${upgrade_to_complete_graded_banner()}
+% elif missed_deadlines:
     % if is_verified:
         ${reset_dates_banner()}
     % elif is_audit:
