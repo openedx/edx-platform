@@ -31,6 +31,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.models import CourseEnrollment
 from util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -107,6 +108,10 @@ class CourseOutlineFragmentView(EdxFragmentView):
         context['enrollment_mode'] = getattr(course_enrollment, 'mode', None)
         context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course)
         context['on_course_outline_page'] = True
+        context['content_type_gating_enabled'] = ContentTypeGatingConfig.enabled_for_enrollment(
+            user=request.user,
+            course_key=course_key
+        )
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)

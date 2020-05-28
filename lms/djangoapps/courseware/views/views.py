@@ -108,6 +108,7 @@ from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
@@ -1075,6 +1076,10 @@ def dates(request, course_id):
         'can_masquerade': can_masquerade,
         'masquerade': masquerade,
         'on_dates_tab': True,
+        'content_type_gating_enabled': ContentTypeGatingConfig.enabled_for_enrollment(
+            user=request.user,
+            course_key=course_key,
+        ),
         'missed_deadlines': missed_deadlines,
         'enrollment_mode': enrollment_mode,
         'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
@@ -1680,6 +1685,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'enrollment_mode': enrollment_mode,
             'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
             'on_courseware_page': True,
+            'content_type_gating_enabled': ContentTypeGatingConfig.enabled_for_enrollment(
+                user=request.user,
+                course_key=course_key,
+            ),
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL),
             'is_mobile_app': is_request_from_mobile_app(request),
