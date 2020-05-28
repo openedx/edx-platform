@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-03 20:49+0000\n"
-"PO-Revision-Date: 2020-05-03 20:50:13.174163\n"
+"POT-Creation-Date: 2020-05-28 10:53+0000\n"
+"PO-Revision-Date: 2020-05-28 10:54:34.509191\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -41,7 +41,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -129,8 +129,8 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
-#: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/templates.underscore
+#: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
@@ -2562,9 +2562,9 @@ msgid "Not specific to a course"
 msgstr "Nöt spéçïfïç tö ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "Töpïç Ⱡ'σяєм ιρѕ#"
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Süßjéçt Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
@@ -2625,23 +2625,42 @@ msgid "Other"
 msgstr "Öthér Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
+msgid "Course Discussion Forum"
+msgstr "Çöürsé Dïsçüssïön Förüm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid ""
+"While our support team is happy to assist with the edX platform, the course "
+"staff has the expertise for specific assignment questions, grading or the "
+"proper procedures in each course. Please post all course related questions "
+"within the Discussion Forum where the Course Staff can directly respond."
 msgstr ""
-"Whät çän wé hélp ýöü wïth, {username}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+"Whïlé öür süppört téäm ïs häppý tö ässïst wïth thé édX plätförm, thé çöürsé "
+"stäff häs thé éxpértïsé för spéçïfïç ässïgnmént qüéstïöns, grädïng ör thé "
+"pröpér pröçédürés ïn éäçh çöürsé. Pléäsé pöst äll çöürsé rélätéd qüéstïöns "
+"wïthïn thé Dïsçüssïön Förüm whéré thé Çöürsé Stäff çän dïréçtlý réspönd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υł#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "Détäïls Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgid "the more quickly and helpfully we can respond!"
 msgstr ""
-"Thé möré ýöü téll üs, thé möré qüïçklý änd hélpfüllý wé çän réspönd! Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"thé möré qüïçklý änd hélpfüllý wé çän réspönd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
 msgstr "Çréäté Süppört Tïçkét Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr ""
+"Whät çän wé hélp ýöü wïth, {username}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2650,11 +2669,9 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr ""
-"Ìf ýöü äré ünäßlé tö äççéss ýöür äççöünt çöntäçt üs vïä émäïl üsïng {email}."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+#: lms/templates/student_account/form_field.underscore
+msgid "Need help logging in?"
+msgstr "Nééd hélp löggïng ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -2665,10 +2682,10 @@ msgstr ""
 "réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a topic for your support request."
+msgid "Select a subject for your support request."
 msgstr ""
-"Séléçt ä töpïç för ýöür süppört réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
+"Séléçt ä süßjéçt för ýöür süppört réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -3124,6 +3141,10 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] "{team_count} Téäm Ⱡ'σяєм ιρѕυм ∂#"
 msgstr[1] "{team_count} Téäms Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "Töpïç Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4199,11 +4220,14 @@ msgstr "Märk énröllmént çödé äs ünüséd Ⱡ'σяєм ιρѕυм ∂σ�
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Username"
 msgstr "Ûsérnämé Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "Émäïl Ⱡ'σяєм ιρѕ#"
 
@@ -4904,10 +4928,6 @@ msgid ""
 msgstr ""
 "Àn érrör öççürréd rétrïévïng ýöür émäïl. Pléäsé trý ägäïn lätér, änd çöntäçt"
 " téçhnïçäl süppört ïf thé prößlém pérsïsts. Ⱡ'σяєм ιρѕυм#"
-
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Süßjéçt Ⱡ'σяєм ιρѕυм #"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -6601,11 +6621,11 @@ msgstr ""
 
 #: cms/static/js/models/uploads.js
 msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
 msgstr ""
-"Önlý <%= fileTypes %> fïlés çän ßé üplöädéd. Pléäsé séléçt ä fïlé éndïng ïn "
-"<%= fileExtensions %> tö üplöäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Önlý <%- fileTypes %> fïlés çän ßé üplöädéd. Pléäsé séléçt ä fïlé éndïng ïn "
+"<%- (fileExtensions) %> tö üplöäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
@@ -6715,6 +6735,7 @@ msgstr "Däté Àddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Type"
 msgstr "Týpé Ⱡ'σяєм ι#"
 
@@ -6809,8 +6830,8 @@ msgid "{selectedProvider} credentials saved"
 msgstr "{selectedProvider} çrédéntïäls sävéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
-msgstr "Ûplöäd ä néw PDF tö “<%= name %>” Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+msgid "Upload a new PDF to “<%- name %>”"
+msgstr "Ûplöäd ä néw PDF tö “<%- name %>” Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -7511,18 +7532,18 @@ msgstr "Wé'ré sörrý, théré wäs än érrör Ⱡ'σяєм ιρѕυм ∂σ�
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
+"fields cannot be more than <%- limit %> characters."
 msgstr ""
 "Thé çömßïnéd léngth öf thé örgänïzätïön, çöürsé nümßér, änd çöürsé rün "
-"fïélds çännöt ßé möré thän <%=limit%> çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσ#"
+"fïélds çännöt ßé möré thän <%- limit %> çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
+"more than <%- limit %> characters."
 msgstr ""
 "Thé çömßïnéd léngth öf thé örgänïzätïön änd lïßrärý çödé fïélds çännöt ßé "
-"möré thän <%=limit%> çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+"möré thän <%- limit %> çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -7750,6 +7771,7 @@ msgid "Video duration is {humanizeDuration}"
 msgstr "Vïdéö dürätïön ïs {humanizeDuration} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/static/js/views/video_thumbnail.js
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
 msgid "minutes"
 msgstr "mïnütés Ⱡ'σяєм ιρѕυм #"
 
@@ -7904,8 +7926,15 @@ msgstr "Hélp Tränsläté ïntö {beta_language} Ⱡ'σяєм ιρѕυм ∂σ�
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Actions"
 msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/js/course-outline.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Timed Exam"
+msgstr "Tïméd Éxäm Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -8382,6 +8411,7 @@ msgid "Course Key"
 msgstr "Çöürsé Kéý Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Status"
 msgstr "Stätüs Ⱡ'σяєм ιρѕυ#"
 
@@ -8700,33 +8730,30 @@ msgid "Remove unit %(unitName)s"
 msgstr "Rémövé ünït %(unitName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/commerce/provider.underscore
-#, python-format
 msgid ""
-"You still need to visit the %(display_name)s website to complete the credit "
+"You still need to visit the {display_name} website to complete the credit "
 "process."
 msgstr ""
-"Ýöü stïll nééd tö vïsït thé %(display_name)s wéßsïté tö çömplété thé çrédït "
+"Ýöü stïll nééd tö vïsït thé {display_name} wéßsïté tö çömplété thé çrédït "
 "pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/commerce/provider.underscore
-#, python-format
 msgid ""
-"To finalize course credit, %(display_name)s requires %(platform_name)s "
-"learners to submit a credit request."
+"To finalize course credit, {display_name} requires {platform_name} learners "
+"to submit a credit request."
 msgstr ""
-"Tö fïnälïzé çöürsé çrédït, %(display_name)s réqüïrés %(platform_name)s "
-"léärnérs tö süßmït ä çrédït réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+"Tö fïnälïzé çöürsé çrédït, {display_name} réqüïrés {platform_name} léärnérs "
+"tö süßmït ä çrédït réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/commerce/provider.underscore
 msgid "Get Credit"
 msgstr "Gét Çrédït Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/commerce/receipt.underscore
-#, python-format
 msgid ""
-"Thank you %(full_name)s! We have received your payment for %(course_name)s."
+"Thank you {full_name}! We have received your payment for {course_name}."
 msgstr ""
-"Thänk ýöü %(full_name)s! Wé hävé réçéïvéd ýöür päýmént för %(course_name)s. "
+"Thänk ýöü {full_name}! Wé hävé réçéïvéd ýöür päýmént för {course_name}. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/commerce/receipt.underscore
@@ -9380,14 +9407,6 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Final Grade"
-msgstr "Fïnäl Grädé Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "for {courseName}"
-msgstr "för {courseName} Ⱡ'σяєм ιρѕυм #"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -9633,10 +9652,6 @@ msgid "An error occurred. Please reload the page."
 msgstr ""
 "Àn érrör öççürréd. Pléäsé rélöäd thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
-
-#: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
-msgstr "Nééd hélp löggïng ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -10491,12 +10506,12 @@ msgstr ""
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
-"(usually within 1-2 days). In the meantime, you can still access all "
+"(usually within 5-7 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
 "Wé hävé réçéïvéd ýöür ïnförmätïön änd äré vérïfýïng ýöür ïdéntïtý. Ýöü wïll "
 "séé ä méssägé ön ýöür däshßöärd whén thé vérïfïçätïön pröçéss ïs çömplété "
-"(üsüällý wïthïn 1-2 däýs). Ìn thé méäntïmé, ýöü çän stïll äççéss äll "
+"(üsüällý wïthïn 5-7 däýs). Ìn thé méäntïmé, ýöü çän stïll äççéss äll "
 "äväïläßlé çöürsé çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
 " αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
@@ -10596,6 +10611,75 @@ msgstr "Rétäké Phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid "Take Photo"
 msgstr "Täké Phötö Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Add a New Allowance"
+msgstr "Àdd ä Néw Àllöwänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Special Exam"
+msgstr "Spéçïäl Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(exam_display_name)s "
+msgstr " %(exam_display_name)s  Ⱡ'σяєм ιρѕ#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Exam Type"
+msgstr "Éxäm Týpé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Allowance Type"
+msgstr "Àllöwänçé Týpé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Additional Time (minutes)"
+msgstr "Àddïtïönäl Tïmé (mïnütés) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Value"
+msgstr "Välüé Ⱡ'σяєм ιρѕ#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Username or Email"
+msgstr "Ûsérnämé ör Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Allowances"
+msgstr "Àllöwänçés Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Add Allowance"
+msgstr "Àdd Àllöwänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Exam Name"
+msgstr "Éxäm Nämé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Allowance Value"
+msgstr "Àllöwänçé Välüé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Time Limit"
+msgstr "Tïmé Lïmït Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Started At"
+msgstr "Stärtéd Àt Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Completed At"
+msgstr "Çömplétéd Àt Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(username)s "
+msgstr " %(username)s  Ⱡ'σяєм ιρѕ#"
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "Bookmarked on"
@@ -11249,10 +11333,6 @@ msgstr "Präçtïçé pröçtöréd Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя �
 #: cms/templates/js/course-outline.underscore
 msgid "Proctored Exam"
 msgstr "Pröçtöréd Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: cms/templates/js/course-outline.underscore
-msgid "Timed Exam"
-msgstr "Tïméd Éxäm Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -12456,12 +12536,12 @@ msgid "Read more"
 msgstr "Réäd möré Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
-msgstr "Shöw tränsçrïpts ({totalTranscripts}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: cms/templates/js/video-transcripts.underscore
 msgid "No transcript uploaded."
 msgstr "Nö tränsçrïpt üplöädéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr "Shöw tränsçrïpts ({totalTranscripts}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"
