@@ -58,7 +58,7 @@ class EdlyUserProfileAdmin(admin.ModelAdmin):
     """
     Admin interface for the "EdlyUserProfile" object.
     """
-    search_fields = ['edly_sub_organization__name']
+    search_fields = ['edly_sub_organizations__name']
     list_display = ['username', 'email', 'edly_sub_organizations_slugs']
 
     def username(self, obj):
