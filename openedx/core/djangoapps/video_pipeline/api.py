@@ -46,7 +46,7 @@ def update_3rd_party_transcription_service_credentials(**credentials_payload):
                 is_updated = True
             else:
                 is_updated = False
-                error_response = response.text
+                error_response = json.loads(response.text)
                 log.error(error_message.format(
                     credentials_payload.get('org'),
                     credentials_payload.get('provider'),
