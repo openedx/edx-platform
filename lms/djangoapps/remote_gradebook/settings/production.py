@@ -1,4 +1,4 @@
-"""AWS settings unique to the remote gradebook plugin."""
+"""Production settings unique to the remote gradebook plugin."""
 
 
 def plugin_settings(settings):
