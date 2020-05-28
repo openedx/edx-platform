@@ -88,6 +88,6 @@ class SegmentTopLevelPropertiesProcessor(object):
                             event[key] = val
                 else:
                     event[key] = val
-        except KeyError:  # no 'data'
+        except (KeyError, AttributeError):  # no 'data' or no sub-properties
             pass
         return event
