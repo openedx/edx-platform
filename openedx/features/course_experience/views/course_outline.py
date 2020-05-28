@@ -97,15 +97,9 @@ class CourseOutlineFragmentView(EdxFragmentView):
         reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME)
         reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME
 
-        course_enrollment = None
-        if not request.user.is_anonymous:
-            course_enrollment = CourseEnrollment.objects.filter(course=course_overview, user=request.user).filter(
-                Q(mode=CourseMode.AUDIT) | Q(mode=CourseMode.VERIFIED)).first()
-
         context['reset_deadlines_url'] = reset_deadlines_url
         context['reset_deadlines_redirect_url_base'] = reset_deadlines_redirect_url_base
         context['reset_deadlines_redirect_url_id_dict'] = {'course_id': str(course.id)}
-        context['enrollment_mode'] = getattr(course_enrollment, 'mode', None)
         context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course)
         context['on_course_outline_page'] = True
         context['content_type_gating_enabled'] = ContentTypeGatingConfig.enabled_for_enrollment(

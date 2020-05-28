@@ -17,9 +17,6 @@ from course_modes.models import CourseMode
     </div>
 % endif
 <%
-has_locked_assignments = any(hasattr(block, 'contains_gated_content') and block.contains_gated_content for block in course_date_blocks if isinstance(block, CourseAssignmentDate)) if (course_date_blocks and on_dates_tab) else False
-is_verified = enrollment_mode == CourseMode.VERIFIED
-is_audit = enrollment_mode == CourseMode.AUDIT
 additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
 %>
 
@@ -98,13 +95,13 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
         % endif
     </div>
 </%def>
-% if on_dates_tab and is_audit and has_locked_assignments and not missed_deadlines:
+% if on_dates_tab and content_type_gating_enabled and not missed_deadlines:
     ${upgrade_to_complete_graded_banner()}
 % elif missed_deadlines:
-    % if is_verified:
-        ${reset_dates_banner()}
-    % elif is_audit:
+    % if content_type_gating_enabled:
         ${upgrade_to_reset_banner()}
+    % else:
+        ${reset_dates_banner()}
     % endif
 % endif
 
