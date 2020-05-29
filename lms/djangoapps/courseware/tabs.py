@@ -11,6 +11,8 @@ from django.utils.translation import ugettext_noop
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, UNIFIED_COURSE_TAB_FLAG, default_course_url_name
@@ -317,6 +319,16 @@ class DatesTab(CourseTab):
         "Dates")  # We don't have the user in this context, so we don't want to translate it at this level.
     view_name = "dates"
     is_dynamic = True
+
+    def __init__(self, tab_dict):
+        def link_func(course, reverse_func):
+            if course_home_mfe_dates_tab_is_active(course.id):
+                return get_microfrontend_url(course_key=course.id, view_name=self.view_name)
+            else:
+                return reverse_func(self.view_name, args=[six.text_type(course.id)])
+
+        tab_dict['link_func'] = link_func
+        super(DatesTab, self).__init__(tab_dict)
 
     @classmethod
     def is_enabled(cls, course, user=None):
