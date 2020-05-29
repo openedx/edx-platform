@@ -881,9 +881,6 @@ class TeamsAssignmentsView(GenericAPIView):
         if not has_team_api_access(request.user, course_id):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        if not has_specific_team_access(user, course_team):
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
         teamset_ora_blocks = get_assignments_for_team(user, course_team)
 
         # Serialize info for display

@@ -33,6 +33,7 @@
                     this.countries = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries);
                     this.languages = TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages);
                     this.topic = options.topic;
+
                     this.listenTo(this.model, 'change', this.render);
                 },
 
