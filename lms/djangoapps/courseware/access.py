@@ -266,8 +266,8 @@ def _can_enroll_courselike(user, courselike):
                   for allowed_provider in allowed_providers])
              for social_provider in social_providers]):
             log.warning(
-                "ENROLLMENT DENIED in %s because user %s not authenticated by %s",
-                course_key, user.username, allowed_provider)
+                "ENROLLMENT DENIED in %s because user %s not authenticated by any of %s",
+                course_key, user.username, allowed_providers)
             return ACCESS_DENIED
 
     # If the user appears in CourseEnrollmentAllowed paired with the given course key,
