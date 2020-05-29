@@ -24,11 +24,30 @@ from util.json_request import JsonResponse
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from lms.djangoapps.grades.context import grading_context_for_course
 from instructor_task.api_helper import AlreadyRunningError
-from instructor.views.api import require_course_permission
 from bridgekeeper.rules import is_staff
 
 log = logging.getLogger(__name__)
 
+def require_course_permission(permission):
+    """
+    Decorator with argument that requires a specific permission of the requesting
+    user. If the requirement is not satisfied, returns an
+    HttpResponseForbidden (403).
+
+    Assumes that request is in args[0].
+    Assumes that course_id is in kwargs['course_id'].
+    """
+    def decorator(func):
+        def wrapped(*args, **kwargs):
+            request = args[0]
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
+
+            if request.user.has_perm(permission, course):
+                return func(*args, **kwargs)
+            else:
+                return HttpResponseForbidden()
+        return wrapped
+    return decorator
 
 def enroll_emails_in_course(emails, course_key):
     """
