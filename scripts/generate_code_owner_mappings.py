@@ -37,12 +37,10 @@ import click
     help="File name of .csv file from edx-platform App ownership sheet",
     default='Squad-based Tech Ownership Assignment - 2020 - edx-platform Apps Ownership.csv'
 )
-@click.option(
-    '--repo-csv',
-    help="File name of .csv file from repo ownership sheet",
-    default='Squad-based Tech Ownership Assignment - 2020 - Individual Repo Ownership'
-)
-def main(app_csv, repo_csv):
+def main(app_csv):
+    """
+    Reads CSV of ownership data and outputs config.yml setting to system.out.
+    """
     csv_data = None
     with open(app_csv, 'r') as file:
         csv_data = file.read()
@@ -54,7 +52,8 @@ def main(app_csv, repo_csv):
         path = row.get('Path')
         squad = row.get('owner.squad')
 
-        may_have_views = re.match(r'.*djangoapps.*', path) and not re.match(r'.*(\/templates\/|\/static\/|\/test|cms\/).*', path)
+        may_have_views = re.match(r'.*djangoapps.*', path) and not \
+            re.match(r'.*(\/templates\/|\/static\/|\/test|cms\/).*', path)
         if may_have_views:
             path = path.replace('./', '')
             path = path.replace('lms/djangoapps/', '')
@@ -73,4 +72,4 @@ def main(app_csv, repo_csv):
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pylint: disable=no-value-for-parameter
