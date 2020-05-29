@@ -1000,7 +1000,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
     def _get_page_data(self, response):
         """Retrieve the data attributes rendered on the page. """
-        soup = BeautifulSoup(response.content)
+        soup = BeautifulSoup(marukup=response.content, features="lxml")
         pay_and_verify_div = soup.find(id="pay-and-verify-container")
 
         self.assertIsNot(

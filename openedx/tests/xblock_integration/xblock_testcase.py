@@ -449,7 +449,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         '''
         usage_id = self.xblocks[urlname].scope_ids.usage_id
         # First, we get out our <div>
-        soup_html = BeautifulSoup(content)
+        soup_html = BeautifulSoup(markup=content, features="lxml")
         xblock_html = six.text_type(soup_html.find(id="seq_contents_0"))
         # Now, we get out the text of the <div>
         try:
