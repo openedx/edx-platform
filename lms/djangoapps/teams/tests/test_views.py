@@ -1517,18 +1517,32 @@ class TestTeamAssignmentsView(TeamAPITestCase):
 
         course = cls.test_course_1
         teamset_id = cls.solar_team.topic_id
+        other_teamset_id = cls.wind_team.topic_id
 
         section = ItemFactory.create(
             parent=course,
             category='chapter',
             display_name='Test Section'
         )
-        open_assessment = ItemFactory.create(
+        subsection = ItemFactory.create(
             parent=section,
+            category="sequential"
+        )
+        unit = ItemFactory.create(
+            parent=section,
+            category="vertical"
+        )
+        open_assessment = ItemFactory.create(
+            parent=unit,
             category="openassessment",
-            display_name="untitled",
             teams_enabled=True,
             selected_teamset_id=teamset_id
+        )
+        off_team_open_assessment = ItemFactory.create(
+            parent=unit,
+            category="openassessment",
+            teams_enabled=True,
+            selected_teamset_id=other_teamset_id
         )
 
         cls.team_assignments = [open_assessment]
