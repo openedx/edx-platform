@@ -85,7 +85,7 @@ define([
         it('does not show actions for a user already in a team in the teamset', function() {
             var options = {myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()};
             var teamsView = createTopicTeamsView(options);
-            verifyActions(teamsView, { showActions: false });
+            verifyActions(teamsView, {showActions: false});
         });
 
         it('does not show actions for a student in an instructor managed topic', function() {
