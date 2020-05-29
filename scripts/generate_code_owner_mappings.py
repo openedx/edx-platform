@@ -52,13 +52,13 @@ def main(app_csv):
         path = row.get('Path')
         squad = row.get('owner.squad')
 
-        may_have_views = re.match(r'.*djangoapps.*', path) and not \
-            re.match(r'.*(\/templates\/|\/static\/|\/test|cms\/).*', path)
+        may_have_views = re.match(r'.*djangoapps', path) or re.match(r'[./]*openedx\/features', path)
+        may_have_views = may_have_views and not re.match(r'.*(\/tests\b|cms\/).*', path)
         if may_have_views:
-            path = path.replace('./', '')
-            path = path.replace('lms/djangoapps/', '')
-            path = path.replace('common/djangoapps/', '')
-            path = path.replace('/', '.')
+            path = path.replace('./', '')  # remove ./ from beginning of path
+            path = path.replace('lms/djangoapps/', '')  # not included in final module name
+            path = path.replace('common/djangoapps/', '')  # not included in final module name
+            path = path.replace('/', '.')  # convert path to dotted module name
 
             output_list.append((path, squad))
 
