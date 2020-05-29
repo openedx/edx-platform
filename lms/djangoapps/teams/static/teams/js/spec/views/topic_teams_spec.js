@@ -7,14 +7,14 @@ define([
 ], function(Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function() {
-        var createTopicTeamsView = function(options, isInstructorManagedTopic, showActions=true) {
+        var createTopicTeamsView = function(options, isInstructorManagedTopic) {
             options = options || {}; // eslint-disable-line no-param-reassign
             return new TopicTeamsView({
                 el: '.teams-container',
                 model: isInstructorManagedTopic ?
                     TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
                 collection: options.teams || TeamSpecHelpers.createMockTeams({ results: [] }),
-                showActions: showActions,
+                myTopicTeamsCollection: options.myTopicTeamsCollection || TeamSpecHelpers.createMockTeams({ results: [] }),
                 context: _.extend({}, TeamSpecHelpers.testContext, options)
             }).render();
         };
@@ -25,10 +25,7 @@ define([
                     'If you still can\'t find a team to join, create a new team in this topic.',
                 title = teamsView.$('.title').text().trim(),
                 message = teamsView.$('.copy').text().trim();
-            if (!options) {
-                options = {showActions: true}; // eslint-disable-line no-param-reassign
-            }
-
+            options = options || { showActions: true };
             if (options.showActions) {
                 expect(title).toBe(expectedTitle);
                 expect(message).toBe(expectedMessage);
@@ -44,20 +41,20 @@ define([
         });
 
         it('can render itself', function() {
-            var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
-                teamsView = createTopicTeamsView({
-                    teams: TeamSpecHelpers.createMockTeams({
-                        results: testTeamData
-                    }),
-                    showTeams: false,
-                });
+            var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5);
+            var options = {
+                teams: TeamSpecHelpers.createMockTeams({
+                    results: testTeamData
+                })
+            };
+            var teamsView = createTopicTeamsView(options);
             var footerEl = teamsView.$('.teams-paging-footer');
             expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
             expect(footerEl.text()).toMatch('1\\s+out of\\s+\/\\s+2'); // eslint-disable-line no-useless-escape
             expect(footerEl).not.toHaveClass('hidden');
 
             TeamSpecHelpers.verifyCards(teamsView, testTeamData);
-            verifyActions(teamsView, { showOptions: false });
+            verifyActions(teamsView);
         });
 
         it('can browse all teams', function() {
@@ -84,9 +81,9 @@ define([
         });
 
         it('does not show actions for a user already in a team in the teamset', function() {
-            var options = {collection: TeamSpecHelpers.createMockTeams()};
+            var options = {myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()};
             var teamsView = createTopicTeamsView(options);
-            verifyActions(teamsView);
+            verifyActions(teamsView, { showActions: false });
         });
 
         it('does not show actions for a student in an instructor managed topic', function() {
@@ -100,7 +97,7 @@ define([
                     privileged: true,
                     staff: false
                 },
-                collection: TeamSpecHelpers.createMockTeams()
+                myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()
             };
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: true});
@@ -112,7 +109,7 @@ define([
                     privileged: false,
                     staff: true
                 },
-                collection: TeamSpecHelpers.createMockTeams()
+                myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()
             };
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: true});

@@ -32,7 +32,7 @@
                 return this.context.userInfo.staff
                     || this.context.userInfo.privileged
                     || (!TeamUtils.isInstructorManagedTopic(this.model.attributes.type)
-                        && this.collection.length === 0);
+                        && this.options.myTopicTeamsCollection.length === 0);
             },
 
             render: function() {
