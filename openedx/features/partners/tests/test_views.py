@@ -5,15 +5,15 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from lms.djangoapps.onboarding.models import Organization, UserExtendedProfile
-from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from openedx.core.lib.api.test_utils import ApiTestCase
 from openedx.features.partners.constants import PARTNER_USER_STATUS_WAITING
 from openedx.features.partners.models import PartnerUser
 from openedx.features.partners.tests.factories import FocusAreaFactory, OrganizationFactory, PartnerFactory
+from openedx.features.philu_utils.tests.mixins import PhiluThemeMixin
 
 
 @ddt
-class PartnerRegistrationViewTest(ApiTestCase):
+class PartnerRegistrationViewTest(PhiluThemeMixin, ApiTestCase):
     """
     Includes test cases for partner registration
     """
@@ -32,11 +32,6 @@ class PartnerRegistrationViewTest(ApiTestCase):
                                              label=self.ORGANIZATION)
         self.registration_url = reverse('partner_register', args=[self.PARTNER])
         self.partner_url = reverse('partner_url', args=[self.PARTNER])
-
-    @classmethod
-    def setUpClass(cls):
-        super(PartnerRegistrationViewTest, cls).setUpClass()
-        configure_philu_theme()
 
     def test_create_new_partner_landing_page_is_accessible(self):
         """
