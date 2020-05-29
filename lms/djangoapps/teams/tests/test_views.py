@@ -1528,18 +1528,22 @@ class TestTeamAssignmentsView(TeamAPITestCase):
             parent=section,
             category="sequential"
         )
-        unit = ItemFactory.create(
-            parent=section,
+        unit_1 = ItemFactory.create(
+            parent=subsection,
             category="vertical"
         )
         open_assessment = ItemFactory.create(
-            parent=unit,
+            parent=unit_1,
             category="openassessment",
             teams_enabled=True,
             selected_teamset_id=teamset_id
         )
-        off_team_open_assessment = ItemFactory.create(
-            parent=unit,
+        unit_2 = ItemFactory.create(
+            parent=subsection,
+            category="vertical"
+        )
+        off_team_open_assessment = ItemFactory.create(  # pylint: disable=unused-variable
+            parent=unit_2,
             category="openassessment",
             teams_enabled=True,
             selected_teamset_id=other_teamset_id
