@@ -6,7 +6,7 @@ import timeit
 from mock import call, patch, Mock
 from unittest import TestCase
 
-from lms.djangoapps.monitoring.middleware import CodeOwner, CodeOwnerMetricMiddleware
+from lms.djangoapps.monitoring.middleware import CodeOwnerMetricMiddleware
 
 
 def mock_view_func():
@@ -33,12 +33,12 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
         request = Mock()
         self.assertEqual(self.middleware(request), 'test-response')
 
-    @patch('lms.djangoapps.monitoring.middleware.CODE_OWNER_MAPPINGS', [('test_middleware', CodeOwner.platform_arch)])
+    @patch('lms.djangoapps.monitoring.middleware.CODE_OWNER_MAPPINGS', [('test_middleware', 'platform-arch')])
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
     def test_code_owner_mapping_success(self, mock_set_custom_metric):
         self.middleware.process_view(None, mock_view_func, None, None)
         self._assert_code_owner_custom_metrics(
-            mock_view_func, mock_set_custom_metric, expected_code_owner=CodeOwner.platform_arch.value
+            mock_view_func, mock_set_custom_metric, expected_code_owner='platform-arch'
         )
 
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
