@@ -7,7 +7,7 @@ define([
 ], function(Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function() {
-        var createTopicTeamsView = function(options, isInstructorManagedTopic, showActions=true) {
+        var createTopicTeamsView = function(options, isInstructorManagedTopic) {
             options = options || {}; // eslint-disable-line no-param-reassign
             return new TopicTeamsView({
                 el: '.teams-container',
@@ -56,7 +56,7 @@ define([
             expect(footerEl).not.toHaveClass('hidden');
 
             TeamSpecHelpers.verifyCards(teamsView, testTeamData);
-            verifyActions(teamsView, { showOptions: false });
+            verifyActions(teamsView);
         });
 
         it('can browse all teams', function() {
@@ -85,7 +85,7 @@ define([
         it('does not show actions for a user already in a team in the teamset', function() {
             var options = {myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()};
             var teamsView = createTopicTeamsView(options);
-            verifyActions(teamsView);
+            verifyActions(teamsView, { showActions: false });
         });
 
         it('does not show actions for a student in an instructor managed topic', function() {

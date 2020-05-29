@@ -381,16 +381,16 @@
                     var topic = options.topic,
                         collection = options.collection,
                         myTopicTeamsCollection = new TeamCollection(
-                            this.context.userInfo.teams,
-                            {
-                                teamEvents: this.teamEvents,
-                                course_id: this.context.courseID,
-                                username: this.context.userInfo.username,
-                                topic_id: topic.get('id'),
-                                perPage: 5,
-                                parse: true,
-                                url: this.context.myTeamsUrl
-                            }
+                          this.context.userInfo.teams,
+                          {
+                              teamEvents: this.teamEvents,
+                              course_id: this.context.courseID,
+                              username: this.context.userInfo.username,
+                              topic_id: topic.get('id'),
+                              perPage: 5,
+                              parse: true,
+                              url: this.context.myTeamsUrl
+                          }
                         ),
                         teamsView = new TopicTeamsView({
                             router: this.router,
