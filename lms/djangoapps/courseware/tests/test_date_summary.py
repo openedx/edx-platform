@@ -329,6 +329,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             user = create_user()
             block = TodaysDate(course, user)
             self.assertTrue(block.is_enabled)
+            self.assertTrue(block.is_allowed)
             self.assertEqual(block.date, datetime.now(utc))
             self.assertEqual(block.title, 'current_datetime')
 
@@ -505,7 +506,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         block = CertificateAvailableDate(course, user)
         self.assertEqual(block.date, None)
-        self.assertFalse(block.is_enabled)
+        self.assertFalse(block.is_allowed)
 
     ## CertificateAvailableDate
     @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
@@ -517,7 +518,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         course.save()
         block = CertificateAvailableDate(course, verified_user)
         self.assertNotEqual(block.date, None)
-        self.assertFalse(block.is_enabled)
+        self.assertFalse(block.is_allowed)
 
     def test_no_certificate_available_date_for_audit_course(self):
         """
@@ -539,7 +540,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
         # Verify Certificate Available Date is not enabled for learner.
         block = CertificateAvailableDate(course, audit_user)
-        self.assertFalse(block.is_enabled)
+        self.assertFalse(block.is_allowed)
         self.assertNotEqual(block.date, None)
 
     @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
@@ -558,7 +559,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         for block in (CertificateAvailableDate(course, audit_user), CertificateAvailableDate(course, verified_user)):
             self.assertIsNotNone(course.certificate_available_date)
             self.assertEqual(block.date, course.certificate_available_date)
-            self.assertTrue(block.is_enabled)
+            self.assertTrue(block.is_allowed)
 
     ## VerificationDeadlineDate
     def test_no_verification_deadline(self):
@@ -566,14 +567,15 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = VerificationDeadlineDate(course, user)
-        self.assertFalse(block.is_enabled)
+        self.assertIsNone(block.date)
+        self.assertTrue(block.is_allowed)
 
     def test_no_verified_enrollment(self):
         course = create_course_run(days_till_start=-1)
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         block = VerificationDeadlineDate(course, user)
-        self.assertFalse(block.is_enabled)
+        self.assertFalse(block.is_allowed)
 
     def test_verification_deadline_date_upcoming(self):
         with freeze_time('2015-01-02'):
