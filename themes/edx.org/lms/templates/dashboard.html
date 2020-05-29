@@ -285,10 +285,7 @@ from student.models import CourseEnrollment
       </div>
   % endif
 
-  <%
-    account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
-    coaching_consent_url = "%s/coaching_consent?next=%s" % (account_mfe_url, getattr(settings, 'LMS_ROOT_URL', '') + resume_button_url)
-  %>
+  <% account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or '' %>
   % if plugins.get("coaching", {}).get("show_coaching_aside"):
     <div class="wrapper-coaching">
         <div class="coaching-signup">
@@ -296,7 +293,7 @@ from student.models import CourseEnrollment
                 ${_("Take advantage of free coaching!")}
             </div>
             <div class="coaching-link">
-                <a class="btn-neutral" href="${coaching_consent_url}">
+                <a class="btn-neutral" href="${account_mfe_url}">
                   ${_("Get Started")}
                 </a>
             </div>
