@@ -4,7 +4,6 @@ Remote gradebook utility functions
 
 import logging
 import json
-from itertools import ifilter
 
 import requests
 from django.conf import settings
@@ -69,8 +68,8 @@ def get_remote_gradebook_datatable_resp(user, course, action, files=None, **kwar
     if not response_data or response_data == [{}]:
         return _("Remote gradebook returned no results for this action ({}).").format(action), {}
     datatable = dict(
-        header=response_data[0].keys(),
-        data=[x.values() for x in response_data],
+        header=list(response_data[0].keys()),
+        data=[list(x.values()) for x in response_data],
         retdata=response_data,
     )
     return None, datatable
@@ -97,7 +96,7 @@ def get_assignment_grade_datatable(course, assignment_name, task_progress=None):
             task_progress.attempted += 1
 
         log.info(
-            u'%s, Current step: %s, Grade calculation in-progress for students: %s/%s',
+            '%s, Current step: %s, Grade calculation in-progress for students: %s/%s',
             assignment_name,
             current_step,
             student_counter,
@@ -106,7 +105,7 @@ def get_assignment_grade_datatable(course, assignment_name, task_progress=None):
 
         if course_grade and not error:
             matching_assignment_grade = next(
-                ifilter(
+                filter(
                     lambda grade_section: grade_section['label'] == assignment_name,
                     course_grade.summary['section_breakdown']
                 ), {}

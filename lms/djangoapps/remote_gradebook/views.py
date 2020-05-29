@@ -111,14 +111,14 @@ def get_course_assignment_labels(course):
     """
     grading_context = grading_context_for_course(course)
     graded_item_labels = []
-    for graded_item_type, graded_items in grading_context['all_graded_subsections_by_type'].iteritems():
+    for graded_item_type, graded_items in grading_context['all_graded_subsections_by_type'].items():
         label = get_assignment_type_label(course, graded_item_type)
         if len(graded_items) == 1:
             graded_item_labels.append(label)
         elif len(graded_items) > 1:
             for i, __ in enumerate(graded_items, start=1):
                 graded_item_labels.append(
-                    u"{label} {index:02d}".format(label=label, index=i)
+                    "{label} {index:02d}".format(label=label, index=i)
                 )
     return graded_item_labels
 
@@ -230,11 +230,11 @@ def add_enrollments_using_remote_gradebook(request, course_id):
         datarow = []
         rg_student_emails = [x['email'] for x in rg_datatable['retdata']]
         enrollment_results = enroll_emails_in_course(rg_student_emails, course_id)
-        datarow.extend([[email, result] for email, result in enrollment_results.items()])
+        datarow.extend([[email, result] for email, result in list(enrollment_results.items())])
 
         if unenroll_current:
             unenrollment_results = unenroll_non_staff_users_in_course(course)
-            datarow.extend([[email, result] for email, result in unenrollment_results.items()])
+            datarow.extend([[email, result] for email, result in list(unenrollment_results.items())])
 
         datatable = dict(
             header=['Email', 'Result'],
@@ -317,7 +317,7 @@ def export_assignment_grades_to_rg(request, course_id):
             request.user.email
         )
         log.info(
-            u'Posting grades to RGB for user %s and course %s',
+            'Posting grades to RGB for user %s and course %s',
             request.user.username,
             course_id
         )
@@ -343,7 +343,7 @@ def export_assignment_grades_csv(request, course_id):
     try:
         remote_gradebook.tasks.run_assignment_grades_csv_export(request, course_key, assignment_name)
         log.info(
-            u'Exporting grades to CSV for user %s and course %s',
+            'Exporting grades to CSV for user %s and course %s',
             request.user.username,
             course_id
         )

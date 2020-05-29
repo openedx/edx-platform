@@ -4,7 +4,7 @@ Helper functions for remote gradebook tasks
 
 import logging
 import csv
-from StringIO import StringIO
+from io import StringIO
 from datetime import datetime
 from time import time
 
@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 def create_datatable_csv(csv_file, datatable):
     """Creates a CSV file from the contents of a datatable."""
     writer = csv.writer(csv_file, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-    encoded_row = [unicode(s).encode('utf-8') for s in datatable['header']]
+    encoded_row = [str(s).encode('utf-8') for s in datatable['header']]
     writer.writerow(encoded_row)
     for datarow in datatable['data']:
         # 's' here may be an integer, float (eg score) or string (eg student name)
@@ -31,7 +31,7 @@ def create_datatable_csv(csv_file, datatable):
             # object out of it will fail unless we pass in an encoding to
             # the constructor. But we can't do that across the board,
             # because s is often a numeric type. So just do this.
-            s if isinstance(s, str) else unicode(s).encode('utf-8')
+            s if isinstance(s, str) else str(s).encode('utf-8')
             for s in datarow
         ]
         writer.writerow(encoded_row)
