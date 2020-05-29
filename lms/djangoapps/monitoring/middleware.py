@@ -4,7 +4,6 @@ Middleware for monitoring the LMS
 import time
 from edx_django_utils.monitoring import set_custom_metric
 
-
 # TODO:
 # * Automate sync mapping definitions from ownership source-of-truth.
 # * Move mappings to a plugin of edX specific customizations.
@@ -57,7 +56,6 @@ CODE_OWNER_MAPPINGS = [
     ('lms.djangoapps.support', 'platform-sustaining'),
     ('lms.djangoapps.survey', 'engagement-always-available'),
     ('lms.djangoapps.teams', 'programs-masters'),
-    ('lms.djangoapps.tests', 'platform-arch'),
     ('lms.djangoapps.verify_student', 'programs-masters'),
     ('lms.djangoapps', 'platform-tnl'),
     ('openedx.core.djangoapps.ace_common', 'platform-tnl'),

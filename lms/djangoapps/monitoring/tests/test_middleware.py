@@ -54,8 +54,8 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
 
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
     def test_code_owner_mapping_no_mapping_performance(self, mock_set_custom_metric):
-        time = timeit.timeit(lambda: self.middleware.process_view(None, mock_view_func, None, None), number=1000)
-        average_time = time/1000
+        time = timeit.timeit(lambda: self.middleware.process_view(None, mock_view_func, None, None), number=100)
+        average_time = time/100
         self.assertTrue(average_time < 0.001, 'Mapping takes {}s which is too slow.'.format(average_time))
 
     def _assert_code_owner_custom_metrics(
