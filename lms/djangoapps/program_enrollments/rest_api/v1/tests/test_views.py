@@ -1498,6 +1498,18 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
         assert len(response.data) == 1
         mock_get_programs.assert_called_once_with(course=self.course_id)
 
+    def _enroll_user_into_course_as_course_staff(self, user, course_key_string):
+        """
+        This is a helper function to create a course run based on the course key string,
+        then enroll the user to the course run as a course staff.
+        """
+        course_key_to_create = CourseKey.from_string(course_key_string)
+        CourseOverviewFactory(id=course_key_to_create)
+        CourseRunFactory.create(key=text_type(course_key_to_create))
+        CourseEnrollmentFactory.create(course_id=course_key_to_create, user=user)
+        CourseStaffRole(course_key_to_create).add_users(user)
+        return course_key_to_create
+
     @ddt.data(
         (
             ['garbage-program'],
@@ -1520,11 +1532,11 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
                     return program
             return None
 
-        other_course_key = CourseKey.from_string('course-v1:edX+ToyX+Other_Course')
-        CourseOverviewFactory(id=other_course_key)
-        CourseRunFactory.create(key=text_type(other_course_key))
-        CourseEnrollmentFactory.create(course_id=other_course_key, user=self.course_staff)
-        CourseStaffRole(other_course_key).add_users(self.course_staff)
+        other_course_key = self._enroll_user_into_course_as_course_staff(
+            self.course_staff,
+            'course-v1:edX+ToyX+Other_Course'
+        )
+
         self.client.login(username=self.course_staff.username, password=self.password)
 
         programs_to_return_first = [
@@ -1553,6 +1565,37 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
             mock.call(course=self.course_id),
             mock.call(course=other_course_key),
         ], any_order=True)
+
+    def test_course_staff_of_non_program_course(self):
+        created_course_key = self._enroll_user_into_course_as_course_staff(
+            self.student,
+            'course-v1:edX+ToyX+Other_Course'
+        )
+
+        program_to_enroll = self.mock_program_data[0]
+        ProgramEnrollmentFactory.create(
+            program_uuid=program_to_enroll['uuid'],
+            curriculum_uuid=self.curriculum_uuid,
+            user=self.student,
+            status='enrolled',
+            external_user_key='user-{}'.format(self.student.id),
+        )
+
+        self.client.login(username=self.student.username, password=self.password)
+
+        with mock.patch(
+            _VIEW_PATCH_FORMAT.format('get_programs'),
+            autospec=True,
+            side_effect=[[], [program_to_enroll]]
+        ) as mock_get_programs:
+            response = self.client.get(reverse(self.view_name))
+
+        assert status.HTTP_200_OK == response.status_code
+        assert len(response.data) == 1
+        mock_get_programs.assert_has_calls([
+            mock.call(course=created_course_key),
+            mock.call(uuids=[UUID(program_to_enroll['uuid'])]),
+        ])
 
     @mock.patch(_VIEW_PATCH_FORMAT.format('get_programs'), autospec=True, return_value=None)
     def test_learner_200_if_no_programs_enrolled(self, mock_get_programs):
