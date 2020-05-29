@@ -25,7 +25,7 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from lms.djangoapps.grades.context import grading_context_for_course
 from instructor_task.api_helper import AlreadyRunningError
 from instructor.views.api import require_course_permission
-from instructor import permissions
+from bridgekeeper.rules import is_staff
 
 log = logging.getLogger(__name__)
 
@@ -111,14 +111,14 @@ def get_course_assignment_labels(course):
     """
     grading_context = grading_context_for_course(course)
     graded_item_labels = []
-    for graded_item_type, graded_items in grading_context['all_graded_subsections_by_type'].items():
+    for graded_item_type, graded_items in grading_context['all_graded_subsections_by_type'].iteritems():
         label = get_assignment_type_label(course, graded_item_type)
         if len(graded_items) == 1:
             graded_item_labels.append(label)
         elif len(graded_items) > 1:
             for i, __ in enumerate(graded_items, start=1):
                 graded_item_labels.append(
-                    "{label} {index:02d}".format(label=label, index=i)
+                    u"{label} {index:02d}".format(label=label, index=i)
                 )
     return graded_item_labels
 
@@ -126,7 +126,7 @@ def get_course_assignment_labels(course):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def get_non_staff_enrollments(__, course_id):
     """
     Returns user emails that are enrolled in a course and not staff
@@ -143,7 +143,7 @@ def get_non_staff_enrollments(__, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def get_remote_gradebook_sections(request, course_id):
     """
     Returns a datatable of students and whether or not there is a match for those students
@@ -161,7 +161,7 @@ def get_remote_gradebook_sections(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def list_matching_remote_enrolled_students(request, course_id):
     """
     Returns a datatable of students and whether or not there is a match for those students
@@ -189,7 +189,7 @@ def list_matching_remote_enrolled_students(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def list_remote_students_in_section(request, course_id):
     """
     Returns a datatable of students in the remote gradebook that are enrolled in a specific section
@@ -213,7 +213,7 @@ def list_remote_students_in_section(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def add_enrollments_using_remote_gradebook(request, course_id):
     """
     Fetches enrollees for a course in a remote gradebook and enrolls those emails in the course in edX
@@ -230,11 +230,11 @@ def add_enrollments_using_remote_gradebook(request, course_id):
         datarow = []
         rg_student_emails = [x['email'] for x in rg_datatable['retdata']]
         enrollment_results = enroll_emails_in_course(rg_student_emails, course_id)
-        datarow.extend([[email, result] for email, result in list(enrollment_results.items())])
+        datarow.extend([[email, result] for email, result in enrollment_results.items()])
 
         if unenroll_current:
             unenrollment_results = unenroll_non_staff_users_in_course(course)
-            datarow.extend([[email, result] for email, result in list(unenrollment_results.items())])
+            datarow.extend([[email, result] for email, result in unenrollment_results.items()])
 
         datatable = dict(
             header=['Email', 'Result'],
@@ -250,7 +250,7 @@ def add_enrollments_using_remote_gradebook(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def get_assignment_names(__, course_id):
     """
     Returns a datatable of the assignments available for this course
@@ -266,7 +266,7 @@ def get_assignment_names(__, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def list_remote_assignments(request, course_id):
     """
     Returns a datatable of the assignments available in the remote gradebook
@@ -284,7 +284,7 @@ def list_remote_assignments(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def display_assignment_grades(request, course_id):
     """
     Returns a datatable of students' grades for an assignment in a course that matches a given course id
@@ -301,7 +301,7 @@ def display_assignment_grades(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def export_assignment_grades_to_rg(request, course_id):
     """
     Exports students' grades for an assignment to the remote gradebook, then returns a
@@ -317,7 +317,7 @@ def export_assignment_grades_to_rg(request, course_id):
             request.user.email
         )
         log.info(
-            'Posting grades to RGB for user %s and course %s',
+            u'Posting grades to RGB for user %s and course %s',
             request.user.username,
             course_id
         )
@@ -333,7 +333,7 @@ def export_assignment_grades_to_rg(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.is_staff)
+@require_course_permission(is_staff)
 def export_assignment_grades_csv(request, course_id):
     """
     Creates a CSV of students' grades for an assignment and returns that CSV as an HTTP response
@@ -343,7 +343,7 @@ def export_assignment_grades_csv(request, course_id):
     try:
         remote_gradebook.tasks.run_assignment_grades_csv_export(request, course_key, assignment_name)
         log.info(
-            'Exporting grades to CSV for user %s and course %s',
+            u'Exporting grades to CSV for user %s and course %s',
             request.user.username,
             course_id
         )
