@@ -1,0 +1,51 @@
+version: 2
+jobs:
+  build:
+    # directory where steps are run
+    working_directory: ~/circleci-edx-platform
+    docker:
+      # CircleCI Python images available at: https://hub.docker.com/r/circleci/python/
+      - image: circleci/python:2.7.13
+        environment:
+          BASH_ENV: ~/.bashrc
+    steps: # steps that comprise the `build` job
+      - checkout # check out source code to working directory
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/share
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
+      - restore_cache:
+          key: edx-test-deps-{{ checksum "requirements/edx/testing.txt" }}
+      - run:
+          name: "Install apt-get packages"
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y python-software-properties mongodb curl git python-dev libxml2-dev libxmlsec1-dev libgeos-dev
+      - run:
+          name: "Install python requirements"
+          command: |
+            virtualenv venv
+            . venv/bin/activate
+            pip install --only-binary="pa11ycrawler" -r requirements/edx/testing.txt
+      - save_cache:
+          key: edx-test-deps-{{ checksum "requirements/edx/testing.txt" }}
+          paths:
+            - "venv"
+      - run:
+          name: "Run Tests"
+          command: |
+            . venv/bin/activate
+            mkdir test-results
+            sudo service mongodb start
+            sudo service mongodb status
+            pytest --junitxml=test-results/junit.xml --pyargs edly_panel_app openedx.features.edly
+      - run:
+          name: "Run Quality"
+          command: |
+            . venv/bin/activate
+            diff-quality --compare-branch=origin/develop-multisite --violations=pylint --html-report test-results/pylint-report.html
+            diff-quality --compare-branch=origin/develop-multisite --violations=flake8 --html-report test-results/pep8-report.html
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: tr

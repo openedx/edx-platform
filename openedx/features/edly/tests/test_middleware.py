@@ -27,6 +27,13 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.request.site = SiteFactory()
+        self.site_config = SiteConfigurationFactory(
+            site=self.request.site,
+            values={
+                'MARKETING_SITE_ROOT': 'http://marketing.site',
+                'DJANGO_SETTINGS_OVERRIDE': {'SITE_NAME': 'testserver.localhost'}
+            }
+        )
 
         self.client = Client(SERVER_NAME=self.request.site.domain)
         self.client.login(username=self.user.username, password='test')
@@ -110,7 +117,6 @@ class SettingsOverrideMiddlewareTests(TestCase):
         """
         for config_key, expected_config_value in expected_settings_values.items():
             assert expected_config_value == getattr(settings, config_key, None)
-
 
     def test_settings_override_middleware_logs_warning_if_no_site_configuration_is_present(self):
         """
