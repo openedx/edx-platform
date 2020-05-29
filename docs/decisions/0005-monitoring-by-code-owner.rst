@@ -16,7 +16,9 @@ Decision
 
 We will implement a custom metric "code_owner" that can be used in NewRelic (or other monitoring solutions that are made pluggable).
 
-To minimize maintenance, the value of the "code_owner" metric should be populated using the source-of-truth of ownership of various parts of edx-platform.
+The new custom metric makes it simple to query NewRelic for all Transactions or TransactionErrors that are associated with requests with a specific owner.  This enables a team to quickly identify data that they own, for use in NewRelic alerts or NewRelic dashboards.
+
+To minimize maintenance, the value of the "code_owner" metric will be populated using the source-of-truth of ownership of various parts of edx-platform.
 
 See `Rejected Alternatives`_ for details of the decision **not** to split the NewRelic application into multiple NewRelic applications.
 
