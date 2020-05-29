@@ -21,6 +21,7 @@ class EdxFragmentView(FragmentView):
     The base class of all Open edX fragment views.
     """
     page_title = None
+    _uses_pattern_library = True
 
     @staticmethod
     def get_css_dependencies(group):
@@ -84,7 +85,8 @@ class EdxFragmentView(FragmentView):
         Creates the base context for rendering a fragment as a standalone page.
         """
         return {
-            'uses_pattern_library': True,
+            'uses_pattern_library': self.uses_pattern_library,
+            'uses_bootstrap': not self.uses_pattern_library,
             'disable_accordion': True,
             'allow_iframing': True,
             'disable_header': True,
@@ -140,3 +142,10 @@ class EdxFragmentView(FragmentView):
             template = 'fragments/standalone-page-v1.html'
 
         return render_to_response(template, context)
+
+    @property
+    def uses_pattern_library(self):
+        """
+        Returns true if this fragment is rendered with edx-pattern-library.
+        """
+        return self._uses_pattern_library
