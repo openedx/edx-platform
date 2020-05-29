@@ -2,6 +2,7 @@
 Tests for the LMS monitoring middleware
 """
 import ddt
+import timeit
 from mock import call, patch, Mock
 from unittest import TestCase
 
@@ -35,26 +36,33 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
     @patch('lms.djangoapps.monitoring.middleware.CODE_OWNER_MAPPINGS', [('test_middleware', CodeOwner.platform_arch)])
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
     def test_code_owner_mapping_success(self, mock_set_custom_metric):
-        expected_code_owner = CodeOwner.platform_arch.value
         self.middleware.process_view(None, mock_view_func, None, None)
-        self._assert_code_owner_custom_metrics(expected_code_owner, mock_set_custom_metric)
+        self._assert_code_owner_custom_metrics(
+            mock_view_func, mock_set_custom_metric, expected_code_owner=CodeOwner.platform_arch.value
+        )
 
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
     def test_code_owner_mapping_no_mapping(self, mock_set_custom_metric):
-        expected_code_owner = None
         self.middleware.process_view(None, mock_view_func, None, None)
-        self._assert_code_owner_custom_metrics(expected_code_owner, mock_set_custom_metric)
+        self._assert_code_owner_custom_metrics(mock_view_func, mock_set_custom_metric)
 
     @patch('lms.djangoapps.monitoring.middleware.CODE_OWNER_MAPPINGS', ['invalid_mapping_list'])
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
     def test_code_owner_mapping_error(self, mock_set_custom_metric):
-        expected_code_owner = None
         self.middleware.process_view(None, mock_view_func, None, None)
-        self._assert_code_owner_custom_metrics(expected_code_owner, mock_set_custom_metric, has_error=True)
+        self._assert_code_owner_custom_metrics(mock_view_func, mock_set_custom_metric, has_error=True)
 
-    def _assert_code_owner_custom_metrics(self, expected_code_owner, mock_set_custom_metric, has_error=False):
+    @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
+    def test_code_owner_mapping_no_mapping_performance(self, mock_set_custom_metric):
+        time = timeit.timeit(lambda: self.middleware.process_view(None, mock_view_func, None, None), number=1000)
+        average_time = time/1000
+        self.assertTrue(average_time < 0.001, 'Mapping takes {}s which is too slow.'.format(average_time))
+
+    def _assert_code_owner_custom_metrics(
+        self, view_func, mock_set_custom_metric, expected_code_owner=None, has_error=False
+    ):
         # default of unknown is always called in the current implementation, but this isn't required
-        self.assertEqual(mock_set_custom_metric.mock_calls[0], call('code_owner', 'unknown'))
+        self.assertEqual(mock_set_custom_metric.mock_calls[0], call('view_func_module', view_func.__module__))
         if expected_code_owner:
             self.assertEqual(mock_set_custom_metric.mock_calls[1], call('code_owner', expected_code_owner))
         if has_error:

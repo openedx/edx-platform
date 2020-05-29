@@ -5,6 +5,7 @@ import time
 from edx_django_utils.monitoring import set_custom_metric
 from enum import Enum
 
+
 class CodeOwner(Enum):
     platform_arch = 'platform-arch'
     platform_sustaining = 'platform-sustaining'
@@ -48,7 +49,7 @@ class CodeOwnerMetricMiddleware:
         """
         before_time = time.perf_counter()
         try:
-            set_custom_metric('code_owner', 'unknown')
+            set_custom_metric('view_func_module', view_func.__module__)
             for module_prefix, code_owner in CODE_OWNER_MAPPINGS:
                 if view_func.__module__.startswith(module_prefix):
                     set_custom_metric('code_owner', code_owner.value)
