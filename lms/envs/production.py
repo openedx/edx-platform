@@ -187,6 +187,7 @@ LMS_INTERNAL_ROOT_URL = ENV_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 
 # Edly Configuration
 EDLY_COOKIE_SECRET_KEY = ENV_TOKENS.get('EDLY_COOKIE_SECRET_KEY', EDLY_COOKIE_SECRET_KEY)
+EDLY_JWT_ALGORITHM = ENV_TOKENS.get('EDLY_JWT_ALGORITHM', EDLY_JWT_ALGORITHM)
 
 
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
