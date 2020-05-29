@@ -48,6 +48,7 @@ from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFl
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
+    ENABLE_VEM_PIPELINE,
     waffle_flags
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
@@ -746,7 +747,7 @@ def videos_post(course, request):
     if error:
         return JsonResponse({'error': error}, status=400)
 
-    bucket = storage_service_bucket()
+    bucket = storage_service_bucket(course.id)
     req_files = data['files']
     resp_files = []
 
@@ -804,9 +805,10 @@ def videos_post(course, request):
     return JsonResponse({'files': resp_files}, status=200)
 
 
-def storage_service_bucket():
+def storage_service_bucket(course_key=None):
     """
-    Returns an S3 bucket for video uploads.
+    Returns an S3 bucket for video upload. The S3 bucket returned depends on
+    which pipeline, VEDA or VEM, is enabled.
     """
     if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
         credentials = AssumeRole.get_instance().credentials
@@ -826,7 +828,10 @@ def storage_service_bucket():
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each
     # environment (since we share a single bucket for multiple deployments in some configurations)
-    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"], validate=False)
+    if course_key and waffle_flags()[ENABLE_VEM_PIPELINE].is_enabled(course_key):
+        return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False)
+    else:
+        return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['BUCKET'], validate=False)
 
 
 def storage_service_key(bucket, file_name):
