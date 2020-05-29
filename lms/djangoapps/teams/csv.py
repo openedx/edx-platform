@@ -7,7 +7,11 @@ from collections import Counter
 
 from django.contrib.auth.models import User
 
-from lms.djangoapps.teams.api import OrganizationProtectionStatus, user_organization_protection_status
+from lms.djangoapps.teams.api import (
+    OrganizationProtectionStatus,
+    user_organization_protection_status,
+    ORGANIZATION_PROTECTED_MODES
+)
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment
 from student.models import CourseEnrollment
@@ -110,8 +114,10 @@ class TeamMembershipImportManager(object):
         self.existing_course_team_memberships = {}
         self.existing_course_teams = {}
         self.user_count_by_team = Counter()
+        self.user_enrollment_by_team = {}
         self.user_to_remove_by_team = Counter()
         self.number_of_learners_assigned = 0
+        self.user_to_actual_enrollment_mode = {}
 
     @property
     def import_succeeded(self):
@@ -240,7 +246,7 @@ class TeamMembershipImportManager(object):
         if actual_enrollment_mode != supplied_enrollment.strip():
             self.validation_errors.append('User ' + user.username + ' enrollment mismatch.')
             return False
-
+        self.user_to_actual_enrollment_mode[user.id] = actual_enrollment_mode
         return True
 
     def is_username_unique(self, username, usernames_found_so_far):
@@ -294,6 +300,8 @@ class TeamMembershipImportManager(object):
                     pass
                 continue
             try:
+                if not self.validate_compatible_enrollment_modes(user, team_name, teamset_id):
+                    return False
                 # checks for a team inside a specific team set. This way team names can be duplicated across
                 # teamsets
                 team = self.existing_course_teams[(team_name, teamset_id)]
@@ -305,6 +313,38 @@ class TeamMembershipImportManager(object):
             if not self.validate_proposed_team_size_wont_exceed_maximum(team_name, teamset_id):
                 return False
         return True
+
+    def validate_compatible_enrollment_modes(self, user, team_name, teamset_id):
+        """
+        Validates that only students enrolled in a masters track are on a single team. Disallows mixing of masters
+        with other enrollment modes on a single team.
+        """
+        if(teamset_id, team_name) not in self.user_enrollment_by_team:
+            self.user_enrollment_by_team[teamset_id, team_name] = set()
+        self.user_enrollment_by_team[teamset_id, team_name].add(self.user_to_actual_enrollment_mode[user.id])
+        if self.is_FERPA_bubble_breached(teamset_id, team_name):
+            error_message = \
+                'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(team_name)
+            self.add_error_and_check_if_max_exceeded(error_message)
+            return False
+        return True
+
+    def is_FERPA_bubble_breached(self, teamset_id, team_name):
+        """
+        Ensures that FERPA bubble is not breached.
+        Checks that we are not trying to violate FERPA proctection by mixing masters
+        track students with other enrollment tracks.
+        """
+
+        team_enrollment_modes = self.user_enrollment_by_team[teamset_id, team_name]
+        protected_modes = set(ORGANIZATION_PROTECTED_MODES)
+
+        if team_enrollment_modes.isdisjoint(protected_modes):
+            return False
+        elif team_enrollment_modes.issubset(protected_modes):
+            return False
+        else:
+            return True
 
     def validate_proposed_team_size_wont_exceed_maximum(self, team_name, teamset_id):
         """

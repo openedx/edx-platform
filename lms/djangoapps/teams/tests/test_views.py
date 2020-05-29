@@ -2722,6 +2722,30 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file}, user='staff'
         )
 
+    def test_upload_invalid_multiple_student_enrollment_mismatch(self):
+        audit_username = 'audit_user'
+        masters_username_a = 'masters_a'
+        masters_username_b = 'masters_b'
+        self.create_and_enroll_student(username=audit_username, mode=CourseMode.AUDIT)
+        self.create_and_enroll_student(username=masters_username_a, mode=CourseMode.MASTERS)
+        self.create_and_enroll_student(username=masters_username_b, mode=CourseMode.MASTERS)
+
+        csv_content = 'user,mode,topic_1' + '\n'
+        csv_content += '{},audit,team wind power'.format(audit_username) + '\n'
+        csv_content += '{},masters,team wind power'.format(masters_username_a) + '\n'
+        csv_content += '{},masters,team wind power'.format(masters_username_b) + '\n'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        response = self.make_call(reverse(
+            'team_membership_bulk_management',
+            args=[self.good_course_id]),
+            400, method='post',
+            data={'csv': csv_file}, user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        expected_error = 'Team team wind power cannot have Master’s track users mixed with users in other tracks.'
+        self.assertEqual(response_text['errors'][0], expected_error)
+
     def test_upload_learners_exceed_max_team_size(self):
         csv_content = 'user,mode,topic_0,topic_1' + '\n'
         team1 = 'team wind power'
