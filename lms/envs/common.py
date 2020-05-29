@@ -3920,3 +3920,17 @@ GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
 
 ##################### SUPPORT URL ############################
 SUPPORT_HOW_TO_UNENROLL_LINK = ''
+
+################### MONITORING ###############################
+# .. toggle_name: CODE_OWNER_MAPPINGS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: None
+# .. toggle_description: List of lists, with inner list of format ['lms.module.dotted.path', 'owning-team'] (e.g. [['student', 'team-red']]).  Used to set monitoring custom metrics for owner.
+# .. toggle_category: monitoring
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2020-05-29
+# .. toggle_expiration_date: None
+# .. toggle_tickets: None
+# .. toggle_status: supported
+# .. toggle_warnings: None
+CODE_OWNER_MAPPINGS = None
