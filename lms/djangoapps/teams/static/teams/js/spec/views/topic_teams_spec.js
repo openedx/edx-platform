@@ -13,8 +13,10 @@ define([
                 el: '.teams-container',
                 model: isInstructorManagedTopic ?
                     TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
-                collection: options.teams || TeamSpecHelpers.createMockTeams({ results: [] }),
-                myTopicTeamsCollection: options.myTopicTeamsCollection || TeamSpecHelpers.createMockTeams({ results: [] }),
+                collection: options.teams || TeamSpecHelpers.createMockTeams({results: []}),
+                myTopicTeamsCollection: (
+                  options.myTopicTeamsCollection || TeamSpecHelpers.createMockTeams({results: []})
+                ),
                 context: _.extend({}, TeamSpecHelpers.testContext, options)
             }).render();
         };
@@ -25,7 +27,7 @@ define([
                     'If you still can\'t find a team to join, create a new team in this topic.',
                 title = teamsView.$('.title').text().trim(),
                 message = teamsView.$('.copy').text().trim();
-            options = options || { showActions: true };
+            options = options || {showActions: true}; // eslint-disable-line no-param-reassign
             if (options.showActions) {
                 expect(title).toBe(expectedTitle);
                 expect(message).toBe(expectedMessage);
@@ -83,7 +85,7 @@ define([
         it('does not show actions for a user already in a team in the teamset', function() {
             var options = {myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()};
             var teamsView = createTopicTeamsView(options);
-            verifyActions(teamsView, { showActions: false });
+            verifyActions(teamsView, {showActions: false});
         });
 
         it('does not show actions for a student in an instructor managed topic', function() {
