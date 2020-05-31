@@ -121,7 +121,7 @@ def _process_code_owner_mappings():
 
 # The following module prefixes are optional in a func_view's reported module:
 #   'common.djangoapps.', 'lms.djangoapps.', 'openedx.core.djangoapps.'
-_OPTIONAL_MODULE_PREFIX_PATTERN = re.compile('^(lms|common|openedx\.core)\.djangoapps\.')
+_OPTIONAL_MODULE_PREFIX_PATTERN = re.compile(r'^(lms|common|openedx\.core)\.djangoapps\.')
 _INVALID_CODE_OWNER_MAPPING = 'invalid-code-owner-mapping'
 # lookup table for code owner given a module path
 _PATH_TO_CODE_OWNER_MAPPINGS = _process_code_owner_mappings()
