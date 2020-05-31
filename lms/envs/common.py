@@ -3925,7 +3925,7 @@ SUPPORT_HOW_TO_UNENROLL_LINK = ''
 # .. toggle_name: CODE_OWNER_MAPPINGS
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: None
-# .. toggle_description: List of lists, with inner list of format ['lms.module.dotted.path', 'owning-team'] (e.g. [['student', 'team-red']]).  Used to set monitoring custom metrics for owner.
+# .. toggle_description: Used to set monitoring custom metrics for owner. Dict with keys of code owner and value as list of dotted path module names owned by code owner.
 # .. toggle_category: monitoring
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-05-29

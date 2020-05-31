@@ -6,8 +6,9 @@ import timeit
 from django.test import override_settings
 from mock import call, patch, Mock
 from unittest import TestCase
+from unittest.mock import ANY
 
-from lms.djangoapps.monitoring.middleware import CodeOwnerMetricMiddleware
+from lms.djangoapps.monitoring.middleware import _load_path_to_code_owner_mappings, CodeOwnerMetricMiddleware
 
 
 def _mock_get_view_func_module(view_func):
@@ -36,11 +37,17 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
         request = Mock()
         self.assertEqual(self.middleware(request), 'test-response')
 
-    @override_settings(CODE_OWNER_MAPPINGS=[
-        ['xblock', 'team-red'],
-        ['xblock_django', 'team-blue'],
-        ['openedx.core.djangoapps.xblock', 'team-black'],
-    ])
+    @override_settings(CODE_OWNER_MAPPINGS={
+        'team-red': [
+            'xblock',
+        ],
+        'team-blue': [
+            'xblock_django',
+        ],
+        'team-black': [
+            'openedx.core.djangoapps.xblock',
+        ],
+    })
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
     @patch('lms.djangoapps.monitoring.middleware._get_view_func_module', side_effect=_mock_get_view_func_module)
     @ddt.data(
@@ -54,13 +61,15 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
     )
     @ddt.unpack
     def test_code_owner_mapping_hits_and_misses(
-        self, module, expected_owner, mock_get_view_func_module, mock_set_custom_metric
+        self, view_func_module, expected_owner, mock_get_view_func_module, mock_set_custom_metric
     ):
-        mock_view_func = self._create_view_func_mock(module)
-        self.middleware.process_view(None, mock_view_func, None, None)
-        self._assert_code_owner_custom_metrics(
-            mock_view_func, mock_set_custom_metric, expected_code_owner=expected_owner
-        )
+        path_to_code_owner_mappings, _ = _load_path_to_code_owner_mappings()
+        with patch('lms.djangoapps.monitoring.middleware._PATH_TO_CODE_OWNER_MAPPINGS', path_to_code_owner_mappings):
+            mock_view_func = self._create_view_func_mock(view_func_module)
+            self.middleware.process_view(None, mock_view_func, None, None)
+            self._assert_code_owner_custom_metrics(
+                view_func_module, mock_set_custom_metric, expected_code_owner=expected_owner
+            )
 
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
     def test_code_owner_no_mappings(self, mock_set_custom_metric):
@@ -68,12 +77,43 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
         self.middleware.process_view(None, mock_view_func, None, None)
         mock_set_custom_metric.assert_not_called()
 
+    @override_settings(CODE_OWNER_MAPPINGS=['invalid_setting_as_list'])
+    @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
+    def test_load_config_with_invalid_dict(self, mock_set_custom_metric):
+        path_to_code_owner_mappings, config_load_errors = _load_path_to_code_owner_mappings()
+        with patch(
+            'lms.djangoapps.monitoring.middleware._PATH_TO_CODE_OWNER_MAPPINGS',
+            path_to_code_owner_mappings
+        ):
+            with patch(
+                'lms.djangoapps.monitoring.middleware._CODE_OWNER_MAPPINGS_CONFIG_LOAD_ERRORS',
+                config_load_errors
+            ):
+                mock_view_func = self._create_view_func_mock('xblock')
+                self.middleware.process_view(None, mock_view_func, None, None)
+                mock_set_custom_metric.assert_called_once()
+                self.assertEqual(mock_set_custom_metric.mock_calls[0].args[0], 'code_owner_mapping_config_load_errors')
+                errors_arg = mock_set_custom_metric.mock_calls[0].args[1]
+                self.assertTrue(any('should be a dict' in error for error in errors_arg))
+
     @override_settings(CODE_OWNER_MAPPINGS=['invalid_mapping_list'])
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
-    def test_code_owner_mapping_error(self, mock_set_custom_metric):
-        mock_view_func = self._create_view_func_mock('xblock')
-        self.middleware.process_view(None, mock_view_func, None, None)
-        self._assert_code_owner_custom_metrics(mock_view_func, mock_set_custom_metric, has_error=True)
+    def test_load_config_with_invalid_settings(self, mock_set_custom_metric):
+        assert False, 'TODO: Add DDT for different settings.'
+        path_to_code_owner_mappings, config_load_errors = _load_path_to_code_owner_mappings()
+        with patch(
+            'lms.djangoapps.monitoring.middleware._PATH_TO_CODE_OWNER_MAPPINGS',
+            path_to_code_owner_mappings
+        ):
+            with patch(
+                'lms.djangoapps.monitoring.middleware._CODE_OWNER_MAPPINGS_CONFIG_LOAD_ERRORS',
+                config_load_errors
+            ):
+                mock_view_func = self._create_view_func_mock('xblock')
+                self.middleware.process_view(None, mock_view_func, None, None)
+                self._assert_code_owner_custom_metrics(
+                    'xblock', mock_set_custom_metric, has_error=True, load_error='should be a dict'
+                )
 
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
     @patch('lms.djangoapps.monitoring.middleware._get_view_func_module', side_effect=_mock_get_view_func_module)
@@ -92,17 +132,17 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
         self._assert_code_owner_custom_metrics(mock_view_func, mock_set_custom_metric)
 
     def _assert_code_owner_custom_metrics(
-        self, view_func, mock_set_custom_metric, expected_code_owner=None, has_error=False
+        self, view_func_module, mock_set_custom_metric, expected_code_owner=None, has_error=False, load_error=None
     ):
-        # default of unknown is always called in the current implementation, but this isn't required
-        self.assertEqual(mock_set_custom_metric.mock_calls[0], call('view_func_module', view_func.__module__))
+        call_list = []
+        if load_error:
+            call_list.append(call('code_owner_mapping_config_load_errors', ANY))
+        call_list.append(call('view_func_module', view_func_module))
         if expected_code_owner:
-            self.assertEqual(mock_set_custom_metric.mock_calls[1], call('code_owner', expected_code_owner))
+            call_list.append(call('code_owner', expected_code_owner))
         if has_error:
-            self.assertEqual(mock_set_custom_metric.mock_calls[1].args[0], 'code_owner_mapping_error')
-        time_call_index = 2 if expected_code_owner or has_error else 1
-        self.assertEqual(mock_set_custom_metric.mock_calls[time_call_index].args[0], 'code_owner_mapping_time')
-        self.assertTrue(mock_set_custom_metric.mock_calls[time_call_index].args[1] < 0.005)
+            call_list.append(call('code_owner_mapping_error', ANY))
+        mock_set_custom_metric.assert_has_calls(call_list)
 
     def _create_view_func_mock(self, module):
         """
