@@ -181,7 +181,7 @@
 # Yue Fang <yfang@juilliard.edu>, 2016
 # Zihui Cheng <z7cheng@ucsd.edu>, 2015
 # 代 兴旺 <525224259@qq.com>, 2016
-# 伟波 黄 <inactive+gtc_ZjEzMTJ@transifex.com>, 2016
+# 8cfb674aa14009d921df29d97d1751e8_9eeecd0 <ff77ddda63493ab7c7af47446c7f91e9_481994>, 2016
 # 健超 张 <jc.zhang@eliteu.com.cn>, 2019
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
 # 微 李 <w.li@eliteu.com.cn>, 2018
@@ -206,8 +206,8 @@
 # Jiazhen Tan <jessie12@live.cn>, 2016
 # jsgang <jsgang9@gmail.com>, 2015-2017
 # LIU NIAN <lauraqq@gmail.com>, 2015
-# peipeixiang <inactive+peipeixiang@transifex.com>, 2015
-# peipeixiang <inactive+peipeixiang@transifex.com>, 2015
+# dae18ada8f5d984070f88a11bd09a0d3_87cf90e <6d2a6f2312a2a802f0de112b58b74c46_176438>, 2015
+# dae18ada8f5d984070f88a11bd09a0d3_87cf90e <6d2a6f2312a2a802f0de112b58b74c46_176438>, 2015
 # Rom, 2015
 # Rom, 2015
 # San <github@zhujunsan.net>, 2015
@@ -215,8 +215,8 @@
 # Xuejia Tong <snowytong@hotmail.com>, 2016
 # Yingying Zhang <1714277256@qq.com>, 2016
 # yohann yang <heinerseiden@yahoo.com>, 2016
-# Yu <inactive+harrycaoyu@transifex.com>, 2015
-# Yu <inactive+harrycaoyu@transifex.com>, 2015
+# db5cc497ac4f3c6c4b3195316e6985b6_cabed74 <3af8e6fd761591a7c85c4ffdc30e97c5_286908>, 2015
+# db5cc497ac4f3c6c4b3195316e6985b6_cabed74 <3af8e6fd761591a7c85c4ffdc30e97c5_286908>, 2015
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
 # 刘啸林 <liuxiaolinfk@gmail.com>, 2016
 # 百杰 陈 <bj.chen@eliteu.com.cn>, 2018
@@ -225,7 +225,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-03 20:42+0000\n"
+"POT-Creation-Date: 2020-05-31 20:42+0000\n"
 "PO-Revision-Date: 2020-04-27 09:13+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -916,7 +916,6 @@ msgstr "删除表格"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "描述"
@@ -2520,9 +2519,9 @@ msgid "Not specific to a course"
 msgstr "不针对特定课程"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "主题"
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "标题"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -2581,29 +2580,40 @@ msgid "Other"
 msgstr "其他"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "亲爱的{username}，有什么可以帮助您？"
+msgid "Course Discussion Forum"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid ""
+"While our support team is happy to assist with the edX platform, the course "
+"staff has the expertise for specific assignment questions, grading or the "
+"proper procedures in each course. Please post all course related questions "
+"within the Discussion Forum where the Course Staff can directly respond."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "细节"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
-msgstr "您提供的信息越详细，我们越能快速并有效地帮助到您！"
+msgid "the more quickly and helpfully we can respond!"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
 msgstr ""
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr "亲爱的{username}，有什么可以帮助您？"
+
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
 msgstr "请登录{platform}，以获得更好的帮助。"
 
-#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr "如果您无法访问账号，请通过电子邮件联系我们{email}。"
+#: lms/templates/student_account/form_field.underscore
+msgid "Need help logging in?"
+msgstr "登录时需要帮助？"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -2612,7 +2622,7 @@ msgid ""
 msgstr "选择一门课程或选择“不针对特定课程”选项。"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a topic for your support request."
+msgid "Select a subject for your support request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2981,6 +2991,10 @@ msgstr "无法找到\"{team}\"团队。"
 msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "主题"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4305,10 +4319,6 @@ msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
 msgstr "获取邮件发生错误，请稍后重试。如问题持续发生，请咨询技术支持。"
-
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "标题"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -5666,9 +5676,9 @@ msgstr "所有章节都必须拥有名称和内容"
 
 #: cms/static/js/models/uploads.js
 msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
-msgstr "只有 <%= fileTypes %> 格式的文件可以上传。请选择扩展名为 <%= fileExtensions %> 的文件上传。"
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
+msgstr ""
 
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
@@ -5846,8 +5856,8 @@ msgid "{selectedProvider} credentials saved"
 msgstr "{selectedProvider} 证书已保存"
 
 #: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
-msgstr "上传新的PDF文件至“<%= name %>”"
+msgid "Upload a new PDF to “<%- name %>”"
+msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -6406,14 +6416,14 @@ msgstr "很抱歉，此处出现错误"
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
-msgstr "机构、课程编号和开课时间字段合在一起不能超过 <%=limit%> 个字符。"
+"fields cannot be more than <%- limit %> characters."
+msgstr ""
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
-msgstr "机构和知识库编号字段合在一起不能超过 <%=limit%> 个字符"
+"more than <%- limit %> characters."
+msgstr ""
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -6758,7 +6768,6 @@ msgid "Unscheduled"
 msgstr "尚未计划"
 
 #: cms/templates/js/course_info_update.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Date"
 msgstr "日期"
@@ -7489,94 +7498,6 @@ msgstr "删除节 %(subsectionDisplayName)s"
 msgid "Remove unit %(unitName)s"
 msgstr "删除单元 %(unitName)s"
 
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"You still need to visit the %(display_name)s website to complete the credit "
-"process."
-msgstr "您仍然需要访问 %(display_name)s 网站完成学分领取流程。"
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"To finalize course credit, %(display_name)s requires %(platform_name)s "
-"learners to submit a credit request."
-msgstr "要完成课程学分，%(display_name)s 要求 %(platform_name)s 学员提交一份学分申请。"
-
-#: lms/templates/commerce/provider.underscore
-msgid "Get Credit"
-msgstr "获得学分"
-
-#: lms/templates/commerce/receipt.underscore
-#, python-format
-msgid ""
-"Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr "谢谢您，%(full_name)s！我们已经收到了您为%(course_name)s的付款。"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr "请打印此页留作纪录，这是您的收据。您也会收到一封有相同信息的电子邮件。"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "订单号："
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "金额"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "总计"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "请注意"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "划掉的项目已退款。"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "账单寄给"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "没有可提供的收据。"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-msgid "Go to Dashboard"
-msgstr "前往课程面板"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from {platformName}"
-" to verify your identity."
-msgstr "如果您现在不验证身份，您仍可以通过课程面板浏览课程。但您会定期从 {platformName} 收到身份验证提醒。"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "希望稍后再验证您的身份？"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Verify Now"
-msgstr "现在认证"
-
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
 msgstr "标记考试完成"
@@ -7733,6 +7654,10 @@ msgid ""
 "Thank you for submitting your financial assistance application for "
 "{course_name}! You can expect a response in 2-4 business days."
 msgstr "感谢您提交 {course_name} 的经济援助申请！您将在 2 至 4 个工作日内得到回复。"
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Go to Dashboard"
+msgstr "前往课程面板"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
@@ -8072,14 +7997,6 @@ msgid "You can change sessions until {expiration_date}."
 msgstr "您可在{expiration_date}前更改学期。"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Final Grade"
-msgstr "最终成绩"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "for {courseName}"
-msgstr "为{courseName}课程"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr "查看存档的课程"
 
@@ -8294,8 +8211,8 @@ msgid "An error occurred. Please reload the page."
 msgstr "发生了一个错误，请重新加载页面。"
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
-msgstr "登录时需要帮助？"
+msgid "Sign in with your company or school"
+msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -8856,6 +8773,11 @@ msgid "Check your email for an activation message."
 msgstr "检查您的电子邮箱是否收到激活消息。"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "总计"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
 msgstr "{courseName} 的专业证书"
 
@@ -8893,6 +8815,36 @@ msgid "Thank you! We have received your payment for {courseName}."
 msgstr "谢谢！我们已经收到您的 {courseName} 付款。"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"Please print this page for your records; it serves as your receipt. You will"
+" also receive an email with the same information."
+msgstr "请打印此页留作纪录，这是您的收据。您也会收到一封有相同信息的电子邮件。"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Order No."
+msgstr "订单号："
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Amount"
+msgstr "金额"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Please Note"
+msgstr "请注意"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Crossed out items have been refunded."
+msgstr "划掉的项目已退款。"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Billed to"
+msgstr "账单寄给"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "No receipt available"
+msgstr "没有可提供的收据。"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
 msgstr "下一步：确认您的身份"
 
@@ -8920,6 +8872,10 @@ msgid ""
 "%(platformName)s to verify your identity."
 msgstr "如果您现在不验证您的身份，您仍可以通过控制面板浏览课程。但您会定期从%(platformName)s收到身份验证提醒。"
 
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Want to confirm your identity later?"
+msgstr "希望稍后再验证您的身份？"
+
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr "身份验证正在进行中"
@@ -8928,11 +8884,9 @@ msgstr "身份验证正在进行中"
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
-"(usually within 1-2 days). In the meantime, you can still access all "
+"(usually within 5-7 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
-"我们已经收到您的信息并正在验证您的身份。验证流程结束后(一般在 1-2 "
-"天内)，您将在您的控制面板上收到一条消息。与此同时，您仍然可以访问所有的课程内容。"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
@@ -10548,12 +10502,12 @@ msgid "Read more"
 msgstr "了解更多"
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
-msgstr "显示字幕 ({totalTranscripts})"
-
-#: cms/templates/js/video-transcripts.underscore
 msgid "No transcript uploaded."
 msgstr "未上传字幕。"
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr "显示字幕 ({totalTranscripts})"
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"

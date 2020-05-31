@@ -24,14 +24,14 @@
 # msare <mervesareakin@gmail.com>, 2014
 # salih <salihh.demirr@gmail.com>, 2019
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
-# iron_man <inactive+iron_man@transifex.com>, 2014
+# ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
 # Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Ali Işıngör <ali@artistanbul.io>, 2017-2019
+# Ali Işıngör <ali@artistanbul.io>, 2017-2020
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
@@ -78,7 +78,7 @@
 # Onur Bektas <mustafaonurbektas@gmail.com>, 2013
 # Pelin Çılgın <pelincilgin@hotmail.com>, 2015
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
-# iron_man <inactive+iron_man@transifex.com>, 2014
+# ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
 # Copyright (C) 2020 edX
@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-03 20:42+0000\n"
+"POT-Creation-Date: 2020-05-31 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -2187,7 +2187,7 @@ msgstr "Her Zaman"
 msgid "Never"
 msgstr "Asla"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_base.py lms/templates/courseware/dates.html
 msgid "Past Due"
 msgstr "Zaman Aşımına Uğramış"
 
@@ -4294,12 +4294,12 @@ msgstr ""
 "girilmişse, problem modülleri için olan cevap gönderimleri Giriş Sınavı "
 "scoring/gating algoritmasında kabul edilecektir."
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
 msgid "Enrollment Track Groups"
 msgstr "Kayıtlanma Yolu Grupları"
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 msgid "Partition for segmenting users by enrollment track"
 msgstr "Kullanıcıları kayıtlanma yollarına göre ayrıştırma için bölümleme"
 
@@ -5929,57 +5929,6 @@ msgstr ""
 "{username} ({email}) kullanıcısı için geri ödeme isteği başlatıldı. Bu "
 "isteği işleme koymak için, lütfen aşağıdaki bağlantı(ları) ziyaret edin."
 
-#: lms/djangoapps/commerce/views.py
-msgid "Receipt"
-msgstr "Fatura"
-
-#: lms/djangoapps/commerce/views.py
-msgid "Payment Failed"
-msgstr "Ödeme Başarısız"
-
-#: lms/djangoapps/commerce/views.py
-msgid "There was a problem with this transaction. You have not been charged."
-msgstr ""
-"Bu işlem ile ilgili bir sorun vardı. Sizden bir ödeme tahsil edilmedi."
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"Make sure your information is correct, or try again with a different card or"
-" another form of payment."
-msgstr ""
-"Bilgilerinizin doğru olduğundan emin olun ya da farklı bir kart ile tekrar "
-"deneyin veya başka bir ödeme yolu seçin."
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"A system error occurred while processing your payment. You have not been "
-"charged."
-msgstr ""
-"Ödemeniz işlenirken bir sistem hatası meydana geldi. Sizden bir ödeme tahsil"
-" edilmedi."
-
-#: lms/djangoapps/commerce/views.py
-msgid "Please wait a few minutes and then try again."
-msgstr "Lütfen bir kaç dakika bekledikten sonra tekrar deneyin."
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid "For help, contact {payment_support_link}."
-msgstr "Yardım için, {payment_support_link} ile iletişime geçin."
-
-#: lms/djangoapps/commerce/views.py
-msgid "An error occurred while creating your receipt."
-msgstr "Faturanızı oluştururken bir hata meydana geldi."
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid ""
-"If your course does not appear on your dashboard, contact "
-"{payment_support_link}."
-msgstr ""
-"Eğer dersiniz panelinizde görünmüyorsa, {payment_support_link} ile iletişime"
-" geçin."
-
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
 msgstr "Bir sertifika kazanın"
@@ -6054,6 +6003,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
 msgstr "Onaylanmışa Yükselt"
+
+#: lms/djangoapps/courseware/course_tools.py
+msgid "Financial Assistance"
+msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Assignment"
@@ -6742,15 +6695,19 @@ msgid "Good"
 msgstr "İyi"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
-msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
-msgstr "%(comment_username)s <b>%(thread_title)s</b> başlığına cevap yazdı:"
+msgid "%(comment_username)s replied to"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 msgid "View discussion"
 msgstr "Tartışmayı görüntüle"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
+#, python-format
+msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
+msgstr "%(comment_username)s <b>%(thread_title)s</b> başlığına cevap yazdı:"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
@@ -9015,14 +8972,6 @@ msgstr "Bu sayfayı görmek için yetkiniz yok."
 msgid "View and regenerate certificates."
 msgstr "Sertifikaları görüntüle ve yeniden oluştur"
 
-#: lms/djangoapps/support/views/index.py lms/templates/support/refund.html
-msgid "Manual Refund"
-msgstr "Elle Iade"
-
-#: lms/djangoapps/support/views/index.py
-msgid "Track refunds issued directly through CyberSource."
-msgstr "İadeler doğrudan CyberSource tarafından düzenlenir."
-
 #: lms/djangoapps/support/views/index.py
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/support/enrollment.html
@@ -9100,45 +9049,6 @@ msgstr "Kullanıcı Başarıyla Etkinleştirildi"
 #: lms/djangoapps/support/views/manage_user.py
 msgid "User Disabled Successfully"
 msgstr "Kullanıcı Başarıyla Devre Dışı Bırakıldı"
-
-#: lms/djangoapps/support/views/refund.py
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "E-posta Adresi"
-
-#: lms/djangoapps/support/views/refund.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Course ID"
-msgstr "Ders No"
-
-#: lms/djangoapps/support/views/refund.py
-msgid "User not found"
-msgstr "Kullanıcı bulunamadı."
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Course {course_id} not past the refund window."
-msgstr "{course_id} dersi için iade süresi aralığı sürüyor."
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "No order found for {user} in course {course_id}"
-msgstr "{course_id} dersinde {user} için bir sipariş bulunamadı. "
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Unenrolled {user} from {course_id}"
-msgstr "{course_id} dersinden {user} kullanıcısının kaydı silindi"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Refunded {cost} for order id {order_id}"
-msgstr "Kimliği {order_id} olan sipariş için {cost} iade edildi."
 
 #: lms/djangoapps/survey/utils.py
 msgid "You must complete a survey"
@@ -11102,6 +11012,15 @@ msgstr "Tümü"
 msgid "Experience"
 msgstr "Deneyim"
 
+#: openedx/core/djangoapps/schedules/admin.py
+#: cms/templates/maintenance/_force_publish_course.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Course ID"
+msgstr "Ders No"
+
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
 msgid "Schedules"
@@ -11326,6 +11245,7 @@ msgstr ""
 "edinebilirsiniz."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: lms/templates/dates_banner.html
 msgid "Upgrade now"
 msgstr "Şimdi yükselt"
 
@@ -13132,7 +13052,13 @@ msgstr "Altyazı Hazır"
 #. failed for some languages
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Partial Failure"
-msgstr ""
+msgstr "Kısmi Arıza"
+
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Transcript Failed"
+msgstr "Altyazı Çalıştırılamadı"
 
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
@@ -13747,6 +13673,84 @@ msgstr "Ayarları Kaydet"
 msgid "Unenroll"
 msgstr "Kaydı iptal et"
 
+#: lms/templates/dates_banner.html
+msgid "We've built a suggested schedule to help you stay on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"But don't worryâit's flexible so you can learn at your own pace. If you "
+"happen to fall behind on our suggested dates, you'll be able to adjust them "
+"to keep yourself on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule. "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future by visiting "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" Donât worryâyou wonât lose any of the progress youâve made when you"
+" shift your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "You are auditing this course,"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid " which means that you are unable to participate in graded assignments."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. To complete graded assignments as part of this course and shift "
+"the past due assignments into the future, you can upgrade today by visiting "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Donât worryâyou wonât lose any of the"
+" progress youâve made when you shift your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. To complete graded assignments as part of this course and shift "
+"the past due assignments into the future, you can upgrade today."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" To complete graded assignments as part of this course, you can upgrade "
+"today."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Reset my deadlines"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Upgrade to shift due dates"
+msgstr ""
+
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
 msgstr "Studio'da Ünite Görüntüle"
@@ -14153,28 +14157,6 @@ msgstr "E-posta"
 msgid "Return To %s"
 msgstr "%s e Geri Dön"
 
-#: lms/templates/reset_deadlines_banner.html
-msgid "It looks like you've missed some important deadlines. Visit "
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "edx.org"
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid " to reset your deadlines and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid ""
-"It looks like you've missed some important deadlines. Reset your deadlines "
-"and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "Reset my deadlines"
-msgstr ""
-
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "Yeniden Abonelik Başarılı!"
@@ -14227,7 +14209,7 @@ msgstr "Sonraki"
 msgid "Sequence"
 msgstr "Sıralı"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_module.html lms/templates/courseware/dates.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr "Tamamlandı"
@@ -15840,37 +15822,6 @@ msgstr ""
 msgid "About edX Certificates"
 msgstr "edX Sertifikaları Hakkında"
 
-#: lms/templates/commerce/checkout_cancel.html
-msgid "Checkout Cancelled"
-msgstr "Ödeme İptal Edildi"
-
-#: lms/templates/commerce/checkout_cancel.html
-msgid ""
-"Your transaction has been cancelled. If you feel an error has occurred, "
-"contact {email}."
-msgstr ""
-"İşleminiz iptal edildi. Eğer hata bir hata oluştuğunu düşünüyorsanız, "
-"{email} ile iletişime geçin. "
-
-#: lms/templates/commerce/checkout_error.html
-msgid "Checkout Error"
-msgstr "Ödeme yeri Hatası"
-
-#: lms/templates/commerce/checkout_error.html
-msgid ""
-"An error has occurred with your payment. {b_start}You have not been "
-"charged.{b_end} Please try to submit your payment again. If this problem "
-"persists, contact {email}."
-msgstr ""
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Loading Order Data..."
-msgstr "Sipariş Verisi Yükleniyor..."
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Please wait while we retrieve your order details."
-msgstr "Lütfen siparişinizle ilgili detaylar hazırlanırken bekleyin."
-
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
@@ -16092,12 +16043,12 @@ msgid "This content is graded"
 msgstr "Bu içerik puanlandı"
 
 #: lms/templates/courseware/course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "Bir hata oluştu. Lütfen daha sonra tekrar deneyin"
-
-#: lms/templates/courseware/course_about.html
 msgid "An error has occurred. Please ensure that you are logged in to enroll."
 msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "Bir hata oluştu. Lütfen daha sonra tekrar deneyin"
 
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
@@ -16111,10 +16062,6 @@ msgid "View Course"
 msgstr "Derse Gözat"
 
 #: lms/templates/courseware/course_about.html
-msgid "This course is in your {start_cart_link}cart{end_cart_link}."
-msgstr "Bu ders sizin {start_cart_link}alışveriş sepetinizde{end_cart_link}."
-
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "Ders Dolu"
 
@@ -16125,10 +16072,6 @@ msgstr "Bu derse sadece davet ile kayıtlanılır"
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr "Kayıtlanma Kapalıdır"
-
-#: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
-msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
@@ -16281,25 +16224,19 @@ msgid "Important Dates"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
-msgid "You are auditing this course."
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid "This means that you are unable to participate in graded assignments."
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid ""
-"To complete graded assignments as part of this course, you can upgrade "
-"today."
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid "Due Today"
-msgstr ""
+msgid "Today"
+msgstr "Bugün"
 
 #: lms/templates/courseware/dates.html
 msgid "Verified Only"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Due Next"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Not yet released"
 msgstr ""
 
 #: lms/templates/courseware/error-message.html
@@ -16991,10 +16928,8 @@ msgstr "Doğrulama bilgilerinizi gönderdiniz."
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You will see a message on your dashboard when the verification process is "
-"complete (usually within 1-2 days)."
+"complete (usually within 5-7 days)."
 msgstr ""
-"Doğrulama süreci tamamlandığında panelinizde bir ileti göreceksiniz "
-"(genellikle 1-2 gün içerisinde)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
@@ -17004,11 +16939,8 @@ msgstr "Mevcut doğrulamanızın süresi yakında sona erecek!"
 msgid ""
 "You have submitted your reverification information. You will see a message "
 "on your dashboard when the verification process is complete (usually within "
-"1-2 days)."
+"5-7 days)."
 msgstr ""
-"Yeniden doğrulama bilgilerinizi gönderdiniz. Doğrulama süreciniz "
-"tamamlandığında panelinizde bir ileti göreceksiniz (genellikle 1-2 gün "
-"içerisinde)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have successfully verified your ID with edX"
@@ -18122,14 +18054,6 @@ msgstr "Dersleri Keşfet"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 msgid "Sysadmin"
 msgstr "Sistem Yöneticisi"
-
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Shopping Cart"
-msgstr "Alışveriş Sepeti"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
@@ -19412,7 +19336,7 @@ msgstr "Tartışma Yöneticisi Ekle"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Data Researcher"
-msgstr ""
+msgstr "Ders Veri Araştırmacısı"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Course Data Researchers can access the data download tab."
@@ -20133,6 +20057,10 @@ msgid "Purchase order number (if any)"
 msgstr " Sipariş numarası satın alma(varsa)"
 
 #: lms/templates/shoppingcart/billing_details.html
+msgid "Email Address"
+msgstr "E-posta Adresi"
+
+#: lms/templates/shoppingcart/billing_details.html
 msgid "email@example.com"
 msgstr "eposta@siteadi.com"
 
@@ -20445,6 +20373,10 @@ msgstr[0] ""
 msgstr[1] "{course_names} kaldırıldı çünkü kayıt dönemi kapandı."
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Shopping Cart"
+msgstr "Alışveriş Sepeti"
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr "Kapak Resmi"
 
@@ -20662,46 +20594,6 @@ msgstr "Öğrenci Desteği: Kullanıcı Yönet"
 msgid "Program Enrollments Inspector"
 msgstr ""
 
-#: lms/templates/support/refund.html
-msgid "About to refund this order:"
-msgstr "Bu siparişin iadesi  hakkında:"
-
-#: lms/templates/support/refund.html
-msgid "Order Id:"
-msgstr "Sipariş Kimliği:"
-
-#: lms/templates/support/refund.html
-msgid "Enrollment:"
-msgstr "Kayıtlanma:"
-
-#: lms/templates/support/refund.html
-msgid "enrolled"
-msgstr "kayıtlandı"
-
-#: lms/templates/support/refund.html
-msgid "unenrolled"
-msgstr "kayıtlanılmamış"
-
-#: lms/templates/support/refund.html
-msgid "Cost:"
-msgstr "Maliyet:"
-
-#: lms/templates/support/refund.html
-msgid "CertificateItem Status:"
-msgstr "Sertifika Öğe Durumu:"
-
-#: lms/templates/support/refund.html
-msgid "Order Status:"
-msgstr "Sipariş Durumu:"
-
-#: lms/templates/support/refund.html
-msgid "Fulfilled Time:"
-msgstr "Tamamlanma Süresi:"
-
-#: lms/templates/support/refund.html
-msgid "Refund Request Time:"
-msgstr "İade Talep Zamanı:"
-
 #: lms/templates/survey/survey.html
 msgid "User Survey"
 msgstr "Kullanıcı Anketi"
@@ -20852,11 +20744,8 @@ msgstr "Kimlik Doğrulama"
 msgid ""
 "You have already submitted your verification information. You will see a "
 "message on your dashboard when the verification process is complete (usually"
-" within 1-2 days)."
+" within 5-7 days)."
 msgstr ""
-"Daha önceden doğrulama bilgilerinizi kaydetmiş görünüyorsunuz. Doğrulama "
-"süreciniz tamamlandığında panelinizde bir ileti göreceksiniz (genellikle 1-2"
-" gün içerisinde)."
 
 #: lms/templates/verify_student/reverify_not_allowed.html
 msgid "You cannot verify your identity at this time."
@@ -21086,7 +20975,7 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Show More"
-msgstr ""
+msgstr "Daha Fazla Göster"
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"

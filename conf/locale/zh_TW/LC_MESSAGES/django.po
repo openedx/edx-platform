@@ -6,7 +6,7 @@
 # Translators:
 # ahan <ahan.net@gmail.com>, 2014
 # ahan <ahan.net@gmail.com>, 2014
-# bhsfmiao <inactive+bhsfmiao@transifex.com>, 2014
+# 8cdb4758e2f8f89e1b6f455d24a57c7b_26aedc9 <d42fecad8431def0e25dc12221e713ed_169300>, 2014
 # CHI, KUAN-MING <sappy5678@gmail.com>, 2015
 # 陳子琦 <christtabris@gmail.com>, 2014
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
@@ -19,7 +19,7 @@
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2015
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014-2015
-# bhsfmiao <inactive+bhsfmiao@transifex.com>, 2014
+# 8cdb4758e2f8f89e1b6f455d24a57c7b_26aedc9 <d42fecad8431def0e25dc12221e713ed_169300>, 2014
 # MOH CHIN LAM <chinlam91@gmail.com>, 2015
 # 區壬豪 <oldmon@livemail.tw>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
@@ -79,7 +79,7 @@
 # ahan <ahan.net@gmail.com>, 2014
 # ahan <ahan.net@gmail.com>, 2014
 # Andrew Lau <alau52@yahoo.com>, 2017
-# bhsfmiao <inactive+bhsfmiao@transifex.com>, 2014
+# 8cdb4758e2f8f89e1b6f455d24a57c7b_26aedc9 <d42fecad8431def0e25dc12221e713ed_169300>, 2014
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
 # HSU-CHENG CHIANG <tosti.chiang@gmail.com>, 2013
 # Joey Chiou <Joeyc0916@gmail.com>, 2013-2014
@@ -92,7 +92,7 @@
 # lin feather <further.33.44@gmail.com>, 2016
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
-# bhsfmiao <inactive+bhsfmiao@transifex.com>, 2014
+# 8cdb4758e2f8f89e1b6f455d24a57c7b_26aedc9 <d42fecad8431def0e25dc12221e713ed_169300>, 2014
 # MOH CHIN LAM <chinlam91@gmail.com>, 2014-2015
 # 區壬豪 <oldmon@livemail.tw>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
@@ -118,7 +118,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# bhsfmiao <inactive+bhsfmiao@transifex.com>, 2014
+# 8cdb4758e2f8f89e1b6f455d24a57c7b_26aedc9 <d42fecad8431def0e25dc12221e713ed_169300>, 2014
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
 # HSU-CHENG CHIANG <tosti.chiang@gmail.com>, 2013
 # JEN-HAO HSIEH <orienthauz@gmail.com>, 2015
@@ -130,7 +130,7 @@
 # lin31504 <lin31504@gmail.com>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2014
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014-2015
-# bhsfmiao <inactive+bhsfmiao@transifex.com>, 2014
+# 8cdb4758e2f8f89e1b6f455d24a57c7b_26aedc9 <d42fecad8431def0e25dc12221e713ed_169300>, 2014
 # MOH CHIN LAM <chinlam91@gmail.com>, 2014-2015
 # myles <i@myles.hk>, 2016
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-03 20:42+0000\n"
+"POT-Creation-Date: 2020-05-31 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/open-edx/teams/6205/zh_TW/)\n"
@@ -3951,12 +3951,12 @@ msgid ""
 " considered in the Entrance Exam scoring/gating algorithm."
 msgstr "輸入 true 或者 false。如果是 true，提交的問題模組將會被列入資格學考試的演算法中。"
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
 msgid "Enrollment Track Groups"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 msgid "Partition for segmenting users by enrollment track"
 msgstr ""
 
@@ -5445,50 +5445,6 @@ msgid ""
 "this request, please visit the link(s) below."
 msgstr "{username} ({email}) 的退款要求已經建立。為了處理此請求，請訪問以下聯結(s) 。"
 
-#: lms/djangoapps/commerce/views.py
-msgid "Receipt"
-msgstr "收據"
-
-#: lms/djangoapps/commerce/views.py
-msgid "Payment Failed"
-msgstr "付款失敗"
-
-#: lms/djangoapps/commerce/views.py
-msgid "There was a problem with this transaction. You have not been charged."
-msgstr "本次交易出現問題。您還未被扣款。"
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"Make sure your information is correct, or try again with a different card or"
-" another form of payment."
-msgstr "請確認您的資訊無誤，或使用其他卡片或付款方式再試一次。"
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"A system error occurred while processing your payment. You have not been "
-"charged."
-msgstr "在處理您的付款事項時出現了一個系統錯誤。您還未被扣款。"
-
-#: lms/djangoapps/commerce/views.py
-msgid "Please wait a few minutes and then try again."
-msgstr "請在等待幾分鐘後，再嘗試一次。"
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid "For help, contact {payment_support_link}."
-msgstr "如需協助，請聯繫 {payment_support_link}。"
-
-#: lms/djangoapps/commerce/views.py
-msgid "An error occurred while creating your receipt."
-msgstr "在產生您的收據時出現了問題。"
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid ""
-"If your course does not appear on your dashboard, contact "
-"{payment_support_link}."
-msgstr "如果您的課程並未出現在課程面板上，請聯繫 {payment_support_link}。"
-
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
 msgstr ""
@@ -5561,6 +5517,10 @@ msgstr ""
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
+msgstr ""
+
+#: lms/djangoapps/courseware/course_tools.py
+msgid "Financial Assistance"
 msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
@@ -6192,14 +6152,18 @@ msgid "Good"
 msgstr "好"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
-msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
+msgid "%(comment_username)s replied to"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 msgid "View discussion"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
+#, python-format
+msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
@@ -8299,14 +8263,6 @@ msgid "View and regenerate certificates."
 msgstr "查看並產生證書。"
 
 #: lms/djangoapps/support/views/index.py
-msgid "Manual Refund"
-msgstr "人工退款"
-
-#: lms/djangoapps/support/views/index.py
-msgid "Track refunds issued directly through CyberSource."
-msgstr "直接透過CyberSource追蹤退款問題。"
-
-#: lms/djangoapps/support/views/index.py
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/support/enrollment.html
 msgid "Enrollment"
@@ -8383,45 +8339,6 @@ msgstr ""
 #: lms/djangoapps/support/views/manage_user.py
 msgid "User Disabled Successfully"
 msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "電子郵件地址"
-
-#: lms/djangoapps/support/views/refund.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Course ID"
-msgstr "課程編號"
-
-#: lms/djangoapps/support/views/refund.py
-msgid "User not found"
-msgstr "無法找到使用者"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Course {course_id} not past the refund window."
-msgstr "課程 {course_id} 並未張貼在退款視窗中。"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "No order found for {user} in course {course_id}"
-msgstr "找不到使用者 {user} 於課程 {course_id} 的訂單"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Unenrolled {user} from {course_id}"
-msgstr "取消 {user} 於 {course_id} 課程的註冊"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Refunded {cost} for order id {order_id}"
-msgstr "退款 {cost} 給訂單編號 {order_id}"
 
 #: lms/djangoapps/survey/utils.py
 msgid "You must complete a survey"
@@ -10203,6 +10120,15 @@ msgstr ""
 msgid "Experience"
 msgstr ""
 
+#: openedx/core/djangoapps/schedules/admin.py
+#: cms/templates/maintenance/_force_publish_course.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Course ID"
+msgstr "課程編號"
+
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
 msgid "Schedules"
@@ -10403,7 +10329,7 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
-#: lms/templates/courseware/dates.html
+#: lms/templates/dates_banner.html
 msgid "Upgrade now"
 msgstr ""
 
@@ -12094,6 +12020,12 @@ msgstr ""
 msgid "Partial Failure"
 msgstr ""
 
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Transcript Failed"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
 msgstr ""
@@ -12682,6 +12614,84 @@ msgstr "儲存設定"
 msgid "Unenroll"
 msgstr "取消註冊"
 
+#: lms/templates/dates_banner.html
+msgid "We've built a suggested schedule to help you stay on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"But don't worryâit's flexible so you can learn at your own pace. If you "
+"happen to fall behind on our suggested dates, you'll be able to adjust them "
+"to keep yourself on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule. "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future by visiting "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" Donât worryâyou wonât lose any of the progress youâve made when you"
+" shift your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "You are auditing this course,"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid " which means that you are unable to participate in graded assignments."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. To complete graded assignments as part of this course and shift "
+"the past due assignments into the future, you can upgrade today by visiting "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Donât worryâyou wonât lose any of the"
+" progress youâve made when you shift your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. To complete graded assignments as part of this course and shift "
+"the past due assignments into the future, you can upgrade today."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" To complete graded assignments as part of this course, you can upgrade "
+"today."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Reset my deadlines"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Upgrade to shift due dates"
+msgstr ""
+
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
 msgstr "在Studio中檢視單元"
@@ -13064,28 +13074,6 @@ msgstr "電子郵件"
 msgid "Return To %s"
 msgstr "返回%s"
 
-#: lms/templates/reset_deadlines_banner.html
-msgid "It looks like you've missed some important deadlines. Visit "
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "edx.org"
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid " to reset your deadlines and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid ""
-"It looks like you've missed some important deadlines. Reset your deadlines "
-"and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "Reset my deadlines"
-msgstr ""
-
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "重新訂閱成功！"
@@ -13134,7 +13122,7 @@ msgstr ""
 msgid "Sequence"
 msgstr ""
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_module.html lms/templates/courseware/dates.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr ""
@@ -14666,35 +14654,6 @@ msgstr "如果所有的資訊是正確的，問題仍然存在，請聯繫技術
 msgid "About edX Certificates"
 msgstr ""
 
-#: lms/templates/commerce/checkout_cancel.html
-msgid "Checkout Cancelled"
-msgstr "交易取消"
-
-#: lms/templates/commerce/checkout_cancel.html
-msgid ""
-"Your transaction has been cancelled. If you feel an error has occurred, "
-"contact {email}."
-msgstr "您的交易已經被取消。如果您覺得有問題，請聯繫{email}。"
-
-#: lms/templates/commerce/checkout_error.html
-msgid "Checkout Error"
-msgstr "結帳錯誤"
-
-#: lms/templates/commerce/checkout_error.html
-msgid ""
-"An error has occurred with your payment. {b_start}You have not been "
-"charged.{b_end} Please try to submit your payment again. If this problem "
-"persists, contact {email}."
-msgstr ""
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Loading Order Data..."
-msgstr "載入訂單中..."
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Please wait while we retrieve your order details."
-msgstr "請稍候，我們正在取得您的訂單資訊。"
-
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
@@ -14893,12 +14852,12 @@ msgid "This content is graded"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "發生錯誤。請稍後再試一次。"
-
-#: lms/templates/courseware/course_about.html
 msgid "An error has occurred. Please ensure that you are logged in to enroll."
 msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "發生錯誤。請稍後再試一次。"
 
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
@@ -14912,10 +14871,6 @@ msgid "View Course"
 msgstr "檢視課程"
 
 #: lms/templates/courseware/course_about.html
-msgid "This course is in your {start_cart_link}cart{end_cart_link}."
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "課程已滿"
 
@@ -14926,10 +14881,6 @@ msgstr "只能經由邀請註冊這課程"
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr "註冊功能已經關閉"
-
-#: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
-msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
@@ -15080,25 +15031,19 @@ msgid "Important Dates"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
-msgid "You are auditing this course."
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid "This means that you are unable to participate in graded assignments."
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid ""
-"To complete graded assignments as part of this course, you can upgrade "
-"today."
-msgstr ""
-
-#: lms/templates/courseware/dates.html
-msgid "Due Today"
+msgid "Today"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
 msgid "Verified Only"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Due Next"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Not yet released"
 msgstr ""
 
 #: lms/templates/courseware/error-message.html
@@ -15740,8 +15685,8 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You will see a message on your dashboard when the verification process is "
-"complete (usually within 1-2 days)."
-msgstr "驗證過程完成後(至少需1-2個工作天)，您將會在課程介面上看到一則訊息。"
+"complete (usually within 5-7 days)."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
@@ -15751,8 +15696,8 @@ msgstr ""
 msgid ""
 "You have submitted your reverification information. You will see a message "
 "on your dashboard when the verification process is complete (usually within "
-"1-2 days)."
-msgstr "您已提交您的驗證訊息。當驗證過程完成(至少需1-2個工作天)，您將會在課程介面上看到一則訊息。"
+"5-7 days)."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have successfully verified your ID with edX"
@@ -16744,14 +16689,6 @@ msgstr ""
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 msgid "Sysadmin"
 msgstr "系統管理員"
-
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Shopping Cart"
-msgstr "購物車"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
@@ -18593,6 +18530,10 @@ msgid "Purchase order number (if any)"
 msgstr "購買訂單編號 (if any)"
 
 #: lms/templates/shoppingcart/billing_details.html
+msgid "Email Address"
+msgstr "電子郵件地址"
+
+#: lms/templates/shoppingcart/billing_details.html
 msgid "email@example.com"
 msgstr "email@example.com"
 
@@ -18880,6 +18821,10 @@ msgid_plural ""
 msgstr[0] "{course_names} 因已不開放註冊而被移除。"
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Shopping Cart"
+msgstr "購物車"
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr "封面圖片"
 
@@ -19089,46 +19034,6 @@ msgstr ""
 msgid "Program Enrollments Inspector"
 msgstr ""
 
-#: lms/templates/support/refund.html
-msgid "About to refund this order:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "Order Id:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "Enrollment:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "enrolled"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "unenrolled"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "Cost:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "CertificateItem Status:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "Order Status:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "Fulfilled Time:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "Refund Request Time:"
-msgstr ""
-
 #: lms/templates/survey/survey.html
 msgid "User Survey"
 msgstr "使用者問卷"
@@ -19265,7 +19170,7 @@ msgstr "身份驗證"
 msgid ""
 "You have already submitted your verification information. You will see a "
 "message on your dashboard when the verification process is complete (usually"
-" within 1-2 days)."
+" within 5-7 days)."
 msgstr ""
 
 #: lms/templates/verify_student/reverify_not_allowed.html

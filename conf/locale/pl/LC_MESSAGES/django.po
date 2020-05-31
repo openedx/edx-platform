@@ -21,7 +21,7 @@
 # Michael Drozd <michael.alex.drozd@gmail.com>, 2016
 # Michał Kołodziej <M.Kolodziej@stud.elka.pw.edu.pl>, 2016
 # Michał Szkutnik <michal7x7@o2.pl>, 2015
-# Cairath, 2014
+# 2cdc55bf3a20ff25d939c7db7de19147_3ae98f5, 2014
 # Ned Batchelder <ned@edx.org>, 2017
 # Paweł Marchewka <mamior@o2.pl>, 2014
 # Radek <d.exax@hotmail.com>, 2015
@@ -61,15 +61,15 @@
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Kamil Magryta <gryxon@gmail.com>, 2015
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
-# Lazarus Zamenhof <inactive+lazarus_zamenhof@transifex.com>, 2014
+# a64592d83cf839ec74a351ae18cc2d2e_cee44e9 <56b7ddfd39a966524c1a849ff758782f_139437>, 2014
 # lucek <lucjan.kierczak@gmail.com>, 2014
 # Magdalena Jarosińska <m.jarosinska@stud.elka.pw.edu.pl>, 2015
 # mateusz2238 <mateusz2238@outlook.com>, 2014
 # Mateusz <blue90pl@gmail.com>, 2014
 # Michał Szkutnik <michal7x7@o2.pl>, 2015
-# Cairath, 2014
+# 2cdc55bf3a20ff25d939c7db7de19147_3ae98f5, 2014
 # Radek <d.exax@hotmail.com>, 2014-2015
-# rutek <inactive+rutek@transifex.com>, 2014
+# e63c7c8176237aadfd7c181dfcb19125_0d2a2cf <2b9ee820ae00a56bd0783458d267b6f2_166252>, 2014
 # Sarina Canelake <sarina@edx.org>, 2015
 # Sebastian <foobarbaz@gazeta.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
@@ -81,7 +81,7 @@
 #
 # Translators:
 # Adam Banasiak <adam@cku.elblag.pl>, 2015
-# Adam Banasiak <inactive+adamba@transifex.com>, 2014
+# be8238a6a200ce133e6c46360471eb91_d2fb582 <ff48a1e86ce9f4cd3956f7438592f7c5_237459>, 2014
 # Adrian Budasz <adrianbudasz@gmail.com>, 2015
 # Bart Fischer (Archimedesign) <info@archimedesign.co.uk>, 2015
 # Bartosz Muczyński <b.muczynski@gmail.com>, 2015
@@ -93,7 +93,7 @@
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Magdalena Jarosińska <m.jarosinska@stud.elka.pw.edu.pl>, 2015-2016
 # Mateusz <blue90pl@gmail.com>, 2014
-# Cairath, 2014
+# 2cdc55bf3a20ff25d939c7db7de19147_3ae98f5, 2014
 # Sebastian <foobarbaz@gazeta.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
@@ -110,7 +110,7 @@
 # mateusz2238 <mateusz2238@outlook.com>, 2014
 # Mateusz <blue90pl@gmail.com>, 2014
 # AlinaG <musicalpreschool@hotmail.com>, 2014
-# Cairath, 2014
+# 2cdc55bf3a20ff25d939c7db7de19147_3ae98f5, 2014
 # Piotr Jańczuk <piotr.janczuk@gmail.com>, 2015
 # Radek <d.exax@hotmail.com>, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
@@ -126,7 +126,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-27 09:12+0000\n"
+"POT-Creation-Date: 2020-05-24 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Polish (https://www.transifex.com/open-edx/teams/6205/pl/)\n"
@@ -4398,12 +4398,12 @@ msgstr ""
 "ćwiczenia z tego modułu będą brane pod uwagę przez algorytm oceniający "
 "egzamin wstępny."
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
 msgid "Enrollment Track Groups"
 msgstr "Grupy ścieżki kursu"
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 msgid "Partition for segmenting users by enrollment track"
 msgstr "Partycja do segmentowania studentów według ścieżki kursu"
 
@@ -6171,6 +6171,10 @@ msgstr ""
 msgid "Upgrade to Verified"
 msgstr "Zmień tryb kursu do poziomu potwierdzonego"
 
+#: lms/djangoapps/courseware/course_tools.py
+msgid "Financial Assistance"
+msgstr ""
+
 #: lms/djangoapps/courseware/courses.py
 msgid "Assignment"
 msgstr ""
@@ -6845,15 +6849,19 @@ msgid "Good"
 msgstr "Dobrze"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
-msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
+msgid "%(comment_username)s replied to"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 msgid "View discussion"
 msgstr "Wyświetl dyskusję"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
+#, python-format
+msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
@@ -11274,6 +11282,7 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: lms/templates/dates_banner.html
 msgid "Upgrade now"
 msgstr ""
 
@@ -11769,6 +11778,11 @@ msgstr ""
 "e-mail."
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Password reset unsuccessful"
 msgstr "Zresetowanie hasła nie powiodło się"
 
@@ -11785,11 +11799,6 @@ msgstr "Wystąpił błąd w trakcie resetowania twojego hasła. Spróbuj ponowni
 msgid ""
 "{html_start}Password Creation Complete{html_end}Your password has been "
 "created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
@@ -13046,6 +13055,12 @@ msgstr "Transkrypcja gotowa"
 msgid "Partial Failure"
 msgstr ""
 
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Transcript Failed"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
 msgstr "Wymagany jest plik obrazka."
@@ -13659,6 +13674,84 @@ msgstr "Zapisz ustawienia"
 msgid "Unenroll"
 msgstr "Wypisz się "
 
+#: lms/templates/dates_banner.html
+msgid "We've built a suggested schedule to help you stay on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"But don't worryâit's flexible so you can learn at your own pace. If you "
+"happen to fall behind on our suggested dates, you'll be able to adjust them "
+"to keep yourself on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule. "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future by visiting "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" Donât worryâyou wonât lose any of the progress youâve made when you"
+" shift your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "You are auditing this course,"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid " which means that you are unable to participate in graded assignments."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. To complete graded assignments as part of this course and shift "
+"the past due assignments into the future, you can upgrade today by visiting "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Donât worryâyou wonât lose any of the"
+" progress youâve made when you shift your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. To complete graded assignments as part of this course and shift "
+"the past due assignments into the future, you can upgrade today."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" To complete graded assignments as part of this course, you can upgrade "
+"today."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Reset my deadlines"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Upgrade to shift due dates"
+msgstr ""
+
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
 msgstr "Wyświetl ekran w Studio"
@@ -14078,28 +14171,6 @@ msgstr "E-mail"
 msgid "Return To %s"
 msgstr "Wróć do %s"
 
-#: lms/templates/reset_deadlines_banner.html
-msgid "It looks like you've missed some important deadlines. Visit "
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "edx.org"
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid " to reset your deadlines and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid ""
-"It looks like you've missed some important deadlines. Reset your deadlines "
-"and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "Reset my deadlines"
-msgstr ""
-
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "Wznowienie subskrypcji zakończone powodzeniem!"
@@ -14150,7 +14221,7 @@ msgstr ""
 msgid "Sequence"
 msgstr "Sekwencja"
 
-#: lms/templates/seq_module.html
+#: lms/templates/seq_module.html lms/templates/courseware/dates.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr ""
@@ -16008,12 +16079,12 @@ msgid "This content is graded"
 msgstr "Ta zawartość podlega ocenie"
 
 #: lms/templates/courseware/course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "Wystąpił błąd. Spróbuj ponownie później."
-
-#: lms/templates/courseware/course_about.html
 msgid "An error has occurred. Please ensure that you are logged in to enroll."
 msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "Wystąpił błąd. Spróbuj ponownie później."
 
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
@@ -16027,10 +16098,6 @@ msgid "View Course"
 msgstr "Wyświetl kurs"
 
 #: lms/templates/courseware/course_about.html
-msgid "This course is in your {start_cart_link}cart{end_cart_link}."
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "Lista uczestników jest już pełna"
 
@@ -16041,10 +16108,6 @@ msgstr "Rekrutacja do tego kursu jest wyłącznie na zaproszenia"
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr "Rekrutacja jest zamknięta"
-
-#: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
-msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
@@ -16202,7 +16265,7 @@ msgid "Important Dates"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
-msgid "Due Today"
+msgid "Today"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
@@ -16210,8 +16273,11 @@ msgid "Verified Only"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
-msgid ""
-"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgid "Due Next"
+msgstr ""
+
+#: lms/templates/courseware/dates.html
+msgid "Not yet released"
 msgstr ""
 
 #: lms/templates/courseware/error-message.html
@@ -16911,10 +16977,8 @@ msgstr "Informacje do celów weryfikacyjnych zostały przez ciebie złożone."
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You will see a message on your dashboard when the verification process is "
-"complete (usually within 1-2 days)."
+"complete (usually within 5-7 days)."
 msgstr ""
-"Po zakończeniu czynności weryfikacyjnych otrzymasz wiadomość na swój pulpit "
-"studenta (zwykle w ciągu 1-2 dni)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
@@ -16924,11 +16988,8 @@ msgstr "Twoja obecna weryfikacja tożsamości wkrótce wygaśnie!"
 msgid ""
 "You have submitted your reverification information. You will see a message "
 "on your dashboard when the verification process is complete (usually within "
-"1-2 days)."
+"5-7 days)."
 msgstr ""
-"Informacje do celów weryfikacyjnych zostały przez ciebie złożone. Po "
-"zakończeniu czynności weryfikacyjnych otrzymasz wiadomość na swój pulpit "
-"studenta (zwykle w ciągu 1-2 dni)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have successfully verified your ID with edX"
@@ -20819,11 +20880,8 @@ msgstr "Potwierdzenie tożsamości"
 msgid ""
 "You have already submitted your verification information. You will see a "
 "message on your dashboard when the verification process is complete (usually"
-" within 1-2 days)."
+" within 5-7 days)."
 msgstr ""
-"Informacje do celów weryfikacyjnych zostały przez ciebie złożone. Po "
-"zakończeniu czynności weryfikacyjnych otrzymasz wiadomość na swój pulpit "
-"studenta (zwykle w ciągu 1-2 dni)."
 
 #: lms/templates/verify_student/reverify_not_allowed.html
 msgid "You cannot verify your identity at this time."
