@@ -1,8 +1,8 @@
 """
 Middleware for monitoring the LMS
 """
-from collections.abc import Iterable
 import logging
+import re
 from django.conf import settings
 from edx_django_utils.monitoring import set_custom_metric
 
@@ -106,6 +106,12 @@ def _process_code_owner_mappings():
             path_list = settings.CODE_OWNER_MAPPINGS[code_owner]
             for path in path_list:
                 path_to_code_owner_mappings[path] = code_owner
+                optional_module_prefix_match = _OPTIONAL_MODULE_PREFIX_PATTERN.match(path)
+                # if path has an optional prefix, also add the module name without the prefix
+                if optional_module_prefix_match:
+                    path_without_prefix = path[optional_module_prefix_match.end():]
+                    path_to_code_owner_mappings[path_without_prefix] = code_owner
+
         return path_to_code_owner_mappings
     except Exception as e:
         log.exception('Error processing code_owner_mappings. {}'.format(e))
@@ -113,6 +119,9 @@ def _process_code_owner_mappings():
         # this will trigger an error custom metric that can be alerted on.
         return _INVALID_CODE_OWNER_MAPPING
 
+# The following module prefixes are optional in a func_view's reported module:
+#   'common.djangoapps.', 'lms.djangoapps.', 'openedx.core.djangoapps.'
+_OPTIONAL_MODULE_PREFIX_PATTERN = re.compile('^(lms|common|openedx\.core)\.djangoapps\.')
 _INVALID_CODE_OWNER_MAPPING = 'invalid-code-owner-mapping'
 # lookup table for code owner given a module path
 _PATH_TO_CODE_OWNER_MAPPINGS = _process_code_owner_mappings()

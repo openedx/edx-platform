@@ -53,11 +53,9 @@ def main(app_csv):
         may_have_views = may_have_views and not re.match(r'.*(\/tests\b|cms\/).*', path)
         if may_have_views:
             path = path.replace('./', '')  # remove ./ from beginning of path
-            path = path.replace('lms/djangoapps/', '')  # not included in final module name
-            path = path.replace('common/djangoapps/', '')  # not included in final module name
             path = path.replace('/', '.')  # convert path to dotted module name
 
-            if path in ('lms.djangoapps', 'openedx.core.djangoapps', 'openedx.features'):
+            if path in ('common,djangoapps', 'lms.djangoapps', 'openedx.core.djangoapps', 'openedx.features'):
                 # skip catch-alls to ensure everything is properly mapped
                 continue
 
@@ -71,7 +69,7 @@ def main(app_csv):
         print("  {}:".format(team))
         path_list.sort()
         for path in path_list:
-             print("  - {}".format(path))
+            print("  - {}".format(path))
 
 
 if __name__ == "__main__":

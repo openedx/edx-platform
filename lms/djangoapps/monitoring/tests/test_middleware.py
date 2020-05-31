@@ -39,13 +39,11 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
 
     @override_settings(CODE_OWNER_MAPPINGS={
         'team-red': [
-            'xblock',
+            'openedx.core.djangoapps.xblock',
+            'lms.djangoapps.grades',
         ],
         'team-blue': [
-            'xblock_django',
-        ],
-        'team-black': [
-            'openedx.core.djangoapps.xblock',
+            'common.djangoapps.xblock_django',
         ],
     })
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
@@ -54,10 +52,13 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
         ('xbl', None),
         ('xblock_2', None),
         ('xblock', 'team-red'),
-        ('xblock_django', 'team-blue'),
         ('openedx.core.djangoapps', None),
-        ('openedx.core.djangoapps.xblock', 'team-black'),
-        ('openedx.core.djangoapps.xblock.views', 'team-black'),
+        ('openedx.core.djangoapps.xblock', 'team-red'),
+        ('openedx.core.djangoapps.xblock.views', 'team-red'),
+        ('grades', 'team-red'),
+        ('lms.djangoapps.grades', 'team-red'),
+        ('xblock_django', 'team-blue'),
+        ('common.djangoapps.xblock_django', 'team-blue'),
     )
     @ddt.unpack
     def test_code_owner_mapping_hits_and_misses(
