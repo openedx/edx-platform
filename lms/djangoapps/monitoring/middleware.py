@@ -11,9 +11,7 @@ log = logging.getLogger(__name__)
 
 class CodeOwnerMetricMiddleware:
     """
-    Django middleware object to set custom metric for the owner of each view.
-
-    See _code_owner_mappings_to_path_mappings for details of the lookup structure.
+    Django middleware object to set custom metrics for the owner of each view.
 
     Custom metrics set:
     - code_owner: The owning team mapped to the current view.
@@ -59,7 +57,7 @@ class CodeOwnerMetricMiddleware:
             raise Exception('CODE_OWNER_MAPPINGS django setting set with invalid configuration. See logs for details.')
 
         view_func_module_parts = view_func_module.split('.')
-        # To match the most specific, tests the most number of parts first
+        # To make the most specific match, start with the max number of parts
         for number_of_parts in range(len(view_func_module_parts), 0, -1):
             partial_path = '.'.join(view_func_module_parts[0:number_of_parts])
             if partial_path in _PATH_TO_CODE_OWNER_MAPPINGS:
@@ -111,8 +109,8 @@ def _process_code_owner_mappings():
         return path_to_code_owner_mappings
     except Exception as e:
         log.exception('Error processing code_owner_mappings. {}'.format(e))
-        # errors should be unlikely due do scripting the setting values
-        # if this rare event occurs, this should cause this to be noticed quickly
+        # errors should be unlikely due do scripting the setting values.
+        # this will trigger an error custom metric that can be alerted on.
         return _INVALID_CODE_OWNER_MAPPING
 
 _INVALID_CODE_OWNER_MAPPING = 'invalid-code-owner-mapping'
