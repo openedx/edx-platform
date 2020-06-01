@@ -1,6 +1,7 @@
 from django.conf.urls import url
-from lms.djangoapps.homepage.views import home_page
+from django.views.generic import TemplateView
+
 
 urlpatterns = [
-    url(r'^$', home_page, name='homepage'),
+    url(r'^$', TemplateView.as_view(template_name='homepage/homepage.html'), name='homepage'),
 ]
