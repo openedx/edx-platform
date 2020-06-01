@@ -461,7 +461,17 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
     Return the list of blocks to display on the course info page,
     sorted by date.
     """
-    block_classes = [
+    blocks = []
+    if RELATIVE_DATES_FLAG.is_enabled(course.id):
+        blocks.append(CourseExpiredDate(course, user))
+        blocks.extend(get_course_assignment_date_blocks(
+            course, user, request, num_return=num_assignments,
+            include_access=include_access, include_past_dates=include_past_dates,
+        ))
+
+    # Adding these in after the assignment blocks so in the case multiple blocks have the same date,
+    # these blocks will be sorted to come after the assignments. See https://openedx.atlassian.net/browse/AA-158
+    default_block_classes = [
         CourseEndDate,
         CourseStartDate,
         TodaysDate,
@@ -471,13 +481,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
     if not course.self_paced and certs_api.get_active_web_certificate(course):
         block_classes.insert(0, CertificateAvailableDate)
 
-    blocks = [cls(course, user) for cls in block_classes]
-    if RELATIVE_DATES_FLAG.is_enabled(course.id):
-        blocks.append(CourseExpiredDate(course, user))
-        blocks.extend(get_course_assignment_date_blocks(
-            course, user, request, num_return=num_assignments,
-            include_access=include_access, include_past_dates=include_past_dates,
-        ))
+    blocks.extend([cls(course, user) for cls in default_block_classes])
 
     return sorted((b for b in blocks if b.date and (b.is_enabled or include_past_dates)), key=date_block_key_fn)
 
