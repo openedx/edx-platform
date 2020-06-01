@@ -551,7 +551,10 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=verified_user, mode=CourseMode.VERIFIED)
         course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
         enable_course_certificates(course)
-        CertificateAvailableDate(course, audit_user)
+        expected_blocks = [
+            CourseEndDate, CourseStartDate, TodaysDate, VerificationDeadlineDate, CertificateAvailableDate
+        ]
+        self.assert_block_types(course, verified_user, expected_blocks)
         for block in (CertificateAvailableDate(course, audit_user), CertificateAvailableDate(course, verified_user)):
             self.assertIsNotNone(course.certificate_available_date)
             self.assertEqual(block.date, course.certificate_available_date)
