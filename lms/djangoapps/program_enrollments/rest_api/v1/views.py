@@ -710,16 +710,16 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
         if request_user.is_staff:
             programs = get_programs_by_type(request.site, requested_program_type)
         else:
+            program_dict = {}
             # Check if the user is a course staff of any course which is a part of a program.
-            programs = self.get_programs_user_is_course_staff_for(request_user, requested_program_type)
-            if not programs:
-                # Now check program enrollments for purely as a learner
-                program_enrollments = fetch_program_enrollments_by_student(
-                    user=request.user,
-                    program_enrollment_statuses=ProgramEnrollmentStatuses.__ACTIVE__,
-                )
-                uuids = [enrollment.program_uuid for enrollment in program_enrollments]
-                programs = get_programs(uuids=uuids) or []
+            for staff_program in self.get_programs_user_is_course_staff_for(request_user, requested_program_type):
+                program_dict.setdefault(staff_program['uuid'], staff_program)
+
+            # Now get the program enrollments for user purely as a learner add to the list
+            for learner_program in self._get_enrolled_programs_from_model(request_user):
+                program_dict.setdefault(learner_program['uuid'], learner_program)
+
+            programs = list(program_dict.values())
 
         programs_in_which_user_has_access = [
             {'uuid': program['uuid'], 'slug': program['marketing_slug']}
@@ -727,6 +727,17 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
         ]
 
         return Response(programs_in_which_user_has_access, status.HTTP_200_OK)
+
+    def _get_enrolled_programs_from_model(self, user):
+        """
+        Return the Program Enrollments linked to the learner within the data model.
+        """
+        program_enrollments = fetch_program_enrollments_by_student(
+            user=user,
+            program_enrollment_statuses=ProgramEnrollmentStatuses.__ACTIVE__,
+        )
+        uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+        return get_programs(uuids=uuids) or []
 
     def get_course_keys_user_is_staff_for(self, user):
         """

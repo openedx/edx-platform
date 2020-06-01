@@ -1490,13 +1490,16 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
         with mock.patch(
             _VIEW_PATCH_FORMAT.format('get_programs'),
             autospec=True,
-            return_value=[self.mock_program_data[0]]
+            side_effect=[[self.mock_program_data[0]], []]
         ) as mock_get_programs:
             response = self.client.get(reverse(self.view_name) + '?type=masters')
 
         assert status.HTTP_200_OK == response.status_code
         assert len(response.data) == 1
-        mock_get_programs.assert_called_once_with(course=self.course_id)
+        mock_get_programs.assert_has_calls([
+            mock.call(course=self.course_id),
+            mock.call(uuids=[]),
+        ], any_order=True)
 
     def _enroll_user_into_course_as_course_staff(self, user, course_key_string):
         """
@@ -1555,7 +1558,7 @@ class UserProgramReadOnlyAccessGetTests(EnrollmentsDataMixin, APITestCase):
         with mock.patch(
             _VIEW_PATCH_FORMAT.format('get_programs'),
             autospec=True,
-            side_effect=[programs_to_return_first, programs_to_return_second]
+            side_effect=[[], programs_to_return_first, programs_to_return_second]
         ) as mock_get_programs:
             response = self.client.get(reverse(self.view_name) + '?type=masters')
 
