@@ -229,6 +229,46 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.data), 1)
 
+    def test_owner_can_access_its_certs(self):
+        """
+        Tests the owner of the certs can access the certificate list api
+        """
+        self.student.profile.year_of_birth = 1977
+        self.student.profile.save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='visibility.course_certificates',
+            value='private',
+        ).save()
+
+        resp = self.get_response(AuthType.session, requesting_user=self.student)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # verifies that other than owner cert list api is not accessible
+        resp = self.get_response(AuthType.session, requesting_user=self.other_student)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_public_profile_certs_is_accessible(self):
+        """
+        Tests the public profile certs can be accessed by all users
+        """
+        self.student.profile.year_of_birth = 1977
+        self.student.profile.save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='visibility.course_certificates',
+            value='all_users',
+        ).save()
+
+        resp = self.get_response(AuthType.session, requesting_user=self.student)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        resp = self.get_response(AuthType.session, requesting_user=self.other_student)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        resp = self.get_response(AuthType.session, requesting_user=self.global_staff)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
     @ddt.data(*list(AuthType))
     def test_another_user_with_certs_shared_custom(self, auth_type):
         """
