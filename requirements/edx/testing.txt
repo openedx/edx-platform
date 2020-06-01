@@ -37,7 +37,7 @@ bok-choy==1.1.1           # via -r requirements/edx/testing.in
 boto3==1.4.8              # via -r requirements/edx/base.txt, fs-s3fs
 boto==2.39.0              # via -r requirements/edx/base.txt, django-ses, edxval, ora2
 botocore==1.8.17          # via -r requirements/edx/base.txt, boto3, s3transfer
-git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0  # via -r requirements/edx/base.txt
+bridgekeeper==0.8         # via -r requirements/edx/base.txt
 celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-celery, django-user-tasks, edx-celeryutils, edx-enterprise
 certifi==2020.4.5.1       # via -r requirements/edx/base.txt, requests
 cffi==1.14.0              # via -r requirements/edx/base.txt, cryptography
