@@ -1576,6 +1576,7 @@ MIDDLEWARE = [
 
     # Outputs monitoring metrics for a request.
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
+    'lms.djangoapps.monitoring.middleware.CodeOwnerMetricMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
 
@@ -2562,6 +2563,9 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+
+    # Monitoring utilities for LMS
+    'lms.djangoapps.monitoring.apps.MonitoringConfig'
 ]
 
 ######################### CSRF #########################################
