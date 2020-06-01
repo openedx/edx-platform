@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from organizations.models import UserOrganizationMapping
 
 from .test_utils import with_organization_context
 
@@ -44,7 +45,7 @@ class MultiTenantAMCSignupTest(APITestCase):
         assert response.status_code == status.HTTP_200_OK, '{}: {}'.format(username, response.content)
         return response
 
-    def trial_step_1_admin_user(self, color, email, username):
+    def trial_step_1_admin_user(self, color, email, username, send_organization=False):
         """
         Match the segmented trial workflow steps for AMC: Step 1 for SetPasswordView.
         """
@@ -57,6 +58,10 @@ class MultiTenantAMCSignupTest(APITestCase):
             'terms_of_service': 'True',
             'honor_code': 'True',
         }
+
+        if send_organization:
+            user_params['organization'] = color
+
         return self.client.post(self.registration_url, user_params)
 
     def trial_step_2_site_configuration(self, color, username):
@@ -114,3 +119,27 @@ class MultiTenantAMCSignupTest(APITestCase):
 
         self.register_new_amc_admin(color='blue', email=learner)
         assert mock_add_creator.call_count == 1
+
+    def test_learner_invited_for_existing_organization(self, mock_add_creator):
+        red_site = 'red1'
+        learner_email = 'learner@example.com'
+        queryset = UserOrganizationMapping.objects.filter(user__email=learner_email)
+        assert not queryset.exists(), 'Sanity check to ensure correct testing'
+
+        with with_organization_context(site_color=red_site):
+            self.register_learner(learner_email, 'learner')
+
+        mapping = UserOrganizationMapping.objects.get(user__email=learner_email)
+        assert not mapping.is_amc_admin, 'Should be just a learner'
+
+        # Perform the step after clicking the invite link in the email from the AMC.
+        # This is usually implemented in the SetPasswordView
+        response = self.trial_step_1_admin_user(
+            color=red_site,
+            email=learner_email,
+            username=mapping.user.username,
+            send_organization=True,
+        )
+        assert response.status_code == status.HTTP_200_OK, response.content
+        mapping.refresh_from_db()
+        assert mapping.is_amc_admin, 'Should now be a site admin'

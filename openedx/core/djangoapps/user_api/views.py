@@ -20,7 +20,12 @@ from six import text_type
 
 import accounts
 from django_comment_common.models import Role
-from openedx.core.djangoapps.appsembler.sites.utils import is_request_for_new_amc_site
+from openedx.core.djangoapps.appsembler.sites.utils import (
+    is_request_for_new_amc_site,
+    is_request_for_amc_admin,
+    get_current_organization,
+)
+from organizations.models import UserOrganizationMapping
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.api import (
     RegistrationFormFactory,
@@ -126,6 +131,29 @@ class RegistrationView(APIView):
 
         email = data.get('email')
         username = data.get('username')
+
+        if is_request_for_amc_admin(request) and not is_request_for_new_amc_site(request):
+            # Check for invitation for existing learner to an AMC admin.
+            current_org = get_current_organization()
+            if username and email:
+                # Being a bit defensive and requiring checking for both email and username to avoid possible
+                # account collision.
+                mapping_query = UserOrganizationMapping.objects.filter(
+                    user__email=email,
+                    user__username=username,
+                    organization=current_org,
+                )
+                if mapping_query.exists():
+                    # If the user already exists in the organization, we just
+                    # return ok. Since the user already exists, the next steps
+                    # will be to set the user as is_amc_admin=Ture and create
+                    # the OAuth tokens only.
+                    # TODO: In the AMC side, make sure to verify the user email
+                    #       before allowing to register it.
+                    mapping = mapping_query.get()
+                    mapping.is_amc_admin = True
+                    mapping.save()
+                    return JsonResponse({"success": True})
 
         # Handle duplicate email/username
         conflicts = check_account_exists(
