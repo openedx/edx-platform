@@ -17,6 +17,7 @@ from organizations import api as org_api
 from organizations import models as org_models
 from organizations.models import UserOrganizationMapping, Organization, UserSiteMapping
 
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
 from openedx.core.djangoapps.theming.models import SiteTheme
 
@@ -173,7 +174,10 @@ def is_request_for_amc_admin(request):
         # Handle all no-request and non-registration requests gracefully.
         return False
 
-    # TODO: Authenticated the request against the amc admin user or other keys via ApiKeyHeaderPermission
+    if not ApiKeyHeaderPermission().has_permission(request=request, view=None):
+        # Security: Ensure the request is coming from the AMC backend with proper `X_EDX_API_KEY` header.
+        return False
+
     param = request.POST.get('registered_from_amc', False)
     return (param == 'True') or (param == 'true') or (param is True)
 
