@@ -72,7 +72,8 @@ log = logging.getLogger(__name__)
 
 # Used by get_course_assignments below. You shouldn't need to use this type directly.
 _Assignment = namedtuple(
-    'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due']
+    'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due',
+                   'assignment_type']
 )
 
 
@@ -505,6 +506,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
         date_block.date = assignment.date
         date_block.contains_gated_content = assignment.contains_gated_content
         date_block.complete = assignment.complete
+        date_block.assignment_type = assignment.assignment_type
         date_block.past_due = assignment.past_due
         date_block.link = assignment.url
         date_block.set_title(assignment.title, link=assignment.url)
@@ -520,7 +522,8 @@ def get_course_assignments(course_key, user, request, include_access=False):
     """
     Returns a list of assignment (at the subsection/sequential level) due dates for the given course.
 
-    Each returned object is a namedtuple with fields: title, url, date, contains_gated_content, complete, past_due
+    Each returned object is a namedtuple with fields: title, url, date, contains_gated_content, complete, past_due,
+    assignment_type
     """
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
@@ -539,6 +542,8 @@ def get_course_assignments(course_key, user, request, include_access=False):
                 subsection_key, 'contains_gated_content', False)
             title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
 
+            assignment_type = block_data.get_xblock_field(subsection_key, 'format', None)
+
             url = ''
             start = block_data.get_xblock_field(subsection_key, 'start')
             assignment_released = not start or start < now
@@ -549,7 +554,7 @@ def get_course_assignments(course_key, user, request, include_access=False):
             complete = block_data.get_xblock_field(subsection_key, 'complete', False)
             past_due = not complete and due < now
             assignments.append(_Assignment(
-                subsection_key, title, url, due, contains_gated_content, complete, past_due
+                subsection_key, title, url, due, contains_gated_content, complete, past_due, assignment_type
             ))
 
     return assignments
