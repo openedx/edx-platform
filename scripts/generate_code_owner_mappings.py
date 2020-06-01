@@ -32,12 +32,22 @@ import click
 @click.command()
 @click.option(
     '--app-csv',
-    help="File name of .csv file from edx-platform App ownership sheet",
-    default='Squad-based Tech Ownership Assignment - 2020 - edx-platform Apps Ownership.csv'
+    help="File name of .csv file with edx-platform app ownership details.",
+    required=True
 )
 def main(app_csv):
     """
     Reads CSV of ownership data and outputs config.yml setting to system.out.
+
+    Expected CSV format:
+
+        Path,owner.squad\n
+        ./lms/templates/oauth2_provider,team-red\n
+        ./openedx/core/djangoapps/user_authn,team-blue\n
+        ...
+
+    Final output only includes paths which might contain views.
+
     """
     csv_data = None
     with open(app_csv, 'r') as file:
@@ -49,14 +59,17 @@ def main(app_csv):
         path = row.get('Path')
         team = row.get('owner.squad')
 
+        # add paths that may have views
         may_have_views = re.match(r'.*djangoapps', path) or re.match(r'[./]*openedx\/features', path)
+        # remove cms (studio) paths and tests
         may_have_views = may_have_views and not re.match(r'.*(\/tests\b|cms\/).*', path)
+
         if may_have_views:
             path = path.replace('./', '')  # remove ./ from beginning of path
             path = path.replace('/', '.')  # convert path to dotted module name
 
+            # skip catch-alls to ensure everything is properly mapped
             if path in ('common,djangoapps', 'lms.djangoapps', 'openedx.core.djangoapps', 'openedx.features'):
-                # skip catch-alls to ensure everything is properly mapped
                 continue
 
             if team not in team_to_paths_map:
