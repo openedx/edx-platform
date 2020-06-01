@@ -3,6 +3,7 @@ Dates Tab Views
 """
 
 
+from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -14,6 +15,7 @@ from lms.djangoapps.courseware.context_processor import user_timezone_locale_pre
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate, verified_upgrade_deadline_link
 from lms.djangoapps.course_home_api.dates.v1.serializers import DatesTabSerializer
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
 from openedx.core.djangoapps.enrollments.api import get_enrollment
 from openedx.features.course_experience.utils import dates_banner_should_display
 
@@ -58,13 +60,16 @@ class DatesTabView(RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
+        course_key = CourseKey.from_string(course_key_string)
+
+        if not course_home_mfe_dates_tab_is_active(course_key):
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_metric('course_id', course_key_string)
         monitoring_utils.set_custom_metric('user_id', request.user.id)
         monitoring_utils.set_custom_metric('is_staff', request.user.is_staff)
 
-        course_key = CourseKey.from_string(course_key_string)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         blocks = get_course_date_blocks(course, request.user, request, include_access=True, include_past_dates=True)
         display_reset_dates_text, _ = dates_banner_should_display(course_key, request)

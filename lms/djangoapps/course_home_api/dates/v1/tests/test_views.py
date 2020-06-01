@@ -9,6 +9,7 @@ from django.urls import reverse
 
 from course_modes.models import CourseMode
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
 from student.models import CourseEnrollment
 
 
@@ -22,6 +23,8 @@ class DatesTabTestViews(BaseCourseHomeTests):
         BaseCourseHomeTests.setUpClass()
         cls.url = reverse('course-home-dates-tab', args=[cls.course.id])
 
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
     def test_get_authenticated_enrolled_user(self, enrollment_mode):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
@@ -38,6 +41,8 @@ class DatesTabTestViews(BaseCourseHomeTests):
             self.assertTrue(response.data.get('learner_is_verified'))
             self.assertTrue(all(block.get('learner_has_access') for block in date_blocks))
 
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)
     def test_get_authenticated_user_not_enrolled(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -48,6 +53,8 @@ class DatesTabTestViews(BaseCourseHomeTests):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)
     def test_get_unknown_course(self):
         url = reverse('course-home-dates-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
