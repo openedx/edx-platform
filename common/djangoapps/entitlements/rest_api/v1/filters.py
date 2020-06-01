@@ -1,4 +1,6 @@
-
+"""
+Filters for the Entitlements API.
+"""
 
 from django_filters import rest_framework as filters
 
@@ -34,6 +36,7 @@ class UUIDListFilter(CharListFilter):
 
 
 class CourseEntitlementFilter(filters.FilterSet):
+    """Filter for CourseEntitlements"""
 
     uuid = UUIDListFilter()
     user = filters.CharFilter(field_name='user__username')

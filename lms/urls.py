@@ -118,7 +118,7 @@ urlpatterns = [
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
     # Entitlement API RESTful endpoints
-    url(r'^api/entitlements/', include(('entitlements.api.urls', 'common.djangoapps.entitlements'),
+    url(r'^api/entitlements/', include(('entitlements.rest_api.urls', 'common.djangoapps.entitlements'),
                                        namespace='entitlements_api')),
 
     # Courseware search endpoints
