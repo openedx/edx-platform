@@ -11,6 +11,7 @@ from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from organizations.models import Organization, UserOrganizationMapping
 from branding.api import get_base_url
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from rest_framework.views import APIView
@@ -18,7 +19,6 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
 )
-
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from openedx.core.djangoapps.appsembler.sites.permissions import AMCAdminPermission
 from openedx.core.djangoapps.appsembler.sites.serializers import (
@@ -218,6 +218,27 @@ class UsernameAvailabilityView(APIView):
             return Response(None, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(None, status=status.HTTP_404_NOT_FOUND)
+
+
+class FindUsernameByEmailView(APIView):
+    """
+    View to find username by email to be used in AMC signup workflow.
+    """
+    permission_classes = [ApiKeyHeaderPermission]
+
+    def get(self, request):
+        user_email = request.GET.get('email')
+        organization_name = request.GET.get('organization_name')
+
+        if user_email and organization_name:
+            try:
+                organization = Organization.objects.get(name=organization_name)
+                mapping = UserOrganizationMapping.objects.get(user__email=user_email, organization=organization)
+                return Response({'username': mapping.user.username}, status=status.HTTP_200_OK)
+            except (Organization.DoesNotExist, UserOrganizationMapping.DoesNotExist):
+                pass
+
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
 
 
 class DomainAvailabilityView(APIView):
