@@ -97,13 +97,14 @@ def _process_code_owner_mappings():
         }
 
     """
-    if not hasattr(settings, 'CODE_OWNER_MAPPINGS') or not settings.CODE_OWNER_MAPPINGS:
+    _CODE_OWNER_MAPPINGS = getattr(settings, 'CODE_OWNER_MAPPINGS', None)
+    if not _CODE_OWNER_MAPPINGS:
         return None
 
     try:
         path_to_code_owner_mappings = {}
-        for code_owner in settings.CODE_OWNER_MAPPINGS:
-            path_list = settings.CODE_OWNER_MAPPINGS[code_owner]
+        for code_owner in _CODE_OWNER_MAPPINGS:
+            path_list = _CODE_OWNER_MAPPINGS[code_owner]
             for path in path_list:
                 path_to_code_owner_mappings[path] = code_owner
                 optional_module_prefix_match = _OPTIONAL_MODULE_PREFIX_PATTERN.match(path)
@@ -118,6 +119,20 @@ def _process_code_owner_mappings():
         # errors should be unlikely due do scripting the setting values.
         # this will trigger an error custom metric that can be alerted on.
         return _INVALID_CODE_OWNER_MAPPING
+
+# .. toggle_name: CODE_OWNER_MAPPINGS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: None
+# .. toggle_description: Used to set monitoring custom metrics for owner. Dict with keys of code owner and value as list of dotted path module names owned by code owner.
+# .. toggle_category: monitoring
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2020-05-29
+# .. toggle_expiration_date: None
+# .. toggle_tickets: None
+# .. toggle_status: supported
+# .. toggle_warnings: None
+# Set to settings.CODE_OWNER_MAPPINGS during processing for simpler testing
+_CODE_OWNER_MAPPINGS = None
 
 # The following module prefixes are optional in a func_view's reported module:
 #   'common.djangoapps.', 'lms.djangoapps.', 'openedx.core.djangoapps.'

@@ -1,5 +1,5 @@
-Monitoring by Owner
-*******************
+Monitoring by Code Owner
+************************
 
 Status
 ======
@@ -47,4 +47,4 @@ We decided against this alternative because:
 
   * This "hack" goes against the grain of NewRelic's typical recommendations, so there could be unknown pitfalls.
   * The mapping of request path to owner would require additional maintenance.
-  * Mapping time is **not** accounted for in the transaction time.
+  * Processing time is **not** accounted for in the NewRelic transaction time, because any processing required takes place before the NewRelic transaction gets started.

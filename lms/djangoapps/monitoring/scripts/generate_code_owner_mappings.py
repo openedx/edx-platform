@@ -3,7 +3,7 @@ This script generates code owner mappings for monitoring LMS.
 
 Sample usage::
 
-    python scripts/generate_code_owner_mappings.py
+    python lms/djangoapps/monitoring/scripts/generate_code_owner_mappings.py --app-csv "edx-platform Apps Ownership.csv"
 
 Sample CSV input::
 
