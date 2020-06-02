@@ -285,11 +285,11 @@ def dates_banner_should_display(course_key, request):
                     if missed_deadlines:
                         break
                     for subsection_key in block_data.get_children(section_key):
-                        if (
+                        subsection_due_date = block_data.get_xblock_field(subsection_key, 'due', None)
+                        if subsection_due_date and (
                             not block_data.get_xblock_field(subsection_key, 'complete', False)
                             and block_data.get_xblock_field(subsection_key, 'graded', False)
-                            and block_data.get_xblock_field(
-                                subsection_key, 'due', timezone.now() + timedelta(1)) < timezone.now()
+                            and subsection_due_date < timezone.now()
                         ):
                             missed_deadlines = True
                             break
