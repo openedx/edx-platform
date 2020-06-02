@@ -42,8 +42,8 @@ jobs:
           name: "Run Quality"
           command: |
             . venv/bin/activate
-            diff-quality --compare-branch=origin/develop-multisite --violations=pylint --html-report test-results/pylint-report.html
-            diff-quality --compare-branch=origin/develop-multisite --violations=flake8 --html-report test-results/pep8-report.html
+            diff-quality --compare-branch=origin/develop-multisite --violations=pylint --fail-under=100 --html-report test-results/pylint-report.html
+            diff-quality --compare-branch=origin/develop-multisite --violations=flake8 --fail-under=100 --html-report test-results/pep8-report.html
       - store_test_results:
           path: test-results
       - store_artifacts:
