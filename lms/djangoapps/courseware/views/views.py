@@ -1627,7 +1627,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
-    from lms.urls import RENDER_XBLOCK_NAME, RESET_COURSE_DEADLINES_NAME
+    from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
     from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 
     usage_key = UsageKey.from_string(usage_key_string)
@@ -1690,6 +1690,9 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL),
             'is_mobile_app': is_request_from_mobile_app(request),
+            'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+            'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
+            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 
