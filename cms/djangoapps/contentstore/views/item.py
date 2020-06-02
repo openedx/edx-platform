@@ -1247,22 +1247,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                 else:
                     show_review_rules = True
 
-                # If this block is not currently a proctored exam,
-                # the best way for us to tell whether it was was *ever* configured
-                # as a proctored exam is by checking whether there is an exam record
-                # associated with the block's ID.
-                # If an exception is not raised, then we know that such a record
-                # exists, indicating that this *was* once a proctored exam.
-                was_ever_proctored_exam = True
-                if not xblock.is_proctored_exam:
-                    try:
-                        get_exam_by_content_id(course.id, xblock_info['id'])
-                    except ProctoredExamNotFoundException:
-                        was_ever_proctored_exam = False
-
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,
-                    'was_ever_proctored_exam': was_ever_proctored_exam,
+                    'was_ever_proctored_exam': _was_xblock_ever_proctored_exam(
+                        course, xblock
+                    ),
                     'online_proctoring_rules': rules_url,
                     'is_practice_exam': xblock.is_practice_exam,
                     'is_onboarding_exam': xblock.is_onboarding_exam,
@@ -1312,6 +1301,32 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['user_partition_info'] = get_visibility_partition_info(xblock, course=course)
 
     return xblock_info
+
+
+def _was_xblock_ever_proctored_exam(course, xblock):
+    """
+    Determine whether this XBlock is or was ever configured as a proctored exam.
+
+    If this block is *not* currently a proctored exam, the best way for us to tell
+    whether it was was *ever* configured as a proctored exam is by checking whether
+    the proctoring backend has an exam record associated with the block's ID.
+    If an exception is not raised, then we know that such a record exists,
+    indicating that this *was* once a proctored exam.
+
+    Arguments:
+        course (CourseDescriptor)
+        xblock (XBlock)
+
+    Returns: bool
+    """
+    if xblock.is_proctored_exam:
+        return True
+    try:
+        get_exam_by_content_id(course.id, xblock.location)
+    except ProctoredExamNotFoundException:
+        return False
+    else:
+        return True
 
 
 def add_container_page_publishing_info(xblock, xblock_info):
