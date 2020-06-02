@@ -31,6 +31,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from openedx.features.edly.utils import get_enabled_organizations
 from six import text_type
 
 from contentstore.course_group_config import (
@@ -546,8 +547,11 @@ def course_listing(request):
 
     optimization_enabled = GlobalStaff().has_user(request.user) and \
         WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
-
     org = request.GET.get('org', '') if optimization_enabled else None
+
+    enabled_organizations = get_enabled_organizations(request)
+    org = enabled_organizations[0].get('short_name', '') if enabled_organizations else None
+
     courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
     user = request.user
     libraries = _accessible_libraries_iter(request.user, org) if LIBRARIES_ENABLED else []
@@ -732,7 +736,7 @@ def get_courses_accessible_to_user(request, org=None):
         except AccessListFallback:
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
-            courses, in_process_course_actions = _accessible_courses_summary_iter(request)
+            courses, in_process_course_actions = _accessible_courses_summary_iter(request, org)
     return courses, in_process_course_actions
 
 
