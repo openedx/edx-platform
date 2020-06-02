@@ -53,9 +53,21 @@ class SettingsOverrideMiddleware(object):
             django_settings_override_values = current_site_configuration.get_value('DJANGO_SETTINGS_OVERRIDE', None)
             if django_settings_override_values:
                 for config_key, config_value in django_settings_override_values.items():
-                    setattr(settings, config_key, config_value)
+                    current_value = getattr(settings, config_key, None)
+                    if _should_update_config(current_value, config_value):
+                        current_value.update(config_value)
+                        setattr(settings, config_key, current_value)
+                    else:
+                        setattr(settings, config_key, config_value)
             else:
                 logger.warning('Site configuration for site (%s) has no django settings overrides.', current_site)
 
         else:
             logger.warning('Site configuration for site (%s) has no values set.', current_site)
+
+
+def _should_update_config(current_value, new_value):
+    """
+    Check if middleware should replace config value or update it.
+    """
+    return isinstance(current_value, dict) and isinstance(new_value, dict)

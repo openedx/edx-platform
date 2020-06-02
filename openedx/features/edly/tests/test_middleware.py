@@ -117,7 +117,8 @@ class SettingsOverrideMiddlewareTests(TestCase):
         self.client.login(username=self.user.username, password='test')
         self.default_settings = {key: getattr(settings, key, None) for key in [
                 'SITE_NAME', 'CMS_BASE', 'LMS_BASE', 'LMS_ROOT_URL', 'SESSION_COOKIE_DOMAIN',
-                'LOGIN_REDIRECT_WHITELIST', 'DEFAULT_FEEDBACK_EMAIL', 'CREDENTIALS_PUBLIC_SERVICE_URL'
+                'LOGIN_REDIRECT_WHITELIST', 'DEFAULT_FEEDBACK_EMAIL', 'CREDENTIALS_PUBLIC_SERVICE_URL',
+                'FEATURES',
             ]
         }
 
@@ -201,6 +202,31 @@ class SettingsOverrideMiddlewareTests(TestCase):
                 )
             )
             self._assert_settings_values(self.default_settings)
+
+    def test_settings_override_middleware_overrides_settings_correctly_if_dict(self):
+        """
+        Tests "SettingsOverrideMiddleware" correctly overrides dict django settings.
+
+        Tests if a value being overriden through the middleware is a dict value,
+        the value is being updated not replaced.
+        """
+        django_override_settings = {
+            'FEATURES': {
+                'PREVIEW_LMS_BASE': 'red.edx.devstack.lms'
+            }
+        }
+        SiteConfigurationFactory(
+            site=self.request.site,
+            values={
+                'DJANGO_SETTINGS_OVERRIDE': django_override_settings
+            }
+        )
+        self._assert_settings_values(self.default_settings)
+        self.client.get('/', follow=True)
+        self.default_settings.get(django_override_settings.keys()[0]).update(
+            django_override_settings.values()[0]
+        )
+        self._assert_settings_values(self.default_settings)
 
     def test_settings_override_middleware_overrides_settings_correctly(self):
         """
