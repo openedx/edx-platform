@@ -324,6 +324,7 @@
     "Are you having trouble finding a team to join?": "Hast Du Probleme ein Team zum Beitreten zu finden?",
     "Are you sure that you want to leave this session?": "Sind Sie sicher, dass Sie diese Sitzung verlassen m\u00f6chten?",
     "Are you sure you want to change to a different session?": "Sind Sie sicher, dass Sie zu einer anderen Sitzung wechseln m\u00f6chten?",
+    "Are you sure you want to delete the following file? It cannot be restored.\nFile: ": "Wollen Sie die folgende Datei wirklich l\u00f6schen? Sie kann nicht wiederhergestellt werden.",
     "Are you sure you want to delete this comment?": "Bist du dir sicher, dass du diesen Kommentar l\u00f6schen m\u00f6chtest?",
     "Are you sure you want to delete this page? This action cannot be undone.": "Sind Sie sicher, dass Sie diese Seite l\u00f6schen wollen? Dies kann nicht r\u00fcckg\u00e4ngig gemacht werden.",
     "Are you sure you want to delete this post?": "Bist du dir sicher, dass du diesen Beitrag l\u00f6schen m\u00f6chtest?",
