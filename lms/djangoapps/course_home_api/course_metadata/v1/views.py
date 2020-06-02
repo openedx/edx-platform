@@ -50,7 +50,6 @@ class CourseHomeMetadataView(RetrieveAPIView):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
         course = course_detail(request, request.user.username, course_key)
-
         data = {
             'course_id': course.id,
             'is_staff': has_access(request.user, 'staff', course_key).has_access,
@@ -58,6 +57,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'org': course.display_org_with_default,
             'tabs': get_course_tab_list(request.user, course),
             'title': course.display_name_with_default,
+            'is_self_paced': getattr(course, 'self_paced', False),
         }
         context = self.get_serializer_context()
         context['course'] = course

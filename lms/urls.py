@@ -963,3 +963,8 @@ urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
 urlpatterns += [
     url(r'^api/course_home/', include('lms.djangoapps.course_home_api.urls')),
 ]
+
+# Course Experience API urls
+urlpatterns += [
+    url(r'^api/course_experience/', include('openedx.features.course_experience.api.v1.urls')),
+]
