@@ -3,6 +3,7 @@ Unit tests for Middleware.
 """
 from testfixtures import LogCapture
 from django.conf import settings
+from django.contrib import auth
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 
@@ -54,17 +55,26 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
 
     def test_user_without_edly_organization_access(self):
         """
-        Verify that logged in user gets valid error and log message response if user has no access.
+        Verify that logged in user gets redirected to logout page and valid log message response if user has no access.
 
-        Test that logged in user gets 404 and valid log message if user has no access for
+        Test that logged in user gets redirected to logout page and valid log message if user has no access for
         request site's edly sub organization.
         """
 
         with LogCapture(LOGGER_NAME) as logger:
             response = self.client.get('/', follow=True)
-            assert response.status_code == 404
+            self.assertRedirects(
+                response,
+                '/logout',
+                status_code=302,
+                target_status_code=200,
+                fetch_redirect_response=True
+            )
 
-            logger.check(
+            user = auth.get_user(self.client)
+            assert not user.is_authenticated()
+
+            logger.check_present(
                 (
                     LOGGER_NAME,
                     'ERROR',
