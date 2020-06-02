@@ -13,7 +13,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import Http404, HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
@@ -51,6 +51,7 @@ from .api import (
     add_team_count,
     can_user_modify_team,
     can_user_create_team_in_topic,
+    get_assignments_for_team,
     has_course_staff_privileges,
     has_specific_team_access,
     has_specific_teamset_access,
@@ -68,6 +69,7 @@ from .serializers import (
     TopicSerializer
 )
 from .utils import emit_team_event
+from .waffle import are_team_submissions_enabled
 
 TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
@@ -210,7 +212,12 @@ class TeamsDashboardView(GenericAPIView):
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
         }
-        return render_to_response("teams/teams.html", context)
+
+        # Assignments are feature-flagged
+        if are_team_submissions_enabled(course_key):
+            context["teams_assignments_url"] = reverse('teams_assignments_list', args=['team_id'])
+
+        return render(request, "teams/teams.html", context)
 
     def _serialize_and_paginate(self, pagination_cls, queryset, request, serializer_cls, serializer_ctx):
         """
@@ -821,6 +828,87 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
                 'user_id': member.user_id
             })
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TeamsAssignmentsView(GenericAPIView):
+    """
+        **Use Cases**
+
+            Get a team's assignments
+
+        **Example Requests**:
+
+            GET /api/team/v0/teams/{team_id}/assignments
+
+        **Response Values for GET**
+
+            If the user is logged in, the response is an array of the following data strcuture:
+
+                * display_name: The name of the assignment to display (currently the Unit title)
+
+                * location: The jump link to a specific assignments
+
+            For all text fields, clients rendering the values should take care
+            to HTML escape them to avoid script injections, as the data is
+            stored exactly as specified. The intention is that plain text is
+            supported, not HTML.
+
+            If team assignments are not enabled for course, a 503 is returned.
+
+            If the user is not logged in, a 401 error is returned.
+
+            If the user is unenrolled or does not have API access, a 403 error is returned.
+
+            If the supplied course/team is bad or the user is not permitted to
+            search in a protected team, a 404 error is returned as if the team does not exist.
+
+    """
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsEnrolledOrIsStaff,
+        HasSpecificTeamAccess,
+        IsStaffOrPrivilegedOrReadOnly,
+    )
+
+    def get(self, request, team_id):
+        """GET v0/teams/{team_id_pattern}/assignments"""
+        course_team = get_object_or_404(CourseTeam, team_id=team_id)
+        user = request.user
+        course_id = course_team.course_id
+
+        if not are_team_submissions_enabled(course_id):
+            return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        if not has_team_api_access(request.user, course_id):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        if not has_specific_team_access(user, course_team):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        teamset_ora_blocks = get_assignments_for_team(user, course_team)
+
+        # Serialize info for display
+        assignments = [{
+            'display_name': self._display_name_for_ora_block(block),
+            'location': self._jump_location_for_block(course_id, block.location)
+        } for block in teamset_ora_blocks]
+
+        return Response(assignments)
+
+    def _display_name_for_ora_block(self, block):
+        """ Get the unit name where the ORA is located for better display naming """
+        unit = modulestore().get_item(block.parent)
+        section = modulestore().get_item(unit.parent)
+
+        return "{section}: {unit}".format(
+            section=section.display_name,
+            unit=unit.display_name
+        )
+
+    def _jump_location_for_block(self, course_id, location):
+        """ Get the URL for jumping to a designated XBlock in a course """
+        return reverse('jump_to', kwargs={'course_id': str(course_id), 'location': str(location)})
 
 
 class TopicListView(GenericAPIView):

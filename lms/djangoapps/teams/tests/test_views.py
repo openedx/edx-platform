@@ -34,7 +34,7 @@ from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
@@ -645,6 +645,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             'patch',
             json.dumps(data) if data else None,
             'application/merge-patch+json',
+            **kwargs
+        )
+
+    def get_team_assignments(self, team_id, expected_status=200, **kwargs):
+        """ Get the open response assessments assigned to a team """
+        return self.make_call(
+            reverse('teams_assignments_list', args=[team_id]),
+            expected_status,
             **kwargs
         )
 
@@ -1568,6 +1576,100 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         )
         if expected_status == 200:
             self.assertEqual(team['name'], 'foo')
+
+
+@patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': True})
+@ddt.ddt
+class TestTeamAssignmentsView(TeamAPITestCase):
+    """ Tests for the TeamAssignmentsView """
+
+    @classmethod
+    def setUpClass(cls):
+        """ Create an openassessment block for testing """
+        super().setUpClass()
+
+        course = cls.test_course_1
+        teamset_id = cls.solar_team.topic_id
+        other_teamset_id = cls.wind_team.topic_id
+
+        section = ItemFactory.create(
+            parent=course,
+            category='chapter',
+            display_name='Test Section'
+        )
+        subsection = ItemFactory.create(
+            parent=section,
+            category="sequential"
+        )
+        unit_1 = ItemFactory.create(
+            parent=subsection,
+            category="vertical"
+        )
+        open_assessment = ItemFactory.create(
+            parent=unit_1,
+            category="openassessment",
+            teams_enabled=True,
+            selected_teamset_id=teamset_id
+        )
+        unit_2 = ItemFactory.create(
+            parent=subsection,
+            category="vertical"
+        )
+        off_team_open_assessment = ItemFactory.create(  # pylint: disable=unused-variable
+            parent=unit_2,
+            category="openassessment",
+            teams_enabled=True,
+            selected_teamset_id=other_teamset_id
+        )
+
+        cls.team_assignments = [open_assessment]
+
+    @ddt.unpack
+    @ddt.data(
+        (None, 401),
+        ('student_inactive', 401),
+        ('student_unenrolled', 403),
+        ('student_on_team_2_private_set_1', 404),
+        ('student_enrolled', 200),
+        ('staff', 200),
+        ('course_staff', 200),
+        ('community_ta', 200),
+    )
+    def test_get_assignments(self, user, expected_status):
+        # Given a course with team-enabled open responses
+        team_id = self.solar_team.team_id
+
+        # When I get the assignments for a team
+        assignments = self.get_team_assignments(team_id, expected_status, user=user)
+
+        if expected_status == 200:
+            # I successful, I get back the assignments for a team
+            self.assertEqual(len(assignments), len(self.team_assignments))
+
+            # ... with the right data structure
+            for assignment in assignments:
+                self.assertIn('display_name', assignment.keys())
+                self.assertIn('location', assignment.keys())
+
+    def test_get_assignments_bad_team(self):
+        # Given a bad team is supplied
+        user = 'student_enrolled'
+        team_id = 'bogus-team'
+
+        # When I run the query, I get back a 404 error
+        expected_status = 404
+        self.get_team_assignments(team_id, expected_status, user=user)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': False})
+    def test_get_assignments_feature_not_enabled(self):
+        # Given the team submissions feature is not enabled
+        user = 'student_enrolled'
+        team_id = self.solar_team.team_id
+
+        # When I try to get assignments
+        # Then I get back a 503 error
+        expected_status = 503
+        self.get_team_assignments(team_id, expected_status, user=user)
 
 
 @ddt.ddt
