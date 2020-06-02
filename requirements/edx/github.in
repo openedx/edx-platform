@@ -81,7 +81,7 @@ git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef793
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@2.7.7#egg=ora2==2.7.7
+git+https://github.com/edx/edx-ora2.git@v2.7.10#egg=ora2==v2.7.10
 git+https://github.com/edx/crowdsourcehinter.git@2178ac72891392106ffef389651aef374177d294#egg=crowdsourcehinter-xblock==0.4
 -e git+https://github.com/edx/RateXBlock.git@2.0#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@2.0.2#egg=done-xblock
