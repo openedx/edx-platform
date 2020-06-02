@@ -7,7 +7,7 @@ Pending
 
 Context
 =======
-The LMS in edx-platform has a limited understanding of the structure and content of programs, as they are stored authoritatively in the Discovery service's SQL database. However, certain features of the LMS, such as displaying a learner’s programs on their dashboard, require access to the programs’ data. To fulfill this need, the LMS has the JSON responses from Discovery’s /api/v1/programs endpoint stored in memcached. The LMS uses the cache to understand what program or programs a course (run) is in. The contents of the cache are exposed through the openedx.core.djangoapps.catalog app. This system is what we are referring to when we say the programs cache” or simply “the cache”.
+The LMS in edx-platform has a limited understanding of the structure and content of programs, as they are stored authoritatively in the Discovery service's SQL database. However, certain features of the LMS, such as displaying a learner’s programs on their dashboard, require access to the programs’ data. To fulfill this need, the LMS has the JSON responses from Discovery’s /api/v1/programs endpoint stored in memcached. The LMS uses the cache to understand what program or programs a course (run) is in. The contents of the cache are exposed through the ``openedx.core.djangoapps.catalog`` app. This system is what we are referring to when we say "the programs cache” or simply “the cache”.
 
 This cache is populated by calling LMS’s cache_programs management command.
 The cache is regularly refreshed via an external process.
@@ -26,7 +26,7 @@ Below is a (not-necessarily-exhaustive) list of features that depend on the prog
 Issues
 ======
 Correctness & Resiliency
-========================
+------------------------
 
 Because the cache is held in volatile memory, any crash or restart of the server holding the programs cache can surface these issues. While the cache_programs command can be run immediately afterwards, this is not a foolproof solution:
 
