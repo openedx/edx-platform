@@ -31,15 +31,10 @@ class DatesTabTestViews(BaseCourseHomeTests):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
-        # Pulling out the date blocks to check learner has access. The Verification Deadline Date
-        # should not be accessible to the audit learner, but accessible to the verified learner.
+        # Pulling out the date blocks to check learner has access.
         date_blocks = response.data.get('course_date_blocks')
-        if enrollment_mode == CourseMode.AUDIT:
-            self.assertFalse(response.data.get('learner_is_verified'))
-            self.assertTrue(any(block.get('learner_has_access') is False for block in date_blocks))
-        else:
-            self.assertTrue(response.data.get('learner_is_verified'))
-            self.assertTrue(all(block.get('learner_has_access') for block in date_blocks))
+        self.assertEqual(response.data.get('learner_is_verified'), enrollment_mode == CourseMode.VERIFIED)
+        self.assertTrue(all(block.get('learner_has_access') for block in date_blocks))
 
     @COURSE_HOME_MICROFRONTEND.override(active=True)
     @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)

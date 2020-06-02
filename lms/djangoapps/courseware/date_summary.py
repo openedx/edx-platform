@@ -20,6 +20,7 @@ from lazy import lazy
 from pytz import utc
 
 from course_modes.models import CourseMode, get_cosmetic_verified_display_price
+from lms.djangoapps.certificates.api import get_active_web_certificate
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -140,6 +141,19 @@ class DateSummary(object):
             absolute='{date}',
         )
 
+    @lazy
+    def is_allowed(self):
+        """
+        Whether or not this summary block is applicable or active for its course.
+
+        For example, a DateSummary might only make sense for a self-paced course, and
+        you could restrict it here.
+
+        You should not make time-sensitive checks here. That sort of thing belongs in
+        is_enabled.
+        """
+        return True
+
     @property
     def is_enabled(self):
         """
@@ -148,9 +162,10 @@ class DateSummary(object):
         By default, the summary is only shown if its date is in the
         future.
         """
-        if self.date is not None:
-            return self.current_time.date() <= self.date.date()
-        return False
+        return (
+            self.date is not None and
+            self.current_time.date() <= self.date.date()
+        )
 
     def deadline_has_passed(self):
         """
@@ -294,10 +309,7 @@ class CourseEndDate(DateSummary):
     """
     css_class = 'end-date'
     title = ugettext_lazy('Course End')
-
-    @property
-    def is_enabled(self):
-        return self.date is not None
+    is_enabled = True
 
     @property
     def description(self):
@@ -432,6 +444,10 @@ class CourseExpiredDate(DateSummary):
     def title(self):
         return _('Audit Access Expires')
 
+    @lazy
+    def is_allowed(self):
+        return RELATIVE_DATES_FLAG.is_enabled(self.course.id)
+
 
 class CertificateAvailableDate(DateSummary):
     """
@@ -440,21 +456,12 @@ class CertificateAvailableDate(DateSummary):
     css_class = 'certificate-available-date'
     title = ugettext_lazy('Certificate Available')
 
-    @property
-    def active_certificates(self):
-        return [
-            certificate for certificate in self.course.certificates.get('certificates', [])
-            if certificate.get('is_active', False)
-        ]
-
-    @property
-    def is_enabled(self):
+    @lazy
+    def is_allowed(self):
         return (
             can_show_certificate_available_date_field(self.course) and
             self.has_certificate_modes and
-            self.date is not None and
-            self.current_time <= self.date and
-            len(self.active_certificates) > 0
+            get_active_web_certificate(self.course)
         )
 
     @property
@@ -519,18 +526,8 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
     def enrollment(self):
         return CourseEnrollment.get_enrollment(self.user, self.course_id)
 
-    @property
-    def is_enabled(self):
-        """
-        Whether or not this summary block should be shown.
-
-        By default, the summary is only shown if it has date and the date is in the
-        future and the user's enrollment is in upsell modes
-        """
-        is_enabled = super(VerifiedUpgradeDeadlineDate, self).is_enabled
-        if not is_enabled:
-            return False
-
+    @lazy
+    def is_allowed(self):
         return can_show_verified_upgrade(self.user, self.enrollment, self.course)
 
     @lazy
@@ -627,6 +624,7 @@ class VerificationDeadlineDate(DateSummary):
     Displays the date by which the user must complete the verification
     process.
     """
+    is_enabled = True
 
     @property
     def css_class(self):
@@ -685,13 +683,13 @@ class VerificationDeadlineDate(DateSummary):
         return 'verification-deadline-date'
 
     @lazy
-    def is_enabled(self):
-        if self.date is None:
-            return False
-        (mode, is_active) = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
-        if is_active and mode == 'verified':
-            return self.verification_status in ('expired', 'none', 'must_reverify')
-        return False
+    def is_allowed(self):
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
+        return (
+            is_active and
+            mode == 'verified' and
+            self.verification_status in ('expired', 'none', 'must_reverify')
+        )
 
     @lazy
     def verification_status(self):
