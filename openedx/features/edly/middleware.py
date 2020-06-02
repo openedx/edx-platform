@@ -2,9 +2,12 @@
 Edly Organization Access Middleware.
 """
 from logging import getLogger
+
 from django.conf import settings
+from django.contrib.auth import logout
 from django.contrib.sites.shortcuts import get_current_site
-from django.http import Http404
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.edly.utils import user_has_edly_organization_access
@@ -26,7 +29,8 @@ class EdlyOrganizationAccessMiddleware(object):
         user_is_superuser = request.user.is_superuser
         if user_is_authenticated and not user_is_superuser and not user_has_edly_organization_access(request):
             logger.exception('Edly user %s has no access for site %s.' % (request.user.email, request.site))
-            raise Http404()
+            logout(request)
+            return HttpResponseRedirect(reverse('logout'))
 
 
 class SettingsOverrideMiddleware(object):
