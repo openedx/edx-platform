@@ -31,7 +31,9 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
         protocol = 'https'
     else:
         protocol = 'http'
-    insights_base_url = settings.ANALYTICS_DASHBOARD_URL
+    insights_base_url = ''
+    if settings.ANALYTICS_DASHBOARD_URL:
+        insights_base_url = settings.ANALYTICS_DASHBOARD_URL + '/courses'
     studio_base_url = ''
     if settings.CMS_BASE:
         studio_base_url = protocol + '://' + settings.CMS_BASE
