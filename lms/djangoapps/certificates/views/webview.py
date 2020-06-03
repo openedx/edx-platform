@@ -571,6 +571,7 @@ def render_html_view(request, user_id, course_id):
 
         _update_context_with_basic_info(context, course_id, platform_name, configuration)
 
+        context['platform_name'] = platform_name
         context['certificate_data'] = active_configuration
 
         # Append/Override the existing view context values with any mode-specific ConfigurationModel values
