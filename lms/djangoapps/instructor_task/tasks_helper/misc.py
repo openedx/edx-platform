@@ -282,7 +282,10 @@ def ora2_data_with_deanonymized_usernames(header, rows):
     ``Username`` column, which contains deanonymized usernames.
     """
 
-    anonymized_id_index = header.index("Anonymized Student ID")
+    try:
+        anonymized_id_index = header.index("Anonymized Student ID")
+    except ValueError:
+        return header, rows
 
     anonymized_ids = {row[anonymized_id_index] for row in rows}
     users = (
