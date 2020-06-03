@@ -25,7 +25,6 @@ from waffle.models import Switch
 from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.urls import RESET_COURSE_DEADLINES_NAME
 from gating import api as lms_gating_api
@@ -34,7 +33,6 @@ from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_experience.views.course_outline import (
     DEFAULT_COMPLETION_TRACKING_START,
     CourseOutlineFragmentView
@@ -172,29 +170,20 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
 
     @RELATIVE_DATES_FLAG.override(active=True)
     @ddt.data(
-        ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, True),
-        ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, False, True),
-        ([CourseMode.AUDIT, CourseMode.VERIFIED, CourseMode.MASTERS], CourseMode.MASTERS, False, True),
-        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, False, True),
-        ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, False),
+        (CourseMode.AUDIT, False, True),
+        (CourseMode.VERIFIED, False, True),
+        (CourseMode.MASTERS, False, False),
+        (CourseMode.VERIFIED, True, False),
     )
     @ddt.unpack
     def test_reset_course_deadlines_banner_shows_for_self_paced_course(
         self,
-        course_modes,
         enrollment_mode,
         is_course_staff,
         should_display
     ):
-        ContentTypeGatingConfig.objects.create(
-            enabled=True,
-            enabled_as_of=datetime.datetime(2018, 1, 1),
-        )
         course = self.courses[0]
-        for mode in course_modes:
-            CourseModeFactory.create(course_id=course.id, mode_slug=mode)
-
-        enrollment = CourseEnrollment.objects.get(course_id=course.id, user=self.user)
+        enrollment = CourseEnrollment.objects.get(course_id=course.id)
         enrollment.mode = enrollment_mode
         enrollment.save()
         self.user.is_staff = is_course_staff
