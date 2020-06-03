@@ -1,5 +1,5 @@
 """
-Tests to ensure the Tahoe Registration API end-point allow multi-tenant emails.
+Tests to ensure the Tahoe Registration API end-point allows multi-tenant emails.
 """
 
 from mock import patch
