@@ -31,7 +31,7 @@ regex==2020.5.14          # via -r requirements/edx-sandbox/shared.txt, nltk
 scipy==1.2.1              # via -r requirements/edx-sandbox/py35.in, calc, chem
 six==1.15.0               # via -r requirements/edx-sandbox/shared.txt, calc, cryptography, cycler, matplotlib, python-dateutil
 sympy==1.4                # via -r requirements/edx-sandbox/py35.in, symmath
-tqdm==4.46.0              # via -r requirements/edx-sandbox/shared.txt, nltk
+tqdm==4.46.1              # via -r requirements/edx-sandbox/shared.txt, nltk
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
