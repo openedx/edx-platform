@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 import django.core.validators
 from django.db import migrations, models
-import functools
 import openedx.features.idea.helpers
 import openedx.features.philu_utils.backend_storage
 
@@ -24,12 +23,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='idea',
             name='file',
-            field=models.FileField(blank=True, help_text='Accepted extensions: .docx, .pdf, .txt (maximum 4 MB)', null=True, storage=openedx.features.philu_utils.backend_storage.CustomS3Storage(), upload_to=functools.partial(openedx.features.idea.helpers.upload_to_path, *(), **{b'folder': 'files'}), validators=[django.core.validators.FileExtensionValidator(['docx', 'pdf', 'txt'])], verbose_name='ADD FILE'),
+            field=models.FileField(blank=True, help_text='Accepted extensions: .docx, .pdf, .txt (maximum 4 MB)', null=True, storage=openedx.features.philu_utils.backend_storage.CustomS3Storage(), validators=[django.core.validators.FileExtensionValidator(['docx', 'pdf', 'txt'])], verbose_name='ADD FILE'),
         ),
         migrations.AlterField(
             model_name='idea',
             name='image',
-            field=models.ImageField(blank=True, help_text='Accepted extensions: .jpg, .png (maximum 2 MB)', null=True, storage=openedx.features.philu_utils.backend_storage.CustomS3Storage(), upload_to=functools.partial(openedx.features.idea.helpers.upload_to_path, *(), **{b'folder': 'images'}), validators=[django.core.validators.FileExtensionValidator(['jpg', 'png'])], verbose_name='ADD IMAGE'),
+            field=models.ImageField(blank=True, help_text='Accepted extensions: .jpg, .png (maximum 2 MB)', null=True, storage=openedx.features.philu_utils.backend_storage.CustomS3Storage(), validators=[django.core.validators.FileExtensionValidator(['jpg', 'png'])], verbose_name='ADD IMAGE'),
         ),
         migrations.AlterField(
             model_name='idea',

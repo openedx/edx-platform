@@ -9,16 +9,17 @@ from openedx.core.lib.api.test_utils import ApiTestCase
 from openedx.features.partners.constants import PARTNER_USER_STATUS_WAITING
 from openedx.features.partners.models import PartnerUser
 from openedx.features.partners.tests.factories import FocusAreaFactory, OrganizationFactory, PartnerFactory
+from openedx.features.philu_utils.tests.mixins import PhiluThemeMixin
 
 
 @ddt
-class PartnerRegistrationViewTest(ApiTestCase):
+class PartnerRegistrationViewTest(PhiluThemeMixin, ApiTestCase):
     """
     Includes test cases for partner registration
     """
 
     NAME = 'bob23 james'
-    COUNTRY = 'Pakistan'
+    COUNTRY = 'PK'
     ORGANIZATION = 'arbisoft'
     EMAIL = 'bob@example.com'
     USERNAME = 'bob123'

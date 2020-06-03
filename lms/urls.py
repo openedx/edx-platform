@@ -74,6 +74,9 @@ handler404 = render_404
 handler500 = static_template_view_views.render_500
 
 urlpatterns = [
+
+    url(r'^', include('waffle.urls')),
+
     # URL for home page
     url(r'', include('homepage.urls', namespace='homepage')),
 

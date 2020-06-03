@@ -2,7 +2,7 @@
   "all_required_form_fields": [
     {
       "idea-organization_name": "org 100",
-      "idea-country_name": "Pakistan",
+      "idea-country": "Pakistan",
       "idea-city": "Lahore",
       "idea-organization_mission": "dummy mission",
       "idea-title": "dummy title",

@@ -57,7 +57,7 @@ class CreateIdeaViewTest(PhiluThemeMixin, MockS3Mixin, TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNone(form_data.initial.get('city'))
-        self.assertIsNone(form_data.initial.get('country_name'))
+        self.assertIsNone(form_data.initial.get('country'))
         self.assertIsNone(form_data.initial.get('organization_name'))
         self.assertEqual(form_data.initial.get('user'), self.user)
 
@@ -113,7 +113,7 @@ class CreateIdeaPreFilledViewTest(PhiluThemeMixin, MockS3Mixin, TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(form_data.initial.get('city'), self.user.profile.city)
-        self.assertEqual(form_data.initial.get('country_name'), COUNTRIES.get(self.user.profile.country))
+        self.assertEqual(form_data.initial.get('country'), self.user.profile.country)
         self.assertEqual(form_data.initial.get('organization_name'), self.user.extended_profile.organization.label)
         self.assertEqual(form_data.initial.get('user'), self.user)
 

@@ -7,7 +7,6 @@ import django.core.validators
 from django.db import migrations, models
 import django.db.models.deletion
 import django_countries.fields
-import functools
 import openedx.custom.db.fields
 import openedx.features.idea.helpers
 
@@ -29,8 +28,8 @@ class Migration(migrations.Migration):
                 ('country', django_countries.fields.CountryField(max_length=2)),
                 ('city', models.CharField(max_length=255)),
                 ('video_link', models.URLField(blank=True, null=True)),
-                ('image', models.ImageField(blank=True, help_text='Accepted extensions: .jpg, .png', null=True, upload_to=functools.partial(openedx.features.idea.helpers.upload_to_path, *(), **{b'folder': 'images'}), validators=[django.core.validators.FileExtensionValidator(['jpg', 'png'])])),
-                ('file', models.FileField(blank=True, help_text='Accepted extensions: .docx, .pdf, .txt', null=True, upload_to=functools.partial(openedx.features.idea.helpers.upload_to_path, *(), **{b'folder': 'files'}), validators=[django.core.validators.FileExtensionValidator(['docx', 'pdf', 'txt'])])),
+                ('image', models.ImageField(blank=True, help_text='Accepted extensions: .jpg, .png', null=True, validators=[django.core.validators.FileExtensionValidator(['jpg', 'png'])])),
+                ('file', models.FileField(blank=True, help_text='Accepted extensions: .docx, .pdf, .txt', null=True, validators=[django.core.validators.FileExtensionValidator(['docx', 'pdf', 'txt'])])),
                 ('organization_mission', models.TextField()),
                 ('organization_sector', openedx.custom.db.fields.MultiSelectWithOtherField(choices=[(b'health-and-well-being', 'Health & Well-being'), (b'education', 'Education'), (b'gender-equality', 'Gender Equality'), (b'sanitation', 'Sanitation'), (b'climate-changes', 'Climate Change'), (b'clean-energy', 'Clean Energy'), (b'environmental-conservation', 'Environmental Conservation'), (b'work-and-economic-growth', 'Work & Economic Growth'), (b'human-rights', 'Human Rights'), (b'social-justice', 'Social Justice'), (b'art-and-culture', 'Art & Culture'), (b'other', b'Other')], help_text='Please select all that apply.', max_length=233, verbose_name='Which sector is your organization working in?')),
                 ('organizational_problems', openedx.custom.db.fields.MultiSelectWithOtherField(choices=[(b'healthcare-supplies', 'Healthcare Supplies'), (b'remote-working-tools', 'Remote Working Tools'), (b'online-training', 'Online Training'), (b'delivery-services', 'Delivery Services'), (b'mentorship', 'Mentorship'), (b'funding', 'Funding'), (b'human-resources', 'Human Resources'), (b'other', b'Other')], help_text='What are the areas that your organizaiton is currently facing a challenge in?  Please select all that apply.', max_length=159, verbose_name='Current Organizational Problems')),

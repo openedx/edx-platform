@@ -2,18 +2,12 @@ from django.core.validators import ValidationError
 from django.test import TestCase
 from mock import Mock
 
-from openedx.features.idea.helpers import upload_to_path, validate_image_dimensions
-from openedx.features.idea.models import Idea
+from openedx.features.idea.helpers import validate_image_dimensions
 
 from ..constants import IDEA_IMAGE_HEIGHT, IDEA_IMAGE_WIDTH
 
 
 class IdeaHelpersTest(TestCase):
-
-    def test_upload_to_path(self):
-        """Assert that file upload path is in specific format i.e. app_label/folder/filename"""
-        expected_result = upload_to_path(Idea, 'my_file.jpg', 'images')
-        self.assertEqual(expected_result, 'idea/images/my_file.jpg')
 
     def test_validate_image_dimensions_success(self):
         """Test valid image dimension"""

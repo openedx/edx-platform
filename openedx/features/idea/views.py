@@ -2,16 +2,17 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding.helpers import COUNTRIES
+from openedx.features.user_leads.helpers import save_user_utm
 
 from .forms import IdeaCreationForm
 from .models import Idea
@@ -32,6 +33,11 @@ class IdeaListingView(ListView):
     ordering = ['-created']
     template_engine = 'mako'
 
+    def get_queryset(self):
+        queryset = super(IdeaListingView, self).get_queryset()
+        save_user_utm(self.request)
+        return queryset
+
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class IdeaCreateView(LoginRequiredMixin, CreateView):
@@ -48,7 +54,7 @@ class IdeaCreateView(LoginRequiredMixin, CreateView):
         if user_organization:
             initial['organization_name'] = user_organization.label
 
-        initial['country_name'] = COUNTRIES.get(user.profile.country)
+        initial['country'] = user.profile.country
         initial['city'] = user.profile.city
         initial['user'] = user.profile.user
 
