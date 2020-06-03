@@ -173,6 +173,9 @@ if STATIC_URL_BASE:
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
 
+# Allow overriding build profile used by RequireJS with one
+# contained on a custom theme
+REQUIRE_BUILD_PROFILE = ENV_TOKENS.get('REQUIRE_BUILD_PROFILE', REQUIRE_BUILD_PROFILE)
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text
 # values when the varibale is an empty string. Therefore, setting these variable as empty text in related
