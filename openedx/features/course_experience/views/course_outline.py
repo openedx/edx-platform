@@ -31,7 +31,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.models import CourseEnrollment
 from util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -97,18 +96,17 @@ class CourseOutlineFragmentView(EdxFragmentView):
         reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME)
         reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME
 
+        course_enrollment = None
+        if not request.user.is_anonymous:
+            course_enrollment = CourseEnrollment.objects.filter(course=course_overview, user=request.user).filter(
+                Q(mode=CourseMode.AUDIT) | Q(mode=CourseMode.VERIFIED)).first()
+
         context['reset_deadlines_url'] = reset_deadlines_url
         context['reset_deadlines_redirect_url_base'] = reset_deadlines_redirect_url_base
         context['reset_deadlines_redirect_url_id_dict'] = {'course_id': str(course.id)}
-        context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course)
-        context['on_course_outline_page'] = True
-        context['content_type_gating_enabled'] = ContentTypeGatingConfig.enabled_for_enrollment(
-            user=request.user,
-            course_key=course_key
-        )
-        # We use javascript to check whether to actually display this banner, so we let the banner assume
-        # that deadlines have been missed.
-        context['missed_deadlines'] = True
+        context['enrollment_mode'] = getattr(course_enrollment, 'mode', None)
+        context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course),
+        context['on_course_outline_page'] = True,
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)

@@ -96,6 +96,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         ``enabled_as_of`` before the enrollment was created.
 
         Arguments:
+            enrollment: The enrollment being queried.
             user: The user being queried.
             course_key: The CourseKey of the course being queried.
         """
