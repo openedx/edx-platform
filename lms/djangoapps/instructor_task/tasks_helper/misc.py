@@ -16,6 +16,7 @@ import six
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.files.storage import DefaultStorage
+from django.db.models import F
 from openassessment.data import OraAggregateData
 from pytz import UTC
 
@@ -275,6 +276,39 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     return task_progress.update_task_state(extra_meta=current_step)
 
 
+def ora2_data_with_deanonymized_usernames(header, rows):
+    """
+    Accepts ORA submissions data in CSV format and returns new data with
+    ``Username`` column, which contains deanonymized usernames.
+    """
+
+    anonymized_id_index = header.index("Anonymized Student ID")
+
+    anonymized_ids = {row[anonymized_id_index] for row in rows}
+    users = (
+        User.objects.filter(anonymoususerid__anonymous_user_id__in=anonymized_ids)
+        .annotate(anonymous_id=F("anonymoususerid__anonymous_user_id"))
+        .values("username", "anonymous_id")
+    )
+
+    anonymous_id_to_username_mapping = {
+        user["anonymous_id"]: user["username"] for user in users
+    }
+
+    new_header = (
+        header[:anonymized_id_index] + ["Username"] + header[anonymized_id_index:]
+    )
+    new_rows = [
+        row[:anonymized_id_index]
+        + [anonymous_id_to_username_mapping.get(row[anonymized_id_index], "")]
+        + row[anonymized_id_index:]
+        for row in rows
+    ]
+
+    return new_header, new_rows
+
+
+
 def upload_ora2_data(
         _xmodule_instance_args, _entry_id, course_id, _task_input, action_name
 ):
@@ -312,12 +346,34 @@ def upload_ora2_data(
 
     try:
         header, datarows = OraAggregateData.collect_ora2_data(course_id)
-        rows = [header] + [row for row in datarows]
     # Update progress to failed regardless of error type
     except Exception:  # pylint: disable=broad-except
         TASK_LOG.exception('Failed to get ORA data.')
         task_progress.failed = 1
         curr_step = {'step': "Error while collecting data"}
+
+        task_progress.update_task_state(extra_meta=curr_step)
+
+        return UPDATE_STATUS_FAILED
+
+
+    curr_step = {'step': "Deanonymizing ORA data"}
+    TASK_LOG.info(
+        u'%s, Task type: %s, Current step: %s for all submissions',
+        task_info_string,
+        action_name,
+        curr_step,
+    )
+    task_progress.update_task_state(extra_meta=curr_step)
+
+    # We perform this step here because don't want to modify ORA runtime
+    try:
+        header, datarows = ora2_data_with_deanonymized_usernames(header, datarows)
+        rows = [header] + [row for row in datarows]
+    except Exception:  # pylint: disable=broad-except
+        TASK_LOG.exception('Failed to deanonymize ORA data.')
+        task_progress.failed = 1
+        curr_step = {'step': "Error while processing data"}
 
         task_progress.update_task_state(extra_meta=curr_step)
 
