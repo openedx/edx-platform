@@ -311,7 +311,17 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 xblockInfo: this.model,
                 xblockType: this.options.xblockType,
                 enable_proctored_exam: this.options.enable_proctored_exams,
-                enable_timed_exam: this.options.enable_timed_exams
+                enable_timed_exam: this.options.enable_timed_exams,
+                is_special_exam: xblockInfo.get('is_time_limited'),
+                is_proctored_exam: xblockInfo.get('is_proctored_exam'),
+                is_practice_exam: xblockInfo.get('is_practice_exam'),
+                is_onboarding_exam: xblockInfo.get('is_onboarding_exam'),
+                is_timed_exam: is_special_exam && !(
+                    is_proctored_exam || is_practice_exam || is_onboarding_exam
+                ),
+                special_exam_locked_in: (
+                    xblockInfo.get('released_to_students') && xblockInfo.get('was_ever_special_exam')
+                )
             }, this.getContext()));
 
             HtmlUtils.setHtml(this.$el, HtmlUtils.HTML(html));
