@@ -2565,7 +2565,10 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
 
     # Monitoring utilities for LMS
-    'lms.djangoapps.monitoring.apps.MonitoringConfig'
+    'lms.djangoapps.monitoring.apps.MonitoringConfig',
+
+    # Learning Sequence Navigation
+    'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 ]
 
 ######################### CSRF #########################################
