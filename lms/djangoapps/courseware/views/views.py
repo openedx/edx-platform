@@ -1053,10 +1053,7 @@ def dates(request, course_id):
     course_date_blocks = get_course_date_blocks(course, request.user, request,
                                                 include_access=True, include_past_dates=True)
 
-    learner_is_verified = False
-    enrollment = get_enrollment(request.user.username, course_id)
-    if enrollment:
-        learner_is_verified = enrollment.get('mode') == 'verified'
+    learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(request.user, course_key)
 
     # User locale settings
     user_timezone_locale = user_timezone_locale_prefs(request)
@@ -1069,7 +1066,7 @@ def dates(request, course_id):
         'course': course,
         'course_date_blocks': course_date_blocks,
         'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
-        'learner_is_verified': learner_is_verified,
+        'learner_is_full_access': learner_is_full_access,
         'user_timezone': user_timezone,
         'user_language': user_language,
         'supports_preview_menu': True,
