@@ -2784,9 +2784,8 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                 self.assertEqual(response, UPDATE_STATUS_FAILED)
 
     def test_report_stores_results(self):
-        with freeze_time('2001-01-01 00:00:00'):
-            test_header = ['field1', 'field2']
-            test_rows = [['row1_field1', 'row1_field2'], ['row2_field1', 'row2_field2']]
+        test_header = ['field1', 'field2']
+        test_rows = [['row1_field1', 'row1_field2'], ['row2_field1', 'row2_field2']]
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
@@ -2798,9 +2797,11 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                 with patch(
                     'lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store_rows'
                 ) as mock_store_rows:
-                    return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
+                    with freeze_time('2001-01-01 00:00:00'):
+                        return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
 
-                    timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
+                        timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
+
                     course_id_string = quote(text_type(self.course.id).replace('/', '_'))
                     filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
 
