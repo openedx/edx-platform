@@ -72,7 +72,7 @@ class DatesTabView(RetrieveAPIView):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         blocks = get_course_date_blocks(course, request.user, request, include_access=True, include_past_dates=True)
-        display_reset_dates_text, _ = dates_banner_should_display(course_key, request)
+        display_reset_dates_text = dates_banner_should_display(course_key, request)
 
         learner_is_verified = False
         enrollment = get_enrollment(request.user.username, course_key_string)
