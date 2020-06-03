@@ -437,7 +437,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
         schedules = self.get_schedules()
         for (user, language, context, is_self_paced) in schedules:
             msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
-            msg_type.personalize(
+            msg = msg_type.personalize(
                 Recipient(
                     user.username,
                     self.override_recipient_email or user.email,
@@ -451,9 +451,8 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
                     self.course_id
                 )
             )
-            # TODO: Uncomment below when going live
-            # with function_trace('enqueue_send_task'):
-            #     self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
+            with function_trace('enqueue_send_task'):
+                self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
 
     def get_schedules(self):
         course_key = CourseKey.from_string(self.course_id)
