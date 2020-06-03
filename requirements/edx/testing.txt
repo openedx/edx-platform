@@ -187,9 +187,9 @@ mongoengine==0.10.0       # via -r requirements/edx/base.txt
 more-itertools==8.3.0     # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, pytest, zipp
 mpmath==1.1.0             # via -r requirements/edx/base.txt, sympy
 mysqlclient==1.4.6        # via -r requirements/edx/base.txt
-newrelic==5.12.1.141      # via -r requirements/edx/base.txt, edx-django-utils
+newrelic==5.14.0.142      # via -r requirements/edx/base.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/base.txt, chem
-nodeenv==1.3.5            # via -r requirements/edx/base.txt
+nodeenv==1.4.0            # via -r requirements/edx/base.txt
 numpy==1.18.4             # via -r requirements/edx/base.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/base.txt
@@ -270,7 +270,7 @@ singledispatch==3.4.0.3   # via -r requirements/edx/testing.in
 six==1.15.0               # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, analytics-python, astroid, bleach, bok-choy, cryptography, diff-cover, django-appconf, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, libsass, mando, mock, openedx-calc, packaging, pathlib2, paver, pycontracts, pyjwkest, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 social-auth-core==3.3.3   # via -r requirements/edx/base.txt, social-auth-app-django
-git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail  # via -r requirements/edx/base.txt
+sorl-thumbnail==12.6.3    # via -r requirements/edx/base.txt
 sortedcontainers==2.1.0   # via -r requirements/edx/base.txt, pdfminer.six
 soupsieve==2.0.1          # via -r requirements/edx/base.txt, beautifulsoup4
 sqlparse==0.3.1           # via -r requirements/edx/base.txt, django
@@ -294,7 +294,7 @@ user-util==0.2            # via -r requirements/edx/base.txt
 virtualenv==20.0.21       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.2          # via -r requirements/edx/base.txt
-wcwidth==0.2.2            # via pytest
+wcwidth==0.2.3            # via pytest
 web-fragments==0.3.2      # via -r requirements/edx/base.txt, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via -r requirements/edx/base.txt, bleach, html5lib
 webob==1.8.6              # via -r requirements/edx/base.txt, xblock, xmodule
