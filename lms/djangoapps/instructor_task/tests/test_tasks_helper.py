@@ -57,6 +57,7 @@ from lms.djangoapps.instructor_task.tasks_helper.grades import (
 )
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
+    ora2_data_with_deanonymized_usernames,
     upload_course_survey_report,
     upload_ora2_data
 )
@@ -82,7 +83,13 @@ from shoppingcart.models import (
     Order,
     PaidCourseRegistration
 )
-from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
+from student.models import (
+    ALLOWEDTOENROLL_TO_ENROLLED,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    ManualEnrollmentAudit,
+    unique_id_for_user
+)
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore import ModuleStoreEnum
@@ -2766,10 +2773,30 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
         self.current_task = Mock()
         self.current_task.update_state = Mock()
 
+        self.student1 = UserFactory()
+        self.student2 = UserFactory()
+
     def tearDown(self):
         super(TestInstructorOra2Report, self).tearDown()
         if os.path.exists(settings.GRADES_DOWNLOAD['ROOT_PATH']):
             shutil.rmtree(settings.GRADES_DOWNLOAD['ROOT_PATH'])
+
+    def test_report_deanonymize_helper(self):
+        student1_anonymized_id = unique_id_for_user(self.student1)
+        student2_anonymized_id = unique_id_for_user(self.student2)
+
+        test_header = ['Submission ID', 'Item ID', 'Anonymized Student ID', 'Date/Time Response Submitted']
+        test_rows = [
+            ['submission_id', '2', student1_anonymized_id, str(datetime.now(UTC))],
+            ['submission_id', '1', student2_anonymized_id, str(datetime.now(UTC))],
+        ]
+
+        new_header, new_rows = ora2_data_with_deanonymized_usernames(test_header, test_rows)
+
+        username_index = new_header.index("Username")
+
+        assert new_rows[0][username_index] == self.student1.username
+        assert new_rows[1][username_index] == self.student2.username
 
     def test_report_fails_if_error(self):
         with patch(
