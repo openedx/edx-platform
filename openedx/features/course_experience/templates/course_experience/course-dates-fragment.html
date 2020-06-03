@@ -13,6 +13,9 @@ from django.utils.translation import ugettext as _
     % for course_date_block in course_date_blocks:
         <%include file="dates-summary.html" args="course_date=course_date_block" />
     % endfor
+    <div class="dates-tab-link">
+        <a href="${dates_tab_link}">View all course dates</a>
+    </div>
 % endif
 
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">

@@ -5,6 +5,7 @@ Fragment for rendering the course dates sidebar.
 
 from django.http import Http404
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.translation import get_language_bidi
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
@@ -25,10 +26,11 @@ class CourseDatesFragmentView(EdxFragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
-        course_date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=2)
+        course_date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
 
         context = {
-            'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime']
+            'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime'],
+            'dates_tab_link': reverse('dates', args=[course.id]),
         }
         html = render_to_string(self.template_name, context)
         dates_fragment = Fragment(html)
