@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
-import openedx.custom.db.fields
+import openedx.features.custom_fields.multiselect_with_other.db.fields
 
 
 class Migration(migrations.Migration):
@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='marketplacerequest',
             name='user_services',
-            field=openedx.custom.db.fields.MultiSelectWithOtherField(choices=[(b'healthcare-supplies', 'Healthcare Supplies'), (b'people-power', 'People Power'), (b'online-training', 'Online Training'), (b'delivery-services', 'Delivery Services'), (b'mentorship', 'Mentorship'), (b'funding', 'Funding'), (b'other', b'Other')], help_text='Please select all that apply.', max_length=135, verbose_name='What help can you provide to other organizations?'),
+            field=openedx.features.custom_fields.multiselect_with_other.db.fields.MultiSelectWithOtherField(choices=[(b'healthcare-supplies', 'Healthcare Supplies'), (b'people-power', 'People Power'), (b'online-training', 'Online Training'), (b'delivery-services', 'Delivery Services'), (b'mentorship', 'Mentorship'), (b'funding', 'Funding'), (b'other', b'Other')], help_text='Please select all that apply.', max_length=135, verbose_name='What help can you provide to other organizations?'),
         ),
     ]

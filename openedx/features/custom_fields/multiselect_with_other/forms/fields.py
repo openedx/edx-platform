@@ -2,26 +2,28 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectFormField
 
-from openedx.custom.helpers import add_other_field_in_choices, get_other_values
-from openedx.custom.forms.widgets import CheckboxSelectMultipleWithOther
+from openedx.features.custom_fields.multiselect_with_other.helpers import add_other_field_in_choices, get_other_values
+from openedx.features.custom_fields.multiselect_with_other.forms.widgets import CheckboxSelectMultipleWithOther, RadioSelectWithOther
 
 
 class MultiSelectWithOtherFormField(MultiSelectFormField):
     """
     Form field class to handle other text input field within the multiselect field
     """
-    widget = CheckboxSelectMultipleWithOther
 
     def __init__(self, other_max_length=None, *args, **kwargs):
         if kwargs.get('choices'):
             kwargs['choices'] = add_other_field_in_choices(kwargs['choices'])
+
+        self.widget = RadioSelectWithOther if kwargs.get('max_choices') == 1 else CheckboxSelectMultipleWithOther
 
         super(MultiSelectWithOtherFormField, self).__init__(*args, **kwargs)
 
         self.other_max_length = other_max_length
         self.error_messages.update(
             dict(invalid_length=_(
-                'Other field value, maximum allowed length violation. Allowed limit is upto {other_max_length} characters.').format(
+                'Other field value, maximum allowed length violation. Allowed limit is upto {other_max_length}'
+                ' characters.').format(
                 other_max_length=other_max_length)))
 
     def valid_value(self, value):

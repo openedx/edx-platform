@@ -1,0 +1,20 @@
+<label>
+    <input class="other_choice" type="{{ widget.type }}" name="{{ widget.name }}"
+           onclick=document.querySelector('.other_text[name={{ widget.name }}]').disabled=!this.checked;
+            {%  if widget.selected %}
+                checked
+            {% endif %}
+            {% if widget.value != None %}
+                value="{{ widget.value|stringformat:'s' }}"
+            {% endif %}
+    >
+    Other:
+    <input class="other_text" type="text" name="{{ widget.name }}"
+            {% if not widget.selected %}
+                disabled
+            {% endif %}
+            {% if widget.value != None %}
+                value="{{ widget.value|stringformat:'s' }}"
+            {% endif %}
+    >
+</label>
