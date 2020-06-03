@@ -381,7 +381,7 @@
                     var topic = options.topic,
                         collection = options.collection,
                         myTopicTeamsCollection = new TeamCollection(
-                            this.context.userInfo.teams,
+                            [],
                             {
                                 teamEvents: this.teamEvents,
                                 course_id: this.context.courseID,
