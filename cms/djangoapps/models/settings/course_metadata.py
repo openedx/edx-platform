@@ -3,10 +3,12 @@ Django module for Course Metadata class -- manages advanced settings and related
 """
 
 
+from datetime import datetime
 import six
 from crum import get_current_user
 from django.conf import settings
 from django.utils.translation import ugettext as _
+import pytz
 from six import text_type
 from xblock.fields import Scope
 
@@ -245,6 +247,20 @@ class CourseMetadata(object):
             except (TypeError, ValueError) as err:
                 did_validate = False
                 errors.append({'message': text_type(err), 'model': model})
+
+        # Disallow updates to the proctoring provider after course start
+        proctoring_provider_model = filtered_dict.get('proctoring_provider')
+        if (
+            not user.is_staff and
+            proctoring_provider_model != descriptor.proctoring_provider and
+            datetime.now(pytz.UTC) > descriptor.start
+        ):
+            did_validate = False
+            message = (
+                'The proctoring provider cannot be modified after a course has started.'
+                ' Contact support for assistance'
+            )
+            errors.append({'message': message, 'model': filtered_dict.get('proctoring_provider')})
 
         # If did validate, go ahead and update the metadata
         if did_validate:
