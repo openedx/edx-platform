@@ -6,6 +6,7 @@ from openedx.core.djangoapps.appsembler.sites.api import (
     CustomDomainView,
     DomainAvailabilityView,
     DomainSwitchView,
+    FindUsernameByEmailView,
     HostFilesView,
     FileUploadView,
     SiteConfigurationViewSet,
@@ -24,6 +25,7 @@ router.register(r'sites', SiteViewSet)
 urlpatterns = [
     url(r'^upload_file/', FileUploadView.as_view()),
     url(r'^username/{}/'.format(settings.USERNAME_PATTERN), UsernameAvailabilityView.as_view()),
+    url(r'^find_username_by_email/', FindUsernameByEmailView.as_view(), name='tahoe_find_username_by_email'),
     url(r'^domain/(?P<subdomain>[\w.@+-]+)/', DomainAvailabilityView.as_view()),
     url(r'^custom_domain/', CustomDomainView.as_view()),
     url(r'^domain_switch/', DomainSwitchView.as_view()),
