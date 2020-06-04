@@ -64,6 +64,7 @@ from courseware.models import (
 )
 from enrollment.api import _default_course_mode
 
+from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
@@ -250,21 +251,23 @@ def is_email_retired(email):
     return User.objects.filter(email__in=list(locally_hashed_emails)).exists()
 
 
-def email_exists_or_retired(email):
+def email_exists_or_retired(email, check_for_new_site=False):
     """
     Check an email against the User model for existence.
     """
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
-        # TODO: Refactor into `get_current_organization` helper.
-        current_site = get_current_site()
-        if current_site.id == settings.SITE_ID:
-            raise NotImplementedError('email_exists_or_retired expecting multi-tenant site')
-        # Using `get` is expected to fail when multiple-orgs found for a site
-        # TODO: Handle both MultipleObjectsReturned and DoesNotExist in a better way
-        current_org = current_site.organizations.get()
-        return current_org.userorganizationmapping_set.filter(user__email=email).exists() or is_email_retired(email)
+        if check_for_new_site:
+            exists = User.objects.filter(
+                email=email,
+                userorganizationmapping__isnull=True,  # Allow learners to signup for trial site, but ensure the trial
+                                                       # workflow is completed.
+            ).exists()
+        else:
+            current_org = get_current_organization()
+            exists = current_org.userorganizationmapping_set.filter(user__email=email).exists()
     else:
-        return User.objects.filter(email=email).exists() or is_email_retired(email)
+        exists = User.objects.filter(email=email).exists()
+    return exists or is_email_retired(email)
 
 
 def get_retired_username_by_username(username):

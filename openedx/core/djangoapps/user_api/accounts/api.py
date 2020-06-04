@@ -346,7 +346,7 @@ def create_account(username, password, email):
     return registration.activation_key
 
 
-def check_account_exists(username=None, email=None):
+def check_account_exists(username=None, email=None, check_for_new_site=False):
     """Check whether an account with a particular username or email already exists.
 
     Keyword Arguments:
@@ -366,7 +366,7 @@ def check_account_exists(username=None, email=None):
     conflicts = []
 
     try:
-        _validate_email_doesnt_exist(email)
+        _validate_email_doesnt_exist(email, check_for_new_site)
     except errors.AccountEmailAlreadyExists:
         conflicts.append("email")
     try:
@@ -687,14 +687,14 @@ def _validate_username_doesnt_exist(username):
         raise errors.AccountUsernameAlreadyExists(_(accounts.USERNAME_CONFLICT_MSG).format(username=username))
 
 
-def _validate_email_doesnt_exist(email):
+def _validate_email_doesnt_exist(email, check_for_new_site=False):
     """Validate that the email is not associated with an existing user.
 
     :param email: The proposed email (unicode).
     :return: None
     :raises: errors.AccountEmailAlreadyExists
     """
-    if email is not None and email_exists_or_retired(email):
+    if email is not None and email_exists_or_retired(email, check_for_new_site):
         raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))
 
 

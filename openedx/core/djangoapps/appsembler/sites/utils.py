@@ -13,11 +13,11 @@ from django.db.models.query import Q
 from provider.oauth2.models import AccessToken, RefreshToken, Client
 from django.utils.text import slugify
 
-from organizations.api import add_organization
 from organizations import api as org_api
 from organizations import models as org_models
 from organizations.models import UserOrganizationMapping, Organization, UserSiteMapping
 
+from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 
@@ -165,6 +165,79 @@ def to_safe_file_name(url):
     return sluggified
 
 
+def is_request_for_amc_admin(request):
+    """
+    Verifies the user is being made on behalf of AMC admin.
+    """
+    if not request or not request.method == 'POST':
+        # Handle all no-request and non-registration requests gracefully.
+        return False
+
+    # TODO: Authenticated the request against the amc admin user or other keys via ApiKeyHeaderPermission
+    param = request.POST.get('registered_from_amc', False)
+    return (param == 'True') or (param == 'true') or (param is True)
+
+
+def get_current_organization(failure_return_none=False):
+    """
+    Get current organization from request using multiple strategies.
+    """
+    request = get_current_request()
+    organization_name = None
+    current_org = None
+
+    if request:
+        organization_name = request.POST.get('organization')
+    elif not failure_return_none:
+        raise Exception('get_current_organization: No request was found. Unable to get current organization.')
+
+    if is_request_for_amc_admin(request) and organization_name:
+        # This might raise DoesNotExist, it means that we are calling in a wrong way. So we should check
+        # if `is_request_for_new_amc_site()` first instead of calling this function.
+        try:
+            current_org = Organization.objects.get(name=organization_name)
+        except Organization.DoesNotExist:
+            if not failure_return_none:
+                raise  # Re-raise the exception
+    else:
+        current_site = get_current_site()
+        if current_site:
+            if current_site.id == settings.SITE_ID:
+                if not failure_return_none:
+                    raise NotImplementedError(
+                        'get_current_organization: Cannot get organization of main site. Please use '
+                        '`is_request_for_new_amc_site()` first'
+                    )
+            else:
+                try:
+                    # TODO: Using `get` is expected to fail when multiple-orgs found for a site.
+                    #       Maybe catch MultipleObjectsReturned?
+                    current_org = current_site.organizations.get()
+                except Organization.DoesNotExist:
+                    if not failure_return_none:
+                        raise  # Re-raise the exception
+        else:
+            if not failure_return_none:
+                raise Exception('get_current_organization: Cannot get current site.')
+
+    return current_org
+
+
+def is_request_for_new_amc_site(request):
+    """
+    Check if request is being made for a new AMC signup.
+
+    This helper returns True only for newly created site but not for AMC invited admin.
+    """
+    if not request or not request.method == 'POST':
+        # Handle all no-request contexts and non-registration requests gracefully.
+        return False
+
+    is_for_admin = is_request_for_amc_admin(request)
+    invitation_organization_name = request.POST.get('organization')
+    return is_for_admin and not invitation_organization_name
+
+
 def get_customer_files_storage():
     kwargs = {}
     # Passing these settings to the FileSystemStorage causes an exception
@@ -278,7 +351,7 @@ def json_to_sass(json_input):
     return dict_to_sass(sass_dict)
 
 
-def bootstrap_site(site, org_data=None, user_email=None):
+def bootstrap_site(site, org_data=None, username=None):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     organization_slug = org_data.get('name')
     # don't use create because we need to call save() to set some values automatically
@@ -298,8 +371,8 @@ def bootstrap_site(site, org_data=None, user_email=None):
         site_config.save()
     else:
         organization = {}
-    if user_email:
-        user = User.objects.get(email=user_email)
+    if username:
+        user = User.objects.get(username=username)
         org_models.UserOrganizationMapping.objects.create(user=user, organization=organization, is_amc_admin=True)
     else:
         user = {}
@@ -311,6 +384,19 @@ def delete_site(site):
     site.themes.all().delete()
 
     site.delete()
+
+
+def add_course_creator_role(user):
+    """
+    Allow users registered from AMC to create courses.
+
+    This will fail in when running tests from within the AMC because the CMS migrations
+    don't run during tests. Patch this function to avoid such errors.
+    """
+    from cms.djangoapps.course_creators.models import CourseCreator  # Fix LMS->CMS imports.
+    from student.roles import CourseAccessRole, CourseCreatorRole  # Avoid circular import.
+    CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
+    CourseAccessRole.objects.create(user=user, role=CourseCreatorRole.ROLE, course_id=None, org='')
 
 
 def migrate_page_element(element):

@@ -20,6 +20,7 @@ from six import text_type
 
 import accounts
 from django_comment_common.models import Role
+from openedx.core.djangoapps.appsembler.sites.utils import is_request_for_new_amc_site
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.api import (
     RegistrationFormFactory,
@@ -127,7 +128,12 @@ class RegistrationView(APIView):
         username = data.get('username')
 
         # Handle duplicate email/username
-        conflicts = check_account_exists(email=email, username=username)
+        conflicts = check_account_exists(
+            email=email,
+            username=username,
+            check_for_new_site=is_request_for_new_amc_site(request),
+        )
+
         if conflicts:
             conflict_messages = {
                 "email": accounts.EMAIL_CONFLICT_MSG.format(email_address=email),
