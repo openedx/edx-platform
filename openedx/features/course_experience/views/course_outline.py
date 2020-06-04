@@ -107,6 +107,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
         context['on_course_outline_page'] = True
         context['missed_deadlines'] = missed_deadlines
         context['missed_gated_content'] = missed_gated_content
+        context['is_archived'] = course.end < datetime.now()
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
