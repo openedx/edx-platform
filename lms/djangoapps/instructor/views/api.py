@@ -3560,11 +3560,9 @@ def _return_csv_response(filename, header, rows):
     writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
     # In practice, there should not be non-ascii data in this query,
     # but trying to do the right thing anyway.
-    encoded = [text_type(s).encode('utf-8') for s in header]
-    writer.writerow(encoded)
+    writer.writerow([s for s in header])
     for row in rows:
-        encoded = [text_type(s).encode('utf-8') for s in row]
-        writer.writerow(encoded)
+        writer.writerow([s for s in row])
     return response
 
 
