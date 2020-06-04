@@ -84,7 +84,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
         xblock_display_names = self.create_xblock_id_and_name_dict(course_block_tree)
         gated_content = self.get_content_milestones(request, course_key)
 
-        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request)
+        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         context['gated_content'] = gated_content
         context['xblock_display_names'] = xblock_display_names

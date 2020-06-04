@@ -73,7 +73,7 @@ class DatesTabView(RetrieveAPIView):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         blocks = get_course_date_blocks(course, request.user, request, include_access=True, include_past_dates=True)
-        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request)
+        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(
             user=request.user,

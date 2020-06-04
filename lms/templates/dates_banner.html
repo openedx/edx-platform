@@ -96,7 +96,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
 % if on_dates_tab and content_type_gating_enabled and not missed_deadlines:
     ${upgrade_to_complete_graded_banner()}
 % elif missed_deadlines:
-    % if content_type_gating_enabled and missed_gated_content:
+    % if missed_gated_content:
         ${upgrade_to_reset_banner()}
     % else:
         ${reset_dates_banner()}

@@ -32,6 +32,7 @@ from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -58,11 +59,16 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
     """
     Test the course outline view.
     """
+
+    ENABLED_SIGNALS = ['course_published']
+
     @classmethod
     def setUpClass(cls):
         """
         Set up an array of various courses to be tested.
         """
+        SelfPacedRelativeDatesConfig.objects.create(enabled=True)
+
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
         # pylint: disable=super-method-not-called
         with super(TestCourseOutlinePage, cls).setUpClassAndTestData():
@@ -207,7 +213,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
     ):
         ContentTypeGatingConfig.objects.create(
             enabled=True,
-            enabled_as_of=datetime.datetime(2018, 1, 1),
+            enabled_as_of=datetime.datetime(2017, 1, 1),
         )
         course = self.courses[0]
         for mode in course_modes:
@@ -229,17 +235,13 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         else:
             self.assertNotContains(response, '<div class="dates-banner-text"')
 
+    @RELATIVE_DATES_FLAG.override(active=True)
     def test_reset_course_deadlines(self):
         course = self.courses[0]
         enrollment = CourseEnrollment.objects.get(course_id=course.id)
         enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=30)
         enrollment.schedule.save()
         post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
-        self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
-        updated_schedule = Schedule.objects.get(enrollment=enrollment)
-        self.assertEqual(updated_schedule.start_date.date(), datetime.datetime.today().date())
-
-    def test_reset_course_deadlines_masquerade_specific_student(self):
         course = self.courses[0]
 
         student_schedule = CourseEnrollment.objects.get(course_id=course.id, user=self.user).schedule
@@ -247,7 +249,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         student_schedule.save()
         staff = StaffFactory(course_key=course.id)
         staff_schedule = ScheduleFactory(
-            start_date=timezone.now() - datetime.timedelta(1),
+            start_date=timezone.now() - datetime.timedelta(days=30),
             enrollment__course__id=course.id,
             enrollment__user=staff,
         )
@@ -274,6 +276,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
         self.assertEqual(updated_staff_schedule.start_date, staff_schedule.start_date)
 
+    @RELATIVE_DATES_FLAG.override(active=True)
     def test_reset_course_deadlines_masquerade_generic_student(self):
         course = self.courses[0]
 
@@ -283,7 +286,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
 
         staff = StaffFactory(course_key=course.id)
         staff_schedule = ScheduleFactory(
-            start_date=timezone.now() - datetime.timedelta(1),
+            start_date=timezone.now() - datetime.timedelta(days=30),
             enrollment__course__id=course.id,
             enrollment__user=staff,
         )
@@ -308,7 +311,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         updated_student_schedule = Schedule.objects.get(id=student_schedule.id)
         self.assertEqual(updated_student_schedule.start_date, student_schedule.start_date)
         updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
-        self.assertEqual(updated_staff_schedule.start_date.date(), datetime.datetime.today().date())
+        self.assertEqual(updated_staff_schedule.start_date.date(), datetime.date.today())
 
 
 class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
