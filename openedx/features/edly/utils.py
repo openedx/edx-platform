@@ -123,10 +123,27 @@ def create_user_link_with_edly_sub_organization(request, user):
         object: EdlyUserProfile object.
 
     """
-    # User registration is possible only on LMS so we only get edly sub org for LMS site
-    edly_sub_org = request.site.edly_sub_org_for_lms
+    try:
+        edly_sub_org = request.site.edly_sub_org_for_lms
+    except EdlySubOrganization.DoesNotExist:
+        edly_sub_org = request.site.edly_sub_org_for_studio
     edly_user_profile, __ = EdlyUserProfile.objects.get_or_create(user=user)
     edly_user_profile.edly_sub_organizations.add(edly_sub_org)
     edly_user_profile.save()
 
     return edly_user_profile
+
+
+def update_course_creator_status(request_user, user, set_creator):
+    """
+    Updates course creator status of a user.
+    """
+    from course_creators.models import CourseCreator
+    try:
+        course_creator, _ = CourseCreator.objects.get_or_create(user=user)
+        course_creator.state = CourseCreator.GRANTED if set_creator else CourseCreator.DENIED
+        course_creator.note = 'Course creator user was updated by panel admin {}'.format(request_user.username)
+        course_creator.admin = request_user
+        course_creator.save()
+    except CourseCreator.DoesNotExist:
+        LOGGER.info('User %s has no course creator.', user)

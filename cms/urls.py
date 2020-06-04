@@ -176,6 +176,9 @@ urlpatterns = [
     url(r'^api/val/v0/', include('edxval.urls')),
     url(r'^api/tasks/v0/', include('user_tasks.urls')),
     url(r'^accessibility$', contentstore.views.accessibility, name='accessibility'),
+
+    # Include edly panel app URL's
+    url(r'^api/edly_panel/', include('edly_panel_app.api.urls', namespace='edly_panel_api')),
 ]
 
 JS_INFO_DICT = {

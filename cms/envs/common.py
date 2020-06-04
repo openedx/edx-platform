@@ -483,6 +483,12 @@ MIDDLEWARE_CLASSES = [
 
     'crum.CurrentRequestUserMiddleware',
 
+    # CORS and CSRF
+    'corsheaders.middleware.CorsMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringMemoryMiddleware',
@@ -555,10 +561,35 @@ MIDDLEWARE_CLASSES = [
 ]
 
 # Edly Configuration
+ADMIN_CONFIGURATION_USERS_GROUP = 'Admin Configuration Users'
+EDLY_PANEL_USERS_GROUP = 'Edly Panel Users'
+EDLY_PANEL_ADMIN_USERS_GROUP = 'Edly Panel Admin Users'
+EDLY_PANEL_RESTRICTED_USERS_GROUP = 'Edly Panel Restricted Users'
+EDLY_WP_ADMIN_USERS_GROUP = 'WordPress Edly Admin Users'
+EDLY_WP_SUBSCRIBER_USERS_GROUP = 'WordPress Subscriber Users'
+
+
+EDLY_USER_ROLES = {
+    'panel_restricted': EDLY_PANEL_RESTRICTED_USERS_GROUP,
+    'panel_user': EDLY_PANEL_USERS_GROUP,
+    'panel_admin': EDLY_PANEL_ADMIN_USERS_GROUP,
+    'subscriber': EDLY_WP_SUBSCRIBER_USERS_GROUP,
+    'edly_admin': EDLY_WP_ADMIN_USERS_GROUP
+}
+
 ENABLE_EDLY_ORGANIZATIONS_SWITCH = 'enable_edly_organizations'
 EDLY_USER_INFO_COOKIE_NAME = 'edly-user-info'
 EDLY_COOKIE_SECRET_KEY = 'EDLY-COOKIE-SECRET-KEY'
 EDLY_JWT_ALGORITHM = 'HS256'
+
+# CORS CONFIG
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_INSECURE = True
+CORS_ORIGIN_WHITELIST = (
+    'http://panel.dev.edly.com',
+    'http://panel.backend.dev.edly.com',
+)
 
 # Clickjacking protection can be disabled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
@@ -1009,6 +1040,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'djcelery',
     'method_override',
+    'corsheaders',
+    'openedx.core.djangoapps.cors_csrf',
 
     # Common Initialization
     'openedx.core.djangoapps.common_initialization.apps.CommonInitializationConfig',
@@ -1192,6 +1225,7 @@ INSTALLED_APPS = [
 
     # Edly apps
     'openedx.features.edly',
+    'edly_panel_app',
 ]
 
 

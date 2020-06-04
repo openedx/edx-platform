@@ -3,6 +3,8 @@ from django.conf import settings
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.features.edly.models import EdlySubOrganization
 from openedx.features.edly.utils import encode_edly_user_info_cookie
+from student import auth
+from student.roles import CourseCreatorRole
 
 
 def set_logged_in_edly_cookies(request, response, user):
@@ -61,7 +63,11 @@ def _get_edly_user_info_cookie_string(request):
         edly_user_info_cookie_data = {
             'edly-org': edly_sub_organization.edly_organization.slug,
             'edly-sub-org': edly_sub_organization.slug,
-            'edx-org': edly_sub_organization.edx_organization.short_name
+            'edx-org': edly_sub_organization.edx_organization.short_name,
+            'is_course_creator': auth.user_has_role(
+                request.user,
+                CourseCreatorRole()
+            ) if getattr(request, 'user', None) else False,
         }
         return encode_edly_user_info_cookie(edly_user_info_cookie_data)
     except EdlySubOrganization.DoesNotExist:

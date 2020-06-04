@@ -7,6 +7,8 @@ from django.test import RequestFactory, TestCase
 
 from openedx.features.edly.tests.factories import SiteFactory, EdlySubOrganizationFactory
 from openedx.features.edly import cookies as cookies_api
+from student import auth
+from student.roles import CourseCreatorRole
 from student.tests.factories import UserFactory
 
 
@@ -48,7 +50,8 @@ class CookieTests(TestCase):
             {
                 'edly-org': edly_sub_organization.edly_organization.slug,
                 'edly-sub-org': edly_sub_organization.slug,
-                'edx-org': edly_sub_organization.edx_organization.short_name
+                'edx-org': edly_sub_organization.edx_organization.short_name,
+                'is_course_creator': auth.user_has_role(self.request.user, CourseCreatorRole()),
             },
             settings.EDLY_COOKIE_SECRET_KEY,
             algorithm=settings.EDLY_JWT_ALGORITHM
