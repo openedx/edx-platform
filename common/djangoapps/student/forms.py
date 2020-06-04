@@ -19,10 +19,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from openedx.core.djangoapps.appsembler.sites.utils import is_request_for_new_amc_site
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import get_current_site
+from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.message_types import PasswordReset
@@ -299,7 +300,8 @@ class AccountCreationForm(forms.Form):
                 # reject the registration.
                 if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
                     raise ValidationError(_("Unauthorized email address."))
-        if email_exists_or_retired(email):
+
+        if email_exists_or_retired(email, check_for_new_site=is_request_for_new_amc_site(get_current_request())):
             raise ValidationError(
                 _(
                     "It looks like {email} belongs to an existing account. Try again with a different email address."

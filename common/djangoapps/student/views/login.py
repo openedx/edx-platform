@@ -44,6 +44,7 @@ import third_party_auth
 from django_comment_common.models import assign_role
 from edxmako.shortcuts import render_to_response, render_to_string
 from eventtracking import tracker
+from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
 from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
@@ -162,13 +163,10 @@ def _get_user_by_email(request):
     email = request.POST['email']
 
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
-        # In this case database-level email constrain is removed, so the search is done at the organization
+        # In this case database-level email constraint is removed, so the search is done at the organization
         # level.
         try:
-            current_site = get_current_site(request)
-            if current_site.id == settings.SITE_ID:
-                raise NotImplementedError('APPSEMBLER_MULTI_TENANT_EMAILS: Cannot login user to the main site.')
-            current_org = current_site.organizations.get()
+            current_org = get_current_organization()
             return current_org.userorganizationmapping_set.get(user__email=email).user
         except UserOrganizationMapping.DoesNotExist:
             _log_failed_get_user_by_email(email)

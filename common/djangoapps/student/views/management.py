@@ -58,6 +58,13 @@ from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import (
     get_programs_with_type,
 )
+from openedx.core.djangoapps.appsembler.sites.utils import (
+    get_current_organization,
+    is_request_for_amc_admin,
+    is_request_for_new_amc_site,
+    add_course_creator_role,
+)
+from openedx.core.djangoapps.theming.helpers import get_current_request
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.external_auth.login_and_register import register as external_auth_register
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -98,7 +105,6 @@ from student.models import (
     create_comments_service_user,
     email_exists_or_retired,
 )
-from student.roles import CourseAccessRole, CourseCreatorRole
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from student.text_me_the_app import TextMeTheAppFragmentView
@@ -719,13 +725,8 @@ def create_account_with_params(request, params):
         django_login(request, new_user)
         request.session.set_expiry(0)
 
-        # APPSEMBLER SPECIFIC
-        # allow users registered from AMC to create courses
-        if 'registered_from_amc' in params:
-            from cms.djangoapps.course_creators.models import CourseCreator
-            CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
-            CourseAccessRole.objects.create(user=user, role=CourseCreatorRole.ROLE, course_id=None, org='')
-        # APPSEMBLER SPECIFIC END
+        if is_request_for_amc_admin(request):  # Appsembler specific
+            add_course_creator_role(user)
 
         if do_external_auth:
             eamap.user = new_user
@@ -813,25 +814,19 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
-    # APPSEMBLER SPECIFIC
-    organization_name = params.get('organization')
-    organization = None
-    # organization name is passed during signup when invited through AMC,
-    # otherwise it's a regular signup on a microsite
-    if organization_name:
-        try:
-            organization = Organization.objects.get(name=organization_name)
-        except:
-            pass
-    elif hasattr(request, 'site'):
-        organization = request.site.organizations.first()
-
-    is_amc_admin = "registered_from_amc" in params
-
-    if organization:
-        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_amc_admin=is_amc_admin)
-
-    # APPSEMBLER SPECIFIC END
+    if not is_request_for_new_amc_site(request):
+        # When _new_ trial is requested, we register the user first, then the
+        # Organization and SiteConfiguration.
+        # So UserOrganizationMapping for new AMC admin sites is deferred later
+        # until `bootstrap_site()` is called.
+        # Tech Debt: This is a weird logic in my opinion that we should simplify into a single API call -- Omar
+        current_org = get_current_organization(failure_return_none=True)
+        if current_org:
+            UserOrganizationMapping.objects.get_or_create(
+                user=user,
+                organization=current_org,
+                is_amc_admin=is_request_for_amc_admin(request),
+            )
 
     try:
         record_registration_attributions(request, new_user)
@@ -906,7 +901,7 @@ def skip_activation_email(user, do_external_auth, running_pipeline, third_party_
         (not params.get('send_activation_email', True)) or  # Appsembler: for Tahoe Registration API
         (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth) or
         (third_party_provider and third_party_provider.skip_email_verification and valid_email) or
-        params.get('registered_from_amc', False)  # Appsembler: No need for activation email for active AMC users
+        is_request_for_amc_admin(get_current_request())  # Appsembler: Skip activation email for _active_ AMC admin
     )
 
 
@@ -1371,10 +1366,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         }
 
         if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
-            current_site = theming_helpers.get_current_site()
-            if current_site.id == settings.SITE_ID:
-                raise NotImplementedError('APPSEMBLER_MULTI_TENANT_EMAILS: Cannot login user to the main site.')
-            current_org = current_site.organizations.get()
+            current_org = get_current_organization()
             email_exists = len(current_org.userorganizationmapping_set.filter(user__email=pec.new_email)) != 0
         else:
             email_exists = len(User.objects.filter(email=pec.new_email)) != 0
