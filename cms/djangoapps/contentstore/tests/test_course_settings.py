@@ -1210,8 +1210,8 @@ class CourseMetadataEditingTest(CourseTestCase):
     @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_does_not_allow_proctoring_provider_changes_after_course_start(self, staff_user):
         """
-        Test the proctoring provder field can not be modified after the course start date.
-        Only staff users may update the provider if the course has started.
+        Course staff cannot modify proctoring provder after the course start date.
+        Only admin users may update the provider if the course has started.
         """
         field_name = "proctoring_provider"
         course = CourseFactory.create(start=datetime.datetime.now(UTC) - datetime.timedelta(days=1))
