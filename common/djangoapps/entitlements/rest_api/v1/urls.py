@@ -1,4 +1,6 @@
-
+"""
+URLs for the V1 of the Entitlements API.
+"""
 
 from django.conf.urls import include, url
 from rest_framework.routers import DefaultRouter

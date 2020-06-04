@@ -1,4 +1,6 @@
-
+"""
+Views for the Entitlements v1 API.
+"""
 
 import logging
 
@@ -15,9 +17,9 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
 from course_modes.models import CourseMode
-from entitlements.api.v1.filters import CourseEntitlementFilter
-from entitlements.api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
-from entitlements.api.v1.serializers import CourseEntitlementSerializer
+from entitlements.rest_api.v1.filters import CourseEntitlementFilter
+from entitlements.rest_api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
+from entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
 from entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
@@ -102,6 +104,9 @@ def set_entitlement_policy(entitlement, site):
 
 
 class EntitlementViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for the Entitlements API.
+    """
     ENTITLEMENT_UUID4_REGEX = '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
 
     authentication_classes = (JwtAuthentication, SessionAuthenticationCrossDomainCsrf,)
@@ -295,7 +300,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
                     )
             CourseEntitlementSupportDetail.objects.create(**support_detail)
 
-        return super(EntitlementViewSet, self).partial_update(request, *args, **kwargs)
+        return super(EntitlementViewSet, self).partial_update(request, *args, **kwargs)  # pylint: disable=no-member
 
 
 class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
