@@ -67,15 +67,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
         if not course_block_tree:
             return None
 
-        context = {
-            'csrf': csrf(request)['csrf_token'],
-            'course': course_overview,
-            'due_date_display_format': course.due_date_display_format,
-            'blocks': course_block_tree,
-            'enable_links': user_is_enrolled or course.course_visibility == COURSE_VISIBILITY_PUBLIC,
-            'course_key': course_key,
-        }
-
         resume_block = get_resume_block(course_block_tree) if user_is_enrolled else None
 
         if not resume_block:
@@ -86,28 +77,32 @@ class CourseOutlineFragmentView(EdxFragmentView):
 
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
-        context['gated_content'] = gated_content
-        context['xblock_display_names'] = xblock_display_names
-
-        page_context = kwargs.get('page_context', None)
-        if page_context:
-            context['self_paced'] = page_context.get('pacing_type', 'instructor_paced') == 'self_paced'
-
-        # We're using this flag to prevent old self-paced dates from leaking out on courses not
-        # managed by edx-when.
-        context['in_edx_when'] = edx_when_api.is_enabled_for_course(course_key)
-
         reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME)
         reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME
 
-        context['reset_deadlines_url'] = reset_deadlines_url
-        context['reset_deadlines_redirect_url_base'] = reset_deadlines_redirect_url_base
-        context['reset_deadlines_redirect_url_id_dict'] = {'course_id': str(course.id)}
-        context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course)
-        context['on_course_outline_page'] = True
-        context['missed_deadlines'] = missed_deadlines
-        context['missed_gated_content'] = missed_gated_content
-        context['is_archived'] = course.end < datetime.now()
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course_overview,
+            'due_date_display_format': course.due_date_display_format,
+            'blocks': course_block_tree,
+            'enable_links': user_is_enrolled or course.course_visibility == COURSE_VISIBILITY_PUBLIC,
+            'course_key': course_key,
+            'gated_content': gated_content,
+            'xblock_display_names': xblock_display_names,
+            'self_paced': course.self_paced,
+
+            # We're using this flag to prevent old self-paced dates from leaking out on courses not
+            # managed by edx-when.
+            'in_edx_when': edx_when_api.is_enabled_for_course(course_key),
+            'reset_deadlines_url': reset_deadlines_url,
+            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
+            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)},
+            'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
+            'on_course_outline_page': True,
+            'missed_deadlines': missed_deadlines,
+            'missed_gated_content': missed_gated_content,
+            'is_archived': course.end < datetime.now(),
+        }
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
