@@ -2,21 +2,23 @@
 Tests for Video Pipeline api utils.
 """
 
-import ddt
 import json
-from mock import Mock, patch
 
+import ddt
 from django.test.testcases import TestCase
+from mock import Mock, patch
+from opaque_keys.edx.locations import CourseLocator
 from slumber.exceptions import HttpClientError
-
 from student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
-from openedx.core.djangoapps.video_pipeline.tests.mixins import VideoPipelineIntegrationMixin
+from openedx.core.djangoapps.video_pipeline.config.waffle import ENABLE_VEM_PIPELINE, waffle_flags
+from openedx.core.djangoapps.video_pipeline.tests.mixins import VideoPipelineMixin
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
 
 @ddt.ddt
-class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
+class TestAPIUtils(VideoPipelineMixin, TestCase):
     """
     Tests for API Utils.
     """
@@ -24,6 +26,14 @@ class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
         self.pipeline_integration = self.create_video_pipeline_integration()
         self.user = UserFactory(username=self.pipeline_integration.service_username)
         self.oauth_client = self.create_video_pipeline_oauth_client(user=self.user)
+
+    def add_vem_client(self):
+        """
+        Creates a VEM oauth client
+        """
+        self.pipeline_integration = self.create_vem_pipeline_integration()
+        self.user = UserFactory(username=self.pipeline_integration.service_username)
+        self.oauth_client = self.create_video_pipeline_oauth_client(user=self.user, vem_enabled=True)
 
     def test_update_transcription_service_credentials_with_integration_disabled(self):
         """
@@ -97,3 +107,28 @@ class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
                 error_content
             )
         )
+
+    @patch('openedx.core.djangoapps.video_pipeline.api.log')
+    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient')
+    def test_update_transcription_service_credentials_for_vem(self, mock_client, mock_logger):
+        """
+        Test that if waffle flag `ENABLE_VEM_PIPELINE` is on for course, then credentials
+        are successfully posted to VEM.
+        """
+        self.add_vem_client()
+        course_key = CourseLocator("test_org", "test_course_num", "test_run")
+        credentials_payload = {
+            'username': 'Jason_cielo_24',
+            'api_key': '12345678',
+            'course_key': course_key
+        }
+        mock_client.request.return_value.ok = True
+
+        # Try updating the transcription service credentials
+        with override_waffle_flag(waffle_flags()[ENABLE_VEM_PIPELINE], active=True):
+            error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
+
+        # Making sure log.exception is not called.
+        self.assertDictEqual(error_response, {})
+        self.assertFalse(mock_logger.exception.called)
+        self.assertTrue(is_updated)

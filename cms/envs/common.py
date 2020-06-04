@@ -1264,9 +1264,10 @@ YOUTUBE = {
 
 YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
 
-############################# VIDEO UPLOAD PIPELINE #############################
+############################# SETTINGS FOR VIDEO UPLOAD PIPELINE #############################
 
 VIDEO_UPLOAD_PIPELINE = {
+    'VEM_S3_BUCKET': '',
     'BUCKET': '',
     'ROOT_PATH': '',
     'CONCURRENT_UPLOAD_LIMIT': 4,
@@ -2056,12 +2057,6 @@ CORS_ORIGIN_WHITELIST = []
 CORS_ORIGIN_ALLOW_ALL = False
 
 LOGIN_REDIRECT_WHITELIST = []
-
-############### Settings for video pipeline ##################
-VIDEO_UPLOAD_PIPELINE = {
-    'BUCKET': '',
-    'ROOT_PATH': '',
-}
 
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 

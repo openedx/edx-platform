@@ -3875,6 +3875,7 @@ DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 ############### Settings for video pipeline ##################
 VIDEO_UPLOAD_PIPELINE = {
+    'VEM_S3_BUCKET': '',
     'BUCKET': '',
     'ROOT_PATH': '',
 }

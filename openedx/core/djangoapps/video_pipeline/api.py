@@ -9,9 +9,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from oauth2_provider.models import Application
 from slumber.exceptions import HttpClientError
 
-from openedx.core.djangoapps.video_pipeline.models import VideoPipelineIntegration
+from openedx.core.djangoapps.video_pipeline.config.waffle import ENABLE_VEM_PIPELINE, waffle_flags
+from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration, VideoPipelineIntegration
 from openedx.core.djangoapps.video_pipeline.utils import create_video_pipeline_api_client
-
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +28,13 @@ def update_3rd_party_transcription_service_credentials(**credentials_payload):
         and an error response received from pipeline.
     """
     error_response, is_updated = {}, False
-    pipeline_integration = VideoPipelineIntegration.current()
+    course_key = credentials_payload.pop('course_key', None)
+
+    if course_key and waffle_flags()[ENABLE_VEM_PIPELINE].is_enabled(course_key):
+        pipeline_integration = VEMPipelineIntegration.current()
+    else:
+        pipeline_integration = VideoPipelineIntegration.current()
+
     if pipeline_integration.enabled:
         try:
             oauth_client = Application.objects.get(name=pipeline_integration.client_name)
