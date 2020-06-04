@@ -1060,7 +1060,7 @@ def dates(request, course_id):
     user_timezone = user_timezone_locale['user_timezone']
     user_language = user_timezone_locale['user_language']
 
-    missed_deadlines = dates_banner_should_display(course_key, request)
+    missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request)
 
     context = {
         'course': course,
@@ -1078,6 +1078,7 @@ def dates(request, course_id):
             course_key=course_key,
         ),
         'missed_deadlines': missed_deadlines,
+        'missed_gated_content': missed_gated_content,
         'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
         'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
         'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
@@ -1663,7 +1664,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
                 }
 
-        missed_deadlines = dates_banner_should_display(course_key, request)
+        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request)
 
         context = {
             'fragment': block.render('student_view', context=student_view_context),
@@ -1678,12 +1679,9 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
             'missed_deadlines': missed_deadlines,
+            'missed_gated_content': missed_gated_content,
             'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
             'on_courseware_page': True,
-            'content_type_gating_enabled': ContentTypeGatingConfig.enabled_for_enrollment(
-                user=request.user,
-                course_key=course_key,
-            ),
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL),
             'is_mobile_app': is_request_from_mobile_app(request),
