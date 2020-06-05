@@ -52,7 +52,7 @@ def get_remote_gradebook_resp(email, course, action, files=None, **kwargs):
     if not resp.ok:
         error_header = _("Error communicating with gradebook server at {url}").format(url=rg_url)
         return HTML('<p>{error_header}</p>{content}').format(error_header=error_header, content=resp.content), {}
-    return None, json.loads(resp.content)
+    return None, resp.json()
 
 
 def get_remote_gradebook_datatable_resp(user, course, action, files=None, **kwargs):
@@ -105,10 +105,7 @@ def get_assignment_grade_datatable(course, assignment_name, task_progress=None):
 
         if course_grade and not error:
             matching_assignment_grade = next(
-                filter(
-                    lambda grade_section: grade_section['label'] == assignment_name,
-                    course_grade.summary['section_breakdown']
-                ), {}
+                [grade_section for grade_section in course_grade.summary['section_breakdown'] if grade_section['label'] == assignment_name], {}
             )
             row_data.append([student.email, matching_assignment_grade.get('percent', 0)])
             if task_progress is not None:
