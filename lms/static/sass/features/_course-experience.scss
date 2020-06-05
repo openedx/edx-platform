@@ -538,19 +538,20 @@
       background: $gray-100;
     }
   }
+}
 
-  .breadcrumbs {
-    font-size: 0.875rem;
+// Course Breadcrumbs
+.has-breadcrumbs .breadcrumbs {
+  font-size: 0.875rem;
 
-    .nav-item {
-      @include margin-left($baseline/4);
-    }
+  .nav-item {
+    @include margin-left($baseline/4);
+  }
 
-    .fa-angle-right {
-      transform: rotateY(0deg) #{"/*rtl: rotateY(180deg)*/"};
+  .fa-angle-right {
+    transform: rotateY(0deg) #{"/*rtl: rotateY(180deg)*/"};
 
-      @include margin-left($baseline/4);
-    }
+    @include margin-left($baseline/4);
   }
 }
 
