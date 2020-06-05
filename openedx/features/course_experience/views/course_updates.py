@@ -82,6 +82,8 @@ class CourseUpdatesFragmentView(EdxFragmentView):
     """
     A fragment to render the updates page for a course.
     """
+    _uses_pattern_library = False
+
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the course's home page as a fragment.
