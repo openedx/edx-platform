@@ -3,7 +3,7 @@ This script generates code owner mappings for monitoring LMS.
 
 Sample usage::
 
-    python lms/djangoapps/monitoring/scripts/generate_code_owner_mappings.py --repo-csv "Individual Repo Ownership.csv" --app-csv "edx-platform Apps Ownership.csv"
+    python lms/djangoapps/monitoring/scripts/generate_code_owner_mappings.py --repo-csv "Individual Repo Ownership.csv" --app-csv "edx-platform Apps Ownership.csv" --dep-csv "edx-platform 3rd-party Ownership.csv"
 
 Or for more details::
 
@@ -13,68 +13,36 @@ Or for more details::
 """
 import csv
 import click
-import logging
 import os
 import re
 
-log = logging.getLogger(__name__)
+# Maps edx Django apps to their containing repo
+EDX_REPO_APPS = {
+    'bulk_grades': 'edx-bulk-grades',
+    'coaching': 'platform-plugin-coaching',
+    'completion': 'completion',
+    'config_models': 'django-config-models',
+    'consent': 'edx-enterprise',
+    'csrf': 'edx-drf-extensions',
+    'edx_proctoring': 'edx-proctoring',
+    'edxval': 'edx-val',
+    'enterprise': 'edx-enterprise',
+    'enterprise_learner_portal': 'edx-enterprise',
+    'help_tokens': 'help-tokens',
+    'integrated_channels': 'edx-enterprise',
+    'organizations': 'edx-organizations',
+    'search': 'edx-search',
+    'wiki': 'django-wiki',
+}
 
-# TODO: Clean this up.
-# - Move to spreadsheet or leave in code?
-# - If in code, reverse mapping so enterprise will be grouped.
-# - Use repo-name vs repo-url to make cleaner.
-# See clean_unmapped_view_modules.py for updating
-EXTERNAL_APPS = {
-    'bulk_grades': 'https://github.com/edx/edx-bulk-grades',
-    'coaching': 'https://github.com/edx/platform-plugin-coaching',
-    'completion': 'https://github.com/edx/completion',
-    'config_models': 'https://github.com/edx/django-config-models',
-    'consent': 'https://github.com/edx/edx-enterprise',
-    'csrf': 'https://github.com/edx/edx-drf-extensions',
-    'django': (  # owner? platform-arch? How to map?
-        # django.contrib.admin.options
-        # django.contrib.admin.sites
-        # django.contrib.auth.admin
-        # django.contrib.auth.views
-        # django.views.generic.base
-        # django.views.i18n           Does this belong with i18n-tools owner?  Not worth breaking out?
-        'https://github.com/django/django',
-        None,  # TODO
-    ),
-    'django_object_actions': (  # via edx-enterprise
-        'https://github.com/crccheck/django-object-actions',
-        'https://github.com/edx/edx-enterprise',
-    ),
-    'drf_yasg': (  # swagger owner? How to map?
-        'https://github.com/axnsan12/drf-yasg',
-        None,  # TODO
-    ),
-    'edx_proctoring': 'https://github.com/edx/edx-proctoring',
-    'edxval': 'https://github.com/edx/edx-val',
-    'enterprise': 'https://github.com/edx/edx-enterprise',
-    'enterprise_learner_portal': 'https://github.com/edx/edx-enterprise',
-    'help_tokens': 'https://github.com/edx/help-tokens',
-    'integrated_channels': 'https://github.com/edx/edx-enterprise',
-    'lx_pathway_plugin': (  # owner? tnl? How to map?
-        'https://github.com/open-craft/lx-pathway-plugin',
-        None,  # TODO
-    ),
-    'organizations': 'https://github.com/edx/edx-organizations',
-    'search': 'https://github.com/edx/edx-search',
-    'simple_history': (  # owner? de? How to map?
-        'https://github.com/treyhunner/django-simple-history',
-        None,  # TODO
-    ),
-    'social_django': (  # owner? enterprise? platform-arch? split?
-        # google-oauth2
-        # facebook
-        # tpa-saml
-        # azuread-oauth2
-        # identityServer3
-        'https://github.com/python-social-auth/social-app-django',
-        None,  # TODO
-    ),
-    'wiki': 'https://github.com/edx/django-wiki',
+# Maps third-party Django apps to their containing repo
+THIRD_PARTY_APPS = {
+    'django': 'django',
+    'django_object_actions': 'django-object-actions',
+    'drf_yasg': 'drf-yasg',
+    'lx_pathway_plugin': 'lx-pathway-plugin',
+    'simple_history': 'django-simple-history',
+    'social_django': 'social-app-django',
 }
 
 
@@ -89,11 +57,24 @@ EXTERNAL_APPS = {
     help="File name of .csv file with edx-platform app ownership details.",
     required=True
 )
-def main(repo_csv, app_csv):
+@click.option(
+    '--dep-csv',
+    help="File name of .csv file with edx-platform 3rd-party dependency ownership details.",
+    required=True
+)
+def main(repo_csv, app_csv, dep_csv):
     """
     Reads CSV of ownership data and outputs config.yml setting to system.out.
 
-    Expected CSV format:
+    Expected Repo CSV format:
+
+        \b
+        repo name,owner.squad
+        edx-platform,team-red
+        edx-proctoring,team-blue
+        ...
+
+    Expected App CSV format:
 
         \b
         Path,owner.squad
@@ -101,11 +82,20 @@ def main(repo_csv, app_csv):
         ./openedx/core/djangoapps/user_authn,team-blue
         ...
 
+    Expected 3rd-party Dependency CSV format:
+
+        \b
+        repo name,repo url,owner.squad
+        django,team-red
+        social-app-django,team-blue
+        ...
+
     Final output only includes paths which might contain views.
 
     """
     owner_to_paths_map = {}
-    _map_external_apps(repo_csv, owner_to_paths_map)
+    _map_repo_apps('edx-repo', repo_csv, EDX_REPO_APPS, owner_to_paths_map)
+    _map_repo_apps('3rd-party', dep_csv, THIRD_PARTY_APPS, owner_to_paths_map)
     _map_edx_platform_apps(app_csv, owner_to_paths_map)
 
     print('# Do not hand edit CODE_OWNER_MAPPINGS. Generated by {}'.format(os.path.basename(__file__)))
@@ -115,6 +105,35 @@ def main(repo_csv, app_csv):
         path_list.sort()
         for path in path_list:
             print("  - {}".format(path))
+
+
+def _map_repo_apps(csv_type, repo_csv, app_to_repo_map, owner_to_paths_map):
+    """
+    Reads CSV of repo ownership and uses app_to_repo_map to updates owner_to_paths_map
+
+    Arguments:
+        csv_type (string): Either 'edx-repo' or '3rd-party' for warning message
+        repo_csv (string): File name for the edx-repo or 3rd-party repo csv
+        app_to_repo_map (dict): Dict mapping apps to repos
+        owner_to_paths_map (dict): Holds results mapping owner to paths.
+
+    """
+    with open(repo_csv, 'r') as file:
+        csv_data = file.read()
+    reader = csv.DictReader(csv_data.splitlines())
+
+    csv_repo_to_owner_map = {}
+    for row in reader:
+        csv_repo_to_owner_map[row.get('repo name')] = row.get('owner.squad')
+
+    for app, repo in app_to_repo_map.items():
+        owner = csv_repo_to_owner_map.get(repo, None)
+        if owner:
+            if owner not in owner_to_paths_map:
+                owner_to_paths_map[owner] = []
+            owner_to_paths_map[owner].append(app)
+        else:
+            print('WARNING: Repo {} was not found in {} csv. Needed for app {}.'.format(repo, csv_type, app))
 
 
 def _map_edx_platform_apps(app_csv, owner_to_paths_map):
@@ -144,31 +163,6 @@ def _map_edx_platform_apps(app_csv, owner_to_paths_map):
             if owner not in owner_to_paths_map:
                 owner_to_paths_map[owner] = []
             owner_to_paths_map[owner].append(path)
-
-
-def _map_external_apps(repo_csv, owner_to_paths_map):
-    """
-    Reads CSV of repo ownership and combines with EXTERNAL_APPS to updates mappings
-    """
-    with open(repo_csv, 'r') as file:
-        csv_data = file.read()
-    reader = csv.DictReader(csv_data.splitlines())
-    csv_repo_to_owner_map = {}
-
-    for row in reader:
-        csv_repo_to_owner_map[row.get('repo url')] = row.get('owner.squad')
-    log.info(csv_repo_to_owner_map)
-
-    for path, repo in EXTERNAL_APPS.items():
-        # repo was either a string, or the second repo of a tuple
-        repo = repo if isinstance(repo, str) else repo[1]
-        owner = csv_repo_to_owner_map.get(repo, None)
-        if owner:
-            if owner not in owner_to_paths_map:
-                owner_to_paths_map[owner] = []
-            owner_to_paths_map[owner].append(path)
-        else:
-            log.warn('WARNING: Repo {} was not found in csv. Needed for path {}.'.format(repo, path))
 
 
 if __name__ == "__main__":
