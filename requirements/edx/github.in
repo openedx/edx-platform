@@ -52,7 +52,6 @@
 
 
 # Python libraries to install directly from github
-git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 
 # Third-party:
 -e git+https://github.com/edx/django-wiki.git@0.0.27#egg=django-wiki

@@ -155,3 +155,4 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
+chem                                # A helper library for chemistry calculations

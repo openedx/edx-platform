@@ -22,8 +22,8 @@ pyparsing==2.2.0                    # Python Parsing module
 random2                             # Implementation of random module that works identically under Python 2 and 3
 scipy==0.14.0                       # Math, science, and engineering library
 sympy==0.7.1                        # Symbolic math library
+chem
 git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
-git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version
