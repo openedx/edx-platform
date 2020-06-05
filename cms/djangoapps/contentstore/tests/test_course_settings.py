@@ -1200,6 +1200,48 @@ class CourseMetadataEditingTest(CourseTestCase):
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertIn('proctoring_provider', test_model)
 
+    @ddt.data(True, False)
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'valid_provider': {}
+        },
+        PARTNER_SUPPORT_EMAIL='support@foobar.com'
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_validate_update_does_not_allow_proctoring_provider_changes_after_course_start(self, staff_user):
+        """
+        Course staff cannot modify proctoring provder after the course start date.
+        Only admin users may update the provider if the course has started.
+        """
+        field_name = "proctoring_provider"
+        course = CourseFactory.create(start=datetime.datetime.now(UTC) - datetime.timedelta(days=1))
+        user = UserFactory.create(is_staff=staff_user)
+
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            course,
+            {
+                field_name: {"value": 'valid_provider'},
+            },
+            user=user
+        )
+
+        if staff_user:
+            self.assertTrue(did_validate)
+            self.assertEqual(len(errors), 0)
+            self.assertIn(field_name, test_model)
+        else:
+            self.assertFalse(did_validate)
+            self.assertEqual(len(errors), 1)
+            self.assertEqual(
+                errors[0].get('message'),
+                (
+                    'The proctoring provider cannot be modified after a course has started.'
+                    ' Contact support@foobar.com for assistance'
+                )
+            )
+            self.assertIsNone(test_model)
+
     @override_settings(
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
