@@ -35,6 +35,7 @@ boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
 bridgekeeper                        # Used for determining permissions for courseware.
 celery                              # Asynchronous task execution library
+chem                                # A helper library for chemistry calculations
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
 defusedxml
 Django                              # Web application framework
@@ -155,4 +156,4 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
-chem                                # A helper library for chemistry calculations
+
