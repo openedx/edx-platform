@@ -50,6 +50,7 @@ contextlib2==0.6.0.post1  # via -r requirements/edx/base.txt
 coreapi==2.3.3            # via -r requirements/edx/base.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/base.txt, coreapi, drf-yasg
 coverage==5.1             # via -r requirements/edx/coverage.txt, pytest-cov
+git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.in
 git+https://github.com/edx/crowdsourcehinter.git@2178ac72891392106ffef389651aef374177d294#egg=crowdsourcehinter-xblock==0.4  # via -r requirements/edx/base.txt
 cryptography==2.9.2       # via -r requirements/edx/base.txt, django-fernet-fields, edx-enterprise, social-auth-core
 cssselect==1.1.0          # via -r requirements/edx/testing.in, pyquery
@@ -70,7 +71,7 @@ django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r req
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-enterprise
 django-crum==0.7.6        # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring, edx-rbac, super-csv
 django-fernet-fields==0.6  # via -r requirements/edx/base.txt, edx-enterprise, edxval
-django-filter==2.2.0      # via -r requirements/edx/base.txt, edx-enterprise
+django-filter==2.3.0      # via -r requirements/edx/base.txt, edx-enterprise
 django-ipware==2.1.0      # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via -r requirements/edx/base.txt, django-mptt
 django-method-override==1.0.4  # via -r requirements/edx/base.txt
@@ -285,8 +286,7 @@ tqdm==4.46.1              # via -r requirements/edx/base.txt, nltk
 transifex-client==0.13.4  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 typed-ast==1.4.1          # via astroid
 unicodecsv==0.14.1        # via -r requirements/edx/base.txt, edx-enterprise
-unidiff==0.6.0            # via -r requirements/edx/testing.in
-git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.in
+unidiff==0.6.0            # via -r requirements/edx/testing.in, coverage-pytest-plugin
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.9           # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/base.txt
