@@ -38,7 +38,7 @@ celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requi
 certifi==2020.4.5.1       # via -r requirements/edx/paver.txt, requests
 cffi==1.14.0              # via -r requirements/edx/../edx-sandbox/shared.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/paver.txt, pdfminer.six, pysrt, requests
-git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0  # via -r requirements/edx/github.in
+chem==1.2.0               # via -r requirements/edx/base.in
 click==7.1.2              # via -r requirements/edx/../edx-sandbox/shared.txt, code-annotations, nltk, user-util
 code-annotations==0.3.4   # via edx-enterprise
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.in
@@ -219,7 +219,7 @@ scipy==1.4.1              # via chem, openedx-calc
 semantic-version==2.8.5   # via edx-drf-extensions
 shapely==1.7.0            # via -r requirements/edx/base.in
 simplejson==3.17.0        # via -r requirements/edx/base.in, sailthru-client, super-csv, xblock-utils
-six==1.15.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, cryptography, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, openedx-calc, packaging, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
+six==1.15.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, chem, cryptography, django-appconf, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, openedx-calc, packaging, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
 slumber==0.7.1            # via edx-bulk-grades, edx-enterprise, edx-rest-api-client
 social-auth-core==3.3.3   # via -r requirements/edx/base.in, social-auth-app-django
 sorl-thumbnail==12.6.3    # via -r requirements/edx/base.in
@@ -227,7 +227,7 @@ sortedcontainers==2.1.0   # via -r requirements/edx/base.in, pdfminer.six
 soupsieve==2.0.1          # via beautifulsoup4
 sqlparse==0.3.1           # via -r requirements/edx/base.in, django
 staff-graded-xblock==0.8  # via -r requirements/edx/base.in
-stevedore==1.32.0         # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, code-annotations, edx-ace, edx-enterprise, edx-opaque-keys
+stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, code-annotations, edx-ace, edx-enterprise, edx-opaque-keys
 super-csv==0.9.9          # via -r requirements/edx/base.in, edx-bulk-grades
 sympy==1.6                # via symmath
 testfixtures==6.14.1      # via edx-enterprise

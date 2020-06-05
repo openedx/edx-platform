@@ -42,7 +42,7 @@ celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requi
 certifi==2020.4.5.1       # via -r requirements/edx/testing.txt, requests
 cffi==1.14.0              # via -r requirements/edx/testing.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/testing.txt, pdfminer.six, pysrt, requests
-git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0  # via -r requirements/edx/testing.txt
+chem==1.2.0               # via -r requirements/edx/testing.txt
 click-log==0.3.2          # via -r requirements/edx/testing.txt, edx-lint
 click==7.1.2              # via -r requirements/edx/development.in, -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, click-log, code-annotations, edx-lint, nltk, pip-tools, user-util
 code-annotations==0.3.4   # via -r requirements/edx/testing.txt, edx-enterprise
@@ -276,7 +276,7 @@ semantic-version==2.8.5   # via -r requirements/edx/testing.txt, edx-drf-extensi
 shapely==1.7.0            # via -r requirements/edx/testing.txt
 simplejson==3.17.0        # via -r requirements/edx/testing.txt, sailthru-client, super-csv, xblock-utils
 singledispatch==3.4.0.3   # via -r requirements/edx/testing.txt
-six==1.15.0               # via -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, analytics-python, astroid, bleach, bok-choy, cryptography, diff-cover, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, edx-sphinx-theme, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, jsonschema, libsass, mando, mock, openedx-calc, packaging, pathlib2, paver, pip-tools, pycontracts, pyjwkest, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, sphinxcontrib-httpdomain, stevedore, tox, transifex-client, virtualenv, xblock
+six==1.15.0               # via -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, analytics-python, astroid, bleach, bok-choy, chem, cryptography, diff-cover, django-appconf, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, edx-sphinx-theme, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, jsonschema, libsass, mando, mock, openedx-calc, packaging, pathlib2, paver, pip-tools, pycontracts, pyjwkest, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, sphinxcontrib-httpdomain, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 snowballstemmer==2.0.0    # via sphinx
 social-auth-core==3.3.3   # via -r requirements/edx/testing.txt, social-auth-app-django
@@ -294,7 +294,7 @@ sphinxcontrib-qthelp==1.0.3  # via sphinx
 sphinxcontrib-serializinghtml==1.1.4  # via sphinx
 sqlparse==0.3.1           # via -r requirements/edx/testing.txt, django, django-debug-toolbar
 staff-graded-xblock==0.8  # via -r requirements/edx/testing.txt
-stevedore==1.32.0         # via -r requirements/edx/testing.txt, code-annotations, edx-ace, edx-enterprise, edx-opaque-keys
+stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, code-annotations, edx-ace, edx-enterprise, edx-opaque-keys
 super-csv==0.9.9          # via -r requirements/edx/testing.txt, edx-bulk-grades
 sympy==1.6                # via -r requirements/edx/testing.txt, symmath
 testfixtures==6.14.1      # via -r requirements/edx/testing.txt, edx-enterprise
