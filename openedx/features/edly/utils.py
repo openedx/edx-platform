@@ -34,7 +34,8 @@ def user_has_edly_organization_access(request):
     try:
         edly_sub_org = EdlySubOrganization.objects.get(
             Q(lms_site=current_site) |
-            Q(studio_site=current_site)
+            Q(studio_site=current_site) |
+            Q(preview_site=current_site)
         )
     except EdlySubOrganization.DoesNotExist:
         return False

@@ -4,10 +4,8 @@ Edly Organization Access Middleware.
 from logging import getLogger
 
 from django.conf import settings
-from django.contrib.auth import logout
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect
-from django.urls import reverse
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.edly.utils import user_has_edly_organization_access
