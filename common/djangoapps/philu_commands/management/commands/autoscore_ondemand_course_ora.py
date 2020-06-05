@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from pytz import utc
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.core.management.base import BaseCommand
 
 from submissions.models import Submission
@@ -64,41 +64,46 @@ class Command(BaseCommand):
                                                 anonymous_user = AnonymousUserId.objects.get(user=user,
                                                                                              course_id=course.id)
                                             except AnonymousUserId.DoesNotExist:
-                                                log.info('Anonymous Id doesn\'t exists for User: %s', user)
+                                                log.info('Anonymous Id does not exist for User: {user}'.format(
+                                                    user=user
+                                                ))
                                                 continue
                                             except AnonymousUserId.MultipleObjectsReturned:
-                                                log.info('Multiple Anonymous Ids for User: %s', user)
+                                                log.info('Multiple Anonymous Ids for User: {user}'.format(user=user))
                                                 continue
 
-                                            try:
-                                                response_submissions = Submission.objects.get(
-                                                    student_item__student_id=anonymous_user.anonymous_user_id,
-                                                    student_item__item_id=block)
-                                                log.info('Response Created at: %s',
-                                                         response_submissions.created_at.date())
-
-                                                response_submission_delta = today - response_submissions.created_at.date()
-
-                                                # check if this chapter is 2 weeks older or not.
-                                                module_access_days = delta_days.days - (index_chapter * 7)
-
-                                                if module_access_days >= DAYS_TO_WAIT_AUTO_ASSESSMENT \
-                                                        and response_submission_delta.days >= DAYS_TO_WAIT_AUTO_ASSESSMENT:
-                                                    try:
-                                                        # Status[0] is the status of assessment that are in waiting mode
-                                                        AssessmentWorkflow.objects.get(
-                                                            status=AssessmentWorkflow.STATUSES[0],
-                                                            course_id=course.id, item_id=block,
-                                                            submission_uuid=response_submissions.uuid)
-                                                        student = {'id': user.id, 'username': user.username,
-                                                                   'email': user.email,
-                                                                   'anonymous_user_id': anonymous_user.anonymous_user_id
-                                                                   }
-                                                        autoscore_ora(course.id, unicode(block), student)
-                                                    except AssessmentWorkflow.DoesNotExist:
-                                                        continue
-
-                                            except Submission.DoesNotExist:
+                                            response_submission = Submission.objects.filter(
+                                                student_item__student_id=anonymous_user.anonymous_user_id,
+                                                student_item__item_id=block).first()
+                                            if not response_submission:
                                                 continue
+                                            log.info('Response Created at: {created_date}'.format(
+                                                created_date=response_submission.created_at.date()
+                                            ))
+
+                                            response_submission_delta = today - response_submission.created_at.date()
+
+                                            # check if this chapter is 2 weeks older or not.
+                                            module_access_days = delta_days.days - (index_chapter * 7)
+
+                                            if (module_access_days >= DAYS_TO_WAIT_AUTO_ASSESSMENT and
+                                                    response_submission_delta.days >= DAYS_TO_WAIT_AUTO_ASSESSMENT):
+                                                try:
+                                                    # Status[0] is the status of assessment that are in waiting mode
+                                                    AssessmentWorkflow.objects.get(
+                                                        status=AssessmentWorkflow.STATUSES[0],
+                                                        course_id=course.id,
+                                                        item_id=block,
+                                                        submission_uuid=response_submission.uuid
+                                                    )
+                                                    student = {
+                                                        'id': user.id,
+                                                        'username': user.username,
+                                                        'email': user.email,
+                                                        'anonymous_user_id': anonymous_user.anonymous_user_id
+                                                    }
+                                                    autoscore_ora(course.id, unicode(block), student)
+                                                except AssessmentWorkflow.DoesNotExist:
+                                                    continue
 
                         max_module = max_module + 1
