@@ -422,7 +422,11 @@ class MongoConnection(object):
         Insert a new structure into the database.
         """
         with TIMER.timer("insert_structure", course_context) as tagger:
-            tagger.measure("blocks", len(structure["blocks"]))
+            if structure and structure.get('blocks'):
+                block_length = len(structure['blocks'])
+            else:
+                block_length = 0
+            tagger.measure("blocks", block_length)
             self.structures.insert_one(structure_to_mongo(structure, course_context))
 
     def get_course_index(self, key, ignore_case=False):
