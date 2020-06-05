@@ -365,6 +365,5 @@ def add_repo(repo, rdir_in, branch=None):
             log.debug(u'saved CourseImportLog for %s', cil.course_id)
         except mongoengine.errors.ValidationError as e:
             log.exception('Unable to save the course import log for %s.', cil.course_id)
-        mongoengine.disconnect()
     else:
         log.error('Unable to save CourseImportLog because of an error in building mongo connection')
