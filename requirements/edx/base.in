@@ -76,7 +76,7 @@ edx-django-sites-extensions==2.3.1
 edx-enterprise
 edx-milestones
 edx-oauth2-provider
-git+https://github.com/appsembler/edx-organizations.git@0.4.12-appsembler4  # edx-organizations
+git+https://github.com/appsembler/edx-organizations.git@0.4.12-appsembler5  # edx-organizations
 edx-proctoring
 edx-rest-api-client
 edx-search
