@@ -258,8 +258,8 @@ class CourseMetadata(object):
             did_validate = False
             message = (
                 'The proctoring provider cannot be modified after a course has started.'
-                ' Contact support for assistance'
-            )
+                ' Contact {support_email} for assistance'
+            ).format(support_email=settings.PARTNER_SUPPORT_EMAIL or 'support')
             errors.append({'message': message, 'model': filtered_dict.get('proctoring_provider')})
 
         # If did validate, go ahead and update the metadata

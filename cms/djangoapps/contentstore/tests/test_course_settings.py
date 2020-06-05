@@ -1205,7 +1205,8 @@ class CourseMetadataEditingTest(CourseTestCase):
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
             'valid_provider': {}
-        }
+        },
+        PARTNER_SUPPORT_EMAIL='support@foobar.com'
     )
     @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_does_not_allow_proctoring_provider_changes_after_course_start(self, staff_user):
@@ -1234,7 +1235,10 @@ class CourseMetadataEditingTest(CourseTestCase):
             self.assertEqual(len(errors), 1)
             self.assertEqual(
                 errors[0].get('message'),
-                'The proctoring provider cannot be modified after a course has started. Contact support for assistance'
+                (
+                    'The proctoring provider cannot be modified after a course has started.'
+                    ' Contact support@foobar.com for assistance'
+                )
             )
             self.assertIsNone(test_model)
 
