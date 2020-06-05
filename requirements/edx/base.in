@@ -36,6 +36,7 @@ botocore==1.8.17                    # via boto3, s3transfer
 bridgekeeper                        # Used for determining permissions for courseware.
 celery                              # Asynchronous task execution library
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
+crowdsourcehinter-xblock
 defusedxml
 Django                              # Web application framework
 django-appconf

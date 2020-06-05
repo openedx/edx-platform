@@ -50,7 +50,7 @@ contextlib2==0.6.0.post1  # via -r requirements/edx/base.txt
 coreapi==2.3.3            # via -r requirements/edx/base.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/base.txt, coreapi, drf-yasg
 coverage==5.1             # via -r requirements/edx/coverage.txt, pytest-cov
-git+https://github.com/edx/crowdsourcehinter.git@2178ac72891392106ffef389651aef374177d294#egg=crowdsourcehinter-xblock==0.4  # via -r requirements/edx/base.txt
+crowdsourcehinter-xblock==0.6  # via -r requirements/edx/base.txt
 cryptography==2.9.2       # via -r requirements/edx/base.txt, django-fernet-fields, edx-enterprise, social-auth-core
 cssselect==1.1.0          # via -r requirements/edx/testing.in, pyquery
 cssutils==1.0.2           # via -r requirements/edx/base.txt, pynliner
