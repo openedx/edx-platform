@@ -65,7 +65,7 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
             response = self.client.get('/', follow=True)
             self.assertRedirects(
                 response,
-                '/logout',
+                settings.FRONTEND_LOGOUT_URL,
                 status_code=302,
                 target_status_code=200,
                 fetch_redirect_response=True
