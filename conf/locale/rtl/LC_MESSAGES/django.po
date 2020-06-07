@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-31 20:49+0000\n"
-"PO-Revision-Date: 2020-05-31 20:49:57.504255\n"
+"POT-Creation-Date: 2020-06-07 20:50+0000\n"
+"PO-Revision-Date: 2020-06-07 20:50:09.890023\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -10618,6 +10618,10 @@ msgstr ""
 msgid "Configuration may not be specified at more than one level at once."
 msgstr "ذخربهلعقشفهخر وشغ رخف زث سحثذهبهثي شف وخقث فاشر خرث مثدثم شف خرذث."
 
+#: openedx/core/djangoapps/content/learning_sequences/apps.py
+msgid "Learning Sequences"
+msgstr "مثشقرهرل سثضعثرذثس"
+
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
 msgstr "شيوهرهسفثق عسثقس شري شعفاخق ذخرفثرف"
@@ -12088,6 +12092,18 @@ msgid ""
 "Username created for Video Pipeline Integration, e.g. veda_service_user."
 msgstr ""
 "عسثقرشوث ذقثشفثي بخق دهيثخ حهحثمهرث هرفثلقشفهخر, ث.ل. دثيش_سثقدهذث_عسثق."
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Oauth client name of VEM service."
+msgstr "خشعفا ذمهثرف رشوث خب دثو سثقدهذث."
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "video encode manager API URL."
+msgstr "دهيثخ ثرذخيث وشرشلثق شحه عقم."
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Username created for VEM Integration, e.g. vem_service_user."
+msgstr "عسثقرشوث ذقثشفثي بخق دثو هرفثلقشفهخر, ث.ل. دثو_سثقدهذث_عسثق."
 
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
@@ -13830,25 +13846,6 @@ msgstr ""
 " ساهبف غخعق يعث يشفثس."
 
 #: lms/templates/dates_banner.html
-msgid "You are auditing this course,"
-msgstr "غخع شقث شعيهفهرل فاهس ذخعقسث,"
-
-#: lms/templates/dates_banner.html
-msgid " which means that you are unable to participate in graded assignments."
-msgstr ""
-" صاهذا وثشرس فاشف غخع شقث عرشزمث فخ حشقفهذهحشفث هر لقشيثي شسسهلروثرفس."
-
-#: lms/templates/dates_banner.html
-msgid ""
-" It looks like you missed some important deadlines based on our suggested "
-"schedule. To complete graded assignments as part of this course and shift "
-"the past due assignments into the future, you can upgrade today by visiting "
-msgstr ""
-" هف مخخنس مهنث غخع وهسسثي سخوث هوحخقفشرف يثشيمهرثس زشسثي خر خعق سعللثسفثي "
-"سذاثيعمث. فخ ذخوحمثفث لقشيثي شسسهلروثرفس شس حشقف خب فاهس ذخعقسث شري ساهبف "
-"فاث حشسف يعث شسسهلروثرفس هرفخ فاث بعفعقث, غخع ذشر عحلقشيث فخيشغ زغ دهسهفهرل "
-
-#: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
 "schedule."
@@ -13867,6 +13864,29 @@ msgstr ""
 " حقخلقثسس غخعâدث وشيث صاثر غخع ساهبف غخعق يعث يشفثس."
 
 #: lms/templates/dates_banner.html
+msgid "Reset my deadlines"
+msgstr "قثسثف وغ يثشيمهرثس"
+
+#: lms/templates/dates_banner.html
+msgid "You are auditing this course,"
+msgstr "غخع شقث شعيهفهرل فاهس ذخعقسث,"
+
+#: lms/templates/dates_banner.html
+msgid " which means that you are unable to participate in graded assignments."
+msgstr ""
+" صاهذا وثشرس فاشف غخع شقث عرشزمث فخ حشقفهذهحشفث هر لقشيثي شسسهلروثرفس."
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. Graded assignments and schedule adjustment are available to "
+"Verified Track learners."
+msgstr ""
+" هف مخخنس مهنث غخع وهسسثي سخوث هوحخقفشرف يثشيمهرثس زشسثي خر خعق سعللثسفثي "
+"سذاثيعمث. لقشيثي شسسهلروثرفس شري سذاثيعمث شيتعسفوثرف شقث شدشهمشزمث فخ "
+"دثقهبهثي فقشذن مثشقرثقس."
+
+#: lms/templates/dates_banner.html
 msgid ""
 " It looks like you missed some important deadlines based on our suggested "
 "schedule. To complete graded assignments as part of this course and shift "
@@ -13877,24 +13897,20 @@ msgstr ""
 "فاث حشسف يعث شسسهلروثرفس هرفخ فاث بعفعقث, غخع ذشر عحلقشيث فخيشغ."
 
 #: lms/templates/dates_banner.html
+msgid "Upgrade to shift due dates"
+msgstr "عحلقشيث فخ ساهبف يعث يشفثس"
+
+#: lms/templates/dates_banner.html
+msgid "Graded assignments are available to Verified Track learners."
+msgstr "لقشيثي شسسهلروثرفس شقث شدشهمشزمث فخ دثقهبهثي فقشذن مثشقرثقس."
+
+#: lms/templates/dates_banner.html
 msgid ""
 " To complete graded assignments as part of this course, you can upgrade "
 "today."
 msgstr ""
 " فخ ذخوحمثفث لقشيثي شسسهلروثرفس شس حشقف خب فاهس ذخعقسث, غخع ذشر عحلقشيث "
 "فخيشغ."
-
-#: lms/templates/dates_banner.html
-msgid "Reset my deadlines"
-msgstr "قثسثف وغ يثشيمهرثس"
-
-#: lms/templates/dates_banner.html
-msgid "Upgrade to shift due dates"
-msgstr "عحلقشيث فخ ساهبف يعث يشفثس"
-
-#: lms/templates/edit_unit_link.html
-msgid "View Unit in Studio"
-msgstr "دهثص عرهف هر سفعيهخ"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -14186,15 +14202,12 @@ msgid "There has been an error on the {platform_name} servers"
 msgstr "فاثقث اشس زثثر شر ثققخق خر فاث {platform_name} سثقدثقس"
 
 #: lms/templates/module-error.html
-#: lms/templates/courseware/courseware-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {tech_support_email} to "
-"report any problems or downtime."
+" fix it as soon as possible. "
 msgstr ""
 "صث'قث سخققغ, فاهس وخيعمث هس فثوحخقشقهمغ عرشدشهمشزمث. خعق سفشبب هس صخقنهرل فخ"
-" بهط هف شس سخخر شس حخسسهزمث. حمثشسث ثوشهم عس شف {tech_support_email} فخ "
-"قثحخقف شرغ حقخزمثوس خق يخصرفهوث."
+" بهط هف شس سخخر شس حخسسهزمث. "
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
@@ -14233,8 +14246,16 @@ msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr "غخع شقث رخص دهثصهرل فاث ذخعقسث شس {i_start}{user_name}{i_end}."
 
 #: lms/templates/preview_menu.html
-msgid "View this unit in the new experience"
-msgstr "دهثص فاهس عرهف هر فاث رثص ثطحثقهثرذث"
+msgid "View in the new experience"
+msgstr "دهثص هر فاث رثص ثطحثقهثرذث"
+
+#: lms/templates/preview_menu.html
+msgid "View in Studio"
+msgstr "دهثص هر سفعيهخ"
+
+#: lms/templates/preview_menu.html
+msgid "View in Insights"
+msgstr "دهثص هر هرسهلافس"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
@@ -16602,6 +16623,15 @@ msgstr "ذخعقسث عفهمهفهثس"
 msgid "Courseware"
 msgstr "ذخعقسثصشقث"
 
+#: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+"صث'قث سخققغ, فاهس وخيعمث هس فثوحخقشقهمغ عرشدشهمشزمث. خعق سفشبب هس صخقنهرل فخ"
+" بهط هف شس سخخر شس حخسسهزمث."
+
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "ذخعقسث سثشقذا"
@@ -16646,14 +16676,6 @@ msgstr "يعث رثطف"
 #: lms/templates/courseware/dates.html
 msgid "Not yet released"
 msgstr "رخف غثف قثمثشسثي"
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible."
-msgstr ""
-"صث'قث سخققغ, فاهس وخيعمث هس فثوحخقشقهمغ عرشدشهمشزمث. خعق سفشبب هس صخقنهرل فخ"
-" بهط هف شس سخخر شس حخسسهزمث."
 
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
@@ -21954,12 +21976,8 @@ msgid "The page that you were looking for was not found."
 msgstr "فاث حشلث فاشف غخع صثقث مخخنهرل بخق صشس رخف بخعري."
 
 #: cms/templates/404.html
-msgid ""
-"Go back to the {homepage} or let us know about any pages that may have been "
-"moved at {email}."
-msgstr ""
-"لخ زشذن فخ فاث {homepage} خق مثف عس نرخص شزخعف شرغ حشلثس فاشف وشغ اشدث زثثر "
-"وخدثي شف {email}."
+msgid "Go back to the {homepage}."
+msgstr "لخ زشذن فخ فاث {homepage}."
 
 #: cms/templates/500.html
 msgid "{studio_name} Server Error"
@@ -21984,10 +22002,6 @@ msgid ""
 msgstr ""
 "صث'دث مخللثي فاث ثققخق شري خعق سفشبب هس ذعققثرفمغ صخقنهرل فخ قثسخمدث فاهس "
 "ثققخق شس سخخر شس حخسسهزمث."
-
-#: cms/templates/500.html
-msgid "If the problem persists, please email us at {email_link}."
-msgstr "هب فاث حقخزمثو حثقسهسفس, حمثشسث ثوشهم عس شف {email_link}."
 
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
@@ -22681,14 +22695,10 @@ msgstr "فاث حشلث غخع قثضعثسفثي حشلث ذشررخف زث ب�
 #: cms/templates/error.html
 msgid ""
 "We're sorry. We couldn't find the {studio_name} page you're looking for. You"
-" may want to return to the {studio_name} Dashboard and try again. If you are"
-" still having problems accessing things, please feel free to "
-"{link_start}contact {studio_name} support{link_end} for further help."
+" may want to return to the {studio_name} Dashboard and try again."
 msgstr ""
 "صث'قث سخققغ. صث ذخعمير'ف بهري فاث {studio_name} حشلث غخع'قث مخخنهرل بخق. غخع"
-" وشغ صشرف فخ قثفعقر فخ فاث {studio_name} يشسازخشقي شري فقغ شلشهر. هب غخع شقث"
-" سفهمم اشدهرل حقخزمثوس شذذثسسهرل فاهرلس, حمثشسث بثثم بقثث فخ "
-"{link_start}ذخرفشذف {studio_name} سعححخقف{link_end} بخق بعقفاثق اثمح."
+" وشغ صشرف فخ قثفعقر فخ فاث {studio_name} يشسازخشقي شري فقغ شلشهر."
 
 #: cms/templates/error.html
 msgid "The Server Encountered an Error"
@@ -22698,15 +22708,11 @@ msgstr "فاث سثقدثق ثرذخعرفثقثي شر ثققخق"
 msgid ""
 "We're sorry. There was a problem with the server while trying to process "
 "your last request. You may want to return to the {studio_name} Dashboard or "
-"try this request again. If you are still having problems accessing things, "
-"please feel free to {link_start}contact {studio_name} support{link_end} for "
-"further help."
+"try this request again."
 msgstr ""
 "صث'قث سخققغ. فاثقث صشس ش حقخزمثو صهفا فاث سثقدثق صاهمث فقغهرل فخ حقخذثسس "
 "غخعق مشسف قثضعثسف. غخع وشغ صشرف فخ قثفعقر فخ فاث {studio_name} يشسازخشقي خق "
-"فقغ فاهس قثضعثسف شلشهر. هب غخع شقث سفهمم اشدهرل حقخزمثوس شذذثسسهرل فاهرلس, "
-"حمثشسث بثثم بقثث فخ {link_start}ذخرفشذف {studio_name} سعححخقف{link_end} بخق "
-"بعقفاثق اثمح."
+"فقغ فاهس قثضعثسف شلشهر."
 
 #: cms/templates/error.html
 msgid "Back to dashboard"

@@ -172,7 +172,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-24 20:42+0000\n"
+"POT-Creation-Date: 2020-05-31 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -6303,57 +6303,6 @@ msgstr ""
 " diese Anfrage zu bearbeiten, besuchen Sie bitte den/die untenstehenden "
 "Link(s)."
 
-#: lms/djangoapps/commerce/views.py
-msgid "Receipt"
-msgstr "Rechnung"
-
-#: lms/djangoapps/commerce/views.py
-msgid "Payment Failed"
-msgstr "Zahlung fehlgeschlagen"
-
-#: lms/djangoapps/commerce/views.py
-msgid "There was a problem with this transaction. You have not been charged."
-msgstr ""
-"Es gab ein Problem mit Ihrer Transaktion. Ihnen wurde nichts berechnet. "
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"Make sure your information is correct, or try again with a different card or"
-" another form of payment."
-msgstr ""
-"Vergewissern Sie sich, dass Ihre Angaben korrekt sind, oder versuchen Sie es"
-" erneut mit einer anderen Karte oder einer anderen Zahlungsart."
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"A system error occurred while processing your payment. You have not been "
-"charged."
-msgstr ""
-"Ein Systemfehler trat während der Bearbeitung Ihrer Zahlung auf. Es wurde "
-"Ihnen nichts berechnet. "
-
-#: lms/djangoapps/commerce/views.py
-msgid "Please wait a few minutes and then try again."
-msgstr "Bitte warten Sie einige Minuten und versuchen es erneut. "
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid "For help, contact {payment_support_link}."
-msgstr "Für Hilfe, kontaktieren Sie bitte {payment_support_link}."
-
-#: lms/djangoapps/commerce/views.py
-msgid "An error occurred while creating your receipt."
-msgstr "Bei der Rechnungserstellung ist ein Fehler aufgetreten."
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid ""
-"If your course does not appear on your dashboard, contact "
-"{payment_support_link}."
-msgstr ""
-"Wenn ein gekaufter Kurs nicht in 'Meine Kurse' aufgelistet wird, "
-"kontaktieren Sie {payment_support_link}."
-
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
 msgstr "Erhalten Sie ein Zertifikat"
@@ -9487,14 +9436,6 @@ msgstr "Sie haben nicht die Erlaubnis, diese Seite anzusehen."
 msgid "View and regenerate certificates."
 msgstr "Zertifikate anzeigen und neu erstellen "
 
-#: lms/djangoapps/support/views/index.py lms/templates/support/refund.html
-msgid "Manual Refund"
-msgstr "Händische Rückerstattung"
-
-#: lms/djangoapps/support/views/index.py
-msgid "Track refunds issued directly through CyberSource."
-msgstr "Verfolgen Sie Rückerstattungen, die direkt über CyberSource erfolgen."
-
 #: lms/djangoapps/support/views/index.py
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/support/enrollment.html
@@ -9573,46 +9514,6 @@ msgstr "Benutzer erfolgreich aktiviert"
 #: lms/djangoapps/support/views/manage_user.py
 msgid "User Disabled Successfully"
 msgstr "Benutzer erfolgreich deaktiviert"
-
-#: lms/djangoapps/support/views/refund.py
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "E-Mail-Adresse"
-
-#: lms/djangoapps/support/views/refund.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Course ID"
-msgstr "Kurs-ID"
-
-#: lms/djangoapps/support/views/refund.py
-msgid "User not found"
-msgstr "Nutzer nicht gefunden"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Course {course_id} not past the refund window."
-msgstr ""
-"Kurs {course_id} hat den Rückerstattungszeitraum noch nicht überschritten."
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "No order found for {user} in course {course_id}"
-msgstr "Keine Bestellung für {user} des Kurs {course_id} gefunden"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Unenrolled {user} from {course_id}"
-msgstr "{user} aus {course_id} entfernt"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Refunded {cost} for order id {order_id}"
-msgstr "Rückerstattung in Höhe von {cost} für Bestellnummer {order_id}"
 
 #: lms/djangoapps/survey/utils.py
 msgid "You must complete a survey"
@@ -11668,6 +11569,15 @@ msgstr "Alles"
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Experience"
 msgstr "Erfahrung"
+
+#: openedx/core/djangoapps/schedules/admin.py
+#: cms/templates/maintenance/_force_publish_course.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Course ID"
+msgstr "Kurs-ID"
 
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
@@ -16965,40 +16875,6 @@ msgstr ""
 msgid "About edX Certificates"
 msgstr "Über edX Zertifikate"
 
-#: lms/templates/commerce/checkout_cancel.html
-msgid "Checkout Cancelled"
-msgstr "Bezahlung abgebrochen "
-
-#: lms/templates/commerce/checkout_cancel.html
-msgid ""
-"Your transaction has been cancelled. If you feel an error has occurred, "
-"contact {email}."
-msgstr ""
-"Ihre Transaktion wurde abgebrochen. Wenn Sie das Gefühl haben, ein Fehler "
-"ist aufgetreten, kontaktieren Sie {email}."
-
-#: lms/templates/commerce/checkout_error.html
-msgid "Checkout Error"
-msgstr "Fehler an der Kasse"
-
-#: lms/templates/commerce/checkout_error.html
-msgid ""
-"An error has occurred with your payment. {b_start}You have not been "
-"charged.{b_end} Please try to submit your payment again. If this problem "
-"persists, contact {email}."
-msgstr ""
-"Bei Ihrer Zahlung ist ein Fehler aufgetreten. {b_start}Es wurde Ihnen nichts"
-" berechnet.{b_end} Bitte versuchen Sie, Ihre Zahlung erneut einzureichen. "
-"Wenn dieses Problem weiterhin besteht, wenden Sie sich an {email}."
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Loading Order Data..."
-msgstr "Bestelldaten werden geladen..."
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Please wait while we retrieve your order details."
-msgstr "Bitte warten Sie. Bestellungsinformationen werden abgerufen."
-
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
@@ -19334,14 +19210,6 @@ msgstr "Kursübersicht"
 msgid "Sysadmin"
 msgstr "Systemadministrator"
 
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Shopping Cart"
-msgstr "Warenkorb"
-
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
 msgstr "Zusätzliche Links"
@@ -21463,6 +21331,10 @@ msgid "Purchase order number (if any)"
 msgstr "Bestellnummer (wenn vorhanden)"
 
 #: lms/templates/shoppingcart/billing_details.html
+msgid "Email Address"
+msgstr "E-Mail-Adresse"
+
+#: lms/templates/shoppingcart/billing_details.html
 msgid "email@example.com"
 msgstr "email@example.com"
 
@@ -21788,6 +21660,10 @@ msgstr[1] ""
 "{course_names} Wurden entfernt, da die Frist zur Anmeldung abgelaufen ist."
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Shopping Cart"
+msgstr "Warenkorb"
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr "Titelbild"
 
@@ -22009,46 +21885,6 @@ msgstr "Teilnehmersupport: Benutzer verwalten"
 #: lms/templates/support/program_enrollments_inspector.html
 msgid "Program Enrollments Inspector"
 msgstr "Inspektor für Programmeinschreibungen"
-
-#: lms/templates/support/refund.html
-msgid "About to refund this order:"
-msgstr "Details Rückerstattung dieser Bestellung:"
-
-#: lms/templates/support/refund.html
-msgid "Order Id:"
-msgstr "Bestellnummer:"
-
-#: lms/templates/support/refund.html
-msgid "Enrollment:"
-msgstr "Einschreibung:"
-
-#: lms/templates/support/refund.html
-msgid "enrolled"
-msgstr "eingeschrieben"
-
-#: lms/templates/support/refund.html
-msgid "unenrolled"
-msgstr "entfernt"
-
-#: lms/templates/support/refund.html
-msgid "Cost:"
-msgstr "Kosten:"
-
-#: lms/templates/support/refund.html
-msgid "CertificateItem Status:"
-msgstr "Status Zertifkat:"
-
-#: lms/templates/support/refund.html
-msgid "Order Status:"
-msgstr "Status Bestellung:"
-
-#: lms/templates/support/refund.html
-msgid "Fulfilled Time:"
-msgstr "Benötigte Zeit:"
-
-#: lms/templates/support/refund.html
-msgid "Refund Request Time:"
-msgstr "Zeit der Rückerstattungsanfrage:"
 
 #: lms/templates/survey/survey.html
 msgid "User Survey"

@@ -20,36 +20,22 @@
   django.catalog = django.catalog || {};
   
   var newcatalog = {
-    "%(sel)s of %(cnt)s selected": [
-      "%(sel)s of %(cnt)s selected",
-      "%(sel)s of %(cnt)s selected"
-    ],
     "6 a.m.": "6 a.m",
     "Available %s": "\u0c06\u0c02\u0c26\u0c41\u0c2c\u0c3e\u0c24\u0c41\u0c32\u0c4b\u0c09\u0c28\u0c4d\u0c28 %s ",
     "Cancel": "\u0c30\u0c26\u0c4d\u0c26\u0c41 \u0c1a\u0c47\u0c2f\u0c41",
-    "Choose": "Choose",
     "Choose a time": "\u0c12\u0c15 \u0c38\u0c2e\u0c2f\u0c2e\u0c41 \u0c0e\u0c28\u0c4d\u0c28\u0c41\u0c15\u0c4b\u0c02\u0c21\u0c3f",
     "Choose all": "\u0c05\u0c28\u0c4d\u0c28\u0c40 \u0c0e\u0c28\u0c4d\u0c28\u0c41\u0c15\u0c4b\u0c02\u0c21\u0c3f",
     "Chosen %s": "\u0c0e\u0c28\u0c4d\u0c28\u0c41\u0c15\u0c41\u0c28\u0c4d\u0c28 %s",
-    "Click to choose all %s at once.": "Click to choose all %s at once.",
-    "Click to remove all chosen %s at once.": "Click to remove all chosen %s at once.",
     "Filter": "\u0c35\u0c21\u0c2a\u0c4b\u0c24",
     "Hide": "\u0c26\u0c3e\u0c1a\u0c41",
     "Midnight": "\u0c06\u0c30\u0c4d\u0c27\u0c30\u0c3e\u0c24\u0c4d\u0c30\u0c3f",
     "Noon": "\u0c2e\u0c27\u0c4d\u0c2f\u0c3e\u0c39\u0c4d\u0c28\u0c2e\u0c41",
     "Now": "\u0c07\u0c2a\u0c4d\u0c2a\u0c41\u0c21\u0c41",
     "Remove": "\u0c24\u0c40\u0c38\u0c3f\u0c35\u0c47\u0c2f\u0c02\u0c21\u0c3f",
-    "Remove all": "Remove all",
     "Show": "\u0c1a\u0c42\u0c2a\u0c3f\u0c02\u0c1a\u0c41\u0c2e\u0c41",
-    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.",
-    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.",
     "Today": "\u0c08\u0c28\u0c3e\u0c21\u0c41",
     "Tomorrow": "\u0c30\u0c47\u0c2a\u0c41",
-    "Type into this box to filter down the list of available %s.": "Type into this box to filter down the list of available %s.",
-    "Yesterday": "\u0c28\u0c3f\u0c28\u0c4d\u0c28",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.",
-    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."
+    "Yesterday": "\u0c28\u0c3f\u0c28\u0c4d\u0c28"
   };
   for (var key in newcatalog) {
     django.catalog[key] = newcatalog[key];

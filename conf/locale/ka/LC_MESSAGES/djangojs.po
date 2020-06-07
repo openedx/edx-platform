@@ -56,7 +56,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-24 20:42+0000\n"
+"POT-Creation-Date: 2020-05-31 20:42+0000\n"
 "PO-Revision-Date: 2020-04-27 09:13+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)\n"
@@ -724,7 +724,6 @@ msgstr ""
 
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "აღწერა"
@@ -6749,7 +6748,6 @@ msgid "Unscheduled"
 msgstr "გაშვების თარიღი მითითებული არაა"
 
 #: cms/templates/js/course_info_update.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Date"
 msgstr "თარიღი"
@@ -7493,96 +7491,6 @@ msgstr "ამოიღეთ ქვეგანყოფილება %(subse
 msgid "Remove unit %(unitName)s"
 msgstr "წაშალეთ  მოდული %(unitName)s"
 
-#: lms/templates/commerce/provider.underscore
-msgid ""
-"You still need to visit the {display_name} website to complete the credit "
-"process."
-msgstr ""
-
-#: lms/templates/commerce/provider.underscore
-msgid ""
-"To finalize course credit, {display_name} requires {platform_name} learners "
-"to submit a credit request."
-msgstr ""
-
-#: lms/templates/commerce/provider.underscore
-msgid "Get Credit"
-msgstr "კრედიტის მიღება"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"Thank you {full_name}! We have received your payment for {course_name}."
-msgstr ""
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"გთხოვთ ამობეჭდოთ თქვენი ჩანაწერების ეს გვერდი. ის ასრულებს ქვითრის ფუნქციას."
-" თქვენ ასევე მიიღებთ ელფოსტის შეტყობინებას იგივე ინფორმაციით."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "შეკვეთის ნომერი"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "რაოდენობა"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "სულ"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "გთხოვთ, გაითვალისწინოთ"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "გადახაზულ ერთეულებში გადახდილი თანხა დაბრუნებულია."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "გადაერიცხა"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "ქვითარი ხელმისაწვდომი არ არის"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-msgid "Go to Dashboard"
-msgstr "სამუშაო დაფაზე დაბრუნება"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from {platformName}"
-" to verify your identity."
-msgstr ""
-"თუ თქვენ არ დაადასტურებთ თქვენს ვინაობას, მაინც შეძლებთ კურსის მოძიებას "
-"სამუშაო დაფაზე. პერიოდულად თქვენ მიიღებთ შეხსენებას, რომ {platformName} "
-"ითხოვს პიროვნების იდენტიფიკაციას."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "გსურთ, თქვენი პიროვნება მოგვიანებით დაადასტუროთ?"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Verify Now"
-msgstr "დადასტურება"
-
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
 msgstr "ყველა გამოცდის დასრულებულად მონიშვნა"
@@ -7742,6 +7650,10 @@ msgid ""
 msgstr ""
 "გმადლობთ, რომ გაგზავნეთ ფინანსური დახმარების აპლიკაცია {course_name} "
 "კურსისთვის! პასუხს 2-4 სამუშაო დღის განმავლობაში მიიღებთ."
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Go to Dashboard"
+msgstr "სამუშაო დაფაზე დაბრუნება"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
@@ -8317,6 +8229,10 @@ msgstr ""
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "დაფიქსირდა შეცდომა. გთხოვთ გადატვირთოთ გვერდი."
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Sign in with your company or school"
+msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -8924,6 +8840,11 @@ msgid "Check your email for an activation message."
 msgstr "აქტივაციის შეტყობინების სანახავად გადაამოწმეთ თქვენი ელფოსტა."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "სულ"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
 msgstr "„{courseName}“ კურსის პროფესიული სერთიფიკატი"
 
@@ -8969,6 +8890,38 @@ msgid "Thank you! We have received your payment for {courseName}."
 msgstr "გმადლობთ! ჩვენ მივიღეთ თქვენი გადახდა კურსისთვის: {courseName}."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"Please print this page for your records; it serves as your receipt. You will"
+" also receive an email with the same information."
+msgstr ""
+"გთხოვთ ამობეჭდოთ თქვენი ჩანაწერების ეს გვერდი. ის ასრულებს ქვითრის ფუნქციას."
+" თქვენ ასევე მიიღებთ ელფოსტის შეტყობინებას იგივე ინფორმაციით."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Order No."
+msgstr "შეკვეთის ნომერი"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Amount"
+msgstr "რაოდენობა"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Please Note"
+msgstr "გთხოვთ, გაითვალისწინოთ"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Crossed out items have been refunded."
+msgstr "გადახაზულ ერთეულებში გადახდილი თანხა დაბრუნებულია."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Billed to"
+msgstr "გადაერიცხა"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "No receipt available"
+msgstr "ქვითარი ხელმისაწვდომი არ არის"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
 msgstr "შემდეგი საფეხური: თქვენი პიროვნების დადასტურება"
 
@@ -9002,6 +8955,10 @@ msgstr ""
 "თუ თქვენ არ დაადასტურებთ თქვენს ვინაობას, მაინც შეძლებთ კურსის მოძიებას "
 "სამუშაო დაფაზე. პერიოდულად თქვენ მიიღებთ შეხსენებას, რომ %(platformName)s "
 "ითხოვს პიროვნების იდენტიფიკაციას."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Want to confirm your identity later?"
+msgstr "გსურთ, თქვენი პიროვნება მოგვიანებით დაადასტუროთ?"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
