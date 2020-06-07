@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-24 20:42+0000\n"
+"POT-Creation-Date: 2020-05-31 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -5837,55 +5837,6 @@ msgstr ""
 "{username} ({email})-ის მიერ ანაზღაურების მოთხოვნა ინიცირებულია. ამ "
 "მოთხოვნის სამართავად, გთხოვთ, ეწვიეთ მისამართს(ებს) ქვემოთ."
 
-#: lms/djangoapps/commerce/views.py
-msgid "Receipt"
-msgstr "ქვითარი"
-
-#: lms/djangoapps/commerce/views.py
-msgid "Payment Failed"
-msgstr "გადახდა ვერ მოხერხდა"
-
-#: lms/djangoapps/commerce/views.py
-msgid "There was a problem with this transaction. You have not been charged."
-msgstr "პრობლემის გამო ეს ტრანზაქცია ვერ განხორციელდა. თანხა არ ჩამოგეჭრათ."
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"Make sure your information is correct, or try again with a different card or"
-" another form of payment."
-msgstr ""
-"დარწმუნდით, რომ თქვენი ინფორმაცია სწორია, ან სცადეთ სხვა ბარათი ან გადახდის "
-"სხვა მეთოდი."
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"A system error occurred while processing your payment. You have not been "
-"charged."
-msgstr ""
-"გადახდის დამუშვებისას დაფიქსირდა სისტემური შეცდომა. თანხა არ ჩამოგეჭრათ."
-
-#: lms/djangoapps/commerce/views.py
-msgid "Please wait a few minutes and then try again."
-msgstr "გთხოვთ, მოიცადოთ რამდენიმე წუთი და კვლავ სცადოთ."
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid "For help, contact {payment_support_link}."
-msgstr "დახმარებისთვის დაუკავშირდით {payment_support_link}."
-
-#: lms/djangoapps/commerce/views.py
-msgid "An error occurred while creating your receipt."
-msgstr "თქვენი ქვითრის დამუშვებისას დაფიქსირდა შეცდომა."
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid ""
-"If your course does not appear on your dashboard, contact "
-"{payment_support_link}."
-msgstr ""
-"დაუკავშირდით {payment_support_link}-ს, თუ თქვენი პართვის პანელზე თქვენი "
-"კურსი არ არის მითითებული."
-
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
 msgstr ""
@@ -8897,14 +8848,6 @@ msgstr "თქვენ არ გაქვთ ამ გვერდის ნ�
 msgid "View and regenerate certificates."
 msgstr "სერტიფიკატების დათვალიერება და ხელახლა გენერირება."
 
-#: lms/djangoapps/support/views/index.py lms/templates/support/refund.html
-msgid "Manual Refund"
-msgstr "თანხის ხელით დაბრუნება"
-
-#: lms/djangoapps/support/views/index.py
-msgid "Track refunds issued directly through CyberSource."
-msgstr "უშუალოდ CyberSource-დან მოთხოვნილი თანხის დაბრუნების მიდევნება."
-
 #: lms/djangoapps/support/views/index.py
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/support/enrollment.html
@@ -8982,45 +8925,6 @@ msgstr ""
 #: lms/djangoapps/support/views/manage_user.py
 msgid "User Disabled Successfully"
 msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "ელფოსტის მისამართი"
-
-#: lms/djangoapps/support/views/refund.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Course ID"
-msgstr "კურსის ID"
-
-#: lms/djangoapps/support/views/refund.py
-msgid "User not found"
-msgstr "მომხმარებელი ვერ მოიძებნა"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Course {course_id} not past the refund window."
-msgstr "კურსი {course_id}  არ არის ანაზღაურების ფანჯრის მიღმა."
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "No order found for {user} in course {course_id}"
-msgstr "კურსზე {course_id} {user}-ის შეკვეთა ვერ მოიძებნა"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Unenrolled {user} from {course_id}"
-msgstr "მომხმარებელი {user} გარიცხულია კურსიდან {course_id}"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Refunded {cost} for order id {order_id}"
-msgstr "დაბრუნებული თანხა {cost} შეკვეთისთვის {order_id}"
 
 #: lms/djangoapps/survey/utils.py
 msgid "You must complete a survey"
@@ -10872,6 +10776,15 @@ msgstr "ყველა"
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Experience"
 msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+#: cms/templates/maintenance/_force_publish_course.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Course ID"
+msgstr "კურსის ID"
 
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
@@ -15636,37 +15549,6 @@ msgstr ""
 msgid "About edX Certificates"
 msgstr ""
 
-#: lms/templates/commerce/checkout_cancel.html
-msgid "Checkout Cancelled"
-msgstr "შემოწმება გაუქმდა"
-
-#: lms/templates/commerce/checkout_cancel.html
-msgid ""
-"Your transaction has been cancelled. If you feel an error has occurred, "
-"contact {email}."
-msgstr ""
-"თქვენი ტრანზაქცია გაუქმდა. თუ ფიქრობთ, რომ წარმოიშვა შეცდომა, დაუკავშირდით "
-"{email}."
-
-#: lms/templates/commerce/checkout_error.html
-msgid "Checkout Error"
-msgstr "შემოწმებისას დაფიქსირდა შეცდომა"
-
-#: lms/templates/commerce/checkout_error.html
-msgid ""
-"An error has occurred with your payment. {b_start}You have not been "
-"charged.{b_end} Please try to submit your payment again. If this problem "
-"persists, contact {email}."
-msgstr ""
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Loading Order Data..."
-msgstr "შესყიდვის მონაცემების ჩატვირთვა..."
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Please wait while we retrieve your order details."
-msgstr "გთხოვთ, დაელოდოთ თქვენი შესყიდვის მონაცემებს ამოღებას."
-
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
@@ -17885,14 +17767,6 @@ msgstr ""
 msgid "Sysadmin"
 msgstr "სისტემური ადმინისტრატორი"
 
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Shopping Cart"
-msgstr "საყიდლების კალათი"
-
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
 msgstr ""
@@ -19917,6 +19791,10 @@ msgid "Purchase order number (if any)"
 msgstr "შესყიდვის შეკვეთის ნომერი (ასეთის არსებობის შემთხვევაში)"
 
 #: lms/templates/shoppingcart/billing_details.html
+msgid "Email Address"
+msgstr "ელფოსტის მისამართი"
+
+#: lms/templates/shoppingcart/billing_details.html
 msgid "email@example.com"
 msgstr "email@example.com"
 
@@ -20237,6 +20115,10 @@ msgstr[0] "{course_names} წაიშალა რადგან ჩარი�
 msgstr[1] "{course_names} წაიშალა რადგან ჩარიცხვის პერიოდი დაიხურა."
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Shopping Cart"
+msgstr "საყიდლების კალათი"
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr "ყდის ფოტოსურათი"
 
@@ -20449,46 +20331,6 @@ msgstr ""
 #: lms/templates/support/program_enrollments_inspector.html
 msgid "Program Enrollments Inspector"
 msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "About to refund this order:"
-msgstr "ამ შეკვეთის თანხის დაბრუნება:"
-
-#: lms/templates/support/refund.html
-msgid "Order Id:"
-msgstr "შეკვეთის Id:"
-
-#: lms/templates/support/refund.html
-msgid "Enrollment:"
-msgstr "ჩარიცხვა:"
-
-#: lms/templates/support/refund.html
-msgid "enrolled"
-msgstr "ჩარიცხული"
-
-#: lms/templates/support/refund.html
-msgid "unenrolled"
-msgstr "ამორიცხული"
-
-#: lms/templates/support/refund.html
-msgid "Cost:"
-msgstr "ღირებულება:"
-
-#: lms/templates/support/refund.html
-msgid "CertificateItem Status:"
-msgstr "სერტიფიკატის სტატუსი:"
-
-#: lms/templates/support/refund.html
-msgid "Order Status:"
-msgstr "შეკვეთის სტატუსი:"
-
-#: lms/templates/support/refund.html
-msgid "Fulfilled Time:"
-msgstr "დასრულებული დრო:"
-
-#: lms/templates/support/refund.html
-msgid "Refund Request Time:"
-msgstr "დროის ანაზღაურების მოთხოვნა:"
 
 #: lms/templates/survey/survey.html
 msgid "User Survey"
