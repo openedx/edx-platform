@@ -3117,6 +3117,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
                 start=now - timedelta(days=1),
                 due=now + timedelta(days=1),  # Setting this to tomorrow so it'll show the 'Due Next' pill
                 graded=True,
+                format='Homework',
             )
             vertical = ItemFactory.create(category='vertical', parent_location=subsection.location)
             ItemFactory.create(category='problem', parent_location=vertical.location)
@@ -3135,6 +3136,8 @@ class DatesTabTestCase(ModuleStoreTestCase):
             self.assertContains(response, '<div class="pill due-next">')
             # No pills for verified enrollments
             self.assertNotContains(response, '<div class="pill verified">')
+            # Make sure the assignment type is rendered
+            self.assertContains(response, 'Homework:')
 
             enrollment.delete()
             enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
@@ -3158,6 +3161,8 @@ class DatesTabTestCase(ModuleStoreTestCase):
             self.assertNotContains(response, '<div class="pill due-next">')
             # Should have verified pills for audit enrollments
             self.assertContains(response, '<div class="pill verified">')
+            # Make sure the assignment type is rendered
+            self.assertContains(response, 'Homework:')
 
     @RELATIVE_DATES_FLAG.override(active=True)
     def test_reset_deadlines_banner_displays(self):

@@ -33,6 +33,7 @@ from openedx.core.djangolib.markup import HTML, Text
                     <% learner_has_access = not block_is_verified or learner_is_full_access %>
                     <% access_class = '' if learner_has_access else 'no-access' %>
                     <% is_assignment = isinstance(block, CourseAssignmentDate) %>
+                    <% assignment_type = is_assignment and block.assignment_type %>
                     <% todays_date = 'todays-date' if isinstance(block, TodaysDate) else '' %>
                     <% past_date = 'past-date' if block.date and block.date < block.current_time else '' %>
                     <% past_due = 'past-due' if learner_is_full_access and is_assignment and block.past_due else '' %>
@@ -69,6 +70,9 @@ from openedx.core.djangolib.markup import HTML, Text
                                 </div>
                                 % if not todays_date:
                                     <div class="timeline-title ${access_class} ${not_released}">
+                                        % if assignment_type:
+                                            ${assignment_type}:&nbsp;
+                                        % endif
                                         % if block.title_html and is_assignment and learner_has_access:
                                             ${block.title_html}
                                         % else:
