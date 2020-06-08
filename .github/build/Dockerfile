@@ -4,11 +4,11 @@ FROM ubuntu:16.04 as base
 ARG EDX_PLATFORM_VERSION=undefined
 
 # Install system requirements
-RUN apt update && \
+RUN apt update \
     # Global requirements
-    apt install -y language-pack-en git build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev libmysqlclient-dev libxmlsec1-dev libfreetype6-dev libssl-dev swig gcc g++ \
+    && apt install -yq language-pack-en git build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev libmysqlclient-dev libxmlsec1-dev libfreetype6-dev libssl-dev swig gcc g++ \
     # openedx requirements
-    gettext gfortran graphviz libgraphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev ntp pkg-config python3.5 python3-pip python3-dev sqlite3 lynx \
+    gettext gfortran graphviz libgraphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev ntp pkg-config python3.5 python3-dev python3-pip lynx \
     # Our requirements
     mysql-client locales unzip \
     && rm -rf /var/lib/apt/lists/* \
@@ -34,14 +34,14 @@ WORKDIR /openedx/edx-platform
 # Install python requirements (clone source repos in a separate dir, otherwise
 # they will be overwritten when we mount edx-platform)
 ENV NO_PYTHON_UNINSTALL 1
-RUN pip3 install pip==20.0.2 \
-  && pip3 install --src ../venv/src -r requirements/edx/base.txt
+RUN pip install pip==20.0.2 \
+  && pip install --src ../venv/src -r requirements/edx/base.txt
 
 # Remove the original versions of ora2 and edx-sga
-RUN pip3 uninstall -y ora2 edx-sga
+RUN pip uninstall -y ora2 edx-sga
 
 # Manually update pytz (Timezones)
-RUN pip3 install pytz --upgrade
+RUN pip install pytz --upgrade
 
 # Install a recent version of nodejs
 RUN nodeenv /openedx/nodeenv --node=12.13.0 --prebuilt
@@ -95,5 +95,18 @@ FROM base as testing
 
 # Install testing packages
 RUN grep -v -x -f /openedx/edx-platform/requirements/edx/base.txt /openedx/edx-platform/requirements/edx/development.txt > /tmp/requirements.txt \
-    && pip3 install -r /tmp/requirements.txt \
+    && pip install -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
+
+## Update sqlite3 to prevent segfaults on tests
+RUN cd /tmp \
+    && curl -O http://sqlite.org/2016/sqlite-autoconf-3140100.tar.gz \
+    && tar -xzvf sqlite-autoconf-3140100.tar.gz \
+    && cd sqlite-autoconf-3140100 \
+    && ./configure --prefix=/usr --disable-static CFLAGS="-g" \
+    && make \
+    && make install \
+    && cd \
+    && rm -rf /tmp/sqlite-autoconf-3140100.tar.gz /tmp/sqlite-autoconf-3140100
+
+ENV LD_LIBRARY_PATH /usr/lib
