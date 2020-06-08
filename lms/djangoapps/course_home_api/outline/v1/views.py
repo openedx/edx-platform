@@ -2,16 +2,22 @@
 Outline Tab Views
 """
 
-
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from edx_django_utils import monitoring as monitoring_utils
+from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
+
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
+from lms.djangoapps.courseware.date_summary import TodaysDate
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
+from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 
@@ -74,6 +80,17 @@ class OutlineTabView(RetrieveAPIView):
 
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
 
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
+        date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
+
+        # User locale settings
+        user_timezone_locale = user_timezone_locale_prefs(request)
+        user_timezone = user_timezone_locale['user_timezone']
+
+        dates_tab_link = request.build_absolute_uri(reverse('dates', args=[course.id]))
+        if course_home_mfe_dates_tab_is_active(course.id):
+            dates_tab_link = get_microfrontend_url(course_key=course.id, view_name='dates')
+
         transformers = BlockStructureTransformers()
         transformers += course_blocks_api.get_course_block_access_transformers(request.user)
         transformers += [
@@ -82,9 +99,16 @@ class OutlineTabView(RetrieveAPIView):
 
         course_blocks = get_course_blocks(request.user, course_usage_key, transformers, include_completion=True)
 
+        dates_widget = {
+            'course_date_blocks': [block for block in date_blocks if not isinstance(block, TodaysDate)],
+            'dates_tab_link': dates_tab_link,
+            'user_timezone': user_timezone,
+        }
+
         data = {
             'course_tools': course_tools,
             'course_blocks': course_blocks,
+            'dates_widget': dates_widget,
         }
         context = self.get_serializer_context()
         context['course_key'] = course_key
