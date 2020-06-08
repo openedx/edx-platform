@@ -1150,6 +1150,8 @@ if FEATURES.get('ENABLE_EVENT_CALIPERIZATION'):
 
     if FEATURES.get('ENABLE_KAFKA_FOR_CALIPER'):
         CALIPER_KAFKA_SETTINGS = ENV_TOKENS.get('CALIPER_KAFKA_SETTINGS')
+        CALIPER_KAFKA_AUTH_SETTINGS = AUTH_TOKENS.get('CALIPER_KAFKA_AUTH_SETTINGS')
+
 ############################### Plugin Settings ###############################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
