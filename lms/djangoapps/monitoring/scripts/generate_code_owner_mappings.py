@@ -157,7 +157,7 @@ def _map_edx_platform_apps(app_csv, owner_to_paths_map):
             path = path.replace('/', '.')  # convert path to dotted module name
 
             # skip catch-alls to ensure everything is properly mapped
-            if path in ('common,djangoapps', 'lms.djangoapps', 'openedx.core.djangoapps', 'openedx.features'):
+            if path in ('common.djangoapps', 'lms.djangoapps', 'openedx.core.djangoapps', 'openedx.features'):
                 continue
 
             if owner not in owner_to_paths_map:
