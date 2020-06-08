@@ -173,6 +173,9 @@ if STATIC_URL_BASE:
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
 
+# Allow overriding build profile used by RequireJS with one
+# contained on a custom theme
+REQUIRE_BUILD_PROFILE = ENV_TOKENS.get('REQUIRE_BUILD_PROFILE', REQUIRE_BUILD_PROFILE)
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text
 # values when the varibale is an empty string. Therefore, setting these variable as empty text in related
@@ -939,3 +942,12 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+############## Settings for Completion API #########################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
+                                                      COMPLETION_VIDEO_COMPLETE_PERCENTAGE)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS',
+                                                      COMPLETION_BY_VIEWING_DELAY_MS)

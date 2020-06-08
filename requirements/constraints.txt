@@ -38,7 +38,7 @@ django-storages<1.9
 # Support was dropped for Python 3.5
 drf-yasg<1.17.1
 
-# Not properly supporting latest changing of drf-jwt
+# drf-jwt 1.15.0 contains a migration that breaks on MySQL: https://github.com/Styria-Digital/django-rest-framework-jwt/issues/40
 drf-jwt==1.14.0
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
@@ -94,6 +94,9 @@ pytest-django<3.9.0
 # Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
 python-dateutil==2.4.0
 
+# stevedore 2.0.0 requires python >= 3.6
+stevedore<2.0.0
+
 # transifex-client 0.13.5 and 0.13.6 needlessly pin six and urllib3, 0.13.7 does so for python-slugify
 #   https://github.com/transifex/transifex-client/issues/252
 transifex-client==0.13.4
@@ -103,3 +106,4 @@ wrapt==1.11.*
 
 # zipp 2.0.0 requires Python >= 3.6
 zipp==1.0.0
+

@@ -1,4 +1,6 @@
-
+"""
+Tests for the API Serializers.
+"""
 
 import unittest
 
@@ -9,14 +11,15 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.api.v1.serializers import CourseEntitlementSerializer
+    from entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
     from entitlements.tests.factories import CourseEntitlementFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EntitlementsSerializerTests(ModuleStoreTestCase):
-    def setUp(self):
-        super(EntitlementsSerializerTests, self).setUp()
+    """
+    Tests for the Entitlement Serializers.
+    """
 
     def test_data(self):
         entitlement = CourseEntitlementFactory()

@@ -109,7 +109,7 @@ def transcript_credentials_handler(request, course_key_string):
         response = JsonResponse({'error': error_message}, status=400)
     else:
         # Send the validated credentials to edx-video-pipeline.
-        credentials_payload = dict(validated_credentials, org=course_key.org, provider=provider)
+        credentials_payload = dict(validated_credentials, org=course_key.org, provider=provider, course_key=course_key)
         error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
         # Send appropriate response based on whether credentials were updated or not.
         if is_updated:

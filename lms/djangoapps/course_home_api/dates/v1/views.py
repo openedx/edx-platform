@@ -18,6 +18,7 @@ from lms.djangoapps.course_home_api.dates.v1.serializers import DatesTabSerializ
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
 from openedx.core.djangoapps.enrollments.api import get_enrollment
 from openedx.features.course_experience.utils import dates_banner_should_display
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
 
 class DatesTabView(RetrieveAPIView):
@@ -44,7 +45,7 @@ class DatesTabView(RetrieveAPIView):
             title: (str) The title of the date event
         display_reset_dates_text: (bool) Indicates whether the reset dates banner should be shown
             for the given user
-        learner_is_verified: (bool) Indicates if the user is verified in the course
+        learner_is_full_access: (bool) Indicates if the user is verified in the course
         user_timezone: (str) The user's preferred timezone
         verified_upgrade_link: (str) The link for upgrading to the Verified track in a course
 
@@ -73,12 +74,12 @@ class DatesTabView(RetrieveAPIView):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         blocks = get_course_date_blocks(course, request.user, request, include_access=True, include_past_dates=True)
-        display_reset_dates_text, _ = dates_banner_should_display(course_key, request)
+        display_reset_dates_text = dates_banner_should_display(course_key, request)
 
-        learner_is_verified = False
-        enrollment = get_enrollment(request.user.username, course_key_string)
-        if enrollment:
-            learner_is_verified = enrollment.get('mode') == 'verified'
+        learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(
+            user=request.user,
+            course_key=course_key,
+        )
 
         # User locale settings
         user_timezone_locale = user_timezone_locale_prefs(request)
@@ -87,12 +88,12 @@ class DatesTabView(RetrieveAPIView):
         data = {
             'course_date_blocks': [block for block in blocks if not isinstance(block, TodaysDate)],
             'display_reset_dates_text': display_reset_dates_text,
-            'learner_is_verified': learner_is_verified,
+            'learner_is_full_access': learner_is_full_access,
             'user_timezone': user_timezone,
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
         }
         context = self.get_serializer_context()
-        context['learner_is_verified'] = learner_is_verified
+        context['learner_is_full_access'] = learner_is_full_access
         serializer = self.get_serializer_class()(data, context=context)
 
         return Response(serializer.data)

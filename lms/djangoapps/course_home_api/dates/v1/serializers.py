@@ -21,10 +21,10 @@ class DateSummarySerializer(serializers.Serializer):
     title = serializers.CharField()
 
     def get_learner_has_access(self, block):
-        learner_is_verified = self.context.get('learner_is_verified', False)
+        learner_is_full_access = self.context.get('learner_is_full_access', False)
         block_is_verified = (getattr(block, 'contains_gated_content', False) or
                              isinstance(block, VerificationDeadlineDate))
-        return (not block_is_verified) or learner_is_verified
+        return (not block_is_verified) or learner_is_full_access
 
     def get_link(self, block):
         if block.link:
@@ -39,6 +39,6 @@ class DatesTabSerializer(serializers.Serializer):
     """
     course_date_blocks = DateSummarySerializer(many=True)
     display_reset_dates_text = serializers.BooleanField()
-    learner_is_verified = serializers.BooleanField()
+    learner_is_full_access = serializers.BooleanField()
     user_timezone = serializers.CharField()
     verified_upgrade_link = serializers.URLField()

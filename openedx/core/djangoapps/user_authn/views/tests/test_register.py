@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for account creation"""
 
-
 import json
 from unittest import skipIf, skipUnless
 from datetime import datetime
@@ -328,7 +327,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
 
 @ddt.ddt
 @skip_unless_lms
-class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
+class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
     """Tests for the registration end-points of the User API. """
 
     maxDiff = None
@@ -392,7 +391,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     link_template = u"<a href='/honor' rel='noopener' target='_blank'>{link_label}</a>"
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(RegistrationViewTest, self).setUp()
+        super(RegistrationViewTestV1, self).setUp()
         self.url = reverse("user_api_registration")
 
     @ddt.data("get", "post")
@@ -494,7 +493,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
-        msg = u'Your password must contain at least 2 characters, including '\
+        msg = u'Your password must contain at least 2 characters, including ' \
               u'3 uppercase letters & 1 symbol.'
         self._assert_reg_field(
             no_extra_fields_setting,
@@ -950,18 +949,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         )
 
     def test_registration_form_confirm_email(self):
-        self._assert_reg_field(
-            {"confirm_email": "required"},
-            {
-                "name": "confirm_email",
-                "type": "text",
-                "required": True,
-                "label": "Confirm Email",
-                "errorMessages": {
-                    "required": "The email addresses do not match.",
-                }
-            }
-        )
+        pass
 
     @override_settings(
         MKTG_URLS={"ROOT": "https://www.test.com/", "HONOR": "honor"},
@@ -1160,7 +1148,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "password",
             "favorite_movie",
             "favorite_editor",
-            "confirm_email",
             "city",
             "state",
             "country",
@@ -1221,7 +1208,6 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "name",
             "username",
             "email",
-            "confirm_email",
             "password",
             "city",
             "state",
@@ -1279,7 +1265,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "password",
             "favorite_movie",
             "favorite_editor",
-            "confirm_email",
+
             "city",
             "state",
             "country",
@@ -1637,6 +1623,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         """
         Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
         """
+
         def _side_effect_for_get_value(value, default=None):
             """
             returns a side_effect with given return value for a given value
@@ -1733,6 +1720,188 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             "required": False,
             "defaultValue": backend.name
         })
+
+
+class RegistrationViewTestV2(RegistrationViewTestV1):
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        super(RegistrationViewTestV1, self).setUp()
+        self.url = reverse("user_api_registration_v2")
+
+    @override_settings(
+        REGISTRATION_EXTRA_FIELDS={
+            "level_of_education": "optional",
+            "gender": "optional",
+            "year_of_birth": "optional",
+            "mailing_address": "optional",
+            "goals": "optional",
+            "city": "optional",
+            "state": "optional",
+            "country": "required",
+            "honor_code": "required",
+            "confirm_email": "required",
+        },
+        REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm',
+        REGISTRATION_FIELD_ORDER=[
+            "name",
+            "confirm_email",
+            "password",
+            "first_name",
+            "last_name",
+            "gender",
+            "year_of_birth",
+            "level_of_education",
+            "company",
+            "title",
+            "mailing_address",
+            "goals",
+            "honor_code",
+            "terms_of_service",
+        ],
+    )
+    def test_field_order_invalid_override(self):
+        response = self.client.get(self.url)
+        self.assertHttpOK(response)
+
+        # Verify that all fields render in the correct order
+        form_desc = json.loads(response.content.decode('utf-8'))
+        field_names = [field["name"] for field in form_desc["fields"]]
+
+        self.assertEqual(field_names, [
+            "email",
+            "name",
+            "username",
+            "password",
+            "favorite_movie",
+            "favorite_editor",
+            "confirm_email",
+            "city",
+            "state",
+            "country",
+            "gender",
+            "year_of_birth",
+            "level_of_education",
+            "mailing_address",
+            "goals",
+            "honor_code",
+        ])
+
+    @override_settings(
+        REGISTRATION_EXTRA_FIELDS={
+            "level_of_education": "optional",
+            "gender": "optional",
+            "year_of_birth": "optional",
+            "mailing_address": "optional",
+            "goals": "optional",
+            "city": "optional",
+            "state": "optional",
+            "country": "required",
+            "honor_code": "required",
+            "confirm_email": "required",
+        },
+        REGISTRATION_FIELD_ORDER=[
+            "name",
+            "username",
+            "email",
+            "confirm_email",
+            "password",
+            "first_name",
+            "last_name",
+            "city",
+            "state",
+            "country",
+            "gender",
+            "year_of_birth",
+            "level_of_education",
+            "company",
+            "title",
+            "job_title",
+            "mailing_address",
+            "goals",
+            "honor_code",
+            "terms_of_service",
+            "specialty",
+            "profession",
+        ],
+    )
+    def test_field_order_override(self):
+        response = self.client.get(self.url)
+        self.assertHttpOK(response)
+
+        # Verify that all fields render in the correct order
+        form_desc = json.loads(response.content.decode('utf-8'))
+        field_names = [field["name"] for field in form_desc["fields"]]
+        self.assertEqual(field_names, [
+            "name",
+            "username",
+            "email",
+            "confirm_email",
+            "password",
+            "city",
+            "state",
+            "country",
+            "gender",
+            "year_of_birth",
+            "level_of_education",
+            "mailing_address",
+            "goals",
+            "honor_code",
+        ])
+
+    @override_settings(
+        REGISTRATION_EXTRA_FIELDS={
+            "level_of_education": "optional",
+            "gender": "optional",
+            "year_of_birth": "optional",
+            "mailing_address": "optional",
+            "goals": "optional",
+            "city": "optional",
+            "state": "optional",
+            "country": "required",
+            "honor_code": "required",
+            "confirm_email": "required",
+        },
+        REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm',
+    )
+    def test_field_order(self):
+        response = self.client.get(self.url)
+        self.assertHttpOK(response)
+
+        # Verify that all fields render in the correct order
+        form_desc = json.loads(response.content.decode('utf-8'))
+        field_names = [field["name"] for field in form_desc["fields"]]
+        self.assertEqual(field_names, [
+            "email",
+            "name",
+            "username",
+            "password",
+            "favorite_movie",
+            "favorite_editor",
+            "confirm_email",
+            "city",
+            "state",
+            "country",
+            "gender",
+            "year_of_birth",
+            "level_of_education",
+            "mailing_address",
+            "goals",
+            "honor_code",
+        ])
+
+    def test_registration_form_confirm_email(self):
+        self._assert_reg_field(
+            {"confirm_email": "required"},
+            {
+                "name": "confirm_email",
+                "type": "text",
+                "required": True,
+                "label": "Confirm Email",
+                "errorMessages": {
+                    "required": "The email addresses do not match.",
+                }
+            }
+        )
 
 
 @httpretty.activate

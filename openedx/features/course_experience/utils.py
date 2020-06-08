@@ -262,36 +262,46 @@ def dates_banner_should_display(course_key, request):
     incomplete sequentials and which enrollment mode is being
     dealt with for the current user and course.
     """
-    missed_deadlines = False
-    course_enrollment = None
-    if RELATIVE_DATES_FLAG.is_enabled(str(course_key)):
-        course_overview = CourseOverview.objects.get(id=str(course_key))
-        course_end_date = getattr(course_overview, 'end_date', None)
-        is_self_paced = getattr(course_overview, 'self_paced', False)
-        is_course_staff = bool(
-            request.user and course_overview and has_access(request.user, 'staff', course_overview, course_overview.id)
-        )
-        if is_self_paced and (not is_course_staff) and (not course_end_date or timezone.now() < course_end_date):
-            course_enrollment = CourseEnrollment.objects.filter(
-                course=course_overview, user=request.user,
-            ).filter(
-                Q(mode=CourseMode.AUDIT) | Q(mode=CourseMode.VERIFIED)
-            ).first()
-            if course_enrollment:
-                store = modulestore()
-                course_usage_key = store.make_course_usage_key(course_key)
-                block_data = get_course_blocks(request.user, course_usage_key, include_completion=True)
-                for section_key in block_data.get_children(course_usage_key):
-                    if missed_deadlines:
-                        break
-                    for subsection_key in block_data.get_children(section_key):
-                        subsection_due_date = block_data.get_xblock_field(subsection_key, 'due', None)
-                        if subsection_due_date and (
-                            not block_data.get_xblock_field(subsection_key, 'complete', False)
-                            and block_data.get_xblock_field(subsection_key, 'graded', False)
-                            and subsection_due_date < timezone.now()
-                        ):
-                            missed_deadlines = True
-                            break
+    if not RELATIVE_DATES_FLAG.is_enabled(str(course_key)):
+        return False
 
-    return missed_deadlines, getattr(course_enrollment, 'mode', None)
+    course_overview = CourseOverview.objects.get(id=str(course_key))
+    course_end_date = getattr(course_overview, 'end_date', None)
+    is_self_paced = getattr(course_overview, 'self_paced', False)
+
+    # Only display the banner for self-paced courses
+    if not is_self_paced:
+        return False
+
+    # Only display the banner for enrolled users
+    if not CourseEnrollment.is_enrolled(request.user, course_key):
+        return False
+
+    # Don't display the banner for course staff
+    is_course_staff = bool(
+        request.user and course_overview and has_access(request.user, 'staff', course_overview, course_overview.id)
+    )
+    if is_course_staff:
+        return False
+
+    # Don't display the banner if the course has ended
+    if course_end_date and course_end_date < timezone.now():
+        return False
+
+    store = modulestore()
+    course_usage_key = store.make_course_usage_key(course_key)
+    block_data = get_course_blocks(request.user, course_usage_key, include_completion=True)
+    for section_key in block_data.get_children(course_usage_key):
+        for subsection_key in block_data.get_children(section_key):
+            subsection_due_date = block_data.get_xblock_field(subsection_key, 'due', None)
+            if subsection_due_date and (
+                not block_data.get_xblock_field(subsection_key, 'complete', False)
+                and block_data.get_xblock_field(subsection_key, 'graded', False)
+                and subsection_due_date < timezone.now()
+            ):
+                # Display the banner if the due date for an incomplete graded subsection
+                # has passed
+                return True
+
+    # Don't display the banner if there were no missed deadlines
+    return False

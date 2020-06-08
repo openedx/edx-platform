@@ -107,6 +107,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
@@ -1051,31 +1053,31 @@ def dates(request, course_id):
     course_date_blocks = get_course_date_blocks(course, request.user, request,
                                                 include_access=True, include_past_dates=True)
 
-    learner_is_verified = False
-    enrollment = get_enrollment(request.user.username, course_id)
-    if enrollment:
-        learner_is_verified = enrollment.get('mode') == 'verified'
+    learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(request.user, course_key)
 
     # User locale settings
     user_timezone_locale = user_timezone_locale_prefs(request)
     user_timezone = user_timezone_locale['user_timezone']
     user_language = user_timezone_locale['user_language']
 
-    missed_deadlines, enrollment_mode = dates_banner_should_display(course_key, request)
+    missed_deadlines = dates_banner_should_display(course_key, request)
 
     context = {
         'course': course,
         'course_date_blocks': course_date_blocks,
         'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
-        'learner_is_verified': learner_is_verified,
+        'learner_is_full_access': learner_is_full_access,
         'user_timezone': user_timezone,
         'user_language': user_language,
         'supports_preview_menu': True,
         'can_masquerade': can_masquerade,
         'masquerade': masquerade,
         'on_dates_tab': True,
+        'content_type_gating_enabled': ContentTypeGatingConfig.enabled_for_enrollment(
+            user=request.user,
+            course_key=course_key,
+        ),
         'missed_deadlines': missed_deadlines,
-        'enrollment_mode': enrollment_mode,
         'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
         'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
         'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
@@ -1622,7 +1624,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
-    from lms.urls import RENDER_XBLOCK_NAME, RESET_COURSE_DEADLINES_NAME
+    from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
     from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 
     usage_key = UsageKey.from_string(usage_key_string)
@@ -1661,7 +1663,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
                 }
 
-        missed_deadlines, enrollment_mode = dates_banner_should_display(course_key, request)
+        missed_deadlines = dates_banner_should_display(course_key, request)
 
         context = {
             'fragment': block.render('student_view', context=student_view_context),
@@ -1676,11 +1678,18 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
             'missed_deadlines': missed_deadlines,
-            'enrollment_mode': enrollment_mode,
             'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
             'on_courseware_page': True,
+            'content_type_gating_enabled': ContentTypeGatingConfig.enabled_for_enrollment(
+                user=request.user,
+                course_key=course_key,
+            ),
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL),
+            'is_mobile_app': is_request_from_mobile_app(request),
+            'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+            'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
+            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 

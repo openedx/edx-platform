@@ -23,7 +23,7 @@ pymongo==3.9.0            # via -r requirements/edx/paver.in, edx-opaque-keys
 python-memcached==1.59    # via -r requirements/edx/paver.in
 requests==2.23.0          # via -r requirements/edx/paver.in
 six==1.15.0               # via edx-opaque-keys, libsass, mock, paver, python-memcached, stevedore
-stevedore==1.32.0         # via -r requirements/edx/paver.in, edx-opaque-keys
+stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in, edx-opaque-keys
 urllib3==1.25.9           # via requests
 watchdog==0.10.2          # via -r requirements/edx/paver.in
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in

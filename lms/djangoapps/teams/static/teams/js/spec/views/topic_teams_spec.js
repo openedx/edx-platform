@@ -8,16 +8,15 @@ define([
     'use strict';
     describe('Topic Teams View', function() {
         var createTopicTeamsView = function(options, isInstructorManagedTopic) {
-            var myTeamsCollection;
             options = options || {}; // eslint-disable-line no-param-reassign
-            myTeamsCollection = options.myTeamsCollection || TeamSpecHelpers.createMockTeams({results: []});
             return new TopicTeamsView({
                 el: '.teams-container',
                 model: isInstructorManagedTopic ?
                     TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
-                collection: options.teams || TeamSpecHelpers.createMockTeams(),
-                myTeamsCollection: myTeamsCollection,
-                showActions: true,
+                collection: options.teams || TeamSpecHelpers.createMockTeams({results: []}),
+                myTopicTeamsCollection: (
+                  options.myTopicTeamsCollection || TeamSpecHelpers.createMockTeams({results: []})
+                ),
                 context: _.extend({}, TeamSpecHelpers.testContext, options)
             }).render();
         };
@@ -28,10 +27,7 @@ define([
                     'If you still can\'t find a team to join, create a new team in this topic.',
                 title = teamsView.$('.title').text().trim(),
                 message = teamsView.$('.copy').text().trim();
-            if (!options) {
-                options = {showActions: true}; // eslint-disable-line no-param-reassign
-            }
-
+            options = options || {showActions: true}; // eslint-disable-line no-param-reassign
             if (options.showActions) {
                 expect(title).toBe(expectedTitle);
                 expect(message).toBe(expectedMessage);
@@ -47,12 +43,13 @@ define([
         });
 
         it('can render itself', function() {
-            var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
-                teamsView = createTopicTeamsView({
-                    teams: TeamSpecHelpers.createMockTeams({
-                        results: testTeamData
-                    })
-                });
+            var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5);
+            var options = {
+                teams: TeamSpecHelpers.createMockTeams({
+                    results: testTeamData
+                })
+            };
+            var teamsView = createTopicTeamsView(options);
             var footerEl = teamsView.$('.teams-paging-footer');
             expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
             expect(footerEl.text()).toMatch('1\\s+out of\\s+\/\\s+2'); // eslint-disable-line no-useless-escape
@@ -85,8 +82,8 @@ define([
             );
         });
 
-        it('does not show actions for a user already in a team', function() {
-            var options = {myTeamsCollection: TeamSpecHelpers.createMockTeams()};
+        it('does not show actions for a user already in a team in the teamset', function() {
+            var options = {myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()};
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: false});
         });
@@ -102,7 +99,7 @@ define([
                     privileged: true,
                     staff: false
                 },
-                myTeamsCollection: TeamSpecHelpers.createMockTeams()
+                myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()
             };
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: true});
@@ -114,7 +111,7 @@ define([
                     privileged: false,
                     staff: true
                 },
-                myTeamsCollection: TeamSpecHelpers.createMockTeams()
+                myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()
             };
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: true});

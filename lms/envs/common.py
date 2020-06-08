@@ -2565,7 +2565,10 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
 
     # Monitoring utilities for LMS
-    'lms.djangoapps.monitoring.apps.MonitoringConfig'
+    'lms.djangoapps.monitoring.apps.MonitoringConfig',
+
+    # Learning Sequence Navigation
+    'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 ]
 
 ######################### CSRF #########################################
@@ -3872,6 +3875,7 @@ DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 ############### Settings for video pipeline ##################
 VIDEO_UPLOAD_PIPELINE = {
+    'VEM_S3_BUCKET': '',
     'BUCKET': '',
     'ROOT_PATH': '',
 }
