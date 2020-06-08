@@ -378,7 +378,8 @@ class TeamMembershipImportManager(object):
                 try:
                     membership = CourseTeamMembership.objects.get(
                         user_id=row['user'].id,
-                        team__topic_id=ts_id
+                        team__topic_id=ts_id,
+                        team__course_id=self.course.id
                     )
                     membership.delete()
                 except CourseTeamMembership.DoesNotExist:
@@ -391,7 +392,8 @@ class TeamMembershipImportManager(object):
                         try:
                             membership = CourseTeamMembership.objects.get(
                                 user_id=row['user'].id,
-                                team__topic_id=ts_id
+                                team__topic_id=ts_id,
+                                team__course_id=self.course.id
                             )
                             membership.delete()
                             del self.existing_course_team_memberships[row['user'].id, ts_id]
