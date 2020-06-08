@@ -16,33 +16,35 @@ import click
 import os
 import re
 
-# Maps edx Django apps to their containing repo
+# Maps edx-platform installed Django apps to the edx repo that contains
+# the app code.
 EDX_REPO_APPS = {
-    'bulk_grades': 'edx-bulk-grades',
-    'coaching': 'platform-plugin-coaching',
-    'completion': 'completion',
-    'config_models': 'django-config-models',
-    'consent': 'edx-enterprise',
-    'csrf': 'edx-drf-extensions',
-    'edx_proctoring': 'edx-proctoring',
-    'edxval': 'edx-val',
-    'enterprise': 'edx-enterprise',
-    'enterprise_learner_portal': 'edx-enterprise',
-    'help_tokens': 'help-tokens',
-    'integrated_channels': 'edx-enterprise',
-    'organizations': 'edx-organizations',
-    'search': 'edx-search',
-    'wiki': 'django-wiki',
+    'bulk_grades': 'https://github.com/edx/edx-bulk-grades',
+    'coaching': 'https://github.com/edx/platform-plugin-coaching',
+    'completion': 'https://github.com/edx/completion',
+    'config_models': 'https://github.com/edx/django-config-models',
+    'consent': 'https://github.com/edx/edx-enterprise',
+    'csrf': 'https://github.com/edx/edx-drf-extensions',
+    'edx_proctoring': 'https://github.com/edx/edx-proctoring',
+    'edxval': 'https://github.com/edx/edx-val',
+    'enterprise': 'https://github.com/edx/edx-enterprise',
+    'enterprise_learner_portal': 'https://github.com/edx/edx-enterprise',
+    'help_tokens': 'https://github.com/edx/help-tokens',
+    'integrated_channels': 'https://github.com/edx/edx-enterprise',
+    'organizations': 'https://github.com/edx/edx-organizations',
+    'search': 'https://github.com/edx/edx-search',
+    'wiki': 'https://github.com/edx/django-wiki',
 }
 
-# Maps third-party Django apps to their containing repo
+# Maps edx-platform installed Django apps to the third-party repo that contains
+# the app code.
 THIRD_PARTY_APPS = {
-    'django': 'django',
-    'django_object_actions': 'django-object-actions',
-    'drf_yasg': 'drf-yasg',
-    'lx_pathway_plugin': 'lx-pathway-plugin',
-    'simple_history': 'django-simple-history',
-    'social_django': 'social-app-django',
+    'django': 'https://github.com/django/django',
+    'django_object_actions': 'https://github.com/crccheck/django-object-actions',
+    'drf_yasg': 'https://github.com/axnsan12/drf-yasg',
+    'lx_pathway_plugin': 'https://github.com/open-craft/lx-pathway-plugin',
+    'simple_history': 'https://github.com/treyhunner/django-simple-history',
+    'social_django': 'https://github.com/python-social-auth/social-app-django',
 }
 
 
@@ -69,30 +71,29 @@ def main(repo_csv, app_csv, dep_csv):
     Expected Repo CSV format:
 
         \b
-        repo name,owner.squad
-        edx-platform,team-red
-        edx-proctoring,team-blue
+        repo url,owner.squad
+        https://github.com/edx/edx-bulk-grades,team-red
         ...
 
     Expected App CSV format:
 
         \b
         Path,owner.squad
-        ./lms/templates/oauth2_provider,team-red
         ./openedx/core/djangoapps/user_authn,team-blue
         ...
 
     Expected 3rd-party Dependency CSV format:
 
         \b
-        repo name,repo url,owner.squad
-        django,team-red
-        social-app-django,team-blue
+        repo url,owner.squad
+        https://github.com/django/django,team-red
         ...
 
     Final output only includes paths which might contain views.
 
     """
+    # Maps owner names to a list of dotted module paths.
+    # For example: { 'team-red': [ 'openedx.core.djangoapps.api_admin', 'openedx.core.djangoapps.auth_exchange' ] }
     owner_to_paths_map = {}
     _map_repo_apps('edx-repo', repo_csv, EDX_REPO_APPS, owner_to_paths_map)
     _map_repo_apps('3rd-party', dep_csv, THIRD_PARTY_APPS, owner_to_paths_map)
@@ -114,7 +115,7 @@ def _map_repo_apps(csv_type, repo_csv, app_to_repo_map, owner_to_paths_map):
     Arguments:
         csv_type (string): Either 'edx-repo' or '3rd-party' for warning message
         repo_csv (string): File name for the edx-repo or 3rd-party repo csv
-        app_to_repo_map (dict): Dict mapping apps to repos
+        app_to_repo_map (dict): Dict mapping Django apps to repo urls
         owner_to_paths_map (dict): Holds results mapping owner to paths.
 
     """
@@ -124,16 +125,16 @@ def _map_repo_apps(csv_type, repo_csv, app_to_repo_map, owner_to_paths_map):
 
     csv_repo_to_owner_map = {}
     for row in reader:
-        csv_repo_to_owner_map[row.get('repo name')] = row.get('owner.squad')
+        csv_repo_to_owner_map[row.get('repo url')] = row.get('owner.squad')
 
-    for app, repo in app_to_repo_map.items():
-        owner = csv_repo_to_owner_map.get(repo, None)
+    for app, repo_url in app_to_repo_map.items():
+        owner = csv_repo_to_owner_map.get(repo_url, None)
         if owner:
             if owner not in owner_to_paths_map:
                 owner_to_paths_map[owner] = []
             owner_to_paths_map[owner].append(app)
         else:
-            print('WARNING: Repo {} was not found in {} csv. Needed for app {}.'.format(repo, csv_type, app))
+            print('WARNING: Repo {} was not found in {} csv. Needed for app {}.'.format(repo_url, csv_type, app))
 
 
 def _map_edx_platform_apps(app_csv, owner_to_paths_map):

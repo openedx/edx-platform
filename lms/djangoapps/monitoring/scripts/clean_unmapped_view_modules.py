@@ -1,5 +1,11 @@
 """
-This script outputs a unique and clean set of external apps provided a CSV of unmapped view_func_modules.
+Provided a CSV of data from our monitoring system, this script outputs a unique and clean
+set of apps of unmapped view_func_modules.
+
+Context: This script was useful when first introducing ownership mapping and we had many
+apps from 3rd-party dependencies that were missed. At this point, we'd probably only
+expect 0-2 new unmapped apps, which could be cleaned manually very quickly without this
+script.
 
 Sample usage::
 
