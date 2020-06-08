@@ -11,6 +11,7 @@ class SmartReferralFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = SmartReferral
+        django_get_or_create = ['contact_email', 'user']
 
     user = factory.SubFactory(UserFactory)
     contact_email = factory.Faker('email')

@@ -100,6 +100,7 @@ urlpatterns = [
     url(r'', include('openedx.features.specializations.urls')),
     url(r'^marketplace/', include('openedx.features.marketplace.urls')),
     url(r'^idea/', include('openedx.features.idea.urls')),
+    url(r'^referral/', include('openedx.features.smart_referral.urls')),
 
     # temporary experiment urls block start.
     url(r'^organizations/', TemplateView.as_view(template_name='main_django.html'),
