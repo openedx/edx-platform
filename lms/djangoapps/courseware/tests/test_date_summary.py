@@ -642,6 +642,25 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             block = VerificationDeadlineDate(course, user)
             self.assertEqual(block.relative_datestring, expected_date_string)
 
+    @ddt.data(
+        'info',
+        'openedx.course_experience.course_home',
+    )
+    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
+    def test_dates_tab_link_render(self, url_name):
+        with freeze_time('2015-01-02'):
+            course = create_course_run()
+            user = create_user()
+            self.client.login(username=user.username, password=TEST_PASSWORD)
+            url = reverse(url_name, args=(course.id,))
+            response = self.client.get(url, follow=True)
+            html_elements = [
+                'class="dates-tab-link"',
+                'View all course dates</a>',
+            ]
+            for html in html_elements:
+                self.assertContains(response, html)
+
 
 @ddt.ddt
 class TestDateAlerts(SharedModuleStoreTestCase):
