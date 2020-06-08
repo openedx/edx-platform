@@ -14,9 +14,7 @@ define([
                 model: isInstructorManagedTopic ?
                     TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
                 collection: options.teams || TeamSpecHelpers.createMockTeams({results: []}),
-                myTopicTeamsCollection: (
-                  options.myTopicTeamsCollection || TeamSpecHelpers.createMockTeams({results: []})
-                ),
+                topicTeams: options.topicTeams || [],
                 context: _.extend({}, TeamSpecHelpers.testContext, options)
             }).render();
         };
@@ -83,7 +81,7 @@ define([
         });
 
         it('does not show actions for a user already in a team in the teamset', function() {
-            var options = {myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()};
+            var options = {topicTeams: ['team']};
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: false});
         });
@@ -94,24 +92,27 @@ define([
         });
 
         it('shows actions for a privileged user already in a team', function() {
+            var topicID = 'topic ID';
             var options = {
                 userInfo: {
                     privileged: true,
-                    staff: false
+                    staff: false,
                 },
-                myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()
+                topicTeams: [{topic_id: topicID}],
             };
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: true});
         });
 
         it('shows actions for a staff user already in a team', function() {
+            var topicID = 'topic ID';
             var options = {
+                model: {topic_id: topicID},
                 userInfo: {
                     privileged: false,
-                    staff: true
+                    staff: true,
+                    teams: [{topic_id: topicID}],
                 },
-                myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()
             };
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: true});
