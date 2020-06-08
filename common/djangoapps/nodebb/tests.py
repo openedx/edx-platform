@@ -4,7 +4,6 @@ from django.test import TestCase
 from requests.exceptions import ConnectionError
 
 from common.lib.nodebb_client.client import NodeBBClient
-from common.lib.nodebb_client.users import ForumUser
 from tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb, task_delete_user_on_nodebb,
                    task_activate_user_on_nodebb, task_join_group_on_nodebb, task_update_onboarding_surveys_status)
 
@@ -19,7 +18,7 @@ class NodeBBUserCreationTestCase(TestCase):
                     user_data={}
                 )
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tests.task_create_user_on_nodebb.delay') as method:
+            with mock.patch('nodebb.tests.task_create_user_on_nodebb.delay') as method:
                 task_create_user_on_nodebb.delay(username=username, user_data={})
 
                 method.assert_called_with(username=username, user_data={})
@@ -38,22 +37,19 @@ class NodeBBUserCreationTestCase(TestCase):
                     profile_data=data_to_sync
                 )
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tasks.task_update_user_profile_on_nodebb.delay') as method:
+            with mock.patch('nodebb.tasks.task_update_user_profile_on_nodebb.delay') as method:
                 task_update_user_profile_on_nodebb.delay(username=username, profile_data=data_to_sync)
 
-                method.assert_called_with(username=username, kwargs=data_to_sync)
+                method.assert_called_with(username=username, profile_data=data_to_sync)
 
     def test_user_deletion(self):
         username = "testuser"
         nodebb_client = NodeBBClient()
         try:
             with mock.patch('common.lib.nodebb_client.users.ForumUser.delete', side_effect=ConnectionError):
-                nodebb_client.users.delete_user(
-                    username=username,
-                    kwargs={}
-                )
+                nodebb_client.users.delete_user(username=username)
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tests.task_delete_user_on_nodebb.delay') as method:
+            with mock.patch('nodebb.tests.task_delete_user_on_nodebb.delay') as method:
                 task_delete_user_on_nodebb.delay(username=username, kwargs={})
 
                 method.assert_called_with(username=username, kwargs={})
@@ -69,7 +65,7 @@ class NodeBBUserCreationTestCase(TestCase):
                     kwargs={}
                 )
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tests.task_activate_user_on_nodebb.delay') as method:
+            with mock.patch('nodebb.tests.task_activate_user_on_nodebb.delay') as method:
                 task_activate_user_on_nodebb.delay(username=username, active=active, kwargs={})
 
                 method.assert_called_with(username=username, active=active, kwargs={})
@@ -86,10 +82,10 @@ class NodeBBUserCreationTestCase(TestCase):
                         kwargs={}
                     )
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tests.task_join_group_on_nodebb.delay') as method:
-                task_join_group_on_nodebb.delay(group_name=groupname, username=username, kwargs={})
+            with mock.patch('nodebb.tests.task_join_group_on_nodebb.delay') as method:
+                task_join_group_on_nodebb.delay(category_id=category_id, username=username, kwargs={})
 
-                method.assert_called_with(group_name=groupname, username=username, kwargs={})
+                method.assert_called_with(category_id=category_id, username=username, kwargs={})
 
     def test_update_onboarding_surveys_status(self):
         username = "testuser"
@@ -102,7 +98,8 @@ class NodeBBUserCreationTestCase(TestCase):
                     NodeBBClient().users.update_onboarding_surveys_status(username=username)
         except ConnectionError:
             with mock.patch(
-                'common.djangoapps.nodebb.tests.task_update_onboarding_surveys_status.delay') as method:
+                'nodebb.tests.task_update_onboarding_surveys_status.delay'
+            ) as method:
                 task_update_onboarding_surveys_status.delay(username=username)
 
                 method.assert_called_with(username=username)
