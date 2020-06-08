@@ -4,11 +4,11 @@
 #
 #    make upgrade
 #
-certifi==2020.4.5.1       # via requests
+certifi==2020.4.5.2       # via requests
 chardet==3.0.4            # via requests
 edx-opaque-keys==2.1.0    # via -r requirements/edx/paver.in
 idna==2.9                 # via requests
-importlib-metadata==1.6.0  # via path
+importlib-metadata==1.6.1  # via path
 lazy==1.4                 # via -r requirements/edx/paver.in
 libsass==0.10.0           # via -r requirements/edx/paver.in
 markupsafe==1.1.1         # via -r requirements/edx/paver.in
