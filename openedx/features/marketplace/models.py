@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext as _
 from model_utils.models import TimeStampedModel
 
-from openedx.custom.db.fields import MultiSelectWithOtherField
+from openedx.features.custom_fields.multiselect_with_other.db.fields import MultiSelectWithOtherField
 from openedx.features.idea.models import Location, OrganizationBase, VisualAttachment
 from openedx.features.marketplace.constants import (
     ORGANIZATION_SECTOR_CHOICES,

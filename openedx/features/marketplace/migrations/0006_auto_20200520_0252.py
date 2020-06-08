@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
-import openedx.custom.db.fields
+import openedx.features.custom_fields.multiselect_with_other.db.fields
 
 
 class Migration(migrations.Migration):
@@ -16,11 +16,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='marketplacerequest',
             name='organization_sector',
-            field=openedx.custom.db.fields.MultiSelectWithOtherField(choices=[(b'health-and-well-being', 'Health & Well-being'), (b'education', 'Education'), (b'gender-equality', 'Gender Equality'), (b'sanitation', 'Sanitation'), (b'climate-changes', 'Climate Change'), (b'clean-energy', 'Clean Energy'), (b'environmental-conservation', 'Environmental Conservation'), (b'work-and-economic-growth', 'Work & Economic Growth'), (b'human-rights', 'Human Rights'), (b'social-justice', 'Social Justice'), (b'art-and-culture', 'Arts & Culture'), (b'other', b'Other')], help_text='Please select all that apply.', max_length=233, verbose_name='Which sector is your organization working in?'),
+            field=openedx.features.custom_fields.multiselect_with_other.db.fields.MultiSelectWithOtherField(choices=[(b'health-and-well-being', 'Health & Well-being'), (b'education', 'Education'), (b'gender-equality', 'Gender Equality'), (b'sanitation', 'Sanitation'), (b'climate-changes', 'Climate Change'), (b'clean-energy', 'Clean Energy'), (b'environmental-conservation', 'Environmental Conservation'), (b'work-and-economic-growth', 'Work & Economic Growth'), (b'human-rights', 'Human Rights'), (b'social-justice', 'Social Justice'), (b'art-and-culture', 'Arts & Culture'), (b'other', b'Other')], help_text='Please select all that apply.', max_length=233, verbose_name='Which sector is your organization working in?'),
         ),
         migrations.AlterField(
             model_name='marketplacerequest',
             name='user_services',
-            field=openedx.custom.db.fields.MultiSelectWithOtherField(choices=[(b'healthcare-supplies', 'Healthcare Supplies'), (b'people-power', 'People Power'), (b'online-training', 'Online Training Tools'), (b'delivery-services', 'Delivery Services'), (b'mentorship', 'Mentorship'), (b'funding', 'Funding'), (b'other', b'Other')], help_text='Please select all that apply.', max_length=135, verbose_name='What help can you provide to other organizations?'),
+            field=openedx.features.custom_fields.multiselect_with_other.db.fields.MultiSelectWithOtherField(choices=[(b'healthcare-supplies', 'Healthcare Supplies'), (b'people-power', 'People Power'), (b'online-training', 'Online Training Tools'), (b'delivery-services', 'Delivery Services'), (b'mentorship', 'Mentorship'), (b'funding', 'Funding'), (b'other', b'Other')], help_text='Please select all that apply.', max_length=135, verbose_name='What help can you provide to other organizations?'),
         ),
     ]

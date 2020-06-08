@@ -5,14 +5,15 @@ from multiselectfield import MultiSelectField
 from multiselectfield.db.fields import MSFList
 from multiselectfield.utils import string_type, get_max_length
 
-from openedx.custom.forms.fields import MultiSelectWithOtherFormField
-from openedx.custom.helpers import add_other_field_in_choices
+from openedx.features.custom_fields.multiselect_with_other.forms.fields import MultiSelectWithOtherFormField
+from openedx.features.custom_fields.multiselect_with_other.helpers import add_other_field_in_choices
 
 
 class OtherMultiSelectFieldList(MSFList):
     def __str__(self):
         selected_choice_list = [self.choices.get(int(i)) if i.isdigit() else (self.choices.get(i) or i) for i in self]
         return u', '.join([string_type(s) for s in selected_choice_list])
+
 
 class MultiSelectWithOtherField(MultiSelectField):
     """
@@ -26,6 +27,7 @@ class MultiSelectWithOtherField(MultiSelectField):
     def __init__(self, other_max_length=None, *args, **kwargs):
         self.other_max_length = other_max_length
         self.other_delimiter = kwargs.get('other_delimiter', '|')
+
         if kwargs.get('max_length') is None and other_max_length is not None:
             choice_max_length = get_max_length(kwargs['choices'], kwargs.get('max_length'))
             kwargs['max_length'] = choice_max_length + other_max_length
