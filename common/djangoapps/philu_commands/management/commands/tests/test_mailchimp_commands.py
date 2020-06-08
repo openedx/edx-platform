@@ -58,7 +58,8 @@ class MailChimpUser(TestCase):
         users = list(User.objects.all())
         users_data = Command().get_users_data_to_send(users)
         call_command('sync_users_with_mailchimp')
-        mock_func.assert_called_once_with(settings.MAILCHIMP_LEARNERS_LIST_ID, {"members": users_data})
+        mock_func.assert_called_once_with(settings.MAILCHIMP_LEARNERS_LIST_ID,
+                                          {'update_existing': True, "members": users_data})
 
     @mock.patch('lms.djangoapps.certificates.api.get_certificates_for_user')
     @mock.patch('mailchimp_pipeline.client.ChimpClient.add_list_members_in_batch')
@@ -78,7 +79,8 @@ class MailChimpUser(TestCase):
         users = list(User.objects.all())
         users_data = Command().get_users_data_to_send(users)
         call_command('sync_users_with_mailchimp')
-        mock_func.assert_called_once_with(settings.MAILCHIMP_LEARNERS_LIST_ID, {"members": users_data})
+        mock_func.assert_called_once_with(settings.MAILCHIMP_LEARNERS_LIST_ID,
+                                          {'update_existing': True, "members": users_data})
         self.assertRaises(Exception)
 
     @mock.patch('philu_commands.management.commands.sync_users_with_mailchimp.connection')
