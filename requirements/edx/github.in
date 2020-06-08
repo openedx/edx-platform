@@ -77,7 +77,6 @@ git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248e
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
 git+https://github.com/edx/edx-ora2.git@v2.7.10#egg=ora2==v2.7.10
-git+https://github.com/edx/crowdsourcehinter.git@2178ac72891392106ffef389651aef374177d294#egg=crowdsourcehinter-xblock==0.4
 -e git+https://github.com/edx/RateXBlock.git@2.0#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@2.0.2#egg=done-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
