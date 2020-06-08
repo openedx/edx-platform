@@ -2352,7 +2352,6 @@ INSTALLED_APPS = [
 
     'static_template_view',
     'staticbook',
-    'track',
     'eventtracking.django.apps.EventTrackingConfig',
     'util',
     'lms.djangoapps.certificates.apps.CertificatesConfig',

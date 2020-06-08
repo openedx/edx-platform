@@ -29,7 +29,7 @@ from path import Path as path
 from six import StringIO, text_type
 
 import dashboard.git_import as git_import
-import track.views
+from eventtracking import tracker
 from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
@@ -209,7 +209,7 @@ class Users(SysadminDashboardView):
         if not request.user.is_staff:
             raise Http404
         action = request.POST.get('action', '')
-        track.views.server_track(request, action, {}, page='user_sysdashboard')
+        tracker.emit(action, {})
 
         if action == 'download_users':
             header = [_('username'), _('email'), ]
@@ -371,8 +371,7 @@ class Courses(SysadminDashboardView):
             raise Http404
 
         action = request.POST.get('action', '')
-        track.views.server_track(request, action, {},
-                                 page='courses_sysdashboard')
+        tracker.emit(action, {})
 
         courses = {course.id: course for course in self.get_courses()}
         if action == 'add_course':
@@ -455,8 +454,7 @@ class Staffing(SysadminDashboardView):
         """Handle all actions from staffing and enrollment view"""
 
         action = request.POST.get('action', '')
-        track.views.server_track(request, action, {},
-                                 page='staffing_sysdashboard')
+        tracker.emit(action, {})
 
         if action == 'get_staff_csv':
             data = []

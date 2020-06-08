@@ -23,8 +23,8 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.features.course_experience.utils import dates_banner_should_display
 
-import track.views
 from edxmako.shortcuts import render_to_response
+from eventtracking import tracker
 from student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)
@@ -166,7 +166,7 @@ def calculate(request):
     except:
         event = {'error': list(map(str, sys.exc_info())),
                  'equation': equation}
-        track.views.server_track(request, 'error:calc', event, page='calc')
+        tracker.emit('error:calc', event)
         return HttpResponse(json.dumps({'result': 'Invalid syntax'}))
     return HttpResponse(json.dumps({'result': str(result)}))
 

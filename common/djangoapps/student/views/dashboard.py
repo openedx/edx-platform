@@ -19,9 +19,9 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import iteritems, text_type
 
-import track.views
 from bulk_email.api import is_bulk_email_feature_enabled
 from bulk_email.models import Optout
+from eventtracking import tracker
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
@@ -335,12 +335,7 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
                     request.user.email,
                     course_key,
                 )
-                track.views.server_track(
-                    request,
-                    "change-email1-settings",
-                    {"receive_emails": "no", "course": text_type(course_key)},
-                    page='dashboard',
-                )
+                tracker.emit("change-email1-settings", {"receive_emails": "no", "course": text_type(course_key)})
                 break
 
     return blocked

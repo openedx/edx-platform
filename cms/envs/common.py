@@ -1334,7 +1334,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
-    'track',
     'eventtracking.django.apps.EventTrackingConfig',
 
     # For asset pipelining

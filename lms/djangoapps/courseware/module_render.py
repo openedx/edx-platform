@@ -132,10 +132,9 @@ def make_track_function(request):
     Make a tracking function that logs what happened.
     For use in ModuleSystem.
     '''
-    import track.views
 
     def function(event_type, event):
-        return track.views.server_track(request, event_type, event, page='x_module')
+        return tracker.emit(event_type, event)
     return function
 
 

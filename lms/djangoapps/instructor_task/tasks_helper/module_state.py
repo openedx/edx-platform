@@ -21,7 +21,7 @@ from lms.djangoapps.courseware.module_render import get_module_for_descriptor_in
 from lms.djangoapps.grades.api import events as grades_events
 from student.models import get_user_by_username_or_email
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
-from track.views import task_track
+from eventtracking import tracker
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
@@ -344,7 +344,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
         provide the event_type (as string) and event (as dict) as arguments.
         The request_info and task_info (and page) are provided here.
         '''
-        return lambda event_type, event: task_track(request_info, task_info, event_type, event, page='x_module_task')
+        return lambda event_type, event: tracker.emit(event_type, event)
 
     xqueue_callback_url_prefix = xmodule_instance_args.get('xqueue_callback_url_prefix', '') \
         if xmodule_instance_args is not None else ''
@@ -377,7 +377,7 @@ def _get_track_function_for_task(student, xmodule_instance_args=None, source_pag
     request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
     task_info = {'student': student.username, 'task_id': _get_task_id_from_xmodule_args(xmodule_instance_args)}
 
-    return lambda event_type, event: task_track(request_info, task_info, event_type, event, page=source_page)
+    return lambda event_type, event: tracker.emit(event_type, event)
 
 
 def _get_task_id_from_xmodule_args(xmodule_instance_args):

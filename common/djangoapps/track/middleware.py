@@ -81,7 +81,7 @@ class TrackMiddleware(MiddlewareMixin):
             event = json.dumps(event)
             event = event[:512]
 
-            views.server_track(request, request.META['PATH_INFO'], event)
+            tracker.emit(request.META['PATH_INFO'], event)
         except:
             ## Why do we have the overly broad except?
             ##
@@ -93,7 +93,7 @@ class TrackMiddleware(MiddlewareMixin):
             ## is down, we should fail and fix it.
             event = {'event-type': 'exception', 'exception': repr(sys.exc_info()[0])}
             try:
-                views.server_track(request, request.META['PATH_INFO'], event)
+                tracker.emit(request.META['PATH_INFO'], event)
             except:
                 # At this point, things are really broken. We really
                 # should fail return a 500 to the user here.  However,

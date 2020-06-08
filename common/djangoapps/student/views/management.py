@@ -35,8 +35,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type
-
-import track.views
 from bulk_email.models import Optout
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
@@ -824,12 +822,7 @@ def change_email_settings(request):
             user.email,
             course_id,
         )
-        track.views.server_track(
-            request,
-            "change-email-settings",
-            {"receive_emails": "yes", "course": course_id},
-            page='dashboard',
-        )
+        tracker.emit('change-email-settings', {"receive_emails": "yes", "course": course_id})
     else:
         Optout.objects.get_or_create(user=user, course_id=course_key)
         log.info(
@@ -838,12 +831,7 @@ def change_email_settings(request):
             user.email,
             course_id,
         )
-        track.views.server_track(
-            request,
-            "change-email-settings",
-            {"receive_emails": "no", "course": course_id},
-            page='dashboard',
-        )
+        tracker.emit('change-email-settings', {"receive_emails": "no", "course": course_id})
 
     return JsonResponse({"success": True})
 
