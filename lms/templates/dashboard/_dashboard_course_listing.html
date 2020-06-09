@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url" expression_filter="h"/>
+<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url" expression_filter="h"/>
 
 <%!
 import six
@@ -68,7 +68,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
       <h2 class="hd hd-2 sr" id="details-heading-${enrollment.course_id}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">
       % if show_courseware_link and not is_unfulfilled_entitlement:
-        % if not is_course_blocked and not is_course_expired:
+        % if not is_course_expired:
             <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover course-target-link" tabindex="-1">
               <img src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
             </a>
@@ -95,7 +95,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
       <div class="wrapper-course-details">
         <h3 class="course-title" id="course-title-${enrollment.course_id}">
           % if show_courseware_link and not is_unfulfilled_entitlement:
-            % if not is_course_blocked and not is_course_expired:
+            % if not is_course_expired:
               <a data-course-key="${enrollment.course_id}" href="${course_target}" class="course-target-link">${course_overview.display_name_with_default}</a>
             % else:
               <a class="disable-look" data-course-key="${enrollment.course_id}">${course_overview.display_name_with_default}</a>
@@ -178,14 +178,12 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
           <div class="course-actions">
             % if (show_courseware_link or is_unfulfilled_entitlement) and not is_course_expired:
               % if course_overview.has_ended():
-                % if is_course_blocked:
-                    <a class="enter-course-blocked archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
-                % elif not is_unfulfilled_entitlement:
+                % if not is_unfulfilled_entitlement:
                   <a href="${course_target}" class="enter-course archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % endif
 
               % else:
-                <%include file="_dashboard_course_resume.html" args="resume_button_url=resume_button_url, course_overview=course_overview, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_course_blocked=is_course_blocked, course_target=course_target, related_programs=related_programs"/>
+                <%include file="_dashboard_course_resume.html" args="resume_button_url=resume_button_url, course_overview=course_overview, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, course_target=course_target, related_programs=related_programs"/>
               % endif
             % endif
 
@@ -264,7 +262,6 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                       % if can_unenroll:
                         <li class="actions-item" id="actions-item-unenroll-${dashboard_index}" role="menuitem">
                           <% course_refund_url = reverse('course_run_refund_status', args=[six.text_type(course_overview.id)]) %>
-                              % if not is_course_blocked:
                               <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal"
                                  data-course-id="${course_overview.id}"
                                  data-course-number="${course_overview.number}"
@@ -276,28 +273,11 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                                  data-course-enrollment-mode="${enrollment.mode}">
                                 ${_('Unenroll')}
                               </a>
-                              % else:
-                              <a class="action action-unenroll is-disabled"
-                                 data-course-id="${course_overview.id}"
-                                 data-course-number="${course_overview.number}"
-                                 data-course-name="${course_overview.display_name_with_default}"
-                                 data-dashboard-index="${dashboard_index}"
-                                 data-course-refund-url="${course_refund_url}"
-                                 data-course-is-paid-course="${is_paid_course}"
-                                 data-course-cert-name-long="${cert_name_long}"
-                                 data-course-enrollment-mode="${enrollment.mode}">
-                                ${_('Unenroll')}
-                              </a>
-                            % endif
                         </li>
                     % endif
                       <li class="actions-item" id="actions-item-email-settings-${dashboard_index}" role="menuitem">
                         % if show_email_settings:
-                          % if not is_course_blocked:
                             <a href="#email-settings-modal" class="action action-email-settings" rel="leanModal" data-course-id="${course_overview.id}" data-course-number="${course_overview.number}" data-dashboard-index="${dashboard_index}" data-optout="${course_overview.id in course_optouts}">${_('Email Settings')}</a>
-                          % else:
-                            <a class="action action-email-settings is-disabled" data-course-id="${course_overview.id}" data-course-number="${course_overview.number}" data-dashboard-index="${dashboard_index}" data-optout="${course_overview.id in course_optouts}">${_('Email Settings')}</a>
-                          % endif
                         % endif
                       </li>
                     </ul>
@@ -356,32 +336,6 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
         <%include file="_dashboard_credit_info.html" args="credit_status=credit_status"/>
       % endif
 
-      % if is_course_blocked and entitlement:
-        <p id="block-course-msg" class="course-block">
-          ${_("You can no longer access this course because payment has not yet been received. You can contact the account holder to request payment, or you can unenroll from this course")}
-        </p>
-      % elif is_course_blocked:
-        <p id="block-course-msg" class="course-block">
-          ${Text(_("You can no longer access this course because payment has not yet been received. "
-              "You can {contact_link_start}contact the account holder{contact_link_end} "
-              "to request payment, or you can "
-              "{unenroll_link_start}unenroll{unenroll_link_end} "
-              "from this course")).format(
-            contact_link_start=HTML('<button type="button">'),
-            contact_link_end=HTML('</button>'),
-            unenroll_link_start=HTML(
-              '<a id="unregister_block_course" rel="leanModal" '
-              'data-course-id="{course_id}" data-course-number="{course_number}" data-course-name="{course_name}" '
-              'href="#unenroll-modal">'
-            ).format(
-              course_id=course_overview.id,
-              course_number=course_overview.number,
-              course_name=course_overview.display_name_with_default,
-            ),
-            unenroll_link_end=HTML('</a>'),
-          )}
-        </p>
-      % else:
         % if show_consent_link:
           <%include file="_dashboard_show_consent.html" args="course_overview=course_overview, course_target=course_target, enrollment=enrollment, enterprise_customer_name=enterprise_customer_name"/>
         %endif
@@ -465,7 +419,6 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
             </div>
           </div>
         % endif
-      % endif
 
         % if course_requirements:
         ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
@@ -485,16 +438,6 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
 </article>
 </div>
 </li>
-<script>
-           $( document ).ready(function() {
-
-               if("${is_course_blocked | n, dump_js_escaped_json}" == 'true'){
-                   $( "#unregister_block_course" ).click(function() {
-                       $('.disable-look-unregister').click();
-                   });
-               }
-           });
-</script>
 
 % if share_settings.get('DASHBOARD_FACEBOOK', False) and share_settings.get('DASHBOARD_TWITTER', False):
     <%static:require_module_async module_name="js/course_sharing/course_sharing_events" class_name="CourseSharingEvents">
