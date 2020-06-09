@@ -8,7 +8,7 @@ from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from student.models import CourseEnrollment
 from course_action_state.models import CourseRerunState
 
-from ..models import CourseCard
+from ..models import CourseCard, CourseOverview
 from .helpers import set_course_dates, disable_course_card, initialize_test_user
 
 
@@ -26,17 +26,18 @@ class CourseCardBaseClass(ModuleStoreTestCase):
 
         org = 'edX'
         course_number_f = 'CS10{}'
-        course_run = '2015_Q1'
+        course_run_f = '2015_Q{}'
         display_name_f = 'test course {}'
 
         self.courses = [
-            CourseFactory.create(org=org, number=course_number_f.format(str(i)), run=course_run,
+            CourseFactory.create(org=org, number=course_number_f.format(str(i)), run=course_run_f.format(str(i)),
                                  display_name=display_name_f.format(str(i)), default_store=ModuleStoreEnum.Type.split)
             for i in range(1, self.NUMBER_OF_COURSES + 1)
         ]
 
         for course in self.courses:
             course.save()
+            CourseOverview._create_or_update(course=course).save()
             CourseCard(course_id=course.id, course_name=course.display_name, is_enabled=True).save()
 
     @classmethod
@@ -107,6 +108,7 @@ class CourseCardViewBaseClass(CourseCardBaseClass):
         )
 
         course.save()
+        CourseOverview._create_or_update(course=course).save()
         CourseCard(course_id=course.id, course_name=course.display_name, is_enabled=True).save()
 
         self.client.login(username=self.staff.username, password=self.password)

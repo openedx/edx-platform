@@ -26,6 +26,7 @@ class CourseCardBaseClass(ModuleStoreTestCase):
         course_run = '2015_Q1'
         display_name_f = 'test course 1'
         self.date_time_format = '%b %-d, %Y'
+        self.about_page_date_time_format = '%B %d, %Y'
 
         self.course = CourseFactory.create(org=org, number=course_number_f, run=course_run,
                                            display_name=display_name_f,
@@ -58,7 +59,7 @@ class CourseCardViewBaseClass(CourseCardBaseClass):
         # We are getting 1st para with class "start-date" and get text from it.
         # It cause a serious problem if CSS is changed. This need to checked if that happens.
         self.assertEqual(pq(response.content)("p.start-date")[0].text,
-                         TEST_COURSE_OPEN_DATE.strftime(self.date_time_format))
+                         TEST_COURSE_OPEN_DATE.strftime(self.about_page_date_time_format))
 
     def test_coursecard_helper_course_open_date(self):
         course_start_date = get_course_open_date(self.course)
