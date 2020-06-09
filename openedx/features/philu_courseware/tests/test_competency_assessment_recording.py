@@ -18,8 +18,9 @@ class CompetencyAssessmentRecordTest(APITestCase):
     def setUp(self):
         self.user = UserFactory()
         self.client.force_authenticate(self.user)
-        self.end_point = reverse('record_competency_assessment')
+        self.end_point = reverse('record_and_fetch_competency_assessment')
         self.valid_record = {
+            'chapter_id': 'test-chapter',
             'problem_id': 'block-v1:PUCIT+IT1+1+type@problem+block@7f1593ef300e4f569e26356b65d3b76b',
             'problem_text': 'This is a problem',
             'assessment_type': 'pre',
