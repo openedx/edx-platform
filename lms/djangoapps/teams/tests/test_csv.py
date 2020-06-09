@@ -186,7 +186,11 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
         course_1_team.add_user(audit_learner)
 
         CourseEnrollmentFactory.create(user=audit_learner, course_id=self.second_course.id, mode='audit')
-        course_2_team = CourseTeamFactory(course_id=self.second_course.id, name='cross_course_test', topic_id='teamset_1')
+        course_2_team = CourseTeamFactory(
+            course_id=self.second_course.id,
+            name='cross_course_test',
+            topic_id='teamset_1'
+        )
         course_2_team.add_user(audit_learner)
 
         self.assertTrue(CourseTeamMembership.is_user_on_team(audit_learner, course_1_team))
