@@ -134,7 +134,10 @@ def _section_has_highlights(section):
 
 
 def _get_sections_with_highlights(course_module):
-    return list(filter(_section_has_highlights, course_module.get_children()))
+    if course_module:
+        return list(filter(_section_has_highlights, course_module.get_children()))
+    else:
+        return []
 
 
 def _get_highlights_for_week(sections, week_num, course_key):
