@@ -27,9 +27,7 @@ from lms.djangoapps.courseware.views.index import CoursewareIndex
 from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from lms.djangoapps.discussion import views as discussion_views
 from lms.djangoapps.discussion.notification_prefs import views as notification_prefs_views
-from lms.djangoapps.instructor.views import coupons as instructor_coupons_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
-from lms.djangoapps.instructor.views import registration_codes as instructor_registration_codes_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
@@ -228,19 +226,6 @@ if settings.WIKI_ENABLED:
         url(r'^courses/{}/wiki/'.format(settings.COURSE_KEY_REGEX),
             include((wiki_url_patterns, 'course_wiki_do_not_reverse'), namespace='course_wiki_do_not_reverse')),
     ]
-
-COURSE_URLS = [
-    url(
-        r'^look_up_registration_code$',
-        instructor_registration_codes_views.look_up_registration_code,
-        name='look_up_registration_code',
-    ),
-    url(
-        r'^registration_code_details$',
-        instructor_registration_codes_views.registration_code_details,
-        name='registration_code_details',
-    ),
-]
 
 urlpatterns += [
     # jump_to URLs for direct access to a location in the course
@@ -522,41 +507,6 @@ urlpatterns += [
         ),
         instructor_dashboard_views.set_course_mode_price,
         name='set_course_mode_price',
-    ),
-    url(
-        r'^courses/{}/remove_coupon$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        instructor_coupons_views.remove_coupon,
-        name='remove_coupon',
-    ),
-    url(
-        r'^courses/{}/add_coupon$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        instructor_coupons_views.add_coupon,
-        name='add_coupon',
-    ),
-    url(
-        r'^courses/{}/update_coupon$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        instructor_coupons_views.update_coupon,
-        name='update_coupon',
-    ),
-    url(
-        r'^courses/{}/get_coupon_info$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        instructor_coupons_views.get_coupon_info,
-        name='get_coupon_info',
-    ),
-
-    url(
-        r'^courses/{}/'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        include(COURSE_URLS)
     ),
 
     # Discussions Management
