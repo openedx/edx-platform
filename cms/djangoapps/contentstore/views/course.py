@@ -313,6 +313,9 @@ def _update_end_date(request, course_key_string, end_date):
     Method to update end date of a course
     """
     course_key = CourseKey.from_string(course_key_string)
+    if not has_studio_read_access(request.user, course_key):
+        raise PermissionDenied()
+
     course_details = CourseDetails.fetch(course_key)
     archive_settings = {
         'start_date': course_details.start_date,
