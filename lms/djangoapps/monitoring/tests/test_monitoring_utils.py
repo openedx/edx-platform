@@ -1,5 +1,9 @@
 """
 Tests for the LMS monitoring middleware
+
+Note: File named test_monitoring_utils.py instead of test_utils.py because of an error
+in Jenkins with test collection and a conflict with another test_utils.py file.
+
 """
 import ddt
 import timeit
