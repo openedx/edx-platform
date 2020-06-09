@@ -331,7 +331,7 @@ def submit_bulk_course_email(request, course_key, email_id):
     targets = Counter([target.target_type for target in email_obj.targets.all()])
     targets = [
         target if count <= 1 else
-        u"{} {}".format(count, target)
+        "{} {}".format(count, target)
         for target, count in six.iteritems(targets)
     ]
 
