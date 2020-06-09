@@ -20,19 +20,8 @@ jobs:
           cd .github/test
           docker-compose run lms /openedx/edx-platform/.github/test/tests.sh
 
-      - name: Push
-        if: github.ref == 'refs/heads/eol/ironwood.master'
-        run: |
-          echo "${DOCKERHUB_PASSWORD}" | docker login --username ${DOCKERHUB_USER} --password-stdin
-          docker push eoluchile/edx-platform:${GITHUB_SHA}
-          docker push eoluchile/edx-platform:latest
-          docker push eoluchile/edx-platform:testing-juniper
-        env:
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-
       - name: Push to juniper
-        if: github.ref == 'refs/heads/eol/juniper.rc3'
+        if: github.ref == 'refs/heads/eol/juniper.master'
         run: |
           echo "${DOCKERHUB_PASSWORD}" | docker login --username ${DOCKERHUB_USER} --password-stdin
           docker push eoluchile/edx-platform:${GITHUB_SHA}
