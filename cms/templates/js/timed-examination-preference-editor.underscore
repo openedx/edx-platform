@@ -34,7 +34,7 @@
                 <label class="label">
                     <input type="radio" name="exam_type" class="input input-radio proctored_exam"
                         aria-describedby="proctored-exam-description"
-                        <%- special_exam_locked_in && !is_proctored_exam ? 'disabled' : '' %>
+                        <%- special_exam_locked_in && (!is_proctored_exam || is_onboarding_exam) ? 'disabled' : '' %>
                     />
                     <%- gettext('Proctored') %>
                 </label>

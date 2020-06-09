@@ -307,16 +307,24 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         render: function() {
+            var xblockInfo = this.model;
+            var is_time_limited = xblockInfo.get('is_time_limited');
+            var is_proctored_exam = xblockInfo.get('is_proctored_exam');
+            var is_practice_exam = xblockInfo.get('is_practice_exam');
+            var is_onboarding_exam = xblockInfo.get('is_onboarding_exam');
+            var is_timed_exam = is_time_limited && !(
+                is_proctored_exam || is_practice_exam || is_onboarding_exam
+            )
             var html = this.template($.extend({}, {
-                xblockInfo: this.model,
+                xblockInfo: xblockInfo,
                 xblockType: this.options.xblockType,
                 enable_proctored_exam: this.options.enable_proctored_exams,
                 enable_timed_exam: this.options.enable_timed_exams,
-                is_special_exam: xblockInfo.get('is_time_limited'),
-                is_proctored_exam: xblockInfo.get('is_proctored_exam'),
-                is_practice_exam: xblockInfo.get('is_practice_exam'),
-                is_onboarding_exam: xblockInfo.get('is_onboarding_exam'),
-                is_timed_exam: is_special_exam && !(
+                is_special_exam: is_time_limited,
+                is_proctored_exam: is_proctored_exam,
+                is_practice_exam: is_practice_exam,
+                is_onboarding_exam: is_onboarding_exam,
+                is_timed_exam: is_time_limited && !(
                     is_proctored_exam || is_practice_exam || is_onboarding_exam
                 ),
                 special_exam_locked_in: (
