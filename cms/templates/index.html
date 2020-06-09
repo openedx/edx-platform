@@ -338,7 +338,7 @@ from openedx.core.djangolib.js_utils import (
             'linkClass': 'course-link',
             'idBase': 'course',
             'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted',
-            'can_archive': user.is_staff,
+            'can_archive': user.is_staff or course_creator_status=='granted',
           }
         )}
       </div>
@@ -468,7 +468,7 @@ from openedx.core.djangolib.js_utils import (
             'linkClass': 'course-link',
             'idBase': 'archived',
             'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted',
-            'can_archive': user.is_staff,
+            'can_archive': user.is_staff or course_creator_status=='granted',
           }
         )}
       </div>

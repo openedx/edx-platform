@@ -264,6 +264,12 @@ LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
                             service_variant=SERVICE_VARIANT)
 
+# CORS configuration
+CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', [])
+CORS_ALLOW_CREDENTIALS = ENV_TOKENS.get('CORS_ALLOW_CREDENTIALS', CORS_ALLOW_CREDENTIALS)
+CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', CORS_ALLOW_INSECURE)
+
+
 #theming start:
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text

@@ -350,6 +350,10 @@ FEATURES = {
     # Show the language selector in the footer
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
+    # If set to True, new Studio users won't be able to author courses unless
+    # an Open edX admin has added them to the course creator group.
+    'ENABLE_CREATOR_GROUP': True,
+
     # Write new CSM history to the extended table.
     # This will eventually default to True and may be
     # removed since all installs should have the separate
