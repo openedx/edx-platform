@@ -1,0 +1,3 @@
+"""
+Provide django migrations
+"""
