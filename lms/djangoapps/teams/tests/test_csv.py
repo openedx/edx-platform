@@ -131,6 +131,7 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         self.assertEqual(expected_csv_output, self.buf.getvalue())
 
 
+# pylint: disable=no-member
 class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
     """ Tests for TeamMembershipImportManager """
     @classmethod
