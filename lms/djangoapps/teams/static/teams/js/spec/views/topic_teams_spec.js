@@ -96,9 +96,9 @@ define([
             var options = {
                 userInfo: {
                     privileged: true,
-                    staff: false,
+                    staff: false
                 },
-                topicTeams: [{topic_id: topicID}],
+                topicTeams: [{topic_id: topicID}]
             };
             var teamsView = createTopicTeamsView(options);
             verifyActions(teamsView, {showActions: true});
@@ -111,7 +111,7 @@ define([
                 userInfo: {
                     privileged: false,
                     staff: true,
-                    teams: [{topic_id: topicID}],
+                    teams: [{topic_id: topicID}]
                 },
             };
             var teamsView = createTopicTeamsView(options);

@@ -108,7 +108,7 @@ define([
                 privileged: false,
                 staff: false,
                 team_memberships_data: createMockTeamMembershipsData(1, 5),
-                teams: createMockTeams(),
+                teams: createMockTeams()
             },
             options
         );
