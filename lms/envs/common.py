@@ -1494,6 +1494,9 @@ MIDDLEWARE = [
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
 
+    # Generate code ownership metrics. Keep this immediately after RequestCacheMiddleware.
+    'lms.djangoapps.monitoring.middleware.CodeOwnerMetricMiddleware',
+
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMetricsMiddleware',
 
@@ -1576,7 +1579,6 @@ MIDDLEWARE = [
 
     # Outputs monitoring metrics for a request.
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
-    'lms.djangoapps.monitoring.middleware.CodeOwnerMetricMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
 
