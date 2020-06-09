@@ -7,8 +7,7 @@ from rest_framework.views import APIView
 
 
 class MockViewTest(APIView):
-    pass
-
-
-class MockViewAnotherTest(APIView):
+    """
+    Mock view for use in testing.
+    """
     pass
