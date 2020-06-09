@@ -26,8 +26,17 @@ ORG_PROBLEM_CHOICES = [
     (ORG_PROBLEM_TYPE_HUMAN_RESOURCES, _('Human Resources')),
 ]
 
-ORG_PROBLEM_TEMPLATE_CHOICES = ORG_PROBLEM_CHOICES
-ORG_PROBLEM_TEMPLATE_CHOICES.append((ORG_PROBLEM_TYPE_OTHER, 'Other'))
+ORG_PROBLEM_TEMPLATE_CHOICES = [
+    (ORG_PROBLEM_TYPE_HEALTH_CARE_SUPPLIES, _('Healthcare Supplies')),
+    (ORG_PROBLEM_TYPE_REMOTE_WORKING_TOOLS, _('Remote Working Tools')),
+    (ORG_PROBLEM_TYPE_ONLINE_TRAINING, _('Online Training')),
+    (ORG_PROBLEM_TYPE_DELIVERY_SERVICES, _('Delivery Services')),
+    (ORG_PROBLEM_TYPE_MENTORSHIP, _('Mentorship')),
+    (ORG_PROBLEM_TYPE_FUNDING, _('Funding')),
+    (ORG_PROBLEM_TYPE_HUMAN_RESOURCES, _('Human Resources')),
+    (ORG_PROBLEM_TYPE_OTHER, _('Other'))
+]
+
 
 ORG_SECTOR_HEALTH_AND_WELL_BEING = 'health-and-well-being'
 ORG_SECTOR_EDUCATION = 'education'
@@ -56,8 +65,21 @@ ORG_SECTOR_CHOICES = [
     (ORG_SECTOR_ART_AND_CULTURE, _('Art & Culture'))
 ]
 
-ORG_SECTOR_TEMPLATE_CHOICES = ORG_SECTOR_CHOICES
-ORG_SECTOR_TEMPLATE_CHOICES.append((ORG_SECTOR_OTHER, 'Other'))
+
+ORG_SECTOR_TEMPLATE_CHOICES = [
+    (ORG_SECTOR_HEALTH_AND_WELL_BEING, _('Health & Well-being')),
+    (ORG_SECTOR_EDUCATION, _('Education')),
+    (ORG_SECTOR_GENDER_EQUALITY, _('Gender Equality')),
+    (ORG_SECTOR_SANITATION, _('Sanitation')),
+    (ORG_SECTOR_CLIMATE_CHANGES, _('Climate Change')),
+    (ORG_SECTOR_CLEAN_ENERGY, _('Clean Energy')),
+    (ORG_SECTOR_ENVIRONMENTAL_CONSERVATION, _('Environmental Conservation')),
+    (ORG_SECTOR_WORK_AND_ECONOMIC_GROWTH, _('Work & Economic Growth')),
+    (ORG_SECTOR_HUMAN_RIGHTS, _('Human Rights')),
+    (ORG_SECTOR_SOCIAL_JUSTICE, _('Social Justice')),
+    (ORG_SECTOR_ART_AND_CULTURE, _('Art & Culture')),
+    (ORG_SECTOR_OTHER, _('Other'))
+]
 
 USER_SERVICES_DELIVERY_SERVICES = 'delivery-services'
 USER_SERVICES_FUNDING = 'funding'
