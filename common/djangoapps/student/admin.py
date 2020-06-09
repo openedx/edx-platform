@@ -487,7 +487,7 @@ class AllowedAuthUserForm(forms.ModelForm):
         if not allowed_site_email_domain:
             raise forms.ValidationError(
                 _("Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in SiteConfiguration "
-                  "model's site_values field.")
+                  "model's values field.")
             )
         elif email_domain != allowed_site_email_domain:
             raise forms.ValidationError(

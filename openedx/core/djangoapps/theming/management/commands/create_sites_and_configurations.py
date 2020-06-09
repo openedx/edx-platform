@@ -116,6 +116,7 @@ class Command(BaseCommand):
             SiteConfiguration.objects.create(
                 site=site,
                 site_values=site_configuration,
+                values=site_configuration,
                 enabled=True
             )
         else:

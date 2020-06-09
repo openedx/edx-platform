@@ -154,7 +154,8 @@ class TestNotifyCredentials(TestCase):
     @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
     def test_site(self, mock_grade_interesting):
         site_config = SiteConfigurationFactory.create(
-            site_values={'course_org_filter': ['testX']}
+            site_values={'course_org_filter': ['testX']},
+            values={'course_org_filter': ['testX']},
         )
 
         call_command(Command(), '--site', site_config.site.domain, '--start-date', '2017-01-01')
