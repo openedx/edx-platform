@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^test/$', MockViewTest.as_view()),
 ]
 
+
 @ddt.ddt
 class CodeOwnerMetricMiddlewareTests(TestCase):
     """
@@ -94,7 +95,7 @@ class CodeOwnerMetricMiddlewareTests(TestCase):
 
     @override_settings(
         CODE_OWNER_MAPPINGS=['invalid_setting_as_list'],
-        ROOT_URLCONF = __name__,
+        ROOT_URLCONF=__name__,
     )
     @patch('lms.djangoapps.monitoring.middleware.set_custom_metric')
     def test_load_config_with_invalid_dict(self, mock_set_custom_metric):
