@@ -231,7 +231,10 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         for i in range(2, 4):
             user_key = 'user-{}'.format(i)
             ProgramEnrollmentFactory.create(
-                program_uuid=self.program_uuid, curriculum_uuid=self.curriculum_uuid, external_user_key=user_key,
+                program_uuid=self.program_uuid,
+                curriculum_uuid=self.curriculum_uuid,
+                user= UserFactory.create(username='student-{}'.format(i), email='email-{}'.format(i)),
+                external_user_key=user_key,
             )
 
         self.addCleanup(self.destroy_program_enrollments)
@@ -283,19 +286,19 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             'results': [
                 {
                     'student_key': 'user-0', 'status': 'pending', 'account_exists': False,
-                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
                 },
                 {
                     'student_key': 'user-1', 'status': 'pending', 'account_exists': False,
-                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
                 },
                 {
                     'student_key': 'user-2', 'status': 'enrolled', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
                 },
                 {
                     'student_key': 'user-3', 'status': 'enrolled', 'account_exists': True,
-                    'curriculum_uuid': text_type(self.curriculum_uuid),
+                    'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
                 },
             ],
         }
@@ -312,11 +315,11 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         expected_results = [
             {
                 'student_key': 'user-0', 'status': 'pending', 'account_exists': False,
-                'curriculum_uuid': text_type(self.curriculum_uuid),
+                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
             },
             {
                 'student_key': 'user-1', 'status': 'pending', 'account_exists': False,
-                'curriculum_uuid': text_type(self.curriculum_uuid),
+                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "", 'email': ""
             },
         ]
         assert expected_results == response.data['results']
@@ -331,11 +334,11 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
         next_expected_results = [
             {
                 'student_key': 'user-2', 'status': 'enrolled', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid),
+                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-2", 'email': "email-2"
             },
             {
                 'student_key': 'user-3', 'status': 'enrolled', 'account_exists': True,
-                'curriculum_uuid': text_type(self.curriculum_uuid),
+                'curriculum_uuid': text_type(self.curriculum_uuid), 'username': "student-3", 'email': "email-3"
             },
         ]
         assert next_expected_results == next_response.data['results']
