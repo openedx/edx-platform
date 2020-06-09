@@ -23,7 +23,7 @@ from constants import (
     TAKE_ME_THERE_KEY,
     TAKE_ME_THERE_VAL
 )
-from openedx.custom.db.fields import MultiSelectWithOtherField
+from openedx.features.custom_fields.multiselect_with_other.db.fields import MultiSelectWithOtherField
 from student.models import UserProfile
 
 log = logging.getLogger("edx.onboarding")
