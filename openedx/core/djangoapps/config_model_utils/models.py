@@ -9,6 +9,7 @@ StackedConfigurationModel: A ConfigurationModel that can be overridden at site, 
 
 from collections import defaultdict
 from enum import Enum
+from typing import Union
 
 import crum
 from config_models.models import ConfigurationModel, cache
@@ -43,6 +44,27 @@ def validate_course_in_org(value):
             _('%(value)s should have the form ORG+COURSE'),
             params={'value': value},
         )
+
+
+@request_cached()
+def site_from_org(org: str) -> Union[Site, RequestSite]:
+    """
+    Return the site associated with an org.
+
+    Args:
+        org (str): The org for which the associated site is to be fetched.
+
+    Returns:
+        Site object
+    """
+    configuration = SiteConfiguration.get_configuration_for_org(org, select_related=['site'])
+    if configuration is None:
+        try:
+            return Site.objects.get(id=settings.SITE_ID)
+        except Site.DoesNotExist:
+            return RequestSite(crum.get_current_request())
+    else:
+        return configuration.site
 
 
 class StackedConfigurationModel(ConfigurationModel):
@@ -173,7 +195,7 @@ class StackedConfigurationModel(ConfigurationModel):
             org = cls._org_from_org_course(org_course)
 
         if site is None and org is not None:
-            site = cls._site_from_org(org)
+            site = site_from_org(org)
 
         stackable_fields = [cls._meta.get_field(field_name) for field_name in cls.STACKABLE_FIELDS]
         field_defaults = {
@@ -234,7 +256,11 @@ class StackedConfigurationModel(ConfigurationModel):
                         provenances[field.name] = Provenance.global_
 
         current = cls(**values)
-        current.provenances = {field.name: provenances[field.name] for field in stackable_fields}  # pylint: disable=attribute-defined-outside-init
+        # pylint: disable=attribute-defined-outside-init
+        current.provenances = {
+            field.name: provenances[field.name]
+            for field in stackable_fields
+        }
         cache.set(cache_key_name, current, cls.cache_timeout)
         return current
 
@@ -324,21 +350,8 @@ class StackedConfigurationModel(ConfigurationModel):
     def _org_course_from_course_key(cls, course_key):
         return u"{}+{}".format(course_key.org, course_key.course)
 
-    @classmethod
-    @request_cached()
-    def _site_from_org(cls, org):
-
-        configuration = SiteConfiguration.get_configuration_for_org(org, select_related=['site'])
-        if configuration is None:
-            try:
-                return Site.objects.get(id=settings.SITE_ID)
-            except Site.DoesNotExist:
-                return RequestSite(crum.get_current_request())
-        else:
-            return configuration.site
-
     def clean(self):
-        # fail validation if more than one of site/org/course are specified simultaneously
+        """ Ensure that only one of site, org, org_course, and course are specified simultaneously. """
         if len([arg for arg in [self.site, self.org, self.org_course, self.course] if arg is not None]) > 1:
             raise ValidationError(
                 _('Configuration may not be specified at more than one level at once.')
