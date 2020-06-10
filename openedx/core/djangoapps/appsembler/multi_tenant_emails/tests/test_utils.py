@@ -3,6 +3,12 @@ Tests utils for multi-tenant emails.
 """
 
 import contextlib
+from mock import patch
+
+from django.conf import settings
+from unittest import skipUnless
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+
 from organizations.models import Organization, UserOrganizationMapping
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
@@ -46,3 +52,11 @@ def create_org_user(organization, **kwargs):
     user = UserFactory.create(**kwargs)
     UserOrganizationMapping.objects.create(user=user, organization=organization)
     return user
+
+
+def lms_multi_tenant_test(cls):
+    """
+    Ensure tests only run in lms while the APPSEMBLER_MULTI_TENANT_EMAILS feature is enabled.
+    """
+    cls = skip_unless_lms(cls)
+    return skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This tests multi-tenancy')(cls)

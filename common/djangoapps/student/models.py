@@ -49,8 +49,11 @@ from pytz import UTC
 from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
-from organizations.models import Organization, UserOrganizationMapping
-from openedx.core.djangoapps.theming.helpers import get_current_site
+from organizations.models import UserOrganizationMapping, OrganizationCourse
+from openedx.core.djangoapps.theming.helpers import (
+    get_current_request,
+    get_current_site,
+)
 
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
@@ -64,7 +67,10 @@ from courseware.models import (
 )
 from enrollment.api import _default_course_mode
 
-from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
+from openedx.core.djangoapps.appsembler.sites.utils import (
+    is_request_for_new_amc_site,
+    get_current_organization,
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
@@ -2279,7 +2285,17 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
         This includes the ones that match the user's e-mail and excludes those CEA which were already consumed
         by a different user.
         """
-        return cls.objects.filter(email=user.email).filter(Q(user__isnull=True) | Q(user=user))
+        queryset = cls.objects.filter(email=user.email).filter(Q(user__isnull=True) | Q(user=user))
+
+        if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+            if not is_request_for_new_amc_site(get_current_request()):
+                current_organization = get_current_organization()
+                return queryset.filter(course_id__in=OrganizationCourse.objects.filter(
+                    organization=current_organization,
+                    active=True,
+                ).values('course_id'))
+
+        return queryset
 
     def valid_for_user(self, user):
         """
