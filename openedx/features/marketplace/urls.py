@@ -1,12 +1,12 @@
 from django.conf.urls import url
 
-from openedx.features.marketplace.views import (MarketplaceListingView, MarketplaceCreateRequestView,
+from openedx.features.marketplace.views import (MarketplaceListView, MarketplaceCreateRequestView,
                                                 MarketplaceRequestDetailView)
 
 urlpatterns = [
     url(
         r'^$',
-        MarketplaceListingView.as_view(),
+        MarketplaceListView.as_view(),
         name='marketplace-listing'
     ),
     url(
