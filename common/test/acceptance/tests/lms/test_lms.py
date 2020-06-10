@@ -13,7 +13,6 @@ import pytz
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
-from common.test.acceptance.pages.common.utils import enroll_user_track
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.course_about import CourseAboutPage
@@ -29,15 +28,12 @@ from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage, ResetPasswordPage
-from common.test.acceptance.pages.lms.pay_and_verify import FakePaymentPage, PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.tests.helpers import (
     EventsTestMixin,
     UniqueCourseTest,
-    get_selected_option_text,
     remove_file,
-    select_option_by_text
 )
 from openedx.core.lib.tests import attr
 
@@ -394,96 +390,6 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertEqual("Unlink This Account", account_settings.link_title_for_link_field(field_id))
         account_settings.click_on_link_in_link_field(field_id)
         account_settings.wait_for_message(field_id, "Successfully unlinked")
-
-
-@attr(shard=19)
-class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
-    """Test that we can proceed through the payment and verification flow."""
-    def setUp(self):
-        """Initialize the test.
-
-        Create the necessary page objects, create a test course and configure its modes,
-        create a user and log them in.
-        """
-        super(PayAndVerifyTest, self).setUp()
-
-        self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
-        self.immediate_verification_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='verify-now')
-        self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
-        self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
-        self.dashboard_page = DashboardPage(self.browser)
-
-        # Create a course
-        CourseFixture(
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run'],
-            self.course_info['display_name']
-        ).install()
-
-        # Add an honor mode to the course
-        ModeCreationPage(self.browser, self.course_id).visit()
-
-        # Add a verified mode to the course
-        ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
-
-    def test_deferred_verification_enrollment(self):
-        # Create a user and log them in
-        student_id = AutoAuthPage(self.browser).visit().get_user_id()
-
-        enroll_user_track(self.browser, self.course_id, 'verified')
-
-        # Navigate to the dashboard
-        self.dashboard_page.visit()
-
-        # Expect that we're enrolled as verified in the course
-        enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
-        self.assertEqual(enrollment_mode, 'verified')
-
-    def test_enrollment_upgrade(self):
-        # Create a user, log them in, and enroll them in the honor mode
-        student_id = AutoAuthPage(self.browser, course_id=self.course_id).visit().get_user_id()
-
-        # Navigate to the dashboard
-        self.dashboard_page.visit()
-
-        # Expect that we're enrolled as honor in the course
-        enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
-        self.assertEqual(enrollment_mode, 'honor')
-
-        # Click the upsell button on the dashboard
-        self.dashboard_page.upgrade_enrollment(self.course_info["display_name"], self.upgrade_page)
-
-        # Select the first contribution option appearing on the page
-        self.upgrade_page.indicate_contribution()
-
-        # Proceed to the fake payment page
-        self.upgrade_page.proceed_to_payment()
-
-        def only_enrollment_events(event):
-            """Filter out all non-enrollment events."""
-            return event['event_type'].startswith('edx.course.enrollment.')
-
-        expected_events = [
-            {
-                'event_type': 'edx.course.enrollment.mode_changed',
-                'event': {
-                    'user_id': int(student_id),
-                    'mode': 'verified',
-                }
-            }
-        ]
-
-        with self.assert_events_match_during(event_filter=only_enrollment_events, expected_events=expected_events):
-            # Submit payment
-            self.fake_payment_page.submit_payment()
-
-        # Navigate to the dashboard
-        self.dashboard_page.visit()
-
-        # Expect that we're enrolled as verified in the course
-        enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
-        self.assertEqual(enrollment_mode, 'verified')
 
 
 @attr('a11y')

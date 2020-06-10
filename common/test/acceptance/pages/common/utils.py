@@ -8,7 +8,6 @@ from bok_choy.promise import BrokenPromise
 from selenium.webdriver.common.action_chains import ActionChains
 
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
-from common.test.acceptance.pages.lms.pay_and_verify import FakePaymentPage, PaymentAndVerificationFlow
 from common.test.acceptance.pages.lms.track_selection import TrackSelectionPage
 from common.test.acceptance.tests.helpers import disable_animations
 
@@ -115,16 +114,11 @@ def enroll_user_track(browser, course_id, track):
     necessary pages. Selects the track and handles payment for verified.
     Supported tracks are 'verified' or 'audit'.
     """
-    payment_and_verification_flow = PaymentAndVerificationFlow(browser, course_id)
-    fake_payment_page = FakePaymentPage(browser, course_id)
     track_selection = TrackSelectionPage(browser, course_id)
 
-    # Select track and process payment
+    # Select track
     track_selection.visit()
     track_selection.enroll(track)
-    if track == 'verified':
-        payment_and_verification_flow.proceed_to_payment()
-        fake_payment_page.submit_payment()
 
 
 def add_enrollment_course_modes(browser, course_id, tracks):

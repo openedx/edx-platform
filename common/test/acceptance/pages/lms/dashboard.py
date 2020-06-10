@@ -82,32 +82,6 @@ class DashboardPage(PageObject):
 
         return enrollment_mode
 
-    def upgrade_enrollment(self, course_name, upgrade_page):
-        """Interact with the upgrade button for the course with the provided name.
-
-        Arguments:
-            course_name (str): The name of the course whose mode should be checked.
-            upgrade_page (PageObject): The page to wait on after clicking the upgrade button. Importing
-                the definition of PaymentAndVerificationFlow results in a circular dependency.
-
-        Raises:
-            Exception, if no enrollment corresponding to the provided course name appears
-                on the dashboard.
-        """
-        # Filter elements by course name, only returning the relevant course item
-        course_listing = self.q(css=".course").filter(lambda el: course_name in el.text).results
-
-        if course_listing:
-            # There should only be one course listing corresponding to the provided course name.
-            el = course_listing[0]
-
-            # Click the upgrade button
-            el.find_element_by_css_selector('#upgrade-to-verified').click()
-
-            upgrade_page.wait_for_page()
-        else:
-            raise Exception(u"No enrollment for {} is visible on the dashboard.".format(course_name))
-
     def view_course(self, course_id):
         """
         Go to the course with `course_id` (e.g. edx/Open_DemoX/edx_demo_course)
