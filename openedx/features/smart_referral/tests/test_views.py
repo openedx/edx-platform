@@ -21,7 +21,7 @@ class SmartReferralInvitationAPIViewTest(APITestCase):
 
     @mock.patch('openedx.features.smart_referral.views.task_referral_and_toolkit_emails')
     def test_send_initial_emails_success(self, mock_task_referral_and_toolkit_emails):
-        """Successfully send referral emails to two users and current user himself will receive a toolkit email"""
+        """Successfully send referral emails to two users and current user will receive a toolkit email"""
 
         data = """[
             {"fist_name": "Test1", "last_name": "Referral", "contact_email": "test.referral1@example.com"},
