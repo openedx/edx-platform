@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from django.shortcuts import redirect, render_to_response
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
@@ -51,9 +51,10 @@ def learner_profile(request, username):
 
     try:
         context = learner_profile_context(request, username, request.user.is_staff)
-        return render_to_response(
-            'learner_profile/learner_profile.html',
-            context
+        return render(
+            request=request,
+            template_name='learner_profile/learner_profile.html',
+            context=context
         )
     except (UserNotAuthorized, UserNotFound, ObjectDoesNotExist):
         raise Http404
