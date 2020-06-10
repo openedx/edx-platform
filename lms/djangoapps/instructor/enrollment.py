@@ -317,25 +317,27 @@ def reset_student_attempts(course_id, student, module_state_key, requesting_user
         else:
             _reset_module_attempts(studentmodule)
 
+    team = None
     if teams_enabled:
         from lms.djangoapps.teams.api import get_team_for_user_course_topic
         team = get_team_for_user_course_topic(student, str(course_id), selected_teamset_id)
-        if team:
-            modules_to_reset = StudentModule.objects.filter(
-                student__teams=team,
-                course_id=course_id,
-                module_state_key=module_state_key
-            )
-            for module_to_reset in modules_to_reset:
-                _reset_or_delete_module(module_to_reset)
+    if team:
+        modules_to_reset = StudentModule.objects.filter(
+            student__teams=team,
+            course_id=course_id,
+            module_state_key=module_state_key
+        )
+        for module_to_reset in modules_to_reset:
+            _reset_or_delete_module(module_to_reset)
+        return
     else:
+        # Teams are not enabled or the user does not have a team
         module_to_reset = StudentModule.objects.get(
             student_id=student.id,
             course_id=course_id,
             module_state_key=module_state_key
         )
         _reset_or_delete_module(module_to_reset)
-
 
 
 def _reset_module_attempts(studentmodule):
