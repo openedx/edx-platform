@@ -85,6 +85,11 @@
   cursor: pointer;
 }
 
+.span-icon {
+    padding-right: 20px;
+    float: right;
+}
+
 .dropdown-links-menu {
   border: 1px solid theme-color("secondary");
   position: absolute;
@@ -93,7 +98,7 @@
 
   @include right(30px);
 
-  top: 55px;
+  top: 200px;
   z-index: 10;
 
   .dropdown-item {
@@ -115,6 +120,7 @@
       padding: $baseline/2 $baseline*0.75;
       display: inline-block;
       width: 100%;
+      color: black;
 
       &:focus {
         outline: none;
