@@ -2,7 +2,7 @@
     <h3 class="modal-section-title"><%- gettext('Set as a Special Exam') %></h3>
     <div class="modal-section-content has-actions">
         <div class="list-fields list-input exam-types" role="group" aria-label="<%- gettext('Exam Types') %>">
-            <% if (special_exam_locked_in && !is_special_exam) { %>
+            <% if (specialExamLockedIn && !isSpecialExam) { %>
                 <div class="summary-message summary-message-warning">
                     <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                     <p class="copy">
@@ -10,7 +10,7 @@
                     </p>
                 </div>
             <% } %>
-            <% if (special_exam_locked_in && is_special_exam) { %>
+            <% if (specialExamLockedIn && isSpecialExam) { %>
                 <div class="summary-message summary-message-warning">
                     <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                     <p class="copy">
@@ -25,16 +25,16 @@
             <label class="label">
                 <input type="radio" name="exam_type" class="input input-radio timed_exam"
                     aria-describedby="timed-exam-description" 
-                    <%- special_exam_locked_in && !is_timed_exam ? 'disabled' : '' %>
+                    <%- specialExamLockedIn && !isTimedExam ? 'disabled' : '' %>
                 />
                 <%- gettext('Timed') %>
             </label>
             <p class='field-message' id='timed-exam-description'> <%- gettext('Use a timed exam to limit the time learners can spend on problems in this subsection. Learners must submit answers before the time expires. You can allow additional time for individual learners through the Instructor Dashboard.') %> </p>
-            <% if (enable_proctored_exam) { %>
+            <% if (enableProctoredExams) { %>
                 <label class="label">
                     <input type="radio" name="exam_type" class="input input-radio proctored_exam"
                         aria-describedby="proctored-exam-description"
-                        <%- special_exam_locked_in && (!is_proctored_exam || is_onboarding_exam) ? 'disabled' : '' %>
+                        <%- specialExamLockedIn && (!isProctoredExam || isOnboardingExam) ? 'disabled' : '' %>
                     />
                     <%- gettext('Proctored') %>
                 </label>
@@ -45,7 +45,7 @@
                     <label class="label">
                         <input type="radio" name="exam_type" class="input input-radio onboarding_exam"
                             aria-describedby="onboarding-exam-description"
-                            <%- special_exam_locked_in && !is_onboarding_exam ? 'disabled' : '' %>
+                            <%- specialExamLockedIn && !isOnboardingExam ? 'disabled' : '' %>
                         />
                         <%- gettext('Onboarding') %>
                     </label>
@@ -54,7 +54,7 @@
                     <label class="label">
                         <input type="radio" name="exam_type" class="input input-radio practice_exam"
                             aria-describedby="practice-exam-description"
-                            <%- special_exam_locked_in && !is_practice_exam ? 'disabled' : '' %>
+                            <%- specialExamLockedIn && !isPracticeExam ? 'disabled' : '' %>
                         />
                         <%- gettext('Practice Proctored') %>
                     </label>
