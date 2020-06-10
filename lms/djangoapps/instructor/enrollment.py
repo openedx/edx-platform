@@ -58,6 +58,7 @@ class EmailEnrollmentState(object):
         # N.B. retired users are not a concern here because they should be
         # handled at a higher level (i.e. in enroll_email).  Besides, this
         # class creates readonly objects.
+        # TODO: Maybe use `get_current_oragnization()` because it's more solid
         site = get_current_site()
         organization = get_organization_for_site(site)
         exists_user = user_exists_in_organization(email, organization)
