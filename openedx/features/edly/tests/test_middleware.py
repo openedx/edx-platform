@@ -5,6 +5,7 @@ from testfixtures import LogCapture
 from django.conf import settings
 from django.contrib import auth
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.test.client import Client, RequestFactory
 
 from openedx.core.djangoapps.site_configuration.models import logger as site_configuration_logger
@@ -52,13 +53,14 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
 
         response = self.client.get('/', follow=True)
         assert response.status_code == 200
-
-    def test_user_without_edly_organization_access(self):
+    
+    @override_settings(FRONTEND_LOGOUT_URL=None)
+    def test_user_without_edly_organization_access_and_without_frontend_logout_url(self):
         """
-        Verify that logged in user gets redirected to logout page and valid log message response if user has no access.
+        Verify that logged in user gets redirected to logout page and valid log message response if user has no access without FRONTEND_LOGOUT_URL set.
 
         Test that logged in user gets redirected to logout page and valid log message if user has no access for
-        request site's edly sub organization.
+        request site's edly sub organization when FRONTEND_LOGOUT_URL is not set.
         """
 
         with LogCapture(LOGGER_NAME) as logger:
@@ -66,6 +68,39 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
             self.assertRedirects(
                 response,
                 '/logout',
+                status_code=302,
+                target_status_code=200,
+                fetch_redirect_response=True
+            )
+            user = auth.get_user(self.client)
+            assert not user.is_authenticated()
+
+            logger.check_present(
+                (
+                    LOGGER_NAME,
+                    'ERROR',
+                    'Edly user %s has no access for site %s.' % (self.user.email, self.request.site)
+                )
+            )
+
+    @override_settings(FRONTEND_LOGOUT_URL='/logout')
+    def test_user_without_edly_organization_access_and_with_frontend_logout_url(self):
+        """
+        Verify that logged in user gets redirected to logout page and valid log message response if user has no access with FRONTEND_LOGOUT_URL set.
+
+        Test that logged in user gets redirected to logout page and valid log message if user has no access for
+        request site's edly sub organization when FRONTEND_LOGOUT_URL is set.
+        """
+
+        with LogCapture(LOGGER_NAME) as logger:
+            response = self.client.get('/', follow=True)
+            
+            logout_url = getattr(settings, 'FRONTEND_LOGOUT_URL', None)
+            assert logout_url == '/logout'
+
+            self.assertRedirects(
+                response,
+                logout_url,
                 status_code=302,
                 target_status_code=200,
                 fetch_redirect_response=True
