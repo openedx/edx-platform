@@ -202,7 +202,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
     all_blocks = get_blocks(
         request,
         course_usage_key,
-        user=request.user,
+        user=user,
         nav_depth=3,
         requested_fields=[
             'children',
@@ -232,7 +232,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
             set_last_accessed_default(course_outline_root_block)
             mark_blocks_completed(
                 block=course_outline_root_block,
-                user=request.user,
+                user=user,
                 course_key=course_key
             )
     return course_outline_root_block
@@ -255,15 +255,20 @@ def get_resume_block(block):
     return block
 
 
-def dates_banner_should_display(course_key, request):
+def dates_banner_should_display(course_key, user):
     """
     Return whether or not the reset banner should display,
     determined by whether or not a course has any past-due,
     incomplete sequentials and which enrollment mode is being
     dealt with for the current user and course.
+
+    Returns:
+        (missed_deadlines, missed_gated_content):
+            missed_deadlines is True if the user has missed any graded content deadlines
+            missed_gated_content is True if the first content that the user missed was gated content
     """
-    if not RELATIVE_DATES_FLAG.is_enabled(str(course_key)):
-        return False
+    if not RELATIVE_DATES_FLAG.is_enabled(course_key):
+        return False, False
 
     course_overview = CourseOverview.objects.get(id=str(course_key))
     course_end_date = getattr(course_overview, 'end_date', None)
@@ -271,26 +276,26 @@ def dates_banner_should_display(course_key, request):
 
     # Only display the banner for self-paced courses
     if not is_self_paced:
-        return False
+        return False, False
 
     # Only display the banner for enrolled users
-    if not CourseEnrollment.is_enrolled(request.user, course_key):
-        return False
+    if not CourseEnrollment.is_enrolled(user, course_key):
+        return False, False
 
     # Don't display the banner for course staff
     is_course_staff = bool(
-        request.user and course_overview and has_access(request.user, 'staff', course_overview, course_overview.id)
+        user and course_overview and has_access(user, 'staff', course_overview, course_overview.id)
     )
     if is_course_staff:
-        return False
+        return False, False
 
     # Don't display the banner if the course has ended
     if course_end_date and course_end_date < timezone.now():
-        return False
+        return False, False
 
     store = modulestore()
     course_usage_key = store.make_course_usage_key(course_key)
-    block_data = get_course_blocks(request.user, course_usage_key, include_completion=True)
+    block_data = get_course_blocks(user, course_usage_key, include_completion=True)
     for section_key in block_data.get_children(course_usage_key):
         for subsection_key in block_data.get_children(section_key):
             subsection_due_date = block_data.get_xblock_field(subsection_key, 'due', None)
@@ -301,7 +306,7 @@ def dates_banner_should_display(course_key, request):
             ):
                 # Display the banner if the due date for an incomplete graded subsection
                 # has passed
-                return True
+                return True, block_data.get_xblock_field(subsection_key, 'contains_gated_content', False)
 
     # Don't display the banner if there were no missed deadlines
-    return False
+    return False, False

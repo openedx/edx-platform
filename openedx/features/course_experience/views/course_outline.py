@@ -31,6 +31,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.models import CourseEnrollment
 from util.milestones_helpers import get_course_content_milestones
@@ -83,6 +84,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
         xblock_display_names = self.create_xblock_id_and_name_dict(course_block_tree)
         gated_content = self.get_content_milestones(request, course_key)
 
+        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
+
         context['gated_content'] = gated_content
         context['xblock_display_names'] = xblock_display_names
 
@@ -102,13 +105,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
         context['reset_deadlines_redirect_url_id_dict'] = {'course_id': str(course.id)}
         context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course)
         context['on_course_outline_page'] = True
-        context['content_type_gating_enabled'] = ContentTypeGatingConfig.enabled_for_enrollment(
-            user=request.user,
-            course_key=course_key
-        )
-        # We use javascript to check whether to actually display this banner, so we let the banner assume
-        # that deadlines have been missed.
-        context['missed_deadlines'] = True
+        context['missed_deadlines'] = missed_deadlines
+        context['missed_gated_content'] = missed_gated_content
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)
