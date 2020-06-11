@@ -444,10 +444,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
-            if course_module.teamsets_by_id[topic_id].is_private_managed \
-                    and not has_access(request.user, 'staff', course_key):
-                result_filter.update({'membership__user__username': request.user})
-
             result_filter.update({'topic_id': topic_id})
 
         organization_protection_status = user_organization_protection_status(
