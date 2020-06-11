@@ -1,7 +1,7 @@
 django-extensions==1.5.9
 libsass==0.11.1
 python-intercom==0.2.13
-raven==5.21.0
+raven==6.10.0
 requests==2.9.1
 django-anymail==5.0
 django-tiers==0.1.0
