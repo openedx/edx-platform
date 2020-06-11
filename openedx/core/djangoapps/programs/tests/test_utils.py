@@ -794,7 +794,7 @@ class TestProgramDataExtender(ModuleStoreTestCase):
                     'certificate_url': None,
                     'course_url': reverse('course_root', args=[self.course.id]),
                     'enrollment_open_date': strftime_localized(DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
-                    'is_course_ended': self.course.end < datetime.datetime.now(utc),
+                    'is_course_ended': self.course.has_ended(),
                     'is_enrolled': False,
                     'is_enrollment_open': True,
                     'upgrade_url': None,

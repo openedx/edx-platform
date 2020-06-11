@@ -2,7 +2,6 @@
 Dates Tab Views
 """
 
-
 from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -85,6 +84,7 @@ class DatesTabView(RetrieveAPIView):
         user_timezone = user_timezone_locale['user_timezone']
 
         data = {
+            'has_ended': course.has_ended(),
             'course_date_blocks': [block for block in blocks if not isinstance(block, TodaysDate)],
             'missed_deadlines': missed_deadlines,
             'missed_gated_content': missed_gated_content,
