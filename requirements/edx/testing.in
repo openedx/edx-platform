@@ -47,5 +47,7 @@ singledispatch            # Backport of functools.singledispatch from Python 3.4
 testfixtures              # Provides a LogCapture utility used by several tests
 tox                       # virtualenv management for tests
 tox-battery               # Makes tox aware of requirements file changes
-transifex-client          # Command-line interface for the Transifex localization service
+# Transifex fork used for compatibilities with python3.8, move to pypi release once
+# https://github.com/transifex/transifex-client/pull/293 gets merged and released
+git+https://github.com/edx/transifex-client.git@1660e05cb4a608a420b23f569c329ba3ff13b175#egg=transifex-client
 unidiff                   # Required by coverage_pytest_plugin

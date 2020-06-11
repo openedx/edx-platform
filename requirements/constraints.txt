@@ -97,10 +97,6 @@ python-dateutil==2.4.0
 # stevedore 2.0.0 requires python >= 3.6
 stevedore<2.0.0
 
-# transifex-client 0.13.5 and 0.13.6 needlessly pin six and urllib3, 0.13.7 does so for python-slugify
-#   https://github.com/transifex/transifex-client/issues/252
-transifex-client==0.13.4
-
 # Constraint from astroid 2.3.3
 wrapt==1.11.*
 
