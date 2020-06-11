@@ -173,6 +173,7 @@
 # Lionel Chen <chenlinchuan@me.com>, 2014
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # meelo <bbvy@qq.com>, 2015
+# qiaoyafeng <qiao_yafeng@qq.com>, 2020
 # Rom, 2015
 # Rom, 2015
 # louyihua <supermouselyh@hotmail.com>, 2014-2015

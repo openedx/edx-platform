@@ -172,7 +172,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-31 20:42+0000\n"
+"POT-Creation-Date: 2020-06-07 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -11128,6 +11128,10 @@ msgstr ""
 "Die Konfiguration darf nicht auf mehr als einer Ebene gleichzeitig "
 "festgelegt werden."
 
+#: openedx/core/djangoapps/content/learning_sequences/apps.py
+msgid "Learning Sequences"
+msgstr ""
+
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
 msgstr "Verwalte Benutzer und Autoren Inhalt"
@@ -12654,6 +12658,18 @@ msgid ""
 msgstr ""
 "Benutzername erstellt für die Video Pipeline Integration, z.B. "
 "veda_service_user."
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Oauth client name of VEM service."
+msgstr ""
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "video encode manager API URL."
+msgstr ""
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Username created for VEM Integration, e.g. vem_service_user."
+msgstr ""
 
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
@@ -14419,21 +14435,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dates_banner.html
-msgid "You are auditing this course,"
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid " which means that you are unable to participate in graded assignments."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-" It looks like you missed some important deadlines based on our suggested "
-"schedule. To complete graded assignments as part of this course and shift "
-"the past due assignments into the future, you can upgrade today by visiting "
-msgstr ""
-
-#: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
 "schedule."
@@ -14447,6 +14448,25 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dates_banner.html
+msgid "Reset my deadlines"
+msgstr "Meine Fristen zurücksetzen"
+
+#: lms/templates/dates_banner.html
+msgid "You are auditing this course,"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid " which means that you are unable to participate in graded assignments."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. Graded assignments and schedule adjustment are available to "
+"Verified Track learners."
+msgstr ""
+
+#: lms/templates/dates_banner.html
 msgid ""
 " It looks like you missed some important deadlines based on our suggested "
 "schedule. To complete graded assignments as part of this course and shift "
@@ -14454,22 +14474,18 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dates_banner.html
+msgid "Upgrade to shift due dates"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Graded assignments are available to Verified Track learners."
+msgstr ""
+
+#: lms/templates/dates_banner.html
 msgid ""
 " To complete graded assignments as part of this course, you can upgrade "
 "today."
 msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid "Reset my deadlines"
-msgstr "Meine Fristen zurücksetzen"
-
-#: lms/templates/dates_banner.html
-msgid "Upgrade to shift due dates"
-msgstr ""
-
-#: lms/templates/edit_unit_link.html
-msgid "View Unit in Studio"
-msgstr "Lerneinheit im Studio betrachten"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -14765,16 +14781,10 @@ msgid "There has been an error on the {platform_name} servers"
 msgstr "Es gab einen Fehler auf den {platform_name} Servern"
 
 #: lms/templates/module-error.html
-#: lms/templates/courseware/courseware-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {tech_support_email} to "
-"report any problems or downtime."
+" fix it as soon as possible. "
 msgstr ""
-"Es tut uns leid, dieses Modul steht momentan nicht zur Verfügung. Unsere "
-"Mitarbeiter arbeiten daran, das Problem so schnell wie möglich zu beheben. "
-"Bitte schreiben Sie eine E-Mail an {tech_support_email}, um Probleme und "
-"Ausfallzeiten zu benennen."
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
@@ -14813,8 +14823,16 @@ msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr "Sie sehen den Kurs aus der Sicht von {i_start}{user_name}{i_end}."
 
 #: lms/templates/preview_menu.html
-msgid "View this unit in the new experience"
-msgstr "Sehen Sie sich diese Einheit in der neuen Erfahrung an"
+msgid "View in the new experience"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "View in Studio"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "View in Insights"
+msgstr ""
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
@@ -17280,6 +17298,13 @@ msgstr "Kurswerkzeuge"
 msgid "Courseware"
 msgstr "Kursinhalte"
 
+#: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "Kurssuche"
@@ -17325,12 +17350,6 @@ msgstr ""
 
 #: lms/templates/courseware/dates.html
 msgid "Not yet released"
-msgstr ""
-
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible."
 msgstr ""
 
 #: lms/templates/courseware/gradebook.html
@@ -22788,12 +22807,8 @@ msgid "The page that you were looking for was not found."
 msgstr "Die aufgerufene Seite wurde leider nicht gefunden"
 
 #: cms/templates/404.html
-msgid ""
-"Go back to the {homepage} or let us know about any pages that may have been "
-"moved at {email}."
+msgid "Go back to the {homepage}."
 msgstr ""
-"Gehen Sie zurück zur Seite {homepage} oder teilen Sie uns Seiten, die "
-"wahrscheinlich verschoben sind, unter {email} mit."
 
 #: cms/templates/500.html
 msgid "{studio_name} Server Error"
@@ -22819,12 +22834,6 @@ msgid ""
 msgstr ""
 "Wir haben diesen Fehler registriert und unsere Mitarbeiter arbeiten daran, "
 "diesen Fehler so schnell wie möglich zu beheben."
-
-#: cms/templates/500.html
-msgid "If the problem persists, please email us at {email_link}."
-msgstr ""
-"Wenn das Problem weiter besteht, schicken Sie uns bitte eine E-Mail unter "
-"{email_link}"
 
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
@@ -23536,15 +23545,8 @@ msgstr "Die angefragte Seite kann nicht gefunden werden"
 #: cms/templates/error.html
 msgid ""
 "We're sorry. We couldn't find the {studio_name} page you're looking for. You"
-" may want to return to the {studio_name} Dashboard and try again. If you are"
-" still having problems accessing things, please feel free to "
-"{link_start}contact {studio_name} support{link_end} for further help."
+" may want to return to the {studio_name} Dashboard and try again."
 msgstr ""
-"Es tut uns leid. Wir konnten die Seite {studio_name}, die Sie suchen, nicht "
-"finden. Sie sollten zur {studio_name} Übersicht zurückkehren und es noch "
-"einmal versuchen. Wenn Sie immer noch Probleme mit dem Zugriff haben, wenden"
-" Sie sich bitte für weitere Hilfe an {link_start}den {studio_name} "
-"Support{link_end}."
 
 #: cms/templates/error.html
 msgid "The Server Encountered an Error"
@@ -23554,15 +23556,8 @@ msgstr "Beim Server trat ein Fehler auf"
 msgid ""
 "We're sorry. There was a problem with the server while trying to process "
 "your last request. You may want to return to the {studio_name} Dashboard or "
-"try this request again. If you are still having problems accessing things, "
-"please feel free to {link_start}contact {studio_name} support{link_end} for "
-"further help."
+"try this request again."
 msgstr ""
-"Es tut uns leid. Es gab ein Problem mit dem Server beim Versuch, Ihre letzte"
-" Anfrage zu bearbeiten. Sie können zur {studio_name} Übersicht zurückkehren "
-"oder diese Anfrage erneut versuchen. Wenn Sie immer noch Probleme mit dem "
-"Zugriff haben, wenden Sie sich bitte für weitere Hilfe an {link_start}den "
-"{studio_name} Support{link_end}."
 
 #: cms/templates/error.html
 msgid "Back to dashboard"
