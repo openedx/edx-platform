@@ -52,10 +52,12 @@ class PasswordResetFormNoActive(PasswordResetForm):
         if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
             from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
             current_org = get_current_organization()
-            try:
-                self.users_cache = [current_org.userorganizationmapping_set.get(user__email__iexact=email).user]
-            except UserOrganizationMapping.DoesNotExist:
-                self.users_cache = []
+            found_mappings = UserOrganizationMapping.objects.filter(
+                user__email__iexact=email,
+                organization=current_org,
+                is_active=True,
+            )
+            self.users_cache = [mapping.user for mapping in found_mappings]
         else:
             self.users_cache = User.objects.filter(email__iexact=email)
 
