@@ -1,20 +1,30 @@
 import logging
+import re
 import uuid
 from datetime import datetime
 
-import re
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, URLValidator
 from django.db import models
 from django.utils.translation import ugettext_noop
 from model_utils.models import TimeStampedModel
+from multiselectfield import MultiSelectField
 from pytz import utc
 from simple_history import register
 from simple_history.models import HistoricalRecords
-from student.models import UserProfile
 
-from constants import ORG_PARTNERSHIP_END_DATE_PLACEHOLDER, REMIND_ME_LATER_KEY, REMIND_ME_LATER_VAL, \
-    TAKE_ME_THERE_KEY, TAKE_ME_THERE_VAL, NOT_INTERESTED_KEY, NOT_INTERESTED_VAL
+import choices
+from constants import (
+    NOT_INTERESTED_KEY,
+    NOT_INTERESTED_VAL,
+    ORG_PARTNERSHIP_END_DATE_PLACEHOLDER,
+    REMIND_ME_LATER_KEY,
+    REMIND_ME_LATER_VAL,
+    TAKE_ME_THERE_KEY,
+    TAKE_ME_THERE_VAL
+)
+from openedx.features.custom_fields.multiselect_with_other.db.fields import MultiSelectWithOtherField
+from student.models import UserProfile
 
 log = logging.getLogger("edx.onboarding")
 
@@ -487,6 +497,21 @@ class UserExtendedProfile(TimeStampedModel):
 
     history = HistoricalRecords()
 
+    # TODO: Populate this newly added field by performing ETL on existing fields hear_about_philanthropy and
+    #  hear_about_philanthropy_other
+    hear_about_philanthropyu = MultiSelectWithOtherField(choices=choices.HEAR_ABOUT_PHILANTHROPY,
+                                                         other_max_length=255,
+                                                         max_choices=1,
+                                                         blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing functions related fields
+    function_areas = MultiSelectField(choices=choices.FUNCTIONS, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing interests related fields
+    interests = MultiSelectField(choices=choices.INTERESTS, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing learners related fields
+    learners_related = MultiSelectField(choices=choices.INTERESTED_LEARNERS, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing goals related fields
+    goals = MultiSelectField(choices=choices.GOALS, blank=True)
+
     def __str__(self):
         return str(self.user)
 
@@ -732,8 +757,8 @@ class UserExtendedProfile(TimeStampedModel):
 
     def admin_has_pending_admin_suggestion_request(self):
         pending_suggestion_request = OrganizationAdminHashKeys.objects.filter(organization=self.organization,
-                                                                               suggested_by=self.user,
-                                                                               is_hash_consumed=False).first()
+                                                                              suggested_by=self.user,
+                                                                              is_hash_consumed=False).first()
         return bool(self.is_organization_admin and pending_suggestion_request)
 
     @property
@@ -776,7 +801,7 @@ class OrganizationMetric(TimeStampedModel):
     org = models.ForeignKey(Organization, related_name="organization_metrics")
     user = models.ForeignKey(User, related_name="organization_metrics")
     submission_date = models.DateTimeField(auto_now_add=True)
-    actual_data= models.NullBooleanField(choices=ACTUAL_DATA_CHOICES, blank=True, null=True)
+    actual_data = models.NullBooleanField(choices=ACTUAL_DATA_CHOICES, blank=True, null=True)
     effective_date = models.DateField(blank=True, null=True)
     total_clients = models.PositiveIntegerField(blank=True, null=True)
     total_employees = models.PositiveIntegerField(blank=True, null=True)
