@@ -1,19 +1,55 @@
+import hashlib
+from datetime import datetime
 from logging import getLogger
 
-import hashlib
 from django.conf import settings
 from django.contrib.auth.models import User
-
-from xmodule.modulestore.django import modulestore
-from openedx.core.lib.url_utils import unquote_slashes
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
-from submissions.models import Submission
-from submissions.api import reset_score, set_score
-from openassessment.assessment.serializers import rubric_from_dict
 from openassessment.assessment.models import Assessment, AssessmentPart
+from openassessment.assessment.serializers import rubric_from_dict
+from openassessment.workflow.models import AssessmentWorkflow
+from pytz import utc
+from submissions.api import reset_score, set_score
+from submissions.models import Submission
+
+from openedx.core.lib.url_utils import unquote_slashes
+from openedx.features.philu_utils.utils import get_anonymous_user
+from xmodule.modulestore.django import modulestore
+
+from .constants import ASSESSMENT_WORKFLOW_WAITING_STATUS, DAYS_TO_WAIT_AUTO_ASSESSMENT
 
 log = getLogger(__name__)
+
+
+def can_auto_score_ora(enrollment, course, block, index_chapter):
+    anonymous_user = get_anonymous_user(enrollment.user, course.id)
+    if not anonymous_user:
+        return False
+    response_submission = Submission.objects.filter(
+        student_item__student_id=anonymous_user.anonymous_user_id,
+        student_item__item_id=block).first()
+    if not response_submission:
+        return False
+    log.info('Response Created at: {created_date}'.format(
+        created_date=response_submission.created_at.date()
+    ))
+    today = datetime.now(utc).date()
+    delta_days = today - enrollment.created.date()
+    response_submission_delta = today - response_submission.created_at.date()
+
+    # check if this chapter is 2 weeks older or not.
+    module_access_days = delta_days.days - (index_chapter * 7)
+    waiting_for_others_submission_exists = AssessmentWorkflow.objects.filter(
+        status=ASSESSMENT_WORKFLOW_WAITING_STATUS,
+        course_id=course.id,
+        item_id=block,
+        submission_uuid=response_submission.uuid
+    ).exists()
+    return (
+        module_access_days >= DAYS_TO_WAIT_AUTO_ASSESSMENT and
+        response_submission_delta.days >= DAYS_TO_WAIT_AUTO_ASSESSMENT and
+        waiting_for_others_submission_exists
+    )
 
 
 def autoscore_ora(course_id, usage_key, student):
