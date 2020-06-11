@@ -39,6 +39,14 @@ IDA_LOGOUT_URI_LIST = [
     'http://localhost:18381/logout/',  # discovery
 ]
 
+# which access.py permission name to check in order to determine if a course is visible in
+# the course catalog.
+COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_in_catalog'
+
+# which access.py permission name to check in order to determine if a course about page is
+# visible.
+COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_about_page'
+
 ################################ LOGGERS ######################################
 
 LOG_OVERRIDES = [
