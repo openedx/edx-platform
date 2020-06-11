@@ -1082,7 +1082,7 @@ def dates(request, course_id):
         'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
         'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
         'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)},
-        'is_archived': course.end and course.end < datetime.now(),
+        'has_ended': course.has_ended(),
     }
 
     return render_to_response('courseware/dates.html', context)
@@ -1681,7 +1681,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
             'missed_deadlines': missed_deadlines,
             'missed_gated_content': missed_gated_content,
-            'is_archived': course.end and course.end < datetime.now(),
+            'has_ended': course.has_ended(),
             'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
             'on_courseware_page': True,
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),

@@ -86,7 +86,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
     </div>
 </%def>
 
-% if not is_archived:
+% if not has_ended:
     % if on_dates_tab and not missed_deadlines:
         %if getattr(course, 'self_paced', False):
         <div class="dates-banner">
