@@ -242,10 +242,58 @@ class TestDashboard(SharedModuleStoreTestCase):
 
         expected_has_open = "hasOpenTopic: " + "true" if has_open else "false"
         expected_has_public = "hasPublicManagedTopic: " + "true" if has_public else "false"
-        expected_has_managed = "hasManagedTopic: " + "true" if has_public or has_private else "false"
 
         self.assertContains(response, expected_has_open)
         self.assertContains(response, expected_has_public)
+
+    @ddt.unpack
+    @ddt.data(
+        (True, False, False),
+        (False, True, False),
+        (False, False, True),
+        (True, True, True),
+        (False, True, True),
+    )
+    def test_has_managed_topic(self, has_open, has_private, has_public):
+        topics = []
+        if has_open:
+            topics.append({
+                "name": "test topic 1",
+                "id": 1,
+                "description": "Desc1",
+                "type": "open"
+            })
+        if has_private:
+            topics.append({
+                "name": "test topic 2",
+                "id": 2,
+                "description": "Desc2",
+                "type": "private_managed"
+            })
+        if has_public:
+            topics.append({
+                "name": "test topic 3",
+                "id": 3,
+                "description": "Desc3",
+                "type": "public_managed"
+            })
+
+        # Given a staff user browsing the teams tab
+        course = CourseFactory.create(
+            teams_configuration=TeamsConfig({"topics": topics})
+        )
+        teams_url = reverse('teams_dashboard', args=[course.id])
+
+        staff_user = UserFactory(is_staff=True, password=self.test_password)
+        staff_client = APIClient()
+        staff_client.login(username=staff_user.username, password=self.test_password)
+
+        # When I browse to the team tab
+        response = staff_client.get(teams_url)
+
+        # Then "hasManagedTopic" (which is used to show the "Manage" tab)
+        # is shown if there are managed team-sets
+        expected_has_managed = "hasManagedTopic: " + "true" if has_public or has_private else "false"
         self.assertContains(response, expected_has_managed)
 
 
