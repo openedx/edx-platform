@@ -157,6 +157,10 @@ def create_account_with_params(request, params):
         'REGISTRATION_EXTRA_FIELDS',
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     )
+    if 'v1' in request.get_full_path():
+        if 'confirm_email' in extra_fields:
+            del extra_fields['confirm_email']
+
     # registration via third party (Google, Facebook) using mobile application
     # doesn't use social auth pipeline (no redirect uri(s) etc involved).
     # In this case all related info (required for account linking)

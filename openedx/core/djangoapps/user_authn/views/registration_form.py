@@ -373,7 +373,7 @@ class RegistrationFormFactory(object):
         Returns:
             HttpResponse
         """
-        form_desc = FormDescription("post", reverse("user_api_registration"))
+        form_desc = FormDescription("post", self._get_submit_url(request))
         self._apply_third_party_auth_overrides(request, form_desc)
 
         # Custom form fields can be added via the form set in settings.REGISTRATION_EXTENSION_FORM
@@ -429,15 +429,19 @@ class RegistrationFormFactory(object):
                         form_desc,
                         required=self._is_field_required(field_name)
                     )
-
         # remove confirm_email form v1 registration form
         if 'v1' in request.get_full_path():
             for index, field in enumerate(form_desc.fields):
                 if field['name'] == 'confirm_email':
                     del form_desc.fields[index]
                     break
-
         return form_desc
+
+    def _get_submit_url(self, request):
+        return reverse("user_api_registration") if self._is_v1(request) else reverse("user_api_registration_v2")
+
+    def _is_v1(self, request):
+        return 'v1' in request.get_full_path() and 'register' not in request.get_full_path()
 
     def _add_email_field(self, form_desc, required=True):
         """Add an email field to a form description.
@@ -481,6 +485,7 @@ class RegistrationFormFactory(object):
 
         form_desc.add_field(
             "confirm_email",
+            field_type="email",
             label=email_label,
             required=required,
             error_messages={
