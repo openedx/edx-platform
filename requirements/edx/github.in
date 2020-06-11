@@ -61,6 +61,14 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 # The latest 2.0.0 release doesn't yet support Django 2.2, this commit from master does
 -e git+https://github.com/jsocol/django-ratelimit.git@72edbe8949fbf6699848e5847645a1998f121d46#egg=ratelimit
 
+# Underscore template extractor for django-babel/enmerkar
+# This fork adds django>1.11 and django<3 compatibility.
+git+https://github.com/edx/django-babel-underscore.git@37705f7377a4d0a4e673f1431895ce28a8860cd7#egg=django-babel-underscore==0.6.0
+
+# Internationalization utilities
+# Our django-babel-underscore fork above does not yet work with the newer enmerkar PyPI releases (BOM-1637)
+git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248eb0f185#egg=django-babel==0.6.3.dev0
+
 # Forked to get Django 2.2 support from unreleased master branch from social-app-django repo.
 # This can be removed once an official social-auth-app-django Pypi release with Django 2.2 support is available in the future.
 -e git+https://github.com/python-social-auth/social-app-django.git@c00d23c2b45c3317bd35b15ad1b959338689cef8#egg=social-auth-app-django
