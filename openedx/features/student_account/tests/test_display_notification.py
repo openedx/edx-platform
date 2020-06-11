@@ -5,7 +5,7 @@ from custom_settings.models import CustomSettings
 from lms.djangoapps.onboarding.helpers import get_current_utc_date
 from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
 from openedx.features.student_account.helpers import get_non_active_course
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory
 from openedx.features.course_card.tests.helpers import initialize_test_user, set_course_dates
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
