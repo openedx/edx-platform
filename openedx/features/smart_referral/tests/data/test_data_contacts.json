@@ -1,0 +1,95 @@
+{
+  "user_contact_list_request_param": [
+    {
+      "contacts_list": [
+        {
+          "first_name": "T4 First Name",
+          "last_name": "T4 Last Name",
+          "contact_email": "testing.301@yahoo.com"
+        },
+        {
+          "first_name": "T1 First Name",
+          "last_name": "T1 Last Name",
+          "contact_email": "testing.101@test.com"
+        },
+        {
+          "first_name": "T5 First Name",
+          "last_name": "T5 Last Name",
+          "contact_email": "testing.302@yahoo.com"
+        },
+        {
+          "first_name": "T2 First Name",
+          "last_name": "T2 Last Name",
+          "contact_email": "testing.102@test.com"
+        },
+        {
+          "first_name": "T3 First Name",
+          "last_name": "T3 Last Name",
+          "contact_email": "testing.201@edx.com"
+        }
+      ]
+    },
+    {
+      "platform_contacts_list": [
+        {
+          "first_name": "T1 First Name",
+          "last_name": "T1 Last Name",
+          "contact_email": "testing.101@test.com"
+        },
+        {
+          "first_name": "T3 First Name",
+          "last_name": "T3 Last Name",
+          "contact_email": "testing.201@edx.com"
+        }
+      ]
+    },
+    {
+      "non_platform_contacts_list": [
+        {
+          "first_name": "T2 First Name",
+          "last_name": "T2 Last Name",
+          "contact_email": "testing.102@test.com"
+        },
+        {
+          "first_name": "T4 First Name",
+          "last_name": "T4 Last Name",
+          "contact_email": "testing.301@yahoo.com"
+        },
+        {
+          "first_name": "T5 First Name",
+          "last_name": "T5 Last Name",
+          "contact_email": "testing.302@yahoo.com"
+        }
+      ]
+    },
+    {
+      "sorted_contacts_list": [
+        {
+          "first_name": "T1 First Name",
+          "last_name": "T1 Last Name",
+          "contact_email": "testing.101@test.com"
+        },
+        {
+          "first_name": "T2 First Name",
+          "last_name": "T2 Last Name",
+          "contact_email": "testing.102@test.com"
+        },
+        {
+          "first_name": "T3 First Name",
+          "last_name": "T3 Last Name",
+          "contact_email": "testing.201@edx.com"
+        },
+        {
+          "first_name": "T4 First Name",
+          "last_name": "T4 Last Name",
+          "contact_email": "testing.301@yahoo.com"
+        },
+        {
+          "first_name": "T5 First Name",
+          "last_name": "T5 Last Name",
+          "contact_email": "testing.302@yahoo.com"
+        }
+      ]
+    }
+  ]
+}
