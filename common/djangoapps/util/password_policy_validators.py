@@ -256,7 +256,7 @@ class NumericValidator(object):
         self.min_numeric = min_numeric
 
     def validate(self, password, user=None):
-        if _validate_condition(password, lambda c: c.isnumeric(), self.min_numeric):
+        if _validate_condition(password, lambda c: c.isdigit(), self.min_numeric):
             return
         raise ValidationError(
             ungettext(
