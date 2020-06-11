@@ -14251,6 +14251,9 @@ msgid ""
 "happen to fall behind on our suggested dates, you'll be able to adjust them "
 "to keep yourself on track."
 msgstr ""
+"Pero no te preocupes—es flexible, por lo que puedes aprender a tu propio "
+"ritmo. Si te pierdes las fechas sugeridas, podrás ajustarlas para asegurar "
+"que puedes mantenerte al día."
 
 #: lms/templates/dates_banner.html
 msgid ""
