@@ -65,30 +65,54 @@ def get_phone_number(user_id):
     return student.phone_number or None
 
 
-def update_name_and_phone_number(user, full_name=None, phone_number=None):
+def update_phone_number(user, phone_number):
     """
-    Try to update a users phone number from their profile.
-    
+    Try to update a users phone in from their profile.
+
     Arguments:
         user: User who's profile we are editing.
-        full_name: The full name of the user.
         phone_number: the new phone number.
 
     Returns:
-        string: On success, the updated name. On Failure, None.
-        string: On success, the updated phone number. On Failure, None.
+        string: On success, the updated phone number. On Failure, None will be returned.
     """
     try:
         student = _UserProfile.objects.get(user=user)
     except _UserProfile.DoesNotExist as exception:
         log.exception(exception)
-        return None, None
-    if phone_number:
-        student.phone_number = phone_number
-    if full_name:
-        student.name = full_name
-    student.save()
-    return student.name, student.phone_number
+        return None
+    student.phone_number = phone_number
+    try:
+        student.save()
+    except Exception as ex:
+        log.error(ex)
+        return None
+    return student.phone_number
+
+
+def update_name(user, name):
+    """
+    Try to update a users name in their profile.
+
+    Arguments:
+        user: User who's profile we are editing.
+        name: The new name for the User
+
+    Returns:
+        string: On success, the updated name. On failure, None will be returned.
+    """
+    try:
+        student = _UserProfile.objects.get(user=user)
+    except _UserProfile.DoesNotExist as exception:
+        log.exception(exception)
+        return None
+    student.name = name
+    try:
+        student.save()
+    except Exception as ex:
+        log.error(ex)
+        return None
+    return student.phone_number
 
 
 def get_course_access_role(user, org, course_id, role):
