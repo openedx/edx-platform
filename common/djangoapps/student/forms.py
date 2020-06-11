@@ -17,6 +17,8 @@ from django.forms import widgets
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext_lazy as _
 
+from organizations.models import UserOrganizationMapping
+
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from openedx.core.djangoapps.appsembler.sites.utils import is_request_for_new_amc_site
@@ -47,7 +49,20 @@ class PasswordResetFormNoActive(PasswordResetForm):
         """
         email = self.cleaned_data["email"]
         #The line below contains the only change, removing is_active=True
-        self.users_cache = User.objects.filter(email__iexact=email)
+        if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+            current_site = get_current_site()
+            if current_site.id == settings.SITE_ID:
+                raise NotImplementedError('email_exists_or_retired expecting multi-tenant site')
+            # Using `get` is expected to fail when multiple-orgs found for a site
+            # TODO: Handle both MultipleObjectsReturned and DoesNotExist in a better way
+            current_org = current_site.organizations.get()
+            try:
+                self.users_cache = [current_org.userorganizationmapping_set.get(user__email__iexact=email).user]
+            except UserOrganizationMapping.DoesNotExist:
+                self.users_cache = []
+        else:
+            self.users_cache = User.objects.filter(email__iexact=email)
+
         if not len(self.users_cache):
             raise forms.ValidationError(self.error_messages['unknown'])
         if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX))
