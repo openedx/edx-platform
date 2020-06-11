@@ -153,6 +153,13 @@ def _log_failed_get_user_by_email(email):
         AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
 
 
+def _is_in_lms():
+    """
+    Returns True if our caller is the LMS, False otherwise.
+    """
+    return settings.ROOT_URLCONF == 'lms.urls'
+
+
 def _get_user_by_email(request):
     """
     Finds a user object in the database based on the given request, ignores all fields except for email.
@@ -166,9 +173,16 @@ def _get_user_by_email(request):
         # In this case database-level email constraint is removed, so the search is done at the organization
         # level.
         try:
-            current_org = get_current_organization()
-            return current_org.userorganizationmapping_set.get(user__email=email).user
-        except UserOrganizationMapping.DoesNotExist:
+            if _is_in_lms():
+                current_org = get_current_organization()
+                return current_org.userorganizationmapping_set.get(user__email=email).user
+            else:
+                from student.roles import CourseCreatorRole  # Avoid import errors.
+                return User.objects.get(
+                    courseaccessrole__role=CourseCreatorRole.ROLE,
+                    email=email,
+                )
+        except (UserOrganizationMapping.DoesNotExist, User.DoesNotExist):
             _log_failed_get_user_by_email(email)
     else:
         try:
