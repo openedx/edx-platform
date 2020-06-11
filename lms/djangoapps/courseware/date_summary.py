@@ -324,11 +324,14 @@ class CourseEndDate(DateSummary):
     @property
     def description(self):
         if self.current_time <= self.date:
+            return _('After this date, course content will be archived.')
+            # EOL: Remove certificate message on course overview
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
             if is_active and CourseMode.is_eligible_for_certificate(mode):
                 return _('To earn a certificate, you must complete all requirements before this date.')
             else:
                 return _('After this date, course content will be archived.')
+            # EOL
         return _('This course is archived, which means you can review course content but it is no longer active.')
 
     @property
