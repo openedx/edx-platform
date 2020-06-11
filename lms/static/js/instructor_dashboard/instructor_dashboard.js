@@ -214,7 +214,11 @@ such that the value can be defined later than this assignment (file load order).
             constructor = _arg.constructor;
             $element = _arg.$element;
             return plantTimeout(0, sectionsHaveLoaded.waitFor(function() {
-                return new constructor($element);
+                if ($element[0]) {
+                    return new constructor($element);
+                } else {
+                    return null;
+                }
             }));
         });
     };
