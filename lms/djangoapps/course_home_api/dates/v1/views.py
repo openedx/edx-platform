@@ -84,7 +84,7 @@ class DatesTabView(RetrieveAPIView):
         user_timezone = user_timezone_locale['user_timezone']
 
         data = {
-            'is_archived': course.end < datetime.now(),
+            'is_archived': course.end and course.end < datetime.now(),
             'course_date_blocks': [block for block in blocks if not isinstance(block, TodaysDate)],
             'missed_deadlines': missed_deadlines,
             'missed_gated_content': missed_gated_content,

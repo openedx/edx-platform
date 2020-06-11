@@ -101,7 +101,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
             'on_course_outline_page': True,
             'missed_deadlines': missed_deadlines,
             'missed_gated_content': missed_gated_content,
-            'is_archived': course.end < datetime.now(),
+            'is_archived': course.end and course.end < datetime.now(),
         }
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)

@@ -327,7 +327,7 @@ class CourseEndDate(DateSummary):
             weeks_to_complete = get_course_run_details(self.course.id, ['weeks_to_complete']).get('weeks_to_complete')
             if weeks_to_complete:
                 course_duration = datetime.timedelta(weeks=weeks_to_complete)
-                if self.course.end < (self.current_time + course_duration):
+                if self.course.end and self.course.end < (self.current_time + course_duration):
                     return self.course.end
                 return None
 
