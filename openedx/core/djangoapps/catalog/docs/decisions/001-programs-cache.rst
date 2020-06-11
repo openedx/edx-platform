@@ -3,7 +3,15 @@ _____________________
 
 Status
 ======
-Pending
+Accepted
+
+Decision
+=========
+1. Developers working on code involving programs (which is not limited Programs theme developers) should be directed to this ADR for context on the usage and limitations of the programs cache.
+2. Consumers of the programs cache should expect cache misses and either handle them gracefully when possible or explicitly fail (with logging).
+    a. Depending on the cache access pattern, it may be impossible to distinguish between a non-existent program and an existent program that is missing from the cache.
+3. Introduce logging to the programs cache, especially in the case of cache misses or an empty cache. This will make debugging easier and make it more apparent when intervention (such as manually running cache_programs) is necessary.
+4. All edX.org developers should be given access to the Jenkins job that runs cache_programs.
 
 Context
 =======
@@ -16,7 +24,7 @@ By design, the cache does not populate itself by calling out to the Discovery AP
 Below is a (not-necessarily-exhaustive) list of features that depend on the programs cache:
 
 * The learner dashboard shows “Related Programs” under the cards of courses that are in programs.
-* The programs progress page uses the programs cache.
+* The programs progress page.
 * The creation of external IDs for users enrolled in courses within MicroBachelors programs requires knowledge of programs.
 * The program_enrollments system, which Masters uses for institution-managed enrollments in degree programs, uses the programs cache for validation of when creating associations between program enrollments and course enrollments.
 * The LMS management commands that populate program credentials need knowledge of programs.
@@ -28,7 +36,7 @@ Issues
 Correctness & Resiliency
 ------------------------
 
-Because the cache is held in volatile memory, any crash or restart of the server holding the programs cache can surface these issues. While the cache_programs command can be run immediately afterwards, this is not a foolproof solution:
+Because the cache is held in volatile memory, any crash or restart of the memcache server holding the programs cache can surface these issues. While the cache_programs command can be run immediately afterwards, this is not a foolproof solution:
 
 * For a large course catalog, this command takes time to run, so there will be at least some time where LMS programs features are broken due to missing data.
 * Site operators may not know that this has to be done. Even if they do, it adds operational complexity.
@@ -45,20 +53,8 @@ Knowledge & access
 ==================
 The requirements to populate the cache via the edx.org Jenkins job, the privileges required or the fact that the cache is not auto refreshed are not well known.
 
-Context boundaries
-==================
-It can be argued that LMS should only have access to data about course-runs, with logic around catalog-courses, curricula, programs, etc. all being handled by the IDAs that are meant to operate within those contexts (Discovery, Registrar, eCommerce, Credentials).
-
-Recommendations
-===============
-1. Developers working on code involving programs (which is not limited Programs theme developers) should be directed to this ADR for context on the usage and limitations of the programs cache.
-2. Consumers of the programs cache should expect cache misses and either handle them gracefully when possible or explicitly fail (with logging).
-    a. Depending on the cache access pattern, it may be impossible to distinguish between a non-existent program and an existent program that is missing from the cache.
-3. Introduce logging to the programs cache, especially in the case of cache misses or an empty cache. This will make debugging easier and make it more apparent when intervention (such as manually running cache_programs) is necessary.
-4. All edX.org developers should be given access to the Jenkins job that runs cache_programs.
-
-Alternatives Considered
-=======================
+Future Recommendations and Alternatives
+=========================================
 * Call into Discovery service if cache miss happens.
    * Pros:
       * Removes the issues that arise when a program is not present in the cache.
@@ -73,6 +69,7 @@ Alternatives Considered
 
    * Cons:
       * Data duplication.
+      * Ensuring that data is synchronized between the two caches.
       * Managing an additional SQL schema.
       * Involves significant engineering effort.
 * Remove logic from LMS that relies on programs.
