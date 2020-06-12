@@ -7,18 +7,15 @@ import importlib
 import logging
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from enrollment import errors
-from lms.djangoapps import certificates
 
 log = logging.getLogger(__name__)
 
 DEFAULT_DATA_API = 'enrollment.data'
-User = get_user_model()
 
 
 def get_enrollments(user_id, include_inactive=False):
@@ -275,12 +272,6 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
         course=course_id,
         mode=mode
     ))
-
-    # [UCSD_CUSTOM] to regenerate certificates on enrollment update.
-    student = User.objects.get(username=user_id)
-    course_key = CourseKey.from_string(course_id)
-    certificates.api.generate_user_certificates(student, course_key)
-
     return enrollment
 
 
