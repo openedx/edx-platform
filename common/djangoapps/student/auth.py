@@ -14,6 +14,7 @@ from student.roles import (
     CourseCreatorRole,
     CourseInstructorRole,
     CourseRole,
+    GlobalCourseCreatorRole,
     CourseStaffRole,
     GlobalStaff,
     LibraryUserRole,
@@ -87,6 +88,8 @@ def get_user_permissions(user, course_key, org=None):
     if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user):
         return all_perms
     if course_key and user_has_role(user, CourseInstructorRole(course_key)):
+        return all_perms
+    if course_key and user_has_role(user, GlobalCourseCreatorRole(org)):
         return all_perms
     # Staff have all permissions except EDIT_ROLES:
     if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
@@ -167,7 +170,7 @@ def _check_caller_authority(caller, role):
     if not (caller.is_authenticated and caller.is_active):
         raise PermissionDenied
     # superuser
-    if GlobalStaff().has_user(caller):
+    if GlobalStaff().has_user(caller) or GlobalCourseCreatorRole().has_user(caller):
         return
 
     if isinstance(role, (GlobalStaff, CourseCreatorRole)):

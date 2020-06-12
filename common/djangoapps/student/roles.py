@@ -247,6 +247,23 @@ class OrgRole(RoleBase):
 
 
 @register_access_role
+class GlobalCourseCreatorRole(OrgRole):
+    """
+    A global course creator with access to all courses of the current site.
+    """
+    ROLE = 'global_course_creator'
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialization method for GlobalCourseCreatorRole.
+
+        Arguments:
+            org (str): Name of the organization of GlobalCourseCreatorRole
+        """
+        super(GlobalCourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+@register_access_role
 class CourseStaffRole(CourseRole):
     """A Staff member of a course"""
     ROLE = 'staff'

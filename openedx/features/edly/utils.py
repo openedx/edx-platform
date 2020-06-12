@@ -7,6 +7,13 @@ from django.db.models import Q
 from django.forms.models import model_to_dict
 
 from openedx.features.edly.models import EdlyUserProfile, EdlySubOrganization
+from student import auth
+from student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalCourseCreatorRole,
+    UserBasedRole,
+)
 from util.organizations_helpers import get_organizations
 
 LOGGER = logging.getLogger(__name__)
@@ -91,6 +98,24 @@ def get_edly_sub_org_from_cookie(encoded_cookie_data):
     return decoded_cookie_data['edly-sub-org']
 
 
+def get_edx_org_from_cookie(encoded_cookie_data):
+    """
+    Returns edx-org short name from the edly-user-info cookie.
+
+    Arguments:
+        encoded_cookie_data (dict): Edly user info cookie JWT encoded string.
+
+    Returns:
+        string
+    """
+
+    if not encoded_cookie_data:
+        return ''
+
+    decoded_cookie_data = decode_edly_user_info_cookie(encoded_cookie_data)
+    return decoded_cookie_data['edx-org']
+
+
 def get_enabled_organizations(request):
     """
     Helper method to get linked organizations for request site.
@@ -139,8 +164,38 @@ def update_course_creator_status(request_user, user, set_creator):
     Updates course creator status of a user.
     """
     from course_creators.models import CourseCreator
+    from course_creators.views import update_course_creator_group
+
     course_creator, __ = CourseCreator.objects.get_or_create(user=user)
-    course_creator.state = CourseCreator.GRANTED if set_creator else CourseCreator.DENIED
+    course_creator.state = CourseCreator.GRANTED if set_creator else CourseCreator.UNREQUESTED
     course_creator.note = 'Course creator user was updated by panel admin {}'.format(request_user.email)
     course_creator.admin = request_user
     course_creator.save()
+    if not set_creator:
+        update_course_creator_group(request_user, user, set_creator)
+        instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
+        staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
+        instructor_courses_keys = [course.course_id for course in instructor_courses]
+        staff_courses_keys = [course.course_id for course in staff_courses]
+        UserBasedRole(user, CourseInstructorRole.ROLE).remove_courses(*instructor_courses_keys)
+        UserBasedRole(user, CourseStaffRole.ROLE).remove_courses(*staff_courses_keys)
+
+
+def set_global_course_creator_status(request, user, set_global_creator):
+    """
+    Updates global course creator status of a user.
+    """
+    from course_creators.models import CourseCreator
+
+    request_user = request.user
+    course_creator, __ = CourseCreator.objects.get_or_create(user=user)
+    course_creator.state = CourseCreator.GRANTED if set_global_creator else CourseCreator.UNREQUESTED
+    course_creator.note = 'Global course creator user was updated by panel admin {}'.format(request_user.email)
+    course_creator.admin = request_user
+    course_creator.save()
+    edly_user_info_cookie = request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, None)
+    edx_org = get_edx_org_from_cookie(edly_user_info_cookie)
+    if set_global_creator:
+        GlobalCourseCreatorRole(edx_org).add_users(user)
+    else:
+        GlobalCourseCreatorRole(edx_org).remove_users(user)

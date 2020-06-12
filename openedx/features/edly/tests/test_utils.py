@@ -2,6 +2,7 @@
 Tests for Edly Utils Functions.
 """
 import jwt
+import mock
 from mock import MagicMock
 
 from django.conf import settings
@@ -9,6 +10,7 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.features.edly import cookies as cookies_api
 from openedx.features.edly.tests.factories import EdlySubOrganizationFactory, EdlyUserProfileFactory, SiteFactory
 from openedx.features.edly.utils import (
@@ -16,10 +18,23 @@ from openedx.features.edly.utils import (
     decode_edly_user_info_cookie,
     encode_edly_user_info_cookie,
     get_edly_sub_org_from_cookie,
-    user_has_edly_organization_access
+    get_edx_org_from_cookie,
+    set_global_course_creator_status,
+    update_course_creator_status,
+    user_has_edly_organization_access,
+)
+from student import auth
+from student.roles import (
+    CourseCreatorRole,
+    GlobalCourseCreatorRole,
 )
 from student.tests.factories import UserFactory
 
+def mock_render_to_string(template_name, context):
+    """
+    Return a string that encodes template_name and context
+    """
+    return str((template_name, context))
 
 class UtilsTests(TestCase):
     """
@@ -32,6 +47,7 @@ class UtilsTests(TestCase):
         """
         super(UtilsTests, self).setUp()
         self.user = UserFactory.create()
+        self.admin_user = UserFactory.create(is_staff=True)
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.request.session = self._get_stub_session()
@@ -61,6 +77,14 @@ class UtilsTests(TestCase):
         Helper method to create 'EdlySubOrganization` for the request site.
         """
         return EdlySubOrganizationFactory(lms_site=self.request.site)
+
+    def _get_course_creator_status(self, user):
+        """
+        Helper method to get user's course creator status.
+        """
+        from course_creators.views import get_course_creator_status
+
+        return get_course_creator_status(user)
 
     def test_encode_edly_user_info_cookie(self):
         """
@@ -114,6 +138,14 @@ class UtilsTests(TestCase):
         edly_user_info_cookie = cookies_api._get_edly_user_info_cookie_string(self.request)
         assert edly_sub_organization.slug == get_edly_sub_org_from_cookie(edly_user_info_cookie)
 
+    def test_get_edx_org_from_cookie(self):
+        """
+        Test that "get_edx_org_from_cookie" method returns edx-org short name correctly.
+        """
+        edly_sub_organization = self._create_edly_sub_organization()
+        edly_user_info_cookie = cookies_api._get_edly_user_info_cookie_string(self.request)
+        assert edly_sub_organization.edx_organization.short_name == get_edx_org_from_cookie(edly_user_info_cookie)
+
     def test_create_user_link_with_edly_sub_organization(self):
         """
         Test that "create_user_link_with_edly_sub_organization" method create "EdlyUserProfile" link with User.
@@ -123,3 +155,39 @@ class UtilsTests(TestCase):
         edly_user_profile = create_user_link_with_edly_sub_organization(self.request, user)
         assert edly_user_profile == user.edly_profile
         assert edly_sub_organization.slug in user.edly_profile.get_linked_edly_sub_organizations
+
+    @skip_unless_cms
+    @mock.patch('course_creators.admin.render_to_string', mock.Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_update_course_creator_status(self):
+        """
+        Test that "update_course_creator_status" method sets/removes a User as Course Creator correctly.
+        """
+        settings.FEATURES['ENABLE_CREATOR_GROUP'] = True
+        update_course_creator_status(self.admin_user, self.user, True)
+        assert self._get_course_creator_status(self.user) == 'granted'
+        assert auth.user_has_role(self.user, CourseCreatorRole())
+
+        update_course_creator_status(self.admin_user, self.user, False)
+        assert self._get_course_creator_status(self.user) == 'unrequested'
+        assert not auth.user_has_role(self.user, CourseCreatorRole())
+
+    @skip_unless_cms
+    @mock.patch('course_creators.admin.render_to_string', mock.Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_set_global_course_creator_status(self):
+        """
+        Test that "set_global_course_creator_status" method sets/removes a User as Global Course Creator correctly.
+        """
+        self._create_edly_sub_organization()
+        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user)
+        self._copy_cookies_to_request(response, self.request)
+        edly_user_info_cookie = self.request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME)
+        edx_org = get_edx_org_from_cookie(edly_user_info_cookie)
+        self.request.user = self.admin_user
+
+        set_global_course_creator_status(self.request, self.user, True)
+        assert self._get_course_creator_status(self.user) == 'granted'
+        assert auth.user_has_role(self.user, GlobalCourseCreatorRole(edx_org))
+
+        set_global_course_creator_status(self.request, self.user, False)
+        assert self._get_course_creator_status(self.user) == 'unrequested'
+        assert not auth.user_has_role(self.user, GlobalCourseCreatorRole(edx_org))
