@@ -253,6 +253,13 @@ class Organization(TimeStampedModel):
         """
         return "%s" % self.admin.email if self.admin else "Administrator not assigned yet."
 
+    def get_first_learner(self):
+        """
+        :return: User Object of  first learner of organization
+        """
+        first_learner_of_org = UserExtendedProfile.objects.filter(organization=self, is_first_learner=True).first()
+        return first_learner_of_org.user if first_learner_of_org else None
+
     def get_active_partners(self):
         """ Return list of active organization partners"""
         return self.organization_partners.filter(end_date__gt=datetime.utcnow()).values_list('partner', flat=True)
