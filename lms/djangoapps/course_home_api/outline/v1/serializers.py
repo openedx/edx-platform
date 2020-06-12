@@ -3,6 +3,7 @@ Outline Tab Serializers.
 """
 
 from rest_framework import serializers
+from lms.djangoapps.course_home_api.dates.v1.serializers import DateSummarySerializer
 from rest_framework.reverse import reverse
 
 
@@ -44,9 +45,19 @@ class CourseBlockSerializer(serializers.Serializer):
         }
 
 
+class DatesWidgetSerializer(serializers.Serializer):
+    """
+    Serializer for Dates Widget data
+    """
+    course_date_blocks = DateSummarySerializer(many=True)
+    dates_tab_link = serializers.CharField()
+    user_timezone = serializers.CharField()
+
+
 class OutlineTabSerializer(serializers.Serializer):
     """
     Serializer for the Outline Tab
     """
     course_tools = CourseToolSerializer(many=True)
     course_blocks = CourseBlockSerializer()
+    dates_widget = DatesWidgetSerializer()

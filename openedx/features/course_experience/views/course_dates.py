@@ -24,7 +24,6 @@ class CourseDatesFragmentView(EdxFragmentView):
         """
         Render the course dates fragment.
         """
-        #TODO: @dlichen we know that this is where the information is coming from
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         course_date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)

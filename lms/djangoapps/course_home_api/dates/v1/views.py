@@ -59,7 +59,6 @@ class DatesTabView(RetrieveAPIView):
     serializer_class = DatesTabSerializer
 
     def get(self, request, *args, **kwargs):
-        #NOTE: @dlichen this is the backend for the MFE 
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
 
