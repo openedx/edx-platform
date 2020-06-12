@@ -1,5 +1,10 @@
-define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/views/baseview', 'xblock/runtime.v1'],
-    function($, _, ViewUtils, BaseView, XBlock) {
+define(['jquery',
+    'underscore',
+    'common/js/components/utils/view_utils',
+    'js/views/baseview', 'xblock/runtime.v1',
+    'edx-ui-toolkit/js/utils/html-utils'
+  ],
+    function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
         'use strict';
 
         var XBlockView = BaseView.extend({
@@ -157,7 +162,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
              * @param html The desired HTML.
              */
             updateHtml: function(element, html) {
-                element.html(html);
+                element.html(HtmlUtils.HTML(html));
             },
 
             /**
@@ -214,19 +219,43 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                     data = resource.data;
                 if (mimetype === 'text/css') {
                     if (kind === 'text') {
-                        $head.append("<style type='text/css'>" + data + '</style>');
+                        HtmlUtils.append(
+                        $head,
+                        HtmlUtils.joinHtml(
+                            HtmlUtils.HTML("<style type='text/css'>"),
+                            data,
+                            HtmlUtils.HTML("</style>")
+                            )
+                        );
+
                     } else if (kind === 'url') {
-                        $head.append("<link rel='stylesheet' href='" + data + "' type='text/css'>");
+                      HtmlUtils.append(
+                        $head,
+                        HtmlUtils.joinHtml(
+                            HtmlUtils.HTML("<link rel='stylesheet' href='"),
+                            data,
+                            HtmlUtils.HTML("' type='text/css'>")
+                            )
+                        );
+
                     }
                 } else if (mimetype === 'application/javascript') {
                     if (kind === 'text') {
-                        $head.append('<script>' + data + '</script>');
+                        HtmlUtils.append(
+                        $head,
+                        HtmlUtils.joinHtml(
+                            HtmlUtils.HTML('<script>'),
+                            data,
+                            HtmlUtils.HTML('</script>')
+                            )
+                        );
+
                     } else if (kind === 'url') {
                         return ViewUtils.loadJavaScript(data);
                     }
                 } else if (mimetype === 'text/html') {
                     if (placement === 'head') {
-                        $head.append(data);
+                        $head.append(HtmlUtils.HTML(data).toString());
                     }
                 }
                 // Return an already resolved promise for synchronous updates
