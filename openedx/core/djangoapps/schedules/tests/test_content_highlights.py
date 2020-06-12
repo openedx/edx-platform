@@ -157,3 +157,19 @@ class TestContentHighlights(ModuleStoreTestCase):
         )
         with self.assertRaises(CourseUpdateDoesNotExist):
             get_next_section_highlights(self.user, self.course_key, yesterday, tomorrow.date())
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    @mock.patch('lms.djangoapps.courseware.module_render.get_module_for_descriptor')
+    def test_get_highlights_without_module(self, mock_get_module):
+        mock_get_module.return_value = None
+
+        with self.store.bulk_operations(self.course_key):
+            self._create_chapter(highlights='Test highlight')
+
+        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
+            get_week_highlights(self.user, self.course_key, 1)
+
+        yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        today = datetime.datetime.utcnow()
+        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
+            get_next_section_highlights(self.user, self.course_key, yesterday, today.date())
