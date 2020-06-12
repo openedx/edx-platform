@@ -256,7 +256,9 @@ class NumericValidator(object):
         self.min_numeric = min_numeric
 
     def validate(self, password, user=None):
-        if _validate_condition(password, lambda c: c.isdigit(), self.min_numeric):
+        if not isinstance(password, unicode):
+            password = password.decode()
+        if _validate_condition(password, lambda c: c.isnumeric(), self.min_numeric):
             return
         raise ValidationError(
             ungettext(
@@ -401,6 +403,8 @@ class PunctuationValidator(object):
         self.min_punctuation = min_punctuation
 
     def validate(self, password, user=None):
+        if not isinstance(password, unicode):
+            password = password.decode()
         if _validate_condition(password, lambda c: 'P' in unicodedata.category(c), self.min_punctuation):
             return
         raise ValidationError(
