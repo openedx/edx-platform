@@ -11,6 +11,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
+from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
@@ -267,13 +268,42 @@ def get_team_count_query_set(topic_id_set, course_id, organization_protection_st
     return CourseTeam.objects.filter(**filter_query)
 
 
-def add_team_count(topics, course_id, organization_protection_status):
+def get_private_team_ids_to_exclude(user, course_module):
+    """
+    Get the list of team ids that should be excluded from the response.
+    Staff can see all private teams.
+    Users should not be able to see teams in private teamsets that they are not a member of.
+    """
+    if has_access(user, 'staff', course_module.id):
+        return set()
+
+    private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
+    excluded_team_ids = CourseTeam.objects.filter(
+        course_id=course_module.id,
+        topic_id__in=private_teamset_ids
+    ).exclude(
+        membership__user=user
+    ).values_list('team_id', flat=True)
+    return set(excluded_team_ids)
+
+
+def get_teams_with_visibility(user, topic_id_set, course_id, organization_protection_status):
+    """ Get teams taking into account user visibility privelages """
+    team_count_query_set = get_team_count_query_set(topic_id_set, course_id, organization_protection_status)
+    course_module = modulestore().get_course(course_id)
+    excluded_private_team_ids = get_private_team_ids_to_exclude(user, course_module)
+
+    return team_count_query_set.exclude(team_id__in=excluded_private_team_ids)
+
+
+def add_team_count(user, topics, course_id, organization_protection_status):
     """
     Helper method to add team_count for a list of topics.
     This allows for a more efficient single query.
     """
     topic_ids = [topic['id'] for topic in topics]
-    teams_query_set = get_team_count_query_set(
+    teams_query_set = get_teams_with_visibility(
+        user,
         topic_ids,
         course_id,
         organization_protection_status

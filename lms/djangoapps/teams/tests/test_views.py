@@ -1773,7 +1773,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         data = {'course_id': str(self.test_course_1.id)}
         if field:
             data['order_by'] = field
-        topics = self.get_topics_list(status, data)
+        topics = self.get_topics_list(status, data, user='student_enrolled')
         if status == 200:
             self.assertEqual(names, [topic['name'] for topic in topics['results']])
             self.assertEqual(topics['sort_order'], expected_ordering)
@@ -1806,28 +1806,37 @@ class TestListTopicsAPI(TeamAPITestCase):
             )
 
         # Wind power has the most teams, followed by Solar
-        topics = self.get_topics_list(data={
-            'course_id': str(self.test_course_1.id),
-            'page_size': 2,
-            'page': 1,
-            'order_by': 'team_count'
-        })
+        topics = self.get_topics_list(
+            data={
+                'course_id': str(self.test_course_1.id),
+                'page_size': 2,
+                'page': 1,
+                'order_by': 'team_count'
+            },
+            user='student_enrolled'
+        )
         self.assertEqual(["Wind Power", u'Sólar power'], [topic['name'] for topic in topics['results']])
 
         # Coal and Nuclear are tied, so they are alphabetically sorted.
-        topics = self.get_topics_list(data={
-            'course_id': str(self.test_course_1.id),
-            'page_size': 2,
-            'page': 2,
-            'order_by': 'team_count'
-        })
+        topics = self.get_topics_list(
+            data={
+                'course_id': str(self.test_course_1.id),
+                'page_size': 2,
+                'page': 2,
+                'order_by': 'team_count'
+            },
+            user='student_enrolled'
+        )
         self.assertEqual(["Coal Power", "Nuclear Power"], [topic['name'] for topic in topics['results']])
 
     def test_pagination(self):
-        response = self.get_topics_list(data={
-            'course_id': str(self.test_course_1.id),
-            'page_size': 2,
-        })
+        response = self.get_topics_list(
+            data={
+                'course_id': str(self.test_course_1.id),
+                'page_size': 2,
+            },
+            user='student_enrolled'
+        )
 
         self.assertEqual(2, len(response['results']))
         self.assertIn('next', response)
@@ -1841,7 +1850,10 @@ class TestListTopicsAPI(TeamAPITestCase):
 
     def test_team_count(self):
         """Test that team_count is included for each topic"""
-        response = self.get_topics_list(data={'course_id': str(self.test_course_1.id)})
+        response = self.get_topics_list(
+            data={'course_id': str(self.test_course_1.id)},
+            user='student_enrolled'
+        )
         for topic in response['results']:
             self.assertIn('team_count', topic)
             if topic['id'] in ('topic_0', 'topic_1', 'topic_2'):
@@ -1875,13 +1887,13 @@ class TestListTopicsAPI(TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
-        ('student_on_team_1_private_set_1', 2),
-        ('student_on_team_2_private_set_1', 2),
+        ('student_on_team_1_private_set_1', 1),
+        ('student_on_team_2_private_set_1', 1),
         ('staff', 2)
     )
     def test_private_teamset_team_count(self, requesting_user, expected_team_count):
         """
-        TODO: the two students should probably not see that there's another team that they don't see
+        Students should only see teams they are members of in private team-sets
         """
         topics = self.get_topics_list(
             data={'course_id': str(self.test_course_1.id)},

@@ -209,7 +209,12 @@ class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: d
     def to_representation(self, obj):  # pylint: disable=arguments-differ
         """Adds team_count to each topic. """
         data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)
-        add_team_count(data, self.context['course_id'], self.context.get('organization_protection_status'))
+        add_team_count(
+            self.context['request'].user,
+            data,
+            self.context['course_id'],
+            self.context.get('organization_protection_status')
+        )
         return data
 
 

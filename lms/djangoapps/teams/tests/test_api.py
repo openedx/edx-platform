@@ -392,6 +392,7 @@ class TeamAccessTests(SharedModuleStoreTestCase):
             'id': self.topic_id
         }
         teams_api.add_team_count(
+            user,
             [topic],
             COURSE_KEY1,
             organization_protection_status

@@ -52,6 +52,7 @@ from .api import (
     can_user_modify_team,
     can_user_create_team_in_topic,
     get_assignments_for_team,
+    get_private_team_ids_to_exclude,
     has_course_staff_privileges,
     has_specific_team_access,
     has_specific_teamset_access,
@@ -638,24 +639,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         page_query_param = self.request.query_params.get(self.paginator.page_query_param)
         return page_kwarg or page_query_param or 1
 
-def get_private_team_ids_to_exclude(user, course_module):
-    """
-    Get the list of team ids that should be excluded from the response.
-    Staff can see all private teams.
-    Users should not be able to see teams in private teamsets that they are not a member of.
-    """
-    if has_access(user, 'staff', course_module.id):
-        return set()
-
-    private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
-    excluded_team_ids = CourseTeam.objects.filter(
-        course_id=course_module.id,
-        topic_id__in=private_teamset_ids
-    ).exclude(
-        membership__user=user
-    ).values_list('team_id', flat=True)
-    return set(excluded_team_ids)
-
 
 class IsEnrolledOrIsStaff(permissions.BasePermission):
     """Permission that checks to see if the user is enrolled in the course or is staff."""
@@ -1020,7 +1003,7 @@ class TopicListView(GenericAPIView):
         topics = _filter_hidden_private_teamsets(request.user, topics, course_module)
 
         if ordering == 'team_count':
-            add_team_count(topics, course_id, organization_protection_status)
+            add_team_count(request.user, topics, course_id, organization_protection_status)
             topics.sort(key=lambda t: t['team_count'], reverse=True)
             page = self.paginate_queryset(topics)
             serializer = TopicSerializer(
@@ -1034,6 +1017,7 @@ class TopicListView(GenericAPIView):
             serializer = BulkTeamCountTopicSerializer(
                 page,
                 context={
+                    'request': request,
                     'course_id': course_id,
                     'organization_protection_status': organization_protection_status
                 },
