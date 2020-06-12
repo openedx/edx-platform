@@ -112,7 +112,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/testing.txt
 edx-django-utils==3.2.3   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.0.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.3.1     # via -r requirements/edx/testing.txt
+edx-enterprise==3.3.2     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
@@ -146,8 +146,8 @@ fs-s3fs==0.1.8            # via -r requirements/edx/testing.txt, django-pyfs
 fs==2.0.18                # via -r requirements/edx/testing.txt, django-pyfs, fs-s3fs, xblock
 future==0.18.2            # via -r requirements/edx/testing.txt, django-ses, edx-celeryutils, edx-enterprise, pycontracts, pyjwkest, radon
 geoip2==3.0.0             # via -r requirements/edx/testing.txt
-gitdb==4.0.5              # via gitpython
-gitpython==3.1.3          # via transifex-client
+gitdb==4.0.5              # via -r requirements/edx/testing.txt, gitpython
+gitpython==3.1.3          # via -r requirements/edx/testing.txt, transifex-client
 glob2==0.7                # via -r requirements/edx/testing.txt
 gunicorn==20.0.4          # via -r requirements/edx/testing.txt
 help-tokens==1.1.2        # via -r requirements/edx/testing.txt
@@ -281,7 +281,7 @@ simplejson==3.17.0        # via -r requirements/edx/testing.txt, sailthru-client
 singledispatch==3.4.0.3   # via -r requirements/edx/testing.txt
 six==1.15.0               # via -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, analytics-python, astroid, bleach, bok-choy, chem, crowdsourcehinter-xblock, cryptography, diff-cover, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, edx-sphinx-theme, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, jsonschema, libsass, mando, mock, openedx-calc, packaging, pathlib2, paver, pip-tools, pycontracts, pyjwkest, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, sphinxcontrib-httpdomain, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
-smmap==3.0.4              # via gitdb
+smmap==3.0.4              # via -r requirements/edx/testing.txt, gitdb
 snowballstemmer==2.0.0    # via sphinx
 social-auth-core==3.3.3   # via -r requirements/edx/testing.txt, social-auth-app-django
 sorl-thumbnail==12.6.3    # via -r requirements/edx/testing.txt
@@ -307,7 +307,7 @@ toml==0.10.1              # via -r requirements/edx/testing.txt, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
 tox==3.15.2               # via -r requirements/edx/testing.txt, tox-battery
 tqdm==4.46.1              # via -r requirements/edx/testing.txt, nltk
-git+https://github.com/edx/transifex-client.git@1660e05cb4a608a420b23f569c329ba3ff13b175#egg=transifex-client  # via -r requirements/edx/testing.in
+git+https://github.com/edx/transifex-client.git@1660e05cb4a608a420b23f569c329ba3ff13b175#egg=transifex-client  # via -r requirements/edx/testing.txt
 typed-ast==1.4.1          # via -r requirements/edx/testing.txt, astroid
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
 unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest-plugin
