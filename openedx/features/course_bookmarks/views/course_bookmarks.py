@@ -65,6 +65,8 @@ class CourseBookmarksFragmentView(EdxFragmentView):
     """
     Fragment view that shows a user's bookmarks for a course.
     """
+    _uses_pattern_library = False
+
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the user's course bookmarks as a fragment.
