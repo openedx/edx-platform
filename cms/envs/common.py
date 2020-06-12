@@ -387,6 +387,23 @@ FEATURES = {
     # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
+
+    # .. toggle_name: DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Warn about removing support for deprecated course keys.
+    #      To enable, set to True.
+    #      To disable, set to False.
+    #      To enable with a custom support deadline, set to an ISO-8601 date string:
+    #        eg: '2020-09-01'
+    # .. toggle_category: n/a
+    # .. toggle_use_cases: incremental_release
+    # .. toggle_creation_date: 2020-06-12
+    # .. toggle_expiration_date: 2020-09-01
+    # .. toggle_warnings: This can be removed once support is removed for deprecated course keys.
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
+    # .. toggle_status: supported
+    'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
 }
 
 ENABLE_JASMINE = False
