@@ -18,6 +18,7 @@ from organizations import models as org_models
 from organizations.models import UserOrganizationMapping, Organization, UserSiteMapping
 
 from openedx.core.lib.api.api_key_permissions import is_request_has_valid_api_key
+from openedx.core.lib.log_utils import audit_log
 from openedx.core.djangoapps.theming.helpers import get_current_request, get_current_site
 from openedx.core.djangoapps.theming.models import SiteTheme
 
@@ -174,12 +175,18 @@ def is_request_for_amc_admin(request):
         # Handle all no-request and non-registration requests gracefully.
         return False
 
-    if not is_request_has_valid_api_key(request):
-        # Security: Ensure the request is coming from the AMC backend with proper `X_EDX_API_KEY` header.
-        return False
-
     param = request.POST.get('registered_from_amc', False)
-    return (param == 'True') or (param == 'true') or (param is True)
+    has_amc_parameter = (param == 'True') or (param == 'true') or (param is True)
+
+    if has_amc_parameter:
+        if is_request_has_valid_api_key(request):
+            # Security: Ensure the request is coming from the AMC backend with proper `X_EDX_API_KEY` header.
+            return True
+        else:
+            audit_log('Suspicious call for the `is_request_for_amc_admin()` function.')
+            raise Exception('Suspicious call for the `is_request_for_amc_admin()` function.')
+
+    return False
 
 
 def get_current_organization(failure_return_none=False):

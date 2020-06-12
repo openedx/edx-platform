@@ -1,6 +1,6 @@
 import json
 from unittest import skipUnless
-from mock import patch
+from mock import patch, Mock
 import uuid
 
 from django.conf import settings
@@ -20,6 +20,11 @@ from .test_utils import with_organization_context
 @patch(
     # Patch to avoids error when importing from CMS
     'student.views.management.add_course_creator_role'
+)
+@patch(
+    # Imitate a proper `X_EDX_API_KEY` header being passed
+    'openedx.core.djangoapps.appsembler.sites.utils.is_request_has_valid_api_key',
+    Mock(return_value=True),
 )
 class MultiTenantAMCSignupTest(APITestCase):
     """
