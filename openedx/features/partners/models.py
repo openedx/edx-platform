@@ -3,11 +3,14 @@ from json import dumps
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+
 from jsonfield.fields import JSONField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
+from openedx.features.philu_utils.backend_storage import CustomS3Storage
+from util.philu_utils import UploadToPathAndRename
 
-from .constants import PARTNER_USER_STATUS_WAITING, PARTNER_USER_STATUS_APPROVED
+from .constants import PARTNER_USER_STATUS_APPROVED, PARTNER_USER_STATUS_WAITING
 
 
 class Partner(TimeStampedModel):
@@ -16,11 +19,13 @@ class Partner(TimeStampedModel):
     """
     performance_url = models.URLField(blank=True, default=None)
     label = models.CharField(max_length=100, help_text="Display as a title in landing page.")
-    logo = models.ImageField(upload_to="partners/logo", help_text="Main logo in landing page.")
+    logo = models.ImageField(
+        storage=CustomS3Storage(), max_length=500, help_text="Main logo in landing page.",
+        upload_to=UploadToPathAndRename(path='images', name_prefix='logo', add_path_prefix=True)
+    )
     slug = models.CharField(max_length=100, unique=True, help_text="A unique identifier for an organization")
     email = models.EmailField(help_text="Contact email of an organization")
     configuration = JSONField(null=False, blank=True, default=dumps({"USER_LIMIT": ""}))
-
 
     def __unicode__(self):
         return '{}'.format(self.label)
@@ -64,4 +69,3 @@ class PartnerCommunity(models.Model):
 
     class Meta:
         unique_together = ('community_id', 'partner')
-
