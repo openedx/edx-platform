@@ -144,12 +144,16 @@
                     $form = this.$form,
                     elements = $form[0].elements,
                     i,
+                    $n,
+                    tpl,
                     len = elements.length,
                     $el,
                     $label,
                     key = '',
                     errors = [],
-                    validation = {};
+                    validation = {},
+                    $desc,
+                    $validationNode;
 
                 for (i = 0; i < len; i++) {
                     $el = $(elements[i]);
@@ -163,12 +167,29 @@
                     }
 
                     if (key) {
+                        if (this.interesting_fields($el)) {
+                            this.remove_validation_error($el, $form);
+                        }
                         validation = this.validate(elements[i]);
                         if (validation.isValid) {
                             obj[key] = $el.attr('type') === 'checkbox' ? $el.is(':checked') : $el.val();
                             $el.removeClass('error');
                             $label.removeClass('error');
                         } else {
+                            if (this.interesting_fields($el)) {
+                                $validationNode = this.get_error_validation_node($el, $form);
+                                if ($validationNode) {
+                                    $n = $.parseHTML(validation.message);
+                                    tpl = HtmlUtils.template('<i class="fa fa-exclamation-triangle"></i>');
+
+                                    HtmlUtils.prepend($n, tpl());
+                                    HtmlUtils.append($validationNode, HtmlUtils.HTML($n));
+                                }
+
+                                $desc = $form.find('#' + $el.attr('id') + '-desc');
+                                $desc.remove();
+                            }
+
                             errors.push(validation.message);
                             $el.addClass('error');
                             $label.addClass('error');
@@ -179,6 +200,34 @@
                 this.errors = _.uniq(errors);
 
                 return obj;
+            },
+            remove_validation_error: function($el, $form) {
+                var $validationNode = this.get_error_validation_node($el, $form);
+                if ($validationNode && $validationNode.find('li').length > 0) {
+                    $validationNode.empty();
+                }
+            },
+
+            get_error_validation_node: function($el, $form) {
+                var $node = $form.find('#' + $el.attr('id') + '-validation-error-msg');
+                return $node.find('ul');
+            },
+
+            interesting_fields: function($el) {
+                return ($el.attr('name') === 'email' || $el.attr('name') === 'password');
+            },
+
+            toggleHelp: function(event, $help) {
+                var $el = $(event.currentTarget);
+                var $i = $el.find('i');
+
+                if ($help.css('display') === 'block') {
+                    $help.css('display', 'none');
+                    $i.addClass('fa-caret-right').removeClass('fa-caret-down');
+                } else {
+                    $help.css('display', 'block');
+                    $i.addClass('fa-caret-down').removeClass('fa-caret-right');
+                }
             },
 
             saveError: function(error) {

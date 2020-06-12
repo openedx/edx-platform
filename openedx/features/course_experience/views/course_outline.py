@@ -31,6 +31,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.models import CourseEnrollment
 from util.milestones_helpers import get_course_content_milestones
@@ -66,15 +67,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
         if not course_block_tree:
             return None
 
-        context = {
-            'csrf': csrf(request)['csrf_token'],
-            'course': course_overview,
-            'due_date_display_format': course.due_date_display_format,
-            'blocks': course_block_tree,
-            'enable_links': user_is_enrolled or course.course_visibility == COURSE_VISIBILITY_PUBLIC,
-            'course_key': course_key,
-        }
-
         resume_block = get_resume_block(course_block_tree) if user_is_enrolled else None
 
         if not resume_block:
@@ -83,32 +75,34 @@ class CourseOutlineFragmentView(EdxFragmentView):
         xblock_display_names = self.create_xblock_id_and_name_dict(course_block_tree)
         gated_content = self.get_content_milestones(request, course_key)
 
-        context['gated_content'] = gated_content
-        context['xblock_display_names'] = xblock_display_names
-
-        page_context = kwargs.get('page_context', None)
-        if page_context:
-            context['self_paced'] = page_context.get('pacing_type', 'instructor_paced') == 'self_paced'
-
-        # We're using this flag to prevent old self-paced dates from leaking out on courses not
-        # managed by edx-when.
-        context['in_edx_when'] = edx_when_api.is_enabled_for_course(course_key)
+        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME)
         reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME
 
-        context['reset_deadlines_url'] = reset_deadlines_url
-        context['reset_deadlines_redirect_url_base'] = reset_deadlines_redirect_url_base
-        context['reset_deadlines_redirect_url_id_dict'] = {'course_id': str(course.id)}
-        context['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course=course)
-        context['on_course_outline_page'] = True
-        context['content_type_gating_enabled'] = ContentTypeGatingConfig.enabled_for_enrollment(
-            user=request.user,
-            course_key=course_key
-        )
-        # We use javascript to check whether to actually display this banner, so we let the banner assume
-        # that deadlines have been missed.
-        context['missed_deadlines'] = True
+        context = {
+            'csrf': csrf(request)['csrf_token'],
+            'course': course_overview,
+            'due_date_display_format': course.due_date_display_format,
+            'blocks': course_block_tree,
+            'enable_links': user_is_enrolled or course.course_visibility == COURSE_VISIBILITY_PUBLIC,
+            'course_key': course_key,
+            'gated_content': gated_content,
+            'xblock_display_names': xblock_display_names,
+            'self_paced': course.self_paced,
+
+            # We're using this flag to prevent old self-paced dates from leaking out on courses not
+            # managed by edx-when.
+            'in_edx_when': edx_when_api.is_enabled_for_course(course_key),
+            'reset_deadlines_url': reset_deadlines_url,
+            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
+            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)},
+            'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
+            'on_course_outline_page': True,
+            'missed_deadlines': missed_deadlines,
+            'missed_gated_content': missed_gated_content,
+            'has_ended': course.has_ended(),
+        }
 
         html = render_to_string('course_experience/course-outline-fragment.html', context)
         return Fragment(html)

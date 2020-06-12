@@ -2,7 +2,6 @@
 Dates Tab Views
 """
 
-
 from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -43,8 +42,8 @@ class DatesTabView(RetrieveAPIView):
             link: (str) An absolute link to content related to the date event
                 (ex. verified link or link to assignment)
             title: (str) The title of the date event
-        display_reset_dates_text: (bool) Indicates whether the reset dates banner should be shown
-            for the given user
+        missed_deadlines: (bool) Indicates whether the user missed any graded content deadlines
+        missed_gated_content: (bool) Indicates whether the user missed gated content
         learner_is_full_access: (bool) Indicates if the user is verified in the course
         user_timezone: (str) The user's preferred timezone
         verified_upgrade_link: (str) The link for upgrading to the Verified track in a course
@@ -74,7 +73,7 @@ class DatesTabView(RetrieveAPIView):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         blocks = get_course_date_blocks(course, request.user, request, include_access=True, include_past_dates=True)
-        display_reset_dates_text = dates_banner_should_display(course_key, request)
+        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(
             user=request.user,
@@ -86,8 +85,10 @@ class DatesTabView(RetrieveAPIView):
         user_timezone = user_timezone_locale['user_timezone']
 
         data = {
+            'has_ended': course.has_ended(),
             'course_date_blocks': [block for block in blocks if not isinstance(block, TodaysDate)],
-            'display_reset_dates_text': display_reset_dates_text,
+            'missed_deadlines': missed_deadlines,
+            'missed_gated_content': missed_gated_content,
             'learner_is_full_access': learner_is_full_access,
             'user_timezone': user_timezone,
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),

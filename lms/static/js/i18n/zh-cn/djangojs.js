@@ -1085,7 +1085,6 @@
     "Name of the signatory": "\u7b7e\u53d1\u8005\u59d3\u540d",
     "Name or short description of the configuration": "\u8be5\u914d\u7f6e\u7684\u540d\u79f0\u6216\u7b80\u77ed\u63cf\u8ff0",
     "Navigate up": "\u5411\u4e0a\u5bfc\u822a",
-    "Need help logging in?": "\u767b\u5f55\u65f6\u9700\u8981\u5e2e\u52a9\uff1f",
     "Needs verified certificate ": "\u9700\u8981\u5df2\u8ba4\u8bc1\u8bc1\u4e66",
     "Never published": "\u4ece\u672a\u53d1\u5e03\u8fc7",
     "Never show assessment results": "\u4e00\u76f4\u9690\u85cf\u8bc4\u5206\u7ed3\u679c",

@@ -2786,9 +2786,9 @@ class TestXBlockInfo(ItemTest):
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-class TestProctoredXBlockInfo(ItemTest):
+class TestSpecialExamXBlockInfo(ItemTest):
     """
-    Unit tests for XBlock outline handling, specific to proctored exam XBlocks.
+    Unit tests for XBlock outline handling, specific to special exam XBlocks.
     """
     patch_get_exam_configuration_dashboard_url = patch.object(
         item_module, 'get_exam_configuration_dashboard_url', return_value='test_url'
@@ -2827,7 +2827,7 @@ class TestProctoredXBlockInfo(ItemTest):
     @patch_get_exam_configuration_dashboard_url
     @patch_does_backend_support_onboarding
     @patch_get_exam_by_content_id_success
-    def test_proctored_exam_xblock_info(
+    def test_special_exam_xblock_info(
             self,
             mock_get_exam_by_content_id,
             _mock_does_backend_support_onboarding,
@@ -2850,20 +2850,20 @@ class TestProctoredXBlockInfo(ItemTest):
             include_children_predicate=ALWAYS,
         )
         # exam proctoring should be enabled and time limited.
-        assert xblock_info['is_proctored_exam']
-        assert xblock_info['was_ever_proctored_exam']
-        assert xblock_info['is_time_limited']
+        assert xblock_info['is_proctored_exam'] is True
+        assert xblock_info['was_ever_special_exam'] is True
+        assert xblock_info['is_time_limited'] is True
         assert xblock_info['default_time_limit_minutes'] == 100
         assert xblock_info['proctoring_exam_configuration_link'] == 'test_url'
-        assert xblock_info['supports_onboarding']
-        assert not xblock_info['is_onboarding_exam']
+        assert xblock_info['supports_onboarding'] is True
+        assert xblock_info['is_onboarding_exam'] is False
         mock_get_exam_configuration_dashboard_url.assert_called_with(self.course.id, xblock_info['id'])
         assert mock_get_exam_by_content_id.call_count == 0
 
     @patch_get_exam_configuration_dashboard_url
     @patch_does_backend_support_onboarding
     @patch_get_exam_by_content_id_success
-    def test_xblock_was_ever_proctored_exam(
+    def test_xblock_was_ever_special_exam(
             self,
             mock_get_exam_by_content_id,
             _mock_does_backend_support_onboarding_patch,
@@ -2875,8 +2875,7 @@ class TestProctoredXBlockInfo(ItemTest):
             display_name="Test Lesson 1",
             user_id=self.user.id,
             is_proctored_exam=False,
-            is_time_limited=True,
-            default_time_limit_minutes=100,
+            is_time_limited=False,
             is_onboarding_exam=False,
         )
         sequential = modulestore().get_item(sequential.location)
@@ -2885,7 +2884,7 @@ class TestProctoredXBlockInfo(ItemTest):
             include_child_info=True,
             include_children_predicate=ALWAYS,
         )
-        assert xblock_info['was_ever_proctored_exam']
+        assert xblock_info['was_ever_special_exam'] is True
         assert mock_get_exam_by_content_id.call_count == 1
 
     @patch_get_exam_configuration_dashboard_url
@@ -2903,8 +2902,7 @@ class TestProctoredXBlockInfo(ItemTest):
             display_name="Test Lesson 1",
             user_id=self.user.id,
             is_proctored_exam=False,
-            is_time_limited=True,
-            default_time_limit_minutes=100,
+            is_time_limited=False,
             is_onboarding_exam=False,
         )
         sequential = modulestore().get_item(sequential.location)
@@ -2913,7 +2911,7 @@ class TestProctoredXBlockInfo(ItemTest):
             include_child_info=True,
             include_children_predicate=ALWAYS,
         )
-        assert not xblock_info['was_ever_proctored_exam']
+        assert xblock_info['was_ever_special_exam'] is False
         assert mock_get_exam_by_content_id.call_count == 1
 
 

@@ -104,6 +104,7 @@ icalendar                           # .ics generator, used by calendar_sync
 ipaddress                           # Ip network support for Embargo feature
 jsonfield2                          # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
+lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako==1.0.2                         # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
@@ -158,4 +159,5 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
+enmerkar-underscore                 # Implements a underscore extractor for django-babel.
 

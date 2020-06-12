@@ -105,6 +105,13 @@
                     expect($(view.el).html().length).toEqual(0);
                 });
 
+                it('displays a link to the password reset help', function() {
+                    createPasswordResetView(this);
+
+                // Verify that the password reset help link is displayed
+                    expect($('.reset-help')).toBeVisible();
+                });
+
                 it('validates the email field', function() {
                     createPasswordResetView(this);
 

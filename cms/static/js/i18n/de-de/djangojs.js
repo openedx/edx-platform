@@ -1161,7 +1161,6 @@
     "Name of the signatory": "Name des Unterzeichners",
     "Name or short description of the configuration": "Name oder Kurzbeschreibung des Aufbaus",
     "Navigate up": "Aufw\u00e4rts navigieren",
-    "Need help logging in?": "Brauchen Sie Hilfe beim anmelden?",
     "Needs verified certificate ": "Ben\u00f6tigt ein verifiziertes Zertifikat",
     "Never published": "Bisher unver\u00f6ffentlicht",
     "Never show assessment results": "Auswertungen nie zeigen",

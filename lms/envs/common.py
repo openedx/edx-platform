@@ -1494,6 +1494,9 @@ MIDDLEWARE = [
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
 
+    # Generate code ownership metrics. Keep this immediately after RequestCacheMiddleware.
+    'lms.djangoapps.monitoring.middleware.CodeOwnerMetricMiddleware',
+
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMetricsMiddleware',
 
@@ -1576,7 +1579,6 @@ MIDDLEWARE = [
 
     # Outputs monitoring metrics for a request.
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
-    'lms.djangoapps.monitoring.middleware.CodeOwnerMetricMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
 
@@ -3769,6 +3771,9 @@ COMPLETION_BY_VIEWING_DELAY_MS = 5000
 ############### Settings for Django Rate limit #####################
 RATELIMIT_ENABLE = True
 RATELIMIT_RATE = '120/m'
+
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = '500/5m'
 
 ############### Settings for Retirement #####################
 RETIRED_USERNAME_PREFIX = 'retired__user_'

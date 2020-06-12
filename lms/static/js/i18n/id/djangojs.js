@@ -856,7 +856,6 @@
     "Name of the signatory": "Nama Penandatangan",
     "Name or short description of the configuration": "Nama atau gambaran singkat dari konfigurasi",
     "Navigate up": "Navigasi naik",
-    "Need help logging in?": "Butuh bantuan untuk masuk?",
     "Needs verified certificate ": "Memerlukan sertifikat terverifikasi",
     "Never published": "Tidak pernah dipublikasikan",
     "Never show assessment results": "Jangan tampilkan hasil penilaian",

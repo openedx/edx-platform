@@ -1,8 +1,6 @@
 """Payment and verification pages"""
 
 
-import re
-
 from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise
 
@@ -75,12 +73,6 @@ class PaymentAndVerificationFlow(PageObject):
         """Interact with the radio buttons appearing on the first page of the upgrade flow."""
         self.q(css=".contribution-option > input").first.click()
 
-    def proceed_to_payment(self):
-        """Interact with the payment button."""
-        self.q(css=".payment-button").click()
-
-        FakePaymentPage(self.browser, self._course_id).wait_for_page()
-
     def immediate_verification(self):
         """Interact with the immediate verification button."""
         self.q(css="#verify_now_button").click()
@@ -119,50 +111,3 @@ class PaymentAndVerificationFlow(PageObject):
             raise Exception("The dashboard can only be accessed from the enrollment confirmation.")
 
         DashboardPage(self.browser).wait_for_page()
-
-
-class FakePaymentPage(PageObject):
-    """Interact with the fake payment endpoint.
-
-    This page is hidden behind the feature flag `ENABLE_PAYMENT_FAKE`,
-    which is enabled in the Bok Choy env settings.
-
-    Configuring this payment endpoint also requires configuring the Bok Choy
-    auth settings with the following:
-
-        "CC_PROCESSOR_NAME": "CyberSource2",
-        "CC_PROCESSOR": {
-            "CyberSource2": {
-                "SECRET_KEY": <string>,
-                "ACCESS_KEY": <string>,
-                "PROFILE_ID": "edx",
-                "PURCHASE_ENDPOINT": "/shoppingcart/payment_fake"
-            }
-        }
-    """
-    def __init__(self, browser, course_id):
-        """Initialize the page.
-
-        Arguments:
-            browser (Browser): The browser instance.
-            course_id (unicode): The course in which the user is enrolling.
-        """
-        super(FakePaymentPage, self).__init__(browser)
-        self._course_id = course_id
-
-    url = BASE_URL + "/shoppingcart/payment_fake/"
-
-    def is_browser_on_page(self):
-        """Check if a step in the payment and verification flow has loaded."""
-        message = self.q(css='BODY').text
-        if not message:
-            return False
-
-        match = re.search('Payment page', message[0])
-        return True if match else False
-
-    def submit_payment(self):
-        """Interact with the payment submission button."""
-        self.q(css="input[value='Submit']").click()
-
-        return PaymentAndVerificationFlow(self.browser, self._course_id, entry_point='payment-confirmation').wait_for_page()

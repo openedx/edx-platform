@@ -3,7 +3,7 @@
 from io import StringIO
 
 from lms.djangoapps.teams import csv
-from lms.djangoapps.teams.models import CourseTeam
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -131,6 +131,7 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         self.assertEqual(expected_csv_output, self.buf.getvalue())
 
 
+# pylint: disable=no-member
 class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
     """ Tests for TeamMembershipImportManager """
     @classmethod
@@ -144,6 +145,7 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
             }]
         })
         cls.course = CourseFactory(teams_configuration=teams_config)
+        cls.second_course = CourseFactory(teams_configuration=teams_config)
 
         # initialize import manager
         cls.import_manager = csv.TeamMembershipImportManager(cls.course)
@@ -174,3 +176,33 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
 
         self.import_manager.add_user_to_team(row)
         self.assertFalse(CourseTeam.objects.get(team_id__startswith='new_unprotected_team').organization_protected)
+
+    def test_team_removals_are_scoped_correctly(self):
+        """ Team memberships should not search across topics in different courses """
+        # Given a learner enrolled in similarly named teamsets across 2 courses
+        audit_learner = UserFactory.create(username='audit_learner')
+
+        CourseEnrollmentFactory.create(user=audit_learner, course_id=self.course.id, mode='audit')
+        course_1_team = CourseTeamFactory(course_id=self.course.id, name='cross_course_test', topic_id='teamset_1')
+        course_1_team.add_user(audit_learner)
+
+        CourseEnrollmentFactory.create(user=audit_learner, course_id=self.second_course.id, mode='audit')
+        course_2_team = CourseTeamFactory(
+            course_id=self.second_course.id,
+            name='cross_course_test',
+            topic_id='teamset_1'
+        )
+        course_2_team.add_user(audit_learner)
+
+        self.assertTrue(CourseTeamMembership.is_user_on_team(audit_learner, course_1_team))
+
+        # When I try to remove them from the team
+        row = {
+            'mode': 'audit',
+            'teamset_1': None,
+            'user': audit_learner
+        }
+        self.import_manager.remove_user_from_team_for_reassignment(row)
+
+        # They are successfully removed from the team
+        self.assertFalse(CourseTeamMembership.is_user_on_team(audit_learner, course_1_team))

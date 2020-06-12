@@ -193,11 +193,11 @@
                     expect($('.button-oa2-facebook')).toBeVisible();
                 });
 
-                it('displays a link to the password reset form', function() {
+                it('displays a link to the signin help', function() {
                     createLoginView(this);
 
-                // Verify that the password reset link is displayed
-                    expect($('.forgot-password')).toBeVisible();
+                // Verify that the Signin help link is displayed
+                    expect($('.login-help')).toBeVisible();
                 });
 
                 it('displays a link to the enterprise slug login', function() {

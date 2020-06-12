@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-07 20:49+0000\n"
-"PO-Revision-Date: 2020-06-07 20:50:09.597183\n"
+"POT-Creation-Date: 2020-06-11 15:20+0000\n"
+"PO-Revision-Date: 2020-06-11 15:20:51.681637\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -41,7 +41,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -129,8 +129,8 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
-#: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/templates.underscore
+#: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
@@ -2668,7 +2668,6 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-#: lms/templates/student_account/form_field.underscore
 msgid "Need help logging in?"
 msgstr "Nééd hélp löggïng ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -9545,9 +9544,29 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_account/form_field.underscore
+msgid "Need help signing in?"
+msgstr "Nééd hélp sïgnïng ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot my password"
+msgstr "Förgöt mý pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Other sign-in issues"
+msgstr "Öthér sïgn-ïn ïssüés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/student_account/form_field.underscore
 msgid "Sign in with your company or school"
 msgstr ""
 "Sïgn ïn wïth ýöür çömpäný ör sçhööl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Need other help signing in?"
+msgstr "Nééd öthér hélp sïgnïng ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Create an account"
+msgstr "Çréäté än äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -12165,6 +12184,36 @@ msgstr "Sét äs ä Spéçïäl Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Exam Types"
 msgstr "Éxäm Týpés Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This subsection was released to learners as a special exam, but was reverted"
+" back to a basic exam. You may not configure it as a special exam now. "
+"Contact edX Support for assistance."
+msgstr ""
+"Thïs süßséçtïön wäs réléäséd tö léärnérs äs ä spéçïäl éxäm, ßüt wäs révértéd"
+" ßäçk tö ä ßäsïç éxäm. Ýöü mäý nöt çönfïgüré ït äs ä spéçïäl éxäm nöw. "
+"Çöntäçt édX Süppört för ässïstänçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
+" α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє "
+"мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ "
+"łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυ#"
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This special exam has been released to learners. You may not convert it to "
+"another type of special exam. You may revert this subsection back to being a"
+" basic exam by selecting 'None', but you will NOT be able to configure it as"
+" a special exam in the future."
+msgstr ""
+"Thïs spéçïäl éxäm häs ßéén réléäséd tö léärnérs. Ýöü mäý nöt çönvért ït tö "
+"änöthér týpé öf spéçïäl éxäm. Ýöü mäý révért thïs süßséçtïön ßäçk tö ßéïng ä"
+" ßäsïç éxäm ßý séléçtïng 'Nöné', ßüt ýöü wïll NÖT ßé äßlé tö çönfïgüré ït äs"
+" ä spéçïäl éxäm ïn thé fütüré. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη я#"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

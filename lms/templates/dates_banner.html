@@ -8,14 +8,6 @@ from lms.djangoapps.courseware.date_summary import CourseAssignmentDate
 from course_modes.models import CourseMode
 %>
 
-% if on_dates_tab and not missed_deadlines and getattr(course, 'self_paced', False):
-    <div class="dates-banner">
-        <div class="dates-banner-text">
-            <strong>${_("We've built a suggested schedule to help you stay on track.")}</strong>
-            ${_("But don't worry—it's flexible so you can learn at your own pace. If you happen to fall behind on our suggested dates, you'll be able to adjust them to keep yourself on track.")}
-        </div>
-    </div>
-% endif
 <%
 additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
 %>
@@ -93,13 +85,25 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
         % endif
     </div>
 </%def>
-% if on_dates_tab and content_type_gating_enabled and not missed_deadlines:
-    ${upgrade_to_complete_graded_banner()}
-% elif missed_deadlines:
-    % if content_type_gating_enabled:
-        ${upgrade_to_reset_banner()}
-    % else:
-        ${reset_dates_banner()}
+
+% if not has_ended:
+    % if on_dates_tab and not missed_deadlines:
+        %if getattr(course, 'self_paced', False):
+        <div class="dates-banner">
+            <div class="dates-banner-text">
+                <strong>${_("We've built a suggested schedule to help you stay on track.")}</strong>
+                ${_("But don't worry—it's flexible so you can learn at your own pace. If you happen to fall behind on our suggested dates, you'll be able to adjust them to keep yourself on track.")}
+            </div>
+        </div>
+        % endif
+        % if content_type_gating_enabled:
+            ${upgrade_to_complete_graded_banner()}
+        % endif
+    % elif missed_deadlines:
+        % if missed_gated_content:
+            ${upgrade_to_reset_banner()}
+        % else:
+            ${reset_dates_banner()}
+        % endif
     % endif
 % endif
-
