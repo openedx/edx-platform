@@ -24,7 +24,6 @@ XMODULES = [
     "videosequence = xmodule.seq_module:SequenceDescriptor",
     "custom_tag_template = xmodule.raw_module:RawDescriptor",
     "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
-    "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
     "lti = xmodule.lti_module:LTIDescriptor",
@@ -40,6 +39,7 @@ XBLOCKS = [
     "vertical = xmodule.vertical_block:VerticalBlock",
     "video = xmodule.video_module:VideoBlock",
     "videoalpha = xmodule.video_module:VideoBlock",
+    "word_cloud = xmodule.word_cloud_module:WordCloudBlock",
     "wrapper = xmodule.wrapper_module:WrapperBlock",
 ]
 XBLOCKS_ASIDES = [
