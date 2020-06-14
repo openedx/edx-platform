@@ -307,7 +307,7 @@ toml==0.10.1              # via -r requirements/edx/testing.txt, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
 tox==3.15.2               # via -r requirements/edx/testing.txt, tox-battery
 tqdm==4.46.1              # via -r requirements/edx/testing.txt, nltk
-git+https://github.com/edx/transifex-client.git@1660e05cb4a608a420b23f569c329ba3ff13b175#egg=transifex-client  # via -r requirements/edx/testing.txt
+transifex-client==0.13.10  # via -r requirements/edx/testing.txt
 typed-ast==1.4.1          # via -r requirements/edx/testing.txt, astroid
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
 unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest-plugin
