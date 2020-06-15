@@ -7,6 +7,7 @@ Dates Tab Serializers. Represents the relevant dates for a Course.
 from rest_framework import serializers
 
 from lms.djangoapps.courseware.date_summary import VerificationDeadlineDate
+from lms.djangoapps.course_home_api.mixins import DatesBannerSerializerMixin
 
 
 class DateSummarySerializer(serializers.Serializer):
@@ -33,7 +34,7 @@ class DateSummarySerializer(serializers.Serializer):
         return ''
 
 
-class DatesTabSerializer(serializers.Serializer):
+class DatesTabSerializer(DatesBannerSerializerMixin, serializers.Serializer):
     """
     Serializer for the Dates Tab
     """
