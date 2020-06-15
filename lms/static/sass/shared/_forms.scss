@@ -54,9 +54,14 @@ textarea {
   height: 60px;
 }
 
+/*
+Added :not(.btn-reset) because this selector is overly broad and adding an escape
+path is easier than actually resetting all the bits or testing the entire platform
+UI after making this code less upsetting.
+*/
 input[type="submit"],
 input[type="button"],
-button,
+button:not(.btn-reset),
 .button {
   border-radius: 3px;
 

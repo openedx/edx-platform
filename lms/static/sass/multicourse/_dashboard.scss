@@ -525,6 +525,8 @@
     order: 2;
 
     .wrapper-find-courses {
+      margin-bottom: $baseline * 0.5;
+
       .course-advertise {
         @include clearfix();
 
@@ -576,31 +578,9 @@
       }
     }
 
-    .wrapper-coaching {
-      border: 1px solid $border-color-l3;
-      margin: 20px 0;
-
-      .coaching-signup {
-        padding: 20px;
-
-        .coaching-prompt {
-          font-size: 20px;
-          line-height: 28px;
-          font-weight: bold;
-        }
-
-        .coaching-link .btn-neutral {
-          display: block;
-          text-align: center;
-          margin: 20px 20px 0;
-          border-radius: 20px;
-          padding: 10px;
-          border: 1px solid theme-color('primary');
-        }
-      }
-    }
-
     .profile-sidebar {
+      margin-bottom: $baseline * 0.5;
+
       ul {
         padding: 0;
         border: 1px solid theme-color("light");
@@ -609,7 +589,6 @@
 
     // Responsive behavior
     @include media-breakpoint-down(md) {
-      margin: 0 $baseline $baseline*2;
       padding: 0;
       max-width: 100%;
     }
