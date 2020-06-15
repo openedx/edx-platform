@@ -51,3 +51,12 @@ def generate_course_structure(course_key):
             },
             'discussion_id_map': discussions
         }
+
+def has_active_certificate(course):
+    has_activated_certificate = False
+    certificates = course.certificates
+
+    if certificates:
+        has_activated_certificate = any([certificate['is_active'] for certificate in certificates['certificates']])
+
+    return has_activated_certificate
