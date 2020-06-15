@@ -1029,6 +1029,7 @@ class TopicListView(GenericAPIView):
 
         return response
 
+
 def _filter_hidden_private_teamsets(user, teamsets, course_module):
     """
     Return a filtered list of teamsets, removing any private teamsets that a user doesn't have access to.
