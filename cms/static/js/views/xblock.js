@@ -1,7 +1,8 @@
 define(['jquery',
     'underscore',
     'common/js/components/utils/view_utils',
-    'js/views/baseview', 'xblock/runtime.v1',
+    'js/views/baseview',
+    'xblock/runtime.v1',
     'edx-ui-toolkit/js/utils/html-utils'
   ],
     function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
