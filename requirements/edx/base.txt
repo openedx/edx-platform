@@ -49,7 +49,7 @@ cryptography==2.9.2       # via -r requirements/edx/../edx-sandbox/shared.txt, d
 cssutils==1.0.2           # via pynliner
 ddt==1.3.1                # via -c requirements/edx/../constraints.txt, xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via pycontracts
-defusedxml==0.6.0         # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
+defusedxml==0.7.0rc1      # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
 django-appconf==1.0.4     # via -r requirements/edx/base.in, django-statici18n
 django-celery==3.3.1      # via -r requirements/edx/base.in
 django-classy-tags==1.0.0  # via django-sekizai
@@ -66,7 +66,7 @@ django-method-override==1.0.4  # via -r requirements/edx/base.in
 django-model-utils==4.0.0  # via -r requirements/edx/base.in, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/base.in, django-wiki
 django-multi-email-field==0.6.1  # via edx-enterprise
-django-mysql==3.6.0       # via -r requirements/edx/base.in
+django-mysql==3.7.0       # via -r requirements/edx/base.in
 django-oauth-toolkit==1.3.2  # via -r requirements/edx/base.in
 django-object-actions==2.0.0  # via edx-enterprise
 django-pipeline==1.7.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
@@ -82,7 +82,7 @@ django-storages==1.8      # via -c requirements/edx/../constraints.txt, -r requi
 django-user-tasks==1.1.0  # via -r requirements/edx/base.in
 django-waffle==0.18.0     # via -r requirements/edx/base.in, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-proctoring
 django-webpack-loader==0.7.0  # via -r requirements/edx/base.in, edx-proctoring
-django==2.2.13            # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, code-annotations, django-appconf, django-celery, django-classy-tags, django-config-models, django-cors-headers, django-crum, django-fernet-fields, django-filter, django-method-override, django-model-utils, django-mptt, django-multi-email-field, django-mysql, django-oauth-toolkit, django-pyfs, django-ratelimit-backend, django-sekizai, django-splash, django-statici18n, django-storages, django-user-tasks, django-wiki, drf-jwt, drf-yasg, edx-ace, edx-api-doc-tools, edx-bulk-grades, edx-celeryutils, edx-completion, edx-django-release-util, edx-django-sites-extensions, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-organizations, edx-proctoring, edx-rbac, edx-search, edx-submissions, edx-when, edxval, enmerkar, enmerkar-underscore, event-tracking, help-tokens, jsonfield2, lti-consumer-xblock, ora2, rest-condition, super-csv, xss-utils
+django==2.2.13            # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, code-annotations, django-appconf, django-celery, django-classy-tags, django-config-models, django-cors-headers, django-crum, django-fernet-fields, django-filter, django-method-override, django-model-utils, django-mptt, django-multi-email-field, django-mysql, django-oauth-toolkit, django-pyfs, django-ratelimit-backend, django-sekizai, django-splash, django-statici18n, django-storages, django-user-tasks, django-wiki, drf-jwt, drf-yasg, edx-ace, edx-api-doc-tools, edx-bulk-grades, edx-celeryutils, edx-completion, edx-django-release-util, edx-django-sites-extensions, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-organizations, edx-proctoring, edx-rbac, edx-search, edx-submissions, edx-when, edxval, enmerkar, enmerkar-underscore, event-tracking, help-tokens, jsonfield2, lti-consumer-xblock, ora2, rest-condition, super-csv, xblock-sdk, xss-utils
 djangorestframework-xml==2.0.0  # via edx-enterprise
 djangorestframework==3.9.4  # via -r requirements/edx/base.in, django-config-models, django-user-tasks, drf-jwt, drf-yasg, edx-api-doc-tools, edx-completion, edx-drf-extensions, edx-enterprise, edx-organizations, edx-proctoring, edx-submissions, ora2, rest-condition, super-csv
 docopt==0.6.2             # via xmodule
@@ -100,14 +100,14 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.in
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.in
 edx-django-utils==3.2.3   # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.0.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.3.2     # via -r requirements/edx/base.in
+edx-enterprise==3.3.4     # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.0  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
 edx-organizations==5.2.0  # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
 edx-proctoring==2.4.2     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
-edx-rbac==1.2.1           # via edx-enterprise
+edx-rbac==1.3.0           # via edx-enterprise
 edx-rest-api-client==5.2.1  # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 edx-search==1.3.4         # via -r requirements/edx/base.in
 edx-sga==0.11.0           # via -r requirements/edx/base.in
@@ -158,7 +158,7 @@ maxminddb==1.5.4          # via geoip2
 mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, xblock-drag-and-drop-v2, xblock-poll
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2  # via -r requirements/edx/github.in
 mongoengine==0.10.0       # via -r requirements/edx/base.in
-more-itertools==8.3.0     # via -r requirements/edx/paver.txt, zipp
+more-itertools==8.4.0     # via -r requirements/edx/paver.txt, zipp
 mpmath==1.1.0             # via sympy
 mysqlclient==1.4.6        # via -r requirements/edx/base.in
 newrelic==5.14.0.142      # via -r requirements/edx/base.in, edx-django-utils
@@ -167,7 +167,7 @@ nodeenv==1.4.0            # via -r requirements/edx/base.in
 numpy==1.18.5             # via chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/base.in
-git+https://github.com/edx/edx-ora2.git@v2.7.10#egg=ora2==v2.7.10  # via -r requirements/edx/github.in
+ora2==2.8.2               # via -r requirements/edx/base.in
 packaging==20.4           # via bleach, drf-yasg
 path.py==12.4.0           # via edx-enterprise, edx-i18n-tools, ora2, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, path.py
@@ -245,6 +245,7 @@ webob==1.8.6              # via xblock, xmodule
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10  # via -r requirements/edx/github.in
 git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee579e00f#egg=xblock-poll==1.9.6  # via -r requirements/edx/github.in
+xblock-sdk==0.2.0         # via ora2
 xblock-utils==2.1.1       # via -r requirements/edx/base.in, edx-sga, lti-consumer-xblock, staff-graded-xblock, xblock-drag-and-drop-v2, xblock-google-drive
 xblock==1.3.1             # via -r requirements/edx/base.in, acid-xblock, crowdsourcehinter-xblock, done-xblock, edx-completion, edx-sga, edx-user-state-client, edx-when, lti-consumer-xblock, ora2, rate-xblock, staff-graded-xblock, xblock-discussion, xblock-drag-and-drop-v2, xblock-google-drive, xblock-poll, xblock-utils
 xmlsec==1.3.8             # via python3-saml
