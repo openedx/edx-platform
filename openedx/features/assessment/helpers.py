@@ -16,7 +16,11 @@ from openedx.core.lib.url_utils import unquote_slashes
 from openedx.features.philu_utils.utils import get_anonymous_user
 from xmodule.modulestore.django import modulestore
 
-from .constants import ASSESSMENT_WORKFLOW_WAITING_STATUS, DAYS_TO_WAIT_AUTO_ASSESSMENT
+from .constants import (
+    ASSESSMENT_WORKFLOW_WAITING_STATUS,
+    DAYS_TO_WAIT_AUTO_ASSESSMENT,
+    ORA_BLOCK_TYPE
+)
 
 log = getLogger(__name__)
 
@@ -52,7 +56,8 @@ def can_auto_score_ora(enrollment, course, block, index_chapter):
     )
 
 
-def autoscore_ora(course_id, usage_key, student):
+def auto_score_ora(course_id, usage_key, anonymous_user):
+    anonymous_user_id = anonymous_user.anonymous_user_id
 
     # Find the associated rubric for that course_id & item_id
     rubric_dict = get_rubric_for_course(course_id, usage_key)
@@ -61,17 +66,14 @@ def autoscore_ora(course_id, usage_key, student):
     options_selected, earned, possible = select_options(rubric_dict)
 
     # Use usage key and student id to get the submission of the user.
-    try:
-        submission = Submission.objects.get(
-            student_item__course_id=course_id.to_deprecated_string(),
-            student_item__student_id=student['anonymous_user_id'],
-            student_item__item_id=usage_key,
-            student_item__item_type='openassessment'
-        )
-    except Submission.DoesNotExist:
-        log.warn(u"No submission found for user {user_id}".format(
-            user_id=student['anonymous_user_id']
-        ))
+    submission = Submission.objects.filter(
+        student_item__course_id=course_id.to_deprecated_string(),
+        student_item__student_id=anonymous_user_id,
+        student_item__item_id=usage_key,
+        student_item__item_type=ORA_BLOCK_TYPE
+    ).first()
+    if not submission:
+        log.warn(u"No submission found for user {user_id}".format(user_id=anonymous_user_id))
         return
 
     # Create assessments
@@ -89,7 +91,7 @@ def autoscore_ora(course_id, usage_key, student):
     log.info(
         u"Created assessment for user {user_id}, submission {submission}, "
         u"course {course_id}, item {item_id} with rubric {rubric} by PhilU Bot.".format(
-            user_id=student['anonymous_user_id'],
+            user_id=anonymous_user_id,
             submission=submission.uuid,
             course_id=course_id.to_deprecated_string(),
             item_id=usage_key,
@@ -98,7 +100,7 @@ def autoscore_ora(course_id, usage_key, student):
     )
 
     reset_score(
-        student_id=student['anonymous_user_id'],
+        student_id=anonymous_user_id,
         course_id=course_id.to_deprecated_string(),
         item_id=usage_key
     )
