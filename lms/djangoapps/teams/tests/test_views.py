@@ -1947,8 +1947,8 @@ class TestDetailTopicAPI(TeamAPITestCase):
     @ddt.unpack
     @ddt.data(
         ('student_enrolled', 404, None),
-        ('student_on_team_1_private_set_1', 200, 2),
-        ('student_on_team_2_private_set_1', 200, 2),
+        ('student_on_team_1_private_set_1', 200, 1),
+        ('student_on_team_2_private_set_1', 200, 1),
         ('student_masters', 404, None),
         ('staff', 200, 2)
     )

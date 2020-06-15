@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django_countries import countries
 from rest_framework import serializers
 
-from lms.djangoapps.teams.api import add_team_count, get_team_count_query_set
+from lms.djangoapps.teams.api import add_team_count, get_teams_with_visibility
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
 from openedx.core.lib.api.fields import ExpandableField
@@ -194,7 +194,8 @@ class TopicSerializer(BaseTopicSerializer):  # pylint: disable=abstract-method
         if 'team_count' in topic:
             return topic['team_count']
         else:
-            return get_team_count_query_set(
+            return get_teams_with_visibility(
+                self.context.get('user'),
                 [topic['id']],
                 self.context['course_id'],
                 self.context.get('organization_protection_status')

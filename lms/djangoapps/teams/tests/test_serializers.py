@@ -79,9 +79,9 @@ class TopicSerializerTestCase(SerializerTestCase):
     def test_topic_with_no_team_count(self):
         """
         Verifies that the `TopicSerializer` correctly displays a topic with a
-        team count of 0, and that it only takes one SQL query.
+        team count of 0, and that it takes a known number of SQL queries.
         """
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             serializer = TopicSerializer(
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
@@ -101,12 +101,12 @@ class TopicSerializerTestCase(SerializerTestCase):
     def test_topic_with_team_count(self):
         """
         Verifies that the `TopicSerializer` correctly displays a topic with a
-        positive team count, and that it only takes one SQL query.
+        positive team count, and that it takes a known number of SQL queries.
         """
         CourseTeamFactory.create(
             course_id=self.course.id, topic_id=self.course.teamsets[0].teamset_id
         )
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             serializer = TopicSerializer(
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
@@ -134,7 +134,7 @@ class TopicSerializerTestCase(SerializerTestCase):
         )
         CourseTeamFactory.create(course_id=self.course.id, topic_id=duplicate_topic[u'id'])
         CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic[u'id'])
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             serializer = TopicSerializer(
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},

@@ -6,7 +6,7 @@ The Python API other app should use to work with Teams feature
 import logging
 from enum import Enum
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -252,7 +252,7 @@ def user_protection_status_matches_team(user, team):
         return OrganizationProtectionStatus.unprotected == protection_status
 
 
-def get_team_count_query_set(topic_id_set, course_id, organization_protection_status):
+def _get_team_filter_query(topic_id_set, course_id, organization_protection_status):
     """ Helper function to get the team count query set based on the filters provided """
 
     filter_query = {'course_id': course_id}
@@ -265,7 +265,7 @@ def get_team_count_query_set(topic_id_set, course_id, organization_protection_st
         filter_query.update(
             {'organization_protected': organization_protection_status == OrganizationProtectionStatus.protected}
         )
-    return CourseTeam.objects.filter(**filter_query)
+    return filter_query
 
 
 def get_private_team_ids_to_exclude(user, course_module):
@@ -289,11 +289,19 @@ def get_private_team_ids_to_exclude(user, course_module):
 
 def get_teams_with_visibility(user, topic_id_set, course_id, organization_protection_status):
     """ Get teams taking into account user visibility privelages """
-    team_count_query_set = get_team_count_query_set(topic_id_set, course_id, organization_protection_status)
-    course_module = modulestore().get_course(course_id)
-    excluded_private_team_ids = get_private_team_ids_to_exclude(user, course_module)
+    # Filter by topics, course, and protection status
+    filter_query = _get_team_filter_query(topic_id_set, course_id, organization_protection_status)
 
-    return team_count_query_set.exclude(team_id__in=excluded_private_team_ids)
+    # Staff gets unfiltered list of teams
+    course_module = modulestore().get_course(course_id)
+    if has_access(user, 'staff', course_module.id):
+        return CourseTeam.objects.filter(**filter_query)
+
+    # Private teams should be hidden unless the student is a member
+    private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
+    return CourseTeam.objects.filter(**filter_query).exclude(
+        Q(topic_id__in=private_teamset_ids), ~Q(membership__user=user)
+    )
 
 
 def add_team_count(user, topics, course_id, organization_protection_status):
