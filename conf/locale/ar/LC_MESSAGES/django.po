@@ -13194,7 +13194,7 @@ msgstr "المساقات"
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Sign In to {studio_name}"
-msgstr "تسجيل العضوية في {platform_name}"
+msgstr "تسجيل العضوية في {studio_name}"
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Don't have a {studio_name} Account? Sign up!"
@@ -14079,7 +14079,7 @@ msgstr "هل تحتاج إلى مساعدة؟"
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help signing in or with your {platform_name} account?"
-msgstr "هل تحتاج إلى مساعدة في استخدام {studio_name}؟"
+msgstr "هل تحتاج إلى مساعدة في استخدام {platform_name}؟"
 
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
@@ -14135,8 +14135,9 @@ msgid ""
 "account. Required fields are noted by {strong_start}bold text and an "
 "asterisk (*){strong_end}."
 msgstr ""
-"يُشار إلى الحقول الإلزامية باستخدام <strong class=\"indicator\">أحرف عريضة "
-"وعلامة النجمة (*)</strong>."
+"يرجى تقديم المعلومات التالية لتسجيل الدخول إلى حساب {platform_name} الخاص بك"
+"يُشار إلى الحقول الإلزامية باستخدام {strong_start}أحرف عريضة"
+"وعلامة النجمة (*){strong_end}."
 
 #: lms/templates/login.html
 msgid "Account Preferences"
@@ -14390,13 +14391,14 @@ msgid "Create your own {platform_name} account below"
 msgstr "أنشِئ حسابك الخاص بك لدى {platform_name} أدناه"
 
 #: lms/templates/register-form.html
+#: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
 "يُشار إلى الحقول الإلزامية باستخدام <strong class=\"indicator\">أحرف عريضة "
-"وعلامة النجمة (*)</strong>. "
+"وعلامة النجمة (*)</strong>."
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
@@ -14509,14 +14511,6 @@ msgstr "تحديث حسابي لدى {platform_name}"
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "مرحبًا بك {username}! يُرجى منك تحديد تفضيلاتك أدناه"
-
-#: lms/templates/register-shib.html
-msgid ""
-"Required fields are noted by {strong_start}bold text and an asterisk "
-"(*){strong_end}."
-msgstr ""
-"يُشار إلى الحقول الإلزامية باستخدام <strong class=\"indicator\">أحرف عريضة "
-"وعلامة النجمة (*)</strong>."
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -17560,8 +17554,8 @@ msgid ""
 "request for course credit. To see your course credit, visit the "
 "{link_to_provider_site} website."
 msgstr ""
-"لقد رفض {provider_name} طلبك للحصول على مادة للمساق. للمزيد من المعلومات، "
-"يرجى الاتصال {link_to_provider_site} مباشرةً."
+"{break_start} تهانينا! لقد وافق {break end} {Provider_name} على طلبك للحصول على ائتمان الدورة التدريبية."
+"لمعرفة رصيد الدورة التدريبية الخاصة بك ، قم بزيارة موقع الويب {link_to_provider_site}."
 
 #: lms/templates/dashboard/_dashboard_credit_info.html
 msgid "View Credit"
@@ -21671,7 +21665,7 @@ msgstr "لوحة المعلومات"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "{journal_title} Cover Image"
-msgstr "صورة غلاف {course_number} {course_title}"
+msgstr "صورة غلاف {journal_title}"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "Access Expired: {date}"
@@ -21915,7 +21909,7 @@ msgstr ""
 #: themes/st-normanx/cms/templates/widgets/footer.html
 #: themes/st-normanx/lms/templates/footer.html
 msgid "All rights reserved."
-msgstr "جميع حقوق النشر والطبع محفوظة {year}"
+msgstr "جميع حقوق النشر والطبع محفوظة"
 
 #: themes/st-lutherx/cms/templates/widgets/footer.html
 #: themes/st-lutherx/lms/templates/footer.html
@@ -22035,8 +22029,8 @@ msgid ""
 "Required fields are noted by {strong_indicator}bold text and an asterisk "
 "(*).{strong_close}"
 msgstr ""
-"يُشار إلى الحقول الإلزامية باستخدام <strong class=\"indicator\">أحرف عريضة "
-"وعلامة النجمة (*)</strong>."
+"يُشار إلى الحقول الإلزامية باستخدام {strong_indicator}أحرف عريضة "
+"وعلامة النجمة (*){strong_close}."
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid ""
@@ -24406,7 +24400,7 @@ msgstr ""
 
 #: cms/templates/register.html
 msgid "Required Information to Sign Up for {studio_name}"
-msgstr "المعلومات المطلوبة لإنشاء مساق جديد"
+msgstr "المعلومات المطلوبة للاشتراك في {studio_name}"
 
 #: cms/templates/register.html
 msgid ""
@@ -26622,4 +26616,4 @@ msgstr "أُنشأت مراجعة جديدة: الدمج بين المراجعة
 #~ msgstr "مساعدة سياقية مباشرة"
 
 #~ msgid "<i>Welcome</i> {name}"
-#~ msgstr "مرحبًا بك {username}"
+#~ msgstr "مرحبًا بك {name}"

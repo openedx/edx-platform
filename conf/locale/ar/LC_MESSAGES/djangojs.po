@@ -250,7 +250,7 @@ msgstr "إلغاء"
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error during the upload process."
-msgstr "{numErrors} تعذر إضافة الطلّاب إلى هذا الفوج:"
+msgstr "حدث خطأ أثناء عملية التحميل."
 
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
@@ -260,7 +260,7 @@ msgstr "حدث خطأ أثناء تحديث هدفك."
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error while verifying the file you submitted."
-msgstr "{numErrors} تعذر إضافة الطلّاب إلى هذا الفوج:"
+msgstr "تعذر إضافة الطلّاب إلى هذا الفوج:"
 
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
@@ -270,17 +270,17 @@ msgstr "اختر الملف"
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error while importing the new library to our database."
-msgstr "{numErrors} تعذر إضافة الطلّاب إلى هذا الفوج:"
+msgstr "حدث خطأ أثناء استيراد المكتبة الجديدة إلى قاعدة بياناتنا."
 
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error while importing the new course to our database."
-msgstr "{numErrors} تعذر إضافة الطلّاب إلى هذا الفوج:"
+msgstr "حدث خطأ أثناء استيراد الدورة التدريبية الجديدة إلى قاعدة بياناتنا."
 
 #: cms/static/js/features/import/views/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error with the upload"
-msgstr "{numErrors} تعذر إضافة الطلّاب إلى هذا الفوج:"
+msgstr "حدث خطأ في التحميل"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/static/js/views/manage_users_and_roles.js
@@ -592,7 +592,7 @@ msgstr "جاري الحذف"
 
 #: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
 msgid "Delete this {xblock_type}?"
-msgstr "أتودّ حذف هذا الفريق؟"
+msgstr "هل تريد حذف {xblock_type} هذا؟"
 
 #: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
 msgid "section"
@@ -3206,7 +3206,7 @@ msgstr "تسجيل الدخول"
 
 #: common/static/bundles/SingleSupportForm.js
 msgid "Create an {platform} account"
-msgstr "إنشاء حساب"
+msgstr "إنشاء حساب {platform}"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
@@ -9150,7 +9150,7 @@ msgstr "تغيير كلمة المرور"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an account?"
-msgstr "لديك حساب مسبقاً؟"
+msgstr "هل لديك حساب مسبقاً؟"
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
