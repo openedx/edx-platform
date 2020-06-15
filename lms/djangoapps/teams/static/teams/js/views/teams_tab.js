@@ -380,24 +380,11 @@
                 createTeamsListView: function(options) {
                     var topic = options.topic,
                         collection = options.collection,
-                        myTopicTeamsCollection = new TeamCollection(
-                            this.context.userInfo.teams,
-                            {
-                                teamEvents: this.teamEvents,
-                                course_id: this.context.courseID,
-                                username: this.context.userInfo.username,
-                                topic_id: topic.get('id'),
-                                perPage: 5,
-                                parse: true,
-                                url: this.context.myTeamsUrl
-                            }
-                        ),
                         teamsView = new TopicTeamsView({
                             router: this.router,
                             context: this.context,
                             model: topic,
                             collection: collection,
-                            myTopicTeamsCollection: myTopicTeamsCollection,
                             showSortControls: options.showSortControls
                         }),
                         searchFieldView = new SearchFieldView({
@@ -414,6 +401,7 @@
                             breadcrumbs: options.breadcrumbs
                         }),
                         searchUrl = 'topics/' + topic.get('id') + '/search';
+
                     // Listen to requests to sync the collection and redirect it as follows:
                     // 1. If the collection includes a search, show the search results page
                     // 2. If we're already on the search page, show the regular
