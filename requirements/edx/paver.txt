@@ -13,7 +13,7 @@ lazy==1.4                 # via -r requirements/edx/paver.in
 libsass==0.10.0           # via -r requirements/edx/paver.in
 markupsafe==1.1.1         # via -r requirements/edx/paver.in
 mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
-more-itertools==8.4.0     # via zipp
+more-itertools==8.3.0     # via zipp
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
 pathtools==0.1.2          # via watchdog
 paver==1.3.4              # via -r requirements/edx/paver.in
