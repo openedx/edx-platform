@@ -45,5 +45,5 @@ HEAR_ABOUT_PHILANTHROPY = (
     ('hear_about_interest_search', 'An Internet Search'),
     ('hear_about_linkedIn_advertisement', 'A LinkedIn Advertisement'),
     ('hear_about_facebook_advertisement', 'A Facebook Advertisement'),
-    ('hear_about_twitter_not_colleague', 'Twitter (Not From A Colleague')
+    ('hear_about_twitter_not_colleague', 'Twitter (Not From A Colleague)')
 )
