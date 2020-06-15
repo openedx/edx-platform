@@ -8,7 +8,6 @@ define([
 ], function(Backbone, _, AjaxHelpers, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
   'use strict';
   describe('Topic Teams View', function() {
-
     let requests, view;
 
     const verifyTeamsetTeamsRequest = (hasTeams) => {
@@ -25,22 +24,17 @@ define([
       AjaxHelpers.respondWithJson(
         requests,
         JSON.stringify({ count: hasTeams ? 1 : 0 }),
-      )
-    }
+      );
+    };
 
-    /**
-     * Initialize the AjaxHelpers requests and render the TopicTeamsView.
-     * 
-     */
     const createTopicTeamsView = async ({
       teams,
       isInstructorManagedTopic,
       onTeamInTeamset,
       options,
     }) => new Promise((resolve) => {
-
       requests = AjaxHelpers.requests();
-      const model = isInstructorManaged
+      const model = isInstructorManagedTopic
         ? TeamSpecHelpers.createMockInstructorManagedTopic()
         : TeamSpecHelpers.createMockTopic();
 
@@ -56,7 +50,6 @@ define([
         resolve(view);
       });
     });
-
 
     /**
      * Verify whether the actions message is displayed in the element.
@@ -79,12 +72,10 @@ define([
       }
     };
 
-
     beforeEach(function() {
       setFixtures('<div class="teams-container"></div>');
       PageHelpers.preventBackboneChangingUrl();
     });
-
 
     it('can render itself', function() {
       // Unpriviledged non-staff user, not on any teams in teamset.
@@ -94,7 +85,6 @@ define([
       createTopicTeamsView({
         teams: TeamSpecHelpers.createMockTeams({ results: testTeamData }),
       }).then((teamsView) => {
-
         const footerEl = teamsView.$('.teams-paging-footer');
 
         expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
@@ -133,13 +123,17 @@ define([
     });
 
     it('does not show actions for a user already in a team in the teamset', function() {
-      createTopicTeamsView({ onTeamInTeamset: true }).then((teamsView) => {
+      createTopicTeamsView({
+        onTeamInTeamset: true
+      }).then((teamsView) => {
         verifyActions(teamsView, false);
       });
     });
 
     it('does not show actions for a student in an instructor managed topic', function() {
-      createTopicTeamsView().then((teamsView) => {
+      createTopicTeamsView({
+        isInstructorManagedTopic: true,
+      }).then((teamsView) => {
         verifyActions(teamsView, false);
       });
     });
