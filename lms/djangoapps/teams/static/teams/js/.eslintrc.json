@@ -1,0 +1,30 @@
+{
+  "extends": "eslint-config-edx",
+  "env": {
+    "es6": true
+  },
+  "rules": {
+    "indent": "off",
+    "comma-dangle": "off",
+    "space-before-function-paren": "off",
+    "prefer-arrow-callback": "off",
+    "no-var": "off",
+    "func-names": "off",
+    "object-shorthand": "off",
+    "object-curly-spacing": "off",
+    "lines-around-directive": "off",
+    "prefer-template": "off",
+    "prefer-rest-params": "off",
+    "max-len": "off",
+    "one-var": "off",
+    "no-multi-assign": "off",
+    "prefer-spread": "off",
+    "spaced-comment": "off",
+    "one-var-declaration-per-line": "off",
+    "no-else-return": "off",
+    "object-property-newline": "off",
+    "import/no-amd": "off",
+    "new-cap": "off",
+    "no-lonely-if": "off"
+  }
+}
