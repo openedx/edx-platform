@@ -1,7 +1,8 @@
 (function(define) {
     'use strict';
 
-    define(['backbone',
+    define([
+        'backbone',
         'jquery',
         'underscore',
         'gettext',
@@ -27,12 +28,12 @@
         'teams/js/views/team_profile_header_actions',
         'teams/js/views/team_utils',
         'teams/js/views/instructor_tools',
-        'text!teams/templates/teams_tab.underscore'],
-        function(Backbone, $, _, gettext, HtmlUtils, StringUtils, SearchFieldView, HeaderView, HeaderModel,
-                  TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
-                  TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, ManageView, TopicTeamsView,
-                  TeamEditView, TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView,
-                  teamsTemplate) {
+        'text!teams/templates/teams_tab.underscore'
+    ], function(Backbone, $, _, gettext, HtmlUtils, StringUtils, SearchFieldView, HeaderView, HeaderModel,
+        TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
+        TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, ManageView, TopicTeamsView,
+        TeamEditView, TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView,
+        teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function() {
                     _.extend(this.defaults, {nav_aria_label: gettext('Topics')});
@@ -73,7 +74,7 @@
                         [':default', _.bind(this.routeNotFound, this)],
                         ['main', _.bind(function() {
                             // The backbone router unfortunately usurps the
-                            // default behavior of in-page-links.  This hack
+                            // default behavior of in-page-links.    This hack
                             // prevents the screen reader in-page-link from
                             // being picked up by the backbone router.
                         }, this)],
@@ -575,7 +576,7 @@
                 },
 
                 /**
-                 * Get a topic given a topic ID.  Returns a jQuery deferred
+                 * Get a topic given a topic ID.    Returns a jQuery deferred
                  * promise, since the topic may need to be fetched from the
                  * server.
                  * @param topicID the string identifier for the requested topic
@@ -583,7 +584,7 @@
                  */
                 getTopic: function(topicID) {
                     // Try finding topic in the current page of the
-                    // topicCollection.  Otherwise call the topic endpoint.
+                    // topicCollection.    Otherwise call the topic endpoint.
                     var topic = this.topicsCollection.findWhere({id: topicID}),
                         self = this,
                         deferred = $.Deferred();
@@ -607,7 +608,7 @@
                 },
 
                 /**
-                 * Get a team given a team ID.  Returns a jQuery deferred
+                 * Get a team given a team ID.    Returns a jQuery deferred
                  * promise, since the team may need to be fetched from the
                  * server.
                  * @param teamID the string identifier for the requested team
@@ -709,5 +710,6 @@
             });
 
             return TeamTabView;
-        });
+        }
+    );
 }).call(this, define || RequireJS.define);
