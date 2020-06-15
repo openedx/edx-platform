@@ -140,26 +140,6 @@ from student.models import CourseEnrollment
 
 <section class="dashboard" id="dashboard-main">
 <main class="main-container" id="main" aria-label="Content" tabindex="-1">
-  <%
-    MB_SLUG = "microbachelors"
-    enrolled_in_mb_program = MB_SLUG in enrolled_program_types
-    account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
-  %>
-  % if getattr(settings, 'ENABLE_DEMOGRAPHICS_COLLECTION', False) and enrolled_in_mb_program:
-    <a href="${account_mfe_url}#demographics">
-      <div
-        class="demographics-banner d-flex justify-content-left align-items-center flex-column flex-lg-row py-1 px-4 mb-2 mb-lg-4">
-        <img class="demographics-banner-icon d-none d-lg-inline-block" src="${static.url('edx.org/images/quote_prompt.png')}" alt="" aria-hidden="true">
-        <div class="demographics-banner-prompt d-inline-block font-weight-bold text-white py-4 px-2 px-lg-3">
-          ${_("Want to make edX better for everyone?")}
-        </div>
-        <button class="demographics-banner-btn btn-reset d-flex align-items-center bg-white font-weight-bold border-0 py-2 px-3 mx-2 mb-3 m-lg-0 shadow">
-          <span class="fa fa-thumbs-up px-2" aria-hidden="true"></span>
-          ${_("Get started")}
-        </button>
-      </div>
-    </a>
-  % endif
   <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
