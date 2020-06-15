@@ -57,7 +57,7 @@ cssselect==1.1.0          # via -r requirements/edx/testing.in, pyquery
 cssutils==1.0.2           # via -r requirements/edx/base.txt, pynliner
 ddt==1.3.1                # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, -r requirements/edx/testing.in, xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via -r requirements/edx/base.txt, pycontracts
-defusedxml==0.6.0         # via -r requirements/edx/base.txt, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
+defusedxml==0.7.0rc1      # via -r requirements/edx/base.txt, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
 diff-cover==3.0.1         # via -r requirements/edx/coverage.txt
 distlib==0.3.0            # via virtualenv
 django-appconf==1.0.4     # via -r requirements/edx/base.txt, django-statici18n
@@ -76,7 +76,7 @@ django-method-override==1.0.4  # via -r requirements/edx/base.txt
 django-model-utils==4.0.0  # via -r requirements/edx/base.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/base.txt, django-wiki
 django-multi-email-field==0.6.1  # via -r requirements/edx/base.txt, edx-enterprise
-django-mysql==3.6.0       # via -r requirements/edx/base.txt
+django-mysql==3.7.0       # via -r requirements/edx/base.txt
 django-oauth-toolkit==1.3.2  # via -r requirements/edx/base.txt
 django-object-actions==2.0.0  # via -r requirements/edx/base.txt, edx-enterprise
 django-pipeline==1.7.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
@@ -109,7 +109,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.txt
 edx-django-utils==3.2.3   # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.0.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.3.2     # via -r requirements/edx/base.txt
+edx-enterprise==3.3.4     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
@@ -117,7 +117,7 @@ edx-opaque-keys[django]==2.1.0  # via -r requirements/edx/base.txt, edx-bulk-gra
 edx-organizations==5.2.0  # via -r requirements/edx/base.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.txt
 edx-proctoring==2.4.2     # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
-edx-rbac==1.2.1           # via -r requirements/edx/base.txt, edx-enterprise
+edx-rbac==1.3.0           # via -r requirements/edx/base.txt, edx-enterprise
 edx-rest-api-client==5.2.1  # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 edx-search==1.3.4         # via -r requirements/edx/base.txt
 edx-sga==0.11.0           # via -r requirements/edx/base.txt
@@ -152,7 +152,7 @@ httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requi
 icalendar==4.0.6          # via -r requirements/edx/base.txt
 idna==2.9                 # via -r requirements/edx/base.txt, requests
 importlib-metadata==1.6.1  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, flake8, importlib-resources, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
-importlib-resources==1.5.0  # via virtualenv
+importlib-resources==2.0.1  # via virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, jinja2-pluralize
 inflection==0.5.0         # via -r requirements/edx/base.txt, drf-yasg
 ipaddress==1.0.23         # via -r requirements/edx/base.txt
@@ -185,7 +185,7 @@ mccabe==0.6.1             # via flake8, pylint
 mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, xblock-drag-and-drop-v2, xblock-poll
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2  # via -r requirements/edx/base.txt
 mongoengine==0.10.0       # via -r requirements/edx/base.txt
-more-itertools==8.3.0     # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, pytest, zipp
+more-itertools==8.4.0     # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, pytest, zipp
 mpmath==1.1.0             # via -r requirements/edx/base.txt, sympy
 mysqlclient==1.4.6        # via -r requirements/edx/base.txt
 newrelic==5.14.0.142      # via -r requirements/edx/base.txt, edx-django-utils
@@ -194,7 +194,7 @@ nodeenv==1.4.0            # via -r requirements/edx/base.txt
 numpy==1.18.5             # via -r requirements/edx/base.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/base.txt
-git+https://github.com/edx/edx-ora2.git@v2.7.10#egg=ora2==v2.7.10  # via -r requirements/edx/base.txt
+ora2==2.8.2               # via -r requirements/edx/base.txt
 packaging==20.4           # via -r requirements/edx/base.txt, bleach, drf-yasg, pytest, tox
 path.py==12.4.0           # via -r requirements/edx/base.txt, edx-enterprise, edx-i18n-tools, ora2, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, path.py
@@ -230,7 +230,7 @@ pyparsing==2.4.7          # via -r requirements/edx/base.txt, chem, openedx-calc
 pyquery==1.4.1            # via -r requirements/edx/testing.in
 pysrt==1.1.2              # via -r requirements/edx/base.txt, edxval
 pytest-attrib==0.1.3      # via -r requirements/edx/testing.in
-pytest-cov==2.9.0         # via -r requirements/edx/testing.in
+pytest-cov==2.10.0        # via -r requirements/edx/testing.in
 pytest-django==3.8.0      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 pytest-forked==1.1.3      # via pytest-xdist
 pytest-json-report==1.2.1  # via -r requirements/edx/testing.in
@@ -293,7 +293,7 @@ unidiff==0.6.0            # via -r requirements/edx/testing.in, coverage-pytest-
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.9           # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/base.txt
-virtualenv==20.0.21       # via tox
+virtualenv==20.0.23       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.2          # via -r requirements/edx/base.txt
 wcwidth==0.2.4            # via pytest
@@ -303,6 +303,7 @@ webob==1.8.6              # via -r requirements/edx/base.txt, xblock, xmodule
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, astroid
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10  # via -r requirements/edx/base.txt
 git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee579e00f#egg=xblock-poll==1.9.6  # via -r requirements/edx/base.txt
+xblock-sdk==0.2.0         # via -r requirements/edx/base.txt, ora2
 xblock-utils==2.1.1       # via -r requirements/edx/base.txt, edx-sga, lti-consumer-xblock, staff-graded-xblock, xblock-drag-and-drop-v2, xblock-google-drive
 xblock==1.3.1             # via -r requirements/edx/base.txt, acid-xblock, crowdsourcehinter-xblock, done-xblock, edx-completion, edx-sga, edx-user-state-client, edx-when, lti-consumer-xblock, ora2, rate-xblock, staff-graded-xblock, xblock-discussion, xblock-drag-and-drop-v2, xblock-google-drive, xblock-poll, xblock-utils
 xmlsec==1.3.8             # via -r requirements/edx/base.txt, python3-saml
