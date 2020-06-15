@@ -13,6 +13,8 @@ from edx_rest_framework_extensions.permissions import IsStaff, IsUserInUrl
 from openedx.core.lib.log_utils import audit_log
 from student.roles import CourseInstructorRole, CourseStaffRole
 
+from .api_key_permissions import is_request_has_valid_api_key
+
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
     """
@@ -25,16 +27,12 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
         Allow the request if and only if settings.EDX_API_KEY is set and
         the X-Edx-Api-Key HTTP header is present in the request and
         matches the setting.
+
+        Appsembler: Actual implementation is now moved to
+                    `is_request_has_valid_api_key` to break circular
+                    dependency.
         """
-        api_key = getattr(settings, "EDX_API_KEY", None)
-
-        if api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key:
-            audit_log("ApiKeyHeaderPermission used",
-                      path=request.path,
-                      ip=request.META.get("REMOTE_ADDR"))
-            return True
-
-        return False
+        return is_request_has_valid_api_key(request)
 
 
 class ApiKeyHeaderPermissionIsAuthenticated(ApiKeyHeaderPermission, permissions.IsAuthenticated):
