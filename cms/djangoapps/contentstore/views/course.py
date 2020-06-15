@@ -289,8 +289,9 @@ def course_rerun_handler(request, course_key_string):
     # Appsembler: Also course staff can do reruns
     course_key = CourseKey.from_string(course_key_string)
     if not CourseStaffRole(course_key).has_user(request.user):
-        if not GlobalStaff().has_user(request.user):
-            raise PermissionDenied()
+        if not CourseInstructorRole(course_key).has_user(request.user):
+            if not GlobalStaff().has_user(request.user):
+                raise PermissionDenied()
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user, depth=3)
         if request.method == 'GET':
