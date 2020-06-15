@@ -45,15 +45,15 @@ def get_org_admin_email(user):
     """
     try:
         user_extended_profile = UserExtendedProfile.objects.get(user_id=user.id)
-        if user_extended_profile.organization:
-            org = Organization.objects.get(id=user_extended_profile.organization.id)
-            return org.admin.email if org.admin else None
-    except (UserExtendedProfile.DoesNotExist, Organization.DoesNotExist):
+        user_org = user_extended_profile.organization
+        if user_org and user_org.admin:
+            return user_org.admin.email
+    except UserExtendedProfile.DoesNotExist:
         return None
 
 
 def get_email_domain(email):
     """
-    Return email domain name e-g "google.com", "yahoo.com" and "outlook.com" etc by splitting email after "@".
+    Return email domain name e.g "google.com", "yahoo.com" and "outlook.com" etc by splitting email after "@".
     """
     return email.split('@')[1] if email else None

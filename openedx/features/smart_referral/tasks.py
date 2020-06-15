@@ -5,7 +5,7 @@ from common.lib.mandrill_client.client import MandrillClient
 
 
 @task(routing_key=settings.HIGH_PRIORITY_QUEUE)
-def task_referral_and_toolkit_emails(contact_emails, user_email):
+def task_send_referral_and_toolkit_emails(contact_emails, user_email):
     """Send initial referral email to all contact emails and send toolkit email to referrer."""
     mandrill_client = MandrillClient()
 

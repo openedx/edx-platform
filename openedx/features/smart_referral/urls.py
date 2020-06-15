@@ -2,11 +2,11 @@ from django.conf.urls import url
 
 from openedx.features.smart_referral.api_views import FilterContactsAPIView
 
-from .views import send_initial_emails
+from .views import send_initial_emails_and_save_record
 
 
 urlpatterns = [
-    url(r'^initial_emails/$', send_initial_emails, name='initial_referral_emails'),
+    url(r'^initial_emails/$', send_initial_emails_and_save_record, name='initial_referral_emails'),
     url(
         r'^api/filter_contacts/$',
         FilterContactsAPIView.as_view(),

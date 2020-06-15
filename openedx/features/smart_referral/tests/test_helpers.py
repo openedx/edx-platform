@@ -1,7 +1,3 @@
-# coding=UTF-8
-"""Tests for helpers methods of smart referral."""
-import mock
-
 from ddt import ddt, file_data
 from django.test import TestCase
 from lms.djangoapps.onboarding.tests.factories import OrganizationFactory, UserFactory
@@ -16,14 +12,11 @@ from .constants import (
     UNSORTED_CONTACT_LIST_KEY,
     UNSORTED_CONTACT_LIST_INDEX,
 )
-from .. import helpers as filter_contacts_helpers
+from openedx.features.smart_referral import helpers as filter_contacts_helpers
 
 
 @ddt
 class FilterContactsAPIViewTestHelpers(TestCase):
-
-    def setUp(self):
-        super(FilterContactsAPIViewTestHelpers, self).setUp()
 
     def test_get_email_domain(self):
         """

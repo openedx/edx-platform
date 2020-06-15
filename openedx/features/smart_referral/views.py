@@ -5,13 +5,13 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from .serializers import SmartReferralSerializer
-from .tasks import task_referral_and_toolkit_emails
+from .tasks import task_send_referral_and_toolkit_emails
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([SessionAuthenticationAllowInactiveUser, ])
-def send_initial_emails(request):
+def send_initial_emails_and_save_record(request):
     serializer = SmartReferralSerializer(context={'request': request}, data=request.data, many=True, allow_empty=False)
 
     if not serializer.is_valid():
@@ -19,5 +19,5 @@ def send_initial_emails(request):
 
     smart_referrals = serializer.save()
     contact_emails = [referral.contact_email for referral in smart_referrals]
-    task_referral_and_toolkit_emails(contact_emails, request.user.email)
+    task_send_referral_and_toolkit_emails.delay(contact_emails=contact_emails, user_email=request.user.email)
     return Response(status=HTTP_200_OK)
