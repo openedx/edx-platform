@@ -20,6 +20,13 @@ def plugin_settings(settings):
         'openedx.core.djangoapps.appsembler.sites',
         'openedx.core.djangoapps.appsembler.html_certificates',
         'openedx.core.djangoapps.appsembler.api',
+        'openedx.core.djangoapps.appsembler.honeycomb',  # legacy honeycomb middleware
+    )
+
+    # insert at beginning because it needs to be earlier in the list than various
+    # redirect middleware which will cause later `process_request()` methods to be skipped
+    settings.MIDDLEWARE_CLASSES.insert(
+        0, 'openedx.core.djangoapps.appsembler.honeycomb.middleware.HoneycombLegacyMiddleware'
     )
 
     settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
