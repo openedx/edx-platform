@@ -65,7 +65,7 @@ RUN mkdir -p /openedx/config ./lms/envs/prod ./cms/envs/prod \
 
 ENV CONFIG_ROOT /openedx/config
 ENV LMS_CFG /openedx/config/lms.yml
-ENV CMS_CFG /openedx/config/cms.yml
+ENV STUDIO_CFG /openedx/config/cms.yml
 ENV REVISION_CFG /openedx/config/revision.yml
 
 # Collect production assets. By default, only assets from the default theme
