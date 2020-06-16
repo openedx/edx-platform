@@ -268,25 +268,6 @@ def _get_team_filter_query(topic_id_set, course_id, organization_protection_stat
     return filter_query
 
 
-def get_private_team_ids_to_exclude(user, course_module):
-    """
-    Get the list of team ids that should be excluded from the response.
-    Staff can see all private teams.
-    Users should not be able to see teams in private teamsets that they are not a member of.
-    """
-    if has_access(user, 'staff', course_module.id):
-        return set()
-
-    private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
-    excluded_team_ids = CourseTeam.objects.filter(
-        course_id=course_module.id,
-        topic_id__in=private_teamset_ids
-    ).exclude(
-        membership__user=user
-    ).values_list('team_id', flat=True)
-    return set(excluded_team_ids)
-
-
 def get_teams_with_visibility(user, topic_id_set, course_id, organization_protection_status):
     """ Get teams taking into account user visibility privelages """
     # Filter by topics, course, and protection status
