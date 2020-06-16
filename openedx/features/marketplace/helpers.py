@@ -10,6 +10,7 @@ def get_connect_url(marketplace_request, request_user):
         3: In case of requester is the admin/first learner of organization
            button should be grayed out and disabled.
     :param marketplace_request: marketplace request item
+    :param request_user: request user object
     """
     chat_url = '{nodebb_end_point}/chat/{username}'
     responsible_user = marketplace_request.organization.admin or marketplace_request.organization.first_learner \
