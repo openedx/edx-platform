@@ -75,7 +75,7 @@ class CourseBlocksSignalTest(ModuleStoreTestCase):
 
     @ddt.data(
         (CourseLocator(org='org', course='course', run='run'), True),
-        (LibraryLocator(org='org', course='course'), False),
+        (LibraryLocator(org='org', library='course'), False),
     )
     @ddt.unpack
     @patch('openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2.apply_async')

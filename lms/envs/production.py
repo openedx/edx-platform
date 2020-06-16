@@ -92,10 +92,10 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     vars().update(__config_copy__)
 
 
-# A file path to a YAML file from which to load all the code revisions currently deployed
-REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
-
 try:
+    # A file path to a YAML file from which to load all the code revisions currently deployed
+    REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
+
     with codecs.open(REVISION_CONFIG_FILE, encoding='utf-8') as f:
         REVISION_CONFIG = yaml.safe_load(f)
 except Exception:  # pylint: disable=broad-except
@@ -173,6 +173,9 @@ if STATIC_URL_BASE:
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
 
+# Allow overriding build profile used by RequireJS with one
+# contained on a custom theme
+REQUIRE_BUILD_PROFILE = ENV_TOKENS.get('REQUIRE_BUILD_PROFILE', REQUIRE_BUILD_PROFILE)
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text
 # values when the varibale is an empty string. Therefore, setting these variable as empty text in related
@@ -596,6 +599,9 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = ENV_TOKENS.get(
     "MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS", MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
 )
 
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = ENV_TOKENS.get('LOGISTRATION_RATELIMIT_RATE', LOGISTRATION_RATELIMIT_RATE)
+
 #### PASSWORD POLICY SETTINGS #####
 AUTH_PASSWORD_VALIDATORS = ENV_TOKENS.get("AUTH_PASSWORD_VALIDATORS", AUTH_PASSWORD_VALIDATORS)
 
@@ -705,6 +711,7 @@ if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
    FEATURES.get('ENABLE_TEAMS'):
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+    SEARCH_FILTER_GENERATOR = ENV_TOKENS.get('SEARCH_FILTER_GENERATOR', SEARCH_FILTER_GENERATOR)
 
 ELASTIC_SEARCH_CONFIG = ENV_TOKENS.get('ELASTIC_SEARCH_CONFIG', [{}])
 
@@ -863,6 +870,8 @@ ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
 )
 
+# List of enterprise customer uuids to exclude from transition to use of enterprise-catalog
+ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG = ENV_TOKENS.get('ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG', ())
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
@@ -936,3 +945,12 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+############## Settings for Completion API #########################
+
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
+                                                      COMPLETION_VIDEO_COMPLETE_PERCENTAGE)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS',
+                                                      COMPLETION_BY_VIEWING_DELAY_MS)

@@ -96,7 +96,7 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
-	# Let tox control the Django version & django-oauth-toolkit version for tests
-	grep -e "^django==" -e "^django-oauth-toolkit==" requirements/edx/base.txt > requirements/edx/django.txt
-	sed '/^[dD]jango==/d;/^django-oauth-toolkit==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
+	# Let tox control the Django version for tests
+	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
+	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt

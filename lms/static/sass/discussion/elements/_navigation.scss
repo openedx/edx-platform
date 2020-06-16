@@ -79,7 +79,7 @@
     // need to override button styles
     background-image: none !important;
     box-shadow: none !important;
-    background: $forum-color-background !important;
+    background: $forum-color-background !important; /* stylelint-disable-line */
   }
 }
 
@@ -132,7 +132,8 @@
   width: 50%;
 }
 
-.forum-nav-filter-cohort, .forum-nav-sort {
+.forum-nav-filter-cohort,
+.forum-nav-sort {
   @include text-align(right);
 
   box-sizing: border-box;

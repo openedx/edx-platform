@@ -108,6 +108,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
           <span class="info-university">${course_overview.display_org_with_default} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default}</span>
           <%
+            enrollment_date = course_overview.self_paced and enrollment and enrollment.created
             if course_overview.start_date_is_still_default:
                 container_string = _("Coming Soon")
                 course_date = None
@@ -118,7 +119,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     course_date = course_overview.end
                 elif course_overview.has_started():
                     container_string = _("Started - {date}")
-                    course_date = course_overview.dashboard_start_display
+                    course_date = enrollment_date or course_overview.dashboard_start_display
                 elif course_overview.starts_within(days=5):
                     container_string = _("Starts - {date}")
                     course_date = course_overview.dashboard_start_display
@@ -406,10 +407,10 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
               </div>
             % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
               <h4 class="message-title">${_('You have submitted your verification information.')}</h4>
-              <p class="message-copy">${_('You will see a message on your dashboard when the verification process is complete (usually within 1-2 days).')}</p>
+              <p class="message-copy">${_('You will see a message on your dashboard when the verification process is complete (usually within 5-7 days).')}</p>
             % elif verification_status['status'] == VERIFY_STATUS_RESUBMITTED:
               <h4 class="message-title">${_('Your current verification will expire soon!')}</h4>
-              <p class="message-copy">${_('You have submitted your reverification information. You will see a message on your dashboard when the verification process is complete (usually within 1-2 days).')}</p>
+              <p class="message-copy">${_('You have submitted your reverification information. You will see a message on your dashboard when the verification process is complete (usually within 5-7 days).')}</p>
             % elif verification_status['status'] == VERIFY_STATUS_APPROVED:
               <h4 class="message-title">${_('You have successfully verified your ID with edX')}</h4>
               % if verification_status.get('verification_good_until') is not None:

@@ -74,7 +74,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         _register_course_home_messages(request, course, user_access, course_start_data)
 
         # Register course date alerts
-        for course_date_block in get_course_date_blocks(course, request.user):
+        for course_date_block in get_course_date_blocks(course, request.user, request):
             course_date_block.register_alerts(request, course)
 
         # Register a course goal message, if appropriate

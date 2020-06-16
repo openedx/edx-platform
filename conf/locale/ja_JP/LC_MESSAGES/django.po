@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-27 09:12+0000\n"
+"POT-Creation-Date: 2020-06-11 14:03+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -122,7 +122,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -147,8 +147,8 @@ msgstr "受講前試験"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/unit_block.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
+#: lms/templates/seq_module.html
 msgid "Unit"
 msgstr "ユニット"
 
@@ -2249,9 +2249,9 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/manage_user_standing.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
+#: lms/templates/manage_user_standing.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: lms/templates/widgets/footer-language-selector.html
@@ -3945,12 +3945,12 @@ msgid ""
 " considered in the Entrance Exam scoring/gating algorithm."
 msgstr "trueまたはfalseを入力してください。trueの場合、受講前試験採点アルゴリズムで問題モジュールの解答提出が考慮されます。"
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
 msgid "Enrollment Track Groups"
 msgstr "受講登録トラックグループ"
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 msgid "Partition for segmenting users by enrollment track"
 msgstr "受講者を受講登録トラックごとに分ける"
 
@@ -4547,17 +4547,17 @@ msgstr ""
 #. interface (a menu or piece of UI that takes the full focus of the screen)
 #: common/templates/admin/student/loginfailures/change_form_template.html
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
-#: lms/templates/forgot_password_modal.html lms/templates/signup_modal.html
-#: lms/templates/ccx/schedule.html
+#: lms/templates/wiki/includes/cheatsheet.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: lms/templates/forgot_password_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
-#: themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/signup_modal.html themes/edx.org/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Close"
 msgstr "閉じる"
@@ -5449,50 +5449,6 @@ msgid ""
 msgstr ""
 "{username} ({email}) の払い戻し請求が開始されました。この請求手続をするには、以下のリンク(複数の場合あり)をご覧ください。"
 
-#: lms/djangoapps/commerce/views.py
-msgid "Receipt"
-msgstr "領収書"
-
-#: lms/djangoapps/commerce/views.py
-msgid "Payment Failed"
-msgstr "支払失敗"
-
-#: lms/djangoapps/commerce/views.py
-msgid "There was a problem with this transaction. You have not been charged."
-msgstr "手続中に問題が発生しました。まだ請求されません。"
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"Make sure your information is correct, or try again with a different card or"
-" another form of payment."
-msgstr "入力した情報に間違いがないかご確認いただくか、別のカードまたは支払方法でやり直してください。"
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"A system error occurred while processing your payment. You have not been "
-"charged."
-msgstr "支払手続きの処理中にシステムエラーが発生しました。まだ請求されません。"
-
-#: lms/djangoapps/commerce/views.py
-msgid "Please wait a few minutes and then try again."
-msgstr "数分待って、もう一度やり直してください。"
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid "For help, contact {payment_support_link}."
-msgstr "ヘルプは{payment_support_link}へお問い合わせください。"
-
-#: lms/djangoapps/commerce/views.py
-msgid "An error occurred while creating your receipt."
-msgstr "領収書の作成中にエラーが発生しました。"
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid ""
-"If your course does not appear on your dashboard, contact "
-"{payment_support_link}."
-msgstr "ダッシュボードに受講講座が表示されていない場合は、{payment_support_link} までご連絡ください。"
-
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
 msgstr ""
@@ -5565,6 +5521,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
 msgstr "認証付きにアップグレードする"
+
+#: lms/djangoapps/courseware/course_tools.py
+msgid "Financial Assistance"
+msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Assignment"
@@ -6197,14 +6157,18 @@ msgid "Good"
 msgstr "良い"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
-msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
+msgid "%(comment_username)s replied to"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 msgid "View discussion"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
+#, python-format
+msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
@@ -6336,8 +6300,8 @@ msgid "Student"
 msgstr "受講者"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/preview_menu.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/preview_menu.html
 msgid "Staff"
 msgstr "スタッフ"
 
@@ -6455,29 +6419,6 @@ msgid "Could not find problem with this location."
 msgstr "このロケーションの問題を見つけることができませんでした。"
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
-msgid "Invoice number '{num}' does not exist."
-msgstr "請求書番号 '{num}' は存在しません。"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "The sale associated with this invoice has already been invalidated."
-msgstr "この請求書に関連する売上は既に無効です。"
-
-#: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
-msgid "Invoice number {0} has been invalidated."
-msgstr "請求書番号{0}は既に無効です。"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "This invoice is already active."
-msgstr "この請求書は既に有効です。"
-
-#: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
-msgid "The registration codes for invoice {0} have been re-activated."
-msgstr "請求書{0}の登録コードは再有効化されました。"
-
-#: lms/djangoapps/instructor/views/api.py
 msgid "CourseID"
 msgstr "講座ID"
 
@@ -6507,9 +6448,8 @@ msgstr "ユーザーID"
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/schedules/admin.py
-#: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/enrollment.html lms/templates/staff_problem_info.html
 msgid "Username"
 msgstr "ユーザー名"
 
@@ -6630,54 +6570,6 @@ msgid "The file must contain a 'username' column, an 'email' column, or both."
 msgstr "ファイルには'ユーザー名'の列、'メール'の列または両方を含む必要があります。"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
-msgid "Coupon Code"
-msgstr "クーポンコード"
-
-#: lms/djangoapps/instructor/views/api.py
-#: openedx/core/djangoapps/schedules/admin.py
-msgid "Course Id"
-msgstr "講座ID"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "% Discount"
-msgstr "% 割引"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: wiki/plugins/attachments/forms.py
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-msgid "Description"
-msgstr "説明"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Expiration Date"
-msgstr "有効期限"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Is Active"
-msgstr "はアクティブ"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Code Redeemed Count"
-msgstr "取り戻されたコード数"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Total Discounted Seats"
-msgstr "総割引seat数"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Total Discounted Amount"
-msgstr "総割引量"
-
-#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "detailed enrollment"
 msgstr "受講登録詳細"
@@ -6696,14 +6588,6 @@ msgstr "アンケート調査"
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "proctored exam results"
 msgstr "監督付き試験結果"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Could not parse amount as a decimal"
-msgstr "数値として解析することができませんでした"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Unable to generate redeem codes because of course misconfiguration."
-msgstr "講座設定ミスのため取戻コードを生成できません。"
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -6922,63 +6806,6 @@ msgid ""
 msgstr ""
 "{student}は{course}講座の修了証を持っていません。ユーザー名/メールおよび選択した講座が正しいかを確認して、再試行してください。"
 
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon id is None"
-msgstr "クーポンIDがありません"
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon id ({coupon_id}) DoesNotExist"
-msgstr "クーポンID ({coupon_id}) は存在しません"
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon id ({coupon_id}) is already inactive"
-msgstr "クーポンID ({coupon_id}) は既に利用不可となっています"
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon id ({coupon_id}) updated successfully"
-msgstr "クーポンID ({coupon_id}) はアップデート成功"
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid ""
-"The code ({code}) that you have tried to define is already in use as a "
-"registration code"
-msgstr "定義しようとされたコード({code})は登録用コードとして既に使用中です"
-
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "Please Enter the Integer Value for Coupon Discount"
-msgstr "クーポン値引率の整数値を入力してください"
-
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "Please Enter the Coupon Discount Value Less than or Equal to 100"
-msgstr "クーポン値引率は100またはそれ以下の値を入力してください"
-
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "Please enter the date in this format i-e month/day/year"
-msgstr "日付を月/日/年の書式で入力してください"
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon code ({code}) added successfully"
-msgstr "クーポンコード ({code}) の追加成功"
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon code ({code}) already exists for this course"
-msgstr "クーポンコード ({code}) はこの講座向けに既に存在します"
-
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon id not found"
-msgstr "クーポンIDが見つかりません"
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
-msgstr "クーポンID ({coupon_id}) のアップデート成功"
-
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Instructor"
 msgstr "講師"
@@ -7085,29 +6912,6 @@ msgstr "完了"
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
 msgstr "未完了"
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-#, python-brace-format
-msgid ""
-"The enrollment code ({code}) was not found for the {course_name} course."
-msgstr "講座 {course_name} の受講登録コード ({code}) が見つかりませんでした。"
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been canceled. It can no longer be used."
-msgstr "この受講登録コードはキャンセルされています。使用することはできません。"
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been marked as unused."
-msgstr "この受講登録コードは不使用と設定されています。"
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "The enrollment code has been restored."
-msgstr "受講登録コードが復旧しました。"
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-#, python-brace-format
-msgid "The redemption does not exist against enrollment code ({code})."
-msgstr "受講登録コード ({code}) に対して取り戻しはありません。"
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
@@ -7505,8 +7309,8 @@ msgstr " (合計{total}中)"
 
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Programs"
 msgstr "プログラム"
@@ -8187,6 +7991,15 @@ msgid "Currency"
 msgstr "通貨"
 
 #: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: wiki/plugins/attachments/forms.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "Description"
+msgstr "説明"
+
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Comments"
 msgstr "コメント"
 
@@ -8329,14 +8142,6 @@ msgstr "このページを見る権限がありません。"
 msgid "View and regenerate certificates."
 msgstr "修了証を見て再作成する。"
 
-#: lms/djangoapps/support/views/index.py lms/templates/support/refund.html
-msgid "Manual Refund"
-msgstr "手動返金"
-
-#: lms/djangoapps/support/views/index.py
-msgid "Track refunds issued directly through CyberSource."
-msgstr "CyberSource社から直接払い戻しを受けた履歴を見る。"
-
 #: lms/djangoapps/support/views/index.py
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/support/enrollment.html
@@ -8414,45 +8219,6 @@ msgstr ""
 #: lms/djangoapps/support/views/manage_user.py
 msgid "User Disabled Successfully"
 msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "メールアドレス"
-
-#: lms/djangoapps/support/views/refund.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Course ID"
-msgstr "講座ID"
-
-#: lms/djangoapps/support/views/refund.py
-msgid "User not found"
-msgstr "ユーザーが見つかりません"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Course {course_id} not past the refund window."
-msgstr "講座{course_id}は返金ウィンドウを過ぎていません。"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "No order found for {user} in course {course_id}"
-msgstr "{course_id} で {user} のオーダーが見つかりません"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Unenrolled {user} from {course_id}"
-msgstr "{course_id} から {user} を受講解除しました"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Refunded {cost} for order id {order_id}"
-msgstr "オーダーID {order_id} の返金 {cost}"
 
 #: lms/djangoapps/survey/utils.py
 msgid "You must complete a survey"
@@ -9072,8 +8838,8 @@ msgid "Allow"
 msgstr "許可"
 
 #: lms/templates/oauth2_provider/authorize.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Error"
 msgstr "エラー"
 
@@ -9437,8 +9203,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: wiki/plugins/attachments/wiki_plugin.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/wiki_plugin.py
 msgid "Attachments"
 msgstr "添付"
 
@@ -9469,11 +9235,10 @@ msgid ""
 msgstr "ファイルは別の記事からも再利用できます。これらのファイルは、良し悪しに関わらず、他の記事内で更新される可能性があります。"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/dashboard.html lms/templates/index.html
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/courseware/courses.html
-#: lms/templates/courseware/courseware.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courseware.html lms/templates/dashboard.html
+#: lms/templates/edxnotes/edxnotes.html lms/templates/index.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
@@ -9858,6 +9623,10 @@ msgstr ""
 msgid "Configuration may not be specified at more than one level at once."
 msgstr ""
 
+#: openedx/core/djangoapps/content/learning_sequences/apps.py
+msgid "Learning Sequences"
+msgstr ""
+
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
 msgstr ""
@@ -10238,12 +10007,25 @@ msgid "Schedule start < course start"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/admin.py
+msgid "Course Id"
+msgstr "講座ID"
+
+#: openedx/core/djangoapps/schedules/admin.py
 msgid "All"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Experience"
 msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+#: cms/templates/maintenance/_force_publish_course.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Course ID"
+msgstr "講座ID"
 
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
@@ -10448,6 +10230,7 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: lms/templates/dates_banner.html
 msgid "Upgrade now"
 msgstr ""
 
@@ -10677,7 +10460,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -10702,8 +10484,8 @@ msgstr ""
 msgid "Success"
 msgstr "成功"
 
-#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "アクション"
 
@@ -10865,6 +10647,14 @@ msgstr "ログイン情報の受信時にエラーが発生しました。管理
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
+"To protect your account, it’s been temporarily locked. Try again in "
+"{locked_out_period} minutes.{li_start}To be on the safe side, you can reset "
+"your password {link_start}here{link_end} before you try again."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
 "In order to sign in, you need to activate your account.{blank_lines}We just "
 "sent an activation link to {email_strong}. If you do not receive an email, "
 "check your spam folders or {link_start}contact {platform_name} "
@@ -10874,6 +10664,15 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "何度もログイン試行に失敗しました。しばらく時間をおいて再操作してください。"
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"Email or password is incorrect.{li_start}You have {remaining_attempts} more "
+"sign-in attempts before your account is temporarily "
+"locked.{li_end}{li_start}If you've forgotten your password, click "
+"{link_start}here{link_end} to reset.{li_end}"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
@@ -10916,6 +10715,11 @@ msgid ""
 msgstr "このメールアドレスが登録されたユーザーアカウントでは、パスワードの変更ができません。"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Password reset unsuccessful"
 msgstr "パスワードの変更に失敗"
 
@@ -10932,11 +10736,6 @@ msgstr "パスワードを変更時のエラー。再試行してください。
 msgid ""
 "{html_start}Password Creation Complete{html_end}Your password has been "
 "created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
@@ -11165,6 +10964,18 @@ msgid ""
 "Username created for Video Pipeline Integration, e.g. veda_service_user."
 msgstr ""
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Oauth client name of VEM service."
+msgstr ""
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "video encode manager API URL."
+msgstr ""
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Username created for VEM Integration, e.g. vem_service_user."
+msgstr ""
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr "強制オン"
@@ -11181,6 +10992,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/xblock/runtime/mixin.py
 msgid "This content is only accessible to enrolled learners. "
+msgstr ""
+
+#: openedx/core/lib/api/view_utils.py
+msgid "The about me field must be at most {} characters long."
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
@@ -11865,8 +11680,8 @@ msgstr "gitレポジトリへのエクスポートが完了したコース"
 msgid "Vertical"
 msgstr "縦"
 
-#: cms/templates/course_outline.html lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
+#: lms/templates/seq_module.html
 msgid "Section"
 msgstr "セクション"
 
@@ -12143,6 +11958,12 @@ msgstr ""
 msgid "Partial Failure"
 msgstr ""
 
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Transcript Failed"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
 msgstr "画像ファイルは必須です。"
@@ -12334,14 +12155,14 @@ msgstr "講座番号: "
 msgid "Course Run:"
 msgstr ""
 
-#: cms/templates/index.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/courseware/courses.html
+#: cms/templates/index.html lms/templates/courseware/courses.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "講座"
@@ -12365,8 +12186,9 @@ msgstr "講師"
 msgid "Requirements"
 msgstr "必須事項"
 
-#: cms/templates/studio_xblock_wrapper.html lms/templates/module-error.html
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/module-error.html
 msgid "Details"
 msgstr "詳細"
 
@@ -12418,15 +12240,15 @@ msgstr ""
 msgid "Choose Language"
 msgstr "言語を選択"
 
-#: cms/templates/widgets/header.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
+#: cms/templates/widgets/header.html lms/templates/header/user_dropdown.html
+#: lms/templates/user_dropdown.html
 msgid "Account"
 msgstr "アカウント"
 
 #: cms/templates/widgets/header.html
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 #: wiki/plugins/help/wiki_plugin.py
@@ -12498,8 +12320,8 @@ msgstr "ユーザーメニュー"
 msgid "Usermenu dropdown"
 msgstr "ドロップダウンのユーザーメニュー"
 
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
+#: cms/templates/widgets/user_dropdown.html
+#: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
 msgstr "サインアウト"
 
@@ -12659,8 +12481,8 @@ msgstr "開始: {date}"
 msgid "View all Courses"
 msgstr "すべての講座を見る"
 
-#: lms/templates/dashboard.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
+#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
+#: lms/templates/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "ダッシュボード"
@@ -12679,8 +12501,8 @@ msgstr "まだどの講座にも受講登録していません。"
 
 #: lms/templates/dashboard.html
 #: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore courses"
 msgstr "講座を探す"
@@ -12698,7 +12520,7 @@ msgstr "講座読込エラー"
 msgid "Search Your Courses"
 msgstr "講座を検索"
 
-#: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+#: lms/templates/courseware/courseware.html lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Clear search"
 msgstr "検索をクリア"
@@ -12723,7 +12545,7 @@ msgstr "講座からのメールを受け取る"
 msgid "Save Settings"
 msgstr "設定を保存"
 
-#: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/enrollment.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
@@ -12733,9 +12555,87 @@ msgstr "設定を保存"
 msgid "Unenroll"
 msgstr "受講登録取消"
 
-#: lms/templates/edit_unit_link.html
-msgid "View Unit in Studio"
-msgstr "Studioでユニットを見る"
+#: lms/templates/dates_banner.html
+msgid "We've built a suggested schedule to help you stay on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"But don't worry—it's flexible so you can learn at your own pace. If you "
+"happen to fall behind on our suggested dates, you'll be able to adjust them "
+"to keep yourself on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule. "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future by visiting "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" Don’t worry—you won’t lose any of the progress you’ve made when you shift "
+"your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Don’t worry—you won’t lose any of the "
+"progress you’ve made when you shift your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Reset my deadlines"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "You are auditing this course,"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid " which means that you are unable to participate in graded assignments."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. Graded assignments and schedule adjustment are available to "
+"Verified Track learners."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. To complete graded assignments as part of this course and shift "
+"the past due assignments into the future, you can upgrade today."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Upgrade to shift due dates"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Graded assignments are available to Verified Track learners."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" To complete graded assignments as part of this course, you can upgrade "
+"today."
+msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -12767,7 +12667,7 @@ msgstr "新しいメールアドレスを使ったアカウントが既に存在
 msgid "You should Register before trying to access the Unit"
 msgstr "ユニットにアクセスするにはまず登録してください"
 
-#: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html lms/templates/enroll_staff.html
 msgctxt "self"
 msgid "Enroll"
 msgstr ""
@@ -12870,7 +12770,7 @@ msgid ""
 msgstr ""
 "締切が過ぎていますので、この課題はもう有効ではありません。{line_break}すでにこの課題を完了している場合、成績は{link_start}進捗ページ{link_end}でご覧いただけます。"
 
-#: lms/templates/index.html lms/templates/courseware/courses.html
+#: lms/templates/courseware/courses.html lms/templates/index.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search for a course"
 msgstr "講座を探す"
@@ -13006,19 +12906,16 @@ msgstr "(画面を再読込してください)"
 msgid "working"
 msgstr "作業中"
 
-#: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/module-error.html
 msgid "There has been an error on the {platform_name} servers"
 msgstr "{platform_name}サーバーにエラーが発生しました"
 
 #: lms/templates/module-error.html
-#: lms/templates/courseware/courseware-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {tech_support_email} to "
-"report any problems or downtime."
+" fix it as soon as possible. "
 msgstr ""
-"申し訳ありません。このモジュールは一時的に利用できません。できるだけ早く復旧できるよう作業中です。問題や中断時間の報告は{tech_support_email}へメールしてください。"
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
@@ -13057,7 +12954,15 @@ msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr " {i_start}{user_name}{i_end}としてこの講座を閲覧しています。"
 
 #: lms/templates/preview_menu.html
-msgid "View this unit in the new experience"
+msgid "View in the new experience"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "View in Studio"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "View in Insights"
 msgstr ""
 
 #: lms/templates/problem.html
@@ -13120,28 +13025,6 @@ msgstr "メール"
 msgid "Return To %s"
 msgstr "%s に戻る"
 
-#: lms/templates/reset_deadlines_banner.html
-msgid "It looks like you've missed some important deadlines. Visit "
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "edx.org"
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid " to reset your deadlines and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid ""
-"It looks like you've missed some important deadlines. Reset your deadlines "
-"and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "Reset my deadlines"
-msgstr ""
-
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "再申込完了！"
@@ -13192,7 +13075,7 @@ msgstr ""
 msgid "Sequence"
 msgstr "順番"
 
-#: lms/templates/seq_module.html
+#: lms/templates/courseware/dates.html lms/templates/seq_module.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr ""
@@ -13321,18 +13204,18 @@ msgstr "点数 (上書き用)"
 msgid "Reset Learner's Attempts to Zero"
 msgstr "受講者の提出数をゼロにリセット"
 
-#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+#: lms/templates/staff_problem_info.html
 msgid "Delete Learner's State"
 msgstr "受講者の状態を削除"
 
-#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+#: lms/templates/staff_problem_info.html
 msgid "Rescore Learner's Submission"
 msgstr "受講者の解答を再採点"
 
-#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+#: lms/templates/staff_problem_info.html
 msgid "Rescore Only If Score Improves"
 msgstr "点数が良くなる場合のみ再採点"
 
@@ -13370,7 +13253,7 @@ msgstr "{course_number}の教科書"
 msgid "Textbook Navigation"
 msgstr "教科書案内"
 
-#: lms/templates/staticbook.html lms/templates/courseware/gradebook.html
+#: lms/templates/courseware/gradebook.html lms/templates/staticbook.html
 msgid "Page"
 msgstr "画面"
 
@@ -13481,9 +13364,9 @@ msgstr "{total_pages}ページ中{current_page}ページ目"
 msgid "Recent git load activity for {course_id}"
 msgstr "{course_id}の最新のgit履歴"
 
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Date"
 msgstr "日付"
 
@@ -13539,7 +13422,7 @@ msgstr ""
 "今後 {platform_name} からのフォーラム通知メールを受け取らなくなります。ダッシュボードへは "
 "{dashboard_link_start}こちらから{link_end}戻ることができます。登録したい場合は、{undo_link_start}こちらから{link_end}再登録できます。"
 
-#: lms/templates/user_dropdown.html lms/templates/header/user_dropdown.html
+#: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "ダッシュボード: "
 
@@ -13547,8 +13430,8 @@ msgstr "ダッシュボード: "
 msgid "More options"
 msgstr "その他のオプション"
 
-#: lms/templates/user_dropdown.html lms/templates/header/header.html
-#: lms/templates/header/user_dropdown.html
+#: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+#: lms/templates/user_dropdown.html
 msgid "More Options"
 msgstr ""
 
@@ -14747,35 +14630,6 @@ msgstr "設定している情報に間違いがないと思われる場合には
 msgid "About edX Certificates"
 msgstr ""
 
-#: lms/templates/commerce/checkout_cancel.html
-msgid "Checkout Cancelled"
-msgstr "支払取消"
-
-#: lms/templates/commerce/checkout_cancel.html
-msgid ""
-"Your transaction has been cancelled. If you feel an error has occurred, "
-"contact {email}."
-msgstr "取り扱いがキャンセルされました。何か問題が起きたと思われる場合には {email} に問い合わせてください。"
-
-#: lms/templates/commerce/checkout_error.html
-msgid "Checkout Error"
-msgstr "支払エラー"
-
-#: lms/templates/commerce/checkout_error.html
-msgid ""
-"An error has occurred with your payment. {b_start}You have not been "
-"charged.{b_end} Please try to submit your payment again. If this problem "
-"persists, contact {email}."
-msgstr ""
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Loading Order Data..."
-msgstr "注文データを読込中..."
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Please wait while we retrieve your order details."
-msgstr "注文詳細情報を復元しておりますので、お待ちください。"
-
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
@@ -14977,12 +14831,12 @@ msgid "This content is graded"
 msgstr "このコンテンツは採点対象です"
 
 #: lms/templates/courseware/course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "エラーが発生しました。後ほど再試行してください。"
-
-#: lms/templates/courseware/course_about.html
 msgid "An error has occurred. Please ensure that you are logged in to enroll."
 msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "エラーが発生しました。後ほど再試行してください。"
 
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
@@ -14996,10 +14850,6 @@ msgid "View Course"
 msgstr "講座画面へ"
 
 #: lms/templates/courseware/course_about.html
-msgid "This course is in your {start_cart_link}cart{end_cart_link}."
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "講座は満員です"
 
@@ -15010,10 +14860,6 @@ msgstr "この講座の受講登録は招待制です"
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr "受講登録は終了しました"
-
-#: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
-msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
@@ -15136,6 +14982,13 @@ msgstr "コースユーティリティー"
 msgid "Courseware"
 msgstr "コースウェア"
 
+#: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "講座検索"
@@ -15165,7 +15018,7 @@ msgid "Important Dates"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
-msgid "Due Today"
+msgid "Today"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
@@ -15173,14 +15026,11 @@ msgid "Verified Only"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
-msgid ""
-"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgid "Due Next"
 msgstr ""
 
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible."
+#: lms/templates/courseware/dates.html
+msgid "Not yet released"
 msgstr ""
 
 #: lms/templates/courseware/gradebook.html
@@ -15823,8 +15673,8 @@ msgstr "認証情報を提出済です。"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You will see a message on your dashboard when the verification process is "
-"complete (usually within 1-2 days)."
-msgstr "認証手続が完了しましたらダッシュボードにメッセージが表示されます(通常1-2日以内)。"
+"complete (usually within 5-7 days)."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
@@ -15834,8 +15684,8 @@ msgstr "現在の認証はまもなく期限切れです！"
 msgid ""
 "You have submitted your reverification information. You will see a message "
 "on your dashboard when the verification process is complete (usually within "
-"1-2 days)."
-msgstr "再認証情報が提出されました。認証手続が完了しましたらダッシュボードにメッセージが表示されます(通常1-2日以内)。"
+"5-7 days)."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have successfully verified your ID with edX"
@@ -16515,139 +16365,6 @@ msgid ""
 "verification process on your dashboard."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Thank you for purchasing enrollments in {course_name}."
-msgstr "{course_name}の受講登録料をお支払いいただき、ありがとうございます。"
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"An invoice for {currency_symbol}{total_price} is attached. Payment is due "
-"upon receipt. You can find information about payment methods on the invoice."
-msgstr ""
-"{currency_symbol}{total_price}の請求書が添付されています。受け取り次第お支払いください。お支払い方法については請求書に記載されています。"
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"A .csv file that lists your enrollment codes is attached. You can use the "
-"email template below to distribute enrollment codes to your students. Each "
-"student must use a separate enrollment code."
-msgstr ""
-"受講登録コードを記載したCSVファイルが添付されています。受講生に受講登録コードを通知するには以下のメールテンプレートをお使いいただけます。各受講生はそれぞれ別の受講登録コードを使用しなければいけません。"
-
-#. Translators: This is the signature of an email.  "\n" is a newline
-#. character
-#. and should be placed between the closing word and the signature.
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"Thanks,\n"
-"The {platform_name} Team"
-msgstr ""
-"ありがとうございます。\n"
-"{platform_name}運営チームより"
-
-#. Translators: please translate the text inside [[ ]]. This is meant as a
-#. template for course teams to use.
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Dear [[Name]]:"
-msgstr " [[Name]] 様: "
-
-#. Translators: please translate the text inside [[ ]]. This is meant as a
-#. template for course teams to use.
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"We have provided a course enrollment code for you in {course_name}. To "
-"enroll in the course, click the following link:"
-msgstr "{course_name}であなたの受講登録コードを発行しました。受講するためには次のリンクをクリックしてください: "
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "HTML link from the attached CSV file"
-msgstr "添付されたCSVファイルからのHTMLリンク"
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"After you enroll, you can see the course on your student dashboard. You can "
-"see course materials after the course start date."
-msgstr "受講登録すると、受講生用ダッシュボードにその講座が表示されます。教材は講座開始日以降見ることができるようになります。"
-
-#. Translators: please translate the text inside [[ ]]. This is meant as a
-#. template for course teams to use.
-#. This is the signature of an email.  "\n" is a newline character
-#. and should be placed between the closing word and the signature.
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"Sincerely,\n"
-"[[Your Signature]]"
-msgstr ""
-"敬意を込めて\n"
-"[[ご署名]]"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "INVOICE"
-msgstr "請求書"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Date: {date}"
-msgstr "日付: {date}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Invoice No: {invoice_number}"
-msgstr "請求書番号: {invoice_number}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Terms: Due Upon Receipt"
-msgstr "期限: 受取次第"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Due Date: {date}"
-msgstr "締切: {date}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Bill to:"
-msgstr "請求先: "
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Customer Reference Number: {reference_number}"
-msgstr "お客様参照番号: {reference_number}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Balance Due: {currency_symbol}{sale_price}"
-msgstr "不足額: {currency_symbol}{sale_price}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Course: {course_name}"
-msgstr "講座: {course_name}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid ""
-"Price:        {currency_symbol}{course_price}  Quantity:      {quantity}  "
-"Sub-Total:    {currency_symbol}{sub_total}  Discount:  "
-"{currency_symbol}{discount}"
-msgstr ""
-"価格: {currency_symbol}{course_price} 数量: {quantity} 小計: "
-"{currency_symbol}{sub_total} 値引: {currency_symbol}{discount}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Total:      {currency_symbol}{sale_price}"
-msgstr "合計: {currency_symbol}{sale_price}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Payment Instructions"
-msgstr "支払いについてのご案内"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid ""
-"If we do not receive payment, the learner enrollments that use these codes "
-"will be canceled and learners will not be able to access course materials. "
-"All purchases are final. For more information, see the {site_name} "
-"cancellation policy."
-msgstr ""
-"お支払いいただけない場合は、このコードの受講登録はキャンセルされ、教材にアクセスできなくなります。いったん購入手続をすると返品はできません。詳しく知りたい方は"
-" {site_name} キャンセルポリシーをご覧ください。"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "For payment questions, contact {contact_email}"
-msgstr "支払についてのご質問は {contact_email} へお問い合わせください"
-
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
 "We are sorry. Our course staff did not approve your request to change your "
@@ -16822,8 +16539,8 @@ msgstr "経済支援に申し込む"
 
 #: lms/templates/header/brand.html
 #: lms/templates/header/navbar-logo-header.html
-#: lms/templates/navigation/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
+#: lms/templates/navigation/navbar-logo-header.html
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} ホームページ"
 
@@ -16846,18 +16563,10 @@ msgstr ""
 
 #. Translators: This is short for "System administration".
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
 msgid "Sysadmin"
 msgstr "システム管理者"
-
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Shopping Cart"
-msgstr "ショッピングカート"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
@@ -16894,6 +16603,12 @@ msgstr "クーポンコード追加"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Enter information about the coupon code below."
 msgstr "クーポンコード情報を以下に入力してください。"
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Coupon Code"
+msgstr "クーポンコード"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Discount Percentage"
@@ -17445,6 +17160,11 @@ msgstr "クーポンコードをダウンロード"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupon Codes"
 msgstr "クーポンコード"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Expiration Date"
+msgstr "有効期限"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupon (%)"
@@ -18726,6 +18446,10 @@ msgid "Purchase order number (if any)"
 msgstr "注文番号(あれば)"
 
 #: lms/templates/shoppingcart/billing_details.html
+msgid "Email Address"
+msgstr "メールアドレス"
+
+#: lms/templates/shoppingcart/billing_details.html
 msgid "email@example.com"
 msgstr "email@example.com"
 
@@ -19017,6 +18741,10 @@ msgid_plural ""
 msgstr[0] "{course_names}は受講登録期間が終了しているので削除されました。"
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Shopping Cart"
+msgstr "ショッピングカート"
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr "カバー画像"
 
@@ -19229,46 +18957,6 @@ msgstr ""
 msgid "Program Enrollments Inspector"
 msgstr ""
 
-#: lms/templates/support/refund.html
-msgid "About to refund this order:"
-msgstr "返金しようとしています: "
-
-#: lms/templates/support/refund.html
-msgid "Order Id:"
-msgstr "オーダーID: "
-
-#: lms/templates/support/refund.html
-msgid "Enrollment:"
-msgstr "受講登録: "
-
-#: lms/templates/support/refund.html
-msgid "enrolled"
-msgstr "受講登録済"
-
-#: lms/templates/support/refund.html
-msgid "unenrolled"
-msgstr "受講登録解除"
-
-#: lms/templates/support/refund.html
-msgid "Cost:"
-msgstr "費用: "
-
-#: lms/templates/support/refund.html
-msgid "CertificateItem Status:"
-msgstr "CertificateItem ステータス: "
-
-#: lms/templates/support/refund.html
-msgid "Order Status:"
-msgstr "注文ステータス: "
-
-#: lms/templates/support/refund.html
-msgid "Fulfilled Time:"
-msgstr "達成時間: "
-
-#: lms/templates/support/refund.html
-msgid "Refund Request Time:"
-msgstr "返金請求時間: "
-
 #: lms/templates/survey/survey.html
 msgid "User Survey"
 msgstr "ユーザーアンケート"
@@ -19408,8 +19096,8 @@ msgstr "本人認証"
 msgid ""
 "You have already submitted your verification information. You will see a "
 "message on your dashboard when the verification process is complete (usually"
-" within 1-2 days)."
-msgstr "認証情報が提出されました。認証手続が完了しましたらダッシュボードにメッセージが表示されます(通常1～2日以内)。"
+" within 5-7 days)."
+msgstr ""
 
 #: lms/templates/verify_student/reverify_not_allowed.html
 msgid "You cannot verify your identity at this time."
@@ -20079,10 +19767,8 @@ msgid "The page that you were looking for was not found."
 msgstr "お探しのページは見つかりませんでした。"
 
 #: cms/templates/404.html
-msgid ""
-"Go back to the {homepage} or let us know about any pages that may have been "
-"moved at {email}."
-msgstr "{homepage}へ戻るか、移動した可能性のあるページについて{email}にお知らせください。"
+msgid "Go back to the {homepage}."
+msgstr ""
 
 #: cms/templates/500.html
 msgid "{studio_name} Server Error"
@@ -20103,10 +19789,6 @@ msgid ""
 "We've logged the error and our staff is currently working to resolve this "
 "error as soon as possible."
 msgstr "我々スタッフはエラーを記録し、できるだけ早く解決できるよう取り組んでいます。"
-
-#: cms/templates/500.html
-msgid "If the problem persists, please email us at {email_link}."
-msgstr "もし不具合が解消されない場合は、{email_link}へメールでご連絡ください。"
 
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
@@ -20739,12 +20421,8 @@ msgstr "リクエストされたページが見つかりませんでした"
 #: cms/templates/error.html
 msgid ""
 "We're sorry. We couldn't find the {studio_name} page you're looking for. You"
-" may want to return to the {studio_name} Dashboard and try again. If you are"
-" still having problems accessing things, please feel free to "
-"{link_start}contact {studio_name} support{link_end} for further help."
+" may want to return to the {studio_name} Dashboard and try again."
 msgstr ""
-"申し訳ございません。お探しの{studio_name}のページが見つかりませんでした。{studio_name}のダッシュボードに戻って再試行してください。アクセスの問題が解決しない場合は、お気軽に{link_start}{studio_name}サポート{link_end}"
-" へご連絡ください。"
 
 #: cms/templates/error.html
 msgid "The Server Encountered an Error"
@@ -20754,12 +20432,8 @@ msgstr "サーバーでエラーが発生しました"
 msgid ""
 "We're sorry. There was a problem with the server while trying to process "
 "your last request. You may want to return to the {studio_name} Dashboard or "
-"try this request again. If you are still having problems accessing things, "
-"please feel free to {link_start}contact {studio_name} support{link_end} for "
-"further help."
+"try this request again."
 msgstr ""
-"申し訳ございません。リクエスト処理中にサーバーエラーが発生しました。{studio_name}のダッシュボードに戻り、再実行してください。アクセスの問題が解決しない場合は、お気軽に{link_start}{studio_name}サポート{link_end}"
-" へご連絡ください。"
 
 #: cms/templates/error.html
 msgid "Back to dashboard"
@@ -23820,8 +23494,8 @@ msgstr "%(file)s はリビジョン #%(revision)d に変更されました"
 msgid "%(file)s has been saved."
 msgstr "%(file)s は保存されました。"
 
-#: wiki/plugins/images/wiki_plugin.py
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
+#: wiki/plugins/images/wiki_plugin.py
 msgid "Images"
 msgstr "画像"
 
@@ -24013,8 +23687,8 @@ msgstr ""
 msgid "Search..."
 msgstr ""
 
-#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
+#: wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html wiki/templates/wiki/base.html
 msgid "Sign up"
 msgstr ""
 

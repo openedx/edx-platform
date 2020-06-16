@@ -42,8 +42,10 @@
                     {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe course_name=course_name|force_escape|safe platform_name=platform_name|force_escape|safe %}
                 {% endif %}
             </p>
-            {# xss-lint: disable=django-trans-missing-escape #}
-            {% trans "Keep learning" as course_cta_text %}
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Keep learning{% endblocktrans %}
+            {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
 
             {% include "ace_common/edx_ace/common/upsell_cta.html"%}

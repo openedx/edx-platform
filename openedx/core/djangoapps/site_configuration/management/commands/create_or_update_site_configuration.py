@@ -17,7 +17,8 @@ LOG = logging.getLogger(__name__)
 
 
 def load_json_from_file(filename):
-    return json.load(codecs.open(filename, encoding='utf-8'))
+    with codecs.open(filename, encoding='utf-8') as file:
+        return json.load(file)
 
 
 class Command(BaseCommand):

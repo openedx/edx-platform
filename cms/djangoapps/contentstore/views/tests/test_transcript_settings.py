@@ -15,11 +15,6 @@ from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from contentstore.views.transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
-from openedx.core.djangoapps.video_pipeline.config.waffle import (
-    SAVE_CREDENTIALS_IN_VAL,
-    waffle_flags
-)
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.roles import CourseStaffRole
 
 
@@ -104,56 +99,6 @@ class TranscriptCredentialsTest(CourseTestCase):
         Tests that transcript credentials handler works as expected.
         """
         mock_update_credentials.return_value = update_credentials_response
-        transcript_credentials_url = self.get_url_for_course_key(self.course.id)
-        response = self.client.post(
-            transcript_credentials_url,
-            data=json.dumps(request_payload),
-            content_type='application/json'
-        )
-        self.assertEqual(response.status_code, expected_status_code)
-        self.assertEqual(response.content.decode('utf-8'), expected_response)
-
-    @override_waffle_flag(waffle_flags()[SAVE_CREDENTIALS_IN_VAL], True)
-    @ddt.data(
-        (
-            {
-                'provider': '3PlayMedia',
-                'api_key': '11111',
-                'api_secret_key': '44444'
-            },
-            {'error_type': TranscriptionProviderErrorType.INVALID_CREDENTIALS},
-            400,
-            '{\n  "error": "The information you entered is incorrect."\n}'
-        ),
-        (
-            {
-                'provider': 'Cielo24',
-                'api_key': '12345',
-                'username': 'test_user'
-            },
-            {'error_type': None},
-            200,
-            ''
-        ),
-        (
-            {
-                'provider': '3PlayMedia',
-                'api_key': '12345',
-                'api_secret_key': '44444'
-            },
-            {'error_type': None},
-            200,
-            ''
-        )
-    )
-    @ddt.unpack
-    @patch('edxval.api.create_or_update_transcript_credentials')
-    def test_val_transcript_credentials_handler(self, request_payload, update_credentials_response,
-                                                expected_status_code, expected_response, api_patch):
-        """
-        Test that credentials handler works fine with VAL api endpoint.
-        """
-        api_patch.return_value = update_credentials_response
         transcript_credentials_url = self.get_url_for_course_key(self.course.id)
         response = self.client.post(
             transcript_credentials_url,

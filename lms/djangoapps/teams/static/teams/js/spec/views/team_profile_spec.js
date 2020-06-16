@@ -48,7 +48,7 @@ define([
                 el: $('.profile-view'),
                 teamEvents: TeamSpecHelpers.teamEvents,
                 courseID: TeamSpecHelpers.testCourseID,
-                context: TeamSpecHelpers.testContext,
+                context: options.context || TeamSpecHelpers.testContext,
                 model: teamModel,
                 topic: isInstructorManagedTopic ?
                     TeamSpecHelpers.createMockInstructorManagedTopic() :
@@ -72,6 +72,23 @@ define([
                 )
             );
             AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockDiscussionResponse());
+
+            // Assignments are feature-flagged
+            if (profileView.context.teamsAssignmentsUrl) {
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    interpolate( // eslint-disable-line no-undef
+                        '/api/team/v0/teams/%(teamId)s/assignments',
+                        {
+                            teamId: teamModel.id
+                        },
+                        true
+                    )
+                );
+                AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamAssignments(options.assignments));
+            }
+
             return profileView;
         };
 
@@ -100,6 +117,76 @@ define([
                 AjaxHelpers.expectNoRequests(requests);
             }
         };
+
+        describe('TeamAssignmentsView', function() {
+            it('can render itself', function() {
+                // Given a member of a team with team assignments
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
+                    options = {
+                        membership: DEFAULT_MEMBERSHIP
+                    },
+                    requests = AjaxHelpers.requests(this);
+
+                // When they go to the team profile view
+                var view = createTeamProfileView(requests, options);
+
+                // The Assignments section renders with their assignments
+                expect(view.$('.team-assignment').length).toEqual(mockAssignments.length);
+            });
+
+            it('displays a message when no assignments are found', function() {
+                // Given a member viewing a team with no assignments
+                var mockAssignments = [],
+                    options = {
+                        assignments: mockAssignments,
+                        membership: DEFAULT_MEMBERSHIP
+                    },
+                    requests = AjaxHelpers.requests(this);
+
+                // When they view the team
+                var view = createTeamProfileView(requests, options);
+
+                // There should be filler text that says there are no assignments
+                expect(view.$('#assignments').text()).toEqual('No assignments for team');
+                expect(view.$('.team-assignment').length).toEqual(0);
+            });
+
+            it('does not show at all for someone who is not on the team or staff', function() {
+                // Given a user who is not on a team viewing a team with assignments
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
+                    options = {
+                        assignments: mockAssignments
+                    },
+                    requests = AjaxHelpers.requests(this);
+
+                // When the user goes to the team detail page
+                var view = createTeamProfileView(requests, options);
+
+                // Then then assignments view does not appear on the page
+                expect(view.$('.team-assignments').length).toBe(0);
+            });
+
+            it('does not show at all when the feature flag is turned off', function() {
+                // Given the team submissions feature is turned off
+                // (teamAsssignmentsUrl isn't surfaced to user)
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
+                    options = {
+                        assignments: mockAssignments,
+                        membership: DEFAULT_MEMBERSHIP,
+                        context: Object.assign({}, TeamSpecHelpers.testContext)
+                    },
+                    requests = AjaxHelpers.requests(this),
+                    view;
+
+                delete options.context.teamsAssignmentsUrl;
+
+                // When the user goes to the team detail page
+                view = createTeamProfileView(requests, options);
+
+                // Then then assignments view does not appear on the page
+                expect(view.$('.team-assignments').length).toBe(0);
+            });
+        });
 
         describe('DiscussionsView', function() {
             it('can render itself', function() {

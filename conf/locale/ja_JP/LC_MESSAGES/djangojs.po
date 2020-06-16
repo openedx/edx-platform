@@ -77,7 +77,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-27 09:11+0000\n"
+"POT-Creation-Date: 2020-06-11 14:03+0000\n"
 "PO-Revision-Date: 2020-04-27 09:13+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Japanese (Japan) (http://www.transifex.com/open-edx/edx-platform/language/ja_JP/)\n"
@@ -86,7 +86,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -158,8 +158,8 @@ msgstr "アップロード中"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
-#: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/templates.underscore
+#: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "閉じる"
@@ -739,7 +739,6 @@ msgstr ""
 
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "説明"
@@ -2324,9 +2323,9 @@ msgid "Not specific to a course"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "トピック"
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "件名"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -2385,7 +2384,15 @@ msgid "Other"
 msgstr "その他"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
+msgid "Course Discussion Forum"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid ""
+"While our support team is happy to assist with the edX platform, the course "
+"staff has the expertise for specific assignment questions, grading or the "
+"proper procedures in each course. Please post all course related questions "
+"within the Discussion Forum where the Course Staff can directly respond."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2393,11 +2400,15 @@ msgid "Details"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgid "the more quickly and helpfully we can respond!"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
@@ -2405,8 +2416,7 @@ msgid "Sign in to {platform} so we can help you better."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
+msgid "Need help logging in?"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2416,11 +2426,23 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a topic for your support request."
+msgid "Select a subject for your support request."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Due to the recent increase in interest in online education and edX, we are "
+"currently experiencing an unusually high volume of support requests. We "
+"appreciate your patience as we work to review each request. Please check the"
+" "
+msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid " as many questions may have already been answered."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2628,6 +2650,10 @@ msgid "An error occurred. Try again."
 msgstr "エラーが発生しました。再試行してください。"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid "No assignments for team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "Leave this team?"
 msgstr "このチームを辞めますか？"
 
@@ -2774,6 +2800,10 @@ msgstr "\"{team}\" というチームが見つかりませんでした。"
 msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] ""
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "トピック"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4121,10 +4151,6 @@ msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
 msgstr "メールを復旧する際にエラーが発生しました。後ほど再試行してください。問題が続くようであれば、テクニカルサポートにお問い合わせください。"
-
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "件名"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -5485,8 +5511,8 @@ msgstr ""
 
 #: cms/static/js/models/uploads.js
 msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -5664,7 +5690,7 @@ msgid "{selectedProvider} credentials saved"
 msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
+msgid "Upload a new PDF to “<%- name %>”"
 msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
@@ -6217,14 +6243,14 @@ msgstr ""
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
-msgstr "組織名、講座番号、course run欄の合計文字数は<%=limit%>文字までです。"
+"fields cannot be more than <%- limit %> characters."
+msgstr ""
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
-msgstr "組織名、ライブラリコード欄の合計文字数は<%=limit%>文字までです。"
+"more than <%- limit %> characters."
+msgstr ""
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -6565,7 +6591,6 @@ msgid "Unscheduled"
 msgstr "未定"
 
 #: cms/templates/js/course_info_update.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Date"
 msgstr "日付"
@@ -7214,6 +7239,10 @@ msgid "Join Team"
 msgstr "チームに参加"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team Assignments"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "チーム詳細"
 
@@ -7296,96 +7325,6 @@ msgstr "サブセクション%(subsectionDisplayName)sを削除"
 #, python-format
 msgid "Remove unit %(unitName)s"
 msgstr "ユニット%(unitName)sを削除"
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"You still need to visit the %(display_name)s website to complete the credit "
-"process."
-msgstr "単位認定処理を完了するには引き続き%(display_name)sを見てください。"
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"To finalize course credit, %(display_name)s requires %(platform_name)s "
-"learners to submit a credit request."
-msgstr ""
-"単位認定の最終処理をするために、%(display_name)sでは%(platform_name)s受講者に単位認定申請を提出するよう求めています。"
-
-#: lms/templates/commerce/provider.underscore
-msgid "Get Credit"
-msgstr "単位を獲得する"
-
-#: lms/templates/commerce/receipt.underscore
-#, python-format
-msgid ""
-"Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr "%(full_name)s様、ありがとうございます！%(course_name)sに関するお支払いを受理しました。"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr "この画面を記録用に印刷してください。これは領収書になります。同様の情報をメールでもお送りしています。"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "申込番号"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "数量"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "合計"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "注意してください"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "線が引いてあるアイテムは返金されました。"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "請求先"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "領収証なし"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-msgid "Go to Dashboard"
-msgstr "ダッシュボードへ移動"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from {platformName}"
-" to verify your identity."
-msgstr ""
-"すぐに本人認証を行わない場合でも、ダッシュボードで講座を探すことができます。定期的に{platformName}から本人認証を行うよう通知があります。"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "後で本人認証を行いますか？"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Verify Now"
-msgstr "いますぐ認証しよう"
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
@@ -7543,6 +7482,10 @@ msgid ""
 "Thank you for submitting your financial assistance application for "
 "{course_name}! You can expect a response in 2-4 business days."
 msgstr "{course_name}の経済援助申込書をご提出いただき、ありがとうございます！2-4営業日以内に返信が届きます。"
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Go to Dashboard"
+msgstr "ダッシュボードへ移動"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
@@ -7885,14 +7828,6 @@ msgid "You can change sessions until {expiration_date}."
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Final Grade"
-msgstr ""
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "for {courseName}"
-msgstr ""
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr "アーカイブ済講座を見る"
 
@@ -8106,7 +8041,27 @@ msgid "An error occurred. Please reload the page."
 msgstr "エラーが発生しました。この画面を再読込してください。"
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
+msgid "Need help signing in?"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot my password"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Other sign-in issues"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Sign in with your company or school"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Need other help signing in?"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Create an account"
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -8669,6 +8624,11 @@ msgid "Check your email for an activation message."
 msgstr "有効化に関するメールを確認してください。"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "合計"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
 msgstr "{courseName}講座のProfessional Certificate"
 
@@ -8706,6 +8666,36 @@ msgid "Thank you! We have received your payment for {courseName}."
 msgstr "ありがとうございました！ {courseName}講座の支払を受領しました。"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"Please print this page for your records; it serves as your receipt. You will"
+" also receive an email with the same information."
+msgstr "この画面を記録用に印刷してください。これは領収書になります。同様の情報をメールでもお送りしています。"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Order No."
+msgstr "申込番号"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Amount"
+msgstr "数量"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Please Note"
+msgstr "注意してください"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Crossed out items have been refunded."
+msgstr "線が引いてあるアイテムは返金されました。"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Billed to"
+msgstr "請求先"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "No receipt available"
+msgstr "領収証なし"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
 msgstr "次のステップ: 本人確認"
 
@@ -8734,6 +8724,10 @@ msgid ""
 msgstr ""
 "いますぐ本人認証を行わなくてもダッシュボードで講座を探すことはできます。定期的に%(platformName)sから本人認証を行うように通知があります。"
 
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Want to confirm your identity later?"
+msgstr "後で本人認証を行いますか？"
+
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr "本人認証手続中"
@@ -8742,10 +8736,9 @@ msgstr "本人認証手続中"
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
-"(usually within 1-2 days). In the meantime, you can still access all "
+"(usually within 5-7 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
-"あなたの情報を受け取り、本人認証中です。認証手続が完了しましたらダッシュボードにメッセージが表示されます(通常1～2日以内)。その間も講座コンテンツにはアクセスできます。"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
@@ -10369,11 +10362,11 @@ msgid "Read more"
 msgstr ""
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
+msgid "No transcript uploaded."
 msgstr ""
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "No transcript uploaded."
+msgid "Show transcripts ({totalTranscripts})"
 msgstr ""
 
 #: cms/templates/js/xblock-access-editor.underscore

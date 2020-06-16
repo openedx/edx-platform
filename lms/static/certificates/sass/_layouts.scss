@@ -13,7 +13,7 @@
   margin-bottom: spacing-vertical(base);
   padding: 0 5%;
 
-  @media(min-width: $bp-screen-md) {
+  @media (min-width: $bp-screen-md) {
     padding: 0 2.5%;
   }
 }
@@ -74,7 +74,7 @@
 .banner-user {
   @include text-align(center);
 
-  @media(min-width: $bp-screen-lg) {
+  @media (min-width: $bp-screen-lg) {
     @include text-align(left);
   }
 
@@ -99,7 +99,7 @@
 
         // CASE: icon display only
         &.icon-only {
-          @media(min-width: $bp-screen-md) {
+          @media (min-width: $bp-screen-md) {
             padding: spacing-vertical(x-small) spacing-horizontal(base);
 
             .icon {
@@ -108,7 +108,7 @@
           }
         }
 
-        @media(min-width: $bp-screen-md) {
+        @media (min-width: $bp-screen-md) {
           display: inline-block;
           vertical-align: middle;
           min-width: 130px;
@@ -135,7 +135,7 @@
 }
 
 .footer-app-copyright {
-  @media(min-width: $bp-screen-md) {
+  @media (min-width: $bp-screen-md) {
     @include span(6, after);
 
     margin-bottom: 0;
@@ -143,7 +143,7 @@
 }
 
 .footer-app-nav {
-  @media(min-width: $bp-screen-md) {
+  @media (min-width: $bp-screen-md) {
     @include span(6, before);
   }
 
@@ -152,7 +152,7 @@
       display: block;
       margin-bottom: spacing-vertical(x-small);
 
-      @media(min-width: $bp-screen-md) {
+      @media (min-width: $bp-screen-md) {
         display: inline-block;
         vertical-align: middle;
 
@@ -164,7 +164,7 @@
   }
 
   .list-legal {
-    @media(min-width: $bp-screen-md) {
+    @media (min-width: $bp-screen-md) {
       @include text-align(right);
     }
   }
@@ -228,15 +228,15 @@
         @include margin-right(0);
       }
 
-      @media(min-width: $bp-screen-md) {
+      @media (min-width: $bp-screen-md) {
         @include span(3);
       }
 
-      @media(min-width: $bp-screen-lg) {
+      @media (min-width: $bp-screen-lg) {
         @include span(2);
       }
 
-      @media(min-width: $bp-screen-xl) {
+      @media (min-width: $bp-screen-xl) {
         @include span(2);
       }
     }
@@ -245,7 +245,6 @@
       @include size(100%);
 
       position: relative;
-
     }
 
     .organization-logo {
@@ -270,15 +269,15 @@
 
       @include span(12);
 
-      @media(min-width: $bp-screen-md) {
+      @media (min-width: $bp-screen-md) {
         @include span(4);
       }
 
-      @media(min-width: $bp-screen-lg) {
+      @media (min-width: $bp-screen-lg) {
         @include span(3);
       }
 
-      @media(min-width: $bp-screen-xl) {
+      @media (min-width: $bp-screen-xl) {
         @include span(3);
       }
 
@@ -319,7 +318,7 @@
           padding-bottom: 0;
         }
 
-        @media(min-width: $bp-screen-md) {
+        @media (min-width: $bp-screen-md) {
           @include span(4);
 
           border-bottom: none;
@@ -339,7 +338,7 @@
     .accomplishment-brief {
       margin-bottom: spacing-vertical(small);
 
-      @media(min-width: $bp-screen-md) {
+      @media (min-width: $bp-screen-md) {
         @include span(6);
       }
 
@@ -364,7 +363,7 @@
         margin-bottom: 0;
       }
 
-      @media(min-width: $bp-screen-md) {
+      @media (min-width: $bp-screen-md) {
         @include span(6);
 
         margin-bottom: 0;

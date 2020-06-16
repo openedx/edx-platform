@@ -37,7 +37,6 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -1225,21 +1224,6 @@ class CheckoutTestMixin(object):
         self.assertEqual(data, {'foo': 'bar'})
 
 
-@patch('lms.djangoapps.verify_student.views.checkout_with_shoppingcart', return_value=TEST_PAYMENT_DATA, autospec=True)
-class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
-    """ Test view behavior when the shoppingcart is used. """
-
-    def make_sku(self):
-        """ Checkout is handled by shoppingcart when the course mode's sku is empty. """
-        return ''
-
-    def _get_checkout_args(self, patched_create_order):
-        """ Assuming patched_create_order was called, return a mapping containing the call arguments."""
-        return dict(
-            list(zip(('request', 'user', 'course_key', 'course_mode', 'amount'), patched_create_order.call_args[0]))
-        )
-
-
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
 @patch(
     'lms.djangoapps.verify_student.views.checkout_with_ecommerce_service',
@@ -1302,113 +1286,6 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         })
         # Check the response
         self.assertEqual(actual_payment_data, expected_payment_data)
-
-
-class TestCreateOrderView(ModuleStoreTestCase):
-    """
-    Tests for the create_order view of verified course enrollment process.
-    """
-
-    def setUp(self):
-        super(TestCreateOrderView, self).setUp()
-
-        self.user = UserFactory.create(username="rusty", password="test")
-        self.client.login(username="rusty", password="test")
-        self.course_id = 'Robot/999/Test_Course'
-        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-        verified_mode = CourseMode(
-            course_id=CourseKey.from_string("Robot/999/Test_Course"),
-            mode_slug="verified",
-            mode_display_name="Verified Certificate",
-            min_price=50
-        )
-        verified_mode.save()
-        course_mode_post_data = {
-            'certificate_mode': 'Select Certificate',
-            'contribution': 50,
-            'contribution-other-amt': '',
-            'explain': ''
-        }
-        self.client.post(
-            reverse("course_modes_choose", kwargs={'course_id': self.course_id}),
-            course_mode_post_data
-        )
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_invalid_amount(self):
-        response = self._create_order('1.a', self.course_id, expect_status_code=400)
-        self.assertContains(response, 'Selected price is not valid number.', status_code=400)
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_invalid_mode(self):
-        # Create a course that does not have a verified mode
-        course_id = 'Fake/999/Test_Course'
-        CourseFactory.create(org='Fake', number='999', display_name='Test Course')
-        response = self._create_order('50', course_id, expect_status_code=400)
-        self.assertContains(
-            response,
-            'This course doesn\'t support paid certificates',
-            status_code=400,
-        )
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_create_order_fail_with_get(self):
-        create_order_post_data = {
-            'contribution': 50,
-            'course_id': self.course_id,
-        }
-
-        # Use the wrong HTTP method
-        response = self.client.get(reverse('verify_student_create_order'), create_order_post_data)
-        self.assertEqual(response.status_code, 405)
-
-    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-    def test_create_order_success(self):
-        response = self._create_order(50, self.course_id)
-        json_response = json.loads(response.content.decode('utf-8'))
-        self.assertIsNotNone(json_response['payment_form_data'].get('orderNumber'))  # TODO not canonical
-
-        # Verify that the order exists and is configured correctly
-        order = Order.objects.get(user=self.user)
-        self.assertEqual(order.status, 'paying')
-        item = CertificateItem.objects.get(order=order)
-        self.assertEqual(item.status, 'paying')
-        self.assertEqual(item.course_id, self.course.id)
-        self.assertEqual(item.mode, 'verified')
-
-    def _create_order(self, contribution, course_id, expect_success=True, expect_status_code=200):
-        """Create a new order.
-
-        Arguments:
-            contribution (int): The contribution amount.
-            course_id (CourseKey): The course to purchase.
-
-        Keyword Arguments:
-            expect_success (bool): If True, verify that the response was successful.
-            expect_status_code (int): The expected HTTP status code
-
-        Returns:
-            HttpResponse
-
-        """
-        url = reverse('verify_student_create_order')
-        data = {
-            'contribution': contribution,
-            'course_id': course_id,
-            'processor': '',
-        }
-
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, expect_status_code)
-
-        if expect_status_code == 200:
-            json_response = json.loads(response.content.decode('utf-8'))
-            if expect_success:
-                self.assertEqual(set(json_response.keys()), PAYMENT_DATA_KEYS)
-            else:
-                self.assertFalse(json_response['success'])
-
-        return response
 
 
 @ddt.ddt

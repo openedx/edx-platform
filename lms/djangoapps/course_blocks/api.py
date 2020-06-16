@@ -7,6 +7,7 @@ get_course_blocks function.
 from django.conf import settings
 from edx_when import field_data
 
+from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
@@ -57,6 +58,8 @@ def get_course_blocks(
         starting_block_usage_key,
         transformers=None,
         collected_block_structure=None,
+        allow_start_dates_in_future=False,
+        include_completion=False,
 ):
     """
     A higher order function implemented on top of the
@@ -90,7 +93,9 @@ def get_course_blocks(
     """
     if not transformers:
         transformers = BlockStructureTransformers(get_course_block_access_transformers(user))
-    transformers.usage_info = CourseUsageInfo(starting_block_usage_key.course_key, user)
+    if include_completion:
+        transformers += [BlockCompletionTransformer()]
+    transformers.usage_info = CourseUsageInfo(starting_block_usage_key.course_key, user, allow_start_dates_in_future)
 
     return get_block_structure_manager(starting_block_usage_key.course_key).get_transformed(
         transformers,

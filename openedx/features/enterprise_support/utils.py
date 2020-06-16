@@ -7,6 +7,7 @@ import json
 
 from crum import get_current_request
 from django.conf import settings
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
 from enterprise.models import EnterpriseCustomerUser
@@ -17,6 +18,7 @@ from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
+from student.helpers import get_next_url_for_login_page
 
 
 def get_data_consent_share_cache_key(user_id, course_id):
@@ -315,3 +317,28 @@ def is_enterprise_learner(user):
         (bool): True if given user is an enterprise learner.
     """
     return EnterpriseCustomerUser.objects.filter(user_id=user.id).exists()
+
+
+def get_enterprise_slug_login_url():
+    """
+    Return the enterprise slug login's URL (enterprise/login) if it exists otherwise None
+    """
+    try:
+        return reverse('enterprise_slug_login')
+    except NoReverseMatch:
+        return None
+
+
+def get_provider_login_url(request, provider_id, redirect_url=None):
+    """
+    Return the given provider's login URL.
+
+    This method is here to avoid the importing of pipeline and student app in enterprise.
+    """
+
+    provider_login_url = third_party_auth.pipeline.get_login_url(
+        provider_id,
+        third_party_auth.pipeline.AUTH_ENTRY_LOGIN,
+        redirect_url=redirect_url if redirect_url else get_next_url_for_login_page(request)
+    )
+    return provider_login_url

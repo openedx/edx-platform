@@ -79,10 +79,10 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     vars().update(__config_copy__)
 
 
-# A file path to a YAML file from which to load all the code revisions currently deployed
-REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
-
 try:
+    # A file path to a YAML file from which to load all the code revisions currently deployed
+    REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
+
     with codecs.open(REVISION_CONFIG_FILE, encoding='utf-8') as f:
         REVISION_CONFIG = yaml.safe_load(f)
 except Exception:  # pylint: disable=broad-except

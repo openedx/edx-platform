@@ -9,24 +9,28 @@
     border-bottom: 0;
   }
 
-  .upgrade-banner {
+  .dates-banner {
     border-radius: 4px;
     border: solid 1px #9cd2e6;
     background-color: #eff8fa;
     margin-top: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     padding: 24px;
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
+    justify-content: space-between;
     max-width: $text-width-readability-max;
 
-    .upgrade-banner-text {
+    .dates-banner-text {
       font-size: 16px;
       line-height: 24px;
       color: #414141;
-      flex: 1 1 20em;
     }
+
+      .banner-has-button {
+          flex: 1 1 20em;
+          max-width: 70%;
+      }
 
     .upgrade-button {
       align-self: start;
@@ -59,15 +63,25 @@
     width: 7px;
     height: 7px;
     position: absolute;
-    left: -4px;
+    left: -5px;
     background-color: #2d323e;
     border-radius: 50%;
+    border-style: solid;
+    border-width: thin;
 
-    &.active {
-      width: 14px;
-      height: 14px;
-      left: -7px;
-      background-color: #2d323e;
+    &.past-date {
+      background-color: #f5f5f5;
+
+      &.past-due {
+        background-color: #d1d2d4;
+      }
+    }
+
+    &.todays-date {
+      width: 13px;
+      height: 13px;
+      left: -8px;
+      background-color: #ffdb87;
     }
   }
 
@@ -79,7 +93,7 @@
     flex: 100%;
     line-height: 1.25;
 
-    &.active {
+    &.todays-date {
       top: -3px;
     }
   }
@@ -99,6 +113,10 @@
     font-weight: bold;
     margin-bottom: 8px;
     align-items: center;
+
+    &.not-released {
+      color: #767676;
+    }
   }
 
   .timeline-title {
@@ -113,6 +131,10 @@
     a {
       color: #2d323e;
       text-decoration: underline;
+    }
+
+    &.not-released {
+      color: #d1d2d4;
     }
   }
 
@@ -132,14 +154,36 @@
   .pill {
     @include font-size(12);
 
-    padding: 2px 8px 2px 8px;
+    padding: 2px 8px;
     border-radius: 5px;
     margin-left: 8px;
     font-style: italic;
     font-weight: bold;
     vertical-align: top;
 
-    &.due {
+    &.completed {
+      background-color: #f3f3f4;
+      color: #2d323e;
+    }
+
+    &.due-next {
+      background-color: #686b73;
+      color: $white;
+    }
+
+    &.not-released {
+      background-color: $white;
+      border-color: #d1d2d4;
+      border-style: solid;
+      border-width: thin;
+      color: #767676;
+    }
+
+    &.past-due {
+      background-color: #d1d2d4;
+    }
+
+    &.today {
       background-color: #ffdb87;
       color: #2d323e;
     }

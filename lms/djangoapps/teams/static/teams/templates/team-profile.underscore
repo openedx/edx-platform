@@ -1,5 +1,12 @@
 <div class="team-profile">
     <div class="page-content-main">
+        <% if (showAssignments && (isMember || isAdminOrStaff)) { %>
+            <div class="team-assignments">
+                <h3><%- gettext("Team Assignments") %></h3>
+                <ul id="assignments"></ul>
+            </div>
+            <hr></hr>
+        <% } %>
         <div class="discussion-module" data-course-id="<%- courseID %>" data-discussion-id="<%- discussionTopicID %>"
                 data-read-only="<%- readOnly %>"
                 data-user-create-comment="<%- !readOnly %>"

@@ -11,6 +11,9 @@ from django.core.files.base import ContentFile
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from opaque_keys.edx.keys import CourseKey
+
+from contentstore.views.videos import TranscriptProvider
 from edxval.api import (
     create_or_update_video_transcript,
     delete_video_transcript,
@@ -19,14 +22,7 @@ from edxval.api import (
     get_video_transcript_data,
     update_transcript_credentials_state_for_org
 )
-from opaque_keys.edx.keys import CourseKey
-
-from contentstore.views.videos import TranscriptProvider
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
-from openedx.core.djangoapps.video_pipeline.config.waffle import (
-    SAVE_CREDENTIALS_IN_VAL,
-    waffle_flags
-)
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
 from student.auth import has_studio_write_access
 from util.json_request import JsonResponse, expect_json
@@ -113,13 +109,8 @@ def transcript_credentials_handler(request, course_key_string):
         response = JsonResponse({'error': error_message}, status=400)
     else:
         # Send the validated credentials to edx-video-pipeline.
-        credentials_payload = dict(validated_credentials, org=course_key.org, provider=provider)
-        if waffle_flags()[SAVE_CREDENTIALS_IN_VAL].is_enabled(course_key):
-            from edxval.api import create_or_update_transcript_credentials
-            response = create_or_update_transcript_credentials(**credentials_payload)
-            error_response, is_updated = response, not response.get('error_type')
-        else:
-            error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
+        credentials_payload = dict(validated_credentials, org=course_key.org, provider=provider, course_key=course_key)
+        error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
         # Send appropriate response based on whether credentials were updated or not.
         if is_updated:
             # Cache credentials state in edx-val.

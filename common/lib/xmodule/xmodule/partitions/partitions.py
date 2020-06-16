@@ -281,3 +281,17 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         Returns: :class:`.Fragment`
         """
         return None
+
+
+def get_partition_from_id(partitions, user_partition_id):
+    """
+    Look for a user partition with a matching id in the provided list of partitions.
+
+    Returns:
+        A UserPartition, or None if not found.
+    """
+    for partition in partitions:
+        if partition.id == user_partition_id:
+            return partition
+
+    return None

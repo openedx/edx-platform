@@ -192,18 +192,6 @@ def is_secondary_email_feature_enabled():
     return waffle.switch_is_active(ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH)
 
 
-def is_secondary_email_feature_enabled_for_user(user):
-    """
-    Checks to see if secondary email feature is enabled for the given user.
-
-    Returns:
-        Boolean value representing the status of secondary email feature.
-    """
-    # import is placed here to avoid cyclic import.
-    from openedx.features.enterprise_support.utils import is_enterprise_learner
-    return is_secondary_email_feature_enabled() and is_enterprise_learner(user)
-
-
 def is_multiple_user_enterprises_feature_enabled():
     """
     Checks to see if the django-waffle switch for enabling the multiple user enterprises feature is active

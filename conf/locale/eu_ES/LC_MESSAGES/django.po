@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-27 09:12+0000\n"
+"POT-Creation-Date: 2020-06-11 14:03+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2019\n"
 "Language-Team: Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -73,7 +73,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -98,8 +98,8 @@ msgstr "Sarrera-azterketa"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/unit_block.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
+#: lms/templates/seq_module.html
 msgid "Unit"
 msgstr "Unitatea"
 
@@ -2239,9 +2239,9 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
 #: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/manage_user_standing.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
+#: lms/templates/manage_user_standing.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: lms/templates/widgets/footer-language-selector.html
@@ -3949,12 +3949,12 @@ msgid ""
 " considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
 msgid "Enrollment Track Groups"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/partitions/partitions_service.py
+#: common/lib/xmodule/xmodule/partitions/enrollment_track_partition_generator.py
 msgid "Partition for segmenting users by enrollment track"
 msgstr ""
 
@@ -4557,17 +4557,17 @@ msgstr "Desblokeatu kontua"
 #. interface (a menu or piece of UI that takes the full focus of the screen)
 #: common/templates/admin/student/loginfailures/change_form_template.html
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
-#: lms/templates/forgot_password_modal.html lms/templates/signup_modal.html
-#: lms/templates/ccx/schedule.html
+#: lms/templates/wiki/includes/cheatsheet.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: lms/templates/forgot_password_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
-#: themes/edx.org/lms/templates/dashboard.html
+#: lms/templates/signup_modal.html themes/edx.org/lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Close"
 msgstr "Itxi"
@@ -5463,54 +5463,6 @@ msgid ""
 "this request, please visit the link(s) below."
 msgstr ""
 
-#: lms/djangoapps/commerce/views.py
-msgid "Receipt"
-msgstr "Ordainagiria"
-
-#: lms/djangoapps/commerce/views.py
-msgid "Payment Failed"
-msgstr "Ordainketak kale egin du"
-
-#: lms/djangoapps/commerce/views.py
-msgid "There was a problem with this transaction. You have not been charged."
-msgstr ""
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"Make sure your information is correct, or try again with a different card or"
-" another form of payment."
-msgstr ""
-"Ziurtatu zure informazioa zuzena dela edo saiatu berriz beste txartel "
-"batekin edo ordaintzeko beste era batean."
-
-#: lms/djangoapps/commerce/views.py
-msgid ""
-"A system error occurred while processing your payment. You have not been "
-"charged."
-msgstr ""
-
-#: lms/djangoapps/commerce/views.py
-msgid "Please wait a few minutes and then try again."
-msgstr "Mesedez, itxaron minutu batzuk eta saiatu berriz."
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid "For help, contact {payment_support_link}."
-msgstr "Laguntza lortzeko, jarri harremanetan {payment_support_link}-rekin."
-
-#: lms/djangoapps/commerce/views.py
-msgid "An error occurred while creating your receipt."
-msgstr "Errorea gertatu da zure ordainagiria sortzean."
-
-#: lms/djangoapps/commerce/views.py
-#, python-brace-format
-msgid ""
-"If your course does not appear on your dashboard, contact "
-"{payment_support_link}."
-msgstr ""
-"Zure ikastaroa ez bada zure aginte-panelean agertzen, jarri harremanetan "
-"{payment_support_link}-rekin."
-
 #: lms/djangoapps/course_goals/models.py
 msgid "Earn a certificate"
 msgstr ""
@@ -5584,6 +5536,10 @@ msgstr ""
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
+msgstr ""
+
+#: lms/djangoapps/courseware/course_tools.py
+msgid "Financial Assistance"
 msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
@@ -6225,15 +6181,19 @@ msgid "Good"
 msgstr "Ona"
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 #, python-format
-msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
+msgid "%(comment_username)s replied to"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
 msgid "View discussion"
 msgstr "Ikusi eztabaida"
+
+#: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.txt
+#, python-format
+msgid "%(comment_username)s replied to <b>%(thread_title)s</b>:"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/subject.txt
 #, python-format
@@ -6364,8 +6324,8 @@ msgid "Student"
 msgstr "Ikaslea"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/preview_menu.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/preview_menu.html
 msgid "Staff"
 msgstr "Arduradunak"
 
@@ -6485,29 +6445,6 @@ msgid "Could not find problem with this location."
 msgstr "Ezin izan da kokapen hau duen ariketa aurkitu."
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
-msgid "Invoice number '{num}' does not exist."
-msgstr "Ez dago '{num}' zenbakia duen faktura."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "The sale associated with this invoice has already been invalidated."
-msgstr "Faktura honekin lotutako salmenta baliogabetu egin da."
-
-#: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
-msgid "Invoice number {0} has been invalidated."
-msgstr "{0} zenbakia duen faktura baliogabetu egin da."
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "This invoice is already active."
-msgstr "Dagoeneko faktura hau aktibo dago."
-
-#: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
-msgid "The registration codes for invoice {0} have been re-activated."
-msgstr "Berriz aktibatu da {0} fakturarako erregistro-kodea."
-
-#: lms/djangoapps/instructor/views/api.py
 msgid "CourseID"
 msgstr "IkastaroIDa"
 
@@ -6537,9 +6474,8 @@ msgstr "Erabiltzailearen IDa"
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/schedules/admin.py
-#: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/enrollment.html lms/templates/staff_problem_info.html
 msgid "Username"
 msgstr "Erabiltzaile-izena"
 
@@ -6662,54 +6598,6 @@ msgstr ""
 "edo biak."
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
-msgid "Coupon Code"
-msgstr "Kupoiaren kodea"
-
-#: lms/djangoapps/instructor/views/api.py
-#: openedx/core/djangoapps/schedules/admin.py
-msgid "Course Id"
-msgstr "Ikastaroan IDa"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "% Discount"
-msgstr "% deskontua"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: wiki/plugins/attachments/forms.py
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-msgid "Description"
-msgstr "Deskribapena"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Expiration Date"
-msgstr "Iraungitze-data"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Is Active"
-msgstr "Aktibo dago"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Code Redeemed Count"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Total Discounted Seats"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Total Discounted Amount"
-msgstr "Guztira deskontatutako kopurua"
-
-#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "detailed enrollment"
 msgstr ""
@@ -6727,14 +6615,6 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "proctored exam results"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Could not parse amount as a decimal"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Unable to generate redeem codes because of course misconfiguration."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6949,65 +6829,6 @@ msgid ""
 " try again."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon id is None"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon id ({coupon_id}) DoesNotExist"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon id ({coupon_id}) is already inactive"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon id ({coupon_id}) updated successfully"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid ""
-"The code ({code}) that you have tried to define is already in use as a "
-"registration code"
-msgstr ""
-"Definitzen saiatu zaren ({code}) kodea dagoeneko erabilita dago "
-"erregistratzeko kode gisa"
-
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "Please Enter the Integer Value for Coupon Discount"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "Please Enter the Coupon Discount Value Less than or Equal to 100"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "Please enter the date in this format i-e month/day/year"
-msgstr "Mesedez, idatzi data formatu honetan: hil/egu/urtea"
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon code ({code}) added successfully"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon code ({code}) already exists for this course"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon id not found"
-msgstr "Ez da kupoiaren IDa aurkitu"
-
-#: lms/djangoapps/instructor/views/coupons.py
-#, python-brace-format
-msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
-msgstr ""
-
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Instructor"
 msgstr "Irakaslea"
@@ -7115,31 +6936,6 @@ msgstr "Osatu"
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
 msgstr "Osatu gabea"
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-#, python-brace-format
-msgid ""
-"The enrollment code ({code}) was not found for the {course_name} course."
-msgstr ""
-"The enrollment code ({code}) was not found for the {course_name} course."
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been canceled. It can no longer be used."
-msgstr ""
-"Matrikulazio-kode hau bertan behera utzi da. Ezin da aurrerantzean erabili."
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "This enrollment code has been marked as unused."
-msgstr "Matrikulazio-kode hau ez erabilitzat markatu da.."
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-msgid "The enrollment code has been restored."
-msgstr "Matrikulazio-kodea berreskuratu da."
-
-#: lms/djangoapps/instructor/views/registration_codes.py
-#, python-brace-format
-msgid "The redemption does not exist against enrollment code ({code})."
-msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 #, python-brace-format
@@ -7539,8 +7335,8 @@ msgstr " ({total}-tik)"
 #: lms/djangoapps/learner_dashboard/programs.py
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/learner_dashboard/programs.html
-#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Programs"
 msgstr "Programak"
@@ -8173,6 +7969,15 @@ msgid "Currency"
 msgstr "Moneta"
 
 #: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: wiki/plugins/attachments/forms.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "Description"
+msgstr "Deskribapena"
+
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Comments"
 msgstr "Iruzkinak"
 
@@ -8315,14 +8120,6 @@ msgstr "Ez duzu baimenik orri hau ikusteko."
 msgid "View and regenerate certificates."
 msgstr ""
 
-#: lms/djangoapps/support/views/index.py lms/templates/support/refund.html
-msgid "Manual Refund"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-msgid "Track refunds issued directly through CyberSource."
-msgstr ""
-
 #: lms/djangoapps/support/views/index.py
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
 #: lms/templates/support/enrollment.html
@@ -8399,45 +8196,6 @@ msgstr "Erabiltzailea ondo gaitu da"
 
 #: lms/djangoapps/support/views/manage_user.py
 msgid "User Disabled Successfully"
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "E-posta helbidea"
-
-#: lms/djangoapps/support/views/refund.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Course ID"
-msgstr "Ikastaroaren IDa"
-
-#: lms/djangoapps/support/views/refund.py
-msgid "User not found"
-msgstr "Ez da erabiltzailea aurkitu"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Course {course_id} not past the refund window."
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "No order found for {user} in course {course_id}"
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Unenrolled {user} from {course_id}"
-msgstr "Desmatrikulatua {user}  {course_id} ikastarotik"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Refunded {cost} for order id {order_id}"
 msgstr ""
 
 #: lms/djangoapps/survey/utils.py
@@ -9074,8 +8832,8 @@ msgid "Allow"
 msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Error"
 msgstr "Errorea"
 
@@ -9461,8 +9219,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: wiki/plugins/attachments/wiki_plugin.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/wiki_plugin.py
 msgid "Attachments"
 msgstr "Eranskinak"
 
@@ -9498,11 +9256,10 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/dashboard.html lms/templates/index.html
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/courseware/courses.html
-#: lms/templates/courseware/courseware.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courseware.html lms/templates/dashboard.html
+#: lms/templates/edxnotes/edxnotes.html lms/templates/index.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
@@ -9910,6 +9667,10 @@ msgstr ""
 msgid "Configuration may not be specified at more than one level at once."
 msgstr ""
 
+#: openedx/core/djangoapps/content/learning_sequences/apps.py
+msgid "Learning Sequences"
+msgstr ""
+
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
 msgstr ""
@@ -10288,12 +10049,25 @@ msgid "Schedule start < course start"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/admin.py
+msgid "Course Id"
+msgstr "Ikastaroan IDa"
+
+#: openedx/core/djangoapps/schedules/admin.py
 msgid "All"
 msgstr "Guztiak"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Experience"
 msgstr ""
+
+#: openedx/core/djangoapps/schedules/admin.py
+#: cms/templates/maintenance/_force_publish_course.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Course ID"
+msgstr "Ikastaroaren IDa"
 
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
@@ -10496,6 +10270,7 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: lms/templates/dates_banner.html
 msgid "Upgrade now"
 msgstr ""
 
@@ -10729,7 +10504,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/views.py
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -10758,8 +10532,8 @@ msgid "Success"
 msgstr "Ondo"
 
 #: openedx/core/djangoapps/user_api/admin.py
-#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Ekintzak"
 
@@ -10925,6 +10699,14 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
+"To protect your account, it’s been temporarily locked. Try again in "
+"{locked_out_period} minutes.{li_start}To be on the safe side, you can reset "
+"your password {link_start}here{link_end} before you try again."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
 "In order to sign in, you need to activate your account.{blank_lines}We just "
 "sent an activation link to {email_strong}. If you do not receive an email, "
 "check your spam folders or {link_start}contact {platform_name} "
@@ -10934,6 +10716,15 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "Saioa hasteko saiakera oker gehiegi. Saiatu berriz beranduago."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"Email or password is incorrect.{li_start}You have {remaining_attempts} more "
+"sign-in attempts before your account is temporarily "
+"locked.{li_end}{li_start}If you've forgotten your password, click "
+"{link_start}here{link_end} to reset.{li_end}"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
@@ -10977,6 +10768,11 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
+msgid ""
+"Your previous request is in progress, please try again in a few moments."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Password reset unsuccessful"
 msgstr "Pasahitza ez da ondo berrezarri"
 
@@ -10993,11 +10789,6 @@ msgstr ""
 msgid ""
 "{html_start}Password Creation Complete{html_end}Your password has been "
 "created. {bold_start}{email}{bold_end} is now your primary login email."
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/password_reset.py
-msgid ""
-"Your previous request is in progress, please try again in a few moments."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
@@ -11227,6 +11018,18 @@ msgid ""
 "Username created for Video Pipeline Integration, e.g. veda_service_user."
 msgstr ""
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Oauth client name of VEM service."
+msgstr ""
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "video encode manager API URL."
+msgstr ""
+
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Username created for VEM Integration, e.g. vem_service_user."
+msgstr ""
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr ""
@@ -11243,6 +11046,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/xblock/runtime/mixin.py
 msgid "This content is only accessible to enrolled learners. "
+msgstr ""
+
+#: openedx/core/lib/api/view_utils.py
+msgid "The about me field must be at most {} characters long."
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
@@ -11922,8 +11729,8 @@ msgid "Vertical"
 msgstr "Bertikala"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: cms/templates/course_outline.html lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
+#: lms/templates/seq_module.html
 msgid "Section"
 msgstr "Atala"
 
@@ -12202,6 +12009,12 @@ msgstr ""
 msgid "Partial Failure"
 msgstr ""
 
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Transcript Failed"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
 msgstr ""
@@ -12345,8 +12158,8 @@ msgstr "Edukia"
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/settings.html
 #: wiki/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr "Ezarpenak"
 
@@ -12394,14 +12207,14 @@ msgstr "Ikastaro-zenbakia"
 msgid "Course Run:"
 msgstr "Ikastaroa ematea:"
 
-#: cms/templates/index.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/courseware/courses.html
+#: cms/templates/index.html lms/templates/courseware/courses.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "Ikastaroak"
@@ -12425,8 +12238,9 @@ msgstr "Irakasleak"
 msgid "Requirements"
 msgstr "Eskakizunak"
 
-#: cms/templates/studio_xblock_wrapper.html lms/templates/module-error.html
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/module-error.html
 msgid "Details"
 msgstr "Xehetasunak"
 
@@ -12480,15 +12294,15 @@ msgstr ""
 msgid "Choose Language"
 msgstr "Aukeratu hizkuntza"
 
-#: cms/templates/widgets/header.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
+#: cms/templates/widgets/header.html lms/templates/header/user_dropdown.html
+#: lms/templates/user_dropdown.html
 msgid "Account"
 msgstr "Kontua"
 
 #: cms/templates/widgets/header.html
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 #: wiki/plugins/help/wiki_plugin.py
@@ -12560,8 +12374,8 @@ msgstr "Erabiltzailearen menua"
 msgid "Usermenu dropdown"
 msgstr "Zabaltzen den erabiltzailearen menua "
 
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
+#: cms/templates/widgets/user_dropdown.html
+#: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
 msgstr "Amaitu saioa"
 
@@ -12723,8 +12537,8 @@ msgstr "Hasiera: {date}"
 msgid "View all Courses"
 msgstr "Ikusi ikastaro guztiak"
 
-#: lms/templates/dashboard.html lms/templates/user_dropdown.html
-#: lms/templates/header/user_dropdown.html
+#: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
+#: lms/templates/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Aginte-panela"
@@ -12743,8 +12557,8 @@ msgstr "Oraindik ez zaude inongo ikastarotan matrikulatuta."
 
 #: lms/templates/dashboard.html
 #: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore courses"
 msgstr "Arakatu ikastaroak"
@@ -12762,7 +12576,7 @@ msgstr "Erroreak ikastaroa igotzean"
 msgid "Search Your Courses"
 msgstr "Bilatu zure ikastaroetan"
 
-#: lms/templates/dashboard.html lms/templates/courseware/courseware.html
+#: lms/templates/courseware/courseware.html lms/templates/dashboard.html
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Clear search"
 msgstr "Garbitu bilaketa"
@@ -12787,7 +12601,7 @@ msgstr "Jaso ikastaroko e-postak"
 msgid "Save Settings"
 msgstr "Gorde ezarpenak"
 
-#: lms/templates/dashboard.html lms/templates/ccx/enrollment.html
+#: lms/templates/ccx/enrollment.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
@@ -12797,9 +12611,87 @@ msgstr "Gorde ezarpenak"
 msgid "Unenroll"
 msgstr "Desmatrikulatu"
 
-#: lms/templates/edit_unit_link.html
-msgid "View Unit in Studio"
-msgstr "Ikusi unitatea Studio-n"
+#: lms/templates/dates_banner.html
+msgid "We've built a suggested schedule to help you stay on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"But don't worry—it's flexible so you can learn at your own pace. If you "
+"happen to fall behind on our suggested dates, you'll be able to adjust them "
+"to keep yourself on track."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule. "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future by visiting "
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" Don’t worry—you won’t lose any of the progress you’ve made when you shift "
+"your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Don’t worry—you won’t lose any of the "
+"progress you’ve made when you shift your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Reset my deadlines"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "You are auditing this course,"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid " which means that you are unable to participate in graded assignments."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. Graded assignments and schedule adjustment are available to "
+"Verified Track learners."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" It looks like you missed some important deadlines based on our suggested "
+"schedule. To complete graded assignments as part of this course and shift "
+"the past due assignments into the future, you can upgrade today."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Upgrade to shift due dates"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Graded assignments are available to Verified Track learners."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+" To complete graded assignments as part of this course, you can upgrade "
+"today."
+msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -12832,7 +12724,7 @@ msgstr "Dagoeneko bada e-posta helbide berria duen kontua."
 msgid "You should Register before trying to access the Unit"
 msgstr "Unitatera sartzen saiatu aurrertik, erregistratu behar zenuke. "
 
-#: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html lms/templates/enroll_staff.html
 msgctxt "self"
 msgid "Enroll"
 msgstr "Matrikulazioa"
@@ -12935,7 +12827,7 @@ msgid ""
 "available on the {link_start}progress page{link_end}."
 msgstr ""
 
-#: lms/templates/index.html lms/templates/courseware/courses.html
+#: lms/templates/courseware/courses.html lms/templates/index.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search for a course"
 msgstr "Bilatu ikastaro bat"
@@ -13071,17 +12963,15 @@ msgstr "(kargatu berriz zure orria freskatzeko)"
 msgid "working"
 msgstr "lanean"
 
-#: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
+#: lms/templates/module-error.html
 msgid "There has been an error on the {platform_name} servers"
 msgstr "Errorea gertatu da {platform_name} plataformako zerbitzarietan"
 
 #: lms/templates/module-error.html
-#: lms/templates/courseware/courseware-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {tech_support_email} to "
-"report any problems or downtime."
+" fix it as soon as possible. "
 msgstr ""
 
 #: lms/templates/module-error.html
@@ -13121,7 +13011,15 @@ msgid "You are now viewing the course as {i_start}{user_name}{i_end}."
 msgstr ""
 
 #: lms/templates/preview_menu.html
-msgid "View this unit in the new experience"
+msgid "View in the new experience"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "View in Studio"
+msgstr ""
+
+#: lms/templates/preview_menu.html
+msgid "View in Insights"
 msgstr ""
 
 #: lms/templates/problem.html
@@ -13183,28 +13081,6 @@ msgstr "E-posta"
 msgid "Return To %s"
 msgstr "Itzuli hona: %s"
 
-#: lms/templates/reset_deadlines_banner.html
-msgid "It looks like you've missed some important deadlines. Visit "
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "edx.org"
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid " to reset your deadlines and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid ""
-"It looks like you've missed some important deadlines. Reset your deadlines "
-"and get started today."
-msgstr ""
-
-#: lms/templates/reset_deadlines_banner.html
-msgid "Reset my deadlines"
-msgstr ""
-
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr ""
@@ -13253,7 +13129,7 @@ msgstr "Hurrengoa"
 msgid "Sequence"
 msgstr "Sekuentzia"
 
-#: lms/templates/seq_module.html
+#: lms/templates/courseware/dates.html lms/templates/seq_module.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr "Osatua"
@@ -13382,18 +13258,18 @@ msgstr ""
 msgid "Reset Learner's Attempts to Zero"
 msgstr ""
 
-#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+#: lms/templates/staff_problem_info.html
 msgid "Delete Learner's State"
 msgstr "Ezabatu ikasleen egoera"
 
-#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+#: lms/templates/staff_problem_info.html
 msgid "Rescore Learner's Submission"
 msgstr ""
 
-#: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+#: lms/templates/staff_problem_info.html
 msgid "Rescore Only If Score Improves"
 msgstr ""
 
@@ -13431,7 +13307,7 @@ msgstr "{course_number} Testu-liburua"
 msgid "Textbook Navigation"
 msgstr "Testu-liburuaren nabigazioa"
 
-#: lms/templates/staticbook.html lms/templates/courseware/gradebook.html
+#: lms/templates/courseware/gradebook.html lms/templates/staticbook.html
 msgid "Page"
 msgstr "Orria"
 
@@ -13542,9 +13418,9 @@ msgstr "{current_page} orri {total_pages}-tik"
 msgid "Recent git load activity for {course_id}"
 msgstr ""
 
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Date"
@@ -13600,7 +13476,7 @@ msgid ""
 " not mean to do this, {undo_link_start}you can re-subscribe{link_end}."
 msgstr ""
 
-#: lms/templates/user_dropdown.html lms/templates/header/user_dropdown.html
+#: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "Norentzako aginte-panela:"
 
@@ -13608,8 +13484,8 @@ msgstr "Norentzako aginte-panela:"
 msgid "More options"
 msgstr "Aukera gehiago"
 
-#: lms/templates/user_dropdown.html lms/templates/header/header.html
-#: lms/templates/header/user_dropdown.html
+#: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+#: lms/templates/user_dropdown.html
 msgid "More Options"
 msgstr "Aukera gehiago"
 
@@ -14789,37 +14665,6 @@ msgstr ""
 msgid "About edX Certificates"
 msgstr "edX ziurtagiriei buruz"
 
-#: lms/templates/commerce/checkout_cancel.html
-msgid "Checkout Cancelled"
-msgstr "Ordainketa bertan behera utzi da"
-
-#: lms/templates/commerce/checkout_cancel.html
-msgid ""
-"Your transaction has been cancelled. If you feel an error has occurred, "
-"contact {email}."
-msgstr ""
-"Zure transakzioa bertan behera utzi da. Errorea gertatu dela uste baduzu, "
-"jarri harrremanetan {email}."
-
-#: lms/templates/commerce/checkout_error.html
-msgid "Checkout Error"
-msgstr ""
-
-#: lms/templates/commerce/checkout_error.html
-msgid ""
-"An error has occurred with your payment. {b_start}You have not been "
-"charged.{b_end} Please try to submit your payment again. If this problem "
-"persists, contact {email}."
-msgstr ""
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Loading Order Data..."
-msgstr "Eskabideen datuak kargatzen..."
-
-#: lms/templates/commerce/checkout_receipt.html
-msgid "Please wait while we retrieve your order details."
-msgstr ""
-
 #: lms/templates/course_modes/_upgrade_button.html
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/_upgrade_button.html
@@ -15024,12 +14869,12 @@ msgid "This content is graded"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "Errorea gertatu da. Mesedez, saiatu berriz beranduago."
-
-#: lms/templates/courseware/course_about.html
 msgid "An error has occurred. Please ensure that you are logged in to enroll."
 msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "Errorea gertatu da. Mesedez, saiatu berriz beranduago."
 
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
@@ -15043,10 +14888,6 @@ msgid "View Course"
 msgstr "Ikusi ikastaroa"
 
 #: lms/templates/courseware/course_about.html
-msgid "This course is in your {start_cart_link}cart{end_cart_link}."
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "Ikastaroa beteta dago"
 
@@ -15057,10 +14898,6 @@ msgstr "Ikastaro honetan gonbidapenarekin bakarrik matrikula daiteke"
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr "Matrikulazioa itxita dago"
-
-#: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart {start_span}({price} USD){end_span}"
-msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enroll Now"
@@ -15185,6 +15022,13 @@ msgstr ""
 msgid "Courseware"
 msgstr "Ikasgunea"
 
+#: lms/templates/courseware/courseware-error.html
+#: lms/templates/courseware/error-message.html
+msgid ""
+"We're sorry, this module is temporarily unavailable. Our staff is working to"
+" fix it as soon as possible."
+msgstr ""
+
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "Ikastaro-bilaketa"
@@ -15214,7 +15058,7 @@ msgid "Important Dates"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
-msgid "Due Today"
+msgid "Today"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
@@ -15222,14 +15066,11 @@ msgid "Verified Only"
 msgstr ""
 
 #: lms/templates/courseware/dates.html
-msgid ""
-"{a_start}Upgrade{a_end}{space}to a Verified Certificate for full access."
+msgid "Due Next"
 msgstr ""
 
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible."
+#: lms/templates/courseware/dates.html
+msgid "Not yet released"
 msgstr ""
 
 #: lms/templates/courseware/gradebook.html
@@ -15870,7 +15711,7 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You will see a message on your dashboard when the verification process is "
-"complete (usually within 1-2 days)."
+"complete (usually within 5-7 days)."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15881,7 +15722,7 @@ msgstr ""
 msgid ""
 "You have submitted your reverification information. You will see a message "
 "on your dashboard when the verification process is complete (usually within "
-"1-2 days)."
+"5-7 days)."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -16572,140 +16413,6 @@ msgid ""
 "verification process on your dashboard."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Thank you for purchasing enrollments in {course_name}."
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"An invoice for {currency_symbol}{total_price} is attached. Payment is due "
-"upon receipt. You can find information about payment methods on the invoice."
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"A .csv file that lists your enrollment codes is attached. You can use the "
-"email template below to distribute enrollment codes to your students. Each "
-"student must use a separate enrollment code."
-msgstr ""
-
-#. Translators: This is the signature of an email.  "\n" is a newline
-#. character
-#. and should be placed between the closing word and the signature.
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"Thanks,\n"
-"The {platform_name} Team"
-msgstr ""
-"Eskerrik asko ,\n"
-"{platform_name} -ko taldea"
-
-#. Translators: please translate the text inside [[ ]]. This is meant as a
-#. template for course teams to use.
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Dear [[Name]]:"
-msgstr "Kaixo  [[Name]]:"
-
-#. Translators: please translate the text inside [[ ]]. This is meant as a
-#. template for course teams to use.
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"We have provided a course enrollment code for you in {course_name}. To "
-"enroll in the course, click the following link:"
-msgstr ""
-"Ikastaroan matrikulatzeko kodea egin dugu zuretzat {course_name}-n. "
-"Ikastaroan matrikulatzeko, sakatu ondorengo estekari:"
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "HTML link from the attached CSV file"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"After you enroll, you can see the course on your student dashboard. You can "
-"see course materials after the course start date."
-msgstr ""
-"Matrikulatutakoanl, ikastaroa zure ikaslearen aginte-panelean ikus dezakezu."
-" Ikastaroko materialak ikastaroaren hasiera-dataren ondoren ikus ditzakezu."
-
-#. Translators: please translate the text inside [[ ]]. This is meant as a
-#. template for course teams to use.
-#. This is the signature of an email.  "\n" is a newline character
-#. and should be placed between the closing word and the signature.
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"Sincerely,\n"
-"[[Your Signature]]"
-msgstr ""
-"Adeitasunez,\n"
-"[[Your Signature]]"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "INVOICE"
-msgstr "FAKTURA"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Date: {date}"
-msgstr "Data: {date}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Invoice No: {invoice_number}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Terms: Due Upon Receipt"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Due Date: {date}"
-msgstr "Entregatze-data: {date}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Bill to:"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Customer Reference Number: {reference_number}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Balance Due: {currency_symbol}{sale_price}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Course: {course_name}"
-msgstr "Ikastaroa: {course_name}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid ""
-"Price:        {currency_symbol}{course_price}  Quantity:      {quantity}  "
-"Sub-Total:    {currency_symbol}{sub_total}  Discount:  "
-"{currency_symbol}{discount}"
-msgstr ""
-"Prezioa:        {currency_symbol}{course_price}  Kantitatea:      {quantity}"
-"  Guztizko partziala:    {currency_symbol}{sub_total}  Deskontua:  "
-"{currency_symbol}{discount}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Total:      {currency_symbol}{sale_price}"
-msgstr "Denera:      {currency_symbol}{sale_price}"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Payment Instructions"
-msgstr "Ordainketarako argibideak"
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid ""
-"If we do not receive payment, the learner enrollments that use these codes "
-"will be canceled and learners will not be able to access course materials. "
-"All purchases are final. For more information, see the {site_name} "
-"cancellation policy."
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "For payment questions, contact {contact_email}"
-msgstr "Ordainketa-kontuetarako, harremana {contact_email}"
-
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
 "We are sorry. Our course staff did not approve your request to change your "
@@ -16880,8 +16587,8 @@ msgstr ""
 
 #: lms/templates/header/brand.html
 #: lms/templates/header/navbar-logo-header.html
-#: lms/templates/navigation/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
+#: lms/templates/navigation/navbar-logo-header.html
 msgid "{platform_name} Home Page"
 msgstr "{platform_name} Hasiera-orria"
 
@@ -16902,18 +16609,10 @@ msgstr "Aurkitu beste ikastaroren bat"
 
 #. Translators: This is short for "System administration".
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
 msgid "Sysadmin"
 msgstr "Sistemako kudeatzailea"
-
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Shopping Cart"
-msgstr "Erosketa-saskia"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
@@ -16950,6 +16649,12 @@ msgstr "Gehitu kupoiaren kodea"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Enter information about the coupon code below."
 msgstr "Idatzi  kupoiaren kodeari buruzko informazioa behean."
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Coupon Code"
+msgstr "Kupoiaren kodea"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Discount Percentage"
@@ -17507,6 +17212,11 @@ msgstr "Jaitsi kupoiaren kodeak"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupon Codes"
 msgstr "Kupoiaren kodeak"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Expiration Date"
+msgstr "Iraungitze-data"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupon (%)"
@@ -18789,6 +18499,10 @@ msgid "Purchase order number (if any)"
 msgstr "Erosketa-aginduaren zenbakia (balego)"
 
 #: lms/templates/shoppingcart/billing_details.html
+msgid "Email Address"
+msgstr "E-posta helbidea"
+
+#: lms/templates/shoppingcart/billing_details.html
 msgid "email@example.com"
 msgstr "e-posta@adibidea.com"
 
@@ -19088,6 +18802,10 @@ msgstr[1] ""
 "{course_names} kendu egin dira matrikulazio-aldia itxi egin delako."
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Shopping Cart"
+msgstr "Erosketa-saskia"
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr ""
 
@@ -19300,46 +19018,6 @@ msgstr "Ikasleentzako laguntza: kudeatu erabiltzailea"
 msgid "Program Enrollments Inspector"
 msgstr ""
 
-#: lms/templates/support/refund.html
-msgid "About to refund this order:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "Order Id:"
-msgstr "Aginduaren ID-a:"
-
-#: lms/templates/support/refund.html
-msgid "Enrollment:"
-msgstr "Matrikulazioa:"
-
-#: lms/templates/support/refund.html
-msgid "enrolled"
-msgstr "matrikulatua"
-
-#: lms/templates/support/refund.html
-msgid "unenrolled"
-msgstr "matrikulatu gabea"
-
-#: lms/templates/support/refund.html
-msgid "Cost:"
-msgstr "Prezioa:"
-
-#: lms/templates/support/refund.html
-msgid "CertificateItem Status:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "Order Status:"
-msgstr "Aginduaren egoera:"
-
-#: lms/templates/support/refund.html
-msgid "Fulfilled Time:"
-msgstr ""
-
-#: lms/templates/support/refund.html
-msgid "Refund Request Time:"
-msgstr ""
-
 #: lms/templates/survey/survey.html
 msgid "User Survey"
 msgstr "Erabiltzailearen inkesta"
@@ -19480,7 +19158,7 @@ msgstr ""
 msgid ""
 "You have already submitted your verification information. You will see a "
 "message on your dashboard when the verification process is complete (usually"
-" within 1-2 days)."
+" within 5-7 days)."
 msgstr ""
 
 #: lms/templates/verify_student/reverify_not_allowed.html
@@ -20053,8 +19731,8 @@ msgid "Already registered?"
 msgstr "Ba al zaude erregistratuta?"
 
 #: themes/stanford-style/lms/templates/register-sidebar.html
-#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
+#: wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html wiki/templates/wiki/base.html
 msgid "Log in"
 msgstr "Sartu"
 
@@ -20164,12 +19842,8 @@ msgid "The page that you were looking for was not found."
 msgstr "Ez da bilatzen ari zaren orria aurkitu."
 
 #: cms/templates/404.html
-msgid ""
-"Go back to the {homepage} or let us know about any pages that may have been "
-"moved at {email}."
+msgid "Go back to the {homepage}."
 msgstr ""
-"Itzuli {homepage} edo jakinarazi guri zein orri ezabatu edo desagertu diren "
-"hona idatziz: {email}."
 
 #: cms/templates/500.html
 msgid "{studio_name} Server Error"
@@ -20192,12 +19866,6 @@ msgid ""
 "We've logged the error and our staff is currently working to resolve this "
 "error as soon as possible."
 msgstr ""
-
-#: cms/templates/500.html
-msgid "If the problem persists, please email us at {email_link}."
-msgstr ""
-"Arazoa konpondu ezean, mesedez idatz iezaguzu e-posta honetara:  "
-"{email_link}."
 
 #: cms/templates/accessibility.html
 msgid "Studio Accessibility Policy"
@@ -20807,9 +20475,7 @@ msgstr ""
 #: cms/templates/error.html
 msgid ""
 "We're sorry. We couldn't find the {studio_name} page you're looking for. You"
-" may want to return to the {studio_name} Dashboard and try again. If you are"
-" still having problems accessing things, please feel free to "
-"{link_start}contact {studio_name} support{link_end} for further help."
+" may want to return to the {studio_name} Dashboard and try again."
 msgstr ""
 
 #: cms/templates/error.html
@@ -20820,9 +20486,7 @@ msgstr "Zerbitzariak errorea aurkitu du"
 msgid ""
 "We're sorry. There was a problem with the server while trying to process "
 "your last request. You may want to return to the {studio_name} Dashboard or "
-"try this request again. If you are still having problems accessing things, "
-"please feel free to {link_start}contact {studio_name} support{link_end} for "
-"further help."
+"try this request again."
 msgstr ""
 
 #: cms/templates/error.html
@@ -23792,8 +23456,8 @@ msgstr ""
 msgid "%(file)s has been saved."
 msgstr "%(file)s gorde dira."
 
-#: wiki/plugins/images/wiki_plugin.py
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
+#: wiki/plugins/images/wiki_plugin.py
 msgid "Images"
 msgstr "Irudiak"
 
@@ -23985,8 +23649,8 @@ msgstr ""
 msgid "Search..."
 msgstr "Bilatu..."
 
-#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
+#: wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html wiki/templates/wiki/base.html
 msgid "Sign up"
 msgstr "Eman izena"
 

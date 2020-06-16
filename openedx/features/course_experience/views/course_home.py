@@ -24,6 +24,7 @@ from lms.djangoapps.course_goals.api import (
     has_course_goal_permission
 )
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -42,7 +43,7 @@ from .. import (
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
     USE_BOOTSTRAP_FLAG
 )
-from ..utils import can_show_verified_upgrade, get_course_outline_block_tree, get_resume_block
+from ..utils import get_course_outline_block_tree, get_resume_block
 from .course_dates import CourseDatesFragmentView
 from .course_home_messages import CourseHomeMessageFragmentView
 from .course_outline import CourseOutlineFragmentView
@@ -165,7 +166,7 @@ class CourseHomeFragmentView(EdxFragmentView):
                     request, course_id=course_id, **kwargs
                 )
             course_sock_fragment = CourseSockFragmentView().render_to_fragment(
-                request, course=course_overview, **kwargs
+                request, course=course, **kwargs
             )
             has_visited_course, resume_course_url, resume_course_title = self._get_resume_course_info(
                 request, course_id
@@ -224,10 +225,10 @@ class CourseHomeFragmentView(EdxFragmentView):
         # TODO Add switch to control deployment
         if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and can_show_verified_upgrade(
             request.user,
-            course.id,
-            enrollment
+            enrollment,
+            course
         ):
-            upgrade_url = EcommerceService().upgrade_url(request.user, course_key)
+            upgrade_url = verified_upgrade_deadline_link(request.user, course_id=course_key)
             upgrade_price, has_discount = format_strikeout_price(request.user, course_overview)
 
         show_search = (

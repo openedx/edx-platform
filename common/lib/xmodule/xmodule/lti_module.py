@@ -346,7 +346,6 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     }
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
     js_module_name = 'LTI'
-    icon_class = 'problem'
 
     def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
@@ -557,6 +556,12 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             'instructor': u'Instructor',
         }
         return roles.get(self.system.get_user_role(), u'Student')
+
+    def get_icon_class(self):
+        """ Returns the icon class """
+        if self.graded and self.has_score:  # pylint: disable=no-member
+            return 'problem'
+        return 'other'
 
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """

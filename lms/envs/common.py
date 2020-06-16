@@ -478,6 +478,19 @@ FEATURES = {
     # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
+
+    # .. toggle_name: ENABLE_ORA_USERNAMES_ON_DATA_EXPORT
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to add deanonymized usernames to ORA data report.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: incremental_release
+    # .. toggle_creation_date: 2020-06-11
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-7273
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_USERNAMES_ON_DATA_EXPORT': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -1493,6 +1506,9 @@ MIDDLEWARE = [
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
+
+    # Generate code ownership metrics. Keep this immediately after RequestCacheMiddleware.
+    'lms.djangoapps.monitoring.middleware.CodeOwnerMetricMiddleware',
 
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMetricsMiddleware',
@@ -2562,6 +2578,12 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+
+    # Monitoring utilities for LMS
+    'lms.djangoapps.monitoring.apps.MonitoringConfig',
+
+    # Learning Sequence Navigation
+    'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 ]
 
 ######################### CSRF #########################################
@@ -3302,6 +3324,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
         "email",
         "extended_profile",
         "gender",
+        "state",
         "goals",
         "is_active",
         "mailing_address",
@@ -3682,6 +3705,9 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
 
+# List of enterprise customer uuids to exclude from transition to use of enterprise-catalog
+ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG = []
+
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance
 # of a particular type of course enrollment mode. This is not to be confused
@@ -3758,6 +3784,9 @@ COMPLETION_BY_VIEWING_DELAY_MS = 5000
 ############### Settings for Django Rate limit #####################
 RATELIMIT_ENABLE = True
 RATELIMIT_RATE = '120/m'
+
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = '500/5m'
 
 ############### Settings for Retirement #####################
 RETIRED_USERNAME_PREFIX = 'retired__user_'
@@ -3864,6 +3893,7 @@ DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 ############### Settings for video pipeline ##################
 VIDEO_UPLOAD_PIPELINE = {
+    'VEM_S3_BUCKET': '',
     'BUCKET': '',
     'ROOT_PATH': '',
 }

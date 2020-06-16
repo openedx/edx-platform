@@ -58,7 +58,7 @@ var workerConfig = function() {
                     extensions: ['.js']
                 }
             }
-        }
+        };
     } catch (err) {
         return null;
     }
@@ -92,8 +92,6 @@ module.exports = Merge.smart({
             StudentAccountDeletion: './lms/static/js/student_account/components/StudentAccountDeletion.jsx',
             StudentAccountDeletionInitializer: './lms/static/js/student_account/StudentAccountDeletionInitializer.js',
             ProblemBrowser: './lms/djangoapps/instructor/static/instructor/ProblemBrowser/index.jsx',
-            CustomUserMenuLinks: './lms/static/js/custom_user_menu_links/CustomUserMenuLinks.js',
-            EnterpriseLearnerPortalBanner: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalBanner.jsx',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',

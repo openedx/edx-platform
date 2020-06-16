@@ -262,8 +262,8 @@
   .profile-self {
     .wrapper-profile-field-account-privacy {
       @include clearfix();
-      @include box-sizing(border-box);
 
+      box-sizing: border-box;
       width: 100%;
       margin: 0 auto;
       border-bottom: 1px solid $gray-l3;

@@ -12,10 +12,11 @@
         'common/js/components/utils/view_utils',
         'teams/js/views/team_utils',
         'text!teams/templates/team-profile.underscore',
-        'text!teams/templates/team-member.underscore'
+        'text!teams/templates/team-member.underscore',
+        'text!teams/templates/team-assignment.underscore'
     ],
         function(Backbone, _, gettext, HtmlUtils, TeamDiscussionView, ViewUtils, TeamUtils,
-                  teamTemplate, teamMemberTemplate) {
+                  teamTemplate, teamMemberTemplate, teamAssignmentTemplate) {
             var TeamProfileView = Backbone.View.extend({
 
                 errorMessage: gettext('An error occurred. Try again.'),
@@ -44,6 +45,10 @@
                         isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
                         maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize);
 
+                    // Assignments URL isn't provided if team assignments shouldn't be shown
+                    // so we can treat it like a toggle
+                    var showAssignments = !!this.context.teamsAssignmentsUrl;
+
                     var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 
                     HtmlUtils.setHtml(
@@ -56,7 +61,9 @@
                             language: this.languages[this.model.get('language')],
                             membershipText: TeamUtils.teamCapacityText(memberships.length, maxTeamSize),
                             isMember: isMember,
+                            isAdminOrStaff: isAdminOrStaff,
                             showLeaveLink: showLeaveLink,
+                            showAssignments: showAssignments,
                             hasCapacity: maxTeamSize && (memberships.length < maxTeamSize),
                             hasMembers: memberships.length >= 1
                         })
@@ -67,10 +74,46 @@
                     });
                     this.discussionView.render();
 
+                    if (showAssignments) {
+                        this.getTeamAssignments();
+                    }
+
                     this.renderTeamMembers();
 
                     this.setFocusToHeaderFunc();
                     return this;
+                },
+
+                getTeamAssignments: function() {
+                    var view = this;
+
+                    $.ajax({
+                        type: 'GET',
+                        url: view.context.teamsAssignmentsUrl.replace('team_id', view.model.get('id'))
+                    }).done(function(data) {
+                        view.renderTeamAssignments(data);
+                    }).fail(function(data) {
+                        TeamUtils.parseAndShowMessage(data, view.errorMessage);
+                    });
+                },
+
+                renderTeamAssignments: function(assignments) {
+                    var view = this;
+
+                    if (!assignments || !assignments.length) {
+                        view.$('#assignments').text(gettext('No assignments for team'));
+                        return;
+                    }
+
+                    _.each(assignments, function(assignment) {
+                        HtmlUtils.append(
+                            view.$('#assignments'),
+                            HtmlUtils.template(teamAssignmentTemplate)({
+                                displayName: assignment.display_name,
+                                linkLocation: assignment.location
+                            })
+                        );
+                    });
                 },
 
                 renderTeamMembers: function() {

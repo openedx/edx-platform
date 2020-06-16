@@ -38,7 +38,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String
 
 import lms.djangoapps.courseware.views.views as views
-import shoppingcart
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
@@ -273,8 +272,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 11, 170),
-        (ModuleStoreEnum.Type.split, 4, 168),
+        (ModuleStoreEnum.Type.mongo, 10, 167),
+        (ModuleStoreEnum.Type.split, 4, 165),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -507,31 +506,6 @@ class ViewsTestCase(BaseViewsTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/courses/{}/about'.format(six.text_type(self.course_key)))
 
-    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
-    @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
-    def test_course_about_in_cart(self):
-        in_cart_span = '<span class="add-to-cart">'
-        # don't mock this course due to shopping cart existence checking
-        course = CourseFactory.create(org="new", number="unenrolled", display_name="course")
-
-        self.client.logout()
-        response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
-        self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, in_cart_span)
-
-        # authenticated user with nothing in cart
-        self.assertTrue(self.client.login(username=self.user.username, password=TEST_PASSWORD))
-        response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
-        self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, in_cart_span)
-
-        # now add the course to the cart
-        cart = shoppingcart.models.Order.get_cart_for_user(self.user)
-        shoppingcart.models.PaidCourseRegistration.add_to_order(cart, course.id)
-        response = self.client.get(reverse('about_course', args=[six.text_type(course.id)]))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, in_cart_span)
-
     def assert_enrollment_link_present(self, is_anonymous):
         """
         Prepare ecommerce checkout data and assert if the ecommerce link is contained in the response.
@@ -563,20 +537,6 @@ class ViewsTestCase(BaseViewsTestCase):
 
     @ddt.data(True, False)
     def test_ecommerce_checkout(self, is_anonymous):
-        if not is_anonymous:
-            self.assert_enrollment_link_present(is_anonymous=is_anonymous)
-        else:
-            self.assertEqual(EcommerceService().is_enabled(AnonymousUser()), False)
-
-    @ddt.data(True, False)
-    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), 'Shopping Cart not enabled in settings')
-    @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
-    def test_ecommerce_checkout_shopping_cart_enabled(self, is_anonymous):
-        """
-        Two scenarios are being validated here -- authenticated/known user and unauthenticated/anonymous user
-        For a known user we expect the checkout link to point to Otto in a scenario where the CommerceConfiguration
-        is active and the course mode is PROFESSIONAL.
-        """
         if not is_anonymous:
             self.assert_enrollment_link_present(is_anonymous=is_anonymous)
         else:
@@ -2571,40 +2531,6 @@ class TestIndexView(ModuleStoreTestCase):
                 expected_should_show_enroll_button
             )
 
-    @RELATIVE_DATES_FLAG.override(active=True)
-    @ddt.data(True, False)
-    def test_reset_deadlines_banner_is_present_when_viewing_courseware(self, graded_section):
-        user = UserFactory()
-        course = CourseFactory.create(self_paced=True)
-        with self.store.bulk_operations(course.id):
-            chapter = ItemFactory.create(parent=course, category='chapter')
-            section = ItemFactory.create(
-                parent=chapter, category='sequential',
-                display_name="Sequence",
-                due=datetime.today() - timedelta(1),
-                graded=graded_section,
-            )
-
-        CourseOverview.load_from_module_store(course.id)
-        CourseEnrollmentFactory(user=user, course_id=course.id, mode=CourseMode.VERIFIED)
-        self.client.login(username=user.username, password='test')
-        response = self.client.get(
-            reverse(
-                'courseware_section',
-                kwargs={
-                    'course_id': six.text_type(course.id),
-                    'chapter': chapter.url_name,
-                    'section': section.url_name,
-                }
-            ) + '?activate_block_id=test_block_id'
-        )
-
-        banner = '<div class="reset-deadlines-banner">'
-        if graded_section:
-            self.assertContains(response, banner)
-        else:
-            self.assertNotContains(response, banner)
-
 
 @ddt.ddt
 class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin):
@@ -3154,9 +3080,10 @@ class DatesTabTestCase(ModuleStoreTestCase):
         super(DatesTabTestCase, self).setUp()
 
         now = datetime.now(utc)
-        self.course = CourseFactory.create(start=now + timedelta(days=-1))
+        self.course = CourseFactory.create(start=now + timedelta(days=-1), self_paced=True)
         self.course.end = now + timedelta(days=3)
 
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         CourseModeFactory(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
         CourseModeFactory(
             course_id=self.course.id,
@@ -3170,6 +3097,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2017, 1, 1))
 
     def _get_response(self, course):
         """ Returns the HTML for the progress page """
@@ -3187,55 +3115,71 @@ class DatesTabTestCase(ModuleStoreTestCase):
                 display_name='Released',
                 parent_location=section.location,
                 start=now - timedelta(days=1),
-                due=now,  # Setting this today so it'll show the 'Due Today' pill
+                due=now + timedelta(days=1),  # Setting this to tomorrow so it'll show the 'Due Next' pill
+                graded=True,
+                format='Homework',
+            )
+            vertical = ItemFactory.create(category='vertical', parent_location=subsection.location)
+            ItemFactory.create(category='problem', parent_location=vertical.location)
+
+        with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
+            mock_get_enrollment.return_value = {
+                'mode': enrollment.mode
+            }
+            response = self._get_response(self.course)
+            self.assertContains(response, subsection.display_name)
+            # Show the Verification Deadline for verified only
+            self.assertContains(response, 'Verification Deadline')
+            # Make sure pill exists for today's date
+            self.assertContains(response, '<div class="pill today">')
+            # Make sure pill exists for next due assignment
+            self.assertContains(response, '<div class="pill due-next">')
+            # No pills for verified enrollments
+            self.assertNotContains(response, '<div class="pill verified">')
+            # Make sure the assignment type is rendered
+            self.assertContains(response, 'Homework:')
+
+            enrollment.delete()
+            enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
+            mock_get_enrollment.return_value = {
+                'mode': enrollment.mode
+            }
+
+            expected_calls = [
+                call('course_id', text_type(self.course.id)),
+                call('user_id', self.user.id),
+                call('is_staff', self.user.is_staff),
+            ]
+
+            response = self._get_response(self.course)
+
+            mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
+            self.assertContains(response, subsection.display_name)
+            # Don't show the Verification Deadline for audit
+            self.assertNotContains(response, 'Verification Deadline')
+            # Pill doesn't exist for assignment due tomorrow
+            self.assertNotContains(response, '<div class="pill due-next">')
+            # Should have verified pills for audit enrollments
+            self.assertContains(response, '<div class="pill verified">')
+            # Make sure the assignment type is rendered
+            self.assertContains(response, 'Homework:')
+
+    @RELATIVE_DATES_FLAG.override(active=True)
+    def test_reset_deadlines_banner_displays(self):
+        CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
+        now = datetime.now(utc)
+        with self.store.bulk_operations(self.course.id):
+            section = ItemFactory.create(category='chapter', parent_location=self.course.location)
+            ItemFactory.create(
+                category='sequential',
+                display_name='Released',
+                parent_location=section.location,
+                start=now - timedelta(days=1),
+                due=now - timedelta(days=1),  # Setting this to tomorrow so it'll show the 'Due Next' pill
                 graded=True,
             )
-
-        with patch('lms.djangoapps.courseware.courses.get_dates_for_course') as mock_get_dates:
-            with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
-                mock_get_dates.return_value = {
-                    (subsection.location, 'due'): subsection.due,
-                    (subsection.location, 'start'): subsection.start,
-                }
-                mock_get_enrollment.return_value = {
-                    'mode': enrollment.mode
-                }
-                response = self._get_response(self.course)
-                self.assertContains(response, subsection.display_name)
-                # Show the Verification Deadline for everyone
-                self.assertContains(response, 'Verification Deadline')
-                # Make sure pill exists for assignment due today
-                self.assertContains(response, '<div class="pill due">')
-                # No pills for verified enrollments
-                self.assertNotContains(response, '<div class="pill verified">')
-
-                enrollment.delete()
-                subsection.due = now + timedelta(days=1)
-                enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.AUDIT)
-                mock_get_dates.return_value = {
-                    (subsection.location, 'due'): subsection.due,
-                    (subsection.location, 'start'): subsection.start,
-                }
-                mock_get_enrollment.return_value = {
-                    'mode': enrollment.mode
-                }
-
-                expected_calls = [
-                    call('course_id', text_type(self.course.id)),
-                    call('user_id', self.user.id),
-                    call('is_staff', self.user.is_staff),
-                ]
-
-                response = self._get_response(self.course)
-
-                mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
-                self.assertContains(response, subsection.display_name)
-                # Show the Verification Deadline for everyone
-                self.assertContains(response, 'Verification Deadline')
-                # Pill doesn't exist for assignment due tomorrow
-                self.assertNotContains(response, '<div class="pill due">')
-                # Should have verified pills for audit enrollments
-                self.assertContains(response, '<div class="pill verified">')
+        response = self._get_response(self.course)
+        self.assertContains(response, 'div class="dates-banner-text"')
 
 
 class TestShowCoursewareMFE(TestCase):

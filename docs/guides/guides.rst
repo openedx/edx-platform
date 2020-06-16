@@ -4,6 +4,7 @@ Guides
 .. toctree::
     :maxdepth: 2
 
+    extension_points
     testing/testing
     frontend/javascript
     frontend/styling

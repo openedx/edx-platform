@@ -1,8 +1,10 @@
 // studio - views - group-configurations
 // ====================
 .view-group-configurations {
-  .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
+
     @include float(left);
   }
 
@@ -128,7 +130,8 @@
           width: 70%;
 
           li {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
+
             @include margin-right(1%);
 
             display: table-cell;
@@ -152,7 +155,8 @@
           width: 70%;
 
           li {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
+
             @include margin-right(1%);
 
             display: table-cell;
@@ -287,8 +291,7 @@
       }
 
       .collection-edit {
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         border-radius: 2px;
         width: 100%;
         background: $white;
@@ -341,7 +344,9 @@
             }
           }
 
-          label, input, textarea {
+          label,
+          input,
+          textarea {
             display: block;
           }
 
@@ -361,7 +366,8 @@
           }
 
           //this section is borrowed from _account.scss - we should clean up and unify later
-          input, textarea {
+          input,
+          textarea {
             @extend %t-copy-base;
 
             height: 100%;
@@ -536,7 +542,7 @@
 
     // specific group-type styles
     .content-groups {
-      .collection-header{
+      .collection-header {
         .title {
           margin-bottom: 0;
         }

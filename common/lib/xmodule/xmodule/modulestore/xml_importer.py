@@ -460,15 +460,19 @@ class ImportManager(object):
                     if self.verbose:
                         log.debug('importing module location %s', child.location)
 
-                    _update_and_import_module(
-                        child,
-                        self.store,
-                        self.user_id,
-                        courselike_key,
-                        dest_id,
-                        do_import_static=self.do_import_static,
-                        runtime=courselike.runtime,
-                    )
+                    try:
+                        _update_and_import_module(
+                            child,
+                            self.store,
+                            self.user_id,
+                            courselike_key,
+                            dest_id,
+                            do_import_static=self.do_import_static,
+                            runtime=courselike.runtime,
+                        )
+                    except Exception:
+                        log.error('failed to import module location %s', child.location)
+                        raise
 
                     depth_first(child)
 
@@ -478,15 +482,19 @@ class ImportManager(object):
             if self.verbose:
                 log.debug('importing module location %s', leftover)
 
-            _update_and_import_module(
-                self.xml_module_store.get_item(leftover),
-                self.store,
-                self.user_id,
-                courselike_key,
-                dest_id,
-                do_import_static=self.do_import_static,
-                runtime=courselike.runtime,
-            )
+            try:
+                _update_and_import_module(
+                    self.xml_module_store.get_item(leftover),
+                    self.store,
+                    self.user_id,
+                    courselike_key,
+                    dest_id,
+                    do_import_static=self.do_import_static,
+                    runtime=courselike.runtime,
+                )
+            except Exception:
+                log.error('failed to import module location %s', leftover)
+                raise
 
     def run_imports(self):
         """

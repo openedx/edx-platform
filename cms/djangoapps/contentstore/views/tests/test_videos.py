@@ -48,6 +48,7 @@ from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
+    ENABLE_VEM_PIPELINE,
     waffle_flags
 )
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
@@ -224,7 +225,9 @@ class VideoUploadTestMixin(VideoUploadTestBase):
 
 @ddt.ddt
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
-@override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
+@override_settings(VIDEO_UPLOAD_PIPELINE={
+    "VEM_S3_BUCKET": "vem_test_bucket", "BUCKET": "test_bucket", "ROOT_PATH": "test_root"
+})
 class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     """Test cases for the main video upload endpoint"""
 
@@ -248,7 +251,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                     'status',
                     'course_video_image_url',
                     'transcripts',
-                    'transcription_status'
+                    'transcription_status',
+                    'error_description'
                 ])
             )
             dateutil.parser.parse(response_video['created'])
@@ -264,6 +268,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
                 'status', 'course_video_image_url', 'transcripts', 'transcription_status',
+                'error_description'
             ],
             [
                 {
@@ -280,6 +285,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
                 'status', 'course_video_image_url', 'transcripts', 'transcription_status',
+                'error_description'
             ],
             [
                 {
@@ -467,9 +473,6 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             'secret_key': 'test_secret',
             'session_token': 'test_session_token'
         }
-
-        bucket = Mock()
-        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
         mock_key_instances = [
             Mock(
                 generate_url=Mock(
@@ -478,7 +481,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             )
             for file_info in files
         ]
-        mock_key.side_effect = mock_key_instances + [Mock()]
+        mock_key.side_effect = mock_key_instances
 
         with patch.object(AssumeRole, 'get_instance') as assume_role:
             assume_role.return_value.credentials = credentials
@@ -495,6 +498,35 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 aws_secret_access_key=credentials['secret_key'],
                 security_token=credentials['session_token']
             )
+
+    @patch('boto.s3.key.Key')
+    @patch('boto.s3.connection.S3Connection')
+    @override_flag(waffle_flags()[ENABLE_VEM_PIPELINE].namespaced_flag_name, active=True)
+    def test_enable_vem_pipeline(self, mock_conn, mock_key):
+        """
+        Test that if VEM pipeline is enabled, objects are uploaded to the correct s3 bucket
+        """
+        files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
+        mock_key_instances = [
+            Mock(
+                generate_url=Mock(
+                    return_value='http://example.com/url_{}'.format(file_info['file_name'])
+                )
+            )
+            for file_info in files
+        ]
+        mock_key.side_effect = mock_key_instances
+
+        response = self.client.post(
+            self.url,
+            json.dumps({'files': files}),
+            content_type='application/json'
+        )
+
+        self.assertEqual(response.status_code, 200)
+        mock_conn.return_value.get_bucket.assert_called_once_with(
+            settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False  # pylint: disable=unsubscriptable-object
+        )
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
@@ -721,25 +753,19 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         status = convert_video_status(video)
         self.assertEqual(status, StatusDisplayStrings.get('youtube_duplicate'))
 
-        # `transcript_ready` should be converted to `file_complete`
-        video['status'] = 'transcript_ready'
-        status = convert_video_status(video)
-        self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
-
-        # The encode status should be converted to `file_complete` if video encodes are complete
+        # The "encode status" should be converted to `file_complete` if video encodes are complete
         video['status'] = 'transcription_in_progress'
         status = convert_video_status(video, is_video_encodes_ready=True)
         self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
 
-        # The encode status should be converted to `file_complete` if video encodes are complete
-        video['status'] = 'partial_failure'
-        status = convert_video_status(video, is_video_encodes_ready=True)
-        self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
+        # If encoding is not complete return the status as it is
+        video['status'] = 's3_upload_failed'
+        status = convert_video_status(video)
+        self.assertEqual(status, StatusDisplayStrings.get('s3_upload_failed'))
 
         # for all other status, there should not be any conversion
         statuses = list(StatusDisplayStrings._STATUS_MAP.keys())  # pylint: disable=protected-access
         statuses.remove('invalid_token')
-        statuses.remove('transcript_ready')
         for status in statuses:
             video['status'] = status
             new_status = convert_video_status(video)

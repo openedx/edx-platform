@@ -6,25 +6,23 @@ import PropTypes from 'prop-types';
 
 class ShowErrors extends React.Component {
   render() {
-    if (this.props.errorList.length > 0) {
-      window.scrollTo(0, 0);
-    }
-    return this.props.errorList.length > 0 &&
-      <div className="col-sm-12">
+    return (
+      this.props.hasErrors && <div className="col-sm-12">
         <div className="alert alert-danger" role="alert">
           <strong>{gettext('Please fix the following errors:')}</strong>
           <ul>
-            {this.props.errorList.map(error =>
-              <li>{error}</li>,
+            { Object.keys(this.props.errorList).map(key =>
+              this.props.errorList[key] && <li key={key}>{this.props.errorList[key]}</li>,
             )}
           </ul>
         </div>
-      </div>;
+      </div>);
   }
 }
 
 ShowErrors.propTypes = {
-  errorList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  errorList: PropTypes.objectOf(PropTypes.string).isRequired,
+  hasErrors: PropTypes.bool.isRequired,
 };
 
 export default ShowErrors;

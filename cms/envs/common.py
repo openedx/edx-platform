@@ -1264,9 +1264,10 @@ YOUTUBE = {
 
 YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
 
-############################# VIDEO UPLOAD PIPELINE #############################
+############################# SETTINGS FOR VIDEO UPLOAD PIPELINE #############################
 
 VIDEO_UPLOAD_PIPELINE = {
+    'VEM_S3_BUCKET': '',
     'BUCKET': '',
     'ROOT_PATH': '',
     'CONCURRENT_UPLOAD_LIMIT': 4,
@@ -1478,6 +1479,9 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+
+    # Learning Sequence Navigation
+    'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 ]
 
 
@@ -2054,12 +2058,6 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 LOGIN_REDIRECT_WHITELIST = []
 
-############### Settings for video pipeline ##################
-VIDEO_UPLOAD_PIPELINE = {
-    'BUCKET': '',
-    'ROOT_PATH': '',
-}
-
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 ########################## VIDEO IMAGE STORAGE ############################
@@ -2094,16 +2092,6 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
 
-############################ TRANSCRIPT PROVIDERS SETTINGS ########################
-
-# Note: These settings will also exist in video-encode-manager, so any update here
-# should also be done there. Additionally, the BASE & LOGIN URL will be overridden at
-# deployment as the actual URL is different from sandboxing URL.
-CIELO24_SETTINGS = dict(
-    CIELO24_API_VERSION=1,
-    CIELO24_BASE_API_URL="https://sandbox.cielo24.com/api",
-    CIELO24_LOGIN_URL="https://sandbox.cielo24.com/api/account/login"
-)
 
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'billing@example.com'
@@ -2242,3 +2230,6 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_tickets: ARCH-1253
 # .. toggle_status: supported
 DISABLE_DEPRECATED_SIGNUP_URL = False
+
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = '500/5m'

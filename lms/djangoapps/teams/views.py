@@ -13,7 +13,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import Http404, HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
@@ -34,7 +34,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import has_discussion
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.core.lib.api.parsers import MergePatchParser
-from openedx.core.lib.api.permissions import IsStaffOrReadOnly
+from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
     ExpandableFieldViewMixin,
     RetrievePatchAPIView,
@@ -51,6 +51,7 @@ from .api import (
     add_team_count,
     can_user_modify_team,
     can_user_create_team_in_topic,
+    get_assignments_for_team,
     has_course_staff_privileges,
     has_specific_team_access,
     has_specific_teamset_access,
@@ -68,6 +69,7 @@ from .serializers import (
     TopicSerializer
 )
 from .utils import emit_team_event
+from .waffle import are_team_submissions_enabled
 
 TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
@@ -210,7 +212,12 @@ class TeamsDashboardView(GenericAPIView):
             "disable_courseware_js": True,
             "teams_base_url": reverse('teams_dashboard', request=request, kwargs={'course_id': course_id}),
         }
-        return render_to_response("teams/teams.html", context)
+
+        # Assignments are feature-flagged
+        if are_team_submissions_enabled(course_key):
+            context["teams_assignments_url"] = reverse('teams_assignments_list', args=['team_id'])
+
+        return render(request, "teams/teams.html", context)
 
     def _serialize_and_paginate(self, pagination_cls, queryset, request, serializer_cls, serializer_ctx):
         """
@@ -436,8 +443,10 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
-            if course_module.teamsets_by_id[topic_id].is_private_managed:
+            if course_module.teamsets_by_id[topic_id].is_private_managed \
+                    and not has_access(request.user, 'staff', course_key):
                 result_filter.update({'membership__user__username': request.user})
+
             result_filter.update({'topic_id': topic_id})
 
         organization_protection_status = user_organization_protection_status(
@@ -470,22 +479,11 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
 
             # Non-staff users should not be able to see private_managed teams that they are not on.
             # Staff shouldn't have any excluded teams.
-
-            if not has_access(request.user, 'staff', course_key):
-                private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
-                excluded_team_ids = CourseTeam.objects.filter(
-                    course_id=course_key,
-                    topic_id__in=private_teamset_ids
-                ).exclude(
-                    membership__user=request.user
-                ).values_list('team_id', flat=True)
-                excluded_team_ids = set(excluded_team_ids)
-            else:
-                excluded_team_ids = set()
+            excluded_private_team_ids = self._get_private_team_ids_to_exclude(course_module)
 
             search_results['results'] = [
                 result for result in search_results['results']
-                if result['data']['id'] not in excluded_team_ids
+                if result['data']['id'] not in excluded_private_team_ids
             ]
             search_results['total'] = len(search_results['results'])
 
@@ -511,18 +509,10 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             'last_activity_at': ('-last_activity_at', 'team_size'),
         }
 
-        if not has_access(request.user, 'staff', course_key):
-            # hide private_managed courses from non-admin users that aren't members of those teams
-            private_topic_ids = [ts.teamset_id for ts in course_module.teamsets if
-                                 ts.is_private_managed]
-            public_teams = CourseTeam.objects.filter(**result_filter).exclude(
-                topic_id__in=private_topic_ids)
-            private_managed_teams_of_user = CourseTeam.objects.filter(topic_id__in=private_topic_ids,
-                                                                      membership__user__username=request.user)
-            queryset = public_teams | private_managed_teams_of_user
-        else:
-            queryset = CourseTeam.objects.filter(**result_filter)
+        # hide private_managed courses from non-staff users that aren't members of those teams
+        excluded_private_team_ids = self._get_private_team_ids_to_exclude(course_module)
 
+        queryset = CourseTeam.objects.filter(**result_filter).exclude(team_id__in=excluded_private_team_ids)
         order_by_input = request.query_params.get('order_by', 'name')
         if order_by_input not in ordering_schemes:
             return Response(
@@ -651,6 +641,24 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         page_query_param = self.request.query_params.get(self.paginator.page_query_param)
         return page_kwarg or page_query_param or 1
 
+    def _get_private_team_ids_to_exclude(self, course_module):
+        """
+        Get the list of team ids that should be excluded from the response.
+        Staff can see all private teams.
+        Users should not be able to see teams in private teamsets that they are not a member of.
+        """
+        if has_access(self.request.user, 'staff', course_module.id):
+            return set()
+
+        private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
+        excluded_team_ids = CourseTeam.objects.filter(
+            course_id=course_module.id,
+            topic_id__in=private_teamset_ids
+        ).exclude(
+            membership__user=self.request.user
+        ).values_list('team_id', flat=True)
+        return set(excluded_team_ids)
+
 
 class IsEnrolledOrIsStaff(permissions.BasePermission):
     """Permission that checks to see if the user is enrolled in the course or is staff."""
@@ -663,13 +671,14 @@ class IsEnrolledOrIsStaff(permissions.BasePermission):
 class IsStaffOrPrivilegedOrReadOnly(IsStaffOrReadOnly):
     """
     Permission that checks to see if the user is global staff, course
-    staff, or has discussion privileges. If none of those conditions are
+    staff, course admin, or has discussion privileges. If none of those conditions are
     met, only read access will be granted.
     """
 
     def has_object_permission(self, request, view, obj):
         return (
             has_discussion_privileges(request.user, obj.course_id) or
+            IsCourseStaffInstructor.has_object_permission(self, request, view, obj) or
             super(IsStaffOrPrivilegedOrReadOnly, self).has_object_permission(request, view, obj)
         )
 
@@ -819,6 +828,87 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
                 'user_id': member.user_id
             })
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TeamsAssignmentsView(GenericAPIView):
+    """
+        **Use Cases**
+
+            Get a team's assignments
+
+        **Example Requests**:
+
+            GET /api/team/v0/teams/{team_id}/assignments
+
+        **Response Values for GET**
+
+            If the user is logged in, the response is an array of the following data strcuture:
+
+                * display_name: The name of the assignment to display (currently the Unit title)
+
+                * location: The jump link to a specific assignments
+
+            For all text fields, clients rendering the values should take care
+            to HTML escape them to avoid script injections, as the data is
+            stored exactly as specified. The intention is that plain text is
+            supported, not HTML.
+
+            If team assignments are not enabled for course, a 503 is returned.
+
+            If the user is not logged in, a 401 error is returned.
+
+            If the user is unenrolled or does not have API access, a 403 error is returned.
+
+            If the supplied course/team is bad or the user is not permitted to
+            search in a protected team, a 404 error is returned as if the team does not exist.
+
+    """
+    authentication_classes = (BearerAuthentication, SessionAuthentication)
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsEnrolledOrIsStaff,
+        HasSpecificTeamAccess,
+        IsStaffOrPrivilegedOrReadOnly,
+    )
+
+    def get(self, request, team_id):
+        """GET v0/teams/{team_id_pattern}/assignments"""
+        course_team = get_object_or_404(CourseTeam, team_id=team_id)
+        user = request.user
+        course_id = course_team.course_id
+
+        if not are_team_submissions_enabled(course_id):
+            return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        if not has_team_api_access(request.user, course_id):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        if not has_specific_team_access(user, course_team):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        teamset_ora_blocks = get_assignments_for_team(user, course_team)
+
+        # Serialize info for display
+        assignments = [{
+            'display_name': self._display_name_for_ora_block(block),
+            'location': self._jump_location_for_block(course_id, block.location)
+        } for block in teamset_ora_blocks]
+
+        return Response(assignments)
+
+    def _display_name_for_ora_block(self, block):
+        """ Get the unit name where the ORA is located for better display naming """
+        unit = modulestore().get_item(block.parent)
+        section = modulestore().get_item(unit.parent)
+
+        return "{section}: {unit}".format(
+            section=section.display_name,
+            unit=unit.display_name
+        )
+
+    def _jump_location_for_block(self, course_id, location):
+        """ Get the URL for jumping to a designated XBlock in a course """
+        return reverse('jump_to', kwargs={'course_id': str(course_id), 'location': str(location)})
 
 
 class TopicListView(GenericAPIView):
@@ -1558,7 +1648,7 @@ class MembershipBulkManagementView(GenericAPIView):
         team_import_manager.set_team_membership_from_csv(inputfile_handle)
 
         if team_import_manager.import_succeeded:
-            msg = "{} learners were assigned to teams.".format(team_import_manager.number_of_learners_assigned)
+            msg = "{} learners were affected.".format(team_import_manager.number_of_learners_assigned)
             return JsonResponse({'message': msg}, status=status.HTTP_201_CREATED)
         else:
             return JsonResponse({

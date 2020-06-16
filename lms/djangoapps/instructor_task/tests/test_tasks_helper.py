@@ -73,15 +73,6 @@ from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from openedx.core.lib.teams_config import TeamsConfig
-from shoppingcart.models import (
-    Coupon,
-    CourseRegistrationCode,
-    CourseRegistrationCodeInvoiceItem,
-    Invoice,
-    InvoiceTransaction,
-    Order,
-    PaidCourseRegistration
-)
 from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from survey.models import SurveyAnswer, SurveyForm
@@ -90,7 +81,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.partitions.partitions import Group, UserPartition
 
-from ..config.waffle import GENERATE_GRADE_REPORT_VERIFIED_ONLY
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
 
@@ -98,7 +88,6 @@ _TEAMS_CONFIG = TeamsConfig({
     'max_size': 2,
     'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}],
 })
-SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY = '.'.join(['instructor_task', GENERATE_GRADE_REPORT_VERIFIED_ONLY])
 
 
 class InstructorGradeReportTestCase(TestReportMixin, InstructorTaskCourseTestCase):
@@ -420,7 +409,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_all_namespaces()
 
-        expected_query_count = 45
+        expected_query_count = 46
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -669,209 +658,6 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
 
 
 @ddt.ddt
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
-class TestInstructorDetailedEnrollmentReport(TestReportMixin, InstructorTaskCourseTestCase):
-    """
-    Tests that CSV detailed enrollment generation works.
-    """
-    def setUp(self):
-        super(TestInstructorDetailedEnrollmentReport, self).setUp()
-        self.course = CourseFactory.create()
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            min_price=50,
-            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
-        )
-
-        # create testing invoice 1
-        self.instructor = InstructorFactory(course_key=self.course.id)
-        self.sale_invoice_1 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
-            company_contact_email='Test@company.com',
-            recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
-            internal_reference="A", course_id=self.course.id, is_valid=True
-        )
-        self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
-            invoice=self.sale_invoice_1,
-            qty=1,
-            unit_price=1234.32,
-            course_id=self.course.id
-        )
-
-    def test_success(self):
-        self.create_student('student', 'student@example.com')
-        task_input = {'features': []}
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
-
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-
-    def test_student_paid_course_enrollment_report(self):
-        """
-        test to check the paid user enrollment csv report status
-        and enrollment source.
-        """
-        student = UserFactory()
-        student_cart = Order.get_cart_for_user(student)
-        PaidCourseRegistration.add_to_order(student_cart, self.course.id)
-        student_cart.purchase()
-
-        task_input = {'features': []}
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-        self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Credit Card - Individual')
-        self._verify_cell_data_in_csv(student.username, 'Payment Status', 'purchased')
-
-    def test_student_manually_enrolled_in_detailed_enrollment_source(self):
-        """
-        test to check the manually enrolled user enrollment report status
-        and enrollment source.
-        """
-        student = UserFactory()
-        enrollment = CourseEnrollment.enroll(student, self.course.id)
-        ManualEnrollmentAudit.create_manual_enrollment_audit(
-            self.instructor, student.email, ALLOWEDTOENROLL_TO_ENROLLED,
-            'manually enrolling unenrolled user', enrollment
-        )
-
-        task_input = {'features': []}
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
-
-        enrollment_source = u'manually enrolled by username: {username}'.format(
-            username=self.instructor.username)
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-        self._verify_cell_data_in_csv(student.username, 'Enrollment Source', enrollment_source)
-        self._verify_cell_data_in_csv(
-            student.username,
-            'Manual (Un)Enrollment Reason',
-            'manually enrolling unenrolled user'
-        )
-        self._verify_cell_data_in_csv(student.username, 'Payment Status', 'TBD')
-
-    def test_student_used_enrollment_code_for_course_enrollment(self):
-        """
-        test to check the user enrollment source and payment status in the
-        enrollment detailed report
-        """
-        student = UserFactory()
-        self.client.login(username=student.username, password='test')
-        student_cart = Order.get_cart_for_user(student)
-        paid_course_reg_item = PaidCourseRegistration.add_to_order(student_cart, self.course.id)
-        # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'),
-                                {'ItemId': paid_course_reg_item.id, 'qty': '4'})
-        self.assertEqual(resp.status_code, 200)
-        student_cart.purchase()
-
-        course_reg_codes = CourseRegistrationCode.objects.filter(order=student_cart)
-        redeem_url = reverse('register_code_redemption', args=[course_reg_codes[0].code])
-        response = self.client.get(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        # check button text
-        self.assertContains(response, 'Activate Course Enrollment')
-
-        response = self.client.post(redeem_url)
-        self.assertEqual(response.status_code, 200)
-
-        task_input = {'features': []}
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-        self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Used Registration Code')
-        self._verify_cell_data_in_csv(student.username, 'Payment Status', 'purchased')
-
-    def test_student_used_invoice_unpaid_enrollment_code_for_course_enrollment(self):
-        """
-        test to check the user enrollment source and payment status in the
-        enrollment detailed report
-        """
-        student = UserFactory()
-        self.client.login(username=student.username, password='test')
-
-        course_registration_code = CourseRegistrationCode(
-            code='abcde',
-            course_id=text_type(self.course.id),
-            created_by=self.instructor,
-            invoice=self.sale_invoice_1,
-            invoice_item=self.invoice_item,
-            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
-        )
-        course_registration_code.save()
-
-        redeem_url = reverse('register_code_redemption', args=['abcde'])
-        response = self.client.get(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        # check button text
-        self.assertContains(response, 'Activate Course Enrollment')
-
-        response = self.client.post(redeem_url)
-        self.assertEqual(response.status_code, 200)
-
-        task_input = {'features': []}
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-        self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Used Registration Code')
-        self._verify_cell_data_in_csv(student.username, 'Payment Status', 'Invoice Outstanding')
-
-    def test_student_used_invoice_paid_enrollment_code_for_course_enrollment(self):
-        """
-        test to check the user enrollment source and payment status in the
-        enrollment detailed report
-        """
-        student = UserFactory()
-        self.client.login(username=student.username, password='test')
-        invoice_transaction = InvoiceTransaction(
-            invoice=self.sale_invoice_1,
-            amount=self.sale_invoice_1.total_amount,
-            status='completed',
-            created_by=self.instructor,
-            last_modified_by=self.instructor
-        )
-        invoice_transaction.save()
-        course_registration_code = CourseRegistrationCode(
-            code='abcde',
-            course_id=text_type(self.course.id),
-            created_by=self.instructor,
-            invoice=self.sale_invoice_1,
-            invoice_item=self.invoice_item,
-            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
-        )
-        course_registration_code.save()
-
-        redeem_url = reverse('register_code_redemption', args=['abcde'])
-        response = self.client.get(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        # check button text
-        self.assertContains(response, 'Activate Course Enrollment')
-
-        response = self.client.post(redeem_url)
-        self.assertEqual(response.status_code, 200)
-
-        task_input = {'features': []}
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = upload_enrollment_report(None, None, self.course.id, task_input, 'generating_enrollment_report')
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-        self._verify_cell_data_in_csv(student.username, 'Enrollment Source', 'Used Registration Code')
-        self._verify_cell_data_in_csv(student.username, 'Payment Status', 'Invoice Paid')
-
-    def _verify_cell_data_in_csv(self, username, column_header, expected_cell_content):
-        """
-        Verify that the last ReportStore CSV contains the expected content.
-        """
-        report_store = ReportStore.from_config(config_name='FINANCIAL_REPORTS')
-        report_csv_filename = report_store.links_for(self.course.id)[0][0]
-        report_path = report_store.path_to(self.course.id, report_csv_filename)
-        with report_store.storage.open(report_path) as csv_file:
-            # Expand the dict reader generator so we don't lose it's content
-            for row in unicodecsv.DictReader(csv_file):
-                if row.get('Username') == username:
-                    self.assertEqual(row[column_header], expected_cell_content)
-
-
-@ddt.ddt
 class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Test that the problem CSV generation works.
@@ -943,23 +729,26 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @override_switch(SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY, True)
     def test_single_problem_verified_student_only(self, _get_current_task):
-        student_verified = self.create_student(u'user_verified', mode='verified')
-        vertical = ItemFactory.create(
-            parent_location=self.problem_section.location,
-            category='vertical',
-            metadata={'graded': True},
-            display_name='Problem Vertical'
-        )
-        self.define_option_problem(u'Problem1', parent=vertical)
+        with patch(
+            'lms.djangoapps.instructor_task.tasks_helper.grades.problem_grade_report_verified_only',
+            return_value=True,
+        ):
+            student_verified = self.create_student(u'user_verified', mode='verified')
+            vertical = ItemFactory.create(
+                parent_location=self.problem_section.location,
+                category='vertical',
+                metadata={'graded': True},
+                display_name='Problem Vertical'
+            )
+            self.define_option_problem(u'Problem1', parent=vertical)
 
-        self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
-        self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
-        result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
-        self.assertDictContainsSubset(
-            {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
-        )
+            self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
+            self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
+            result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
+            )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
     def test_inactive_enrollment_included(self, _get_current_task):
@@ -1258,34 +1047,6 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.student1 = UserFactory()
         self.student2 = UserFactory()
-        self.student1_cart = Order.get_cart_for_user(self.student1)
-        self.student2_cart = Order.get_cart_for_user(self.student2)
-
-        self.sale_invoice_1 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
-            company_contact_email='Test@company.com',
-            recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
-            internal_reference="A", course_id=self.course.id, is_valid=True
-        )
-        InvoiceTransaction.objects.create(
-            invoice=self.sale_invoice_1,
-            amount=self.sale_invoice_1.total_amount,
-            status='completed',
-            created_by=self.instructor,
-            last_modified_by=self.instructor
-        )
-        self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
-            invoice=self.sale_invoice_1,
-            qty=10,
-            unit_price=1234.32,
-            course_id=self.course.id
-        )
-        for i in range(5):
-            coupon = Coupon(
-                code='coupon{0}'.format(i), description='test_description', course_id=self.course.id,
-                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True,
-            )
-            coupon.save()
 
     def test_successfully_generate_executive_summary_report(self):
         """
@@ -1299,66 +1060,6 @@ class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
             )
         ReportStore.from_config(config_name='FINANCIAL_REPORTS')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-
-    def students_purchases(self):
-        """
-        Students purchases the courses using enrollment
-        and coupon codes.
-        """
-        self.client.login(username=self.student1.username, password='test')
-        paid_course_reg_item = PaidCourseRegistration.add_to_order(self.student1_cart, self.course.id)
-        # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {
-            'ItemId': paid_course_reg_item.id, 'qty': '4'
-        })
-        self.assertEqual(resp.status_code, 200)
-        # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'coupon1'})
-        self.assertEqual(resp.status_code, 200)
-
-        self.student1_cart.purchase()
-
-        course_reg_codes = CourseRegistrationCode.objects.filter(order=self.student1_cart)
-        redeem_url = reverse('register_code_redemption', args=[course_reg_codes[0].code])
-        response = self.client.get(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        # check button text
-        self.assertContains(response, 'Activate Course Enrollment')
-
-        response = self.client.post(redeem_url)
-        self.assertEqual(response.status_code, 200)
-
-        self.client.login(username=self.student2.username, password='test')
-        PaidCourseRegistration.add_to_order(self.student2_cart, self.course.id)
-
-        # apply the coupon code to the item in the cart
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'coupon1'})
-        self.assertEqual(resp.status_code, 200)
-
-        self.student2_cart.purchase()
-
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
-    def test_generate_executive_summary_report(self):
-        """
-        test to generate executive summary report
-        and then test the report authenticity.
-        """
-        self.students_purchases()
-        task_input = {'features': []}
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = upload_exec_summary_report(
-                None, None, self.course.id,
-                task_input, 'generating executive summary report'
-            )
-        report_store = ReportStore.from_config(config_name='FINANCIAL_REPORTS')
-        expected_data = [
-            'Gross Revenue Collected', '$1481.82',
-            'Gross Revenue Pending', '$0.00',
-            'Average Price per Seat', '$296.36',
-            'Number of seats purchased using coupon codes', '<td>2</td>'
-        ]
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-        self._verify_html_file_report(report_store, expected_data)
 
     def _verify_html_file_report(self, report_store, expected_data):
         """
@@ -2008,28 +1709,31 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
-    @override_switch(SWITCH_GENERATE_GRADE_REPORT_VERIFIED_ONLY, True)
     def test_course_grade_with_verified_student_only(self, _get_current_task):
         """
         Tests that course grade report has expected data when it is generated only for
         verified learners.
         """
-        student_1 = self.create_student(u'user_honor')
-        student_verified = self.create_student(u'user_verified', mode='verified')
-        vertical = ItemFactory.create(
-            parent_location=self.problem_section.location,
-            category='vertical',
-            metadata={'graded': True},
-            display_name='Problem Vertical'
-        )
-        self.define_option_problem(u'Problem1', parent=vertical)
+        with patch(
+            'lms.djangoapps.instructor_task.tasks_helper.grades.course_grade_report_verified_only',
+            return_value=True,
+        ):
+            student_1 = self.create_student(u'user_honor')
+            student_verified = self.create_student(u'user_verified', mode='verified')
+            vertical = ItemFactory.create(
+                parent_location=self.problem_section.location,
+                category='vertical',
+                metadata={'graded': True},
+                display_name='Problem Vertical'
+            )
+            self.define_option_problem(u'Problem1', parent=vertical)
 
-        self.submit_student_answer(student_1.username, u'Problem1', ['Option 1'])
-        self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
-        result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
-        self.assertDictContainsSubset(
-            {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
-        )
+            self.submit_student_answer(student_1.username, u'Problem1', ['Option 1'])
+            self.submit_student_answer(student_verified.username, u'Problem1', ['Option 1'])
+            result = CourseGradeReport.generate(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0}, result
+            )
 
     @ddt.data(True, False)
     def test_fast_generation(self, create_non_zero_grade):

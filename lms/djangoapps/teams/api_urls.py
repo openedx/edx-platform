@@ -10,6 +10,7 @@ from .views import (
     MembershipBulkManagementView,
     MembershipDetailView,
     MembershipListView,
+    TeamsAssignmentsView,
     TeamsDetailView,
     TeamsListView,
     TopicDetailView,
@@ -31,6 +32,13 @@ urlpatterns = [
         ),
         TeamsDetailView.as_view(),
         name="teams_detail"
+    ),
+    url(
+        r'^v0/teams/{team_id_pattern}/assignments$'.format(
+            team_id_pattern=TEAM_ID_PATTERN,
+        ),
+        TeamsAssignmentsView.as_view(),
+        name="teams_assignments_list"
     ),
     url(
         r'^v0/topics/$',

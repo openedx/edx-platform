@@ -7,6 +7,7 @@ Tests for the teams API at the HTTP request level.
 import json
 import unittest
 from datetime import datetime
+from uuid import UUID
 
 import ddt
 import pytz
@@ -29,10 +30,11 @@ from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMM
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.teams_config import TeamsConfig
 from student.models import CourseEnrollment
+from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..models import CourseTeamMembership
 from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
@@ -323,7 +325,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         cls.topics_count = 6
         cls.users = {
             'staff': AdminFactory.create(password=cls.test_password),
-            'course_staff': StaffFactory.create(course_key=cls.test_course_1.id, password=cls.test_password)
+            'course_staff': StaffFactory.create(course_key=cls.test_course_1.id, password=cls.test_password),
+            'admin': AdminFactory.create(password=cls.test_password)
         }
         cls.create_and_enroll_student(username='student_enrolled')
         cls.create_and_enroll_student(username='student_on_team_1_private_set_1', mode=CourseMode.MASTERS)
@@ -500,7 +503,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         return self.build_membership_data_raw(self.users[username].username, team.team_id)
 
     @classmethod
-    def create_and_enroll_student(cls, courses=None, username=None, mode=None):
+    def create_and_enroll_student(cls, courses=None, username=None, mode=None, external_key=None):
         """ Creates a new student and enrolls that student in the course.
 
         Adds the new user to the cls.users dictionary with the username as the key.
@@ -515,6 +518,15 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         for course in courses:
             CourseEnrollment.enroll(user, course.id, mode=mode, check_access=True)
         cls.users[user.username] = user
+
+        if external_key is not None:
+            ProgramEnrollmentFactory(
+                user=user,
+                external_user_key=external_key,
+                program_uuid=UUID("88888888-4444-3333-1111-000000000000"),
+                curriculum_uuid=UUID("77777777-4444-2222-1111-000000000000"),
+                status='enrolled'
+            )
 
         return user.username
 
@@ -633,6 +645,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             'patch',
             json.dumps(data) if data else None,
             'application/merge-patch+json',
+            **kwargs
+        )
+
+    def get_team_assignments(self, team_id, expected_status=200, **kwargs):
+        """ Get the open response assessments assigned to a team """
+        return self.make_call(
+            reverse('teams_assignments_list', args=[team_id]),
+            expected_status,
             **kwargs
         )
 
@@ -810,6 +830,15 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         self.assertEqual('private_topic_1_id', result['results'][0]['topic_id'])
         self.assertNotEqual([], result['results'])
 
+    def test_course_staff_getting_information_on_private_topic(self):
+        """
+        Verifies that when an admin browses to a private team set,
+         information about the teams in the teamset is returned even if the admin is not in any teams.
+        """
+        result = self.get_teams_list(data={'topic_id': 'private_topic_1_id'},
+                                     user='course_staff')
+        self.assertEqual(2, len(result['results']))
+
     @ddt.unpack
     @ddt.data(
         ('student_masters_not_on_team', 1),
@@ -954,6 +983,43 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             [],
             user='staff'
         )
+
+    def test_duplicates_and_nontopic_private_teamsets(self):
+        """
+        Test for a bug where non-admin users would have their private memberships returned from this endpoint
+        despite the topic, and duplicate entries for teams in the topic that was being queried (EDUCATOR-5042)
+        """
+        # create a team in a private teamset and add a user
+        unprotected_team_in_private_teamset = CourseTeamFactory.create(
+            name='unprotected_team_in_private_teamset',
+            description='unprotected_team_in_private_teamset',
+            course_id=self.test_course_1.id,
+            topic_id='private_topic_1_id',
+        )
+        unprotected_team_in_private_teamset.add_user(self.users['student_enrolled'])
+
+        # make some more users and put them in the solar team.
+        another_student_username = 'another_student'
+        yet_another_student_username = 'yet_another_student'
+        self.create_and_enroll_student(username=another_student_username)
+        self.create_and_enroll_student(username=yet_another_student_username)
+        self.solar_team.add_user(self.users[another_student_username])
+        self.solar_team.add_user(self.users[yet_another_student_username])
+
+        teams = self.get_teams_list(data={'topic_id': self.solar_team.topic_id}, user='student_enrolled')
+        team_names = [team['name'] for team in teams['results']]
+        team_names.sort()
+        self.assertEqual(team_names, [
+            self.solar_team.name,
+        ])
+
+        teams = self.get_teams_list(data={'topic_id': self.solar_team.topic_id}, user='staff')
+        team_names = [team['name'] for team in teams['results']]
+        team_names.sort()
+        self.assertEqual(team_names, [
+            self.solar_team.name,
+            self.masters_only_team.name,
+        ])
 
 
 @ddt.ddt
@@ -1282,28 +1348,54 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
         super(TestDeleteTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
-        (None, 401),
-        ('student_inactive', 401),
-        ('student_unenrolled', 403),
-        ('student_enrolled', 403),
         ('staff', 204),
         ('course_staff', 204),
-        ('community_ta', 204)
+        ('community_ta', 204),
+        ('admin', 204)
     )
     @ddt.unpack
     def test_access(self, user, status):
+        team_list = self.get_teams_list(user='course_staff', expected_status=200)
+        previous_count = team_list['count']
+        self.assertIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
         self.delete_team(self.solar_team.team_id, status, user=user)
-        if status == 204:
-            self.assert_event_emitted(
-                'edx.team.deleted',
-                team_id=self.solar_team.team_id,
-            )
-            self.assert_event_emitted(
-                'edx.team.learner_removed',
-                team_id=self.solar_team.team_id,
-                remove_method='team_deleted',
-                user_id=self.users['student_enrolled'].id
-            )
+
+        team_list = self.get_teams_list(user='course_staff', expected_status=200)
+        self.assertEqual(team_list['count'], previous_count - 1)
+        self.assertNotIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
+        self.assert_event_emitted(
+            'edx.team.deleted',
+            team_id=self.solar_team.team_id,
+        )
+        self.assert_event_emitted(
+            'edx.team.learner_removed',
+            team_id=self.solar_team.team_id,
+            remove_method='team_deleted',
+            user_id=self.users['student_enrolled'].id
+        )
+
+    @ddt.data(
+        ('student_unenrolled', 403),
+        ('student_enrolled', 403),
+    )
+    @ddt.unpack
+    def test_access_forbidden(self, user, status):
+        team_list = self.get_teams_list(user='course_staff', expected_status=200)
+        previous_count = team_list['count']
+        self.assertIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
+        self.delete_team(self.solar_team.team_id, status, user=user)
+
+        team_list = self.get_teams_list(user='course_staff', expected_status=200)
+        self.assertEqual(team_list['count'], previous_count)
+        self.assertIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
+
+    @ddt.data(
+        (None, 401),
+        ('student_inactive', 401),
+    )
+    @ddt.unpack
+    def test_access_unauthorized(self, user, status):
+        self.delete_team(self.solar_team.team_id, status, user=user)
 
     def test_does_not_exist(self):
         self.delete_team('nonexistent', 404)
@@ -1484,6 +1576,100 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         )
         if expected_status == 200:
             self.assertEqual(team['name'], 'foo')
+
+
+@patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': True})
+@ddt.ddt
+class TestTeamAssignmentsView(TeamAPITestCase):
+    """ Tests for the TeamAssignmentsView """
+
+    @classmethod
+    def setUpClass(cls):
+        """ Create an openassessment block for testing """
+        super().setUpClass()
+
+        course = cls.test_course_1
+        teamset_id = cls.solar_team.topic_id
+        other_teamset_id = cls.wind_team.topic_id
+
+        section = ItemFactory.create(
+            parent=course,
+            category='chapter',
+            display_name='Test Section'
+        )
+        subsection = ItemFactory.create(
+            parent=section,
+            category="sequential"
+        )
+        unit_1 = ItemFactory.create(
+            parent=subsection,
+            category="vertical"
+        )
+        open_assessment = ItemFactory.create(
+            parent=unit_1,
+            category="openassessment",
+            teams_enabled=True,
+            selected_teamset_id=teamset_id
+        )
+        unit_2 = ItemFactory.create(
+            parent=subsection,
+            category="vertical"
+        )
+        off_team_open_assessment = ItemFactory.create(  # pylint: disable=unused-variable
+            parent=unit_2,
+            category="openassessment",
+            teams_enabled=True,
+            selected_teamset_id=other_teamset_id
+        )
+
+        cls.team_assignments = [open_assessment]
+
+    @ddt.unpack
+    @ddt.data(
+        (None, 401),
+        ('student_inactive', 401),
+        ('student_unenrolled', 403),
+        ('student_on_team_2_private_set_1', 404),
+        ('student_enrolled', 200),
+        ('staff', 200),
+        ('course_staff', 200),
+        ('community_ta', 200),
+    )
+    def test_get_assignments(self, user, expected_status):
+        # Given a course with team-enabled open responses
+        team_id = self.solar_team.team_id
+
+        # When I get the assignments for a team
+        assignments = self.get_team_assignments(team_id, expected_status, user=user)
+
+        if expected_status == 200:
+            # I successful, I get back the assignments for a team
+            self.assertEqual(len(assignments), len(self.team_assignments))
+
+            # ... with the right data structure
+            for assignment in assignments:
+                self.assertIn('display_name', assignment.keys())
+                self.assertIn('location', assignment.keys())
+
+    def test_get_assignments_bad_team(self):
+        # Given a bad team is supplied
+        user = 'student_enrolled'
+        team_id = 'bogus-team'
+
+        # When I run the query, I get back a 404 error
+        expected_status = 404
+        self.get_team_assignments(team_id, expected_status, user=user)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': False})
+    def test_get_assignments_feature_not_enabled(self):
+        # Given the team submissions feature is not enabled
+        user = 'student_enrolled'
+        team_id = self.solar_team.team_id
+
+        # When I try to get assignments
+        # Then I get back a 503 error
+        expected_status = 503
+        self.get_team_assignments(team_id, expected_status, user=user)
 
 
 @ddt.ddt
@@ -2496,7 +2682,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         # This strategy allows us to test with invalid course IDs
         return reverse('team_membership_bulk_management', args=[course_id])
 
-    def test_upload_valid_csv_simple(self):
+    def test_create_membership_via_upload(self):
         self.create_and_enroll_student(username='a_user')
         csv_content = 'user,mode,topic_0' + '\n'
         csv_content += 'a_user,audit,team wind power'
@@ -2510,7 +2696,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_text['message'], '1 learners were assigned to teams.')
+        self.assertEqual(response_text['message'], '1 learners were affected.')
 
     def test_upload_invalid_teamset(self):
         self.create_and_enroll_student(username='a_user')
@@ -2555,7 +2741,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             1
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_text['message'], '3 learners were assigned to teams.')
+        self.assertEqual(response_text['message'], '3 learners were affected.')
 
     def test_upload_non_existing_user(self):
         csv_content = 'user,mode,topic_0' + '\n'
@@ -2638,6 +2824,30 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file}, user='staff'
         )
 
+    def test_upload_invalid_multiple_student_enrollment_mismatch(self):
+        audit_username = 'audit_user'
+        masters_username_a = 'masters_a'
+        masters_username_b = 'masters_b'
+        self.create_and_enroll_student(username=audit_username, mode=CourseMode.AUDIT)
+        self.create_and_enroll_student(username=masters_username_a, mode=CourseMode.MASTERS)
+        self.create_and_enroll_student(username=masters_username_b, mode=CourseMode.MASTERS)
+
+        csv_content = 'user,mode,topic_1' + '\n'
+        csv_content += '{},audit,team wind power'.format(audit_username) + '\n'
+        csv_content += '{},masters,team wind power'.format(masters_username_a) + '\n'
+        csv_content += '{},masters,team wind power'.format(masters_username_b) + '\n'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        response = self.make_call(reverse(
+            'team_membership_bulk_management',
+            args=[self.good_course_id]),
+            400, method='post',
+            data={'csv': csv_file}, user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        expected_error = 'Team team wind power cannot have Master’s track users mixed with users in other tracks.'
+        self.assertEqual(response_text['errors'][0], expected_error)
+
     def test_upload_learners_exceed_max_team_size(self):
         csv_content = 'user,mode,topic_0,topic_1' + '\n'
         team1 = 'team wind power'
@@ -2657,3 +2867,153 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         )
         response_text = json.loads(response.content.decode('utf-8'))
         self.assertEqual(response_text['errors'][0], 'Team {} is full.'.format(team1))
+
+    def test_deletion_via_upload_csv(self):
+        # create a team membership that will be used further down
+        self.test_create_membership_via_upload()
+        username = 'a_user'
+        topic_0_id = 'topic_0'
+        self.assertTrue(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id
+        ).exists())
+
+        csv_content = 'user,mode,{},topic_1'.format(topic_0_id) + '\n'
+        csv_content += '{},audit'.format(username)
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            201,
+            method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        self.assertFalse(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id
+        ).exists())
+
+    def test_reassignment_via_upload_csv(self):
+        # create a team membership that will be used further down
+        self.test_create_membership_via_upload()
+        username = 'a_user'
+        topic_0_id = 'topic_0'
+        nuclear_team_name = 'team nuclear power'
+        windpower_team_name = 'team wind power'
+        self.assertTrue(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id,
+            team__name=windpower_team_name
+        ).exists())
+        csv_content = 'user,mode,{}'.format(topic_0_id) + '\n'
+        csv_content += '{0},audit,{1}'.format(username, nuclear_team_name)
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            201,
+            method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        self.assertFalse(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id,
+            team__name=windpower_team_name
+        ).exists())
+        self.assertTrue(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id,
+            team__name=nuclear_team_name
+        ).exists())
+
+    def test_upload_file_not_changed_csv(self):
+        # create a team membership that will be used further down
+        self.test_create_membership_via_upload()
+        username = 'a_user'
+        topic_0_id = 'topic_0'
+        nuclear_team_name = 'team wind power'
+        self.assertEqual(len(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id
+        )), 1)
+        csv_content = 'user,mode,{}'.format(topic_0_id) + '\n'
+        csv_content += '{0},audit,{1}'.format(username, nuclear_team_name)
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username,
+                          password=self.users['course_staff'].password)
+        self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            201,
+            method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        self.assertEqual(len(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__name=nuclear_team_name
+        )), 1)
+        self.assertTrue(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__name=nuclear_team_name
+        ).exists())
+
+    def test_create_membership_via_upload_using_external_key(self):
+        self.create_and_enroll_student(username='a_user', external_key='a_user_external_key')
+        csv_content = 'user,mode,topic_0' + '\n'
+        csv_content += 'a_user_external_key,audit,team wind power'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        response = self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            201,
+            method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response_text['message'], '1 learners were affected.')
+
+    def test_create_membership_via_upload_using_external_key_invalid(self):
+        self.create_and_enroll_student(username='a_user', external_key='a_user_external_key')
+        csv_content = 'user,mode,topic_0' + '\n'
+        csv_content += 'a_user_external_key_invalid,audit,team wind power'
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        response = self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            400,
+            method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(
+            response_text['errors'],
+            ['User name/email/external key: a_user_external_key_invalid does not exist.']
+        )
+
+    def test_upload_non_ascii(self):
+        csv_content = 'user,mode,topic_0' + '\n'
+        team_name = '著文企臺個'
+        user_name = '著著文企臺個文企臺個'
+        self.create_and_enroll_student(username=user_name)
+        csv_content += '{},audit,{}'.format(user_name, team_name)
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+        self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            201, method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        team = self.users[user_name].teams.first()
+        self.assertEqual(
+            team.name,
+            team_name
+        )
+        self.assertEqual(
+            [user.username for user in team.users.all()],
+            [user_name]
+        )

@@ -365,3 +365,20 @@ def anonymous_user_ids_for_team(user, team):
         anonymous_id_for_user(user=team_member, course_id=team.course_id, save=False)
         for team_member in team.users.all()
     ])
+
+
+def get_assignments_for_team(user, team):
+    """ Get openassessment XBlocks configured for the current teamset """
+    # Confirm access
+    if not has_specific_team_access(user, team):
+        raise Exception("User {user} is not permitted to access team info for {team}".format(
+            user=user.username,
+            team=team.team_id
+        ))
+
+    # Limit to team-enabled ORAs for the matching teamset in the course
+    return modulestore().get_items(
+        team.course_id,
+        qualifiers={'category': 'openassessment'},
+        settings={'teams_enabled': True, 'selected_teamset_id': team.topic_id}
+    )

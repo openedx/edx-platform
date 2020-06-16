@@ -3,13 +3,10 @@ Tests for the migrate_saml_uids management command.
 """
 
 
-from mock import mock_open, patch
 import six
-
 from django.core.management import call_command
 from django.test import TestCase
-from factory import LazyAttributeSequence, SubFactory
-from factory.django import DjangoModelFactory
+from mock import mock_open, patch
 from social_django.models import UserSocialAuth
 
 from lms.djangoapps.program_enrollments.management.commands import migrate_saml_uids
@@ -39,6 +36,9 @@ class TestMigrateSamlUids(TestCase):
         )
 
     def _call_command(self, data):
+        """
+        Call management command with `data` as contents of input file.
+        """
         with patch(
                 _COMMAND_PATH + '.py3_open',
                 mock_open(read_data=data)
@@ -145,7 +145,7 @@ class TestMigrateSamlUids(TestCase):
             ','.join(
                 [
                     self._format_email_uid_pair(
-                        auth.user.email,  # pylint disable=no-member
+                        auth.user.email,
                         new_urn + six.text_type(ind)
                     )
                     for ind, auth

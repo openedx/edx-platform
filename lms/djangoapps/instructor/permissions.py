@@ -41,7 +41,9 @@ perms[GENERATE_CERTIFICATE_EXCEPTIONS] = is_staff
 perms[GENERATE_BULK_CERTIFICATE_EXCEPTIONS] = is_staff
 perms[GIVE_STUDENT_EXTENSION] = HasAccessRule('staff')
 perms[VIEW_ISSUED_CERTIFICATES] = HasAccessRule('staff') | HasRolesRule('data_researcher')
-perms[CAN_RESEARCH] = HasRolesRule('data_researcher')
+# only global staff or those with the data_researcher role can access the data download tab
+# HasAccessRule('staff') also includes course staff
+perms[CAN_RESEARCH] = is_staff | HasRolesRule('data_researcher')
 perms[CAN_ENROLL] = HasAccessRule('staff')
 perms[CAN_BETATEST] = HasAccessRule('instructor')
 perms[ENROLLMENT_REPORT] = HasAccessRule('staff') | HasRolesRule('data_researcher')
