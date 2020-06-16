@@ -58,9 +58,6 @@ class Command(BaseCommand):
                                                 can_auto_score_ora(enrollment, course, block, index_chapter)):
                                             anonymous_user = get_anonymous_user(user, course.id)
                                             student = {
-                                                'id': user.id,
-                                                'username': user.username,
-                                                'email': user.email,
                                                 'anonymous_user_id': anonymous_user.anonymous_user_id
                                             }
                                             autoscore_ora(course.id, unicode(block), student)
