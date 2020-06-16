@@ -269,7 +269,7 @@ def _get_team_filter_query(topic_id_set, course_id, organization_protection_stat
 
 
 def get_teams_with_visibility(user, topic_id_set, course_id, organization_protection_status):
-    """ Get teams taking into account user visibility privelages """
+    """ Get teams taking into account user visibility privileges """
     # Filter by topics, course, and protection status
     filter_query = _get_team_filter_query(topic_id_set, course_id, organization_protection_status)
 
