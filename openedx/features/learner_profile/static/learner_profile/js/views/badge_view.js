@@ -5,9 +5,10 @@
         [
             'gettext', 'jquery', 'underscore', 'backbone', 'moment',
             'text!learner_profile/templates/badge.underscore',
-            'learner_profile/js/views/share_modal_view'
+            'learner_profile/js/views/share_modal_view',
+            'edx-ui-toolkit/js/utils/html-utils'
         ],
-        function(gettext, $, _, Backbone, Moment, badgeTemplate, ShareModalView) {
+        function(gettext, $, _, Backbone, Moment, badgeTemplate, ShareModalView, HtmlUtils) {
             var BadgeView = Backbone.View.extend({
                 initialize: function(options) {
                     this.options = _.extend({}, options);
@@ -35,7 +36,7 @@
                     modal.$el.fadeIn('short', 'swing', _.bind(modal.ready, modal));
                 },
                 render: function() {
-                    this.$el.html(this.template(this.context));
+                    this.$el.html(HtmlUtils.HTML(this.template(this.context)).toString());
                     this.shareButton = this.$el.find('.share-button');
                     return this;
                 }
