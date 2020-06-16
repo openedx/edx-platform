@@ -8,10 +8,7 @@ import os
 import unittest
 import six
 
-if six.PY2:
-    from test.test_support import EnvironmentVarGuard
-else:
-    from test.support import EnvironmentVarGuard
+from test.support import EnvironmentVarGuard
 
 from pavelib.utils.test.suites import BokChoyTestSuite
 
@@ -53,7 +50,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         return expected_statement
 
     def setUp(self):
-        super(TestPaverBokChoyCmd, self).setUp()
+        super().setUp()
         self.shard = os.environ.get('SHARD')
         self.env_var_override = EnvironmentVarGuard()
 
@@ -147,7 +144,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
             ),
-            u"-n {}".format(process_count),
+            "-n {}".format(process_count),
             "--color=no",
             "--verbose",
         ]
@@ -164,7 +161,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
             ),
-            u"-n {}".format(process_count),
+            "-n {}".format(process_count),
             "--color=no",
             "--verbose",
         ]

@@ -18,10 +18,7 @@ from paver.easy import BuildFailure
 import pavelib.quality
 from pavelib.paver_tests.utils import PaverTestCase, fail_on_eslint
 
-if six.PY2:
-    OPEN_BUILTIN = '__builtin__.open'
-else:
-    OPEN_BUILTIN = 'builtins.open'
+OPEN_BUILTIN = 'builtins.open'
 
 
 @ddt
@@ -30,7 +27,7 @@ class TestPaverQualityViolations(unittest.TestCase):
     For testing the paver violations-counting tasks
     """
     def setUp(self):
-        super(TestPaverQualityViolations, self).setUp()
+        super().setUp()
         self.f = tempfile.NamedTemporaryFile(delete=False)
         self.f.close()
         self.addCleanup(os.remove, self.f.name)
@@ -84,7 +81,7 @@ class TestPaverQualityOptions(unittest.TestCase):
     )
     @unpack
     def test_pylint_parser_other_string(self, options, expected_values):
-        class PaverOptions(object):
+        class PaverOptions:
             """
             Simple options class to mimick paver's Namespace object.
             """
@@ -102,7 +99,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TestPaverReportViolationsCounts, self).setUp()
+        super().setUp()
 
         # Temporary file infrastructure
         self.f = tempfile.NamedTemporaryFile(delete=False)
@@ -258,7 +255,7 @@ class TestPrepareReportDir(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TestPrepareReportDir, self).setUp()
+        super().setUp()
         self.test_dir = tempfile.mkdtemp()
         self.test_file = tempfile.NamedTemporaryFile(delete=False, dir=self.test_dir)
         self.addCleanup(os.removedirs, self.test_dir)
@@ -280,7 +277,7 @@ class TestPaverRunQuality(PaverTestCase):
     """
 
     def setUp(self):
-        super(TestPaverRunQuality, self).setUp()
+        super().setUp()
 
         # mock the @needs decorator to skip it
         patcher = patch('pavelib.quality.sh')
@@ -365,7 +362,7 @@ class TestPaverRunDiffQuality(PaverTestCase):
     cases weren't tested properly.
     """
     def setUp(self):
-        super(TestPaverRunDiffQuality, self).setUp()
+        super().setUp()
 
         # mock the @needs decorator to skip it
         patcher = patch('pavelib.quality.sh')

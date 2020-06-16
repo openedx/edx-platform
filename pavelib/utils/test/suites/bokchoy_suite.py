@@ -43,7 +43,7 @@ def load_bok_choy_data(options):
     """
     print('Loading data from json fixtures in db_fixtures directory')
     sh(
-        u"DEFAULT_STORE={default_store}"
+        "DEFAULT_STORE={default_store}"
         " ./manage.py lms --settings {settings} loaddata --traceback"
         " common/test/db_fixtures/*.json".format(
             default_store=options.default_store,
@@ -68,11 +68,11 @@ def load_courses(options):
     `test_root/courses/`.
     """
     if 'imports_dir' in options:
-        msg = colorize('green', u"Importing courses from {}...".format(options.imports_dir))
+        msg = colorize('green', "Importing courses from {}...".format(options.imports_dir))
         print(msg)
 
         sh(
-            u"DEFAULT_STORE={default_store}"
+            "DEFAULT_STORE={default_store}"
             " ./manage.py cms --settings={settings} import {import_dir}".format(
                 default_store=options.default_store,
                 import_dir=options.imports_dir,
@@ -95,7 +95,7 @@ def update_fixtures():
     print(msg)
 
     sh(
-        u" ./manage.py lms --settings={settings} update_fixtures".format(
+        " ./manage.py lms --settings={settings} update_fixtures".format(
             settings=Env.SETTINGS
         )
     )
@@ -159,7 +159,7 @@ class BokChoyTestSuite(TestSuite):
       See pytest documentation: https://docs.pytest.org/en/latest/
     """
     def __init__(self, *args, **kwargs):
-        super(BokChoyTestSuite, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.test_dir = Env.BOK_CHOY_DIR / kwargs.get('test_dir', 'tests')
         self.log_dir = Env.BOK_CHOY_LOG_DIR
         self.report_dir = kwargs.get('report_dir', Env.BOK_CHOY_REPORT_DIR)
@@ -182,7 +182,7 @@ class BokChoyTestSuite(TestSuite):
         self.save_screenshots = kwargs.get('save_screenshots', False)
 
     def __enter__(self):
-        super(BokChoyTestSuite, self).__enter__()
+        super().__enter__()
 
         # Ensure that we have a directory to put logs and reports
         self.log_dir.makedirs_p()
@@ -229,7 +229,7 @@ class BokChoyTestSuite(TestSuite):
             self.run_servers_continuously()
 
     def __exit__(self, exc_type, exc_value, traceback):
-        super(BokChoyTestSuite, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
 
         # Using testsonly will leave all fixtures in place (Note: the db will also be dirtier.)
         if self.testsonly:
@@ -239,7 +239,7 @@ class BokChoyTestSuite(TestSuite):
             # Clean up data we created in the databases
             msg = colorize('green', "Cleaning up databases...")
             print(msg)
-            sh(u"./manage.py lms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
+            sh("./manage.py lms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
             clear_mongo()
 
     @property
@@ -252,7 +252,7 @@ class BokChoyTestSuite(TestSuite):
         if self.num_processes != 1:
             # Construct "multiprocess" pytest command
             command += [
-                u"-n {}".format(self.num_processes),
+                "-n {}".format(self.num_processes),
                 "--color=no",
             ]
         if self.verbosity < 1:
@@ -260,7 +260,7 @@ class BokChoyTestSuite(TestSuite):
         elif self.verbosity > 1:
             command.append("--verbose")
         if self.eval_attr:
-            command.append(u"-a '{}'".format(self.eval_attr))
+            command.append("-a '{}'".format(self.eval_attr))
 
         return command
 

@@ -15,7 +15,7 @@ class PaverTestCase(TestCase):
     Base class for Paver test cases.
     """
     def setUp(self):
-        super(PaverTestCase, self).setUp()
+        super().setUp()
 
         # Show full length diffs upon test failure
         self.maxDiff = None  # pylint: disable=invalid-name
@@ -27,7 +27,7 @@ class PaverTestCase(TestCase):
         os.environ['NO_PREREQ_INSTALL'] = 'true'
 
     def tearDown(self):
-        super(PaverTestCase, self).tearDown()
+        super().tearDown()
         tasks.environment = tasks.Environment()
         del os.environ['NO_PREREQ_INSTALL']
 
@@ -51,7 +51,7 @@ class MockEnvironment(tasks.Environment):
     Mock environment that collects information about Paver commands.
     """
     def __init__(self):
-        super(MockEnvironment, self).__init__()
+        super().__init__()
         self.dry_run = True
         self.messages = []
 
@@ -62,7 +62,7 @@ class MockEnvironment(tasks.Environment):
         else:
             output = message
         if not output.startswith("--->"):
-            self.messages.append(six.text_type(output))
+            self.messages.append(str(output))
 
 
 def fail_on_eslint(*args, **kwargs):
