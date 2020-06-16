@@ -258,7 +258,7 @@ class Organization(TimeStampedModel):
         """
         :return: organization's first learner
         """
-        org_first_learner = UserExtendedProfile.objects.filter(organization=self, is_first_learner=True).first()
+        org_first_learner = self.extended_profile.filter(is_first_learner=True).first()
         return org_first_learner.user if org_first_learner else None
 
     def get_active_partners(self):
