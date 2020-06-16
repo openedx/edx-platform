@@ -233,7 +233,7 @@ class ProgramEnrollmentsGetTests(EnrollmentsDataMixin, APITestCase):
             ProgramEnrollmentFactory.create(
                 program_uuid=self.program_uuid,
                 curriculum_uuid=self.curriculum_uuid,
-                user= UserFactory.create(username='student-{}'.format(i), email='email-{}'.format(i)),
+                user=UserFactory.create(username='student-{}'.format(i), email='email-{}'.format(i)),
                 external_user_key=user_key,
             )
 

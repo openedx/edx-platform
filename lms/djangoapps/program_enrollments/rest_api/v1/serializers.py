@@ -47,12 +47,12 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
         return bool(obj.user)
 
     def get_username(self, obj):
-        if bool(obj.user):
+        if obj.user:
             return obj.user.username
         return ""
 
     def get_email(self, obj):
-        if bool(obj.user):
+        if obj.user:
             return obj.user.email
         return ""
 
