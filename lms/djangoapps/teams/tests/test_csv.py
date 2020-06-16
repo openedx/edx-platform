@@ -1,7 +1,8 @@
 """ Tests for the functionality in csv """
+from csv import DictWriter
+from io import BytesIO, StringIO, TextIOWrapper
 
-from io import StringIO
-
+from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
 from lms.djangoapps.teams import csv
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
@@ -206,3 +207,130 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
 
         # They are successfully removed from the team
         self.assertFalse(CourseTeamMembership.is_user_on_team(audit_learner, course_1_team))
+
+
+class ExternalKeyCsvTests(SharedModuleStoreTestCase):
+    """ Tests for functionality related to external_user_keys"""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.teamset_id = 'teamset_id'
+        teams_config = TeamsConfig({
+            'team_sets': [
+                {
+                    'id': cls.teamset_id,
+                    'name': 'teamset_name',
+                    'description': 'teamset_desc',
+                }
+            ]
+        })
+        cls.course = CourseFactory(teams_configuration=teams_config)
+        # pylint: disable=protected-access
+        cls.header_fields = csv._get_team_membership_csv_headers(cls.course)
+
+        cls.team = CourseTeamFactory(course_id=cls.course.id, name='team_name', topic_id=cls.teamset_id)
+
+        cls.user_no_program = UserFactory.create()
+        cls.user_in_program = UserFactory.create()
+        cls.user_in_program_no_external_id = UserFactory.create()
+        cls.user_in_program_not_enrolled_through_program = UserFactory.create()
+
+        # user_no_program is only enrolled in the course
+        cls.add_user_to_course_program_team(cls.user_no_program, enroll_in_program=False)
+
+        # user_in_program is enrolled in the course and the program, with an external_id
+        cls.external_user_key = 'externalProgramUserId-123'
+        cls.add_user_to_course_program_team(cls.user_in_program, external_user_key=cls.external_user_key)
+
+        # user_in_program is enrolled in the course and the program, with no external_id
+        cls.add_user_to_course_program_team(cls.user_in_program_no_external_id)
+
+        # user_in_program_not_enrolled_through_program is enrolled in a program and the course, but they not connected
+        cls.add_user_to_course_program_team(
+            cls.user_in_program_not_enrolled_through_program, connect_enrollments=False
+        )
+
+        # initialize import manager
+        cls.import_manager = csv.TeamMembershipImportManager(cls.course)
+        cls.import_manager.teamset_ids = {ts.teamset_id for ts in cls.course.teamsets}
+
+    @classmethod
+    def add_user_to_course_program_team(
+        cls, user, add_to_team=True, enroll_in_program=True, connect_enrollments=True, external_user_key=None
+    ):
+        """
+        Set up a test user by enrolling them in self.course, and then optionaly:
+            - enroll them in a program
+            - link their program and course enrollments
+            - give their program enrollment an external_user_key
+        """
+        course_enrollment = CourseEnrollmentFactory.create(user=user, course_id=cls.course.id)
+        if add_to_team:
+            cls.team.add_user(user)
+        if enroll_in_program:
+            program_enrollment = ProgramEnrollmentFactory.create(user=user, external_user_key=external_user_key)
+            if connect_enrollments:
+                ProgramCourseEnrollmentFactory.create(
+                    program_enrollment=program_enrollment, course_enrollment=course_enrollment
+                )
+
+    def assert_user_on_team(self, user):
+        self.assertTrue(CourseTeamMembership.is_user_on_team(user, self.team))
+
+    def assert_user_not_on_team(self, user):
+        self.assertFalse(CourseTeamMembership.is_user_on_team(user, self.team))
+
+    def test_add_user_to_team_with_external_key(self):
+        # Make a new user with an external_user_key who is enrolled in the course and program, with an external_key,
+        #  but is not on the team
+        new_user = UserFactory.create()
+        new_ext_key = "another-external-user-id-FKQP12345"
+        self.add_user_to_course_program_team(new_user, add_to_team=False, external_user_key=new_ext_key)
+        self.assert_user_not_on_team(new_user)
+
+        with BytesIO() as mock_csv_file:
+            with TextIOWrapper(mock_csv_file, write_through=True) as text_wrapper:
+                # Create the fake csv file
+                csv_writer = DictWriter(text_wrapper, fieldnames=self.header_fields)
+                csv_writer.writeheader()
+                # Add the new user to the team via CSV upload, identified by their external key
+                csv_writer.writerow({'user': new_ext_key, 'mode': 'audit', self.teamset_id: self.team.name})
+                # We need to seek to the beginning of the file so the csv import manager can read it
+                mock_csv_file.seek(0)
+                #After processing the file, the user should be on the team
+                self.import_manager.set_team_membership_from_csv(mock_csv_file)
+
+        self.assert_user_on_team(new_user)
+
+    def test_lookup_team_membership_data(self):
+        with self.assertNumQueries(3):
+            # pylint: disable=protected-access
+            data = csv._lookup_team_membership_data(self.course)
+
+        team_membership = lambda user: {'user': user, 'mode': 'audit', self.teamset_id: self.team.name}
+
+        # The four test users should be listed as members of the team, and user_in_program should be identified
+        #   by their external_user_key
+        self.assertEqual(len(data), 4)
+        self.assertDictEqual(data[0], team_membership(self.user_no_program.username))
+        self.assertDictEqual(data[1], team_membership(self.external_user_key))
+        self.assertDictEqual(data[2], team_membership(self.user_in_program_no_external_id.username))
+        self.assertDictEqual(data[3], team_membership(self.user_in_program_not_enrolled_through_program.username))
+
+    def test_get_csv(self):
+        expected_csv_output = (
+            'user,mode,teamset_id\r\n'
+            '{},audit,team_name\r\n'
+            '{},audit,team_name\r\n'
+            '{},audit,team_name\r\n'
+            '{},audit,team_name\r\n'
+        ).format(
+            self.user_no_program.username,
+            self.external_user_key,
+            self.user_in_program_no_external_id.username,
+            self.user_in_program_not_enrolled_through_program.username,
+        )
+        with StringIO() as read_buf:
+            csv.load_team_membership_csv(self.course, read_buf)
+            self.assertEqual(expected_csv_output, read_buf.getvalue())
