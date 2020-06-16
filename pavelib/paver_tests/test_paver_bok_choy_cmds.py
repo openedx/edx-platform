@@ -6,7 +6,6 @@ Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_bok_ch
 
 import os
 import unittest
-import six
 
 from test.support import EnvironmentVarGuard
 

@@ -6,7 +6,6 @@ from unittest import TestCase
 
 import ddt
 import paver.tasks
-import six
 from mock import patch
 from paver.easy import call_task, path
 from watchdog.observers import Observer

@@ -2,15 +2,12 @@
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
-
-import io
 import json
 import os
 import re
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
-import six
 from paver.easy import BuildFailure, cmdopts, needs, sh, task
 
 from openedx.core.djangolib.markup import HTML

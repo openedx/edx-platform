@@ -7,7 +7,6 @@ import os
 import re
 import subprocess
 
-import six
 from paver.easy import cmdopts, sh, task
 
 from pavelib.utils.envs import Env

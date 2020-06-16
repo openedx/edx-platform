@@ -2,15 +2,12 @@
 Helper functions for loading environment settings.
 """
 
-
-import io
 import json
 import os
 import sys
 from time import sleep
 
 import memcache
-import six
 from lazy import lazy
 from path import Path as path
 from paver.easy import BuildFailure, sh

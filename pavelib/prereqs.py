@@ -4,14 +4,12 @@ Install Python and Node prerequisites.
 
 
 import hashlib
-import io
 import os
 import re
 import subprocess
 import sys
 from distutils import sysconfig
 
-import six
 from paver.easy import BuildFailure, sh, task
 
 from .utils.envs import Env
@@ -344,7 +342,6 @@ def install_prereqs():
 def log_installed_python_prereqs():
     """  Logs output of pip freeze for debugging. """
     sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
-    return
 
 
 def print_devstack_warning():

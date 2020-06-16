@@ -11,7 +11,6 @@ from datetime import datetime
 from functools import wraps
 from threading import Timer
 
-import six
 from paver import tasks
 from paver.easy import call_task, cmdopts, consume_args, needs, no_help, path, sh, task
 from watchdog.events import PatternMatchingEventHandler

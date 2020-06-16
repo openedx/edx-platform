@@ -9,7 +9,6 @@ import tempfile
 import textwrap
 import unittest
 
-import six
 from ddt import data, ddt, file_data, unpack
 from mock import MagicMock, mock_open, patch
 from path import Path as path

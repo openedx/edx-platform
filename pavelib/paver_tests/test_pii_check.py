@@ -2,13 +2,10 @@
 Tests for Paver's PII checker task.
 """
 
-
-import io
 import shutil
 import tempfile
 import unittest
 
-import six
 from mock import patch
 from path import Path as path
 from paver.easy import call_task, BuildFailure

@@ -5,7 +5,6 @@ import os
 from unittest import TestCase
 from uuid import uuid4
 
-import six
 from paver import tasks
 from paver.easy import BuildFailure
 
