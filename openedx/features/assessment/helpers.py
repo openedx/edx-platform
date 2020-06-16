@@ -31,7 +31,8 @@ def can_auto_score_ora(enrollment, course, block, index_chapter):
         return False
     response_submission = Submission.objects.filter(
         student_item__student_id=anonymous_user.anonymous_user_id,
-        student_item__item_id=block).first()
+        student_item__item_id=block
+    ).order_by('submitted_at').first()
     if not response_submission:
         return False
     log.info('Response Created at: {created_date}'.format(
@@ -71,7 +72,7 @@ def autoscore_ora(course_id, usage_key, student):
         student_item__student_id=anonymous_user_id,
         student_item__item_id=usage_key,
         student_item__item_type=ORA_BLOCK_TYPE
-    ).first()
+    ).order_by('submitted_at').first()
     if not submission:
         log.warn(u"No submission found for user {user_id}".format(user_id=anonymous_user_id))
         return
