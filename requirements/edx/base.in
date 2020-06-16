@@ -91,7 +91,7 @@ fs==2.0.18
 fs-s3fs==0.1.8
 futures ; python_version == "2.7"   # via django-pipeline, python-swift-client, s3transfer
 glob2==0.3                          # Enhanced glob module, used in openedx.core.lib.rooted_paths
-gunicorn==0.17.5
+gunicorn==17.5
 help-tokens
 html5lib==0.999                     # HTML parser, used for capa problems
 ipaddr==2.1.11                      # Ip network support for Embargo feature
