@@ -14,6 +14,8 @@ COURSE_GRADE_CHANGED = Signal(providing_args=["user", "course_grade", "course_ke
 COURSE_CERT_CHANGED = Signal(providing_args=["user", "course_key", "mode", "status"])
 COURSE_CERT_AWARDED = Signal(providing_args=["user", "course_key", "mode", "status"])
 COURSE_CERT_REVOKED = Signal(providing_args=["user", "course_key", "mode", "status"])
+COURSE_CERT_DATE_CHANGE = Signal(providing_args=["course_key"])
+
 
 # Signal that indicates that a user has passed a course.
 COURSE_GRADE_NOW_PASSED = Signal(

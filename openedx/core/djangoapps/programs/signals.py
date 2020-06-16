@@ -6,8 +6,12 @@ This module contains signals / handlers related to programs.
 import logging
 
 from django.dispatch import receiver
-
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
+from openedx.core.djangoapps.signals.signals import (
+    COURSE_CERT_AWARDED,
+    COURSE_CERT_CHANGED,
+    COURSE_CERT_DATE_CHANGE,
+    COURSE_CERT_REVOKED
+)
 from openedx.core.djangoapps.site_configuration import helpers
 
 LOGGER = logging.getLogger(__name__)
@@ -174,3 +178,36 @@ def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs)
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.programs.tasks.v1.tasks import revoke_program_certificates
     revoke_program_certificates.delay(user.username, course_key)
+
+
+@receiver(COURSE_CERT_DATE_CHANGE, dispatch_uid='course_certificate_date_change_handler')
+def handle_course_cert_date_change(sender, course_key, **kwargs):
+    """
+    If course is updated and the certificate_available_date is changed,
+    schedule a celery task to update visible_date for all certificates
+    within course.
+
+    Args:
+        course_key:
+            refers to the course whose certificate_available_date was updated.
+
+    Returns:
+        None
+
+    """
+    # Import here instead of top of file since this module gets imported before
+    # the credentials app is loaded, resulting in a Django deprecation warning.
+    from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+
+    # Avoid scheduling new tasks if certification is disabled.
+    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+        return
+
+    # schedule background task to process
+    LOGGER.info(
+        'handling COURSE_CERT_DATE_CHANGE for course %s',
+        course_key,
+    )
+    # import here, because signal is registered at startup, but items in tasks are not yet loaded
+    from openedx.core.djangoapps.programs.tasks.v1.tasks import update_certificate_visible_date_on_course_update
+    update_certificate_visible_date_on_course_update.delay(course_key)
