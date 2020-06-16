@@ -1,6 +1,7 @@
 from math import floor
 
 from django.conf import settings
+from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 DEFAULT_SERVICES_NOTIFICATIONS_COOKIE_EXPIRY = 180  # value in seconds
@@ -52,29 +53,17 @@ def edly_app_context(request):  # pylint: disable=unused-argument
 
     edly_context.update(
         {
-            'edly_copyright_text': configuration_helpers.get_value('EDLY_COPYRIGHT_TEXT')
-        }
-    )
-
-    edly_context.update(
-        {
-            'services_notifications_url': panel_services_notifications_url
-        }
-    )
-
-    edly_context.update(
-        {
+            'edly_copyright_text': configuration_helpers.get_value('EDLY_COPYRIGHT_TEXT'),
+            'services_notifications_url': panel_services_notifications_url,
             'session_cookie_domain': configuration_helpers.get_value(
                 'SESSION_COOKIE_DOMAIN', settings.SESSION_COOKIE_DOMAIN
-            )
-        }
-    )
-
-    edly_context.update(
-        {
+            ),
             'services_notifications_cookie_expiry': configuration_helpers.get_value(
                 'SERVICES_NOTIFICATIONS_COOKIE_EXPIRY', DEFAULT_SERVICES_NOTIFICATIONS_COOKIE_EXPIRY
-            )
+            ),
+            'nav_menu_url': marketing_link('NAV_MENU'),
+            'zendesk_widget_url': marketing_link('ZENDESK-WIDGET'),
+            'footer_url': marketing_link('FOOTER'),
         }
     )
 
