@@ -1,16 +1,23 @@
-from django.core.validators import ValidationError
-from django.utils.translation import ugettext as _
-
-from openedx.features.job_board.constants import LOGO_IMAGE_MAX_SIZE
+from django.conf import settings
 
 
-def validate_file_size(file):
+def get_connect_url(marketplace_request, request):
     """
-    Validate maximum allowed file upload size, raise validation error if file size exceeds.
-    :param file: file that needs to be validated for size
+    Connecting user with Org Admin/First Learner via NodeBB Chat
+        1: If Organization admin is not present then connect with the first learner.
+        2: If Organization(orphan organization) admin and first learner both are
+           not present then connect user with the marketplace request creator.
+        3: In case of requester is the admin/first learner of organization
+           button should be grayed out and disabled.
+    :param marketplace_request: marketplace request item
+    :param request: user request object
     """
-    size = getattr(file, 'size', None)
-    if size and LOGO_IMAGE_MAX_SIZE < size:
-        raise ValidationError(
-            _('File size must not exceed {size} MB').format(size=LOGO_IMAGE_MAX_SIZE / 1024 / 1024)
-        )
+    chat_url = '{nodebb_end_point}/chat/{username}'
+    responsible_user = marketplace_request.organization.admin or marketplace_request.organization.first_learner \
+                       or marketplace_request.user
+    if responsible_user.username != request.user.username:
+        connect_url = chat_url.format(nodebb_end_point=settings.NODEBB_ENDPOINT, username=responsible_user.username)
+    else:
+        connect_url = None
+
+    return connect_url
