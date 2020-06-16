@@ -56,8 +56,8 @@ def can_auto_score_ora(enrollment, course, block, index_chapter):
     )
 
 
-def auto_score_ora(course_id, usage_key, anonymous_user):
-    anonymous_user_id = anonymous_user.anonymous_user_id
+def autoscore_ora(course_id, usage_key, student):
+    anonymous_user_id = student['anonymous_user_id']
 
     # Find the associated rubric for that course_id & item_id
     rubric_dict = get_rubric_for_course(course_id, usage_key)

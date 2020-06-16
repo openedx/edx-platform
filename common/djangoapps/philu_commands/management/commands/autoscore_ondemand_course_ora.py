@@ -6,7 +6,7 @@ from pytz import utc
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.assessment.constants import ORA_BLOCK_TYPE
-from openedx.features.assessment.helpers import auto_score_ora, can_auto_score_ora
+from openedx.features.assessment.helpers import autoscore_ora, can_auto_score_ora
 from openedx.features.philu_utils.utils import get_anonymous_user
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
@@ -57,6 +57,12 @@ class Command(BaseCommand):
                                         if (block.block_type == ORA_BLOCK_TYPE and
                                                 can_auto_score_ora(enrollment, course, block, index_chapter)):
                                             anonymous_user = get_anonymous_user(user, course.id)
-                                            auto_score_ora(course.id, unicode(block), anonymous_user)
+                                            student = {
+                                                'id': user.id,
+                                                'username': user.username,
+                                                'email': user.email,
+                                                'anonymous_user_id': anonymous_user.anonymous_user_id
+                                            }
+                                            autoscore_ora(course.id, unicode(block), student)
 
                         max_module = max_module + 1
