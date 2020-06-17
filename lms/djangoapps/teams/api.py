@@ -274,11 +274,11 @@ def get_teams_accessible_by_user(user, topic_id_set, course_id, organization_pro
     filter_query = _get_team_filter_query(topic_id_set, course_id, organization_protection_status)
 
     # Staff gets unfiltered list of teams
-    course_module = modulestore().get_course(course_id)
-    if has_access(user, 'staff', course_module.id):
+    if has_access(user, 'staff', course_id):
         return CourseTeam.objects.filter(**filter_query)
 
     # Private teams should be hidden unless the student is a member
+    course_module = modulestore().get_course(course_id)
     private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
     return CourseTeam.objects.filter(**filter_query).exclude(
         Q(topic_id__in=private_teamset_ids), ~Q(membership__user=user)
