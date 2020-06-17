@@ -1087,6 +1087,17 @@ class RegistrationFormFactory(object):
                                     instructions="",
                                 )
 
+                    # Hide the confirm_email field
+                    form_desc.override_field_properties(
+                        "confirm_email",
+                        default="",
+                        field_type="hidden",
+                        required=False,
+                        label="",
+                        instructions="",
+                        restrictions={}
+                    )
+
                     # Hide the password field
                     form_desc.override_field_properties(
                         "password",
