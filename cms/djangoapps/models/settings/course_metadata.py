@@ -6,6 +6,7 @@ Django module for Course Metadata class -- manages advanced settings and related
 from datetime import datetime
 import six
 from crum import get_current_user
+from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.utils.translation import ugettext as _
 import pytz
@@ -143,6 +144,11 @@ class CourseMetadata(object):
         if not GlobalStaff().has_user(get_current_user()):
             exclude_list.append('create_zendesk_tickets')
 
+        # Do not show "Proctortrack Exam Escalation Contact" if Proctortrack is not
+        # an available proctoring backend.
+        if not settings.PROCTORING_BACKENDS or settings.PROCTORING_BACKENDS.get('proctortrack') is None:
+            exclude_list.append('proctoring_escalation_email')
+
         return exclude_list
 
     @classmethod
@@ -244,50 +250,20 @@ class CourseMetadata(object):
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
-            except (TypeError, ValueError) as err:
+            except (TypeError, ValueError, ValidationError) as err:
                 did_validate = False
                 errors.append({'message': text_type(err), 'model': model})
 
-        # Disallow updates to the proctoring provider after course start
-        proctoring_provider_model = filtered_dict.get('proctoring_provider', {})
-
-        # If the user is not edX staff, the user has requested a change to the proctoring_provider
-        # Advanced Setting, and and it is after course start, prevent the user from changing the
-        # proctoring provider.
-        if (
-            not user.is_staff and
-            cls._has_requested_proctoring_provider_changed(
-                descriptor.proctoring_provider, proctoring_provider_model.get('value')
-            ) and
-            datetime.now(pytz.UTC) > descriptor.start
-        ):
+        proctoring_errors = cls._validate_proctoring_settings(descriptor, filtered_dict, user)
+        if proctoring_errors:
+            errors = errors + proctoring_errors
             did_validate = False
-            message = (
-                'The proctoring provider cannot be modified after a course has started.'
-                ' Contact {support_email} for assistance'
-            ).format(support_email=settings.PARTNER_SUPPORT_EMAIL or 'support')
-            errors.append({'message': message, 'model': proctoring_provider_model})
 
         # If did validate, go ahead and update the metadata
         if did_validate:
             updated_data = cls.update_from_dict(key_values, descriptor, user, save=False)
 
         return did_validate, errors, updated_data
-
-    @staticmethod
-    def _has_requested_proctoring_provider_changed(current_provider, requested_provider):
-        """
-        Return whether the requested proctoring provider is different than the current proctoring provider, indicating
-        that the user has requested a change to the proctoring_provider Advanced Setting.
-
-        The requested_provider will be None if the proctoring_provider setting is not available (e.g. if the
-        ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled for the course). In this case, we consider
-        that there is no change in the requested proctoring provider.
-        """
-        if requested_provider is None:
-            return False
-        else:
-            return current_provider != requested_provider
 
     @classmethod
     def update_from_dict(cls, key_values, descriptor, user, save=True):
@@ -301,3 +277,66 @@ class CourseMetadata(object):
             modulestore().update_item(descriptor, user.id)
 
         return cls.fetch(descriptor)
+
+    @classmethod
+    def _validate_proctoring_settings(cls, descriptor, settings_dict, user):
+        """
+        Verify proctoring settings
+
+        Returns a list of error objects
+        """
+        errors = []
+
+        # If the user is not edX staff, the user has requested a change to the proctoring_provider
+        # Advanced Setting, and it is after course start, prevent the user from changing the
+        # proctoring provider.
+        proctoring_provider_model = settings_dict.get('proctoring_provider', {})
+        if (
+            not user.is_staff and
+            cls._has_requested_proctoring_provider_changed(
+                descriptor.proctoring_provider, proctoring_provider_model.get('value')
+            ) and
+            datetime.now(pytz.UTC) > descriptor.start
+        ):
+            message = (
+                'The proctoring provider cannot be modified after a course has started.'
+                ' Contact {support_email} for assistance'
+            ).format(support_email=settings.PARTNER_SUPPORT_EMAIL or 'support')
+            errors.append({'message': message, 'model': proctoring_provider_model})
+
+        # Require a valid escalation email if Proctortrack is chosen as the proctoring provider
+        escalation_email_model = settings_dict.get('proctoring_escalation_email')
+        if escalation_email_model:
+            escalation_email = escalation_email_model.get('value')
+        else:
+            escalation_email = descriptor.proctoring_escalation_email
+
+        missing_escalation_email_msg = 'Provider \'{provider}\' requires an exam escalation contact.'
+        if proctoring_provider_model and proctoring_provider_model.get('value') == 'proctortrack':
+            if not escalation_email:
+                message = missing_escalation_email_msg.format(provider=proctoring_provider_model.get('value'))
+                errors.append({'message': message, 'model': proctoring_provider_model})
+
+        if (
+            escalation_email_model and not proctoring_provider_model and
+            descriptor.proctoring_provider == 'proctortrack'
+        ):
+            if not escalation_email:
+                message = missing_escalation_email_msg.format(provider=descriptor.proctoring_provider)
+                errors.append({'message': message, 'model': escalation_email_model})
+
+        return errors
+
+    @staticmethod
+    def _has_requested_proctoring_provider_changed(current_provider, requested_provider):
+        """
+        Return whether the requested proctoring provider is different than the current proctoring provider, indicating
+        that the user has requested a change to the proctoring_provider Advanced Setting.
+        The requested_provider will be None if the proctoring_provider setting is not available (e.g. if the
+        ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled for the course). In this case, we consider
+        that there is no change in the requested proctoring provider.
+        """
+        if requested_provider is None:
+            return False
+        else:
+            return current_provider != requested_provider
