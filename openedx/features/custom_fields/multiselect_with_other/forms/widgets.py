@@ -1,6 +1,7 @@
 from django.forms.widgets import CheckboxSelectMultiple
 
-from openedx.features.custom_fields.multiselect_with_other.helpers import get_other_values
+from openedx.features.custom_fields.multiselect_with_other.helpers import \
+    get_other_values, filter_other_field_checkbox_value
 
 
 class CheckboxSelectMultipleWithOther(CheckboxSelectMultiple):
@@ -38,6 +39,11 @@ class CheckboxSelectMultipleWithOther(CheckboxSelectMultiple):
         self.other_choice = other_values
 
         return super(CheckboxSelectMultipleWithOther, self).optgroups(name, value, attrs)
+
+    def format_value(self, value):
+        return super(CheckboxSelectMultipleWithOther, self).format_value(
+            filter_other_field_checkbox_value(value)
+        )
 
 
 class RadioSelectWithOther(CheckboxSelectMultipleWithOther):

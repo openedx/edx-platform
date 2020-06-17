@@ -165,9 +165,7 @@ def interests(request):
         "interests": user_extended_profile.get_user_selected_interests(_type="fields"),
         "interested_learners": user_extended_profile.get_user_selected_interested_learners(_type="fields"),
         "personal_goals": user_extended_profile.get_user_selected_personal_goal(_type="fields"),
-        "hear_about_philanthropy": user_extended_profile.get_user_hear_about_philanthropy(_type="fields"),
-        "hear_about_philanthropy_other": user_extended_profile.hear_about_philanthropy_other if user_extended_profile
-            .hear_about_philanthropy_other else ''
+        "hear_about_philanthropy": user_extended_profile.get_user_hear_about_philanthropy(_type="fields")
     }
 
     if request.method == 'POST':

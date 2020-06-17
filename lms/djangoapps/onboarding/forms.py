@@ -4,20 +4,16 @@ Model form for the surveys.
 import json
 import logging
 from datetime import datetime
-from itertools import chain
 
 import os
 from django import forms
-from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_noop
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.features.ondemand_email_preferences.models import OnDemandEmailPreferences
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
-from lms.djangoapps.onboarding.helpers import COUNTRIES, LANGUAGES, get_country_iso, get_sorted_choices_from_dict, \
-    get_actual_field_names, admin_not_assigned_or_me
+from lms.djangoapps.onboarding.helpers import COUNTRIES, LANGUAGES, get_country_iso
 from lms.djangoapps.onboarding.models import (
     UserExtendedProfile,
     EmailPreference,
@@ -26,6 +22,10 @@ from lms.djangoapps.onboarding.models import (
     FocusArea, TotalEmployee, OrgSector, PartnerNetwork, OrganizationPartner, OrganizationMetric, Currency,
     GranteeOptIn)
 from lms.djangoapps.philu_overrides.helpers import save_user_partner_network_consent
+from onboarding import choices
+from openedx.features.ondemand_email_preferences.models import OnDemandEmailPreferences
+from openedx.features.custom_fields.multiselect_with_other.forms.fields import MultiSelectWithOtherFormField
+
 
 NO_OPTION_SELECT_ERROR = 'Please select an option for {}'
 EMPTY_FIELD_ERROR = 'Please enter your {}'
@@ -197,12 +197,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         self.fields['start_month_year'].required = False
         self.fields['hours_per_week'].required = False
 
-        focus_area_choices = ((field_name, label) for field_name, label in
-                              UserExtendedProfile.FUNCTIONS_LABELS.items())
-
-        focus_area_choices = sorted(focus_area_choices, key=lambda focus_area_choices: focus_area_choices[0])
-
-        self.fields['function_areas'] = forms.ChoiceField(choices=focus_area_choices,
+        self.fields['function_areas'] = forms.ChoiceField(choices=choices.FUNCTIONS,
                                                           label=ugettext_noop(
                                                               'Department or Function (Check all that apply.)'),
                                                           widget=forms.CheckboxSelectMultiple)
@@ -351,11 +346,12 @@ class UserInfoModelForm(BaseOnboardingModelForm):
             userprofile.gender = self.cleaned_data['gender']
         userprofile.save()
 
-        user_info_survey.country_of_employment = get_country_iso(request.POST.get('country_of_employment'))
+        user_info_survey.country_of_employment = get_country_iso(
+            request.POST.get('country_of_employment'))
         user_info_survey.city_of_employment = self.cleaned_data['city_of_employment']
 
-        selected_function_areas = get_actual_field_names(request.POST.getlist('function_areas'))
-        user_info_survey.user.extended_profile.save_user_function_areas(selected_function_areas)
+        user_info_survey.user.extended_profile.save_user_function_areas(
+            request.POST.getlist('function_areas'))
 
         is_currently_unemployed = self.cleaned_data['is_currently_employed']
 
@@ -420,8 +416,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
             user_info_survey.start_month_year = None
             user_info_survey.hours_per_week = 0
             user_info_survey.role_in_org = None
-            selected_function_areas = ""
-            user_info_survey.user.extended_profile.save_user_function_areas(selected_function_areas)
+            user_info_survey.user.extended_profile.save_user_function_areas(list())
             user_info_survey.is_organization_metrics_submitted = False
 
         if commit:
@@ -452,76 +447,66 @@ class InterestsForm(BaseOnboardingForm):
     This will record user's interests information as modeled in
     'UserExtendedProfile' model.
     """
+    interests = forms.ChoiceField(
+        label=ugettext_noop('Which of these areas of organizational effectiveness are you most interested '
+                            'to learn more about? (Check all that apply.)'),
+        choices=choices.INTERESTS, widget=forms.CheckboxSelectMultiple,
+        required=False)
 
-    def __init__(self, *args, **kwargs):
-        super(InterestsForm, self).__init__(*args, **kwargs)
+    interested_learners = forms.ChoiceField(
+        label=ugettext_noop('Which types of other Philanthropy University learners are interesting to you? '
+                            '(Check all that apply.)'),
+        choices=choices.INTERESTED_LEARNERS, widget=forms.CheckboxSelectMultiple,
+        required=False)
 
-        interest_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTS_LABELS)
-        interest_choices = sorted(interest_choices, key=lambda interest_choices: interest_choices[0])
-        self.fields['interests'] = forms.ChoiceField(
-            label=ugettext_noop('Which of these areas of organizational effectiveness are you most interested '
-                                'to learn more about? (Check all that apply.)'),
-            choices=interest_choices, widget=forms.CheckboxSelectMultiple,
-            required=False)
+    personal_goals = forms.ChoiceField(
+        label=ugettext_noop('What is your most important personal goal in joining Philanthropy University? '
+                            '(Check all that apply.)'),
+        choices=choices.GOALS, widget=forms.CheckboxSelectMultiple,
+        required=False)
 
-        interested_learners_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTED_LEARNERS_LABELS)
-        interested_learners_choices = sorted(interested_learners_choices,
-                                             key=lambda interested_learners_choices: interested_learners_choices[0])
-        self.fields['interested_learners'] = forms.ChoiceField(
-            label=ugettext_noop('Which types of other Philanthropy University learners are interesting to you? '
-                                '(Check all that apply.)'),
-            choices=interested_learners_choices, widget=forms.CheckboxSelectMultiple,
-            required=False)
+    hear_about_philanthropy = MultiSelectWithOtherFormField(
+        label=ugettext_noop('How did you hear about Philanthropy University?'
+                            ' (Choose one. If more than one applies, please '
+                            'choose the source that most strongly '
+                            'influenced you to visit the website.)'),
+        choices=choices.HEAR_ABOUT_PHILANTHROPY, max_choices=1, required=False)
 
-        personal_goal_choices = get_sorted_choices_from_dict(UserExtendedProfile.GOALS_LABELS)
-        personal_goal_choices = sorted(personal_goal_choices,
-                                       key=lambda personal_goal_choices: personal_goal_choices[0])
-        self.fields['personal_goals'] = forms.ChoiceField(
-            label=ugettext_noop('What is your most important personal goal in joining Philanthropy University? '
-                                '(Check all that apply.)'),
-            choices=personal_goal_choices, widget=forms.CheckboxSelectMultiple,
-            required=False)
+    def clean_hear_about_philanthropy(self):
+        name = 'hear_about_philanthropy'
+        field = self.fields[name]
 
-        hear_about_philanthropy_choices = get_sorted_choices_from_dict(UserExtendedProfile
-                                                                       .HEAR_ABOUT_PHILANTHROPY_LABELS)
-        hear_about_philanthropy_choices = sorted(hear_about_philanthropy_choices,
-                                                 key=lambda hear_about_philanthropy_choices:
-                                                 hear_about_philanthropy_choices[0])
-        self.fields['hear_about_philanthropy'] = forms.ChoiceField(
-            label=ugettext_noop('How did you hear about Philanthropy University?'
-                                ' (Choose one. If more than one applies, please choose the source that most strongly '
-                                'influenced you to visit the website.)'),
-            choices=hear_about_philanthropy_choices, widget=forms.RadioSelect,
-            required=False)
+        if field.disabled:
+            value = self.get_initial_for_field(field, name)
+        else:
+            value = field.widget.value_from_datadict(
+                self.data, self.files, self.add_prefix(name))
 
-        self.fields['hear_about_philanthropy_other'] = forms.CharField(
-            max_length=255,
-            required=False,
-            widget=forms.TextInput(
-                attrs={'placeholder': ugettext_noop('Other Reason')}
-            ))
+        try:
+            value = field.clean(value)
+            self.cleaned_data[name] = value
+        except forms.ValidationError as e:
+            self.add_error(name, e)
 
     def _clean_fields(self):
         """
         Override to prevent 'valid choice options' validations
         """
+        self.clean_hear_about_philanthropy()
         return True
 
     def save(self, request, user_extended_profile):
         """
         save form selected choices without any validation
         """
-        selected_interests = get_actual_field_names(request.POST.getlist('interests'))
-        selected_interested_learners = get_actual_field_names(request.POST.getlist('interested_learners'))
-        selected_personal_goals = get_actual_field_names(request.POST.getlist('personal_goals'))
-        selected_hear_about_philanthropy = get_actual_field_names(request.POST.getlist('hear_about_philanthropy'))
-
-        user_extended_profile.save_user_interests(selected_interests)
-        user_extended_profile.save_user_interested_learners(selected_interested_learners)
-        user_extended_profile.save_user_personal_goals(selected_personal_goals)
-        user_extended_profile.save_user_hear_about_philanthropy_result(selected_hear_about_philanthropy,
-                                                                       request.POST.getlist('hear_about_'
-                                                                                            'philanthropy_other'))
+        user_extended_profile.save_user_interests(
+            request.POST.getlist('interests'))
+        user_extended_profile.save_user_interested_learners(
+            request.POST.getlist('interested_learners'))
+        user_extended_profile.save_user_personal_goals(
+            request.POST.getlist('personal_goals'))
+        user_extended_profile.save_user_hear_about_philanthropy_result(
+            request.POST.getlist('hear_about_philanthropy'))
 
         user_extended_profile.is_interests_data_submitted = True
         user_extended_profile.save()

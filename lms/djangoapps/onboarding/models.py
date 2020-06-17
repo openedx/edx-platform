@@ -24,6 +24,8 @@ from constants import (
     TAKE_ME_THERE_VAL
 )
 from openedx.features.custom_fields.multiselect_with_other.db.fields import MultiSelectWithOtherField
+from openedx.features.custom_fields.multiselect_with_other.helpers import \
+    filter_other_field_checkbox_value
 from student.models import UserProfile
 
 log = logging.getLogger("edx.onboarding")
@@ -522,14 +524,10 @@ class UserExtendedProfile(TimeStampedModel):
         :return: list of labels / names of fields
         """
         if _type == "labels":
-            return [label for field_name, label in self.FUNCTIONS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        elif _type == "field_name":
-            return [field_name.split('=')[1] for field_name, label in self.FUNCTIONS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        else:
-            return [field_name for field_name, label in self.FUNCTIONS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
+            return [self.function_areas.choices.get(function_area)
+                    for function_area in self.function_areas]
+
+        return list(self.function_areas)
 
     def get_user_selected_interests(self, _type="labels"):
         """
@@ -538,14 +536,9 @@ class UserExtendedProfile(TimeStampedModel):
         :return: list of labels / names of fields
         """
         if _type == "labels":
-            return [label for field_name, label in self.INTERESTS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        elif _type == "field_name":
-            return [field_name.split('=')[1] for field_name, label in self.INTERESTS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        else:
-            return [field_name for field_name, label in self.INTERESTS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
+            return map(self.interests.choices.get, self.interests)
+
+        return list(self.interests)
 
     def get_user_selected_interested_learners(self, _type="labels"):
         """
@@ -553,13 +546,10 @@ class UserExtendedProfile(TimeStampedModel):
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-
         if _type == "labels":
-            return [label for field_name, label in self.INTERESTED_LEARNERS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        else:
-            return [field_name for field_name, label in self.INTERESTED_LEARNERS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
+            return map(self.learners_related.choices.get, self.learners_related)
+
+        return list(self.learners_related)
 
     def get_user_selected_personal_goal(self, _type="labels"):
         """
@@ -567,13 +557,10 @@ class UserExtendedProfile(TimeStampedModel):
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-
         if _type == "labels":
-            return [label for field_name, label in self.GOALS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        else:
-            return [field_name for field_name, label in self.GOALS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
+            return map(self.goals.choices.get, self.goals)
+
+        return list(self.goals)
 
     def get_user_hear_about_philanthropy(self, _type="labels"):
         """
@@ -582,73 +569,35 @@ class UserExtendedProfile(TimeStampedModel):
         :return: list of labels / names of fields
         """
         if _type == "labels":
-            _field_label_data = [label for field_name, label in self.GOALS_LABELS.items() if
-                                 getattr(self, 'hear_about_philanthropy') ==
-                                 self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(field_name)]
-        else:
-            _field_label_data = [field_name for field_name, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items() if
-                                 getattr(self, 'hear_about_philanthropy') ==
-                                 self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(field_name)]
-        return _field_label_data if not _field_label_data else _field_label_data[0]
+            return map(lambda x: self.hear_about_philanthropyu.choices.get(x, x),
+                       self.hear_about_philanthropyu)
 
-    def save_user_hear_about_philanthropy_result(self, selected_values, _other_field):
-        _updated_value_about_philanthropy = None
-        _updated_value_about_philanthropy_other = None
+        return list(self.hear_about_philanthropyu)
 
-        for function_area_field, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items():
-            _function_area_field = function_area_field.split("=")[1]
-            if _function_area_field in selected_values:
-                _updated_value_about_philanthropy = self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(function_area_field)
-            if _function_area_field == 'hear_about_other' and _other_field:
-                _updated_value_about_philanthropy_other = _other_field[0]
-
-        self.__setattr__('hear_about_philanthropy', _updated_value_about_philanthropy)
-        self.__setattr__('hear_about_philanthropy_other', _updated_value_about_philanthropy_other)
+    def save_user_hear_about_philanthropy_result(self, selected_values):
+        self.hear_about_philanthropyu = \
+            filter_other_field_checkbox_value(selected_values)
 
     def save_user_function_areas(self, selected_values):
         """
         Save users selected function areas
         :param selected_values: selected values list
         """
-
-        for function_area_field, label in self.FUNCTIONS_LABELS.items():
-            function_area_field = function_area_field.split("=")[1]
-            if function_area_field in selected_values:
-                _updated_value = 1
-            else:
-                _updated_value = 0
-
-            self.__setattr__(function_area_field, _updated_value)
+        self.function_areas = selected_values
 
     def save_user_interests(self, selected_values):
         """
         Save users selected interests
         :param selected_values: selected values list
         """
-
-        for interest_field, label in self.INTERESTS_LABELS.items():
-            interest_field = interest_field.split("=")[1]
-            if interest_field in selected_values:
-                _updated_value = 1
-            else:
-                _updated_value = 0
-
-            self.__setattr__(interest_field, _updated_value)
+        self.interests = selected_values
 
     def save_user_interested_learners(self, selected_values):
         """
         Save users selected interested learners
         :param selected_values: selected values list
         """
-
-        for interested_learner_field, label in self.INTERESTED_LEARNERS_LABELS.items():
-            interested_learner_field = interested_learner_field.split("=")[1]
-            if interested_learner_field in selected_values:
-                _updated_value = 1
-            else:
-                _updated_value = 0
-
-            self.__setattr__(interested_learner_field, _updated_value)
+        self.learners_related = selected_values
 
     def is_organization_data_filled(self):
         """
@@ -668,15 +617,7 @@ class UserExtendedProfile(TimeStampedModel):
         Save data for users personal goals
         :param selected_values: list of selected goals
         """
-
-        for goal_field, label in self.GOALS_LABELS.items():
-            goal_field = goal_field.split("=")[1]
-            if goal_field in selected_values:
-                _updated_value = 1
-            else:
-                _updated_value = 0
-
-            self.__setattr__(goal_field, _updated_value)
+        self.goals = selected_values
 
     def get_normal_user_attend_surveys(self):
         """
