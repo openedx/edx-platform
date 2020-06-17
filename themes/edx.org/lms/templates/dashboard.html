@@ -168,6 +168,11 @@ from student.models import CourseEnrollment
       </div>
     </a>
   % endif
+  ${static.renderReact(
+    component="DemographicsCollectionModal",
+    id="dashboard-demographics-collection-modal",
+    props={},
+  )}
   <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
