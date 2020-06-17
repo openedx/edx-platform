@@ -56,3 +56,13 @@ class DatesTabTestViews(BaseCourseHomeTests):
         url = reverse('course-home-dates-tab', args=['course-v1:unknown+course+2T2020'])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)
+    def test_banner_data_is_returned(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'missed_deadlines')
+        self.assertContains(response, 'missed_gated_content')
+        self.assertContains(response, 'content_type_gating_enabled')
+        self.assertContains(response, 'verified_upgrade_link')

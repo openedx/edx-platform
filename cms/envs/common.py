@@ -1403,6 +1403,9 @@ INSTALLED_APPS = [
     # Catalog integration
     'openedx.core.djangoapps.catalog',
 
+    # Programs support
+    'openedx.core.djangoapps.programs.apps.ProgramsConfig',
+
     # django-oauth-toolkit
     'oauth2_provider',
 

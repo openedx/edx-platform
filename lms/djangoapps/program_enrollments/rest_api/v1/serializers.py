@@ -37,12 +37,24 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
     status = serializers.CharField()
     account_exists = serializers.SerializerMethodField()
     curriculum_uuid = serializers.UUIDField()
+    username = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
 
     class Meta(object):
         model = ProgramEnrollment
 
     def get_account_exists(self, obj):
         return bool(obj.user)
+
+    def get_username(self, obj):
+        if obj.user:
+            return obj.user.username
+        return ""
+
+    def get_email(self, obj):
+        if obj.user:
+            return obj.user.email
+        return ""
 
 
 class ProgramEnrollmentRequestMixin(InvalidStatusMixin, serializers.Serializer):

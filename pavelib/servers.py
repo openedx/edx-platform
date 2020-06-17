@@ -259,7 +259,7 @@ def update_db(options):
     fake = "--fake-initial" if getattr(options, 'fake_initial', False) else ""
     for system in ('lms', 'cms'):
         # pylint: disable=line-too-long
-        sh(u"NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback --pythonpath=. {fake}".format(
+        sh("NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{system} --traceback --pythonpath=. {fake}".format(
             settings=settings,
             system=system,
             fake=fake))
@@ -282,9 +282,9 @@ def check_settings(args):
     settings = args.settings[0]
 
     try:
-        import_cmd = u"echo 'import {system}.envs.{settings}'".format(system=system, settings=settings)
+        import_cmd = "echo 'import {system}.envs.{settings}'".format(system=system, settings=settings)
         django_shell_cmd = django_cmd(system, settings, 'shell', '--plain', '--pythonpath=.')
-        sh(u"{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd))
+        sh("{import_cmd} | {shell_cmd}".format(import_cmd=import_cmd, shell_cmd=django_shell_cmd))
 
     except:  # pylint: disable=bare-except
         print("Failed to import settings", file=sys.stderr)

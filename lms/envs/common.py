@@ -478,6 +478,19 @@ FEATURES = {
     # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
+
+    # .. toggle_name: ENABLE_ORA_USERNAMES_ON_DATA_EXPORT
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to add deanonymized usernames to ORA data report.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: incremental_release
+    # .. toggle_creation_date: 2020-06-11
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-7273
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_USERNAMES_ON_DATA_EXPORT': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews

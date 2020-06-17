@@ -4,16 +4,13 @@ Install Python and Node prerequisites.
 
 
 import hashlib
-import io
 import os
 import re
 import subprocess
 import sys
 from distutils import sysconfig
 
-import six
 from paver.easy import BuildFailure, sh, task
-from six.moves import range
 
 from .utils.envs import Env
 from .utils.timer import timed
@@ -84,7 +81,7 @@ def compute_fingerprint(path_list):
 
         # For files, hash the contents of the file
         if os.path.isfile(path_item):
-            with io.open(path_item, "rb") as file_handle:
+            with open(path_item, "rb") as file_handle:
                 hasher.update(file_handle.read())
 
     return hasher.hexdigest()
@@ -103,7 +100,7 @@ def prereq_cache(cache_name, paths, install_func):
     cache_file_path = os.path.join(PREREQS_STATE_DIR, "{}.sha1".format(cache_filename))
     old_hash = None
     if os.path.isfile(cache_file_path):
-        with io.open(cache_file_path, "r") as cache_file:
+        with open(cache_file_path, "r") as cache_file:
             old_hash = cache_file.read()
 
     # Compare the old hash to the new hash
@@ -117,13 +114,13 @@ def prereq_cache(cache_name, paths, install_func):
         # If the code executed within the context fails (throws an exception),
         # then this step won't get executed.
         create_prereqs_cache_dir()
-        with io.open(cache_file_path, "wb") as cache_file:
+        with open(cache_file_path, "wb") as cache_file:
             # Since the pip requirement files are modified during the install
             # process, we need to store the hash generated AFTER the installation
             post_install_hash = compute_fingerprint(paths)
             cache_file.write(post_install_hash.encode('utf-8'))
     else:
-        print(u'{cache} unchanged, skipping...'.format(cache=cache_name))
+        print('{cache} unchanged, skipping...'.format(cache=cache_name))
 
 
 def node_prereqs_installation():
@@ -138,7 +135,7 @@ def node_prereqs_installation():
         npm_log_file_path = '{}/npm-install.{}.log'.format(Env.GEN_LOG_DIR, shard_str)
     else:
         npm_log_file_path = '{}/npm-install.log'.format(Env.GEN_LOG_DIR)
-    npm_log_file = io.open(npm_log_file_path, 'wb')
+    npm_log_file = open(npm_log_file_path, 'wb')
     npm_command = 'npm install --verbose'.split()
 
     cb_error_text = "Subprocess return code: 1"
@@ -153,13 +150,13 @@ def node_prereqs_installation():
         proc = subprocess.Popen(npm_command, stderr=npm_log_file)
         proc.wait()
     except BuildFailure as error:
-        if cb_error_text in six.text_type(error):
+        if cb_error_text in str(error):
             print("npm install error detected. Retrying...")
             proc = subprocess.Popen(npm_command, stderr=npm_log_file)
             proc.wait()
         else:
             raise
-    print(u"Successfully installed NPM packages. Log found at {}".format(
+    print("Successfully installed NPM packages. Log found at {}".format(
         npm_log_file_path
     ))
 
@@ -175,7 +172,7 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
-    sh(u"{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
+    sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
 @task
@@ -234,7 +231,7 @@ def uninstall_python_packages():
     create_prereqs_cache_dir()
 
     if os.path.isfile(state_file_path):
-        with io.open(state_file_path) as state_file:
+        with open(state_file_path) as state_file:
             version = state_file.read()
         if version == expected_version:
             print('Python uninstalls unchanged, skipping...')
@@ -250,7 +247,7 @@ def uninstall_python_packages():
         for package_name in PACKAGES_TO_UNINSTALL:
             if package_in_frozen(package_name, frozen):
                 # Uninstall the pacakge
-                sh(u"pip uninstall --disable-pip-version-check -y {}".format(package_name))
+                sh("pip uninstall --disable-pip-version-check -y {}".format(package_name))
                 uninstalled = True
         if not uninstalled:
             break
@@ -260,7 +257,7 @@ def uninstall_python_packages():
         return
 
     # Write our version.
-    with io.open(state_file_path, "wb") as state_file:
+    with open(state_file_path, "wb") as state_file:
         state_file.write(expected_version.encode('utf-8'))
 
 
@@ -344,8 +341,7 @@ def install_prereqs():
 
 def log_installed_python_prereqs():
     """  Logs output of pip freeze for debugging. """
-    sh(u"pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
-    return
+    sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
 
 
 def print_devstack_warning():
