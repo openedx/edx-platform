@@ -7,6 +7,7 @@ import six
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import Http404
+from django.utils.cache import patch_response_headers
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -22,8 +23,8 @@ from .api import get_blocks
 from .forms import BlockListGetForm
 
 
-@view_auth_classes()
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
+@view_auth_classes(is_authenticated=False)
 class BlocksView(DeveloperErrorViewMixin, ListAPIView):
     """
     **Use Case**
@@ -53,12 +54,16 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
 
         * username: (string) Required, unless ``all_blocks`` is specified.
           Specify the username for the user whose course blocks are requested.
-          Only users with course staff permissions can specify other users'
-          usernames. If a username is specified, results include blocks that
-          are visible to that user, including those based on group or cohort
-          membership or randomized content assigned to that user.
+          A blank/empty username can be used to request the blocks accessible
+          to anonymous users (for public courses). Only users with course staff
+          permissions can specify other users' usernames. If a username is
+          specified, results include blocks that are visible to that user,
+          including those based on group or cohort membership or randomized
+          content assigned to that user.
 
           Example: username=anjali
+                   username=''
+                   username
 
         * student_view_data: (list) Indicates for which block types to return
           student_view_data.
@@ -211,7 +216,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             raise ValidationError(params.errors)
 
         try:
-            return Response(
+            response = Response(
                 get_blocks(
                     request,
                     params.cleaned_data['usage_key'],
@@ -226,11 +231,17 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                     hide_access_denials=hide_access_denials,
                 )
             )
+            # If the username is an empty string, and not None, then we are requesting
+            # data about the anonymous view of a course, which can be cached. In this
+            # case we add the usual caching headers to the response.
+            if params.cleaned_data.get('username', None) == '':
+                patch_response_headers(response)
+            return response
         except ItemNotFoundError as exception:
             raise Http404(u"Block not found: {}".format(text_type(exception)))
 
 
-@view_auth_classes()
+@view_auth_classes(is_authenticated=False)
 class BlocksInCourseView(BlocksView):
     """
     **Use Case**
