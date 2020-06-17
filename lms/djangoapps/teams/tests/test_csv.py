@@ -1,5 +1,6 @@
 """ Tests for the functionality in csv """
 
+from csv import DictReader
 from io import StringIO
 
 from lms.djangoapps.teams import csv
@@ -142,6 +143,7 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
                 'id': 'teamset_1',
                 'name': 'teamset_name',
                 'description': 'teamset_desc',
+                'max_team_size': 3,
             }]
         })
         cls.course = CourseFactory(teams_configuration=teams_config)
@@ -206,3 +208,39 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
 
         # They are successfully removed from the team
         self.assertFalse(CourseTeamMembership.is_user_on_team(audit_learner, course_1_team))
+
+    def test_validate_max_size_correctly(self):
+        # Given a bunch of students enrolled in a course
+        users = []
+        for i in range(5):
+            user = UserFactory.create(username='learner_{id}'.format(id=i))
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode='audit')
+            users.append(user)
+
+        # When a team is already at/near capaciy
+        for i in range(3):
+            user = users[i]
+            row = {'user': user, 'teamset_1': 'team_1', 'mode': 'audit'}
+            self.import_manager.add_user_to_team(row)
+
+        # ... and I try to switch membership (add/remove)
+        csv_data = self._csv_reader_from_array([
+            ['user','mode', 'teamset_1'],
+            ['learner_4', 'audit', 'team_1'],
+            ['learner_0', 'audit', ''],
+        ])
+
+        result = self.import_manager.set_team_memberships(csv_data)
+
+        # Existing behavior is to fail since learner is added to team (max size exceeded)
+        # before learner is removed
+        self.assertFalse(result)
+
+    def _csv_reader_from_array(self, rows):
+        """
+        Given a 2D array, treat each element as a cell of a CSV file and construct a reader
+
+        Example:
+            [['header1', 'header2'], ['r1:c1', 'r1:c2'], ['r2:c2', 'r3:c3'] ... ]
+        """
+        return DictReader((','.join(row) for row in rows))
