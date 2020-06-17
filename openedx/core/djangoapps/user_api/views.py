@@ -34,7 +34,6 @@ from openedx.core.djangoapps.user_api.serializers import CountryTimeZoneSerializ
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
-from openedx.features.edly.cookies import set_logged_in_edly_cookies
 from openedx.features.edly.utils import create_user_link_with_edly_sub_organization
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
@@ -174,7 +173,6 @@ class RegistrationView(APIView):
 
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
-        set_logged_in_edly_cookies(request, response, user)
         return response
 
     @method_decorator(transaction.non_atomic_requests)

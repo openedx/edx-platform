@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
+from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings as cookie_settings
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.features.edly import cookies as cookies_api
 from openedx.features.edly.tests.factories import EdlySubOrganizationFactory, EdlyUserProfileFactory, SiteFactory
@@ -114,7 +115,11 @@ class UtilsTests(TestCase):
         Test user have access to a valid site URL which is linked to that user.
         """
         self._create_edly_sub_organization()
-        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user)
+        response = cookies_api.set_logged_in_edly_cookies(
+            self.request, HttpResponse(),
+            self.user,
+            cookie_settings(self.request)
+        )
         self._copy_cookies_to_request(response, self.request)
 
         user_has_access = user_has_edly_organization_access(self.request)
