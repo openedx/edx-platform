@@ -52,7 +52,6 @@ from .api import (
     can_user_modify_team,
     can_user_create_team_in_topic,
     get_assignments_for_team,
-    get_teams_with_visibility,
     has_course_staff_privileges,
     has_specific_team_access,
     has_specific_teamset_access,

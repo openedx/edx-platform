@@ -268,8 +268,8 @@ def _get_team_filter_query(topic_id_set, course_id, organization_protection_stat
     return filter_query
 
 
-def get_teams_with_visibility(user, topic_id_set, course_id, organization_protection_status):
-    """ Get teams taking into account user visibility privileges """
+def get_teams_accessible_by_user(user, topic_id_set, course_id, organization_protection_status):
+    """ Get teams taking for a user, taking into account user visibility privileges """
     # Filter by topics, course, and protection status
     filter_query = _get_team_filter_query(topic_id_set, course_id, organization_protection_status)
 
@@ -291,7 +291,7 @@ def add_team_count(user, topics, course_id, organization_protection_status):
     This allows for a more efficient single query.
     """
     topic_ids = [topic['id'] for topic in topics]
-    teams_query_set = get_teams_with_visibility(
+    teams_query_set = get_teams_accessible_by_user(
         user,
         topic_ids,
         course_id,
