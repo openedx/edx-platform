@@ -390,10 +390,12 @@ if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
 # in it's path. Re-calling derive_settings doesn't work because the settings was already
 # changed from a function to a list, and it can't be derived again.
 
-# from .common import _make_mako_template_dirs
-# ENABLE_COMPREHENSIVE_THEMING = True
-# COMPREHENSIVE_THEME_DIRS = [
-#     "/edx/app/edxapp/edx-platform/themes/"
-# ]
-# TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
-# derive_settings(__name__)
+from .common import _make_mako_template_dirs
+ENABLE_COMPREHENSIVE_THEMING = True
+COMPREHENSIVE_THEME_DIRS = [
+    "/edx/app/edxapp/edx-platform/themes/"
+]
+TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
+derive_settings(__name__)
+
+ENABLE_DEMOGRAPHICS_COLLECTION = True

@@ -1,4 +1,10 @@
+
 .dashboard {
+  .demographics-collection-modal {
+    .paragon__modal-header button {
+      display: none;
+    }
+  }
   .demographics-banner {
     background-color: #23419f;
     border-radius: 12px;

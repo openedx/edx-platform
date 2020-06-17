@@ -160,6 +160,11 @@ from student.models import CourseEnrollment
       </div>
     </a>
   % endif
+  ${static.renderReact(
+    component="DemographicsCollectionModal",
+    id="dashboard-demographics-collection-modal",
+    props={},
+  )}
   <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
@@ -270,6 +275,7 @@ from student.models import CourseEnrollment
       ${sidebar_account_activation_message | n, decode.utf8}
     </div>
   %endif
+
 
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
