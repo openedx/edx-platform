@@ -5,6 +5,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
 
+from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings as cookie_settings
 from openedx.features.edly.tests.factories import SiteFactory, EdlySubOrganizationFactory
 from openedx.features.edly import cookies as cookies_api
 from student import auth
@@ -27,6 +28,7 @@ class CookieTests(TestCase):
         self.request.user = self.user
         self.request.session = self._get_stub_session()
         self.request.site = SiteFactory()
+        self.cookie_settings = cookie_settings(self.request)
 
     def _get_stub_session(self, expire_at_browser_close=False, max_age=604800):
         return MagicMock(
@@ -64,14 +66,14 @@ class CookieTests(TestCase):
         Tests that Edly user info cookie is set correctly.
         """
         self._create_edly_sub_organization()
-        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user)
+        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user, self.cookie_settings)
         assert settings.EDLY_USER_INFO_COOKIE_NAME in response.cookies
 
     def test_set_logged_in_edly_cookies_with_no_edly_sub_organiztion(self):
         """
         Tests that Edly user info cookie is set to empty in absence of edly sub-organization.
         """
-        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user)
+        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user, self.cookie_settings)
         assert settings.EDLY_USER_INFO_COOKIE_NAME in response.cookies
         assert response.cookies.get(settings.EDLY_USER_INFO_COOKIE_NAME).value == ''
 
@@ -80,7 +82,7 @@ class CookieTests(TestCase):
         Tests that Edly user info cookie is deleted correctly.
         """
         self._create_edly_sub_organization()
-        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user)
+        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user, self.cookie_settings)
         assert settings.EDLY_USER_INFO_COOKIE_NAME in response.cookies
 
         cookies_api.delete_logged_in_edly_cookies(response)

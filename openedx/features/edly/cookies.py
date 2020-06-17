@@ -1,13 +1,12 @@
 from django.conf import settings
 
-from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.features.edly.models import EdlySubOrganization
 from openedx.features.edly.utils import encode_edly_user_info_cookie
 from student import auth
 from student.roles import CourseCreatorRole
 
 
-def set_logged_in_edly_cookies(request, response, user):
+def set_logged_in_edly_cookies(request, response, user, cookie_settings):
     """
     Set cookies for edly users at the time of login.
 
@@ -22,7 +21,6 @@ def set_logged_in_edly_cookies(request, response, user):
 
     """
     if user.is_authenticated and not user.is_anonymous:
-        cookie_settings = standard_cookie_settings(request)
         edly_cookie_string = _get_edly_user_info_cookie_string(request)
 
         response.set_cookie(
