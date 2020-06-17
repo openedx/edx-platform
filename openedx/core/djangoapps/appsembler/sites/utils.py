@@ -1,3 +1,4 @@
+import beeline
 import json
 from itertools import izip
 from urlparse import urlparse
@@ -23,12 +24,15 @@ from openedx.core.djangoapps.theming.helpers import get_current_request, get_cur
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 
+@beeline.traced(name="get_lms_link_from_course_key")
 def get_lms_link_from_course_key(base_lms_url, course_key):
     """
     Returns the microsite-aware LMS link based on the organization the course
     belongs to. If there is a Custom Domain in use, will return the custom
     domain URL instead.
     """
+    beeline.add_context_field("base_lms_url", base_lms_url)
+    beeline.add_context_field("course_key", course_key)
     try:
         site_domain = Site.objects.get(name=course_key.org).domain
     except Site.DoesNotExist:
@@ -37,6 +41,7 @@ def get_lms_link_from_course_key(base_lms_url, course_key):
     return site_domain
 
 
+@beeline.traced(name="get_site_by_organization")
 def get_site_by_organization(org):
     """
     Get the site matching the organization, throws an error if there's more than one site.
@@ -45,6 +50,7 @@ def get_site_by_organization(org):
     return org.sites.all()[0]
 
 
+@beeline.traced(name="get_amc_oauth_client")
 def get_amc_oauth_client():
     """
     Return the AMC OAuth2 Client model instance.
@@ -52,6 +58,7 @@ def get_amc_oauth_client():
     return Client.objects.get(url=settings.FEATURES['AMC_APP_URL'])
 
 
+@beeline.traced(name="get_amc_tokens")
 def get_amc_tokens(user):
     """
     Return the the access and refresh token with expiry date in a dict.
@@ -82,6 +89,7 @@ def get_amc_tokens(user):
     return tokens
 
 
+@beeline.traced(name="reset_amc_token")
 def reset_amc_tokens(user, access_token=None, refresh_token=None):
     """
     Create and return new tokens, or extend existing ones to one year in the future.
@@ -117,6 +125,7 @@ def reset_amc_tokens(user, access_token=None, refresh_token=None):
     return get_amc_tokens(user)
 
 
+@beeline.traced(name="get_single_user_organization")
 def get_single_user_organization(user):
     """
     Finds the single organization the user is associated with.
@@ -127,6 +136,7 @@ def get_single_user_organization(user):
     return uom.organization
 
 
+@beeline.traced(name="make_amc_admin")
 def make_amc_admin(user, org_name):
     """
     Make a user AMC admin with the following steps:
@@ -167,6 +177,7 @@ def to_safe_file_name(url):
     return sluggified
 
 
+@beeline.traced(name="is_request_for_amc_admin")
 def is_request_for_amc_admin(request):
     """
     Verifies the user is being made on behalf of AMC admin.
@@ -189,6 +200,7 @@ def is_request_for_amc_admin(request):
     return False
 
 
+@beeline.traced(name="get_current_organization")
 def get_current_organization(failure_return_none=False):
     """
     Get current organization from request using multiple strategies.
@@ -234,6 +246,7 @@ def get_current_organization(failure_return_none=False):
     return current_org
 
 
+@beeline.traced(name="is_request_for_new_amc_site")
 def is_request_for_new_amc_site(request):
     """
     Check if request is being made for a new AMC signup.
@@ -249,6 +262,7 @@ def is_request_for_new_amc_site(request):
     return is_for_admin and not invitation_organization_name
 
 
+@beeline.traced(name="get_customer_files_storage")
 def get_customer_files_storage():
     kwargs = {}
     # Passing these settings to the FileSystemStorage causes an exception
@@ -262,6 +276,7 @@ def get_customer_files_storage():
     return get_storage_class()(**kwargs)
 
 
+@beeline.traced(name="get_initial_sass_variables")
 def get_initial_sass_variables():
     """
     This method loads the SASS variables file from the currently active theme. It is used as a default value
@@ -272,6 +287,7 @@ def get_initial_sass_variables():
     return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
 
 
+@beeline.traced(name="get_branding_values_from_file")
 def get_branding_values_from_file():
     from openedx.core.djangoapps.theming.helpers import get_theme_base_dir, Theme
 
@@ -296,6 +312,7 @@ def get_branding_values_from_file():
     return values
 
 
+@beeline.traced(name="get_branding_labels_from_file")
 def get_branding_labels_from_file(custom_branding=None):
 
     if not settings.ENABLE_COMPREHENSIVE_THEMING:
@@ -314,6 +331,7 @@ def get_branding_labels_from_file(custom_branding=None):
     return labels
 
 
+@beeline.traced(name="compile_sass")
 def compile_sass(sass_file, custom_branding=None):
     from openedx.core.djangoapps.theming.helpers import get_theme_base_dir, Theme
     site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
@@ -362,6 +380,7 @@ def json_to_sass(json_input):
     return dict_to_sass(sass_dict)
 
 
+@beeline.traced(name="bootstrap_site")
 def bootstrap_site(site, org_data=None, username=None):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     organization_slug = org_data.get('name')
@@ -390,6 +409,7 @@ def bootstrap_site(site, org_data=None, username=None):
     return organization, site, user
 
 
+@beeline.traced(name="delete_site")
 def delete_site(site):
     site.configuration.delete()
     site.themes.all().delete()
@@ -397,6 +417,7 @@ def delete_site(site):
     site.delete()
 
 
+@beeline.traced(name="add_course_creator_role")
 def add_course_creator_role(user):
     """
     Allow users registered from AMC to create courses.
@@ -410,6 +431,7 @@ def add_course_creator_role(user):
     CourseAccessRole.objects.create(user=user, role=CourseCreatorRole.ROLE, course_id=None, org='')
 
 
+@beeline.traced(name="migrate_page_element")
 def migrate_page_element(element):
     """
     Translate the `content` in the page element, apply the same for all children elements.

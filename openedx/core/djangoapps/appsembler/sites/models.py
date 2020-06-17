@@ -6,6 +6,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.http.request import split_domain_port
 from django.contrib.sites.models import Site, SiteManager, SITE_CACHE
+import beeline
 import django
 
 cache = caches['default']
@@ -19,22 +20,29 @@ def _cache_key_for_site_host(site_host):
     return 'site:host:%s' % (site_host,)
 
 
+@beeline.traced(name="patched_get_site_by_id")
 def patched_get_site_by_id(self, site_id):
+    beeline.add_context_field("site_id", site_id)
     key = _cache_key_for_site_id(site_id)
     site = cache.get(key)
     if site is None:
+        beeline.add_context_field("get_site_by_id_cache_hit", False)
         site = self.get(pk=site_id)
         SITE_CACHE[site_id] = site
+    else:
+        beeline.add_context_field("get_site_by_id_cache_hit", True)
     cache.add(key, site)
     return site
 
 
+@beeline.traced(name="patched_get_site_by_request")
 def patched_get_site_by_request(self, request):
 
     host = request.get_host()
     key = _cache_key_for_site_host(host)
     site = cache.get(key)
     if site is None:
+        beeline.add_context_field("get_site_by_request_cache_hit", False)
         try:
             # First attempt to look up the site by host with or without port.
             site = self.get(domain__iexact=host)
@@ -45,10 +53,13 @@ def patched_get_site_by_request(self, request):
                 raise
             site = self.get(domain__iexact=domain)
         SITE_CACHE[host] = site
+    else:
+        beeline.add_context_field("get_site_by_request_cache_hit", True)
     cache.add(key, site)
     return site
 
 
+@beeline.traced(name="patched_clear_cache")
 def patched_clear_cache(self):
     keys_id = [_cache_key_for_site_id(site_id) for site_id in SITE_CACHE]
     keys_host = [_cache_key_for_site_host(site_host) for site_host in SITE_CACHE]
@@ -56,6 +67,7 @@ def patched_clear_cache(self):
     SITE_CACHE.clear()
 
 
+@beeline.traced(name="patched_clear_site_cache")
 def patched_clear_site_cache(sender, **kwargs):
     """
     Clears the cache (if primed) each time a site is saved or deleted
@@ -82,6 +94,7 @@ class AlternativeDomain(models.Model):
     def __unicode__(self):
         return self.domain
 
+    @beeline.traced(name="switch_with_active")
     def switch_with_active(self):
         """
         Switches the currently active site with the alternative domain (custom or default) and saves
