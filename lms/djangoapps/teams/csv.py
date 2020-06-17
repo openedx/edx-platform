@@ -131,19 +131,33 @@ class TeamMembershipImportManager(object):
         Assigns team membership based on the content of an uploaded CSV file.
         Returns true if there were no issues.
         """
-        reader = csv.DictReader((line.decode('utf-8-sig').strip() for line in input_file.readlines()))
-        self.teamset_ids = reader.fieldnames[2:]
-        row_dictionaries = []
-        csv_usernames = set()
-        if not self.validate_header(reader.fieldnames):
+        # Load info from CSV
+        csv_data = csv.DictReader((line.decode('utf-8-sig').strip() for line in input_file.readlines()))
+
+        # Validate CSV
+        if not self.validate_header(csv_data.fieldnames):
             return False
         if not self.validate_teamsets():
             return False
+
+        # Process rows
+        return self.set_team_memberships(csv_data)
+
+    def set_team_memberships(self, csv_data):
+        """
+        Given validated rows read from a CSV, set team memberships
+        """
+        self.teamset_ids = csv_data.fieldnames[2:]
+        row_dictionaries = []
+        csv_usernames = set()
+
+        # Get existing team membership data
         self.load_user_ids_by_teamset_id()
         self.load_course_team_memberships()
         self.load_course_teams()
+
         # process student rows:
-        for row in reader:
+        for row in csv_data:
             if not self.validate_teams_have_matching_teamsets(row):
                 return False
             username = row['user']
