@@ -52,8 +52,8 @@ def _lookup_team_membership_data(course):
     Returns a list of dicts, in the following form:
     [
         {
-            'user': If the user is enrolled in this course as a part of a program, this will be <external_user_key>
-                    otherwise <username>,
+            'user': If the user is enrolled in this course as a part of a program,
+                    this will be <external_user_key> if the user has one, otherwise <username>,
             'mode': <student enrollment mode for the given course>,
             <teamset id>: <team name> for each teamset in which the given user is on a team
         }
