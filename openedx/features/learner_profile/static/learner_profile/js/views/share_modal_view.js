@@ -4,9 +4,10 @@
     define(
         [
             'gettext', 'jquery', 'underscore', 'backbone', 'moment',
-            'text!learner_profile/templates/share_modal.underscore'
+            'text!learner_profile/templates/share_modal.underscore',
+            'edx-ui-toolkit/js/utils/html-utils'
         ],
-        function(gettext, $, _, Backbone, Moment, badgeModalTemplate) {
+        function(gettext, $, _, Backbone, Moment, badgeModalTemplate, HtmlUtils) {
             var ShareModalView = Backbone.View.extend({
                 attributes: {
                     class: 'badges-overlay'
@@ -45,7 +46,7 @@
                     this.$el.find('.badges-modal').focus();
                 },
                 render: function() {
-                    this.$el.html(this.template(this.model.toJSON()));
+                    this.$el.html(HtmlUtils.HTML(this.template(this.model.toJSON())).toString());
                     return this;
                 }
             });

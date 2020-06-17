@@ -1,5 +1,6 @@
-define(['backbone', 'js/models/location', 'js/collections/course_grader'],
-    function(Backbone, Location, CourseGraderCollection) {
+define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-ui-toolkit/js/utils/string-utils'],
+    function(Backbone, Location, CourseGraderCollection, StringUtils) {
+        'use strict';
         var CourseGradingPolicy = Backbone.Model.extend({
             defaults: {
                 graders: null,  // CourseGraderCollection
@@ -36,9 +37,15 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader'],
             },
             gracePeriodToDate: function() {
                 var newDate = new Date();
-                if (this.has('grace_period') && this.get('grace_period').hours) { newDate.setHours(this.get('grace_period').hours); } else newDate.setHours(0);
-                if (this.has('grace_period') && this.get('grace_period').minutes) { newDate.setMinutes(this.get('grace_period').minutes); } else newDate.setMinutes(0);
-                if (this.has('grace_period') && this.get('grace_period').seconds) { newDate.setSeconds(this.get('grace_period').seconds); } else newDate.setSeconds(0);
+                if (this.has('grace_period') && this.get('grace_period').hours) {
+                    newDate.setHours(this.get('grace_period').hours);
+                } else newDate.setHours(0);
+                if (this.has('grace_period') && this.get('grace_period').minutes) {
+                    newDate.setMinutes(this.get('grace_period').minutes);
+                } else newDate.setMinutes(0);
+                if (this.has('grace_period') && this.get('grace_period').seconds) {
+                    newDate.setSeconds(this.get('grace_period').seconds);
+                } else newDate.setSeconds(0);
 
                 return newDate;
             },
@@ -61,6 +68,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader'],
                 return parseInt(minimum_grade_credit);
             },
             validate: function(attrs) {
+                var minimumGradeCutoff;
                 if (_.has(attrs, 'grace_period')) {
                     if (attrs.grace_period === null) {
                         return {
@@ -70,12 +78,13 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader'],
                 }
                 if (this.get('is_credit_course') && _.has(attrs, 'minimum_grade_credit')) {
             // Getting minimum grade cutoff value
-                    var minimum_grade_cutoff = _.min(_.values(attrs.grade_cutoffs));
-                    if (isNaN(attrs.minimum_grade_credit) || attrs.minimum_grade_credit === null || attrs.minimum_grade_credit < minimum_grade_cutoff) {
+                    minimumGradeCutoff = _.min(_.values(attrs.grade_cutoffs));
+                    if (isNaN(attrs.minimum_grade_credit) || attrs.minimum_grade_credit === null ||
+                      attrs.minimum_grade_credit < minimumGradeCutoff) {
                         return {
-                            minimum_grade_credit: interpolate(
+                            minimum_grade_credit: StringUtils.interpolate(
                         gettext('Not able to set passing grade to less than %(minimum_grade_cutoff)s%.'),
-                        {minimum_grade_cutoff: minimum_grade_cutoff * 100},
+                        {minimum_grade_cutoff: minimumGradeCutoff * 100},
                         true
                     )
                         };
