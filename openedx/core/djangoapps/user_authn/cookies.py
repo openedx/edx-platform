@@ -22,7 +22,7 @@ from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token, 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.features.edly.cookies import set_logged_in_edly_cookies
+from openedx.features.edly.cookies import delete_logged_in_edly_cookies, set_logged_in_edly_cookies
 from student.models import CourseEnrollment
 
 
@@ -83,6 +83,8 @@ def delete_logged_in_cookies(response):
             path='/',
             domain=settings.SESSION_COOKIE_DOMAIN
         )
+
+    delete_logged_in_edly_cookies(response)
 
     return response
 
