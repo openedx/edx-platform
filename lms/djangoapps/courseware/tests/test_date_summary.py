@@ -57,7 +57,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(CourseDateSummaryTest, self).setUp()
-        SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
     def make_request(self, user):
         request = RequestFactory().request()
@@ -65,17 +64,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.addCleanup(crum.set_current_request, None)
         crum.set_current_request(request)
         return request
-
-    def test_course_info_feature_flag(self):
-        SelfPacedConfiguration(enable_course_home_improvements=False).save()
-        course = create_course_run()
-        user = create_user()
-        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
-
-        self.client.login(username=user.username, password=TEST_PASSWORD)
-        url = reverse('info', args=(course.id,))
-        response = self.client.get(url)
-        self.assertNotContains(response, 'date-summary', status_code=302)
 
     def test_course_home_logged_out(self):
         course = create_course_run()
