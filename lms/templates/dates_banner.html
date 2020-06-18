@@ -19,10 +19,10 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
                 ${_('It looks like you missed some important deadlines based on our suggested schedule. ')}
                 ${_('To keep yourself on track, you can update this schedule and shift the past due assignments into the future by visiting ')}
                 <a class="mobile-dates-link" href="${web_app_course_url}">edx.org</a>.
-                ${_(' Don’t worry—you won’t lose any of the progress you’ve made when you shift your due dates.')}
+                ${_(" Don't worry—you won't lose any of the progress you've made when you shift your due dates.")}
             % else:
                 <strong>${_('It looks like you missed some important deadlines based on our suggested schedule.')}</strong>
-                ${_('To keep yourself on track, you can update this schedule and shift the past due assignments into the future. Don’t worry—you won’t lose any of the progress you’ve made when you shift your due dates.')}
+                ${_("To keep yourself on track, you can update this schedule and shift the past due assignments into the future. Don't worry—you won't lose any of the progress you've made when you shift your due dates.")}
             % endif
         </div>
         % if not is_mobile_app:
@@ -31,7 +31,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
                     <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
                     <input type="hidden" name="reset_deadlines_redirect_url_base" value="${reset_deadlines_redirect_url_base}">
                     <input type="hidden" name="reset_deadlines_redirect_url_id_dict" value="${reset_deadlines_redirect_url_id_dict}">
-                    <button class="btn reset-deadlines-button">${_("Reset my deadlines")}</button>
+                    <button class="btn reset-deadlines-button">${_("Shift due dates")}</button>
                 </form>
             </div>
         % endif
