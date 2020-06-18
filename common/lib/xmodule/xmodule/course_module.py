@@ -927,17 +927,6 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    bypass_home = Boolean(
-        display_name=_("Bypass Course Home"),
-        help=_(
-            "Bypass the course home tab when students arrive from the dashboard, "
-            "sending them directly to course content."
-        ),
-        default=False,
-        scope=Scope.settings,
-        deprecated=True
-    )
-
     enable_subsection_gating = Boolean(
         display_name=_("Enable Subsection Prerequisites"),
         help=_(
