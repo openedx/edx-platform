@@ -8,8 +8,8 @@
     color 0.125s ease-in-out 0s,
     border-color 0.125s ease-in-out 0s,
     background 0.125s ease-in-out 0s,
-        box-shadow 0.125s ease-in-out 0s
-   );
+    box-shadow 0.125s ease-in-out 0s
+  );
 
   display: inline-block;
   border: 1px solid $forum-color-active-thread;
@@ -54,7 +54,8 @@
 }
 
 // Use pattern library buttons for discussion components
-.discussion-module, .wmd-prompt-dialog {
+.discussion-module,
+.wmd-prompt-dialog {
   .btn {
     @extend %pattern-library-btn;
 

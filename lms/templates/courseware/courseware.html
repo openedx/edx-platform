@@ -22,6 +22,12 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
    (course.enable_proctored_exams or course.enable_timed_exams)
    )
 %>
+
+% if display_reset_dates_banner:
+    <script type="text/javascript">
+        $('.reset-deadlines-banner').css('display', 'flex');
+    </script>
+% endif
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>

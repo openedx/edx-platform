@@ -18,8 +18,8 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
 from enterprise.models import (
     EnterpriseCourseEnrollment,
     EnterpriseCustomer,
@@ -201,8 +201,7 @@ class TestDeactivateLogout(RetirementTestCase):
         return {'password': password}
 
     @mock.patch('openedx.core.djangoapps.user_api.accounts.views.retire_dot_oauth2_models')
-    @mock.patch('openedx.core.djangoapps.user_api.accounts.views.retire_dop_oauth2_models')
-    def test_user_can_deactivate_self(self, mock_retire_dop, mock_retire_dot):
+    def test_user_can_deactivate_self(self, mock_retire_dot):
         """
         Verify a user calling the deactivation endpoint logs out the user, deletes all their SSO tokens,
         and creates a user retirement row.
@@ -219,7 +218,6 @@ class TestDeactivateLogout(RetirementTestCase):
         self.assertEqual(list(Registration.objects.filter(user=self.test_user)), [])
         self.assertEqual(len(UserRetirementStatus.objects.filter(user_id=self.test_user.id)), 1)
         # these retirement utils are tested elsewhere; just make sure we called them
-        mock_retire_dop.assert_called_with(self.test_user)
         mock_retire_dot.assert_called_with(self.test_user)
         # make sure the user cannot log in
         self.assertFalse(self.client.login(username=self.test_user.username, password=self.test_password))
@@ -1322,6 +1320,7 @@ class TestAccountRetirementPost(RetirementTestCase):
             'city': None,
             'country': None,
             'bio': None,
+            'phone_number': None,
         }
         self.assertEqual(expected_user_profile_pii, USER_PROFILE_PII)
 

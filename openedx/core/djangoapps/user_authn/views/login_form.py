@@ -5,9 +5,6 @@ import json
 import logging
 
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
-import third_party_auth
-
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -15,31 +12,30 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from ratelimit.decorators import ratelimit
 
 import third_party_auth
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import (
-    is_secondary_email_feature_enabled,
-    is_multiple_user_enterprises_feature_enabled
+    is_multiple_user_enterprises_feature_enabled,
+    is_secondary_email_feature_enabled
 )
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.cookies import are_logged_in_cookies_set
-from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.core.djangoapps.user_authn.views.password_reset import get_password_reset_form
+from openedx.core.djangoapps.user_authn.views.registration_form import RegistrationFormFactory
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from openedx.features.enterprise_support.utils import (
     handle_enterprise_cookies_for_logistration,
-    update_logistration_context_for_enterprise
+    get_enterprise_slug_login_url,
+    update_logistration_context_for_enterprise,
 )
 from student.helpers import get_next_url_for_login_page
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
-
-from util.password_policy_validators import (
-    DEFAULT_MAX_PASSWORD_LENGTH,
-)
+from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 log = logging.getLogger(__name__)
 
@@ -95,15 +91,11 @@ def get_login_session_form(request):
 
     # Translators: This label appears above a field on the login form
     # meant to hold the user's email address.
-    email_label = _(u"Email")
-
-    # Translators: This example email address is used as a placeholder in
-    # a field on the login form meant to hold the user's email address.
-    email_placeholder = _(u"username@domain.com")
+    email_label = _("Email")
 
     # Translators: These instructions appear on the login form, immediately
     # below a field meant to hold the user's email address.
-    email_instructions = _(u"The email address you used to register with {platform_name}").format(
+    email_instructions = _("The email address you used to register with {platform_name}").format(
         platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )
 
@@ -111,7 +103,6 @@ def get_login_session_form(request):
         "email",
         field_type="email",
         label=email_label,
-        placeholder=email_placeholder,
         instructions=email_instructions,
         restrictions={
             "min_length": accounts.EMAIL_MIN_LENGTH,
@@ -134,6 +125,12 @@ def get_login_session_form(request):
 
 
 @require_http_methods(['GET'])
+@ratelimit(
+    key='openedx.core.djangoapps.util.ratelimit.real_ip',
+    rate=settings.LOGISTRATION_RATELIMIT_RATE,
+    method='GET',
+    block=True
+)
 @ensure_csrf_cookie
 @xframe_allow_whitelisted
 def login_and_registration_form(request, initial_mode="login"):
@@ -222,7 +219,8 @@ def login_and_registration_form(request, initial_mode="login"):
             'account_creation_allowed': configuration_helpers.get_value(
                 'ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)),
             'is_account_recovery_feature_enabled': is_secondary_email_feature_enabled(),
-            'is_multiple_user_enterprises_feature_enabled': is_multiple_user_enterprises_feature_enabled()
+            'is_multiple_user_enterprises_feature_enabled': is_multiple_user_enterprises_feature_enabled(),
+            'enterprise_slug_login_url': get_enterprise_slug_login_url()
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
         'responsive': True,

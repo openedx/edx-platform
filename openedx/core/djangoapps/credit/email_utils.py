@@ -10,8 +10,6 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
 import six
-import six.moves.html_parser  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders

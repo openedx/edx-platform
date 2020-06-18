@@ -17,7 +17,7 @@ class LmsFieldData(SplitFieldData):
     def __init__(self, authored_data, student_data):
         # Make sure that we don't repeatedly nest LmsFieldData instances
         if isinstance(authored_data, LmsFieldData):
-            authored_data = authored_data._authored_data  # pylint: disable=protected-access
+            authored_data = authored_data._authored_data
         else:
             authored_data = ReadOnlyFieldData(authored_data)
 

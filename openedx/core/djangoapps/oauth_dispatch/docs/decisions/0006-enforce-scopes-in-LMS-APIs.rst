@@ -51,7 +51,7 @@ payload.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We will no longer return expired *JWTs as access tokens* to Restricted
-Applications. We will sign them with a *new key* that is not shared with 
+Applications. We will sign them with a *new key* that is not shared with
 unprotected microservices.
 
 * API endpoints that are exposed by other microservices and that
@@ -59,7 +59,7 @@ unprotected microservices.
   they are also updated to enforce scopes.
 
   * We do not want a lock-step deployment across all of our microservices.
-    We want to enable these changes without blocking on updating all 
+    We want to enable these changes without blocking on updating all
     microservices.
 
   * We do not want to issue unexpired *Bearer tokens* to Restricted
@@ -88,8 +88,8 @@ unprotected microservices.
     JWT tokens for Restricted Applications, but ONLY if:
 
     * the token_type in the request equals *"jwt"* and
-    * a `feature toggle (switch)`_ named "oauth2.enforce_jwt_scopes"
-      is enabled.
+    * a `feature toggle (switch)`_ named "oauth2.enforce_jwt_scopes" is enabled.
+      * **Note:** the toggle has since been retired with the equivalent of ``enforce_jwt_scopes`` value of True.
 
 .. _edx-platform settings: https://github.com/edx/edx-platform/blob/master/lms/envs/docs/README.rst
 .. _JwtBuilder: https://github.com/edx/edx-platform/blob/d3d64970c36f36a96d684571ec5b48ed645618d8/openedx/core/lib/token_utils.py#L15
@@ -182,7 +182,7 @@ See 0007-include-organizations-in-tokens_ for decisions on this.
     `feature toggle (switch)`_ named "oauth2.enforce_token_scopes". When the
     switch is disabled, the new Permission class fails verification of all
     Restricted Application requests.
-     
+
 .. _custom Permission: http://www.django-rest-framework.org/api-guide/permissions/#custom-permissions
 .. _TokenHasScope: https://github.com/evonove/django-oauth-toolkit/blob/50e4df7d97af90439d27a73c5923f2c06a4961f2/oauth2_provider/contrib/rest_framework/permissions.py#L13
 .. _`REST_FRAMEWORK's DEFAULT_PERMISSION_CLASSES`: http://www.django-rest-framework.org/api-guide/permissions/#setting-the-permission-policy
@@ -195,15 +195,15 @@ See 0007-include-organizations-in-tokens_ for decisions on this.
 Consequences
 ------------
 
-* Putting these changes behind a feature toggle allows us to decouple 
+* Putting these changes behind a feature toggle allows us to decouple
   release from deployment and disable these changes in the event of
-  unexpected issues. 
-  
+  unexpected issues.
+
   * Minimizing the places that the feature toggle is checked (at the
     time of returning unexpired tokens and at the time of validating
     requests), minimizes the complexity of the code.
 
-* By associating Scopes with DOT Applications and not Restricted 
+* By associating Scopes with DOT Applications and not Restricted
   Applications, we can eventually eliminate Restricted Applications
   altogether. Besides, they were introduced as a temporary concept
   until Scopes were fully rolled out.

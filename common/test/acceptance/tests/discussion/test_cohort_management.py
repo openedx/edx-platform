@@ -4,15 +4,14 @@ End-to-end tests related to the cohort management on the LMS Instructor Dashboar
 """
 
 
+import csv
 import os
 import os.path
 import uuid
-import csv
-import unicodecsv
-import six
-
 from datetime import datetime
 
+import six
+import unicodecsv
 from bok_choy.promise import EmptyPromise
 from pytz import UTC, utc
 
@@ -688,7 +687,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         self.cohort_management_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=6)
+@attr(shard=15)
 class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
     """
     Tests for linking between content groups and cohort in the instructor dashboard.

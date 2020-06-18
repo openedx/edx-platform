@@ -28,7 +28,7 @@ function setup_debug(element_id, edit_link, staff_context){
             var username = $("#" + element_id + "_history_student_username").val();
             var location = $("#" + element_id + "_history_location").val();
             // xss-lint: disable=mako-invalid-js-filter
-            $("#" + element_id + "_history_text").load('/courses/' + "${six.text_type(course.id) | u}" +
+            $("#" + element_id + "_history_text").load('/courses/' + "${six.text_type(getattr(course,'id','')) | u}" +
                 "/submission_history/" + username + "/" + location);
             return false;
         }

@@ -3,12 +3,9 @@ Test the enterprise support APIs.
 """
 
 
-import mock
-
 import ddt
 import httpretty
-from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error
-
+import mock
 from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -16,6 +13,9 @@ from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_django_utils.cache import get_cache_key
+from six.moves.urllib.parse import parse_qs
+
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
@@ -35,7 +35,7 @@ from openedx.features.enterprise_support.api import (
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, get_cache_key
+from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
 from student.tests.factories import UserFactory
 
 

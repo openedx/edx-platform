@@ -11,7 +11,7 @@ from uuid import uuid4
 
 import requests
 import six
-from six.moves.urllib.parse import urlencode, urlparse, parse_qs  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode, urlparse, parse_qs
 from dateutil.parser import parse as dateutil_parse
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -449,7 +449,7 @@ def generate_uid():
     """
     Generates unique id.
     """
-    return uuid4().int  # pylint: disable=no-member
+    return uuid4().int
 
 
 def is_feature_enabled(course, user):

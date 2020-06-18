@@ -3,9 +3,9 @@ Discussion API forms
 """
 
 
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.core.exceptions import ValidationError
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
 from opaque_keys import InvalidKeyError
@@ -167,13 +167,12 @@ class CourseDiscussionRolesForm(CourseDiscussionSettingsForm):
         (FORUM_ROLE_GROUP_MODERATOR, FORUM_ROLE_GROUP_MODERATOR),
     )
     rolename = ChoiceField(
-        ROLE_CHOICES,
+        choices=ROLE_CHOICES,
         error_messages={u"invalid_choice": u"Role '%(value)s' does not exist"}
     )
 
     def clean_rolename(self):
         """Validate the 'rolename' value."""
-        # pylint: disable=too-many-function-args
         rolename = six.moves.urllib.parse.unquote(self.cleaned_data.get('rolename'))
         course_id = self.cleaned_data.get('course_key')
         if course_id and rolename:

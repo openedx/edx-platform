@@ -48,7 +48,7 @@ define([
                 el: $('.profile-view'),
                 teamEvents: TeamSpecHelpers.teamEvents,
                 courseID: TeamSpecHelpers.testCourseID,
-                context: TeamSpecHelpers.testContext,
+                context: options.context || TeamSpecHelpers.testContext,
                 model: teamModel,
                 topic: isInstructorManagedTopic ?
                     TeamSpecHelpers.createMockInstructorManagedTopic() :
@@ -72,6 +72,23 @@ define([
                 )
             );
             AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockDiscussionResponse());
+
+            // Assignments are feature-flagged
+            if (profileView.context.teamsAssignmentsUrl) {
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    interpolate( // eslint-disable-line no-undef
+                        '/api/team/v0/teams/%(teamId)s/assignments',
+                        {
+                            teamId: teamModel.id
+                        },
+                        true
+                    )
+                );
+                AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockTeamAssignments(options.assignments));
+            }
+
             return profileView;
         };
 
@@ -101,6 +118,76 @@ define([
             }
         };
 
+        describe('TeamAssignmentsView', function() {
+            it('can render itself', function() {
+                // Given a member of a team with team assignments
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
+                    options = {
+                        membership: DEFAULT_MEMBERSHIP
+                    },
+                    requests = AjaxHelpers.requests(this);
+
+                // When they go to the team profile view
+                var view = createTeamProfileView(requests, options);
+
+                // The Assignments section renders with their assignments
+                expect(view.$('.team-assignment').length).toEqual(mockAssignments.length);
+            });
+
+            it('displays a message when no assignments are found', function() {
+                // Given a member viewing a team with no assignments
+                var mockAssignments = [],
+                    options = {
+                        assignments: mockAssignments,
+                        membership: DEFAULT_MEMBERSHIP
+                    },
+                    requests = AjaxHelpers.requests(this);
+
+                // When they view the team
+                var view = createTeamProfileView(requests, options);
+
+                // There should be filler text that says there are no assignments
+                expect(view.$('#assignments').text()).toEqual('No assignments for team');
+                expect(view.$('.team-assignment').length).toEqual(0);
+            });
+
+            it('does not show at all for someone who is not on the team or staff', function() {
+                // Given a user who is not on a team viewing a team with assignments
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
+                    options = {
+                        assignments: mockAssignments
+                    },
+                    requests = AjaxHelpers.requests(this);
+
+                // When the user goes to the team detail page
+                var view = createTeamProfileView(requests, options);
+
+                // Then then assignments view does not appear on the page
+                expect(view.$('.team-assignments').length).toBe(0);
+            });
+
+            it('does not show at all when the feature flag is turned off', function() {
+                // Given the team submissions feature is turned off
+                // (teamAsssignmentsUrl isn't surfaced to user)
+                var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
+                    options = {
+                        assignments: mockAssignments,
+                        membership: DEFAULT_MEMBERSHIP,
+                        context: Object.assign({}, TeamSpecHelpers.testContext)
+                    },
+                    requests = AjaxHelpers.requests(this),
+                    view;
+
+                delete options.context.teamsAssignmentsUrl;
+
+                // When the user goes to the team detail page
+                view = createTeamProfileView(requests, options);
+
+                // Then then assignments view does not appear on the page
+                expect(view.$('.team-assignments').length).toBe(0);
+            });
+        });
+
         describe('DiscussionsView', function() {
             it('can render itself', function() {
                 var requests = AjaxHelpers.requests(this),
@@ -127,11 +214,21 @@ define([
         });
 
         describe('TeamDetailsView', function() {
-            var assertTeamDetails = function(view, members, memberOfTeam) {
+            var assertTeamDetails = function(view, members, memberOfTeam, isManagedTeam) {
+                var expectedMemberMsg;
                 expect(view.$('.team-detail-header').text()).toBe('Team Details');
                 expect(view.$('.team-country').text()).toContain('United States');
                 expect(view.$('.team-language').text()).toContain('English');
-                expect(view.$('.team-capacity').text()).toContain(members + ' / 6 Members');
+                if (isManagedTeam) {
+                    if (members === 1) {
+                        expectedMemberMsg = '1 Member';
+                    } else {
+                        expectedMemberMsg = members + ' Members';
+                    }
+                } else {
+                    expectedMemberMsg = members + ' / 6 Members';
+                }
+                expect(view.$('.team-capacity').text()).toContain(expectedMemberMsg);
                 expect(view.$('.team-member').length).toBe(members);
                 expect(Boolean(view.$('.leave-team-link').length)).toBe(memberOfTeam);
             };
@@ -143,7 +240,7 @@ define([
                         country: 'US',
                         language: 'en'
                     });
-                    assertTeamDetails(view, 0, false);
+                    assertTeamDetails(view, 0, false, false);
                     expect(view.$('.team-user-membership-status').length).toBe(0);
 
                     // Verify that the leave team link is not present.
@@ -166,7 +263,7 @@ define([
                         language: 'en',
                         membership: DEFAULT_MEMBERSHIP
                     });
-                    assertTeamDetails(view, 1, true);
+                    assertTeamDetails(view, 1, true, false);
                     expect(view.$('.team-user-membership-status').text().trim()).toBe('You are a member of this team.');
 
                     // assert tooltip text.
@@ -184,9 +281,9 @@ define([
                     var view = createTeamProfileView(
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
-                    assertTeamDetails(view, 1, true);
+                    assertTeamDetails(view, 1, true, false);
                     clickLeaveTeam(requests, view, {cancel: false});
-                    assertTeamDetails(view, 0, false);
+                    assertTeamDetails(view, 0, false, false);
                 });
 
                 it('student can not leave instructor managed team', function() {
@@ -196,7 +293,7 @@ define([
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}, true
                     );
                     // When a student is in a team of an instructor-managed topic, he can't see the leave team button.
-                    assertTeamDetails(view, 1, false);
+                    assertTeamDetails(view, 1, false, true);
                 });
 
                 it("wouldn't do anything if user click on Cancel button on dialog", function() {
@@ -205,9 +302,9 @@ define([
                     var view = createTeamProfileView(
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
-                    assertTeamDetails(view, 1, true);
+                    assertTeamDetails(view, 1, true, false);
                     clickLeaveTeam(requests, view, {cancel: true});
-                    assertTeamDetails(view, 1, true);
+                    assertTeamDetails(view, 1, true, false);
                 });
 
                 it('shows correct error messages', function() {

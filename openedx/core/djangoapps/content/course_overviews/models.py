@@ -13,9 +13,11 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
+from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from six import text_type  # pylint: disable=ungrouped-imports
@@ -26,13 +28,20 @@ from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.lib.cache_utils import request_cached, RequestCache
 from static_replace.models import AssetBaseUrlConfig
 from xmodule import block_metadata_utils, course_metadata_utils
 from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.tabs import CourseTab
+
 
 log = logging.getLogger(__name__)
+
+
+class CourseOverviewCaseMismatchException(Exception):
+    pass
 
 
 @python_2_unicode_compatible
@@ -54,7 +63,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 7
+    VERSION = 11  # this one goes to eleven
 
     # Cache entry versioning.
     version = IntegerField()
@@ -162,6 +171,11 @@ class CourseOverview(TimeStampedModel):
         if course_overview.exists():
             log.info(u'Updating course overview for %s.', six.text_type(course.id))
             course_overview = course_overview.first()
+            # MySQL ignores casing, but CourseKey doesn't. To prevent multiple
+            # courses with different cased keys from overriding each other, we'll
+            # check for equality here in python.
+            if course_overview.id != course.id:
+                raise CourseOverviewCaseMismatchException(course_overview.id, course.id)
         else:
             log.info(u'Creating course overview for %s.', six.text_type(course.id))
             course_overview = cls()
@@ -175,7 +189,10 @@ class CourseOverview(TimeStampedModel):
         course_overview.display_org_with_default = course.display_org_with_default
 
         course_overview.start = start
+        # Add writes to new fields 'start_date' & 'end_date'.
+        course_overview.start_date = start
         course_overview.end = end
+        course_overview.end_date = end
         course_overview.advertised_start = course.advertised_start
         course_overview.announcement = course.announcement
 
@@ -232,18 +249,30 @@ class CourseOverview(TimeStampedModel):
             - IOError if some other error occurs while trying to load the
                 course from the module store.
         """
+        log.info(
+            "Attempting to load CourseOverview for course %s from modulestore.",
+            course_id,
+        )
         store = modulestore()
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
             if isinstance(course, CourseDescriptor):
-                course_overview = cls._create_or_update(course)
                 try:
+                    course_overview = cls._create_or_update(course)
                     with transaction.atomic():
                         course_overview.save()
                         # Remove and recreate all the course tabs
                         CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
                         CourseOverviewTab.objects.bulk_create([
-                            CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
+                            CourseOverviewTab(
+                                tab_id=tab.tab_id,
+                                type=tab.type,
+                                name=tab.name,
+                                course_staff_only=tab.course_staff_only,
+                                url_slug=tab.get('url_slug'),
+                                link=tab.get('link'),
+                                is_hidden=tab.get('is_hidden', False),
+                                course_overview=course_overview)
                             for tab in course.tabs
                         ])
                         # Remove and recreate course images
@@ -259,10 +288,15 @@ class CourseOverview(TimeStampedModel):
                     # other one will cause an IntegrityError because it tries
                     # to save a duplicate.
                     # (see: https://openedx.atlassian.net/browse/TNL-2854).
-                    pass
+                    log.info(
+                        "Multiple CourseOverviews for course %s requested "
+                        "simultaneously; will only save one.",
+                        course_id,
+                    )
                 except Exception:
                     log.exception(
-                        u"CourseOverview for course %s failed!",
+                        "Saving CourseOverview for course %s failed with "
+                        "unexpected exception!",
                         course_id,
                     )
                     raise
@@ -270,11 +304,16 @@ class CourseOverview(TimeStampedModel):
                 return course_overview
             elif course is not None:
                 raise IOError(
-                    u"Error while loading course {} from the module store: {}",
+                    "Error while loading CourseOverview for course {} "
+                    "from the module store: {}",
                     six.text_type(course_id),
                     course.error_msg if isinstance(course, ErrorDescriptor) else six.text_type(course)
                 )
             else:
+                log.info(
+                    "Could not create CourseOverview for non-existent course: %s",
+                    course_id,
+                )
                 raise cls.DoesNotExist()
 
     @classmethod
@@ -297,6 +336,7 @@ class CourseOverview(TimeStampedModel):
         return modulestore().has_course(course_id)
 
     @classmethod
+    @request_cached('course_overview')
     def get_from_id(cls, course_id):
         """
         Load a CourseOverview object for a given course ID.
@@ -615,12 +655,24 @@ class CourseOverview(TimeStampedModel):
         """
         Returns True if course has discussion tab and is enabled
         """
-        tabs = self.tabs.all()
+        tabs = self.tab_set.all()
         # creates circular import; hence explicitly referenced is_discussion_enabled
         for tab in tabs:
             if tab.tab_id == "discussion" and django_comment_client.utils.is_discussion_enabled(self.id):
                 return True
         return False
+
+    @property
+    def tabs(self):
+        """
+        Returns an iterator of CourseTabs.
+        """
+        for tab_dict in self.tab_set.all().values():
+            tab = CourseTab.from_json(tab_dict)
+            if tab is None:
+                log.warning("Can't instantiate CourseTab from %r", tab_dict)
+            else:
+                yield tab
 
     @property
     def image_urls(self):
@@ -719,6 +771,91 @@ class CourseOverview(TimeStampedModel):
 
         return urlunparse(('', base_url, path, params, query, fragment))
 
+    @cached_property
+    def _original_course(self):
+        """
+        Returns the course from the modulestore.
+        """
+        log.warning('Falling back on modulestore to get course information for %s', self.id)
+        return modulestore().get_course(self.id)
+
+    @property
+    def allow_public_wiki_access(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.allow_public_wiki_access
+
+    @property
+    def textbooks(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.textbooks
+
+    @property
+    def pdf_textbooks(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.pdf_textbooks
+
+    @property
+    def html_textbooks(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.html_textbooks
+
+    @property
+    def hide_progress_tab(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.hide_progress_tab
+
+    @property
+    def edxnotes(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.edxnotes
+
+    @property
+    def enable_ccx(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.enable_ccx
+
+    @property
+    def course_visibility(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.course_visibility
+
+    @property
+    def teams_enabled(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.teams_enabled
+
+    @property
+    def show_calculator(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.show_calculator
+
+    @property
+    def edxnotes_visibility(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.edxnotes_visibility
+
     def __str__(self):
         """Represent ourselves with the course key."""
         return six.text_type(self.id)
@@ -731,7 +868,16 @@ class CourseOverviewTab(models.Model):
     .. no_pii:
     """
     tab_id = models.CharField(max_length=50)
-    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs", on_delete=models.CASCADE)
+    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tab_set", on_delete=models.CASCADE)
+    type = models.CharField(max_length=50, null=True)
+    name = models.TextField(null=True)
+    course_staff_only = models.BooleanField(default=False)
+    url_slug = models.TextField(null=True)
+    link = models.TextField(null=True)
+    is_hidden = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.tab_id
 
 
 @python_2_unicode_compatible
@@ -934,3 +1080,16 @@ class SimulateCoursePublishConfig(ConfigurationModel):
 
     def __str__(self):
         return six.text_type(self.arguments)
+
+
+def _invalidate_overview_cache(**kwargs):  # pylint: disable=unused-argument
+    """
+    Invalidate the course overview request cache.
+    """
+    RequestCache('course_overview').clear()
+
+
+post_save.connect(_invalidate_overview_cache, sender=CourseOverview)
+post_save.connect(_invalidate_overview_cache, sender=CourseOverviewImageConfig)
+post_delete.connect(_invalidate_overview_cache, sender=CourseOverview)
+post_delete.connect(_invalidate_overview_cache, sender=CourseOverviewImageConfig)

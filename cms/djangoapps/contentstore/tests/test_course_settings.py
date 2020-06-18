@@ -91,6 +91,33 @@ class CourseSettingsEncoderTest(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
 
+class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
+    """
+    Tests for AdvanceSettings View.
+    """
+
+    def setUp(self):
+        super(CourseAdvanceSettingViewTest, self).setUp()
+        self.fullcourse = CourseFactory.create()
+        self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
+
+    @override_settings(FEATURES={'DISABLE_MOBILE_COURSE_AVAILABLE': True})
+    def test_mobile_field_available(self):
+
+        """
+        Test to check `Mobile Course Available` field is not viewable in Studio
+        when DISABLE_MOBILE_COURSE_AVAILABLE is true.
+        """
+
+        response = self.client.get_html(self.course_setting_url)
+        start = response.content.decode('utf-8').find("mobile_available")
+        end = response.content.decode('utf-8').find("}", start)
+        settings_fields = json.loads(response.content.decode('utf-8')[start + len("mobile_available: "):end + 1])
+
+        self.assertEqual(settings_fields["display_name"], "Mobile Course Available")
+        self.assertEqual(settings_fields["deprecated"], True)
+
+
 @ddt.ddt
 class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
@@ -1055,7 +1082,8 @@ class CourseMetadataEditingTest(CourseTestCase):
         fresh = modulestore().get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
 
-        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')  # pylint: disable=line-too-long
+        self.assertNotEqual(test_model['advertised_start']['value'], 1,
+                            'advertised_start should not be updated to a wrong value')
         self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
                             'days_early_for beta should not be updated to a wrong value')
 
@@ -1171,6 +1199,48 @@ class CourseMetadataEditingTest(CourseTestCase):
         """
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertIn('proctoring_provider', test_model)
+
+    @ddt.data(True, False)
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'valid_provider': {}
+        },
+        PARTNER_SUPPORT_EMAIL='support@foobar.com'
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_validate_update_does_not_allow_proctoring_provider_changes_after_course_start(self, staff_user):
+        """
+        Course staff cannot modify proctoring provder after the course start date.
+        Only admin users may update the provider if the course has started.
+        """
+        field_name = "proctoring_provider"
+        course = CourseFactory.create(start=datetime.datetime.now(UTC) - datetime.timedelta(days=1))
+        user = UserFactory.create(is_staff=staff_user)
+
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            course,
+            {
+                field_name: {"value": 'valid_provider'},
+            },
+            user=user
+        )
+
+        if staff_user:
+            self.assertTrue(did_validate)
+            self.assertEqual(len(errors), 0)
+            self.assertIn(field_name, test_model)
+        else:
+            self.assertFalse(did_validate)
+            self.assertEqual(len(errors), 1)
+            self.assertEqual(
+                errors[0].get('message'),
+                (
+                    'The proctoring provider cannot be modified after a course has started.'
+                    ' Contact support@foobar.com for assistance'
+                )
+            )
+            self.assertIsNone(test_model)
 
     @override_settings(
         PROCTORING_BACKENDS={

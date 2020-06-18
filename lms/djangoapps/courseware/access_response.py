@@ -214,3 +214,25 @@ class NoAllowedPartitionGroupsError(AccessError):
         error_code = "no_allowed_user_groups"
         developer_message = u"Group access for {} excludes all students".format(partition.name)
         super(NoAllowedPartitionGroupsError, self).__init__(error_code, developer_message, user_message)
+
+
+class EnrollmentRequiredAccessError(AccessError):
+    """
+    Access denied because the user must be enrolled in the course
+    """
+    def __init__(self):
+        error_code = "enrollment_required"
+        developer_message = u"User must be enrolled in the course"
+        user_message = _(u"You must be enrolled in the course")
+        super(EnrollmentRequiredAccessError, self).__init__(error_code, developer_message, user_message)
+
+
+class AuthenticationRequiredAccessError(AccessError):
+    """
+    Access denied because the user must be authenticated to see it
+    """
+    def __init__(self):
+        error_code = "authentication_required"
+        developer_message = u"User must be authenticated to view the course"
+        user_message = _(u"You must be logged in to see this course")
+        super(AuthenticationRequiredAccessError, self).__init__(error_code, developer_message, user_message)

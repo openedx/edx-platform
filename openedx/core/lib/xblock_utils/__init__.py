@@ -9,32 +9,31 @@ import json
 import logging
 import re
 import uuid
-import static_replace
-import markupsafe
-from lxml import html, etree
-from contracts import contract
 
+import markupsafe
+import six
+import webpack_loader.utils
+from contracts import contract
 from django.conf import settings
-from django.urls import reverse
-from django.utils.html import escape
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.urls import reverse
+from django.utils.html import escape
+from lxml import etree, html
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from pytz import UTC
-from edxmako.shortcuts import render_to_string
+from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 
+import static_replace
+from edxmako.shortcuts import render_to_string
 from xmodule.seq_module import SequenceModule
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
-from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
-
-import webpack_loader.utils
-import six
-from six import text_type
+from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, XModule, XModuleDescriptor, shim_xmodule_js
 
 log = logging.getLogger(__name__)
 
@@ -324,23 +323,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
         return frag
     # TODO: make this more general, eg use an XModule attribute instead
     if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
-        # check that the course is a mongo backed Studio course before doing work
-        is_studio_course = block.course_edit_method == "Studio"
-
-        if is_studio_course:
-            # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
-            edit_link = "//" + settings.CMS_BASE + '/container/' + text_type(block.location)
-
-            # return edit link in rendered HTML for display
-            return wrap_fragment(
-                frag,
-                render_to_string(
-                    "edit_unit_link.html",
-                    {'frag_content': frag.content, 'edit_link': edit_link}
-                )
-            )
-        else:
-            return frag
+        return frag
 
     if isinstance(block, SequenceModule) or getattr(block, 'HIDDEN', False):
         return frag

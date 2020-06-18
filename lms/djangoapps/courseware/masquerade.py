@@ -12,8 +12,9 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_POST
+from django.views import View
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from web_fragments.fragment import Fragment
@@ -24,7 +25,9 @@ from openedx.core.djangolib.markup import HTML
 from student.models import CourseEnrollment
 from student.role_helpers import has_staff_roles
 from util.json_request import JsonResponse, expect_json
+from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 log = logging.getLogger(__name__)
 
@@ -62,44 +65,109 @@ class CourseMasquerade(object):
         self.__init__(**state)
 
 
-@require_POST
-@login_required
-@expect_json
-def handle_ajax(request, course_key_string):
+@method_decorator(login_required, name='dispatch')
+class MasqueradeView(View):
     """
-    Handle AJAX posts to update the current user's masquerade for the specified course.
-    The masquerade settings are stored in the Django session as a dict from course keys
-    to CourseMasquerade objects.
+    Create an HTTP endpoint to manage masquerade settings
     """
-    course_key = CourseKey.from_string(course_key_string)
-    masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
-    request_json = request.json
-    role = request_json.get('role', 'student')
-    group_id = request_json.get('group_id', None)
-    user_partition_id = request_json.get('user_partition_id', None) if group_id is not None else None
-    user_name = request_json.get('user_name', None)
-    found_user_name = None
-    if user_name:
-        users_in_course = CourseEnrollment.objects.users_enrolled_in(course_key)
-        try:
-            found_user_name = users_in_course.get(Q(email=user_name) | Q(username=user_name)).username
-        except User.DoesNotExist:
+
+    def get(self, request, course_key_string):
+        """
+        Retrieve data on the active and available masquerade options
+        """
+        course_key = CourseKey.from_string(course_key_string)
+        is_staff = has_staff_roles(request.user, course_key)
+        if not is_staff:
             return JsonResponse({
                 'success': False,
-                'error': _(
-                    u'There is no user with the username or email address u"{user_identifier}" '
-                    'enrolled in this course.'
-                ).format(user_identifier=user_name)
             })
-    masquerade_settings[course_key] = CourseMasquerade(
-        course_key,
-        role=role,
-        user_partition_id=user_partition_id,
-        group_id=group_id,
-        user_name=found_user_name,
-    )
-    request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
-    return JsonResponse({'success': True})
+        masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
+        course = masquerade_settings.get(course_key, None)
+        course = course or CourseMasquerade(
+            course_key,
+            role='staff',
+            user_partition_id=None,
+            group_id=None,
+            user_name=None,
+        )
+        descriptor = modulestore().get_course(course_key)
+        partitions = get_all_partitions_for_course(descriptor)
+        data = {
+            'success': True,
+            'active': {
+                'course_key': course_key_string,
+                'group_id': course.group_id,
+                'role': course.role,
+                'user_name': course.user_name or ' ',
+                'user_partition_id': course.user_partition_id,
+            },
+            'available': [
+                {
+                    'name': 'Staff',
+                    'role': 'staff',
+                },
+                {
+                    'name': 'Learner',
+                    'role': 'student',
+                },
+            ],
+        }
+        for partition in partitions:
+            if partition.active:
+                data['available'].extend([
+                    {
+                        'group_id': group.id,
+                        'name': group.name,
+                        'role': 'student',
+                        'user_partition_id': partition.id,
+                    }
+                    for group in partition.groups
+                ])
+        return JsonResponse(data)
+
+    @method_decorator(expect_json)
+    def post(self, request, course_key_string):
+        """
+        Handle AJAX posts to update the current user's masquerade for the specified course.
+        The masquerade settings are stored in the Django session as a dict from course keys
+        to CourseMasquerade objects.
+        """
+        course_key = CourseKey.from_string(course_key_string)
+        is_staff = has_staff_roles(request.user, course_key)
+        if not is_staff:
+            return JsonResponse({
+                'success': False,
+            })
+        masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
+        request_json = request.json
+        role = request_json.get('role', 'student')
+        group_id = request_json.get('group_id', None)
+        user_partition_id = request_json.get('user_partition_id', None) if group_id is not None else None
+        user_name = request_json.get('user_name', None)
+        found_user_name = None
+        if user_name:
+            users_in_course = CourseEnrollment.objects.users_enrolled_in(course_key)
+            try:
+                found_user_name = users_in_course.get(Q(email=user_name) | Q(username=user_name)).username
+            except User.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': _(
+                        u'There is no user with the username or email address u"{user_identifier}" '
+                        'enrolled in this course.'
+                    ).format(
+                        user_identifier=user_name,
+                    ),
+                })
+        masquerade_settings[course_key] = CourseMasquerade(
+            course_key,
+            role=role,
+            user_partition_id=user_partition_id,
+            group_id=group_id,
+            user_name=found_user_name,
+        )
+        request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
+        return JsonResponse({'success': True})
 
 
 def setup_masquerade(request, course_key, staff_access=False, reset_masquerade_data=False):

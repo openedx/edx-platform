@@ -7,13 +7,12 @@ django-oauth-toolkit as appropriate.
 import json
 
 from django.conf import settings
+from django.utils.decorators import method_decorator
 from django.views.generic import View
 from edx_django_utils import monitoring as monitoring_utils
-from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
-from oauth2_provider import models as dot_models  # django-oauth-toolkit
 from oauth2_provider import views as dot_views
 from ratelimit import ALL
-from ratelimit.mixins import RatelimitMixin
+from ratelimit.decorators import ratelimit
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.djangoapps.oauth_dispatch import adapters
@@ -29,7 +28,6 @@ class _DispatchingView(View):
     """
 
     dot_adapter = adapters.DOTAdapter()
-    dop_adapter = adapters.DOPAdapter()
 
     def get_adapter(self, request):
         """
@@ -38,12 +36,7 @@ class _DispatchingView(View):
         client_id = self._get_client_id(request)
         monitoring_utils.set_custom_metric('oauth_client_id', client_id)
 
-        if dot_models.Application.objects.filter(client_id=client_id).exists():
-            monitoring_utils.set_custom_metric('oauth_adapter', 'dot')
-            return self.dot_adapter
-        else:
-            monitoring_utils.set_custom_metric('oauth_adapter', 'dop')
-            return self.dop_adapter
+        return self.dot_adapter
 
     def dispatch(self, request, *args, **kwargs):
         """
@@ -69,8 +62,6 @@ class _DispatchingView(View):
         """
         if backend == self.dot_adapter.backend:
             return self.dot_view.as_view()
-        elif backend == self.dop_adapter.backend:
-            return self.dop_view.as_view()
         else:
             raise KeyError('Failed to dispatch view. Invalid backend {}'.format(backend))
 
@@ -84,18 +75,19 @@ class _DispatchingView(View):
             return request.POST.get('client_id')
 
 
-class AccessTokenView(RatelimitMixin, _DispatchingView):
+@method_decorator(
+    ratelimit(
+        key='openedx.core.djangoapps.util.ratelimit.real_ip', rate=settings.RATELIMIT_RATE,
+        method=ALL, block=True
+    ), name='dispatch'
+)
+class AccessTokenView(_DispatchingView):
     """
     Handle access token requests.
     """
     dot_view = dot_views.TokenView
-    dop_view = dop_views.AccessTokenView
-    ratelimit_key = 'openedx.core.djangoapps.util.ratelimit.real_ip'
-    ratelimit_rate = settings.RATELIMIT_RATE
-    ratelimit_block = True
-    ratelimit_method = ALL
 
-    def dispatch(self, request, *args, **kwargs):  # pylint: disable=arguments-differ
+    def dispatch(self, request, *args, **kwargs):
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
 
         token_type = request.POST.get('token_type',
@@ -123,7 +115,6 @@ class AuthorizationView(_DispatchingView):
     """
     Part of the authorization flow.
     """
-    dop_view = dop_views.Capture
     dot_view = dot_overrides_views.EdxOAuth2AuthorizationView
 
 
@@ -131,7 +122,6 @@ class AccessTokenExchangeView(_DispatchingView):
     """
     Exchange a third party auth token.
     """
-    dop_view = auth_exchange_views.DOPAccessTokenExchangeView
     dot_view = auth_exchange_views.DOTAccessTokenExchangeView
 
 

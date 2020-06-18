@@ -10,7 +10,6 @@ from uuid import uuid4
 import ddt
 import requests
 import six
-import six.moves.urllib.parse  # pylint: disable=import-error
 from six.moves import range
 
 from ..edxnotes import StubEdxNotesService
@@ -35,7 +34,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         """
         Returns a list of dummy notes.
         """
-        return [self._get_dummy_note(i) for i in range(count)]  # pylint: disable=unused-variable
+        return [self._get_dummy_note(i) for i in range(count)]
 
     def _get_dummy_note(self, uid=0):
         """

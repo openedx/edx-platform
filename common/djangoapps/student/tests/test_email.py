@@ -14,6 +14,7 @@ from django.http import HttpResponse
 from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils.html import escape
 from mock import Mock, patch
 from six import text_type
 
@@ -21,7 +22,6 @@ from edxmako.shortcuts import marketing_link, render_to_string
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
 from openedx.core.lib.request_utils import safe_get_host
 from student.models import PendingEmailChange, Registration, UserProfile
@@ -199,8 +199,8 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
                             self.assertEqual(user.is_active, True)
                             self.assertEqual(email.called, False, msg='method should not have been called')
 
-    @patch('student.tasks.log')
-    def test_send_email_to_inactive_user(self, mock_log):
+    @patch('student.views.management.compose_activation_email')
+    def test_send_email_to_inactive_user(self, email):
         """
         Tests that when an inactive user logs-in using the social auth, system
         sends an activation email to the user.
@@ -212,11 +212,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         with patch('edxmako.request_context.get_current_request', return_value=request):
             with patch('third_party_auth.pipeline.running', return_value=False):
                 inactive_user_view(request)
-                mock_log.info.assert_called_with(
-                    "Activation Email has been sent to User {user_email}".format(
-                        user_email=inactive_user.email
-                    )
-                )
+                self.assertEqual(email.called, True, msg='method should have been called')
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
@@ -517,14 +513,6 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         )
         self.assertEqual(0, PendingEmailChange.objects.count())
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    def test_prevent_auth_user_writes(self):
-        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
-            self.check_confirm_email_change('email_change_failed.html', {
-                'err_msg': SYSTEM_MAINTENANCE_MSG
-            })
-            self.assertRolledBack()
-
     @patch('student.views.PendingEmailChange.objects.get', Mock(side_effect=TestException))
     def test_always_rollback(self):
         connection = transaction.get_connection()
@@ -613,9 +601,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         self._assert_email(
             subject=u'Confirm your recovery email for édX',
             body_fragments=[
-                u'You\'ve registered this recovery email address for édX.'.format(
-                    new_email=new_email,
-                ),
+                u'You\'ve registered this recovery email address for édX.',
                 u'If you set this email address, click "confirm email."',
                 u'If you didn\'t request this change, you can disregard this email.',
                 u'http://edx.org/activate_secondary_email/{key}'.format(key=registration_key),
@@ -636,6 +622,6 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
 
         assert message.subject == subject
 
-        for body in text, html:
-            for fragment in body_fragments:
-                assert fragment in body
+        for fragment in body_fragments:
+            assert fragment in text
+            assert escape(fragment) in html

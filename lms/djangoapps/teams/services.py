@@ -19,3 +19,7 @@ class TeamsService(object):
             topic_id=team.topic_id,
             team_id=team.team_id,
         )
+
+    def get_anonymous_user_ids_for_team(self, user, team):
+        from . import api
+        return api.anonymous_user_ids_for_team(user, team)

@@ -25,6 +25,15 @@ class TestRedirectUtils(TestCase):
 
     RedirectCase = namedtuple('RedirectCase', ['url', 'host', 'req_is_secure', 'expected_is_safe'])
 
+    @staticmethod
+    def _is_safe_redirect(req, url):
+        return is_safe_login_or_logout_redirect(
+            redirect_to=url,
+            request_host=req.get_host(),
+            dot_client_id=req.GET.get('client_id'),
+            require_https=req.is_secure(),
+        )
+
     @ddt.data(
         RedirectCase('/dashboard', 'testserver', req_is_secure=True, expected_is_safe=True),
         RedirectCase('https://test.edx.org/courses', 'edx.org', req_is_secure=True, expected_is_safe=True),
@@ -44,7 +53,7 @@ class TestRedirectUtils(TestCase):
         """ Test safe next parameter """
         req = self.request.get('/login', HTTP_HOST=host)
         req.is_secure = lambda: req_is_secure
-        actual_is_safe = is_safe_login_or_logout_redirect(req, url)
+        actual_is_safe = self._is_safe_redirect(req, url)
         self.assertEqual(actual_is_safe, expected_is_safe)
 
     @ddt.data(
@@ -60,7 +69,7 @@ class TestRedirectUtils(TestCase):
             'redirect_url': redirect_url,
         }
         req = self.request.get('/logout?{}'.format(urlencode(params)), HTTP_HOST=host)
-        actual_is_safe = is_safe_login_or_logout_redirect(req, redirect_url)
+        actual_is_safe = self._is_safe_redirect(req, redirect_url)
         self.assertEqual(actual_is_safe, expected_is_safe)
 
 

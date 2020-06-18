@@ -51,4 +51,5 @@ from .exceptions import (
     BundleNotFound,
     DraftNotFound,
     BundleFileNotFound,
+    BundleStorageError,
 )

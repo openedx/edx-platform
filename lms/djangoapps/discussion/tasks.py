@@ -17,7 +17,7 @@ from edx_ace.recipient import Recipient
 from edx_ace.utils import date
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urljoin
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from lms.djangoapps.discussion.django_comment_client.utils import (
@@ -129,12 +129,6 @@ def _is_first_comment(comment_id, thread_id):
         first_comment = thread.children[0]
         return first_comment.get('id') == comment_id
     else:
-        log.info(
-            u"EDUCATOR-3385: No child exists for thread_id %s | course_id %s | username %s ",
-            thread.get('id'),
-            thread['course_id'],
-            thread['username']
-        )
         return False
 
 

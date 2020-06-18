@@ -100,9 +100,7 @@ nav {
 
   .nav-sub {
     border-radius: 2px;
-
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     box-shadow: 0 1px 1px $shadow-l1;
     position: relative;
     width: 100%;
@@ -210,7 +208,8 @@ nav {
 .jump-nav {
   .nav-item {
     display: inline-block;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
+
 
     .title {
       &:hover,
@@ -252,7 +251,7 @@ $seq-nav-height: 40px;
   @extend .topbar;
 
   background-color: #fff;
-  margin: 0 auto $baseline;
+  margin: 0 auto;
   position: relative;
   border-bottom: none;
   z-index: 0;
@@ -494,6 +493,32 @@ $seq-nav-height: 40px;
 
       .icon {
         color: $seq-nav-icon-color;
+      }
+    }
+  }
+
+  // FontAwesome rtl chevron next - Learning Sequence Nav
+  .fa-chevron-next {
+    &::before {
+      @if $bi-app-direction == ltr {
+        content: "\f054"; // .fa-chevron-right
+      }
+
+      @else if $bi-app-direction == rtl {
+        content: "\f053"; // .fa-chevron-left
+      }
+    }
+  }
+
+  // FontAwesome rtl chevron prev - - Learning Sequence Nav
+  .fa-chevron-prev {
+    &::before {
+      @if $bi-app-direction == ltr {
+        content: "\f053"; // .fa-chevron-left
+      }
+
+      @else if $bi-app-direction == rtl {
+        content: "\f054"; // .fa-chevron-right
       }
     }
   }

@@ -10,8 +10,6 @@ import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.courseware.tabs import EnrolledTab
 from xmodule.tabs import TabFragmentViewMixin
 
-from .config import USE_BOOTSTRAP_FLAG
-
 
 class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
     """
@@ -39,4 +37,4 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
         """
         Returns true if this tab is rendered with Bootstrap.
         """
-        return USE_BOOTSTRAP_FLAG.is_enabled()
+        return True

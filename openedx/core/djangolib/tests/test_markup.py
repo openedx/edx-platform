@@ -14,7 +14,6 @@ from django.utils.translation import ungettext
 from mako.template import Template
 
 from openedx.core.djangolib.markup import HTML, Text, strip_all_tags_but_br
-import six
 
 
 @ddt.ddt

@@ -12,29 +12,20 @@ from datetime import datetime, timedelta
 import ddt
 import six
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
-from course_modes.models import CourseMode
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-from entitlements.tests.factories import CourseEntitlementFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pyquery import PyQuery as pq
 from six.moves import range
-from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, UserProfile
-from student.signals import REFUND_ORDER
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
-from util.testing import UrlResetMixin
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from course_modes.models import CourseMode
+from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -45,6 +36,15 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
+from student.helpers import DISABLE_UNENROLL_CERT_STATES
+from student.models import CourseEnrollment, UserProfile
+from student.signals import REFUND_ORDER
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.milestones_helpers import get_course_milestones, remove_prerequisite_course, set_prerequisite_courses
+from util.testing import UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 PASSWORD = 'test'
 
@@ -222,32 +222,38 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
 
-    def test_grade_doesnt_appears_before_course_end_date(self):
+    def test_grade_appears_before_course_end_date(self):
         """
         Verify that learners are not able to see their final grade before the end
         of course in the learner dashboard
         """
-        self.course = CourseFactory.create(end=self.TOMORROW, emit_signals=True)
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.TOMORROW,
+                                                   certificate_available_date=self.THREE_YEARS_AGO,
+                                                   lowest_passing_grade=0.3)
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
         GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
 
         response = self.client.get(reverse('dashboard'))
         # The final grade does not appear before the course has ended
-        self.assertNotContains(response, 'Your final grade:')
-        self.assertNotContains(response, '<span class="grade-value">45%</span>')
+        self.assertContains(response, 'Your final grade:')
+        self.assertContains(response, '<span class="grade-value">45%</span>')
 
-    def test_grade_appears_after_course_has_ended(self):
+    def test_grade_not_appears_before_cert_available_date(self):
         """
         Verify that learners are able to see their final grade of the course in
         the learner dashboard after the course had ended
         """
-        self.course = CourseFactory.create(end=self.THREE_YEARS_AGO, emit_signals=True)
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.THREE_YEARS_AGO,
+                                                   certificate_available_date=self.TOMORROW,
+                                                   lowest_passing_grade=0.3)
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
         GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
 
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, 'Your final grade:')
-        self.assertContains(response, '<span class="grade-value">45%</span>')
+        self.assertNotContains(response, 'Your final grade:')
+        self.assertNotContains(response, '<span class="grade-value">45%</span>')
 
     @patch.multiple('django.conf.settings', **MOCK_SETTINGS)
     @ddt.data(
@@ -335,7 +341,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         # If an entitlement has already been redeemed by the user for a course run, do not let the run be selectable
         enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=six.text_type(mock_course_overview.return_value.id), mode=CourseMode.VERIFIED
+            user=self.user, course=mock_course_overview.return_value, mode=CourseMode.VERIFIED
         )
         CourseEntitlementFactory.create(
             user=self.user, course_uuid=program['courses'][0]['uuid'], enrollment_course_run=enrollment
@@ -383,7 +389,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertNotContains(response, '<li class="course-item">')
 
-    @patch('entitlements.api.v1.views.get_course_runs_for_course')
+    @patch('entitlements.rest_api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
     def test_sessions_for_entitlement_course_runs(self, mock_course_overview, mock_course_runs):
         """
@@ -768,7 +774,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Links will be removed from the course title, course image and button (View Course/Resume Course).
         The course card should have an access expired message.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=self.THREE_YEARS_AGO - timedelta(days=30))
         self.override_waffle_switch(True)
 
         course = CourseFactory.create(start=self.THREE_YEARS_AGO)
@@ -777,12 +783,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             user=self.user,
             course_id=course.id
         )
-        startdate = self.THREE_YEARS_AGO + timedelta(days=1)
-        schedule = ScheduleFactory(
-            start=startdate,
-            start_date=startdate,
-            enrollment=enrollment
-        )
+        enrollment.created = self.THREE_YEARS_AGO + timedelta(days=1)
+        enrollment.save()
+
+        # pylint: disable=unused-variable
+        schedule = ScheduleFactory(enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
         dashboard_html = self._remove_whitespace_from_response(response)

@@ -29,7 +29,8 @@
     background: $black-t1;
     color: $white;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       background: $gray-d1;
     }
 
@@ -56,7 +57,8 @@
     .calculator-input-help-table {
       margin: ($baseline/2) 0;
 
-      tr th, tr td {
+      tr th,
+      tr td {
         vertical-align: top;
         border: 1px solid $gray-l4;
         padding: ($baseline/2);
@@ -66,8 +68,7 @@
     form {
       @extend .clearfix;
 
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       padding: lh();
 
       .calc-output-label {
@@ -79,9 +80,7 @@
         border: 1px solid $white;
         border-radius: 0;
         box-shadow: none;
-
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         color: $black;
         float: left;
         font-size: 30px;
@@ -93,7 +92,8 @@
         -webkit-appearance: none;
         width: flex-grid(0.5) + flex-gutter();
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           background: $blue-d2;
           color: $white;
         }
@@ -109,9 +109,7 @@
         background: $white;
         border: 1px solid $white;
         box-shadow: none;
-
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         color: $black;
         float: left;
         font-size: 16px;
@@ -120,7 +118,7 @@
         padding: 10px;
         -webkit-appearance: none;
         width: flex-grid(4);
-        
+
         &.has-result {
           border: 1px solid $green-d1;
           box-shadow: inset 0 0 ($baseline/3) $green-d1;
@@ -144,9 +142,7 @@
           direction: ltr;  // Almost all of the real-world calculators are LTR
           border: none;
           box-shadow: none;
-
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           font-size: 16px;
           padding: 10px;
           -webkit-appearance: none;
@@ -215,14 +211,16 @@
               font-weight: bold;
             }
 
-            p, p+p {
+            p,
+            p + p {
               margin: 0;
             }
 
             .calc-postfixes {
               margin: 10px auto;
 
-              td, th {
+              td,
+              th {
                 padding: 2px 15px;
               }
             }

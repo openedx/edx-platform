@@ -12,6 +12,7 @@ from lxml import etree
 from markupsafe import Markup
 from mock import patch
 
+from capa.responsetypes import LoncapaProblemError
 from capa.tests.helpers import new_loncapa_problem
 from openedx.core.djangolib.markup import HTML
 
@@ -188,6 +189,23 @@ class CAPAProblemTest(unittest.TestCase):
                 }
             }
         )
+
+    def test_additional_answer_is_skipped_from_resulting_html(self):
+        """Tests that additional_answer element is not present in transformed HTML"""
+        xml = """
+        <problem>
+            <p>Be sure to check your spelling.</p>
+            <stringresponse answer="War" type="ci">
+                <label>___ requires sacrifices.</label>
+                <description>Anyone who looks the world as if it was a game of chess deserves to lose.</description>
+                <additional_answer answer="optional acceptable variant of the correct answer"/>
+                <textline size="40"/>
+            </stringresponse>
+        </problem>
+        """
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(len(problem.extracted_tree.xpath('//additional_answer')), 0)
+        self.assertNotIn('additional_answer', problem.get_html())
 
     def test_non_accessible_inputtype(self):
         """
@@ -459,6 +477,37 @@ class CAPAProblemTest(unittest.TestCase):
         """
         self.assert_question_tag(question1, question2, tag='label', label_attr=False)
         self.assert_question_tag(question1, question2, tag='p', label_attr=True)
+
+    def test_optionresponse_xml_compatibility(self):
+        """
+        Verify that an optionresponse problem with multiple correct answers is not instantiated.
+
+        Scenario:
+        Given an optionresponse/Dropdown problem
+        If there are multiple correct answers
+        Then the problem is not instantiated
+        And Loncapa problem error exception is raised
+        If the problem is corrected by including only one correct answer
+        Then the problem is created successfully
+        """
+        xml = """
+        <problem>
+            <optionresponse>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+            <label>Add the question text, or prompt, here. This text is required.</label>
+            <description>You can add an optional tip or note related to the prompt like this. </description>
+            <optioninput>
+                <option correct="False">an incorrect answer</option>
+                <option correct="True">the correct answer</option>
+                <option correct="{correctness}">an incorrect answer</option>
+              </optioninput>
+            </optionresponse>
+        </problem>
+        """
+        with self.assertRaises(LoncapaProblemError):
+            new_loncapa_problem(xml.format(correctness=True))
+        problem = new_loncapa_problem(xml.format(correctness=False))
+        self.assertIsNotNone(problem)
 
 
 @ddt.ddt

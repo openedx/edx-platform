@@ -8,6 +8,7 @@ StudioViewHandlers are handlers for video descriptor instance.
 
 import json
 import logging
+import math
 
 import six
 from django.core.files.base import ContentFile
@@ -88,6 +89,11 @@ class VideoStudentViewHandlers(object):
 
                     if key == 'bumper_last_view_date':
                         value = now()
+
+                    if key == 'speed' and math.isnan(value):
+                        message = u"Invalid speed value {}, must be a float.".format(value)
+                        log.warning(message)
+                        return json.dumps({'success': False, 'error': message})
 
                     setattr(self, key, value)
 
@@ -385,7 +391,7 @@ class VideoStudentViewHandlers(object):
         runtime uses a similar REST API that's not an XBlock handler.
         """
         from lms.djangoapps.courseware.views.views import load_metadata_from_youtube
-        metadata, status_code = load_metadata_from_youtube(video_id=self.youtube_id_1_0)
+        metadata, status_code = load_metadata_from_youtube(video_id=self.youtube_id_1_0, request=request)
         response = Response(json.dumps(metadata), status=status_code)
         response.content_type = 'application/json'
         return response

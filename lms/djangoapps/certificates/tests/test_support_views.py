@@ -7,23 +7,22 @@ import json
 
 import ddt
 import six
-from mock import patch
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import CourseEnrollment
 from student.roles import GlobalStaff, SupportStaffRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True

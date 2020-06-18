@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
-from openedx.core.lib.teams_config import TeamsConfig
+from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 
@@ -295,7 +295,13 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         topic_id = "topic_id_{}".format(next_num)
         name = "Name {}".format(next_num)
         description = "Description {}".format(next_num)
-        return {"name": name, "description": description, "id": topic_id}
+        return {
+            "name": name,
+            "description": description,
+            "id": topic_id,
+            "type": "open",
+            "max_team_size": None
+        }
 
     def test_teams_enabled_new_course(self):
         # Make sure we can detect when no teams exist.
@@ -318,7 +324,10 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.assertTrue(self.course.teams_enabled)
 
     def test_teams_max_size_no_teams_configuration(self):
-        self.assertIsNone(self.course.teams_configuration.default_max_team_size)
+        self.assertEqual(
+            self.course.teams_configuration.default_max_team_size,
+            DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
+        )
 
     def test_teams_max_size_with_teams_configured(self):
         size = 4
@@ -338,7 +347,7 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.add_team_configuration(max_team_size=4, topics=topics)
         self.assertTrue(self.course.teams_enabled)
         expected_teamsets_data = [
-            teamset.cleaned_data_old_format
+            teamset.cleaned_data
             for teamset in self.course.teamsets
         ]
         self.assertEqual(expected_teamsets_data, topics)

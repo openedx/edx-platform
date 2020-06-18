@@ -2,7 +2,6 @@
 Objects and utilities used to construct registration forms.
 """
 
-
 import copy
 from importlib import import_module
 import re
@@ -42,6 +41,7 @@ class TrueCheckbox(widgets.CheckboxInput):
     """
     A checkbox widget that only accepts "true" (case-insensitive) as true.
     """
+
     def value_from_datadict(self, data, files, name):
         value = data.get(name, '')
         return value.lower() == 'true'
@@ -164,12 +164,12 @@ class AccountCreationForm(forms.Form):
     )
 
     def __init__(
-            self,
-            data=None,
-            extra_fields=None,
-            extended_profile_fields=None,
-            do_third_party_auth=True,
-            tos_required=True
+        self,
+        data=None,
+        extra_fields=None,
+        extended_profile_fields=None,
+        do_third_party_auth=True,
+        tos_required=True
     ):
         super(AccountCreationForm, self).__init__(data)
 
@@ -181,7 +181,6 @@ class AccountCreationForm(forms.Form):
                 error_messages={"required": _("You must accept the terms of service.")}
             )
 
-        # TODO: These messages don't say anything about minimum length
         error_message_dict = {
             "level_of_education": _("A level of education is required"),
             "gender": _("Your gender is required"),
@@ -202,7 +201,7 @@ class AccountCreationForm(forms.Form):
                         )
                 else:
                     required = field_value == "required"
-                    min_length = 1 if field_name in ("gender", "level_of_education") else 2
+                    min_length = 1
                     error_message = error_message_dict.get(
                         field_name,
                         _("You are missing one or more required fields")
@@ -351,10 +350,11 @@ class RegistrationFormFactory(object):
         field_order = configuration_helpers.get_value('REGISTRATION_FIELD_ORDER')
         if not field_order:
             field_order = settings.REGISTRATION_FIELD_ORDER or valid_fields
-
-        # Check that all of the valid_fields are in the field order and vice versa, if not set to the default order
+        # Check that all of the valid_fields are in the field order and vice versa,
+        # if not append missing fields at end of field order
         if set(valid_fields) != set(field_order):
-            field_order = valid_fields
+            difference = set(valid_fields).difference(set(field_order))
+            field_order.extend(difference)
 
         self.field_order = field_order
 
@@ -429,6 +429,13 @@ class RegistrationFormFactory(object):
                         form_desc,
                         required=self._is_field_required(field_name)
                     )
+
+        # remove confirm_email form v1 registration form
+        if 'v1' in request.get_full_path():
+            for index, field in enumerate(form_desc.fields):
+                if field['name'] == 'confirm_email':
+                    del form_desc.fields[index]
+                    break
 
         return form_desc
 
@@ -952,7 +959,6 @@ class RegistrationFormFactory(object):
         field_type = 'checkbox'
 
         if not separate_honor_and_tos:
-
             field_type = 'plaintext'
 
             pp_link = marketing_link("PRIVACY")
@@ -1069,16 +1075,28 @@ class RegistrationFormFactory(object):
                                 field_name, default=field_overrides[field_name]
                             )
 
-                            if (field_name not in ['terms_of_service', 'honor_code']
-                                    and field_overrides[field_name]
-                                    and hide_registration_fields_except_tos):
-
+                            if (
+                                field_name not in ['terms_of_service', 'honor_code'] and
+                                field_overrides[field_name] and
+                                hide_registration_fields_except_tos
+                            ):
                                 form_desc.override_field_properties(
                                     field_name,
                                     field_type="hidden",
                                     label="",
                                     instructions="",
                                 )
+
+                    # Hide the confirm_email field
+                    form_desc.override_field_properties(
+                        "confirm_email",
+                        default="",
+                        field_type="hidden",
+                        required=False,
+                        label="",
+                        instructions="",
+                        restrictions={}
+                    )
 
                     # Hide the password field
                     form_desc.override_field_properties(

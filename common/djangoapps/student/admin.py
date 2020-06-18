@@ -5,6 +5,7 @@ from functools import wraps
 
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
 from django.contrib.admin.utils import unquote
@@ -30,6 +31,7 @@ from student.models import (
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    CourseEnrollmentCelebration,
     DashboardConfiguration,
     LinkedInAddToProfileConfiguration,
     LoginFailures,
@@ -39,7 +41,8 @@ from student.models import (
     UserAttribute,
     UserProfile,
     UserTestGroup,
-    BulkUnenrollConfiguration
+    BulkUnenrollConfiguration,
+    AccountRecoveryConfiguration
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
@@ -50,6 +53,70 @@ User = get_user_model()  # pylint:disable=invalid-name
 # In a large enough deployment of Open edX, this is enough to cause a site outage.
 # See https://openedx.atlassian.net/browse/OPS-2943
 COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin')
+
+
+class _Check(object):
+    """
+    A method decorator that pre-emptively returns false if a feature is disabled.
+    Otherwise, it returns the return value of the decorated method.
+
+    To use, add this decorator above a method and pass in a function that returns
+    a boolean indicating whether the feature is enabled.
+
+    Example:
+    @_Check.is_enabled(FEATURE_TOGGLE.is_enabled)
+    """
+    @classmethod
+    def is_enabled(cls, is_enabled_func):
+        """
+        See above docstring.
+        """
+        def inner(func):
+            @wraps(func)
+            def decorator(*args, **kwargs):
+                if not is_enabled_func():
+                    return False
+                return func(*args, **kwargs)
+            return decorator
+        return inner
+
+
+class DisableEnrollmentAdminMixin:
+    """ Disables admin access to an admin page that scales with enrollments, as performance is poor at that size. """
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_view_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be viewed via the admin view.
+        """
+        return super().has_view_permission(request, obj)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_add_permission(self, request):
+        """
+        Returns True if CourseEnrollment objects can be added via the admin view.
+        """
+        return super().has_add_permission(request)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_change_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be modified via the admin view.
+        """
+        return super().has_change_permission(request, obj)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_delete_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be deleted via the admin view.
+        """
+        return super().has_delete_permission(request, obj)
+
+    @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
+    def has_module_permission(self, request):
+        """
+        Returns True if links to the CourseEnrollment admin view can be displayed.
+        """
+        return super().has_module_permission(request)
 
 
 class CourseAccessRoleForm(forms.ModelForm):
@@ -210,7 +277,7 @@ class CourseEnrollmentForm(forms.ModelForm):
 
 
 @admin.register(CourseEnrollment)
-class CourseEnrollmentAdmin(admin.ModelAdmin):
+class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
@@ -236,38 +303,6 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     def queryset(self, request):
         return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
 
-    def has_permission(self, request, method):
-        """
-        Returns True if the given admin method is allowed.
-        """
-        if COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled():
-            return getattr(super(CourseEnrollmentAdmin, self), method)(request)
-        return False
-
-    def has_add_permission(self, request):
-        """
-        Returns True if CourseEnrollment objects can be added via the admin view.
-        """
-        return self.has_permission(request, 'has_add_permission')
-
-    def has_change_permission(self, request, obj=None):
-        """
-        Returns True if CourseEnrollment objects can be modified via the admin view.
-        """
-        return self.has_permission(request, 'has_change_permission')
-
-    def has_delete_permission(self, request, obj=None):
-        """
-        Returns True if CourseEnrollment objects can be deleted via the admin view.
-        """
-        return self.has_permission(request, 'has_delete_permission')
-
-    def has_module_permission(self, request):
-        """
-        Returns True if links to the CourseEnrollment admin view can be displayed.
-        """
-        return self.has_permission(request, 'has_module_permission')
-
 
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """
@@ -289,13 +324,19 @@ class UserChangeForm(BaseUserChangeForm):
     Override the default UserChangeForm such that the password field
     does not contain a link to a 'change password' form.
     """
-    password = ReadOnlyPasswordHashField(
-        label=_("Password"),
-        help_text=_(
-            "Raw passwords are not stored, so there is no way to see this "
-            "user's password."
-        ),
-    )
+    last_name = forms.CharField(max_length=30, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(UserChangeForm, self).__init__(*args, **kwargs)
+
+        if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
+            self.fields["password"] = ReadOnlyPasswordHashField(
+                label=_("Password"),
+                help_text=_(
+                    "Raw passwords are not stored, so there is no way to see this "
+                    "user's password."
+                ),
+            )
 
 
 class UserAdmin(BaseUserAdmin):
@@ -345,45 +386,35 @@ class LoginFailuresAdmin(admin.ModelAdmin):
     actions = ['unlock_student_accounts']
     change_form_template = 'admin/student/loginfailures/change_form_template.html'
 
-    class _Feature(object):
-        """
-        Inner feature class to implement decorator.
-        """
-        @classmethod
-        def is_enabled(cls, func):
-            """
-            Check if feature is enabled.
-            """
-            @wraps(func)
-            def decorator(*args, **kwargs):
-                """Decorator class to return"""
-                if not LoginFailures.is_feature_enabled():
-                    return False
-                return func(*args, **kwargs)
-            return decorator
-
-    @_Feature.is_enabled
+    @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_module_permission(self, request):
         """
         Only enabled if feature is enabled.
         """
         return super(LoginFailuresAdmin, self).has_module_permission(request)
 
-    @_Feature.is_enabled
+    @_Check.is_enabled(LoginFailures.is_feature_enabled)
+    def has_view_permission(self, request, obj=None):
+        """
+        Only enabled if feature is enabled.
+        """
+        return super(LoginFailuresAdmin, self).has_view_permission(request, obj)
+
+    @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_delete_permission(self, request, obj=None):
         """
         Only enabled if feature is enabled.
         """
         return super(LoginFailuresAdmin, self).has_delete_permission(request, obj)
 
-    @_Feature.is_enabled
+    @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_change_permission(self, request, obj=None):
         """
         Only enabled if feature is enabled.
         """
         return super(LoginFailuresAdmin, self).has_change_permission(request, obj)
 
-    @_Feature.is_enabled
+    @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_add_permission(self, request):
         """
         Only enabled if feature is enabled.
@@ -460,7 +491,7 @@ class AllowedAuthUserForm(forms.ModelForm):
         if not allowed_site_email_domain:
             raise forms.ValidationError(
                 _("Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in SiteConfiguration "
-                  "model's values field.")
+                  "model's site_values field.")
             )
         elif email_domain != allowed_site_email_domain:
             raise forms.ValidationError(
@@ -484,9 +515,29 @@ class AllowedAuthUserAdmin(admin.ModelAdmin):
         model = AllowedAuthUser
 
 
+@admin.register(CourseEnrollmentCelebration)
+class CourseEnrollmentCelebrationAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
+    """Admin interface for the CourseEnrollmentCelebration model. """
+    raw_id_fields = ('enrollment',)
+    list_display = ('id', 'course', 'user', 'celebrate_first_section')
+    search_fields = ('enrollment__course__id', 'enrollment__user__username')
+
+    class Meta(object):
+        model = CourseEnrollmentCelebration
+
+    def course(self, obj):
+        return obj.enrollment.course.id
+    course.short_description = 'Course'
+
+    def user(self, obj):
+        return obj.enrollment.user.username
+    user.short_description = 'User'
+
+
 admin.site.register(UserTestGroup)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
+admin.site.register(AccountRecoveryConfiguration, ConfigurationModelAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 admin.site.register(BulkUnenrollConfiguration, ConfigurationModelAdmin)

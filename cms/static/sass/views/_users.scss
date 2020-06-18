@@ -4,8 +4,9 @@
 .view-team {
 
   // LAYOUT: page
-  .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
+  .content-primary,
+  .content-supplementary {
+    box-sizing: border-box;
   }
 
   .content-primary {
@@ -32,7 +33,8 @@
 
     // CASE: notice has actions {
     &.has-actions {
-      .msg, .list-actions {
+      .msg,
+      .list-actions {
         display: inline-block;
         vertical-align: middle;
       }
@@ -46,10 +48,6 @@
         width: flex-grid(3, 9);
         text-align: right;
         margin-top: 0;
-
-        .action-item {
-
-        }
 
         .action-primary {
           @extend %btn-primary-green;
@@ -69,8 +67,11 @@
   }
 
   // ELEM: listing of users
-  .user-list, .user-item, .item-metadata, .item-actions {
-    @include box-sizing(border-box);
+  .user-list,
+  .user-item,
+  .item-metadata,
+  .item-actions {
+    box-sizing: border-box;
   }
 
   .user-list {
@@ -88,7 +89,8 @@
         margin-bottom: 0;
       }
 
-      .item-metadata, .item-actions {
+      .item-metadata,
+      .item-actions {
         display: inline-block;
         vertical-align: middle;
       }
@@ -133,7 +135,8 @@
 
         @include margin-right(flex-gutter());
 
-        .user-username, .user-email {
+        .user-username,
+        .user-email {
           display: inline-block;
           vertical-align: middle;
         }
@@ -218,20 +221,6 @@
           margin-right: 0;
           float: none;
           color: inherit;
-        }
-      }
-
-      // STATE: hover
-      &:hover {
-        .user-username {
-        }
-
-        .user-email {
-
-        }
-
-        .item-actions {
-
         }
       }
     }

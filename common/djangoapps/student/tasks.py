@@ -6,7 +6,7 @@ This file contains celery tasks for sending email
 import logging
 
 from celery.exceptions import MaxRetriesExceededError
-from celery.task import task  # pylint: disable=no-name-in-module, import-error
+from celery.task import task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -43,10 +43,6 @@ def send_activation_email(self, msg_string, from_address=None):
     try:
         with emulate_http_request(site=site, user=user):
             ace.send(msg)
-        # Log that the Activation Email has been sent to user without an exception
-        log.info("Activation Email has been sent to User {user_email}".format(
-            user_email=dest_addr
-        ))
     except RecoverableChannelDeliveryError:
         log.info('Retrying sending email to user {dest_addr}, attempt # {attempt} of {max_attempts}'.format(
             dest_addr=dest_addr,
@@ -62,11 +58,10 @@ def send_activation_email(self, msg_string, from_address=None):
                 dest_addr,
                 exc_info=True
             )
-    except Exception:  # pylint: disable=bare-except
+    except Exception:
         log.exception(
             'Unable to send activation email to user from "%s" to "%s"',
             from_address,
             dest_addr,
-            exc_info=True
         )
         raise Exception

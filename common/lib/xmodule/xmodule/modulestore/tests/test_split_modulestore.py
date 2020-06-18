@@ -2235,12 +2235,12 @@ class TestSchema(SplitModuleTest):
         db_connection = modulestore().db_connection
         for collection in [db_connection.course_index, db_connection.structures, db_connection.definitions]:
             self.assertEqual(
-                collection.find({'schema_version': {'$exists': False}}).count(),
+                collection.count_documents({'schema_version': {'$exists': False}}),
                 0,
                 "{0.name} has records without schema_version".format(collection)
             )
             self.assertEqual(
-                collection.find({'schema_version': {'$ne': SplitMongoModuleStore.SCHEMA_VERSION}}).count(),
+                collection.count_documents({'schema_version': {'$ne': SplitMongoModuleStore.SCHEMA_VERSION}}),
                 0,
                 "{0.name} has records with wrong schema_version".format(collection)
             )
@@ -2278,6 +2278,6 @@ def modulestore():
     return SplitModuleTest.modulestore
 
 
-# pylint: disable=unused-argument, missing-docstring
+# pylint: disable=unused-argument
 def render_to_template_mock(*args):
     pass

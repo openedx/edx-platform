@@ -302,21 +302,6 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
         self.assertFalse(self.video.is_button_shown('transcript_button'))
 
-    def test_fullscreen_video_alignment_with_transcript_hidden(self):
-        """
-        Scenario: Video is aligned with transcript hidden in fullscreen mode
-        Given the course has a Video component in "Youtube" mode
-        When I view the video at fullscreen
-        Then the video with the transcript hidden is aligned correctly
-        """
-        self.navigate_to_video()
-
-        # click video button "fullscreen"
-        self.video.click_player_button('fullscreen')
-
-        # check if video aligned correctly without enabled transcript
-        self.assertTrue(self.video.is_aligned(False))
-
     def test_download_button_wo_english_transcript(self):
         """
         Scenario: Download button works correctly w/o english transcript in YouTube mode
@@ -370,38 +355,6 @@ class YouTubeVideoTest(VideoBaseTest):
         # check if we can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = u"好 各位同学"
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
-
-    def test_fullscreen_video_alignment_on_transcript_toggle(self):
-        """
-        Scenario: Video is aligned correctly on transcript toggle in fullscreen mode
-        Given the course has a Video component in "Youtube" mode
-        And I have uploaded a .srt.sjson file to assets
-        And I have defined subtitles for the video
-        When I view the video at fullscreen
-        Then the video with the transcript enabled is aligned correctly
-        And the video with the transcript hidden is aligned correctly
-        """
-        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
-        data = {'sub': '3_yD_cEKoCk'}
-        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
-
-        # go to video
-        self.navigate_to_video()
-
-        # make sure captions are opened
-        self.video.show_captions()
-
-        # click video button "fullscreen"
-        self.video.click_player_button('fullscreen')
-
-        # check if video aligned correctly with enabled transcript
-        self.assertTrue(self.video.is_aligned(True))
-
-        # click video button "transcript"
-        self.video.click_player_button('transcript_button')
-
-        # check if video aligned correctly without enabled transcript
-        self.assertTrue(self.video.is_aligned(False))
 
     def test_video_rendering_with_default_response_time(self):
         """

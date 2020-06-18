@@ -1,14 +1,13 @@
 
 
-from edxmako.shortcuts import render_to_string
-
+from django.conf import settings as django_settings
+from django.contrib.staticfiles.storage import staticfiles_storage
 from pipeline.conf import settings
 from pipeline.packager import Packager
 from pipeline.utils import guess_type
-from static_replace import try_staticfiles_lookup
 
-from django.conf import settings as django_settings
-from django.contrib.staticfiles.storage import staticfiles_storage
+from edxmako.shortcuts import render_to_string
+from static_replace import try_staticfiles_lookup
 
 
 def compressed_css(package_name, raw=False):
@@ -86,7 +85,7 @@ def render_individual_js(package, paths, templates=None):
     return '\n'.join(tags)
 
 
-def render_require_js_path_overrides(path_overrides):  # pylint: disable=invalid-name
+def render_require_js_path_overrides(path_overrides):
     """Render JavaScript to override default RequireJS paths.
 
     The Django pipeline appends a hash to JavaScript files,

@@ -25,15 +25,19 @@ class SiteConfiguration(models.Model):
 
     Fields:
         site (OneToOneField): one to one field relating each configuration to a single site
-        values (JSONField):  json field to store configurations for a site
+        site_values (JSONField):  json field to store configurations for a site
 
     .. no_pii:
     """
     site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
-    values = JSONField(
+    site_values = JSONField(
         null=False,
         blank=True,
+        # The actual default value is determined by calling the given callable.
+        # Therefore, the default here is just {}, since that is the result of
+        # calling `dict`.
+        default=dict,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
 
@@ -58,7 +62,7 @@ class SiteConfiguration(models.Model):
         """
         if self.enabled:
             try:
-                return self.values.get(name, default)
+                return self.site_values.get(name, default)
             except AttributeError as error:
                 logger.exception(u'Invalid JSON data. \n [%s]', error)
         else:
@@ -76,7 +80,7 @@ class SiteConfiguration(models.Model):
             org (str): Org to use to filter SiteConfigurations
             select_related (list or None): A list of values to pass as arguments to select_related
         """
-        query = cls.objects.filter(values__contains=org, enabled=True).all()
+        query = cls.objects.filter(site_values__contains=org, enabled=True).all()
         if select_related is not None:
             query = query.select_related(*select_related)
         for configuration in query:
@@ -120,7 +124,7 @@ class SiteConfiguration(models.Model):
         """
         org_filter_set = set()
 
-        for configuration in cls.objects.filter(values__contains='course_org_filter', enabled=True).all():
+        for configuration in cls.objects.filter(site_values__contains='course_org_filter', enabled=True).all():
             course_org_filter = configuration.get_value('course_org_filter', [])
             if not isinstance(course_org_filter, list):
                 course_org_filter = [course_org_filter]
@@ -138,6 +142,22 @@ class SiteConfiguration(models.Model):
         return org in cls.get_all_orgs()
 
 
+def save_siteconfig_without_historical_record(siteconfig, *args, **kwargs):
+    """
+    Save model without saving a historical record
+
+    Make sure you know what you're doing before you use this method.
+
+    Note: this method is copied verbatim from django-simple-history.
+    """
+    siteconfig.skip_history_when_saving = True
+    try:
+        ret = siteconfig.save(*args, **kwargs)
+    finally:
+        del siteconfig.skip_history_when_saving
+    return ret
+
+
 @python_2_unicode_compatible
 class SiteConfigurationHistory(TimeStampedModel):
     """
@@ -146,13 +166,13 @@ class SiteConfigurationHistory(TimeStampedModel):
 
     Fields:
         site (ForeignKey): foreign-key to django Site
-        values (JSONField): json field to store configurations for a site
+        site_values (JSONField): json field to store configurations for a site
 
     .. no_pii:
     """
     site = models.ForeignKey(Site, related_name='configuration_histories', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name=u"Enabled")
-    values = JSONField(
+    site_values = JSONField(
         null=False,
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
@@ -174,17 +194,27 @@ class SiteConfigurationHistory(TimeStampedModel):
 
 
 @receiver(post_save, sender=SiteConfiguration)
-def update_site_configuration_history(sender, instance, **kwargs):  # pylint: disable=unused-argument
+def update_site_configuration_history(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """
     Add site configuration changes to site configuration history.
+
+    Recording history on updates and deletes can be skipped by first setting
+    the `skip_history_when_saving` attribute on the instace, e.g.:
+
+      site_config.skip_history_when_saving = True
+      site_config.save()
 
     Args:
         sender: sender of the signal i.e. SiteConfiguration model
         instance: SiteConfiguration instance associated with the current signal
+        created (bool): True if a new record was created.
         **kwargs: extra key word arguments
     """
-    SiteConfigurationHistory.objects.create(
-        site=instance.site,
-        values=instance.values,
-        enabled=instance.enabled,
-    )
+    # Skip writing history when asked by the caller.  This skip feature only
+    # works for non-creates.
+    if created or not hasattr(instance, "skip_history_when_saving"):
+        SiteConfigurationHistory.objects.create(
+            site=instance.site,
+            site_values=instance.site_values,
+            enabled=instance.enabled,
+        )

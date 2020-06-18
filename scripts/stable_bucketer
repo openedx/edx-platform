@@ -65,7 +65,13 @@ def main(args, env):
     if abbrev is None:
         abbrev = abbreviate(my_args.exp)
 
-    print("{user} is in bucket: {bucket}".format(user=my_args.user, bucket=bucket))
+    print(
+        "For experiment {exp}, {user} is in bucket: {bucket}".format(
+            exp=my_args.exp,
+            user=my_args.user,
+            bucket=bucket,
+        )
+    )
     if my_args.print_args:
         print("* Args:\n\t{my_args}\n* Computed:\n\tdigest: {digest} - hash: {hashed} - {abbrev}".format(**vars()))
         return 0

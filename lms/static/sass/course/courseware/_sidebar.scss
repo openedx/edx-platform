@@ -6,7 +6,8 @@
   display: table-cell; // needed to extend the sidebar the full height of the area
 
   // provides sufficient contrast for all screen reader-only elements
-  .sr, .sr-only {
+  .sr,
+  .sr-only {
     color: $black;
     background: $white;
   }
@@ -23,7 +24,9 @@
     .course-navigation {
       .button-chapter {
         @include transition(all $tmg-s3 ease-in-out);
-        @include box-sizing(border-box);
+
+        box-sizing: border-box;
+
         @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
         @include transition(background-color 0.1s linear 0s);
 

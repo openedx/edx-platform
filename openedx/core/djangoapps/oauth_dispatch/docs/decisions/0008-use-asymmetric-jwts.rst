@@ -34,7 +34,7 @@ allow a Client to forward a verifiable token to other Clients.
 
 Looking forward, we want to support Single Page Apps (a.k.a., Microfronteds), where users can seamlessly
 traverse from one microfronted to another and access APIs on various backends. This *Single Sign On*
-capability cannot be achieved unless verifiable tokens can be forwarded from one service to another. 
+capability cannot be achieved unless verifiable tokens can be forwarded from one service to another.
 
 Decisions
 ---------
@@ -45,6 +45,7 @@ Asymmetric JWTs
 We will introduce identified "asymmetric" cryptographic keys for signing JWTs. The OAuth Provider will
 be the only service configured with the aymmetric keypair, including its Private and Public key portions.
 All other OAuth Clients will be configured with only the Public key portion of the asymmetric key pair.
+This will ultimately replace all uses of "symmetric" keys for signing JWTs.
 
 "kid" Key Identifier
 ~~~~~~~~~~~~~~~~~~~~
@@ -183,3 +184,7 @@ Consequences
   asymmetric JWTs introduces yet another. The sooner we upgrade our dependent services
   and remove these other mechanisms, the better - in the meantime, we are increasing
   code complexity.
+
+* All uses of "symmetric" keys used for signing JWTs should be marked as deprecated
+  until they can be removed. Pointing to this decision record from other code will
+  quickly explain and help identify outstanding work for removal.

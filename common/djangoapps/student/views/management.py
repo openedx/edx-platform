@@ -49,7 +49,6 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML, Text
 from student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
@@ -520,16 +519,6 @@ def activate_account(request, key):
                 ),
                 extra_tags='account-activation aa-icon',
             )
-        elif waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-            messages.error(
-                request,
-                HTML(u'{html_start}{message}{html_end}').format(
-                    message=Text(SYSTEM_MAINTENANCE_MSG),
-                    html_start=HTML('<p class="message-title">'),
-                    html_end=HTML('</p>'),
-                ),
-                extra_tags='account-activation aa-icon',
-            )
         else:
             registration.activate()
             # Success message for logged in users.
@@ -572,9 +561,6 @@ def activate_account_studio(request, key):
         user_logged_in = request.user.is_authenticated
         already_active = True
         if not registration.user.is_active:
-            if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-                return render_to_response('registration/activation_invalid.html',
-                                          {'csrf': csrf(request)['csrf_token']})
             registration.activate()
             already_active = False
 
@@ -601,7 +587,7 @@ def validate_new_email(user, new_email):
         raise ValueError(_('Old email is the same as the new email.'))
 
 
-def validate_secondary_email(account_recovery, new_email):
+def validate_secondary_email(user, new_email):
     """
     Enforce valid email addresses.
     """
@@ -612,20 +598,14 @@ def validate_secondary_email(account_recovery, new_email):
     if get_email_validation_error(new_email):
         raise ValueError(_('Valid e-mail address required.'))
 
-    if new_email == account_recovery.secondary_email:
-        raise ValueError(_('Old email is the same as the new email.'))
+    # Make sure that if there is an active recovery email address, that is not the same as the new one.
+    if hasattr(user, "account_recovery"):
+        if user.account_recovery.is_active and new_email == user.account_recovery.secondary_email:
+            raise ValueError(_('Old email is the same as the new email.'))
 
     # Make sure that secondary email address is not same as user's primary email.
-    if new_email == account_recovery.user.email:
+    if new_email == user.email:
         raise ValueError(_('Cannot be same as your sign in email address.'))
-
-    # Make sure that secondary email address is not same as any of the primary emails currently in use or retired
-    if email_exists_or_retired(new_email):
-        raise ValueError(
-            _("It looks like {email} belongs to an existing account. Try again with a different email address.").format(
-                email=new_email
-            )
-        )
 
     message = get_secondary_email_validation_error(new_email)
     if message:
@@ -712,7 +692,7 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
 
 
 @ensure_csrf_cookie
-def activate_secondary_email(request, key):  # pylint: disable=unused-argument
+def activate_secondary_email(request, key):
     """
     This is called when the activation link is clicked. We activate the secondary email
     for the requested user.
@@ -723,26 +703,28 @@ def activate_secondary_email(request, key):  # pylint: disable=unused-argument
         return render_to_response("invalid_email_key.html", {})
 
     try:
-        account_recovery_obj = AccountRecovery.objects.get(user_id=pending_secondary_email_change.user)
+        account_recovery = pending_secondary_email_change.user.account_recovery
     except AccountRecovery.DoesNotExist:
+        account_recovery = AccountRecovery(user=pending_secondary_email_change.user)
+
+    try:
+        account_recovery.update_recovery_email(pending_secondary_email_change.new_secondary_email)
+    except ValidationError:
         return render_to_response("secondary_email_change_failed.html", {
             'secondary_email': pending_secondary_email_change.new_secondary_email
         })
 
-    account_recovery_obj.is_active = True
-    account_recovery_obj.save()
+    pending_secondary_email_change.delete()
+
     return render_to_response("secondary_email_change_successful.html")
 
 
 @ensure_csrf_cookie
-def confirm_email_change(request, key):  # pylint: disable=unused-argument
+def confirm_email_change(request, key):
     """
     User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     """
-    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        return render_to_response('email_change_failed.html', {'err_msg': SYSTEM_MAINTENANCE_MSG})
-
     with transaction.atomic():
         try:
             pec = PendingEmailChange.objects.get(activation_key=key)

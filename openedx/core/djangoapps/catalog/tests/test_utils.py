@@ -19,6 +19,7 @@ from course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.constants import COURSE_UNPUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
+    CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
@@ -238,6 +239,28 @@ class TestGetPrograms(CacheIsolationTestCase):
         assert second_program in results
         assert not mock_warning.called
 
+    def test_get_from_catalog_course(self, mock_warning, _mock_info):
+        expected_program = ProgramFactory()
+        expected_catalog_course = expected_program['courses'][0]
+
+        self.assertEqual(get_programs(catalog_course_uuid=expected_catalog_course['uuid']), [])
+
+        cache.set(
+            CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_uuid=expected_catalog_course['uuid']),
+            [expected_program['uuid']],
+            None
+        )
+        cache.set(
+            PROGRAM_CACHE_KEY_TPL.format(uuid=expected_program['uuid']),
+            expected_program,
+            None
+        )
+
+        actual_program = get_programs(catalog_course_uuid=expected_catalog_course['uuid'])
+
+        self.assertEqual(actual_program, [expected_program])
+        self.assertFalse(mock_warning.called)
+
 
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.logger.info')
@@ -439,7 +462,7 @@ class TestGetLocalizedPriceText(TestCase):
 
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
-class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
+class TestGetCourseRuns(CatalogIntegrationMixin, CacheIsolationTestCase):
     """
     Tests covering retrieval of course runs from the catalog service.
     """
@@ -474,6 +497,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         Verify that no errors occur when catalog config is missing.
         """
         CatalogIntegration.objects.all().delete()
+        self.clear_caches()
 
         data = get_course_runs()
         self.assertFalse(mock_get_edx_api_data.called)
@@ -568,7 +592,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
         CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=six.text_type(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course=course_overview, mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
@@ -593,7 +617,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
             expiration_datetime=now() - timedelta(days=1)
         )
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=six.text_type(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course=course_overview, mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
@@ -619,7 +643,7 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
             expiration_datetime=now() - timedelta(days=1)
         )
         course_enrollment = CourseEnrollmentFactory(
-            user=self.user, course_id=six.text_type(course_overview.id), mode=CourseMode.VERIFIED
+            user=self.user, course=course_overview, mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED

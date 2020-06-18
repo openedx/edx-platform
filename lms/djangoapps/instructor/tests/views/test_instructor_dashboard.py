@@ -4,12 +4,12 @@ Unit tests for instructor_dashboard.py.
 
 
 import datetime
+import re
 
 import ddt
 import six
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
@@ -20,18 +20,17 @@ from six.moves import range
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from edxmako.shortcuts import render_to_response
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.roles import CourseFinanceAdminRole
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory
+from student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -107,9 +106,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         def has_instructor_tab(user, course):
             """Returns true if the "Instructor" tab is shown."""
-            request = RequestFactory().request()
-            request.user = user
-            tabs = get_course_tab_list(request, course)
+            tabs = get_course_tab_list(user, course)
             return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
 
         self.assertTrue(has_instructor_tab(self.instructor, self.course))
@@ -119,6 +116,72 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         student = UserFactory.create()
         self.assertFalse(has_instructor_tab(student, self.course))
+
+        researcher = UserFactory.create()
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=researcher,
+            role='data_researcher',
+            org=self.course.id.org
+        )
+        self.assertTrue(has_instructor_tab(researcher, self.course))
+
+        org_researcher = UserFactory.create()
+        CourseAccessRoleFactory(
+            course_id=None,
+            user=org_researcher,
+            role='data_researcher',
+            org=self.course.id.org
+        )
+        self.assertTrue(has_instructor_tab(org_researcher, self.course))
+
+    @ddt.data(
+        ('staff', False),
+        ('instructor', False),
+        ('data_researcher', True),
+        ('global_staff', True),
+    )
+    @ddt.unpack
+    def test_data_download(self, access_role, can_access):
+        """
+        Verify that the Data Download tab only shows up for certain roles
+        """
+        download_section = '<li class="nav-item"><button type="button" class="btn-link data_download" '\
+                           'data-section="data_download">Data Download</button></li>'
+        user = UserFactory.create(is_staff=access_role == 'global_staff')
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role=access_role,
+            org=self.course.id.org
+        )
+        self.client.login(username=user.username, password="test")
+        response = self.client.get(self.url)
+        if can_access:
+            self.assertContains(response, download_section)
+        else:
+            self.assertNotContains(response, download_section)
+
+    @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
+    @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
+    def test_data_download_only(self):
+        """
+        Verify that only the data download tab is visible for data researchers.
+        """
+        user = UserFactory.create()
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role='data_researcher',
+            org=self.course.id.org
+        )
+        self.client.login(username=user.username, password="test")
+        response = self.client.get(self.url)
+        matches = re.findall(
+            rb'<li class="nav-item"><button type="button" class="btn-link .*" data-section=".*">.*',
+            response.content
+        )
+        assert len(matches) == 1
 
     @ddt.data(
         ("How to defeat the Road Runner", "2017", "001", "ACME"),
@@ -168,7 +231,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             "ENABLE_MANUAL_ENROLLMENT_REASON_FIELD": enbale_reason_field
         }
         site = Site.objects.first()
-        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration_values,
+            enabled=True
+        )
 
         url = reverse(
             'instructor_dashboard',
@@ -177,7 +244,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             }
         )
         response = self.client.get(url)
-        reason_field = '<textarea rows="2" id="reason-field-id" name="reason-field" placeholder="Reason" spellcheck="false"></textarea>'  # pylint: disable=line-too-long
+        reason_field = '<textarea rows="2" id="reason-field-id" name="reason-field" ' \
+                       'placeholder="Reason" spellcheck="false"></textarea>'
         if enbale_reason_field:
             self.assertContains(response, reason_field)
         else:
@@ -196,7 +264,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             ]
         }
         site = Site.objects.first()
-        SiteConfiguration.objects.create(site=site, values=configuration_values, enabled=True)
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration_values,
+            enabled=True
+        )
         url = reverse(
             'instructor_dashboard',
             kwargs={
@@ -296,31 +368,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
         self.assertContains(response, 'View Gradebook')
 
-    def test_default_currency_in_the_html_response(self):
-        """
-        Test that checks the default currency_symbol ($) in the response
-        """
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        response = self.client.get(self.url)
-        self.assertContains(response, '${amount}'.format(amount=total_amount))
-
     def test_course_name_xss(self):
         """Test that the instructor dashboard correctly escapes course names
         with script tags.
         """
         response = self.client.get(self.url)
         self.assert_no_xss(response, '<script>alert("XSS")</script>')
-
-    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
-    def test_override_currency_settings_in_the_html_response(self):
-        """
-        Test that checks the default currency_symbol ($) in the response
-        """
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        response = self.client.get(self.url)
-        self.assertContains(response, '{currency}{amount}'.format(currency='Rs', amount=total_amount))
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -400,40 +453,13 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Test analytics dashboard message is shown
         """
         response = self.client.get(self.url)
-        analytics_section = '<li class="nav-item"><button type="button" class="btn-link instructor_analytics" data-section="instructor_analytics">Analytics</button></li>'  # pylint: disable=line-too-long
+        analytics_section = '<li class="nav-item"><button type="button" class="btn-link instructor_analytics"' \
+                            ' data-section="instructor_analytics">Analytics</button></li>'
         self.assertContains(response, analytics_section)
 
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
         self.assertIn(expected_message, response.content.decode(response.charset))
-
-    def add_course_to_user_cart(self, cart, course_key):
-        """
-        adding course to user cart
-        """
-        reg_item = PaidCourseRegistration.add_to_order(cart, course_key)
-        return reg_item
-
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
-    def test_total_credit_cart_sales_amount(self):
-        """
-        Test to check the total amount for all the credit card purchases.
-        """
-        student = UserFactory.create()
-        self.client.login(username=student.username, password="test")
-        student_cart = Order.get_cart_for_user(student)
-        item = self.add_course_to_user_cart(student_cart, self.course.id)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': 4})
-        self.assertEqual(resp.status_code, 200)
-        student_cart.purchase()
-
-        self.client.login(username=self.instructor.username, password="test")
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        single_purchase_total = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(self.course.id)
-        total_amount = single_purchase_total + bulk_purchase_total
-        response = self.client.get(self.url)
-        self.assertContains(response, '{currency}{amount}'.format(currency='$', amount=total_amount))
 
     @ddt.data(
         (True, True, True),

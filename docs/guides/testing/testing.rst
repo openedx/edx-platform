@@ -161,6 +161,10 @@ against a database created by applying the migrations instead, use the
 
     paver test_system -s lms --enable-migrations
 
+To see the migration output, use::
+
+    paver test_system -s lms --enable-migrations --verbose --disable_capture
+
 To run a single django test class use this command::
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest
@@ -350,6 +354,7 @@ console, run these commands::
     paver test_js_run -s cms
     paver test_js_run -s cms-squire
     paver test_js_run -s xmodule
+    paver test_js_run -s xmodule-webpack
     paver test_js_run -s common
     paver test_js_run -s common-requirejs
 
@@ -359,13 +364,14 @@ To run JavaScript tests in a browser, run these commands::
     paver test_js_dev -s cms
     paver test_js_dev -s cms-squire
     paver test_js_dev -s xmodule
+    paver test_js_dev -s xmodule-webpack
     paver test_js_dev -s common
     paver test_js_dev -s common-requirejs
 
 To debug these tests on devstack in a local browser:
 
 * first run the appropriate test_js_dev command from above which will open a browser using XQuartz
-* open http://edx.devstack.lms:19876/debug.html in your host system's browser of choice
+* open http://localhost:19876/debug.html in your host system's browser of choice
 * this will run all the tests and show you the results including details of any failures
 * you can click on an individually failing test and/or suite to re-run it by itself
 * you can now use the browser's developer tools to debug as you would any other JavaScript code

@@ -136,12 +136,6 @@ from student.models import CourseEnrollment
         % endfor
       </div>
     %endif
-
-    ${static.renderReact(
-      component="EnterpriseLearnerPortalBanner",
-      id="enterprise-learner-portal-banner",
-      props={}
-    )}
 </div>
 
 <section class="dashboard" id="dashboard-main">
@@ -185,7 +179,10 @@ from student.models import CourseEnrollment
                 pseudo_session = unfulfilled_entitlement_pseudo_sessions[str(entitlement.uuid)]
                 if not pseudo_session:
                     continue
-                enrollment = CourseEnrollment(user=user, course_id=pseudo_session['key'], mode=pseudo_session['type'])
+                pseudo_key = pseudo_session['key']
+                if not isinstance(pseudo_key, CourseKey):
+                  pseudo_key = CourseKey.from_string(pseudo_session['key'])
+                enrollment = CourseEnrollment(user=user, course=CourseOverview.get_from_id(pseudo_key), mode=pseudo_session['type'])
               # We only show email settings for entitlement cards if the entitlement has an associated enrollment
               show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
             else:
@@ -278,7 +275,7 @@ from student.models import CourseEnrollment
               <div class="advertise-message">
                   ${_("Browse recently launched courses and see what's new in your favorite subjects.")}
               </div>
-              <div class="ad-link">
+              <div class="marketing-link">
                   <a class="btn-neutral" href="${marketing_link('COURSES')}">
                       <span class="icon fa fa-search" aria-hidden="true"></span>
                       ${_("Explore New Courses")}
@@ -288,6 +285,25 @@ from student.models import CourseEnrollment
       </div>
   % endif
 
+  <%
+    account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
+    coaching_consent_url = "%s/coaching_consent?next=%s" % (account_mfe_url, getattr(settings, 'LMS_ROOT_URL', '') + reverse('dashboard'))
+  %>
+  % if plugins.get("coaching", {}).get("show_coaching_aside"):
+    <div class="wrapper-coaching">
+        <div class="coaching-signup">
+            <div class="coaching-prompt">
+                ${_("Take advantage of free coaching!")}
+            </div>
+            <div class="coaching-link">
+                <a class="btn-neutral" href="${coaching_consent_url}">
+                  ${_("Get Started")}
+                </a>
+            </div>
+        </div>
+    </div>
+  % endif
+
   % if display_sidebar_on_dashboard:
     <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
       <header class="profile">
@@ -295,15 +311,6 @@ from student.models import CourseEnrollment
       </header>
       <section class="user-info">
         <ul>
-
-          % if len(order_history_list):
-          <li class="order-history">
-            <span class="title">${_("Order History")}</span>
-            % for order_history_item in order_history_list:
-              <span><a href="${order_history_item['receipt_url']}" rel="noopener" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
-            % endfor
-          </li>
-          % endif
 
           <%include file="${theming_helpers.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 

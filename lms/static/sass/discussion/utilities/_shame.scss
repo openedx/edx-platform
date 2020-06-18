@@ -43,14 +43,18 @@
 // --------------------------------
 
 // Override global label rules
-.forum-nav-filter-main, .forum-nav-filter-cohort, .forum-nav-sort {
+.forum-nav-filter-main,
+.forum-nav-filter-cohort,
+.forum-nav-sort {
   font: inherit;
   line-height: 1em;
   margin-bottom: 0;
 }
 
 // Override global select rules
-.forum-nav-filter-main-control, .forum-nav-filter-cohort-control, .forum-nav-sort-control {
+.forum-nav-filter-main-control,
+.forum-nav-filter-cohort-control,
+.forum-nav-sort-control {
   font: inherit;
 }
 
@@ -68,7 +72,8 @@ li[class*=forum-nav-thread-label-] {
   }
 
   // Override clearfix stuff in .sidebar ul li rules
-  &::before, &::after {
+  &::before,
+  &::after {
     display: none !important;
   }
 }
@@ -80,12 +85,15 @@ li[class*=forum-nav-thread-label-] {
 .discussion {
 
   // Override courseware
-  .post-actions-list, .response-actions-list, .comment-actions-list {
+  .post-actions-list,
+  .response-actions-list,
+  .comment-actions-list {
     @extend %t-copy-sub2;
   }
 
   // Override global span
-  .action-label span, .action-icon span {
+  .action-label span,
+  .action-icon span {
     color: inherit;
   }
 }

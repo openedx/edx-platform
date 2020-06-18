@@ -77,7 +77,10 @@ a.light-button, // only used in askbot as classes
   width: flex-grid(3);
   background: $sidebar-color;
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-weight: bold;
     letter-spacing: 0;
     text-transform: none;
@@ -116,7 +119,8 @@ a.light-button, // only used in askbot as classes
     display: none;
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin: 0;
     padding-left: 0;
 

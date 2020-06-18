@@ -11,9 +11,6 @@ from functools import wraps
 
 import bleach
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
@@ -24,7 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates import api
 from lms.djangoapps.certificates.models import CertificateInvalidation
-from lms.djangoapps.certificates.permissions import VIEW_ALL_CERTIFICATES, GENERATE_ALL_CERTIFICATES
+from lms.djangoapps.certificates.permissions import GENERATE_ALL_CERTIFICATES, VIEW_ALL_CERTIFICATES
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, User
@@ -92,7 +89,6 @@ def search_certificates(request):
         ]
 
     """
-    # pylint: disable=too-many-function-args
     unbleached_filter = six.moves.urllib.parse.unquote(six.moves.urllib.parse.quote_plus(request.GET.get("user", "")))
     user_filter = bleach.clean(unbleached_filter)
     if not user_filter:
@@ -111,7 +107,6 @@ def search_certificates(request):
         cert["modified"] = cert["modified"].isoformat()
         cert["regenerate"] = not cert['is_pdf_certificate']
 
-    # pylint: disable=redundant-keyword-arg
     course_id = six.moves.urllib.parse.quote_plus(request.GET.get("course_id", ""), safe=':/')
     if course_id:
         try:

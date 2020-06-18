@@ -13,6 +13,7 @@ from django.test import TestCase, override_settings
 from freezegun import freeze_time
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -60,6 +61,35 @@ class TestNotifyCredentials(TestCase):
         self.assertEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2])
         self.assertEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2])
 
+    @freeze_time(datetime(2017, 5, 2))
+    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
+    def test_auto_execution(self, mock_send):
+        cert_filter_args = {}
+
+        with freeze_time(datetime(2017, 5, 1)):
+            cert1 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+11')
+        with freeze_time(datetime(2017, 5, 2)):
+            cert2 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+22')
+
+        with freeze_time(datetime(2017, 5, 1)):
+            grade1 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+11',
+                                                          percent_grade=1)
+        with freeze_time(datetime(2017, 5, 2)):
+            grade2 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+22',
+                                                          percent_grade=1)
+
+        total_certificates = GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')  # pylint: disable=no-member
+        total_grades = PersistentCourseGrade.objects.all()
+
+        call_command(Command(), '--auto')
+
+        self.assertTrue(mock_send.called)
+        self.assertListEqual(list(mock_send.call_args[0][0]), [cert1, cert2])
+        self.assertListEqual(list(mock_send.call_args[0][1]), [grade1, grade2])
+
+        self.assertLessEqual(len(list(mock_send.call_args[0][0])), len(total_certificates))
+        self.assertLessEqual(len(list(mock_send.call_args[0][1])), len(total_grades))
+
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_date_args(self, mock_send):
         call_command(Command(), '--start-date', '2017-01-31')
@@ -90,12 +120,10 @@ class TestNotifyCredentials(TestCase):
         call_command(Command(), '--dry-run', '--start-date', '2017-02-01')
         self.assertFalse(mock_send.called)
 
-    @mock.patch(COMMAND_MODULE + '.handle_cert_change')
     @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
     @mock.patch(COMMAND_MODULE + '.handle_course_cert_changed')
-    def test_hand_off(self, mock_grade_cert_change, mock_grade_interesting, mock_program_changed):
+    def test_hand_off(self, mock_grade_interesting, mock_program_changed):
         call_command(Command(), '--start-date', '2017-02-01')
-        self.assertEqual(mock_grade_cert_change.call_count, 2)
         self.assertEqual(mock_grade_interesting.call_count, 2)
         self.assertEqual(mock_program_changed.call_count, 2)
 
@@ -124,15 +152,13 @@ class TestNotifyCredentials(TestCase):
         self.assertEqual(len(connection.queries), baseline + 2)  # one extra page query each for certs & grades
 
     @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
-    @mock.patch(COMMAND_MODULE + '.handle_cert_change')
-    def test_site(self, mock_grade_interesting, mock_cert_change):
+    def test_site(self, mock_grade_interesting):
         site_config = SiteConfigurationFactory.create(
-            values={'course_org_filter': ['testX']},
+            site_values={'course_org_filter': ['testX']}
         )
 
         call_command(Command(), '--site', site_config.site.domain, '--start-date', '2017-01-01')
         self.assertEqual(mock_grade_interesting.call_count, 1)
-        self.assertEqual(mock_cert_change.call_count, 1)
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_args_from_database(self, mock_send):

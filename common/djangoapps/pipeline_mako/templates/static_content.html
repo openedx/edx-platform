@@ -97,7 +97,7 @@ engine = Engine(dirs=dirs)
 loader = Loader(engine)
 
 source = None
-for origin in loader.get_template_sources(path, dirs):
+for origin in loader.get_template_sources(path):
     try:
         source = loader.get_contents(origin)
     except TemplateDoesNotExist:

@@ -347,6 +347,12 @@ class LoginFailuresAdminTest(TestCase):
         )
         self.assertEqual(str(LoginFailures.objects.get(user=self.user2)), 'Zażółć gęślą jaźń: 2 - -')
 
+    @override_settings(FEATURES={'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True})
+    def test_feature_enabled(self):
+        url = reverse('admin:student_loginfailures_changelist')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
     @ddt.data(
         reverse('admin:student_loginfailures_changelist'),
         reverse('admin:student_loginfailures_add'),
@@ -454,7 +460,7 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
 
     def _update_site_configuration(self):
         """ Updates the site's configuration """
-        self.site.configuration.values = {'THIRD_PARTY_AUTH_ONLY_DOMAIN': self.email_domain_name}
+        self.site.configuration.site_values = {'THIRD_PARTY_AUTH_ONLY_DOMAIN': self.email_domain_name}
         self.site.configuration.save()
 
     def _assert_form(self, site, email, is_valid_form=False):
@@ -480,7 +486,7 @@ class AllowedAuthUserFormTest(SiteMixin, TestCase):
         self.assertEqual(
             error,
             "Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in SiteConfiguration "
-            "model's values field."
+            "model's site_values field."
         )
 
     def test_form_with_invalid_domain_name(self):

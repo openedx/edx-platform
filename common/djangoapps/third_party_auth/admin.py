@@ -7,19 +7,16 @@ Admin site configuration for third party authentication
 from config_models.admin import KeyedConfigurationModelAdmin
 from django import forms
 from django.contrib import admin
-from django.db import DatabaseError, transaction
+from django.db import transaction
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
-
-from openedx.core.djangolib.markup import HTML
-from third_party_auth.provider import Registry
 
 from .models import (
     _PSA_OAUTH2_BACKENDS,
     _PSA_SAML_BACKENDS,
     LTIProviderConfig,
     OAuth2ProviderConfig,
-    ProviderApiPermissions,
     SAMLConfiguration,
     SAMLProviderConfig,
     SAMLProviderData
@@ -104,9 +101,8 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
 
         update_url = reverse('admin:{}_{}_add'.format(self.model._meta.app_label, self.model._meta.model_name))
         update_url += '?source={}'.format(instance.pk)
-        return HTML(u'<a href="{}">{}</a>').format(update_url, instance.name)
+        return format_html(u'<a href="{}">{}</a>', update_url, instance.name)
 
-    name_with_update_link.allow_tags = True
     name_with_update_link.short_description = u'Name'
 
     def has_data(self, inst):
@@ -121,9 +117,8 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     def mode(self, inst):
         """ Indicate if debug_mode is enabled or not"""
         if inst.debug_mode:
-            return '<span style="color: red;">Debug</span>'
+            return format_html('<span style="color: red;">Debug</span>')
         return "Normal"
-    mode.allow_tags = True
 
     def save_model(self, request, obj, form, change):
         """
@@ -153,11 +148,10 @@ class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
         public_key = inst.get_setting('SP_PUBLIC_CERT')
         private_key = inst.get_setting('SP_PRIVATE_KEY')
         if not public_key or not private_key:
-            return HTML(u'<em>Key pair incomplete/missing</em>')
+            return format_html(u'<em>Key pair incomplete/missing</em>')
         pub1, pub2 = public_key[0:10], public_key[-10:]
         priv1, priv2 = private_key[0:10], private_key[-10:]
-        return HTML(u'Public: {}…{}<br>Private: {}…{}').format(pub1, pub2, priv1, priv2)
-    key_summary.allow_tags = True
+        return format_html(u'Public: {}…{}<br>Private: {}…{}', pub1, pub2, priv1, priv2)
 
 admin.site.register(SAMLConfiguration, SAMLConfigurationAdmin)
 
@@ -199,27 +193,3 @@ class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
         )
 
 admin.site.register(LTIProviderConfig, LTIProviderConfigAdmin)
-
-
-class ApiPermissionsAdminForm(forms.ModelForm):
-    """ Django admin form for ApiPermissions model """
-    class Meta(object):
-        model = ProviderApiPermissions
-        fields = ['client', 'provider_id']
-
-    provider_id = forms.ChoiceField(choices=[], required=True)
-
-    def __init__(self, *args, **kwargs):
-        super(ApiPermissionsAdminForm, self).__init__(*args, **kwargs)
-        self.fields['provider_id'].choices = (
-            (provider.provider_id, u"{} ({})".format(provider.name, provider.provider_id))
-            for provider in Registry.enabled()
-        )
-
-
-class ApiPermissionsAdmin(admin.ModelAdmin):
-    """ Django Admin class for ApiPermissions """
-    list_display = ('client', 'provider_id')
-    form = ApiPermissionsAdminForm
-
-admin.site.register(ProviderApiPermissions, ApiPermissionsAdmin)

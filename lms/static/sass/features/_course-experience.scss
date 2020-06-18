@@ -11,11 +11,10 @@
 
     .icon {
       width: 20px;
-      text-align: center;
     }
 
-    &:not(:first-child) {
-      margin-top: $baseline;
+    &:not(:last-child) {
+      margin-bottom: 32px;
     }
   }
 }
@@ -182,9 +181,9 @@
   h1,
   h2,
   h3 {
-    font-size: font-size(large);
     font-weight: $font-bold;
     color: $black;
+    margin-bottom: $baseline;
   }
 
   img {
@@ -198,9 +197,17 @@
     @include float(right);
 
     .btn-link {
-      color: palette(grayscale, base);
+      color: $gray-800;
       border-color: transparent;
+      cursor: pointer;
     }
+  }
+
+  .welcome-message-show-more {
+    float: right;
+    background-color: transparent;
+    color: $black;
+    cursor: pointer;
   }
 }
 
@@ -275,21 +282,31 @@
         }
       }
     }
+  }
 
-    .section-tools .course-tool {
-      .course-tool-link:visited {
-        color: theme-color("primary");
-      }
-
-      &:not(:first-child) {
-        margin-top: ($baseline / 5);
-      }
+  .section-tools .course-tool {
+    .course-tool-link:visited {
+      color: theme-color("primary");
     }
 
-    @media print {
-      .section-tools {
-        display: none !important;
-      }
+    &:not(:first-child) {
+      margin-top: ($baseline / 5);
+    }
+
+    .course-tool-button {
+      background: none;
+      border: none;
+      color: theme-color("primary");
+      cursor: pointer;
+      font-size: 1em;
+      padding: 0;
+      text-align: left;
+    }
+  }
+
+  @media print {
+    .section-tools {
+      display: none !important;
     }
   }
 
@@ -307,6 +324,35 @@
     margin: 0;
     padding: 0;
     list-style-type: none;
+
+    // Course outline accordion / link
+    .outline-button {
+      display: block;
+      padding: 10px 0 10px 2px;
+      border: none;
+      width: 100%;
+      text-align: left;
+      margin: 0;
+      background: none;
+      cursor: pointer;
+
+      .fa {
+        color: $blue;
+      }
+
+      .prerequisites-icon {
+        margin-right: 0.25rem;
+      }
+
+      .complete-checkmark {
+        border: 1px solid $green;
+        margin-right: $baseline / 2;
+        border-radius: 100px;
+        color: white;
+        background-color: $green;
+        float: right;
+      }
+    }
 
     .section {
       @include media-breakpoint-up(md) {
@@ -343,10 +389,8 @@
           margin: 0 0 0 35px;
 
           .subsection-title {
-            display: inline-block;
             margin: 0;
             font-weight: $font-regular;
-            margin-left: $baseline - 2;
             display: inline;
           }
 
@@ -354,7 +398,6 @@
             .details {
               font-size: $body-font-size;
               color: theme-color("secondary");
-              margin-left: 34px;
             }
 
             .prerequisite {
@@ -362,75 +405,25 @@
               font-weight: $font-bold;
             }
           }
-
-          .vertical {
-            @include margin-left(16px);
-
-            list-style-type: none;
-
-            a.outline-item {
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              padding: ($baseline / 2) 0 ($baseline / 2) 0;
-              margin: 0 0 0 ($baseline);
-              border-top: 1px solid $border-color;
-            }
-
-            a.outline-item:hover {
-              text-decoration: none;
-
-              .vertical-details {
-                text-decoration: underline;
-              }
-
-              .complete-checkmark {
-                text-decoration: none;
-              }
-            }
-
-            .vertical-details {
-              float:left;
-            }
-
-            &:hover,
-            &:focus {
-              background-color: palette(primary, x-back);
-              border-radius: $btn-border-radius;
-              text-decoration: none;
-            }
-
-            .vertical-actions {
-              .resume-right {
-                position: relative;
-                top: calc(50% - (#{$baseline} / 2));
-              }
-            }
-          }
         }
       }
     }
   }
-}
 
-// Course outline accordion
-button.accordion-trigger, button.prerequisite-button {
-  padding: 10px 0 10px 2px;
-  border: none;
-  width: 100%;
-  text-align: left;
-  margin: 0;
-  background: none;
-  cursor: pointer;
+  .fa-chevron-right {
+    transform: rotateY(0deg) #{"/*rtl: rotateY(180deg)*/"};
+    font-size: inherit;
 
-  .fa {
-    color: $blue;
+    &.fa-rotate-90 {
+      transform: rotate(90deg) #{"/*rtl: rotate(90deg)*/"};
+      font-size: inherit;
+    }
   }
 }
 
 #expand-collapse-outline-all-button {
   float: right;
-  background-color: $white;
+  background-color: transparent;
   color: $black;
   cursor: pointer;
 }
@@ -444,15 +437,6 @@ button.accordion-trigger, button.prerequisite-button {
   display: none;
 }
 
-.fa-check.fa.complete-checkmark {
-  border: 1px solid $green;
-  margin-right: $baseline / 2;
-  border-radius: 100px;
-  color: white;
-  background-color: $green;
-  float: right;
-}
-
 // date summary
 .date-summary-container {
   .date-summary {
@@ -460,39 +444,40 @@ button.accordion-trigger, button.prerequisite-button {
 
     display: flex;
     justify-content: space-between;
-    padding: $baseline/2 $baseline/2 $baseline/2 0;
+    padding: 12px 0;
 
-    .heading {
-      font-size: 0.9rem;
-      font: -apple-system-body;
-      line-height: 1;
-      font-weight: $font-bold;
-      color: theme-color("dark");
-    }
-
-    .left-column {
-      flex: 5%;
-
-      .calendar-icon {
-        margin-top: 3px;
-        height: 1em;
-        width: auto;
-        background: url('#{$static-path}/images/calendar-alt-regular.svg');
-        background-repeat: no-repeat;
-      }
+    &:last-of-type {
+      padding-bottom: 0;
     }
 
     .right-column {
-      flex: 85%;
+      flex: auto;
+      padding-left: 4px;
 
       .localized-datetime {
         font-weight: $font-weight-bold;
         margin-bottom: 8px;
       }
 
+      .heading {
+        font: -apple-system-body;
+        line-height: 1.5;
+        font-weight: $font-bold;
+        color: theme-color("dark");
+
+        a {
+          font-weight: $font-semibold;
+        }
+      }
+
       .description {
-        margin-bottom: $baseline/2;
+        margin-bottom: 0;
         display: inline-block;
+      }
+
+      .heading,
+      .description {
+        font-size: 0.9rem;
       }
 
       .date-summary-link {
@@ -500,7 +485,7 @@ button.accordion-trigger, button.prerequisite-button {
 
         a {
           color: $link-color;
-          font-weight: $font-regular;
+          font-size: 0.9rem;
         }
       }
     }
@@ -509,6 +494,14 @@ button.accordion-trigger, button.prerequisite-button {
       color: theme-color("dark");
       font: -apple-system-body;
     }
+  }
+}
+
+.dates-tab-link {
+  padding: 16px 0 0 24px;
+
+  a {
+    font-weight: bold;
   }
 }
 
@@ -523,7 +516,7 @@ button.accordion-trigger, button.prerequisite-button {
       border-bottom: 1px solid $border-color;
 
       .date {
-        font-size: font-size(small);
+        font-size: 0.875rem;
         font-weight: $font-light;
         float: none;
         padding-bottom: ($baseline/4);
@@ -537,6 +530,26 @@ button.accordion-trigger, button.prerequisite-button {
         margin: $baseline/2;
         max-width: 100%;
       }
+    }
+
+    .well {
+      box-shadow: inset 0 1px 2px 1px $shadow;
+      padding: 1.25rem;
+      background: $gray-100;
+    }
+  }
+
+  .breadcrumbs {
+    font-size: 0.875rem;
+
+    .nav-item {
+      @include margin-left($baseline/4);
+    }
+
+    .fa-angle-right {
+      transform: rotateY(0deg) #{"/*rtl: rotateY(180deg)*/"};
+
+      @include margin-left($baseline/4);
     }
   }
 }

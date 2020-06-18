@@ -100,21 +100,21 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(3), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        num_queries = 45
+        num_queries = 44
         with self.assertNumQueries(num_queries), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
         with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
 
-        num_queries = 7
+        num_queries = 6
         with self.assertNumQueries(num_queries), mock_get_score(1, 4):
             grade_factory.update(self.request.user, self.course, force_update_subsections=False)
 
         with self.assertNumQueries(3):
             _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
 
-        num_queries = 24
+        num_queries = 23
         with self.assertNumQueries(num_queries), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
@@ -202,12 +202,12 @@ class TestCourseGradeFactory(GradeTestBase):
                 'Homework': {
                     'category': 'Homework',
                     'percent': 0.25,
-                    'detail': 'Homework = 25.00% of a possible 100.00%',   # pylint: disable=unicode-format-string
+                    'detail': 'Homework = 25.00% of a possible 100.00%',
                 },
                 'NoCredit': {
                     'category': 'NoCredit',
                     'percent': 0.0,
-                    'detail': 'NoCredit = 0.00% of a possible 0.00%',  # pylint: disable=unicode-format-string
+                    'detail': 'NoCredit = 0.00% of a possible 0.00%',
                 }
             },
             'percent': 0.25,

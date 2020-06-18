@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
 from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.catalog.utils import get_programs
@@ -78,37 +78,36 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     otherwise, returns None for both the link and date.
     """
     if enrollment is None and course is None:
-        logger.warn(u'Must specify either an enrollment or a course')
+        logger.warning(u'Must specify either an enrollment or a course')
         return (None, None, None)
 
     if enrollment:
-        if course is None:
-            course = enrollment.course
-        elif enrollment.course_id != course.id:
-            logger.warn(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
-                        u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
-                        .format(enrollment,
-                                course,
-                                enrollment.course_id,
-                                enrollment.course_id,
-                                enrollment.course_id.deprecated,
-                                course.id,
-                                course.id,
-                                course.id.deprecated
-                                )
-                        )
+        if course and enrollment.course_id != course.id:
+            logger.warning(u'{} refers to a different course than {} which was supplied. Enrollment course id={}, '
+                           u'repr={!r}, deprecated={}. Course id={}, repr={!r}, deprecated={}.'
+                           .format(enrollment,
+                                   course,
+                                   enrollment.course_id,
+                                   enrollment.course_id,
+                                   enrollment.course_id.deprecated,
+                                   course.id,
+                                   course.id,
+                                   course.id.deprecated
+                                   )
+                           )
             return (None, None, None)
 
         if enrollment.user_id != user.id:
-            logger.warn(u'{} refers to a different user than {} which was supplied. Enrollment user id={}, repr={!r}. '
-                        u'User id={}, repr={!r}.'.format(enrollment,
-                                                         user,
-                                                         enrollment.user_id,
-                                                         enrollment.user_id,
-                                                         user.id,
-                                                         user.id,
-                                                         )
-                        )
+            logger.warning(u'{} refers to a different user than {} which was supplied. '
+                           u'Enrollment user id={}, repr={!r}. '
+                           u'User id={}, repr={!r}.'.format(enrollment,
+                                                            user,
+                                                            enrollment.user_id,
+                                                            enrollment.user_id,
+                                                            user.id,
+                                                            user.id,
+                                                            )
+                           )
             return (None, None, None)
 
     if enrollment is None:
@@ -116,9 +115,9 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
         if enrollment is None:
             return (None, None, None)
 
-    if user.is_authenticated and verified_upgrade_link_is_valid(enrollment):
+    if user.is_authenticated and can_show_verified_upgrade(user, enrollment, course):
         return (
-            verified_upgrade_deadline_link(user, course),
+            verified_upgrade_deadline_link(user, enrollment.course),
             enrollment.upgrade_deadline,
             enrollment.course_upgrade_deadline,
         )
@@ -227,7 +226,7 @@ def is_enrolled_in_course_run(course_run, enrollment_course_ids):
         course_run_key = CourseKey.from_string(key)
         return course_run_key in enrollment_course_ids
     except InvalidKeyError:
-        logger.warn(
+        logger.warning(
             u'Unable to determine if user was enrolled since the course key {} is invalid'.format(key)
         )
         return False  # Invalid course run key. Assume user is not enrolled.

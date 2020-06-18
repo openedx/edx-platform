@@ -9,6 +9,11 @@ from enum import Enum
 import six
 from django.utils.functional import cached_property
 
+# "Arbitrarily large" but still limited
+MANAGED_TEAM_MAX_TEAM_SIZE = 200
+# Arbitrarily arbitrary
+DEFAULT_COURSE_RUN_MAX_TEAM_SIZE = 50
+
 
 class TeamsConfig(object):
     """
@@ -79,21 +84,6 @@ class TeamsConfig(object):
             ]
         }
 
-    @cached_property
-    def cleaned_data_old_format(self):
-        """
-        JSON-friendly dictionary containing cleaned data from this TeamsConfig,
-        excluding newly added fields.
-
-        Here for backwards compatibility; to be removed (TODO MST-40).
-        """
-        return {
-            'max_team_size': self.default_max_team_size,
-            'topics': [
-                teamset.cleaned_data_old_format for teamset in self.teamsets
-            ]
-        }
-
     @property
     def is_enabled(self):
         """
@@ -142,7 +132,7 @@ class TeamsConfig(object):
 
         Can be overriden by individual team sets; see `calc_max_team_size`.
         """
-        return _clean_max_team_size(self._data.get('max_team_size'))
+        return _clean_max_team_size(self._data.get('max_team_size')) or DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 
     def calc_max_team_size(self, teamset_id):
         """
@@ -150,7 +140,8 @@ class TeamsConfig(object):
 
         For 'open' team-sets, first regards the team-set's `max_team_size`,
         then falls back to the course's `max_team_size`.
-        For managed team-stes, `max_team_size` is ignored.
+        For managed team-sets, returns `MANAGED_TEAM_MAX_TEAM_SIZE`
+        (a number that is big enough to never really be a limit, but does put an upper limit for safety's sake)
 
         Return value of None should be regarded as "no maximum size" (TODO MST-33).
         """
@@ -159,7 +150,7 @@ class TeamsConfig(object):
         except KeyError:
             raise ValueError("Team-set {!r} does not exist.".format(teamset_id))
         if teamset.teamset_type != TeamsetType.open:
-            return None
+            return MANAGED_TEAM_MAX_TEAM_SIZE
         if teamset.max_team_size:
             return teamset.max_team_size
         return self.default_max_team_size
@@ -241,20 +232,6 @@ class TeamsetConfig(object):
         }
 
     @cached_property
-    def cleaned_data_old_format(self):
-        """
-        JSON-friendly dictionary containing cleaned data from this TeamsConfig,
-        excluding newly added fields.
-
-        Here for backwards compatibility; to be removed (TODO MST-40).
-        """
-        return {
-            'id': self.teamset_id,
-            'name': self.name,
-            'description': self.description,
-        }
-
-    @cached_property
     def teamset_id(self):
         """
         An identifier for this team-set.
@@ -301,6 +278,13 @@ class TeamsetConfig(object):
             return TeamsetType(self._data['type'])
         except (KeyError, ValueError):
             return TeamsetType.get_default()
+
+    @cached_property
+    def is_private_managed(self):
+        """
+        Returns true if teamsettype is private_managed
+        """
+        return self.teamset_type == TeamsetType.private_managed
 
 
 class TeamsetType(Enum):

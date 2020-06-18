@@ -21,7 +21,6 @@
                 this.options = _.extend({}, options);
                 this.showSortControls = options.showSortControls;
                 this.context = options.context;
-                this.myTeamsCollection = options.myTeamsCollection;
                 TeamsView.prototype.initialize.call(this, options);
             },
 
@@ -30,10 +29,10 @@
                     // that they create. This means that if multiple team membership is
                     // disabled that they cannot create a new team when they already
                     // belong to one.
-                return this.context.staff
-                    || this.context.privileged
+                return this.context.userInfo.staff
+                    || this.context.userInfo.privileged
                     || (!TeamUtils.isInstructorManagedTopic(this.model.attributes.type)
-                        && this.myTeamsCollection.length === 0);
+                        && this.options.myTopicTeamsCollection.length === 0);
             },
 
             render: function() {
@@ -102,6 +101,12 @@
                     srInfo: this.srInfo,
                     showSortControls: this.showSortControls
                 });
+            },
+
+            getTopic: function(topicId) { // eslint-disable-line no-unused-vars
+                var deferred = $.Deferred();
+                deferred.resolve(this.model);
+                return deferred.promise();
             }
         });
 

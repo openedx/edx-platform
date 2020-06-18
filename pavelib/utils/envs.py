@@ -2,16 +2,12 @@
 Helper functions for loading environment settings.
 """
 
-
-import io
 import json
 import os
-import re
 import sys
 from time import sleep
 
 import memcache
-import six
 from lazy import lazy
 from path import Path as path
 from paver.easy import BuildFailure, sh
@@ -37,7 +33,7 @@ def repo_root():
             absolute_path = file_path.abspath()
             break
         except OSError:
-            print(u'Attempt {}/180 to get an absolute path failed'.format(attempt))
+            print('Attempt {}/180 to get an absolute path failed'.format(attempt))
             if attempt < 180:
                 attempt += 1
                 sleep(1)
@@ -47,7 +43,7 @@ def repo_root():
     return absolute_path.parent.parent.parent
 
 
-class Env(object):
+class Env:
     """
     Load information about the execution environment.
     """
@@ -258,38 +254,19 @@ class Env(object):
                 django_cmd(
                     system,
                     settings,
-                    u"print_setting {django_setting} 2>{log_file}".format(
+                    "print_setting {django_setting} 2>{log_file}".format(
                         django_setting=django_setting,
                         log_file=cls.PRINT_SETTINGS_LOG_FILE
                     )
                 ),
                 capture=True
             )
-            return six.text_type(value).strip()
+            return str(value).strip()
         except BuildFailure:
-            print(u"Unable to print the value of the {} setting:".format(django_setting))
-            with io.open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
+            print("Unable to print the value of the {} setting:".format(django_setting))
+            with open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
                 print(f.read())
             sys.exit(1)
-
-    @classmethod
-    def get_nested_django_setting(cls, django_setting, nested_django_setting, system, settings=None):
-        """
-        Interrogate Django environment for specific nested settings values
-        :param django_setting: the root django setting to get
-        :param nested_django_setting: the nested django setting to get
-        :param system: the django app to use when asking for the setting (lms | cms)
-        :param settings: the settings file to use when asking for the value
-        :return: unicode value of the django setting
-        """
-        django_setting_value = cls.get_django_setting(django_setting, system, settings)
-        pattern = re.compile(
-            u"[\"']{setting}[\"']: [\"'](?P<setting_value>.*?)[\"']".format(setting=nested_django_setting)
-        )
-        match = pattern.search(django_setting_value)
-        if match:
-            return match.group('setting_value')
-        return None
 
     @classmethod
     def covered_modules(cls):
@@ -326,8 +303,8 @@ class Env(object):
             env_path = env_path.parent.parent / env_path.basename()
         if not env_path.isfile():
             print(
-                u"Warning: could not find environment JSON file "
-                "at '{path}'".format(path=env_path),  # pylint: disable=unicode-format-string
+                "Warning: could not find environment JSON file "
+                "at '{path}'".format(path=env_path),
                 file=sys.stderr,
             )
             return dict()
@@ -339,8 +316,8 @@ class Env(object):
 
         except ValueError:
             print(
-                u"Error: Could not parse JSON "
-                "in {path}".format(path=env_path),  # pylint: disable=unicode-format-string
+                "Error: Could not parse JSON "
+                "in {path}".format(path=env_path),
                 file=sys.stderr,
             )
             sys.exit(1)

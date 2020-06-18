@@ -14,11 +14,14 @@ from .views.course_updates import CourseUpdatesFragmentView, CourseUpdatesView
 from .views.latest_update import LatestUpdateFragmentView
 from .views.welcome_message import WelcomeMessageFragmentView, dismiss_welcome_message
 
+COURSE_HOME_VIEW_NAME = 'openedx.course_experience.course_home'
+COURSE_DATES_FRAGMENT_VIEW_NAME = 'openedx.course_experience.mobile_dates_fragment_view'
+
 urlpatterns = [
     url(
         r'^$',
         CourseHomeView.as_view(),
-        name='openedx.course_experience.course_home',
+        name=COURSE_HOME_VIEW_NAME,
     ),
     url(
         r'^updates$',
@@ -56,11 +59,6 @@ urlpatterns = [
         name='openedx.course_experience.latest_update_fragment_view',
     ),
     url(
-        r'course_sock_fragment$',
-        CourseSockFragmentView.as_view(),
-        name='openedx.course_experience.course_sock_fragment_view',
-    ),
-    url(
         r'^dismiss_welcome_message$',
         dismiss_welcome_message,
         name='openedx.course_experience.dismiss_welcome_message',
@@ -68,6 +66,6 @@ urlpatterns = [
     url(
         r'^mobile_dates_fragment',
         CourseDatesFragmentMobileView.as_view(),
-        name='openedx.course_experience.mobile_dates_fragment_view',
+        name=COURSE_DATES_FRAGMENT_VIEW_NAME,
     ),
 ]

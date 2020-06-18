@@ -13,6 +13,8 @@ from django.conf import settings
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import mail
 from django.core.cache import cache
 from django.http import Http404
@@ -20,22 +22,19 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.http import int_to_base36
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
-from provider.oauth2 import models as dop_models
 from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH
 from openedx.core.djangoapps.user_authn.views.password_reset import (
-    SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
-)
+    SETTING_CHANGE_INITIATED, password_reset,
+    PasswordResetConfirmWrapper)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student.tests.test_configuration_overrides import fake_get_value
@@ -43,6 +42,12 @@ from student.tests.test_email import mock_render_to_string
 
 from util.password_policy_validators import create_validator_config
 from util.testing import EventTestMixin
+
+
+def process_request(request):
+    middleware = SessionMiddleware()
+    middleware.process_request(request)
+    request.session.save()
 
 
 @unittest.skipUnless(
@@ -55,7 +60,6 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     Tests that clicking reset password sends email, and doesn't activate the user
     """
     request_factory = RequestFactory()
-
     ENABLED_CACHES = ['default']
 
     def setUp(self):  # pylint: disable=arguments-differ
@@ -81,6 +85,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         """
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
+        bad_pwd_req.user = AnonymousUser()
         bad_pwd_resp = password_reset(bad_pwd_req)
         # If they've got an unusable password, we return a successful response code
         self.assertEqual(bad_pwd_resp.status_code, 200)
@@ -101,6 +106,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         """
 
         bad_email_req = self.request_factory.post('/password_reset/', {'email': self.user.email + "makeItFail"})
+        bad_email_req.user = AnonymousUser()
         bad_email_resp = password_reset(bad_email_req)
         # Note: even if the email is bad, we return a successful response code
         # This prevents someone potentially trying to "brute-force" find out which
@@ -117,24 +123,87 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
         Mock(side_effect=mock_render_to_string, autospec=True)
     )
-    def test_password_reset_ratelimited(self):
+    def test_password_reset_ratelimited_for_non_existing_user(self):
         """
-        Try (and fail) resetting password 30 times in a row on an non-existant email address
+        Test that reset password endpoint only allow one request per minute
+        for non-existing user.
+        """
+        self.assert_password_reset_ratelimitted('thisdoesnotexist@foo.com', AnonymousUser())
+        self.assert_no_events_were_emitted()
+
+    @patch(
+        'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
+        Mock(side_effect=mock_render_to_string, autospec=True)
+    )
+    def test_password_reset_ratelimited_for_existing_user(self):
+        """
+        Test that reset password endpoint only allow one request per minute
+        for existing user.
+        """
+        self.assert_password_reset_ratelimitted(self.user.email, self.user)
+        self.assert_event_emission_count(SETTING_CHANGE_INITIATED, 1)
+
+    def assert_password_reset_ratelimitted(self, email, user):
+        """
+        Assert that password reset endpoint allow one request per minute per email.
         """
         cache.clear()
-
-        for i in range(30):
-            good_req = self.request_factory.post('/password_reset/', {
-                'email': 'thisdoesnotexist{0}@foo.com'.format(i)
-            })
-            good_resp = password_reset(good_req)
-            self.assertEqual(good_resp.status_code, 200)
+        password_reset_req = self.request_factory.post('/password_reset/', {'email': email})
+        password_reset_req.user = user
+        password_reset_req.site = Mock(domain='example.com')
+        good_resp = password_reset(password_reset_req)
+        self.assertEqual(good_resp.status_code, 200)
 
         # then the rate limiter should kick in and give a HttpForbidden response
-        bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        bad_resp = password_reset(password_reset_req)
+        self.assertEqual(bad_resp.status_code, 403)
+
+        cache.clear()
+
+    def test_ratelimitted_from_same_ip_with_different_email(self):
+        """
+        Test that password reset endpoint allow only one request per minute per IP.
+        """
+        cache.clear()
+        good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        good_req.user = AnonymousUser()
+        good_resp = password_reset(good_req)
+        self.assertEqual(good_resp.status_code, 200)
+
+        # change the email ID and verify that the rate limiter should kick in and
+        # give a Forbidden response if the request is from same IP.
+        bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist2@foo.com'})
+        bad_req.user = AnonymousUser()
         bad_resp = password_reset(bad_req)
         self.assertEqual(bad_resp.status_code, 403)
-        self.assert_no_events_were_emitted()
+
+        cache.clear()
+
+    def test_ratelimited_from_different_ips_with_same_email(self):
+        """
+        Test that password reset endpoint allow only one request per minute
+        per email address.
+        """
+        cache.clear()
+        good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        good_req.user = AnonymousUser()
+        good_resp = password_reset(good_req)
+        self.assertEqual(good_resp.status_code, 200)
+
+        # change the IP and verify that the rate limiter should kick in and
+        # give a Forbidden response if the request is for same email address.
+        new_ip = "8.8.8.8"
+        self.assertNotEqual(good_req.META.get('REMOTE_ADDR'), new_ip)
+
+        bad_req = self.request_factory.post(
+            '/password_reset/',
+            {'email': 'thisdoesnotexist@foo.com'},
+            REMOTE_ADDR=new_ip
+        )
+        bad_req.user = AnonymousUser()
+        bad_resp = password_reset(bad_req)
+        self.assertEqual(bad_resp.status_code, 403)
+        self.assertEqual(bad_req.META.get('REMOTE_ADDR'), new_ip)
 
         cache.clear()
 
@@ -147,16 +216,11 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         good_req = self.request_factory.post('/password_reset/', {'email': self.user.email})
         good_req.user = self.user
         good_req.site = Mock(domain='example.com')
-        dop_client = ClientFactory()
-        dop_access_token = AccessTokenFactory(user=self.user, client=dop_client)
-        RefreshTokenFactory(user=self.user, client=dop_client, access_token=dop_access_token)
         dot_application = dot_factories.ApplicationFactory(user=self.user)
         dot_access_token = dot_factories.AccessTokenFactory(user=self.user, application=dot_application)
         dot_factories.RefreshTokenFactory(user=self.user, application=dot_application, access_token=dot_access_token)
         good_resp = password_reset(good_req)
         self.assertEqual(good_resp.status_code, 200)
-        self.assertFalse(dop_models.AccessToken.objects.filter(user=self.user).exists())
-        self.assertFalse(dop_models.RefreshToken.objects.filter(user=self.user).exists())
         self.assertFalse(dot_models.AccessToken.objects.filter(user=self.user).exists())
         self.assertFalse(dot_models.RefreshToken.objects.filter(user=self.user).exists())
         obj = json.loads(good_resp.content.decode('utf-8'))
@@ -303,8 +367,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 kwargs={"uidb36": uidb36, "token": token}
             )
         )
+        process_request(bad_request)
         bad_request.user = AnonymousUser()
-        password_reset_confirm_wrapper(bad_request, uidb36, token)
+        PasswordResetConfirmWrapper.as_view()(bad_request, uidb36=uidb36, token=token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertFalse(self.user.is_active)
 
@@ -317,8 +382,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             kwargs={"uidb36": self.uidb36, "token": self.token}
         )
         good_reset_req = self.request_factory.get(url)
+        process_request(good_reset_req)
         good_reset_req.user = self.user
-        password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
+        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
 
@@ -331,8 +397,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             kwargs={"uidb36": self.uidb36, "token": self.token}
         )
         good_reset_req = self.request_factory.get(url)
+        process_request(good_reset_req)
         good_reset_req.user = AnonymousUser()
-        password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
+        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
 
@@ -348,10 +415,11 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
         request_params = {'new_password1': 'password1', 'new_password2': 'password2'}
         confirm_request = self.request_factory.post(url, data=request_params)
+        process_request(confirm_request)
         confirm_request.user = self.user
 
         # Make a password reset request with mismatching passwords.
-        resp = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+        resp = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
 
         # Verify the response status code is: 200 with password reset fail and also verify that
         # the user is not marked as active.
@@ -373,25 +441,12 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
         reset_req = self.request_factory.get(url)
         reset_req.user = self.user
-        resp = password_reset_confirm_wrapper(reset_req, self.uidb36, self.token)
+        resp = PasswordResetConfirmWrapper.as_view()(reset_req, uidb36=self.uidb36, token=self.token)
 
         # Verify the response status code is: 200 with password reset fail and also verify that
         # the user is not marked as active.
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
-
-    def test_password_reset_prevent_auth_user_writes(self):
-        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
-            url = reverse(
-                "password_reset_confirm",
-                kwargs={"uidb36": self.uidb36, "token": self.token}
-            )
-            for request in [self.request_factory.get(url), self.request_factory.post(url)]:
-                request.user = self.user
-                response = password_reset_confirm_wrapper(request, self.uidb36, self.token)
-                assert response.context_data['err_msg'] == SYSTEM_MAINTENANCE_MSG
-                self.user.refresh_from_db()
-                assert not self.user.is_active
 
     def test_password_reset_normalize_password(self):
         # pylint: disable=anomalous-unicode-escape-in-string
@@ -408,8 +463,10 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         password = u'p\u212bssword'
         request_params = {'new_password1': password, 'new_password2': password}
         confirm_request = self.request_factory.post(url, data=request_params)
+        process_request(confirm_request)
+        confirm_request.session[INTERNAL_RESET_SESSION_TOKEN] = self.token
         confirm_request.user = self.user
-        __ = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+        __ = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
 
         user = User.objects.get(pk=self.user.pk)
         salt_val = user.password.split('$')[1]
@@ -445,11 +502,11 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         confirm_request.user = self.user
 
         # Make a password reset request with minimum/maximum passwords characters.
-        response = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+        response = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
 
         self.assertEqual(response.context_data['err_msg'], password_dict['error_message'])
 
-    @patch('openedx.core.djangoapps.user_authn.views.password_reset.password_reset_confirm')
+    @patch.object(PasswordResetConfirmView, 'dispatch')
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_reset_password_good_token_configuration_override(self, reset_confirm):
         """
@@ -460,8 +517,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
             kwargs={"uidb36": self.uidb36, "token": self.token}
         )
         good_reset_req = self.request_factory.get(url)
+        process_request(good_reset_req)
         good_reset_req.user = self.user
-        password_reset_confirm_wrapper(good_reset_req, self.uidb36, self.token)
+        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
         confirm_kwargs = reset_confirm.call_args[1]
         self.assertEqual(confirm_kwargs['extra_context']['platform_name'], 'Fake University')
         self.user = User.objects.get(pk=self.user.pk)
@@ -497,7 +555,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         reset_request = self.request_factory.get(reset_url)
         reset_request.user = UserFactory.create()
 
-        self.assertRaises(Http404, password_reset_confirm_wrapper, reset_request, self.uidb36, self.token)
+        self.assertRaises(Http404, PasswordResetConfirmWrapper.as_view(), reset_request, uidb36=self.uidb36,
+                          token=self.token)
 
 
 @ddt.ddt

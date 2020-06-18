@@ -23,6 +23,7 @@ class CourseOverviewField(serializers.RelatedField):
         course_id = six.text_type(course_overview.id)
         request = self.context.get('request')
         api_version = self.context.get('api_version')
+        enrollment = CourseEnrollment.get_enrollment(user=self.context.get('request').user, course_key=course_id)
 
         return {
             # identifiers
@@ -36,6 +37,7 @@ class CourseOverviewField(serializers.RelatedField):
             'start_display': course_overview.start_display,
             'start_type': course_overview.start_type,
             'end': course_overview.end,
+            'dynamic_upgrade_deadline': enrollment.upgrade_deadline,
 
             # notification info
             'subscription_id': course_overview.clean_id(padding_char='_'),

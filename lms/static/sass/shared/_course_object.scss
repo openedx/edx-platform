@@ -1,8 +1,9 @@
-.highlighted-courses, .find-courses {
+.highlighted-courses,
+.find-courses {
   .courses {
     @include clearfix();
 
-    padding: ($baseline*2) 0 ($baseline*0.75) ;
+    padding: ($baseline*2) 0 ($baseline*0.75);
 
     .university-column {
       width: flex-grid(4);
@@ -20,9 +21,7 @@
       background: $body-bg;
       border: 1px solid $border-color-1;
       border-radius: 2px;
-
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
       margin-bottom: ($baseline*1.5);
       position: relative;
@@ -60,7 +59,8 @@
         display: block;
       }
 
-      a:hover, a:focus {
+      a:hover,
+      a:focus {
         text-decoration: none;
       }
 
@@ -103,15 +103,15 @@
         width: 100%;
         z-index: 3;
 
-        // > a {
         @include background-image(linear-gradient(-90deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85)));
 
         box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.2);
-        border-bottom: 1px solid rgba(150,150,150, 0.7);
+        border-bottom: 1px solid rgba(150, 150, 150, 0.7);
         display: block;
         height: 50px;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           @include background-image(linear-gradient(-90deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8)));
 
           text-decoration: none;
@@ -156,10 +156,8 @@
         }
 
         .info-link {
-          border-left: 1px solid rgba(150,150,150, 0.5);
-
-          @include box-sizing(border-box);
-
+          border-left: 1px solid rgba(150, 150, 150, 0.5);
+          box-sizing: border-box;
           color: $body-color;
           display: inline-block;
           font: bold 1.6em/1.2em $font-family-sans-serif;
@@ -174,9 +172,7 @@
           width: 60px;
           vertical-align: middle;
         }
-
       }
-      // }
 
       .info {
         background: $body-bg;
@@ -203,8 +199,7 @@
         }
 
         .desc {
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           height: 120px;
           overflow: hidden;
           padding: 10px 10px 12px;
@@ -222,8 +217,7 @@
         }
 
         .bottom {
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           padding: 0 10px 10px;
           width: 100%;
 
@@ -232,7 +226,7 @@
             letter-spacing: 1px;
           }
 
-          .start-date  {
+          .start-date {
             border-left: 1px solid $border-color-2;
             margin-left: ($baseline/4);
             padding-left: ($baseline/2);
@@ -242,7 +236,8 @@
         }
       }
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         background: $course-profile-bg;
         border-color: $border-color-1;
         box-shadow: 0 1px 4px 0 rgba($shadow-color, 0.4);

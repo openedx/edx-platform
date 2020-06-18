@@ -29,7 +29,7 @@ def _listen_for_lms_retire(sender, **kwargs):  # pylint: disable=unused-argument
 
 
 @receiver(post_save, sender=UserSocialAuth)
-def listen_for_social_auth_creation(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
+def listen_for_social_auth_creation(sender, instance, created, **kwargs):
     """
     Post-save signal that will attempt to link a social auth entry with waiting enrollments
     """
@@ -59,7 +59,7 @@ def matriculate_learner(user, uid):
         if not authorizing_org:
             return
     except (AttributeError, ValueError):
-        logger.info('Ignoring non-saml social auth entry for user=%s', user.id)
+        logger.debug('Ignoring non-saml social auth entry for user=%s', user.id)
         return
     except SAMLProviderConfig.DoesNotExist:
         logger.warning(

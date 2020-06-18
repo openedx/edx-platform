@@ -12,7 +12,7 @@ import ddt
 import jwt
 import six
 from six import text_type
-from six.moves.urllib.parse import urlparse, parse_qs  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse, parse_qs
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured
@@ -1003,9 +1003,7 @@ class EdxNotesViewsTest(ModuleStoreTestCase):
         """
         def has_notes_tab(user, course):
             """Returns true if the "Notes" tab is shown."""
-            request = RequestFactory().request()
-            request.user = user
-            tabs = get_course_tab_list(request, course)
+            tabs = get_course_tab_list(user, course)
             return len([tab for tab in tabs if tab.type == 'edxnotes']) == 1
 
         self.assertFalse(has_notes_tab(self.user, self.course))

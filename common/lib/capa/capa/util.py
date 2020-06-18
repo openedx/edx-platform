@@ -3,13 +3,13 @@ Utility functions for capa.
 """
 
 
-import re
 import logging
-import six
+import re
 from cmath import isinf, isnan
 from decimal import Decimal
 
 import bleach
+import six
 from calc import evaluator
 from lxml import etree
 

@@ -3,46 +3,22 @@ Utility methods for Enterprise
 """
 
 
-import hashlib
 import json
 
-import six
-
 from crum import get_current_request
-import third_party_auth
 from django.conf import settings
+from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
-from edx_django_utils.cache import TieredCache
+from edx_django_utils.cache import TieredCache, get_cache_key
 from enterprise.models import EnterpriseCustomerUser
+from social_django.models import UserSocialAuth
+
+import third_party_auth
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
-from social_django.models import UserSocialAuth
-
-
-def get_cache_key(**kwargs):
-    """
-    Get MD5 encoded cache key for given arguments.
-
-    Here is the format of key before MD5 encryption.
-        key1:value1__key2:value2 ...
-
-    Example:
-        >>> get_cache_key(site_domain="example.com", resource="enterprise-learner")
-        # Here is key format for above call
-        # "site_domain:example.com__resource:enterprise-learner"
-        a54349175618ff1659dee0978e3149ca
-
-    Arguments:
-        **kwargs: Key word arguments that need to be present in cache key.
-
-    Returns:
-         An MD5 encoded key uniquely identified by the key word arguments.
-    """
-    key = '__'.join(['{}:{}'.format(item, value) for item, value in six.iteritems(kwargs)])
-
-    return hashlib.md5(key.encode('utf-8')).hexdigest()
+from student.helpers import get_next_url_for_login_page
 
 
 def get_data_consent_share_cache_key(user_id, course_id):
@@ -316,6 +292,11 @@ def get_enterprise_learner_generic_name(request):
     """
     # Prevent a circular import. This function makes sense to be in this module though. And see function description.
     from openedx.features.enterprise_support.api import enterprise_customer_for_request
+
+    # ENT-2626: For 404 pages we don't need to perform these actions.
+    if getattr(request, 'view_name', None) == '404':
+        return
+
     enterprise_customer = enterprise_customer_for_request(request)
 
     return (
@@ -336,3 +317,28 @@ def is_enterprise_learner(user):
         (bool): True if given user is an enterprise learner.
     """
     return EnterpriseCustomerUser.objects.filter(user_id=user.id).exists()
+
+
+def get_enterprise_slug_login_url():
+    """
+    Return the enterprise slug login's URL (enterprise/login) if it exists otherwise None
+    """
+    try:
+        return reverse('enterprise_slug_login')
+    except NoReverseMatch:
+        return None
+
+
+def get_provider_login_url(request, provider_id, redirect_url=None):
+    """
+    Return the given provider's login URL.
+
+    This method is here to avoid the importing of pipeline and student app in enterprise.
+    """
+
+    provider_login_url = third_party_auth.pipeline.get_login_url(
+        provider_id,
+        third_party_auth.pipeline.AUTH_ENTRY_LOGIN,
+        redirect_url=redirect_url if redirect_url else get_next_url_for_login_page(request)
+    )
+    return provider_login_url

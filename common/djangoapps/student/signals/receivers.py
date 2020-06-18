@@ -2,27 +2,21 @@
 Signal receivers for the "student" application.
 """
 
+# pylint: disable=unused-argument
 
 from django.conf import settings
-from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.db import IntegrityError
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
 
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
-from student.helpers import USERNAME_EXISTS_MSG_FMT, AccountValidationError
-from student.models import is_email_retired, is_username_retired
-
-
-def update_last_login(sender, user, **kwargs):  # pylint: disable=unused-argument
-    """
-    Replacement for Django's ``user_logged_in`` signal handler that knows not
-    to attempt updating the ``last_login`` field when we're trying to avoid
-    writes to the ``auth_user`` table while running a migration.
-    """
-    if not waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        user.last_login = timezone.now()
-        user.save(update_fields=['last_login'])
+from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND
+from student.helpers import EMAIL_EXISTS_MSG_FMT, USERNAME_EXISTS_MSG_FMT, AccountValidationError
+from student.models import CourseEnrollment, CourseEnrollmentCelebration, is_email_retired, is_username_retired
 
 
-def on_user_updated(sender, instance, **kwargs):  # pylint: disable=unused-argument
+@receiver(pre_save, sender=get_user_model())
+def on_user_updated(sender, instance, **kwargs):
     """
     Check for retired usernames.
     """
@@ -47,6 +41,32 @@ def on_user_updated(sender, instance, **kwargs):  # pylint: disable=unused-argum
         # Check for a retired email.
         if is_email_retired(instance.email):
             raise AccountValidationError(
-                EMAIL_EXISTS_MSG_FMT.format(username=instance.email),
+                EMAIL_EXISTS_MSG_FMT.format(email=instance.email),
                 field="email"
             )
+
+
+@receiver(post_save, sender=CourseEnrollment)
+def create_course_enrollment_celebration(sender, instance, created, **kwargs):
+    """
+    Creates celebration rows when enrollments are created
+
+    This is how we distinguish between new enrollments that we want to celebrate and old ones
+    that existed before we introduced a given celebration.
+    """
+    if not created:
+        return
+
+    # The UI for celebrations is only supported on the MFE right now, so don't turn on
+    # celebrations unless this enrollment's course is MFE-enabled.
+    if not REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(instance.course_id):
+        return
+
+    try:
+        CourseEnrollmentCelebration.objects.create(
+            enrollment=instance,
+            celebrate_first_section=True,
+        )
+    except IntegrityError:
+        # A celebration object was already created. Shouldn't happen, but ignore it if it does.
+        pass

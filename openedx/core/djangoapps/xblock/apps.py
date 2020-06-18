@@ -17,10 +17,6 @@ class XBlockAppConfig(AppConfig):
     verbose_name = 'New XBlock Runtime'
     label = 'xblock_new'  # The name 'xblock' is already taken by ORA2's 'openassessment.xblock' app :/
 
-    # If this is True, users must have 'edit' permission to be allowed even to
-    # view content. (It's only true in Studio)
-    require_edit_permission = False
-
     def get_runtime_system_params(self):
         """
         Get the XBlockRuntimeSystem parameters appropriate for viewing and/or
@@ -72,8 +68,6 @@ class StudioXBlockAppConfig(XBlockAppConfig):
     """
     Studio-specific configuration of the XBlock Runtime django app.
     """
-    # In Studio, users must have 'edit' permission to be allowed even to view content
-    require_edit_permission = True
 
     BLOCKSTORE_DRAFT_NAME = "studio_draft"
 

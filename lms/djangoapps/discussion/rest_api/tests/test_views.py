@@ -10,14 +10,13 @@ import ddt
 import httpretty
 import mock
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
 from six import text_type
 from six.moves import range
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse
 
 from common.test.utils import disable_signal
 from course_modes.models import CourseMode
@@ -39,6 +38,7 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from student.models import get_retired_username_by_username
@@ -1906,7 +1906,7 @@ class CourseDiscussionSettingsAPIViewTest(APITestCase, UrlResetMixin, ModuleStor
 
     def _get_oauth_headers(self, user):
         """Return the OAuth headers for testing OAuth authentication"""
-        access_token = AccessTokenFactory.create(user=user, client=ClientFactory()).token
+        access_token = AccessTokenFactory.create(user=user, application=ApplicationFactory()).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }
@@ -2159,7 +2159,7 @@ class CourseDiscussionRolesAPIViewTest(APITestCase, UrlResetMixin, ModuleStoreTe
 
     def _get_oauth_headers(self, user):
         """Return the OAuth headers for testing OAuth authentication."""
-        access_token = AccessTokenFactory.create(user=user, client=ClientFactory()).token
+        access_token = AccessTokenFactory.create(user=user, application=ApplicationFactory()).token
         headers = {
             'HTTP_AUTHORIZATION': 'Bearer ' + access_token
         }

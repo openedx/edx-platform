@@ -26,12 +26,11 @@ from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
 from edx_when.api import get_overrides_for_user
-from edx_when.signals import extract_dates
 from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
-from six import text_type, unichr  # pylint: disable=redefined-builtin
+from six import text_type, unichr
 from six.moves import range, zip
 from testfixtures import LogCapture
 
@@ -62,24 +61,17 @@ from lms.djangoapps.instructor_task.api_helper import (
     QueueConnectionError,
     generate_already_running_error_message
 )
+from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
-from shoppingcart.models import (
-    Coupon,
-    CouponRedemption,
-    CourseRegistrationCode,
-    CourseRegistrationCodeInvoiceItem,
-    Invoice,
-    InvoiceTransaction,
-    Order,
-    PaidCourseRegistration,
-    RegistrationCodeRedemption
-)
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
@@ -95,7 +87,10 @@ from student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from student.roles import CourseBetaTesterRole, CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole
+from student.roles import (
+    CourseBetaTesterRole, CourseDataResearcherRole, CourseFinanceAdminRole,
+    CourseInstructorRole, CourseSalesAdminRole
+)
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
@@ -109,8 +104,6 @@ EXPECTED_CSV_HEADER = (
     '"code","redeem_code_url","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser",'
     '"customer_reference_number","internal_reference"'
 )
-EXPECTED_COUPON_CSV_HEADER = u'"Coupon Code","Course Id","% Discount","Description","Expiration Date",' \
-                             u'"Is Active","Code Redeemed Count","Total Discounted Seats","Total Discounted Amount"'
 
 # ddt data for test cases involving reports
 REPORTS_DATA = (
@@ -166,35 +159,27 @@ EXECUTIVE_SUMMARY_DATA = (
 
 INSTRUCTOR_GET_ENDPOINTS = set([
     'get_anon_ids',
-    'get_coupon_codes',
     'get_issued_certificates',
-    'get_sale_order_records',
-    'get_sale_records',
 ])
 INSTRUCTOR_POST_ENDPOINTS = set([
-    'active_registration_codes',
     'add_users_to_cohorts',
     'bulk_beta_modify_access',
     'calculate_grades_csv',
     'change_due_date',
     'export_ora2_data',
-    'generate_registration_codes',
     'get_enrollment_report',
     'get_exec_summary_report',
     'get_grading_config',
     'get_problem_responses',
     'get_proctored_exam_results',
-    'get_registration_codes',
     'get_student_enrollment_status',
     'get_student_progress_url',
     'get_students_features',
     'get_students_who_may_enroll',
-    'get_user_invoice_preference',
     'list_background_email_tasks',
     'list_course_role_members',
     'list_email_content',
     'list_entrance_exam_instructor_tasks',
-    'list_financial_report_downloads',
     'list_forum_members',
     'list_instructor_tasks',
     'list_report_downloads',
@@ -206,11 +191,9 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'reset_due_date',
     'reset_student_attempts',
     'reset_student_attempts_for_entrance_exam',
-    'sale_validation',
     'show_student_extensions',
     'show_unit_extensions',
     'send_email',
-    'spent_registration_codes',
     'students_update_enrollment',
     'update_forum_role_membership',
     'override_problem_score',
@@ -243,25 +226,25 @@ def reverse(endpoint, args=None, kwargs=None, is_dashboard_endpoint=True):
 
 
 @common_exceptions_400
-def view_success(request):  # pylint: disable=unused-argument
+def view_success(request):
     "A dummy view for testing that returns a simple HTTP response"
     return HttpResponse('success')
 
 
 @common_exceptions_400
-def view_user_doesnotexist(request):  # pylint: disable=unused-argument
+def view_user_doesnotexist(request):
     "A dummy view that raises a User.DoesNotExist exception"
     raise User.DoesNotExist()
 
 
 @common_exceptions_400
-def view_alreadyrunningerror(request):  # pylint: disable=unused-argument
+def view_alreadyrunningerror(request):
     "A dummy view that raises an AlreadyRunningError exception"
     raise AlreadyRunningError()
 
 
 @common_exceptions_400
-def view_alreadyrunningerror_unicode(request):  # pylint: disable=unused-argument
+def view_alreadyrunningerror_unicode(request):
     """
     A dummy view that raises an AlreadyRunningError exception with unicode message
     """
@@ -269,7 +252,7 @@ def view_alreadyrunningerror_unicode(request):  # pylint: disable=unused-argumen
 
 
 @common_exceptions_400
-def view_queue_connection_error(request):  # pylint: disable=unused-argument
+def view_queue_connection_error(request):
     """
     A dummy view that raises a QueueConnectionError exception.
     """
@@ -293,24 +276,24 @@ class TestCommonExceptions400(TestCase):
 
     def test_user_doesnotexist(self):
         self.request.is_ajax.return_value = False
-        resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_user_doesnotexist(self.request)
         self.assertContains(resp, "User does not exist", status_code=400)
 
     def test_user_doesnotexist_ajax(self):
         self.request.is_ajax.return_value = True
-        resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_user_doesnotexist(self.request)
         self.assertContains(resp, "User does not exist", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror(self, is_ajax):
         self.request.is_ajax.return_value = is_ajax
-        resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_alreadyrunningerror(self.request)
         self.assertContains(resp, "Requested task is already running", status_code=400)
 
     @ddt.data(True, False)
     def test_alreadyrunningerror_with_unicode(self, is_ajax):
         self.request.is_ajax.return_value = is_ajax
-        resp = view_alreadyrunningerror_unicode(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_alreadyrunningerror_unicode(self.request)
         self.assertContains(
             resp,
             u'Text with unicode chárácters',
@@ -323,7 +306,7 @@ class TestCommonExceptions400(TestCase):
         Tests that QueueConnectionError exception is handled in common_exception_400.
         """
         self.request.is_ajax.return_value = is_ajax
-        resp = view_queue_connection_error(self.request)  # pylint: disable=assignment-from-no-return
+        resp = view_queue_connection_error(self.request)
         self.assertContains(
             resp,
             'Error occured. Please try again later',
@@ -459,7 +442,6 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('list_instructor_tasks', {}),
             ('list_background_email_tasks', {}),
             ('list_report_downloads', {}),
-            ('list_financial_report_downloads', {}),
             ('calculate_grades_csv', {}),
             ('get_students_features', {}),
             ('get_enrollment_report', {}),
@@ -555,6 +537,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         staff_member = StaffFactory(course_key=self.course.id)
         CourseEnrollment.enroll(staff_member, self.course.id)
         CourseFinanceAdminRole(self.course.id).add_users(staff_member)
+        CourseDataResearcherRole(self.course.id).add_users(staff_member)
         self.client.login(username=staff_member.username, password='test')
         # Try to promote to forums admin - not working
         # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
@@ -593,6 +576,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         CourseEnrollment.enroll(inst, self.course.id)
 
         CourseFinanceAdminRole(self.course.id).add_users(inst)
+        CourseDataResearcherRole(self.course.id).add_users(inst)
         self.client.login(username=inst.username, password='test')
 
         for endpoint, args in self.staff_level_endpoints:
@@ -1053,32 +1037,6 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Verify enrollment modes to be 'honor'
         for enrollment in manual_enrollments:
             self.assertEqual(enrollment.enrollment.mode, CourseMode.HONOR)
-
-    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
-    def test_default_shopping_cart_enrollment_mode_for_white_label(self):
-        """
-        Test that enrollment mode for white label courses (paid courses) is DEFAULT_SHOPPINGCART_MODE_SLUG.
-        """
-        # Login white label course instructor
-        self.client.login(username=self.white_label_course_instructor.username, password='test')
-
-        csv_content = b"test_student_wl@example.com,test_student_wl,Test Student,USA"
-        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
-
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(len(data['row_errors']), 0)
-        self.assertEqual(len(data['warnings']), 0)
-        self.assertEqual(len(data['general_errors']), 0)
-
-        manual_enrollments = ManualEnrollmentAudit.objects.all()
-        self.assertEqual(manual_enrollments.count(), 1)
-        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
-
-        # Verify enrollment modes to be CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
-        for enrollment in manual_enrollments:
-            self.assertEqual(enrollment.enrollment.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
 
 
 @ddt.ddt
@@ -2602,25 +2560,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                                       min_price=40)
         self.course_mode.save()
         self.instructor = InstructorFactory(course_key=self.course.id)
+        CourseDataResearcherRole(self.course.id).add_users(self.instructor)
         self.client.login(username=self.instructor.username, password='test')
-        self.cart = Order.get_cart_for_user(self.instructor)
-        self.coupon_code = 'abcde'
-        self.coupon = Coupon(code=self.coupon_code, description='testing code', course_id=self.course.id,
-                             percentage_discount=10, created_by=self.instructor, is_active=True)
-        self.coupon.save()
-
-        # Create testing invoice 1
-        self.sale_invoice_1 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
-            recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
-            internal_reference="A", course_id=self.course.id, is_valid=True
-        )
-        self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
-            invoice=self.sale_invoice_1,
-            qty=1,
-            unit_price=1234.32,
-            course_id=self.course.id
-        )
 
         self.students = [UserFactory() for _ in range(6)]
         for student in self.students:
@@ -2631,292 +2572,6 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             CourseEnrollmentAllowed.objects.create(
                 email=student.email, course_id=self.course.id
             )
-
-    def register_with_redemption_code(self, user, code):
-        """
-        enroll user using a registration code
-        """
-        redeem_url = reverse('register_code_redemption', args=[code], is_dashboard_endpoint=False)
-        self.client.login(username=user.username, password='test')
-        response = self.client.get(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        # check button text
-        self.assertContains(response, 'Activate Course Enrollment')
-
-        response = self.client.post(redeem_url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_invalidate_sale_record(self):
-        """
-        Testing the sale invalidating scenario.
-        """
-        for i in range(2):
-            course_registration_code = CourseRegistrationCode(
-                code='sale_invoice{}'.format(i),
-                course_id=text_type(self.course.id),
-                created_by=self.instructor,
-                invoice=self.sale_invoice_1,
-                invoice_item=self.invoice_item,
-                mode_slug='honor'
-            )
-            course_registration_code.save()
-
-        data = {'invoice_number': self.sale_invoice_1.id, 'event_type': "invalidate"}
-        url = reverse('sale_validation', kwargs={'course_id': text_type(self.course.id)})
-        self.assert_request_status_code(200, url, method="POST", data=data)
-
-        #Now try to fetch data against not existing invoice number
-        test_data_1 = {'invoice_number': 100, 'event_type': "invalidate"}
-        self.assert_request_status_code(404, url, method="POST", data=test_data_1)
-
-        # Now invalidate the same invoice number and expect an Bad request
-        response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertContains(
-            response,
-            "The sale associated with this invoice has already been invalidated.",
-            status_code=400,
-        )
-
-        # now re_validate the invoice number
-        data['event_type'] = "re_validate"
-        self.assert_request_status_code(200, url, method="POST", data=data)
-
-        # Now re_validate the same active invoice number and expect an Bad request
-        response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertContains(response, "This invoice is already active.", status_code=400)
-
-        test_data_2 = {'invoice_number': self.sale_invoice_1.id}
-        response = self.assert_request_status_code(400, url, method="POST", data=test_data_2)
-        self.assertContains(response, "Missing required event_type parameter", status_code=400)
-
-        test_data_3 = {'event_type': "re_validate"}
-        response = self.assert_request_status_code(400, url, method="POST", data=test_data_3)
-        self.assertContains(response, "Missing required invoice_number parameter", status_code=400)
-
-        # submitting invalid invoice number
-        data['invoice_number'] = 'testing'
-        response = self.assert_request_status_code(400, url, method="POST", data=data)
-        self.assertContains(
-            response,
-            u"invoice_number must be an integer, {value} provided".format(value=data['invoice_number']),
-            status_code=400,
-        )
-
-    def test_get_sale_order_records_features_csv(self):
-        """
-        Test that the response from get_sale_order_records is in csv format.
-        """
-        # add the coupon code for the course
-        coupon = Coupon(
-            code='test_code', description='test_description', course_id=self.course.id,
-            percentage_discount='10', created_by=self.instructor, is_active=True
-        )
-        coupon.save()
-        self.cart.order_type = 'business'
-        self.cart.save()
-        self.cart.add_billing_details(company_name='Test Company', company_contact_name='Test',
-                                      company_contact_email='test@123', recipient_name='R1',
-                                      recipient_email='', customer_reference_number='PO#23')
-
-        paid_course_reg_item = PaidCourseRegistration.add_to_order(
-            self.cart,
-            self.course.id,
-            mode_slug=CourseMode.HONOR
-        )
-        # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(
-            reverse('shoppingcart.views.update_user_cart', is_dashboard_endpoint=False),
-            {'ItemId': paid_course_reg_item.id, 'qty': '4'}
-        )
-        self.assertEqual(resp.status_code, 200)
-        # apply the coupon code to the item in the cart
-        resp = self.client.post(
-            reverse('shoppingcart.views.use_code', is_dashboard_endpoint=False),
-            {'code': coupon.code}
-        )
-        self.assertEqual(resp.status_code, 200)
-        self.cart.purchase()
-        # get the updated item
-        item = self.cart.orderitem_set.all().select_subclasses()[0]
-        # get the redeemed coupon information
-        coupon_redemption = CouponRedemption.objects.select_related('coupon').filter(order=self.cart)
-
-        sale_order_url = reverse('get_sale_order_records', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(sale_order_url)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        self.assertIn('36', response.content.decode('utf-8').split('\r\n')[1])
-        self.assertIn(str(item.unit_cost), response.content.decode('utf-8').split('\r\n')[1],)
-        self.assertIn(str(item.list_price), response.content.decode('utf-8').split('\r\n')[1],)
-        self.assertIn(item.status, response.content.decode('utf-8').split('\r\n')[1],)
-        self.assertIn(coupon_redemption[0].coupon.code, response.content.decode('utf-8').split('\r\n')[1],)
-
-    def test_coupon_redeem_count_in_ecommerce_section(self):
-        """
-        Test that checks the redeem count in the instructor_dashboard coupon section
-        """
-        # add the coupon code for the course
-        coupon = Coupon(
-            code='test_code', description='test_description', course_id=self.course.id,
-            percentage_discount='10', created_by=self.instructor, is_active=True
-        )
-        coupon.save()
-
-        # Coupon Redeem Count only visible for Financial Admins.
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-
-        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
-        # apply the coupon code to the item in the cart
-        resp = self.client.post(
-            reverse('shoppingcart.views.use_code', is_dashboard_endpoint=False),
-            {'code': coupon.code}
-        )
-        self.assertEqual(resp.status_code, 200)
-
-        # URL for instructor dashboard
-        instructor_dashboard = reverse(
-            'instructor_dashboard',
-            kwargs={'course_id': text_type(self.course.id)},
-            is_dashboard_endpoint=False
-        )
-        # visit the instructor dashboard page and
-        # check that the coupon redeem count should be 0
-        resp = self.client.get(instructor_dashboard)
-        self.assertContains(resp, 'Number Redeemed')
-        self.assertContains(resp, '<td>0</td>')
-
-        # now make the payment of your cart items
-        self.cart.purchase()
-        # visit the instructor dashboard page and
-        # check that the coupon redeem count should be 1
-        resp = self.client.get(instructor_dashboard)
-
-        self.assertContains(resp, 'Number Redeemed')
-        self.assertContains(resp, '<td>1</td>')
-
-    def test_get_sale_records_features_csv(self):
-        """
-        Test that the response from get_sale_records is in csv format.
-        """
-        for i in range(2):
-            course_registration_code = CourseRegistrationCode(
-                code='sale_invoice{}'.format(i),
-                course_id=text_type(self.course.id),
-                created_by=self.instructor,
-                invoice=self.sale_invoice_1,
-                invoice_item=self.invoice_item,
-                mode_slug='honor'
-            )
-            course_registration_code.save()
-
-        url = reverse(
-            'get_sale_records',
-            kwargs={'course_id': text_type(self.course.id)}
-        )
-        response = self.client.post(url + '/csv', {})
-        self.assertEqual(response['Content-Type'], 'text/csv')
-
-    def test_get_sale_records_features_json(self):
-        """
-        Test that the response from get_sale_records is in json format.
-        """
-        for i in range(5):
-            course_registration_code = CourseRegistrationCode(
-                code='sale_invoice{}'.format(i),
-                course_id=text_type(self.course.id),
-                created_by=self.instructor,
-                invoice=self.sale_invoice_1,
-                invoice_item=self.invoice_item,
-                mode_slug='honor'
-            )
-            course_registration_code.save()
-
-        url = reverse('get_sale_records', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {})
-        res_json = json.loads(response.content.decode('utf-8'))
-        self.assertIn('sale', res_json)
-
-        for res in res_json['sale']:
-            self.validate_sale_records_response(
-                res,
-                course_registration_code,
-                self.sale_invoice_1,
-                0,
-                invoice_item=self.invoice_item
-            )
-
-    def test_get_sale_records_features_with_multiple_invoices(self):
-        """
-        Test that the response from get_sale_records is in json format for multiple invoices
-        """
-        for i in range(5):
-            course_registration_code = CourseRegistrationCode(
-                code='qwerty{}'.format(i),
-                course_id=text_type(self.course.id),
-                created_by=self.instructor,
-                invoice=self.sale_invoice_1,
-                invoice_item=self.invoice_item,
-                mode_slug='honor'
-            )
-            course_registration_code.save()
-
-        # Create test invoice 2
-        sale_invoice_2 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
-            recipient_name='Testw_2', recipient_email='test2@test.com', customer_reference_number='2Fwe23S',
-            internal_reference="B", course_id=self.course.id
-        )
-
-        invoice_item_2 = CourseRegistrationCodeInvoiceItem.objects.create(
-            invoice=sale_invoice_2,
-            qty=1,
-            unit_price=1234.32,
-            course_id=self.course.id
-        )
-
-        for i in range(5):
-            course_registration_code = CourseRegistrationCode(
-                code='xyzmn{}'.format(i), course_id=text_type(self.course.id),
-                created_by=self.instructor, invoice=sale_invoice_2, invoice_item=invoice_item_2, mode_slug='honor'
-            )
-            course_registration_code.save()
-
-        url = reverse('get_sale_records', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {})
-        res_json = json.loads(response.content.decode('utf-8'))
-        self.assertIn('sale', res_json)
-
-        self.validate_sale_records_response(
-            res_json['sale'][0],
-            course_registration_code,
-            self.sale_invoice_1,
-            0,
-            invoice_item=self.invoice_item
-        )
-        self.validate_sale_records_response(
-            res_json['sale'][1],
-            course_registration_code,
-            sale_invoice_2,
-            0,
-            invoice_item=invoice_item_2
-        )
-
-    def validate_sale_records_response(self, res, course_registration_code, invoice, used_codes, invoice_item):
-        """
-        validate sale records attribute values with the response object
-        """
-        self.assertEqual(res['total_amount'], invoice.total_amount)
-        self.assertEqual(res['recipient_email'], invoice.recipient_email)
-        self.assertEqual(res['recipient_name'], invoice.recipient_name)
-        self.assertEqual(res['company_name'], invoice.company_name)
-        self.assertEqual(res['company_contact_name'], invoice.company_contact_name)
-        self.assertEqual(res['company_contact_email'], invoice.company_contact_email)
-        self.assertEqual(res['internal_reference'], invoice.internal_reference)
-        self.assertEqual(res['customer_reference_number'], invoice.customer_reference_number)
-        self.assertEqual(res['invoice_number'], invoice.id)
-        self.assertEqual(res['created_by'], course_registration_code.created_by.username)
-        self.assertEqual(res['course_id'], text_type(invoice_item.course_id))
-        self.assertEqual(res['total_used_codes'], used_codes)
-        self.assertEqual(res['total_codes'], 5)
 
     def test_get_problem_responses_invalid_location(self):
         """
@@ -3038,6 +2693,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 'max_size': 2, 'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]
             }))
             course_instructor = InstructorFactory(course_key=self.course.id)
+            CourseDataResearcherRole(self.course.id).add_users(course_instructor)
             self.client.login(username=course_instructor.username, password='test')
 
         url = reverse('get_students_features', kwargs={'course_id': text_type(self.course.id)})
@@ -3134,148 +2790,6 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
         decorated_func(request, text_type(self.course.id))
         self.assertTrue(func.called)
-
-    def test_enrollment_report_features_csv(self):
-        """
-        test to generate enrollment report.
-        enroll users, admin staff using registration codes.
-        """
-        InvoiceTransaction.objects.create(
-            invoice=self.sale_invoice_1,
-            amount=self.sale_invoice_1.total_amount,
-            status='completed',
-            created_by=self.instructor,
-            last_modified_by=self.instructor
-        )
-        course_registration_code = CourseRegistrationCode.objects.create(
-            code='abcde',
-            course_id=text_type(self.course.id),
-            created_by=self.instructor,
-            invoice=self.sale_invoice_1,
-            invoice_item=self.invoice_item,
-            mode_slug='honor'
-        )
-
-        admin_user = AdminFactory()
-        admin_cart = Order.get_cart_for_user(admin_user)
-        PaidCourseRegistration.add_to_order(admin_cart, self.course.id)
-        admin_cart.purchase()
-
-        # create a new user/student and enroll
-        # in the course using a registration code
-        # and then validates the generated detailed enrollment report
-        test_user = UserFactory()
-        self.register_with_redemption_code(test_user, course_registration_code.code)
-
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        UserProfileFactory.create(user=self.students[0], meta='{"company": "asdasda"}')
-
-        self.client.login(username=self.instructor.username, password='test')
-        url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {})
-        self.assertContains(response, 'The detailed enrollment report is being created.')
-
-    def test_bulk_purchase_detailed_report(self):
-        """
-        test to generate detailed enrollment report.
-        1 Purchase registration codes.
-        2 Enroll users via registration code.
-        3 Validate generated enrollment report.
-        """
-        paid_course_reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course.id)
-        # update the quantity of the cart item paid_course_reg_item
-        resp = self.client.post(
-            reverse('shoppingcart.views.update_user_cart', is_dashboard_endpoint=False),
-            {'ItemId': paid_course_reg_item.id, 'qty': '4'}
-        )
-        self.assertEqual(resp.status_code, 200)
-        # apply the coupon code to the item in the cart
-        resp = self.client.post(
-            reverse('shoppingcart.views.use_code', is_dashboard_endpoint=False),
-            {'code': self.coupon_code}
-        )
-        self.assertEqual(resp.status_code, 200)
-        self.cart.purchase()
-
-        course_reg_codes = CourseRegistrationCode.objects.filter(order=self.cart)
-        self.register_with_redemption_code(self.instructor, course_reg_codes[0].code)
-
-        test_user = UserFactory()
-        test_user_cart = Order.get_cart_for_user(test_user)
-        PaidCourseRegistration.add_to_order(test_user_cart, self.course.id)
-        test_user_cart.purchase()
-        InvoiceTransaction.objects.create(
-            invoice=self.sale_invoice_1,
-            amount=-self.sale_invoice_1.total_amount,
-            status='refunded',
-            created_by=self.instructor,
-            last_modified_by=self.instructor
-        )
-        course_registration_code = CourseRegistrationCode.objects.create(
-            code='abcde',
-            course_id=text_type(self.course.id),
-            created_by=self.instructor,
-            invoice=self.sale_invoice_1,
-            invoice_item=self.invoice_item,
-            mode_slug='honor'
-        )
-
-        test_user1 = UserFactory()
-        self.register_with_redemption_code(test_user1, course_registration_code.code)
-
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        self.client.login(username=self.instructor.username, password='test')
-
-        url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {})
-        self.assertContains(response, 'The detailed enrollment report is being created.')
-
-    def test_create_registration_code_without_invoice_and_order(self):
-        """
-        test generate detailed enrollment report,
-        used a registration codes which has been created via invoice or bulk
-        purchase scenario.
-        """
-        course_registration_code = CourseRegistrationCode.objects.create(
-            code='abcde',
-            course_id=text_type(self.course.id),
-            created_by=self.instructor,
-            mode_slug='honor'
-        )
-        test_user1 = UserFactory()
-        self.register_with_redemption_code(test_user1, course_registration_code.code)
-
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        self.client.login(username=self.instructor.username, password='test')
-
-        url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {})
-        self.assertContains(response, 'The detailed enrollment report is being created.')
-
-    def test_invoice_payment_is_still_pending_for_registration_codes(self):
-        """
-        test generate enrollment report
-        enroll a user in a course using registration code
-        whose invoice has not been paid yet
-        """
-        course_registration_code = CourseRegistrationCode.objects.create(
-            code='abcde',
-            course_id=text_type(self.course.id),
-            created_by=self.instructor,
-            invoice=self.sale_invoice_1,
-            invoice_item=self.invoice_item,
-            mode_slug='honor'
-        )
-
-        test_user1 = UserFactory()
-        self.register_with_redemption_code(test_user1, course_registration_code.code)
-
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        self.client.login(username=self.instructor.username, password='test')
-
-        url = reverse('get_enrollment_report', kwargs={'course_id': text_type(self.course.id)})
-        response = self.client.post(url, {})
-        self.assertContains(response, 'The detailed enrollment report is being created.')
 
     @patch('lms.djangoapps.instructor.views.api.anonymous_id_for_user', Mock(return_value='42'))
     @patch('lms.djangoapps.instructor.views.api.unique_id_for_user', Mock(return_value='41'))
@@ -3990,8 +3504,8 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         self.assertEqual(response.status_code, 400)
 
     def test_send_email_with_site_template_and_from_addr(self):
-        site_email = self.site_configuration.values.get('course_email_from_addr')
-        site_template = self.site_configuration.values.get('course_email_template_name')
+        site_email = self.site_configuration.site_values.get('course_email_from_addr')
+        site_template = self.site_configuration.site_values.get('course_email_template_name')
         CourseEmailTemplate.objects.create(name=site_template)
         url = reverse('send_email', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, self.full_test_message)
@@ -4009,7 +3523,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         org_email = 'fake_org@example.com'
         org_template = 'fake_org_email_template'
         CourseEmailTemplate.objects.create(name=org_template)
-        self.site_configuration.values.update({
+        self.site_configuration.site_values.update({
             'course_email_from_addr': {self.course.id.org: org_email},
             'course_email_template_name': {self.course.id.org: org_template}
         })
@@ -4471,6 +3985,8 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.user1 = user1
         self.user2 = user2
+        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
+        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
@@ -4512,6 +4028,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             get_extended_due(self.course, self.week3, self.user1)
         )
 
+    @RELATIVE_DATES_FLAG.override(True)
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': text_type(self.course.id)})
@@ -4630,10 +4147,13 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
 
         self.user1 = user1
         self.user2 = user2
+        ScheduleFactory.create(enrollment__user=self.user1, enrollment__course_id=self.course.id)
+        ScheduleFactory.create(enrollment__user=self.user2, enrollment__course_id=self.course.id)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
 
+    @RELATIVE_DATES_FLAG.override(True)
     def test_reset_extension_to_deleted_date(self):
         """
         Test that we can delete a due date extension after deleting the normal
@@ -4774,448 +4294,6 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
             '"CourseID","Certificate Type","Total Certificates Issued","Date Report Run"\r\n"'
             + str(self.course.id) + '","honor","3","' + current_date + '"'
         )
-
-
-@override_settings(REGISTRATION_CODE_LENGTH=8)
-class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
-    """
-    Test data dumps for E-commerce Course Registration Codes.
-    """
-    @classmethod
-    def setUpClass(cls):
-        super(TestCourseRegistrationCodes, cls).setUpClass()
-        cls.course = CourseFactory.create()
-        cls.url = reverse(
-            'generate_registration_codes',
-            kwargs={'course_id': text_type(cls.course.id)}
-        )
-
-    def setUp(self):
-        """
-        Fixtures.
-        """
-        super(TestCourseRegistrationCodes, self).setUp()
-
-        CourseModeFactory.create(course_id=self.course.id, min_price=50)
-        self.instructor = InstructorFactory(course_key=self.course.id)
-        self.client.login(username=self.instructor.username, password='test')
-        CourseSalesAdminRole(self.course.id).add_users(self.instructor)
-
-        data = {
-            'total_registration_codes': 12, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street',
-            'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-
-        response = self.client.post(self.url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-        for i in range(5):
-            order = Order(user=self.instructor, status='purchased')
-            order.save()
-
-        # Spent(used) Registration Codes
-        for i in range(5):
-            i += 1
-            registration_code_redemption = RegistrationCodeRedemption(
-                registration_code_id=i,
-                redeemed_by=self.instructor
-            )
-            registration_code_redemption.save()
-
-    @override_settings(FINANCE_EMAIL='finance@example.com')
-    def test_finance_email_in_recipient_list_when_generating_registration_codes(self):
-        """
-        Test to verify that the invoice will also be sent to the FINANCE_EMAIL when
-        generating registration codes
-        """
-        url_reg_code = reverse('generate_registration_codes',
-                               kwargs={'course_id': text_type(self.course.id)})
-
-        data = {
-            'total_registration_codes': 5, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 121.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': 'True'
-        }
-
-        response = self.client.post(url_reg_code, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        # check for the last mail.outbox, The FINANCE_EMAIL has been appended at the
-        # very end, when generating registration codes
-        self.assertEqual(mail.outbox[-1].to[0], 'finance@example.com')
-
-    def test_user_invoice_copy_preference(self):
-        """
-        Test to remember user invoice copy preference
-        """
-        url_reg_code = reverse('generate_registration_codes',
-                               kwargs={'course_id': text_type(self.course.id)})
-
-        data = {
-            'total_registration_codes': 5, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 121.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': 'True'
-        }
-
-        # user invoice copy preference will be saved in api user preference; model
-        response = self.client.post(url_reg_code, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-
-        # get user invoice copy preference.
-        url_user_invoice_preference = reverse('get_user_invoice_preference',
-                                              kwargs={'course_id': text_type(self.course.id)})
-
-        response = self.client.post(url_user_invoice_preference, data)
-        result = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(result['invoice_copy'], True)
-
-        # updating the user invoice copy preference during code generation flow
-        data['invoice'] = ''
-        response = self.client.post(url_reg_code, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-
-        # get user invoice copy preference.
-        url_user_invoice_preference = reverse('get_user_invoice_preference',
-                                              kwargs={'course_id': text_type(self.course.id)})
-
-        response = self.client.post(url_user_invoice_preference, data)
-        result = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(result['invoice_copy'], False)
-
-    def test_generate_course_registration_codes_csv(self):
-        """
-        Test to generate a response of all the generated course registration codes
-        """
-        url = reverse('generate_registration_codes',
-                      kwargs={'course_id': text_type(self.course.id)})
-
-        data = {
-            'total_registration_codes': 15, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-
-        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-        self.assertEqual(len(body.split('\n')), 17)
-
-    def test_generate_course_registration_with_redeem_url_codes_csv(self):
-        """
-        Test to generate a response of all the generated course registration codes
-        """
-        url = reverse('generate_registration_codes',
-                      kwargs={'course_id': text_type(self.course.id)})
-
-        data = {
-            'total_registration_codes': 15, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-
-        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
-
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-        self.assertEqual(len(body.split('\n')), 17)
-        rows = body.split('\n')
-        index = 1
-        while index < len(rows):
-            if rows[index]:
-                row_data = rows[index].split(',')
-                code = row_data[0].replace('"', '')
-                self.assertTrue(row_data[1].startswith('"http')
-                                and row_data[1].endswith('/shoppingcart/register/redeem/{0}/"'.format(code)))
-            index += 1
-
-    @patch('lms.djangoapps.instructor.views.api.random_code_generator',
-           Mock(side_effect=['first', 'second', 'third', 'fourth']))
-    def test_generate_course_registration_codes_matching_existing_coupon_code(self):
-        """
-        Test the generated course registration code is already in the Coupon Table
-        """
-        url = reverse('generate_registration_codes',
-                      kwargs={'course_id': text_type(self.course.id)})
-
-        coupon = Coupon(code='first', course_id=text_type(self.course.id), created_by=self.instructor)
-        coupon.save()
-        data = {
-            'total_registration_codes': 3, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-
-        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-        self.assertEqual(len(body.split('\n')), 5)  # 1 for headers, 1 for new line at the end and 3 for the actual data
-
-    @patch('lms.djangoapps.instructor.views.api.random_code_generator',
-           Mock(side_effect=['first', 'first', 'second', 'third']))
-    def test_generate_course_registration_codes_integrity_error(self):
-        """
-       Test for the Integrity error against the generated code
-        """
-        url = reverse('generate_registration_codes',
-                      kwargs={'course_id': text_type(self.course.id)})
-
-        data = {
-            'total_registration_codes': 2, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-
-        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-        self.assertEqual(len(body.split('\n')), 4)
-
-    def test_spent_course_registration_codes_csv(self):
-        """
-        Test to generate a response of all the spent course registration codes
-        """
-        url = reverse('spent_registration_codes',
-                      kwargs={'course_id': text_type(self.course.id)})
-
-        data = {'spent_company_name': ''}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-
-        self.assertEqual(len(body.split('\n')), 7)
-
-        generate_code_url = reverse(
-            'generate_registration_codes', kwargs={'course_id': text_type(self.course.id)}
-        )
-
-        data = {
-            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'unit_price': 122.45, 'company_contact_email': 'Test@company.com', 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-
-        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-
-        for i in range(9):
-            order = Order(user=self.instructor, status='purchased')
-            order.save()
-
-        # Spent(used) Registration Codes
-        for i in range(9):
-            i += 13
-            registration_code_redemption = RegistrationCodeRedemption(
-                registration_code_id=i,
-                redeemed_by=self.instructor
-            )
-            registration_code_redemption.save()
-
-        data = {'spent_company_name': 'Group Alpha'}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-        self.assertEqual(len(body.split('\n')), 11)
-
-    def test_active_course_registration_codes_csv(self):
-        """
-        Test to generate a response of all the active course registration codes
-        """
-        url = reverse('active_registration_codes',
-                      kwargs={'course_id': text_type(self.course.id)})
-
-        data = {'active_company_name': ''}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-        self.assertEqual(len(body.split('\n')), 9)
-
-        generate_code_url = reverse(
-            'generate_registration_codes', kwargs={'course_id': text_type(self.course.id)}
-        )
-
-        data = {
-            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-
-        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-
-        data = {'active_company_name': 'Group Alpha'}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-        self.assertEqual(len(body.split('\n')), 11)
-
-    def test_get_all_course_registration_codes_csv(self):
-        """
-        Test to generate a response of all the course registration codes
-        """
-        url = reverse(
-            'get_registration_codes', kwargs={'course_id': text_type(self.course.id)}
-        )
-
-        data = {'download_company_name': ''}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-        self.assertEqual(len(body.split('\n')), 14)
-
-        generate_code_url = reverse(
-            'generate_registration_codes', kwargs={'course_id': text_type(self.course.id)}
-        )
-
-        data = {
-            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-
-        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-
-        data = {'download_company_name': 'Group Alpha'}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-        self.assertEqual(len(body.split('\n')), 11)
-
-    def test_get_codes_with_sale_invoice(self):
-        """
-        Test to generate a response of all the course registration codes
-        """
-        generate_code_url = reverse(
-            'generate_registration_codes', kwargs={'course_id': text_type(self.course.id)}
-        )
-
-        data = {
-            'total_registration_codes': 5.5, 'company_name': 'Group Invoice', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': True
-        }
-
-        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
-
-        url = reverse('get_registration_codes',
-                      kwargs={'course_id': text_type(self.course.id)})
-        data = {'download_company_name': 'Group Invoice'}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
-
-    def test_with_invalid_unit_price(self):
-        """
-        Test to generate a response of all the course registration codes
-        """
-        generate_code_url = reverse(
-            'generate_registration_codes', kwargs={'course_id': text_type(self.course.id)}
-        )
-
-        data = {
-            'total_registration_codes': 10, 'company_name': 'Group Invoice', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 'invalid', 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
-            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': True
-        }
-
-        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertContains(response, 'Could not parse amount as', status_code=400)
-
-    def test_get_historical_coupon_codes(self):
-        """
-        Test to download a response of all the active coupon codes
-        """
-        get_coupon_code_url = reverse(
-            'get_coupon_codes', kwargs={'course_id': text_type(self.course.id)}
-        )
-        for i in range(10):
-            coupon = Coupon(
-                code='test_code{0}'.format(i), description='test_description', course_id=self.course.id,
-                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True
-            )
-            coupon.save()
-
-        #now create coupons with the expiration dates
-        for i in range(5):
-            coupon = Coupon(
-                code='coupon{0}'.format(i), description='test_description', course_id=self.course.id,
-                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True,
-                expiration_date=datetime.datetime.now(UTC) + datetime.timedelta(days=2)
-            )
-            coupon.save()
-
-        response = self.client.post(get_coupon_code_url)
-        self.assertEqual(response.status_code, 200, response.content)
-        # filter all the coupons
-        for coupon in Coupon.objects.all():
-            self.assertIn(
-                '"{coupon_code}","{course_id}","{discount}","{description}","{expiration_date}","{is_active}",'
-                '"{code_redeemed_count}","{total_discounted_seats}","{total_discounted_amount}"'.format(
-                    coupon_code=coupon.code,
-                    course_id=coupon.course_id,
-                    discount=coupon.percentage_discount,
-                    description=coupon.description,
-                    expiration_date=coupon.display_expiry_date,
-                    is_active=coupon.is_active,
-                    code_redeemed_count="0",
-                    total_discounted_seats="0",
-                    total_discounted_amount="0",
-                ), response.content.decode("utf-8")
-            )
-
-        self.assertEqual(response['Content-Type'], 'text/csv')
-        body = response.content.decode('utf-8').replace('\r', '')
-        self.assertTrue(body.startswith(EXPECTED_COUPON_CSV_HEADER))
 
 
 class TestBulkCohorting(SharedModuleStoreTestCase):

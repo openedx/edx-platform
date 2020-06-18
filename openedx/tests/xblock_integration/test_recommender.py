@@ -5,12 +5,12 @@ recommender system
 
 
 import codecs
-from io import BytesIO
 import itertools
-import simplejson as json
 import unittest
 from copy import deepcopy
+from io import BytesIO
 
+import simplejson as json
 import six
 from ddt import data, ddt
 from django.conf import settings

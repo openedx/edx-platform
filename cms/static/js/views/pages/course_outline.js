@@ -82,7 +82,7 @@ define([
                 }
 
                 /* globals course */
-                if (this.model.get('highlights_enabled') && course.get('self_paced')) {
+                if (this.model.get('highlights_enabled')) {
                     this.highlightsEnableView = new CourseHighlightsEnableView({
                         el: this.$('.status-highlights-enabled'),
                         model: this.model

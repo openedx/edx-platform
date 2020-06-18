@@ -8,4 +8,6 @@
 
 {% blocktrans %}It is recommended that you change your password.{% endblocktrans %}
 
+{% blocktrans %}You may access your course at: {{ course_url }}.{% endblocktrans %}
+
 {% blocktrans %}Sincerely yours, The {{ course_name }} Team{% endblocktrans %}{% endautoescape %}

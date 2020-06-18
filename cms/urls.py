@@ -215,8 +215,9 @@ if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
 
 # The password pages in the admin tool are disabled so that all password
 # changes go through our user portal and follow complexity requirements.
+if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
+    urlpatterns.append(url(r'^admin/auth/user/\d+/password/$', handler404))
 urlpatterns.append(url(r'^admin/password_change/$', handler404))
-urlpatterns.append(url(r'^admin/auth/user/\d+/password/$', handler404))
 urlpatterns.append(url(r'^admin/', admin.site.urls))
 
 # enable entrance exams
@@ -272,6 +273,16 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
 # UX reference templates
 urlpatterns.append(url(r'^template/(?P<template>.+)$', openedx.core.djangoapps.debug.views.show_reference_template,
                        name='openedx.core.djangoapps.debug.views.show_reference_template'))
+
+urlpatterns.append(
+    url(
+        r'^api/learning_sequences/',
+        include(
+            ('openedx.core.djangoapps.content.learning_sequences.urls', 'learning_sequences'),
+            namespace='learning_sequences'
+        ),
+    ),
+)
 
 # display error page templates, for testing purposes
 urlpatterns += [

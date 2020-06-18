@@ -29,10 +29,10 @@ def with_site_configuration(domain="test.localhost", configuration=None):
             site, __ = Site.objects.get_or_create(domain=domain, name=domain)
             site_configuration, created = SiteConfiguration.objects.get_or_create(
                 site=site,
-                defaults={"enabled": True, "values": configuration},
+                defaults={"enabled": True, "site_values": configuration},
             )
             if not created:
-                site_configuration.values = configuration
+                site_configuration.site_values = configuration
                 site_configuration.save()
 
             with patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration',
@@ -56,10 +56,10 @@ def with_site_configuration_context(domain="test.localhost", configuration=None)
     site, __ = Site.objects.get_or_create(domain=domain, name=domain)
     site_configuration, created = SiteConfiguration.objects.get_or_create(
         site=site,
-        defaults={"enabled": True, "values": configuration},
+        defaults={"enabled": True, "site_values": configuration},
     )
     if not created:
-        site_configuration.values = configuration
+        site_configuration.site_values = configuration
         site_configuration.save()
 
     with patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration',

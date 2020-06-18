@@ -43,16 +43,22 @@ from openedx.core.djangolib.js_utils import (
     TeamsTabFactory({
         courseID: '${six.text_type(course.id) | n, js_escaped_string}',
         topics: ${topics | n, dump_js_escaped_json},
+        hasManagedTopic: ${has_managed_teamset | n, dump_js_escaped_json},
+        hasPublicManagedTopic: ${has_public_managed_teamset | n, dump_js_escaped_json},
+        hasOpenTopic: ${has_open_teamset | n, dump_js_escaped_json},
         userInfo: ${user_info | n, dump_js_escaped_json},
         topicUrl: '${topic_url | n, js_escaped_string}',
         topicsUrl: '${topics_url | n, js_escaped_string}',
         teamsUrl: '${teams_url | n, js_escaped_string}',
+        % if teams_assignments_url:
+        teamsAssignmentsUrl: '${teams_assignments_url | n, js_escaped_string}',
+        % endif
         teamsDetailUrl: '${teams_detail_url | n, js_escaped_string}',
         teamMembershipsUrl: '${team_memberships_url | n, js_escaped_string}',
         teamMembershipDetailUrl: '${team_membership_detail_url | n, js_escaped_string}',
         myTeamsUrl: '${my_teams_url | n, js_escaped_string}',
         teamMembershipManagementUrl: '${team_membership_management_url | n, js_escaped_string}',
-        maxTeamSize: ${course.teams_configuration.default_max_team_size | n, dump_js_escaped_json},
+        courseMaxTeamSize: ${course.teams_configuration.default_max_team_size | n, dump_js_escaped_json},
         languages: ${languages | n, dump_js_escaped_json},
         countries: ${countries | n, dump_js_escaped_json},
         teamsBaseUrl: '${teams_base_url | n, js_escaped_string}'

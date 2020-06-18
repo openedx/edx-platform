@@ -18,6 +18,14 @@ class AlreadyOnTeamInCourse(TeamAPIRequestError):
     pass
 
 
+class AddToIncompatibleTeamError(TeamAPIRequestError):
+    """
+    User is enrolled in a mode that is incompatible with this team type.
+    e.g. Masters learners cannot be placed in a team with audit learners
+    """
+    pass
+
+
 class ElasticSearchConnectionError(TeamAPIRequestError):
     """The system was unable to connect to the configured elasticsearch instance."""
     pass

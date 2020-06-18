@@ -12,10 +12,10 @@ from django.test import TestCase
 from django.urls import clear_url_caches, resolve
 from mock import patch
 
-from util.db import CommitOnSuccessManager, OuterAtomic
+from util.db import OuterAtomic
 
 if six.PY3:
-    from importlib import reload  # pylint: disable=no-name-in-module,redefined-builtin
+    from importlib import reload
 
 
 class UrlResetMixin(object):
@@ -156,7 +156,6 @@ def patch_testcase():
             """
             Method that performs atomic-entering accounting.
             """
-            CommitOnSuccessManager.ENABLED = False
             OuterAtomic.ALLOW_NESTED = True
             if not hasattr(OuterAtomic, 'atomic_for_testcase_calls'):
                 OuterAtomic.atomic_for_testcase_calls = 0
@@ -174,7 +173,6 @@ def patch_testcase():
             """
             Method that performs atomic-rollback accounting.
             """
-            CommitOnSuccessManager.ENABLED = True
             OuterAtomic.ALLOW_NESTED = False
             OuterAtomic.atomic_for_testcase_calls -= 1
             return wrapped_func(*args, **kwargs)

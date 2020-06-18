@@ -36,6 +36,11 @@ class TestSendEmailBaseCommand(CacheIsolationTestCase):
                 None
             )
 
+    def test_weeks_option(self):
+        with patch.object(self.command, 'enqueue') as enqueue:
+            self.command.handle(site_domain_name=self.site.domain, date='2017-09-29', weeks=12)
+            self.assertEqual(enqueue.call_count, 12)
+
     def test_send_emails(self):
         with patch.multiple(
             self.command,

@@ -56,30 +56,29 @@ class TestLoginHelper(TestCase):
         """ Test unsafe next parameter """
         with LogCapture(LOGGER_NAME, level=log_level) as logger:
             req = self.request.get(settings.LOGIN_URL + "?next={url}".format(url=unsafe_url))
-            req.META["HTTP_ACCEPT"] = http_accept  # pylint: disable=no-member
-            req.META["HTTP_USER_AGENT"] = user_agent  # pylint: disable=no-member
+            req.META["HTTP_ACCEPT"] = http_accept
+            req.META["HTTP_USER_AGENT"] = user_agent
             get_next_url_for_login_page(req)
             logger.check(
                 (LOGGER_NAME, log_name, expected_log)
             )
 
     @ddt.data(
-        ('/dashboard', 'testserver'),
-        ('https://edx.org/courses', 'edx.org'),
-        ('https://test.edx.org/courses', 'edx.org'),
-        ('https://test2.edx.org/courses', 'edx.org'),
+        ('/dashboard', 'text/html', 'testserver'),
+        ('https://edx.org/courses', 'text/*', 'edx.org'),
+        ('https://test.edx.org/courses', '*/*', 'edx.org'),
+        ('https://test2.edx.org/courses', 'image/webp, */*;q=0.8', 'edx.org'),
     )
     @ddt.unpack
     @override_settings(LOGIN_REDIRECT_WHITELIST=['test.edx.org', 'test2.edx.org'])
-    def test_safe_next(self, next_url, host):
+    def test_safe_next(self, next_url, http_accept, host):
         """ Test safe next parameter """
         req = self.request.get(settings.LOGIN_URL + "?next={url}".format(url=next_url), HTTP_HOST=host)
-        req.META["HTTP_ACCEPT"] = "text/html"  # pylint: disable=no-member
+        req.META["HTTP_ACCEPT"] = http_accept
         next_page = get_next_url_for_login_page(req)
         self.assertEqual(next_page, next_url)
 
-    @patch('student.helpers.third_party_auth.pipeline.get')
-    @ddt.data(
+    tpa_hint_test_cases = [
         # Test requests outside the TPA pipeline - tpa_hint should be added.
         (None, '/dashboard', '/dashboard', False),
         ('', '/dashboard', '/dashboard', False),
@@ -95,14 +94,36 @@ class TestLoginHelper(TestCase):
         ('saml-idp', '/dashboard', '/dashboard', True),
         # OK to leave tpa_hint overrides in place.
         ('saml-idp', '/dashboard?tpa_hint=oa2-google-oauth2', '/dashboard?tpa_hint=oa2-google-oauth2', True),
-    )
+    ]
+    tpa_hint_test_cases_with_method = [
+        (method, *test_case)
+        for test_case in tpa_hint_test_cases
+        for method in ['GET', 'POST']
+    ]
+
+    @patch('student.helpers.third_party_auth.pipeline.get')
+    @ddt.data(*tpa_hint_test_cases_with_method)
     @ddt.unpack
-    def test_third_party_auth_hint(self, tpa_hint, next_url, expected_url, running_pipeline, mock_running_pipeline):
+    def test_third_party_auth_hint(
+        self,
+        method,
+        tpa_hint,
+        next_url,
+        expected_url,
+        running_pipeline,
+        mock_running_pipeline,
+    ):
         mock_running_pipeline.return_value = running_pipeline
 
         def validate_login():
-            req = self.request.get(settings.LOGIN_URL + "?next={url}".format(url=next_url))
-            req.META["HTTP_ACCEPT"] = "text/html"  # pylint: disable=no-member
+            """
+            Assert that get_next_url_for_login_page returns as expected.
+            """
+            if method == 'GET':
+                req = self.request.get(settings.LOGIN_URL + "?next={url}".format(url=next_url))
+            elif method == 'POST':
+                req = self.request.post(settings.LOGIN_URL, {'next': next_url})
+            req.META["HTTP_ACCEPT"] = "text/html"
             self._add_session(req)
             next_page = get_next_url_for_login_page(req)
             self.assertEqual(next_page, expected_url)

@@ -15,7 +15,7 @@ class DiscussionComponentTest(ContainerBase):
     Feature: CMS.Component Adding
     As a course author, I want to be able to add and edit Discussion component
     """
-    shard = 14
+    shard = 20
 
     def setUp(self, is_staff=True):
         """

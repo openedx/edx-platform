@@ -11,13 +11,13 @@
                 ) %>
             </p>
             <button
-                id="download-team-csv-input"
+                id="download-team-csv"
                 class="download-team-csv action action-primary"
             >
                 <%- gettext("Download Memberships") %>
             </button>
         </div>
-        <div class="team-management-section">
+        <div id="team-management-assign" class="team-management-section">
             <h3 class="team-detail-header">
                 <%- gettext("Assign Team Memberships") %>
             </h3>
@@ -27,16 +27,25 @@
                     "users to teams."
                 ) %>
             </p>
-            <div class="upload-team-csv btn action action-primary">
-                <input
-                    id="upload-team-csv-input"
-                    type="file"
-                    accept="text/csv"
-                    class="input-overlay-hack"
-                />
+            <input
+                id="upload-team-csv-input"
+                type="file"
+                accept="text/csv"
+            />
+            <button
+                id="upload-team-csv"
+                class="btn action action-primary is-disabled"
+                aria-disabled="true"
+            >
                 <%- gettext("Upload Memberships") %>
-            </div>
+            </button>
             <!-- We need to describe the format of the CSV here (TODO MST-49) -->
+            <div class="page-banner" hidden>
+                <div class="alert alert-danger" role="alert">
+                    <span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span>
+                    <div class="message-content"><%- gettext("Error assigning team memberships") %></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

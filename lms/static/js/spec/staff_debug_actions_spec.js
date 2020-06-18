@@ -31,6 +31,15 @@ define([
                 });
             });
 
+            describe('getURL ', function() {
+                it('defines that getCurrentUrl works on instructor page as expected', function() {
+                    spyOn(StaffDebug, 'getCurrentUrl')
+                      .and.returnValue('/courses/edx_demo_course/instructor#view-open_response_assessment');
+                    expect(StaffDebug.getURL('rescore_problem'))
+                      .toBe('/courses/edx_demo_course/instructor/api/rescore_problem');
+                });
+            });
+
             describe('sanitizeString', function() {
                 it('escapes escapable characters in a string', function() {
                     expect(StaffDebug.sanitizeString('.*+?^:${}()|]['))

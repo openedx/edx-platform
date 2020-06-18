@@ -61,7 +61,8 @@
 
             var TeamTabView = Backbone.View.extend({
                 initialize: function(options) {
-                    var router, tabsList;
+                    var view = this,
+                        router, tabsList;
                     this.context = options.context;
                     // This slightly tedious approach is necessary
                     // to use regular expressions within Backbone
@@ -106,7 +107,7 @@
                             teamEvents: this.teamEvents,
                             course_id: this.context.courseID,
                             username: this.context.userInfo.username,
-                            perPage: 2,
+                            perPage: 5,
                             parse: true,
                             url: this.context.myTeamsUrl
                         }
@@ -115,7 +116,8 @@
                         router: this.router,
                         teamEvents: this.teamEvents,
                         context: this.context,
-                        collection: this.myTeamsCollection
+                        collection: this.myTeamsCollection,
+                        getTopic: function(topicId) { return view.getTopic(topicId); }
                     });
 
                     this.topicsCollection = new TopicCollection(
@@ -141,14 +143,17 @@
                     });
 
                     tabsList = [{
-                        title: gettext('My Team'),
+                        title: gettext('My Teams'),
                         url: 'my-teams',
                         view: this.myTeamsView
-                    }, {
-                        title: gettext('Browse'),
-                        url: 'browse',
-                        view: this.topicsView
                     }];
+                    if (this.shouldSeeBrowseTab()) {
+                        tabsList.push({
+                            title: gettext('Browse'),
+                            url: 'browse',
+                            view: this.topicsView
+                        });
+                    }
                     if (this.canViewManageTab()) {
                         tabsList.push({
                             title: gettext('Manage'),
@@ -159,11 +164,7 @@
 
                     this.mainView = this.tabbedView = this.createViewWithHeader({
                         title: gettext('Teams'),
-                        description: gettext(
-                            'See all teams in your course, organized by topic. ' +
-                            'Join a team to collaborate with other learners who are ' +
-                            'interested in the same topic as you are.'
-                        ),
+                        description: this.getTeamsTabViewDescription(),
                         mainView: new TeamsTabbedView({
                             tabs: tabsList,
                             router: this.router
@@ -181,9 +182,10 @@
 
                     // Navigate to the default page if there is no history:
                     // 1. If the user belongs to at least one team, jump to the "My Teams" page
-                    // 2. If not, then jump to the "Browse" page
+                    // 2. If the user will not see a "Browse" page, jump to the "My Teams" page
+                    // 3. Otherwise, jump to the "Browse" page
                     if (Backbone.history.getFragment() === '') {
-                        if (this.myTeamsCollection.length > 0) {
+                        if (this.myTeamsCollection.length > 0 || !this.shouldSeeBrowseTab()) {
                             this.router.navigate('my-teams', {trigger: true});
                         } else {
                             this.router.navigate('browse', {trigger: true});
@@ -378,12 +380,24 @@
                 createTeamsListView: function(options) {
                     var topic = options.topic,
                         collection = options.collection,
+                        myTopicTeamsCollection = new TeamCollection(
+                            this.context.userInfo.teams,
+                            {
+                                teamEvents: this.teamEvents,
+                                course_id: this.context.courseID,
+                                username: this.context.userInfo.username,
+                                topic_id: topic.get('id'),
+                                perPage: 5,
+                                parse: true,
+                                url: this.context.myTeamsUrl
+                            }
+                        ),
                         teamsView = new TopicTeamsView({
                             router: this.router,
                             context: this.context,
                             model: topic,
                             collection: collection,
-                            myTeamsCollection: this.myTeamsCollection,
+                            myTopicTeamsCollection: myTopicTeamsCollection,
                             showSortControls: options.showSortControls
                         }),
                         searchFieldView = new SearchFieldView({
@@ -488,7 +502,7 @@
                  * Returns whether the "Manage" tab should be shown to the user.
                  */
                 canViewManageTab: function() {
-                    return this.canManageTeams() && this.anyInstructorManagedTopics();
+                    return this.canManageTeams() && this.context.hasManagedTopic;
                 },
 
                 /**
@@ -499,13 +513,26 @@
                     return this.canEditTeam();
                 },
 
-                /**
-                 * Returns whether _any_ of the topics are instructor-managed.
-                 */
-                anyInstructorManagedTopics: function() {
-                    return this.topicsCollection.some(
-                        function(topic) { return topic.isInstructorManaged(); }
-                    );
+                shouldSeeBrowseTab: function() {
+                    return this.context.hasOpenTopic || this.context.hasPublicManagedTopic;
+                },
+
+                getTeamsTabViewDescription: function() {
+                    if (this.context.hasOpenTopic) {
+                        return gettext(
+                            'See all teams you belong to and all public ' +
+                            'teams in your course, organized by topic. ' +
+                            'Join an open public team to collaborate with other learners ' +
+                            'who are interested in the same topic as you are.'
+                        );
+                    } else if (this.context.hasPublicManagedTopic) {
+                        return gettext(
+                            'See all teams you belong to and all public ' +
+                            'teams in your course, organized by topic.'
+                        );
+                    } else {
+                        return gettext('See all teams you belong to.');
+                    }
                 },
 
                 createBreadcrumbs: function(topic, team) {

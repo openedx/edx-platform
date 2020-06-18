@@ -8,7 +8,7 @@ from collections import OrderedDict, namedtuple
 from datetime import datetime
 
 import ddt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from freezegun import freeze_time
 from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator
@@ -27,9 +27,9 @@ from lms.djangoapps.grades.course_grade import CourseGrade
 from lms.djangoapps.grades.models import (
     BlockRecord,
     BlockRecordList,
-    PersistentSubsectionGrade,
-    PersistentSubsectionGradeOverride,
     PersistentCourseGrade,
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride
 )
 from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
 from lms.djangoapps.grades.rest_api.v1.views import CourseEnrollmentPagination

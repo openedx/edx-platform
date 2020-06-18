@@ -353,7 +353,7 @@ class CCXListView(GenericAPIView):
     """
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
@@ -612,7 +612,7 @@ class CCXDetailView(GenericAPIView):
 
     authentication_classes = (
         JwtAuthentication,
-        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)
@@ -648,7 +648,7 @@ class CCXDetailView(GenericAPIView):
         serializer = self.get_serializer(ccx_course_object)
         return Response(serializer.data)
 
-    def delete(self, request, ccx_course_id=None):  # pylint: disable=unused-argument
+    def delete(self, request, ccx_course_id=None):
         """
         Deletes a CCX course.
 

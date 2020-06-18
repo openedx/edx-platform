@@ -542,7 +542,6 @@ class StackTraceCounter(object):
         """
         stacks = StackTraceCounter(stack_depth, include_arguments)
 
-        # pylint: disable=missing-docstring
         @functools.wraps(func)
         def capture(*args, **kwargs):
             stacks.capture_stack(args, kwargs)
@@ -600,10 +599,10 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
         print("".join(messages))
 
     # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
-    assert call_count >= minimum_calls
+    assert call_count >= minimum_calls, call_count
 
     # now verify the number of actual calls is less than (or equal to) the expected maximum
-    assert call_count <= maximum_calls
+    assert call_count <= maximum_calls, call_count
 
 
 def mongo_uses_error_check(store):
@@ -618,7 +617,7 @@ def mongo_uses_error_check(store):
 @contextmanager
 def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None, min_sends=None):
     """
-    Instruments the given store to count the number of calls to find (incl find_one) and the number
+    Instruments the given store to count the number of calls to find (incl find_one and count_documents) and the number
     of calls to send_message which is for insert, update, and remove (if you provide num_sends). At the
     end of the with statement, it compares the counts to the bounds provided in the arguments.
 
@@ -629,7 +628,7 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
     """
     with check_sum_of_calls(
         pymongo.collection.Collection,
-        ['find'],
+        ['find', 'count_documents'],
         max_finds,
         min_finds,
     ):
@@ -637,7 +636,7 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
             with check_sum_of_calls(
                 pymongo.collection.Collection,
                 # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
-                ['insert', 'update', 'bulk_write', '_delete'],
+                ['insert_one', 'replace_one', 'update_one', 'bulk_write', '_delete'],
                 max_sends if max_sends is not None else float("inf"),
                 min_sends if min_sends is not None else 0,
             ):

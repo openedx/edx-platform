@@ -8,13 +8,10 @@ View for Courseware Index
 import logging
 
 import six
-import six.moves.urllib as urllib  # pylint: disable=import-error
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
+from six.moves import urllib
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
+from django.db import transaction
 from django.http import Http404
 from django.template.context_processors import csrf
 from django.urls import reverse
@@ -25,12 +22,12 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
 
 from edxmako.shortcuts import render_to_response, render_to_string
-from lms.djangoapps.courseware.courses import allow_public_access
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -44,19 +41,26 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
-    default_course_url_name
+    default_course_url_name,
+    RELATIVE_DATES_FLAG,
 )
+from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from shoppingcart.models import CourseRegistrationCode
-from student.views import is_course_blocked
+from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from ..access import has_access
-from ..courses import check_course_access, get_course_with_access, get_current_child, get_studio_url
+from ..access_utils import check_public_access
+from ..courses import (
+    check_course_access_with_redirect,
+    get_course_with_access,
+    get_current_child,
+    get_studio_url
+)
 from ..entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -67,6 +71,12 @@ from ..masquerade import check_content_start_date_for_masquerade_user, setup_mas
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
+from ..toggles import (
+    COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
+    REDIRECT_TO_COURSEWARE_MICROFRONTEND,
+    should_redirect_to_courseware_microfrontend,
+)
+from ..url_helpers import get_microfrontend_url
 
 from .views import CourseTabView
 
@@ -77,6 +87,7 @@ TEMPLATE_IMPORTS = {'urllib': urllib}
 CONTENT_DEPTH = 2
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CoursewareIndex(View):
     """
     View class for the Courseware page.
@@ -130,34 +141,25 @@ class CoursewareIndex(View):
 
                 self.view = STUDENT_VIEW
 
-                # Do the enrollment check if enable_unenrolled_access is not enabled.
                 self.course = get_course_with_access(
                     request.user, 'load', self.course_key,
                     depth=CONTENT_DEPTH,
-                    check_if_enrolled=not self.enable_unenrolled_access,
+                    check_if_enrolled=True,
+                    check_if_authenticated=True
                 )
                 self.course_overview = CourseOverview.get_from_id(self.course.id)
+                self.is_staff = has_access(request.user, 'staff', self.course)
 
-                if self.enable_unenrolled_access:
-                    # Check if the user is considered enrolled (i.e. is an enrolled learner or staff).
-                    try:
-                        check_course_access(
-                            self.course, request.user, 'load', check_if_enrolled=True,
-                        )
-                    except CourseAccessRedirect as exception:
-                        # If the user is not considered enrolled:
-                        if self.course.course_visibility == COURSE_VISIBILITY_PUBLIC:
-                            # If course visibility is public show the XBlock public_view.
-                            self.view = PUBLIC_VIEW
-                        else:
-                            # Otherwise deny them access.
-                            raise exception
-                    else:
-                        # If the user is considered enrolled show the default XBlock student_view.
-                        pass
+                # There's only one situation where we want to show the public view
+                if (
+                        not self.is_staff and
+                        self.enable_unenrolled_access and
+                        self.course.course_visibility == COURSE_VISIBILITY_PUBLIC and
+                        not CourseEnrollment.is_enrolled(request.user, self.course_key)
+                ):
+                    self.view = PUBLIC_VIEW
 
                 self.can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, self.course)
-                self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
 
                 return self.render(request)
@@ -179,11 +181,48 @@ class CoursewareIndex(View):
         # Set the user in the request to the effective user.
         self.request.user = self.effective_user
 
+    def _redirect_to_learning_mfe(self):
+        """
+        Redirect to the new courseware micro frontend,
+        unless this is a time limited exam.
+        """
+        # learners should redirect, if the waffle flag is set
+        if should_redirect_to_courseware_microfrontend(self.course_key):
+            # but exams should not redirect to the mfe until they're supported
+            if getattr(self.section, 'is_time_limited', False):
+                return
+
+            # and staff will not redirect, either
+            if self.is_staff:
+                return
+
+            raise Redirect(self.microfrontend_url)
+
+    @property
+    def microfrontend_url(self):
+        """
+        Return absolute URL to this section in the courseware micro-frontend.
+        """
+        try:
+            unit_key = UsageKey.from_string(self.request.GET.get('activate_block_id', ''))
+            # `activate_block_id` is typically a Unit (a.k.a. Vertical),
+            # but it can technically be any block type. Do a check to
+            # make sure it's really a Unit before we use it for the MFE.
+            if unit_key.block_type != 'vertical':
+                unit_key = None
+        except InvalidKeyError:
+            unit_key = None
+        url = get_microfrontend_url(
+            self.course_key,
+            self.section.location if self.section else None,
+            unit_key
+        )
+        return url
+
     def render(self, request):
         """
         Render the index page.
         """
-        self._redirect_if_needed_to_pay_for_course()
         self._prefetch_and_bind_course(request)
 
         if self.course.has_children_at_depth(CONTENT_DEPTH):
@@ -195,6 +234,7 @@ class CoursewareIndex(View):
                 self._redirect_if_not_requested_section()
                 self._save_positions()
                 self._prefetch_and_bind_section()
+                self._redirect_to_learning_mfe()
 
             check_content_start_date_for_masquerade_user(self.course_key, self.effective_user, request,
                                                          self.course.start, self.chapter.start, self.section.start)
@@ -206,7 +246,7 @@ class CoursewareIndex(View):
                 'email_opt_in': False,
             })
 
-            allow_anonymous = allow_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
+            allow_anonymous = check_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
 
             if not allow_anonymous:
                 PageLevelMessages.register_warning_message(
@@ -257,31 +297,6 @@ class CoursewareIndex(View):
                 self.position = max(int(self.position), 1)
             except ValueError:
                 raise Http404(u"Position {} is not an integer!".format(self.position))
-
-    def _redirect_if_needed_to_pay_for_course(self):
-        """
-        Redirect to dashboard if the course is blocked due to non-payment.
-        """
-        redeemed_registration_codes = []
-
-        if self.request.user.is_authenticated:
-            self.real_user = User.objects.prefetch_related("groups").get(id=self.real_user.id)
-            redeemed_registration_codes = CourseRegistrationCode.objects.filter(
-                course_id=self.course_key,
-                registrationcoderedemption__redeemed_by=self.real_user
-            )
-
-        if is_course_blocked(self.request, redeemed_registration_codes, self.course_key):
-            # registration codes may be generated via Bulk Purchase Scenario
-            # we have to check only for the invoice generated registration codes
-            # that their invoice is valid or not
-            # TODO Update message to account for the fact that the user is not authenticated.
-            log.warning(
-                u'User %s cannot access the course %s because payment has not yet been received',
-                self.real_user,
-                six.text_type(self.course_key),
-            )
-            raise CourseAccessRedirect(reverse('dashboard'))
 
     def _reset_section_to_exam_if_required(self):
         """
@@ -408,12 +423,14 @@ class CoursewareIndex(View):
         Returns and creates the rendering context for the courseware.
         Also returns the table of contents for the courseware.
         """
+
         course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(self.course.id)})
         show_search = (
             settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH') or
             (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and self.is_staff)
         )
+        staff_access = self.is_staff
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -423,7 +440,7 @@ class CoursewareIndex(View):
             'section': self.section,
             'init': '',
             'fragment': Fragment(),
-            'staff_access': self.is_staff,
+            'staff_access': staff_access,
             'can_masquerade': self.can_masquerade,
             'masquerade': self.masquerade,
             'supports_preview_menu': True,
@@ -458,7 +475,7 @@ class CoursewareIndex(View):
         )
 
         courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
-            request, course=self.course_overview)
+            request, course=self.course)
 
         # entrance exam data
         self._add_entrance_exam_to_context(courseware_context)
@@ -482,11 +499,16 @@ class CoursewareIndex(View):
                 table_of_contents['previous_of_active_section'],
                 table_of_contents['next_of_active_section'],
             )
-
             courseware_context['fragment'] = self.section.render(self.view, section_context)
 
             if self.section.position and self.section.has_children:
                 self._add_sequence_title_to_context(courseware_context)
+
+        # Courseware MFE link
+        if show_courseware_mfe_link(request.user, staff_access, self.course.id):
+            courseware_context['microfrontend_link'] = self.microfrontend_url
+        else:
+            courseware_context['microfrontend_link'] = None
 
         return courseware_context
 
@@ -606,3 +628,32 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
             save_child_position(parent, current_module.location.block_id)
 
         current_module = parent
+
+
+def show_courseware_mfe_link(user, staff_access, course_key):
+    """
+    Return whether to display the button to switch to the Courseware MFE.
+    """
+    # The MFE isn't enabled at all, so don't show the button.
+    if not settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND'):
+        return False
+
+    # MFE does not work for Old Mongo courses.
+    if course_key.deprecated:
+        return False
+
+    # Global staff members always get to see the courseware MFE button if the
+    # platform and course are capable, regardless of rollout waffle flags.
+    if user.is_staff:
+        return True
+
+    # If you have course staff access, you see this link if we've enabled the
+    # course team preview CourseWaffleFlag for this course *or* if we've turned
+    # on the redirect for your students.
+    mfe_enabled_for_course_team = COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key)
+    mfe_experiment_enabled_for_course = REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_experiment_on(course_key)
+
+    if staff_access and (mfe_enabled_for_course_team or mfe_experiment_enabled_for_course):
+        return True
+
+    return False

@@ -88,7 +88,7 @@
         This is a workaround for the fact that tinyMCE's baseURL property is not getting correctly set on AWS
         instances (like sandbox). It is not necessary to explicitly set baseURL when running locally.
          */
-        tinyMCE.baseURL = baseUrl + "/js/vendor/tinymce/js/tinymce";
+        tinyMCE.baseURL = baseUrl + "js/vendor/tinymce/js/tinymce";
 
         /*
         This is necessary for the LMS bulk e-mail acceptance test. In that particular scenario,
@@ -96,7 +96,7 @@
          */
         tinyMCE.suffix = ".min";
         this.tiny_mce_textarea = $(".tiny-mce", this.element).tinymce({
-          script_url: baseUrl + "/js/vendor/tinymce/js/tinymce/tinymce.full.min.js",
+          script_url: baseUrl + "js/vendor/tinymce/js/tinymce/tinymce.full.min.js",
           font_formats: _getFonts(),
           theme: "modern",
           skin: 'studio-tmce4',
@@ -126,7 +126,7 @@
           visual: false,
           plugins: "textcolor, link, image, codemirror",
           codemirror: {
-            path: baseUrl + "/js/vendor"
+            path: baseUrl + "js/vendor"
           },
           image_advtab: true,
 
@@ -1204,7 +1204,7 @@
         Translators: this is a toolbar button tooltip from the raw HTML editor displayed in the browser when a user needs to edit HTML
          */
         title: gettext('Code block'),
-        image: baseUrl + "/images/ico-tinymce-code.png",
+        image: baseUrl + "images/ico-tinymce-code.png",
         onclick: function() {
           return ed.formatter.toggle('code');
         }

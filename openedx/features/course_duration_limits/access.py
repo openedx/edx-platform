@@ -17,17 +17,16 @@ from web_fragments.fragment import Fragment
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
-from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_date_signals.utils import get_expected_duration
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
 
-MIN_DURATION = timedelta(weeks=4)
-MAX_DURATION = timedelta(weeks=18)
 EXPIRATION_DATE_FORMAT_STR = u'%b %-d, %Y'
 
 
@@ -64,28 +63,15 @@ def get_user_course_duration(user, course):
       - If course fields are missing, default course access duration to MIN_DURATION.
     """
 
-    access_duration = MIN_DURATION
-
-    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
-
-    if not verified_mode:
-        return None
-
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
         return None
 
-    # The user course expiration date is the content availability date
-    # plus the weeks_to_complete field from course-discovery.
-    discovery_course_details = get_course_run_details(course.id, ['weeks_to_complete'])
-    expected_weeks = discovery_course_details.get('weeks_to_complete')
-    if expected_weeks:
-        access_duration = timedelta(weeks=expected_weeks)
+    verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
+    if not verified_mode:
+        return None
 
-    # Course access duration is bounded by the min and max duration.
-    access_duration = max(MIN_DURATION, min(MAX_DURATION, access_duration))
-
-    return access_duration
+    return get_expected_duration(course)
 
 
 def get_user_course_expiration_date(user, course):
@@ -105,21 +91,10 @@ def get_user_course_expiration_date(user, course):
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
         return None
 
-    try:
-        # Content availability date is equivalent to max(enrollment date, course start date)
-        # for most people. Using the schedule date will provide flexibility to deal with
-        # more complex business rules in the future.
-        content_availability_date = enrollment.schedule.start
-        # We have anecdotally observed a case where the schedule.start was
-        # equal to the course start, but should have been equal to the enrollment start
-        # https://openedx.atlassian.net/browse/PROD-58
-        # This section is meant to address that case
-        if enrollment.created and course.start:
-            if (content_availability_date.date() == course.start.date() and
-               course.start < enrollment.created < timezone.now()):
-                content_availability_date = enrollment.created
-    except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
-        content_availability_date = max(enrollment.created, course.start)
+    # We reset schedule.start in order to change a user's computed deadlines.
+    # But their expiration date shouldn't change when we adjust their schedule (they don't
+    # get additional time), so we need to based the expiration date on a fixed start date.
+    content_availability_date = max(enrollment.created, course.start)
 
     return content_availability_date + access_duration
 

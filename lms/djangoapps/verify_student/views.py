@@ -9,10 +9,6 @@ import json
 import logging
 
 import six
-import six.moves.urllib.error  # pylint: disable=import-error
-import six.moves.urllib.parse  # pylint: disable=import-error
-import six.moves.urllib.request  # pylint: disable=import-error
-from course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -29,25 +25,21 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic.base import View
 from edx_rest_api_client.exceptions import SlumberBaseException
-from edxmako.shortcuts import render_to_response, render_to_string
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from shoppingcart.models import CertificateItem, Order
-from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
-from student.models import CourseEnrollment
-from track import segment
-from util.db import outer_atomic
-from util.json_request import JsonResponse
-from xmodule.modulestore.django import modulestore
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
+from course_modes.models import CourseMode
+from edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
-from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
+from lms.djangoapps.verify_student.utils import can_verify_now
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -55,6 +47,11 @@ from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import update_account_settings
 from openedx.core.djangoapps.user_api.errors import AccountValidationError, UserNotFound
 from openedx.core.lib.log_utils import audit_log
+from student.models import CourseEnrollment
+from track import segment
+from util.db import outer_atomic
+from util.json_request import JsonResponse
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -243,7 +240,7 @@ class PayAndVerifyView(View):
 
         # Verify that the course exists
         if course is None:
-            log.warn(u"Could not find course with ID %s.", course_id)
+            log.warning(u"Could not find course with ID %s.", course_id)
             raise Http404
 
         # Check whether the user has access to this course
@@ -299,7 +296,7 @@ class PayAndVerifyView(View):
         else:
             # Otherwise, there has never been a verified/paid mode,
             # so return a page not found response.
-            log.warn(
+            log.warning(
                 u"No paid/verified course mode found for course '%s' for verification/payment flow request",
                 course_id
             )
@@ -444,10 +441,10 @@ class PayAndVerifyView(View):
         # utm_params is [(u'utm_content', u'course-v1:IDBx IDB20.1x 1T2017'),...
         utm_params = [item for item in self.request.GET.items() if 'utm_' in item[0]]
         # utm_params is utm_content=course-v1%3AIDBx+IDB20.1x+1T2017&...
-        utm_params = six.moves.urllib.parse.urlencode(utm_params, True)  # pylint: disable=too-many-function-args
+        utm_params = six.moves.urllib.parse.urlencode(utm_params, True)
         # utm_params is utm_content=course-v1:IDBx+IDB20.1x+1T2017&...
         # (course-keys do not have url encoding)
-        utm_params = six.moves.urllib.parse.unquote(utm_params)  # pylint: disable=too-many-function-args
+        utm_params = six.moves.urllib.parse.unquote(utm_params)
         if utm_params:
             if '?' in url:
                 url = url + '&' + utm_params
@@ -758,38 +755,6 @@ def checkout_with_ecommerce_service(user, course_key, course_mode, processor):
         )
 
 
-def checkout_with_shoppingcart(request, user, course_key, course_mode, amount):
-    """ Create an order and trigger checkout using shoppingcart."""
-    cart = Order.get_cart_for_user(user)
-    cart.clear()
-    enrollment_mode = course_mode.slug
-    CertificateItem.add_to_order(cart, course_key, amount, enrollment_mode)
-
-    # Change the order's status so that we don't accidentally modify it later.
-    # We need to do this to ensure that the parameters we send to the payment system
-    # match what we store in the database.
-    # (Ordinarily we would do this client-side when the user submits the form, but since
-    # the JavaScript on this page does that immediately, we make the change here instead.
-    # This avoids a second AJAX call and some additional complication of the JavaScript.)
-    # If a user later re-enters the verification / payment flow, she will create a new order.
-    cart.start_purchase()
-
-    callback_url = request.build_absolute_uri(
-        reverse("shoppingcart.views.postpay_callback")
-    )
-
-    payment_data = {
-        'payment_processor_name': settings.CC_PROCESSOR_NAME,
-        'payment_page_url': get_purchase_endpoint(),
-        'payment_form_data': get_signed_purchase_params(
-            cart,
-            callback_url=callback_url,
-            extra_data=[six.text_type(course_key), course_mode.slug]
-        ),
-    }
-    return payment_data
-
-
 @require_POST
 @login_required
 def create_order(request):
@@ -822,12 +787,12 @@ def create_order(request):
         paid_modes = CourseMode.paid_modes_for_course(course_id)
         if paid_modes:
             if len(paid_modes) > 1:
-                log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
+                log.warning(u"Multiple paid course modes found for course '%s' for create order request", course_id)
             current_mode = paid_modes[0]
 
     # Make sure this course has a paid mode
     if not current_mode:
-        log.warn(u"Create order requested for course '%s' without a paid mode.", course_id)
+        log.warning(u"Create order requested for course '%s' without a paid mode.", course_id)
         return HttpResponseBadRequest(_("This course doesn't support paid certificates"))
 
     if CourseMode.is_professional_mode(current_mode):
@@ -836,16 +801,13 @@ def create_order(request):
     if amount < current_mode.min_price:
         return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
 
-    if current_mode.sku:
-        # if request.POST doesn't contain 'processor' then the service's default payment processor will be used.
-        payment_data = checkout_with_ecommerce_service(
-            request.user,
-            course_id,
-            current_mode,
-            request.POST.get('processor')
-        )
-    else:
-        payment_data = checkout_with_shoppingcart(request, request.user, course_id, current_mode, amount)
+    # if request.POST doesn't contain 'processor' then the service's default payment processor will be used.
+    payment_data = checkout_with_ecommerce_service(
+        request.user,
+        course_id,
+        current_mode,
+        request.POST.get('processor')
+    )
 
     if 'processor' not in request.POST:
         # (XCOM-214) To be removed after release.
@@ -903,7 +865,7 @@ class SubmitPhotosView(View):
 
         # Retrieve the image data
         # Validation ensures that we'll have a face image, but we may not have
-        # a photo ID image if this is a reverification.
+        # a photo ID image if this is a re-verification.
         face_image, photo_id_image, response = self._decode_image_data(
             params["face_image"], params.get("photo_id_image")
         )
@@ -1228,6 +1190,43 @@ def results_callback(request):
     return HttpResponse("OK!")
 
 
+class VerificationStatusAPIView(APIView):
+    """
+    GET /verify_student/status/
+
+    Parameters: None
+
+    Returns:
+        200 OK
+        {
+            "status": String,
+            "expires": String,
+            "can_verify": Boolean
+        }
+
+    Notes:
+        * "status" is a verification status string, or "none" if there is none.
+        * Verification should be allowed if and only if "can_verify" is true.
+        * If there is a current verification, then "expires" is a ISO datetime string.
+        * Otherwise, "expires" is omitted.
+    """
+    @method_decorator(login_required)
+    def get(self, request):
+        """
+        Handle the GET request.
+        """
+        verification_status = IDVerificationService.user_status(request.user)
+        expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
+        can_verify = can_verify_now(verification_status, expiration_datetime)
+        data = {
+            'status': verification_status['status'],
+            'can_verify': can_verify,
+        }
+        if expiration_datetime:
+            data['expires'] = expiration_datetime
+        return Response(data)
+
+
 class ReverifyView(View):
     """
     Reverification occurs when a user's initial verification is denied
@@ -1250,23 +1249,8 @@ class ReverifyView(View):
         Backbone views used in the initial verification flow.
         """
         verification_status = IDVerificationService.user_status(request.user)
-
         expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
-        can_reverify = False
-        if expiration_datetime:
-            if is_verification_expiring_soon(expiration_datetime):
-                # The user has an active verification, but the verification
-                # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
-                # In this case user can resubmit photos for reverification.
-                can_reverify = True
-
-        # If the user has no initial verification or if the verification
-        # process is still ongoing 'pending' or expired then allow the user to
-        # submit the photo verification.
-        # A photo verification is marked as 'pending' if its status is either
-        # 'submitted' or 'must_retry'.
-
-        if verification_status['status'] in ["none", "must_reverify", "expired", "pending"] or can_reverify:
+        if can_verify_now(verification_status, expiration_datetime):
             context = {
                 "user_full_name": request.user.profile.name,
                 "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),

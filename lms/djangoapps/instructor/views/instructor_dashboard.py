@@ -6,7 +6,7 @@ Instructor Dashboard Views
 import datetime
 import logging
 import uuid
-from functools import reduce  # pylint: disable=redefined-builtin
+from functools import reduce
 
 import pytz
 import six
@@ -25,12 +25,11 @@ from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
-from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
+from six.moves.urllib.parse import urljoin
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from bulk_email.api import is_bulk_email_feature_enabled
-from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
 from course_modes.models import CourseMode, CourseModesArchive
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.certificates import api as certs_api
@@ -56,13 +55,17 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
 from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
 from student.models import CourseEnrollment
-from student.roles import CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole, CourseStaffRole
+from student.roles import (
+    CourseFinanceAdminRole, CourseInstructorRole,
+    CourseSalesAdminRole, CourseStaffRole
+)
 from util.json_request import JsonResponse
 from xmodule.html_module import HtmlBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 
 from .tools import get_units_with_due_date, title_or_url
+from .. import permissions
 
 log = logging.getLogger(__name__)
 
@@ -82,7 +85,7 @@ class InstructorDashboardTab(CourseTab):
         """
         Returns true if the specified user has staff access.
         """
-        return bool(user and has_access(user, 'staff', course, course.id))
+        return bool(user and user.is_authenticated and user.has_perm(permissions.VIEW_DASHBOARD, course.id))
 
 
 def show_analytics_dashboard_message(course_key):
@@ -118,26 +121,30 @@ def instructor_dashboard_2(request, course_id):
         'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
+        'data_researcher': request.user.has_perm(permissions.CAN_RESEARCH, course_key),
     }
 
-    if not access['staff']:
+    if not request.user.has_perm(permissions.VIEW_DASHBOARD, course_key):
         raise Http404()
 
     is_white_label = CourseMode.is_white_label(course_key)
 
     reports_enabled = configuration_helpers.get_value('SHOW_ECOMMERCE_REPORTS', False)
 
-    sections = [
-        _section_course_info(course, access),
-        _section_membership(course, access),
-        _section_cohort_management(course, access),
-        _section_discussions_management(course, access),
-        _section_student_admin(course, access),
-        _section_data_download(course, access),
-    ]
+    sections = []
+    if access['staff']:
+        sections.extend([
+            _section_course_info(course, access),
+            _section_membership(course, access),
+            _section_cohort_management(course, access),
+            _section_discussions_management(course, access),
+            _section_student_admin(course, access),
+        ])
+    if access['data_researcher']:
+        sections.append(_section_data_download(course, access))
 
     analytics_dashboard_message = None
-    if show_analytics_dashboard_message(course_key):
+    if show_analytics_dashboard_message(course_key) and (access['staff'] or access['instructor']):
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
         link_start = HTML(u"<a href=\"{}\" rel=\"noopener\" target=\"_blank\">").format(analytics_dashboard_url)
@@ -167,12 +174,8 @@ def instructor_dashboard_2(request, course_id):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if is_bulk_email_feature_enabled(course_key):
+    if is_bulk_email_feature_enabled(course_key) and (access['staff'] or access['instructor']):
         sections.append(_section_send_email(course, access))
-
-    # Gate access to Metrics tab by featue flag and staff authorization
-    if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
-        sections.append(_section_metrics(course, access))
 
     # Gate access to Ecommerce tab
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
@@ -208,7 +211,7 @@ def instructor_dashboard_2(request, course_id):
     openassessment_blocks = [
         block for block in openassessment_blocks if block.parent is not None
     ]
-    if len(openassessment_blocks) > 0:
+    if len(openassessment_blocks) > 0 and access['staff']:
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
     disable_buttons = not _is_small_course(course_key)
@@ -246,6 +249,7 @@ def instructor_dashboard_2(request, course_id):
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
         'certificate_exception_view_url': certificate_exception_view_url,
         'certificate_invalidation_view_url': certificate_invalidation_view_url,
+        'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
@@ -504,7 +508,8 @@ def _section_course_info(course, access):
 
     try:
         sorted_cutoffs = sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True)
-        advance = lambda memo, letter_score_tuple: u"{}: {}, ".format(letter_score_tuple[0], letter_score_tuple[1]) + memo  # pylint: disable=line-too-long
+        advance = lambda memo, letter_score_tuple: u"{}: {}, ".format(letter_score_tuple[0], letter_score_tuple[1]) \
+                                                   + memo
         section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
@@ -709,6 +714,8 @@ def _section_data_download(course, access):
         ),
         'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': six.text_type(course_key)}),
     }
+    if not access.get('data_researcher'):
+        section_data['is_hidden'] = True
     return section_data
 
 
@@ -787,23 +794,6 @@ def _section_analytics(course, access):
         'section_display_name': _('Analytics'),
         'access': access,
         'course_id': six.text_type(course.id),
-    }
-    return section_data
-
-
-def _section_metrics(course, access):
-    """Provide data for the corresponding dashboard section """
-    course_key = course.id
-    section_data = {
-        'section_key': 'metrics',
-        'section_display_name': _('Metrics'),
-        'access': access,
-        'course_id': six.text_type(course_key),
-        'sub_section_display_name': get_section_display_name(course_key),
-        'section_has_problem': get_array_section_has_problem(course_key),
-        'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),
-        'get_students_problem_grades_url': reverse('get_students_problem_grades'),
-        'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
 

@@ -3,8 +3,8 @@
 
 import re
 
+import six.moves.urllib.parse
 from bok_choy.page_object import PageObject
-import six.moves.urllib.parse  # pylint: disable=import-error
 
 from common.test.acceptance.pages.lms import BASE_URL
 

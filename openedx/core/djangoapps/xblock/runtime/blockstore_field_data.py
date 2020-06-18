@@ -180,7 +180,9 @@ class BlockstoreFieldData(FieldData):
             # Otherwise, this is an anomalous get() before the XML was fully loaded:
             # This could happen if an XBlock's parse_xml() method tried to read a field before setting it,
             # if an XBlock read field data in its constructor (forbidden), or if an XBlock was loaded via
-            # some means other than runtime.get_block()
+            # some means other than runtime.get_block(). One way this can happen is if you log/print an XBlock during
+            # XML parsing, because ScopedStorageMixin.__repr__ will try to print all field values, and any fields which
+            # aren't mentioned in the XML (which are left at their default) will be "not loaded yet."
             log.exception(
                 "XBlock %s tried to read from field data (%s) that wasn't loaded from Blockstore!",
                 block.scope_ids.usage_id, name,

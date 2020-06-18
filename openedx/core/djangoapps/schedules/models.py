@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
+from simple_history.models import HistoricalRecords
 
 
 class Schedule(TimeStampedModel):
@@ -18,14 +19,11 @@ class Schedule(TimeStampedModel):
         default=True,
         help_text=_('Indicates if this schedule is actively used')
     )
-    # TODO Delete this field during last stage of rolling out field renames
-    start = models.DateTimeField(
-        db_index=True,
-        help_text=_('Date this schedule went into effect')
-    )
     start_date = models.DateTimeField(
         db_index=True,
-        help_text=_('Date this schedule went into effect')
+        help_text=_('Date this schedule went into effect'),
+        null=True,
+        default=None
     )
     upgrade_deadline = models.DateTimeField(
         blank=True,
@@ -33,6 +31,7 @@ class Schedule(TimeStampedModel):
         null=True,
         help_text=_('Deadline by which the learner must upgrade to a verified seat')
     )
+    history = HistoricalRecords()
 
     def get_experience_type(self):
         try:

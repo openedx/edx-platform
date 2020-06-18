@@ -12,9 +12,7 @@ section.tool-wrapper {
 
   div#graph-container {
     background: none;
-
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     display: table-cell;
     padding: lh();
     vertical-align: top;
@@ -81,9 +79,7 @@ section.tool-wrapper {
     background: darken(#073642, 2%);
     border-right: 1px solid darken(#002b36, 6%);
     box-shadow: 1px 0 0 lighten(#002b36, 6%), inset 0 0 0 4px darken(#094959, 6%);
-
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     display: table-cell;
     padding: lh();
     vertical-align: top;
@@ -133,7 +129,6 @@ section.tool-wrapper {
         @include clearfix();
 
         margin-bottom: lh();
-        margin-bottom: lh();
         padding: 0 0 lh();
       }
 
@@ -179,25 +174,30 @@ section.tool-wrapper {
     }
 
     //MOSFET AMPLIFIER
-    label[for="vinCheckbox"], label[for="vinRadioButton"]{
+    label[for="vinCheckbox"],
+    label[for="vinRadioButton"] {
       color: desaturate(#00bfff, 50%);
     }
 
-    label[for="voutCheckbox"], label[for="voutRadioButton"]{
+    label[for="voutCheckbox"],
+    label[for="voutRadioButton"] {
       color: darken(#ffcf48, 20%);
     }
 
-    label[for="vrCheckbox"], label[for="vrRadioButton"]{
+    label[for="vrCheckbox"],
+    label[for="vrRadioButton"] {
       color: desaturate(#1df914, 40%);
     }
 
     //RC Filters
-    label[for="vcCheckbox"], label[for="vcRadioButton"]{
+    label[for="vcCheckbox"],
+    label[for="vcRadioButton"] {
       color: darken(#ffcf48, 20%);
     }
 
     //RLC Series
-    label[for="vlCheckbox"], label[for="vlRadioButton"]{
+    label[for="vlCheckbox"],
+    label[for="vlRadioButton"] {
       color: desaturate(#d33682, 40%);
     }
 
@@ -249,7 +249,9 @@ section.tool-wrapper {
           box-shadow: inset 0 1px 0 lighten(#586e75, 20%);
           margin-top: -0.3em;
 
-          &:hover, &:active, &:focus {
+          &:hover,
+          &:active,
+          &:focus {
             background-color: lighten(#586e75, 10%);
           }
         }

@@ -57,8 +57,6 @@ for log_name, log_level in LOG_OVERRIDES:
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 
-os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
-
 THIS_UUID = uuid4().hex[:5]
 
 FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
@@ -195,11 +193,6 @@ DATABASES = {
     },
 }
 
-if os.environ.get('DISABLE_MIGRATIONS'):
-    # Create tables directly from apps' models. This can be removed once we upgrade
-    # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
-    MIGRATION_MODULES = NoOpMigrationModules()
-
 CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
@@ -261,6 +254,7 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.facebook.FacebookOAuth2',
     'social_core.backends.azuread.AzureADOAuth2',
     'social_core.backends.twitter.TwitterOAuth',
+    'third_party_auth.identityserver3.IdentityServer3',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
     'third_party_auth.lti.LTIAuthBackend',
@@ -274,15 +268,8 @@ THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = {
     },
 }
 
-OPENID_CREATE_USERS = False
-OPENID_UPDATE_DETAILS_FROM_SREG = True
-OPENID_USE_AS_ADMIN_LOGIN = False
-OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
-
 ############################## OAUTH2 Provider ################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
-# don't cache courses for testing
-OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 OAUTH_ENFORCE_SECURE = False
 
 ########################### External REST APIs #################################
@@ -484,7 +471,7 @@ PROFILE_IMAGE_BACKEND = {
 }
 PROFILE_IMAGE_DEFAULT_FILENAME = 'default'
 PROFILE_IMAGE_DEFAULT_FILE_EXTENSION = 'png'
-PROFILE_IMAGE_SECRET_KEY = 'secret'
+PROFILE_IMAGE_HASH_SEED = 'secret'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 
@@ -537,7 +524,6 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 )
 
 ####################### Authentication Settings ##########################
-# pylint: disable=unicode-format-string
 JWT_AUTH.update({
     'JWT_PUBLIC_SIGNING_JWK_SET': (
         '{"keys": [{"kid": "BTZ9HA6K", "e": "AQAB", "kty": "RSA", "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6'
@@ -593,9 +579,17 @@ PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
 ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
 ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
+LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 
 ########################## limiting dashboard courses ######################
 
 DASHBOARD_COURSE_LIMIT = 250
 
 PROCTORING_SETTINGS = {}
+
+############### Settings for Django Rate limit #####################
+
+RATELIMIT_RATE = '2/m'
+
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = '5/5m'

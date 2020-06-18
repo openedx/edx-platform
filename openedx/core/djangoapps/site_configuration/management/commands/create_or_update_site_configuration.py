@@ -17,7 +17,8 @@ LOG = logging.getLogger(__name__)
 
 
 def load_json_from_file(filename):
-    return json.load(codecs.open(filename, encoding='utf-8'))
+    with codecs.open(filename, encoding='utf-8') as file:
+        return json.load(file)
 
 
 class Command(BaseCommand):
@@ -103,10 +104,10 @@ class Command(BaseCommand):
         site_configuration_values = configuration or config_file_data
 
         if site_configuration_values:
-            if site_configuration.values:
-                site_configuration.values.update(site_configuration_values)
+            if site_configuration.site_values:
+                site_configuration.site_values.update(site_configuration_values)
             else:
-                site_configuration.values = site_configuration_values
+                site_configuration.site_values = site_configuration_values
 
         if enabled is not None:
             site_configuration.enabled = enabled

@@ -6,6 +6,7 @@ Test for lms courseware app, module render unit
 
 import itertools
 import json
+import textwrap
 from datetime import datetime
 from functools import partial
 
@@ -22,7 +23,6 @@ from django.middleware.csrf import get_token
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
@@ -62,6 +62,7 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
@@ -348,7 +349,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_oauth_authentication(self):
         """ Test that the xblock endpoint supports OAuth authentication."""
         dispatch_url = self._get_dispatch_url()
-        access_token = AccessTokenFactory(user=self.mock_user, client=ClientFactory()).token
+        access_token = AccessTokenFactory(user=self.mock_user, application=ApplicationFactory()).token
         headers = {'HTTP_AUTHORIZATION': 'Bearer ' + access_token}
         response = self.client.post(dispatch_url, {}, **headers)
         self.assertEqual(200, response.status_code)
@@ -387,7 +388,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
-        response = self.client.post(dispatch_url, {'position': None})
+        response = self.client.post(dispatch_url, {'position': ''})
         self.assertEqual(200, response.status_code)
         self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
 
@@ -1711,104 +1712,6 @@ class JsonInitDataTest(ModuleStoreTestCase):
         self.assertEqual(html.count("</script>"), 1)
 
 
-class ViewInStudioTest(ModuleStoreTestCase):
-    """Tests for the 'View in Studio' link visiblity."""
-
-    def setUp(self):
-        """ Set up the user and request that will be used. """
-        super(ViewInStudioTest, self).setUp()
-        self.staff_user = GlobalStaffFactory.create()
-        self.request = RequestFactoryNoCsrf().get('/')
-        self.request.user = self.staff_user
-        self.request.session = {}
-        self.module = None
-        self.default_context = {'bookmarked': False, 'username': self.user.username}
-
-    def _get_module(self, course_id, descriptor, location):
-        """
-        Get the module from the course from which to pattern match (or not) the 'View in Studio' buttons
-        """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course_id,
-            self.staff_user,
-            descriptor
-        )
-
-        return render.get_module(
-            self.staff_user,
-            self.request,
-            location,
-            field_data_cache,
-        )
-
-    def setup_mongo_course(self, course_edit_method='Studio'):
-        """ Create a mongo backed course. """
-        course = CourseFactory.create(
-            course_edit_method=course_edit_method
-        )
-
-        descriptor = ItemFactory.create(
-            category='vertical',
-            parent_location=course.location,
-        )
-
-        child_descriptor = ItemFactory.create(
-            category='vertical',
-            parent_location=descriptor.location
-        )
-
-        self.module = self._get_module(course.id, descriptor, descriptor.location)
-
-        # pylint: disable=attribute-defined-outside-init
-        self.child_module = self._get_module(course.id, child_descriptor, child_descriptor.location)
-
-
-class MongoViewInStudioTest(ViewInStudioTest):
-    """Test the 'View in Studio' link visibility in a mongo backed course."""
-
-    def test_view_in_studio_link_studio_course(self):
-        """Regular Studio courses should see 'View in Studio' links."""
-        self.setup_mongo_course()
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertIn('View Unit in Studio', result_fragment.content)
-
-    def test_view_in_studio_link_only_in_top_level_vertical(self):
-        """Regular Studio courses should not see 'View in Studio' for child verticals of verticals."""
-        self.setup_mongo_course()
-        # Render the parent vertical, then check that there is only a single "View Unit in Studio" link.
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        # The single "View Unit in Studio" link should appear before the first xmodule vertical definition.
-        parts = result_fragment.content.split('data-block-type="vertical"')
-        self.assertEqual(3, len(parts), "Did not find two vertical blocks")
-        self.assertIn('View Unit in Studio', parts[0])
-        self.assertNotIn('View Unit in Studio', parts[1])
-        self.assertNotIn('View Unit in Studio', parts[2])
-
-    def test_view_in_studio_link_xml_authored(self):
-        """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
-        self.setup_mongo_course(course_edit_method='XML')
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertNotIn('View Unit in Studio', result_fragment.content)
-
-
-class MixedViewInStudioTest(ViewInStudioTest):
-    """Test the 'View in Studio' link visibility in a mixed mongo backed course."""
-
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-
-    def test_view_in_studio_link_mongo_backed(self):
-        """Mixed mongo courses that are mongo backed should see 'View in Studio' links."""
-        self.setup_mongo_course()
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertIn('View Unit in Studio', result_fragment.content)
-
-    def test_view_in_studio_link_xml_authored(self):
-        """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
-        self.setup_mongo_course(course_edit_method='XML')
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertNotIn('View Unit in Studio', result_fragment.content)
-
-
 @XBlock.tag("detached")
 class DetachedXBlock(XBlock):
     """
@@ -1879,6 +1782,47 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('Staff Debug', result_fragment.content)
+
+    def test_staff_debug_info_score_for_invalid_dropdown(self):
+        """
+        Verifies that for an invalid drop down problem, the max score is set
+        to zero in the html.
+        """
+        problem_xml = """
+        <problem>
+            <optionresponse>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
+            <label>Add the question text, or prompt, here. This text is required.</label>
+            <description>You can add an optional tip or note related to the prompt like this. </description>
+            <optioninput>
+                <option correct="False">an incorrect answer</option>
+                <option correct="True">the correct answer</option>
+                <option correct="True">an incorrect answer</option>
+              </optioninput>
+            </optionresponse>
+        </problem>
+        """
+        problem_descriptor = ItemFactory.create(
+            category='problem',
+            data=problem_xml
+        )
+        module = render.get_module(
+            self.user,
+            self.request,
+            problem_descriptor.location,
+            self.field_data_cache
+        )
+        html_fragment = module.render(STUDENT_VIEW)
+        expected_score_override_html = textwrap.dedent("""<div>
+        <label for="sd_fs_{block_id}">Score (for override only):</label>
+        <input type="text" tabindex="0" id="sd_fs_{block_id}" placeholder="0"/>
+        <label for="sd_fs_{block_id}"> / 0</label>
+      </div>""")
+
+        self.assertIn(
+            expected_score_override_html.format(block_id=problem_descriptor.location.block_id),
+            html_fragment.content
+        )
 
     @XBlock.register_temp_plugin(DetachedXBlock, identifier='detached-block')
     def test_staff_debug_info_disabled_for_detached_blocks(self):

@@ -415,7 +415,7 @@ class ProblemSubmitButtonPastDueTest(ProblemsTest):
         problem_page.wait_for_submit_disabled()
 
 
-@attr(shard=9)
+@attr(shard=19)
 class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
     """
     Test that extended hint features plumb through to the page html and tracking log.

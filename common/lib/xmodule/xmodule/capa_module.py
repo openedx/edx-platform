@@ -35,7 +35,7 @@ from .capa_base import CapaMixin, ComplexEncoder, _
 log = logging.getLogger("edx.courseware")
 
 
-@XBlock.wants('user')  # pylint: disable=abstract-method
+@XBlock.wants('user')
 @XBlock.needs('i18n')
 class ProblemBlock(
         CapaMixin, RawMixin, XmlMixin, EditingMixin,
@@ -203,7 +203,7 @@ class ProblemBlock(
                 self.scope_ids.usage_id,
                 self.scope_ids.user_id
             )
-            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            _, _, traceback_obj = sys.exc_info()
             six.reraise(ProcessingError, ProcessingError(not_found_error_message), traceback_obj)
 
         except Exception:
@@ -213,7 +213,7 @@ class ProblemBlock(
                 self.scope_ids.usage_id,
                 self.scope_ids.user_id
             )
-            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            _, _, traceback_obj = sys.exc_info()
             six.reraise(ProcessingError, ProcessingError(generic_error_message), traceback_obj)
 
         after = self.get_progress()
@@ -344,7 +344,7 @@ class ProblemBlock(
 
     def max_score(self):
         """
-        Return the problem's max score
+        Return the problem's max score if problem is instantiated successfully, else return max score of 0.
         """
         from capa.capa_problem import LoncapaProblem, LoncapaSystem
         capa_system = LoncapaSystem(
@@ -363,16 +363,22 @@ class ProblemBlock(
             xqueue=None,
             matlab_api_key=None,
         )
-        lcp = LoncapaProblem(
-            problem_text=self.data,
-            id=self.location.html_id(),
-            capa_system=capa_system,
-            capa_module=self,
-            state={},
-            seed=1,
-            minimal_init=True,
-        )
-        return lcp.get_max_score()
+        try:
+            lcp = LoncapaProblem(
+                problem_text=self.data,
+                id=self.location.html_id(),
+                capa_system=capa_system,
+                capa_module=self,
+                state={},
+                seed=1,
+                minimal_init=True,
+            )
+        except responsetypes.LoncapaProblemError:
+            log.exception(u"LcpFatalError for block {} while getting max score".format(str(self.location)))
+            maximum_score = 0
+        else:
+            maximum_score = lcp.get_max_score()
+        return maximum_score
 
     def generate_report_data(self, user_state_iterator, limit_responses=None):
         """

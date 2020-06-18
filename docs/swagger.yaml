@@ -19,10 +19,10 @@ paths:
   /badges/v1/assertions/user/{username}/:
     get:
       operationId: badges_v1_assertions_user_read
-      summary: '** Use cases **'
+      summary: '**Use Cases**'
       description: "Request a list of assertions for a user, optionally constrained\
-        \ to a course.\n\n** Example Requests **\n\n    GET /api/badges/v1/assertions/user/{username}/\n\
-        \n** Response Values **\n\n    Body comprised of a list of objects with the\
+        \ to a course.\n\n**Example Requests**\n\n    GET /api/badges/v1/assertions/user/{username}/\n\
+        \n**Response Values**\n\n    Body comprised of a list of objects with the\
         \ following fields:\n\n    * badge_class: The badge class the assertion was\
         \ awarded for. Represented as an object\n      with the following fields:\n\
         \        * slug: The identifier for the badge class\n        * issuing_component:\
@@ -35,28 +35,27 @@ paths:
         \    * image_url: The baked assertion image derived from the badge_class icon--\
         \ contains metadata about the award\n      in its headers.\n    * assertion_url:\
         \ The URL to the OpenBadges BadgeAssertion object, for verification by compatible\
-        \ tools\n      and software.\n\n** Params **\n\n    * slug (optional): The\
-        \ identifier for a particular badge class to filter by.\n    * issuing_component\
-        \ (optional): The issuing component for a particular badge class to filter\
-        \ by\n      (requires slug to have been specified, or this will be ignored.)\
-        \ If slug is provided and this is not,\n      assumes the issuing_component\
-        \ should be empty.\n    * course_id (optional): Returns assertions that were\
-        \ awarded as part of a particular course. If slug is\n      provided, and\
-        \ this field is not specified, assumes that the target badge has an empty\
-        \ course_id field.\n      '*' may be used to get all badges with the specified\
-        \ slug, issuing_component combination across all courses.\n\n** Returns **\n\
-        \n    * 200 on success, with a list of Badge Assertion objects.\n    * 403\
-        \ if a user who does not have permission to masquerade as\n      another user\
-        \ specifies a username other than their own.\n    * 404 if the specified user\
-        \ does not exist\n\n    {\n        \"count\": 7,\n        \"previous\": null,\n\
-        \        \"num_pages\": 1,\n        \"results\": [\n            {\n      \
-        \          \"badge_class\": {\n                    \"slug\": \"special_award\"\
-        ,\n                    \"issuing_component\": \"openedx__course\",\n     \
-        \               \"display_name\": \"Very Special Award\",\n              \
-        \      \"course_id\": \"course-v1:edX+DemoX+Demo_Course\",\n             \
-        \       \"description\": \"Awarded for people who did something incredibly\
-        \ special\",\n                    \"criteria\": \"Do something incredibly\
-        \ special.\",\n                    \"image\": \"http://example.com/media/badge_classes/badges/special_xdpqpBv_9FYOZwN.png\"\
+        \ tools\n      and software.\n\n**Params**\n\n    * slug (optional): The identifier\
+        \ for a particular badge class to filter by.\n    * issuing_component (optional):\
+        \ The issuing component for a particular badge class to filter by\n      (requires\
+        \ slug to have been specified, or this will be ignored.) If slug is provided\
+        \ and this is not,\n      assumes the issuing_component should be empty.\n\
+        \    * course_id (optional): Returns assertions that were awarded as part\
+        \ of a particular course. If slug is\n      provided, and this field is not\
+        \ specified, assumes that the target badge has an empty course_id field.\n\
+        \      '*' may be used to get all badges with the specified slug, issuing_component\
+        \ combination across all courses.\n\n**Returns**\n\n    * 200 on success,\
+        \ with a list of Badge Assertion objects.\n    * 403 if a user who does not\
+        \ have permission to masquerade as\n      another user specifies a username\
+        \ other than their own.\n    * 404 if the specified user does not exist\n\n\
+        \    {\n        \"count\": 7,\n        \"previous\": null,\n        \"num_pages\"\
+        : 1,\n        \"results\": [\n            {\n                \"badge_class\"\
+        : {\n                    \"slug\": \"special_award\",\n                  \
+        \  \"issuing_component\": \"openedx__course\",\n                    \"display_name\"\
+        : \"Very Special Award\",\n                    \"course_id\": \"course-v1:edX+DemoX+Demo_Course\"\
+        ,\n                    \"description\": \"Awarded for people who did something\
+        \ incredibly special\",\n                    \"criteria\": \"Do something\
+        \ incredibly special.\",\n                    \"image\": \"http://example.com/media/badge_classes/badges/special_xdpqpBv_9FYOZwN.png\"\
         \n                },\n                \"image_url\": \"http://badges.example.com/media/issued/cd75b69fc1c979fcc1697c8403da2bdf.png\"\
         ,\n                \"assertion_url\": \"http://badges.example.com/public/assertions/07020647-e772-44dd-98b7-d13d34335ca6\"\
         \n            },\n        ...\n        ]\n    }"
@@ -111,7 +110,7 @@ paths:
         \ list contains 10 bookmarks by default. The page\nsize can be altered by\
         \ passing parameter \"page_size=<page_size>\".\n\nTo include the optional\
         \ fields pass the values in \"fields\" parameter\nas a comma separated list.\
-        \ Possible values are:\n\n* \"display_name\"\n* \"path\"\n\n# Example Requests\n\
+        \ Possible values are:\n\n* \"display_name\"\n* \"path\"\n\n**Example Requests**\n\
         \nGET /api/bookmarks/v1/bookmarks/?course_id={course_id1}&fields=display_name,path"
       parameters:
         - name: page
@@ -143,8 +142,8 @@ paths:
       description: "The POST request only needs to contain one parameter \"usage_id\"\
         .\n\nHttp400 is returned if the format of the request is not correct,\nthe\
         \ usage_id is invalid or a block corresponding to the usage_id\ncould not\
-        \ be found.\n\n# Example Requests\n\nPOST /api/bookmarks/v1/bookmarks/\nRequest\
-        \ data: {\"usage_id\": <usage-id>}"
+        \ be found.\n\n**Example Requests**\n\nPOST /api/bookmarks/v1/bookmarks/\n\
+        Request data: {\"usage_id\": <usage-id>}"
       parameters: []
       responses:
         '201':
@@ -156,7 +155,7 @@ paths:
     get:
       operationId: bookmarks_v1_bookmarks_read
       summary: Get a specific bookmark for a user.
-      description: "# Example Requests\n\nGET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path"
+      description: "**Example Requests**\n\nGET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path"
       parameters: []
       responses:
         '200':
@@ -216,9 +215,7 @@ paths:
     get:
       operationId: ccx_v0_ccx_list
       summary: Gets a list of CCX Courses for a given Master Course.
-      description: "Additional parameters are allowed for pagination purposes.\n\n\
-        Args:\n    request (Request): Django request object.\n\nReturn:\n    A JSON\
-        \ serialized representation of a list of CCX courses."
+      description: Additional parameters are allowed for pagination purposes.
       parameters:
         - name: page
           in: query
@@ -257,9 +254,7 @@ paths:
         - ccx
     post:
       operationId: ccx_v0_ccx_create
-      summary: Creates a new CCX course for a given Master Course.
-      description: "Args:\n    request (Request): Django request object.\n\nReturn:\n\
-        \    A JSON serialized representation a newly created CCX course."
+      description: Creates a new CCX course for a given Master Course.
       parameters:
         - name: data
           in: body
@@ -277,10 +272,7 @@ paths:
   /ccx/v0/ccx/{ccx_course_id}/:
     get:
       operationId: ccx_v0_ccx_read
-      summary: Gets a CCX Course information.
-      description: "Args:\n    request (Request): Django request object.\n    ccx_course_id\
-        \ (string): URI element specifying the CCX course location.\n\nReturn:\n \
-        \   A JSON serialized representation of the CCX course."
+      description: Gets a CCX Course information.
       parameters: []
       responses:
         '200':
@@ -291,9 +283,7 @@ paths:
         - ccx
     patch:
       operationId: ccx_v0_ccx_partial_update
-      summary: Modifies a CCX course.
-      description: "Args:\n    request (Request): Django request object.\n    ccx_course_id\
-        \ (string): URI element specifying the CCX course location."
+      description: Modifies a CCX course.
       parameters:
         - name: data
           in: body
@@ -309,9 +299,7 @@ paths:
         - ccx
     delete:
       operationId: ccx_v0_ccx_delete
-      summary: Deletes a CCX course.
-      description: "Args:\n    request (Request): Django request object.\n    ccx_course_id\
-        \ (string): URI element specifying the CCX course location."
+      description: Deletes a CCX course.
       parameters: []
       responses:
         '204':
@@ -367,11 +355,7 @@ paths:
   /certificates/v0/certificates/{username}/courses/{course_id}/:
     get:
       operationId: certificates_v0_certificates_courses_read
-      summary: Gets a certificate information.
-      description: "Args:\n    request (Request): Django request object.\n    username\
-        \ (string): URI element specifying the user's username.\n    course_id (string):\
-        \ URI element specifying the course location.\n\nReturn:\n    A JSON serialized\
-        \ representation of the certificate."
+      description: Gets a certificate information.
       parameters: []
       responses:
         '200':
@@ -475,9 +459,7 @@ paths:
         - cohorts
     delete:
       operationId: cohorts_v1_courses_cohorts_users_delete
-      summary: Removes and user from a specific cohort.
-      description: "Note: It's better to use the post method to move users between\
-        \ cohorts."
+      description: Removes and user from a specific cohort.
       parameters: []
       responses:
         '204':
@@ -1190,6 +1172,67 @@ paths:
         in: path
         required: true
         type: string
+  /courses/v1/course_ids/:
+    get:
+      operationId: courses_v1_course_ids_list
+      summary: '**Use Cases**'
+      description: "Request a list of course IDs for all courses the specified user\
+        \ can\n    access based on the provided parameters.\n\n**Example Requests**\n\
+        \n    GET /api/courses/v1/courses_ids/\n\n**Response Values**\n\n    Body\
+        \ comprises a list of course ids and pagination details.\n\n**Parameters**\n\
+        \n    username (optional):\n        The username of the specified user whose\
+        \ visible courses we\n        want to see.\n\n    role (required):\n     \
+        \   Course ids are filtered such that only those for which the\n        user\
+        \ has the specified role are returned. Role can be \"staff\"\n        or \"\
+        instructor\".\n        Case-insensitive.\n\n**Returns**\n\n    * 200 on success,\
+        \ with a list of course ids and pagination details\n    * 400 if an invalid\
+        \ parameter was sent or the username was not provided\n      for an authenticated\
+        \ request.\n    * 403 if a user who does not have permission to masquerade\
+        \ as\n      another user who specifies a username other than their own.\n\
+        \    * 404 if the specified user does not exist, or the requesting user does\n\
+        \      not have permission to view their courses.\n\n    Example response:\n\
+        \n        {\n            \"results\":\n                [\n               \
+        \     \"course-v1:edX+DemoX+Demo_Course\"\n                ],\n          \
+        \  \"pagination\": {\n                \"previous\": null,\n              \
+        \  \"num_pages\": 1,\n                \"next\": null,\n                \"\
+        count\": 1\n            }\n        }"
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+        - name: page_size
+          in: query
+          description: Number of results to return per page.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  type: string
+      tags:
+        - courses
+    parameters: []
   /courses/v1/courses/:
     get:
       operationId: courses_v1_courses_list
@@ -1197,32 +1240,29 @@ paths:
       description: "Request information on all courses visible to the specified user.\n\
         \n**Example Requests**\n\n    GET /api/courses/v1/courses/\n\n**Response Values**\n\
         \n    Body comprises a list of objects as returned by `CourseDetailView`.\n\
-        \n**Parameters**\n    search_term (optional):\n        Search term to filter\
+        \n**Parameters**\n\n    search_term (optional):\n        Search term to filter\
         \ courses (used by ElasticSearch).\n\n    username (optional):\n        The\
         \ username of the specified user whose visible courses we\n        want to\
         \ see. The username is not required only if the API is\n        requested\
         \ by an Anonymous user.\n\n    org (optional):\n        If specified, visible\
         \ `CourseOverview` objects are filtered\n        such that only those belonging\
         \ to the organization with the\n        provided org code (e.g., \"HarvardX\"\
-        ) are returned.\n        Case-insensitive.\n\n    role (optional):\n     \
-        \   If specified, visible `CourseOverview` objects are filtered\n        such\
-        \ that only those for which the user has the specified role\n        are returned.\
-        \ Multiple role parameters can be specified.\n        Case-insensitive.\n\n\
-        **Returns**\n\n    * 200 on success, with a list of course discovery objects\
-        \ as returned\n      by `CourseDetailView`.\n    * 400 if an invalid parameter\
-        \ was sent or the username was not provided\n      for an authenticated request.\n\
-        \    * 403 if a user who does not have permission to masquerade as\n     \
-        \ another user specifies a username other than their own.\n    * 404 if the\
-        \ specified user does not exist, or the requesting user does\n      not have\
-        \ permission to view their courses.\n\n    Example response:\n\n        [\n\
-        \          {\n            \"blocks_url\": \"/api/courses/v1/blocks/?course_id=edX%2Fexample%2F2012_Fall\"\
-        ,\n            \"media\": {\n              \"course_image\": {\n         \
-        \       \"uri\": \"/c4x/edX/example/asset/just_a_test.jpg\",\n           \
-        \     \"name\": \"Course Image\"\n              }\n            },\n      \
-        \      \"description\": \"An example course.\",\n            \"end\": \"2015-09-19T18:00:00Z\"\
-        ,\n            \"enrollment_end\": \"2015-07-15T00:00:00Z\",\n           \
-        \ \"enrollment_start\": \"2015-06-15T00:00:00Z\",\n            \"course_id\"\
-        : \"edX/example/2012_Fall\",\n            \"name\": \"Example Course\",\n\
+        ) are returned.\n        Case-insensitive.\n\n**Returns**\n\n    * 200 on\
+        \ success, with a list of course discovery objects as returned\n      by `CourseDetailView`.\n\
+        \    * 400 if an invalid parameter was sent or the username was not provided\n\
+        \      for an authenticated request.\n    * 403 if a user who does not have\
+        \ permission to masquerade as\n      another user specifies a username other\
+        \ than their own.\n    * 404 if the specified user does not exist, or the\
+        \ requesting user does\n      not have permission to view their courses.\n\
+        \n    Example response:\n\n        [\n          {\n            \"blocks_url\"\
+        : \"/api/courses/v1/blocks/?course_id=edX%2Fexample%2F2012_Fall\",\n     \
+        \       \"media\": {\n              \"course_image\": {\n                \"\
+        uri\": \"/c4x/edX/example/asset/just_a_test.jpg\",\n                \"name\"\
+        : \"Course Image\"\n              }\n            },\n            \"description\"\
+        : \"An example course.\",\n            \"end\": \"2015-09-19T18:00:00Z\",\n\
+        \            \"enrollment_end\": \"2015-07-15T00:00:00Z\",\n            \"\
+        enrollment_start\": \"2015-06-15T00:00:00Z\",\n            \"course_id\":\
+        \ \"edX/example/2012_Fall\",\n            \"name\": \"Example Course\",\n\
         \            \"number\": \"example\",\n            \"org\": \"edX\",\n   \
         \         \"start\": \"2015-07-17T12:00:00Z\",\n            \"start_display\"\
         : \"July 17, 2015\",\n            \"start_type\": \"timestamp\"\n        \
@@ -1475,6 +1515,76 @@ paths:
           description: ''
       tags:
         - courses
+    parameters:
+      - name: usage_key_string
+        in: path
+        required: true
+        type: string
+      - name: var
+        in: path
+        required: true
+        type: string
+  ? /courseware/course/(P{course_key_string}[/+]+{var}[/+]+api/courseware/course/(P{course_key_string}[/+]+(/|+)[/+]+{var}[/]+)
+  : get:
+      operationId: courseware_course_+]+api_courseware_course_+]+(_|+)[_]+)_read
+      summary: '**Use Cases**'
+      description: "Request details for a course\n\n**Example Requests**\n\n    GET\
+        \ /api/courseware/course/{course_key}\n\n**Response Values**\n\n    Body consists\
+        \ of the following fields:\n\n    * effort: A textual description of the weekly\
+        \ hours of effort expected\n        in the course.\n    * end: Date the course\
+        \ ends, in ISO 8601 notation\n    * enrollment_end: Date enrollment ends,\
+        \ in ISO 8601 notation\n    * enrollment_start: Date enrollment begins, in\
+        \ ISO 8601 notation\n    * id: A unique identifier of the course; a serialized\
+        \ representation\n        of the opaque key identifying the course.\n    *\
+        \ media: An object that contains named media items.  Included here:\n    \
+        \    * course_image: An image to show for the course.  Represented\n     \
+        \     as an object with the following fields:\n            * uri: The location\
+        \ of the image\n    * name: Name of the course\n    * number: Catalog number\
+        \ of the course\n    * org: Name of the organization that owns the course\n\
+        \    * short_description: A textual description of the course\n    * start:\
+        \ Date the course begins, in ISO 8601 notation\n    * start_display: Readably\
+        \ formatted start of the course\n    * start_type: Hint describing how `start_display`\
+        \ is set. One of:\n        * `\"string\"`: manually set by the course author\n\
+        \        * `\"timestamp\"`: generated from the `start` timestamp\n       \
+        \ * `\"empty\"`: no start date is specified\n    * pacing: Course pacing.\
+        \ Possible values: instructor, self\n    * tabs: Course tabs\n    * enrollment:\
+        \ Enrollment status of authenticated user\n        * mode: `audit`, `verified`,\
+        \ etc\n        * is_active: boolean\n    * can_load_course: Whether the user\
+        \ can view the course (AccessResponse object)\n    * is_staff: Whether the\
+        \ user has staff access to the course\n\n**Parameters:**\n\n    requested_fields\
+        \ (optional) comma separated list:\n        If set, then only those fields\
+        \ will be returned.\n    username (optional) username to masquerade as (if\
+        \ requesting user is staff)\n\n**Returns**\n\n    * 200 on success with above\
+        \ fields.\n    * 400 if an invalid parameter was sent or the username was\
+        \ not provided\n      for an authenticated request.\n    * 403 if a user who\
+        \ does not have permission to masquerade as\n      another user specifies\
+        \ a username other than their own.\n    * 404 if the course is not available\
+        \ or cannot be seen."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - courseware
+    parameters:
+      - name: course_key_string
+        in: path
+        required: true
+        type: string
+      - name: var
+        in: path
+        required: true
+        type: string
+  ? /courseware/sequence/(P{usage_key_string}{var}|api/courseware/sequence/(P{usage_key_string}(:i4x://[/]+/[/]+/[/]+/[@]+(:@[/]+))|{var})
+  : get:
+      operationId: courseware_sequence_courseware_sequence__[_]+_[_]+_[_]+_[@]+(:@[_read
+      description: Return response to a GET request.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - courseware
     parameters:
       - name: usage_key_string
         in: path
@@ -2356,6 +2466,21 @@ paths:
         in: path
         required: true
         type: string
+  /edx_proctoring/v1/retire_user/{user_id}/:
+    post:
+      operationId: edx_proctoring_v1_retire_user_create
+      description: Obfuscates all PII for a given user_id
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - edx_proctoring
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        type: string
   /edxnotes/v1/retire_user/:
     post:
       operationId: edxnotes_v1_retire_user_create
@@ -2370,9 +2495,7 @@ paths:
   /embargo/v1/course_access/:
     get:
       operationId: embargo_v1_course_access_list
-      summary: GET /api/embargo/v1/course_access/
-      description: "Arguments:\n    request (HttpRequest)\n\nReturn:\n    Response:\
-        \ True or False depending on the check."
+      description: GET /api/embargo/v1/course_access/
       parameters: []
       responses:
         '200':
@@ -2384,12 +2507,7 @@ paths:
     get:
       operationId: enrollment_v1_course_read
       summary: Read enrollment information for a particular course.
-      description: "HTTP Endpoint for retrieving course level enrollment information.\n\
-        \nArgs:\n    request (Request): To get current course enrollment information,\
-        \ a GET request will return\n        information for the specified course.\n\
-        \    course_id (str): URI element specifying the course location. Enrollment\
-        \ information will be\n        returned.\n\nReturn:\n    A JSON serialized\
-        \ representation of the course enrollment details."
+      description: HTTP Endpoint for retrieving course level enrollment information.
       parameters: []
       responses:
         '200':
@@ -2441,13 +2559,7 @@ paths:
       summary: Create, read, or update enrollment information for a user.
       description: "HTTP Endpoint for all CRUD operations for a user course enrollment.\
         \ Allows creation, reading, and\nupdates of the current enrollment for a particular\
-        \ course.\n\nArgs:\n    request (Request): To get current course enrollment\
-        \ information, a GET request will return\n        information for the current\
-        \ user and the specified course.\n    course_id (str): URI element specifying\
-        \ the course location. Enrollment information will be\n        returned, created,\
-        \ or updated for this particular course.\n    username (str): The username\
-        \ associated with this enrollment request.\n\nReturn:\n    A JSON serialized\
-        \ representation of the course enrollment."
+        \ course."
       parameters: []
       responses:
         '200':
@@ -2465,13 +2577,7 @@ paths:
       summary: Create, read, or update enrollment information for a user.
       description: "HTTP Endpoint for all CRUD operations for a user course enrollment.\
         \ Allows creation, reading, and\nupdates of the current enrollment for a particular\
-        \ course.\n\nArgs:\n    request (Request): To get current course enrollment\
-        \ information, a GET request will return\n        information for the current\
-        \ user and the specified course.\n    course_id (str): URI element specifying\
-        \ the course location. Enrollment information will be\n        returned, created,\
-        \ or updated for this particular course.\n    username (str): The username\
-        \ associated with this enrollment request.\n\nReturn:\n    A JSON serialized\
-        \ representation of the course enrollment."
+        \ course."
       parameters: []
       responses:
         '200':
@@ -2700,6 +2806,39 @@ paths:
         required: true
         type: string
         pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
+  /entitlements/v1/entitlements/{uuid}/enrollments:
+    post:
+      operationId: entitlements_v1_entitlements_enrollments_create
+      description: "On POST this method will be called and will handle enrolling a\
+        \ user in the\nprovided course_run_id from the data. This is called on a specific\
+        \ entitlement\nUUID so the course_run_id has to correspond to the Course that\
+        \ is assigned to\nthe Entitlement.\n\nWhen this API is called for a user who\
+        \ is already enrolled in a run that User\nwill be unenrolled from their current\
+        \ run and enrolled in the new run if it is\navailable."
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - entitlements
+    delete:
+      operationId: entitlements_v1_entitlements_enrollments_delete
+      summary: On DELETE call to this API we will unenroll the course enrollment for
+        the provided uuid
+      description: "If is_refund parameter is provided then unenroll the user, set\
+        \ Entitlement expiration, and issue\na refund"
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - entitlements
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        type: string
+        format: uuid
   /experiments/v0/custom/REV-934/:
     get:
       operationId: experiments_v0_custom_REV-934_list
@@ -2780,24 +2919,6 @@ paths:
         - experiments
     put:
       operationId: experiments_v0_data_update
-      description: ''
-      parameters:
-        - name: data
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/ExperimentData'
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/ExperimentData'
-      tags:
-        - experiments
-    parameters: []
-  /experiments/v0/data/bulk_upsert/:
-    put:
-      operationId: experiments_v0_data_bulk_upsert
       description: ''
       parameters:
         - name: data
@@ -2939,24 +3060,6 @@ paths:
       tags:
         - experiments
     parameters: []
-  /experiments/v0/key-value/bulk_upsert/:
-    put:
-      operationId: experiments_v0_key-value_bulk_upsert
-      description: ''
-      parameters:
-        - name: data
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/ExperimentKeyValue'
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/ExperimentKeyValue'
-      tags:
-        - experiments
-    parameters: []
   /experiments/v0/key-value/{id}/:
     get:
       operationId: experiments_v0_key-value_read
@@ -3020,11 +3123,7 @@ paths:
   /grades/v1/courses/:
     get:
       operationId: grades_v1_courses_list
-      description: "Gets a course progress status.\nArgs:\n    request (Request):\
-        \ Django request object.\n    course_id (string): URI element specifying the\
-        \ course location.\n                        Can also be passed as a GET parameter\
-        \ instead.\nReturn:\n    A JSON serialized representation of the requesting\
-        \ user's current grade status."
+      description: Gets a course progress status.
       parameters:
         - name: cursor
           in: query
@@ -3045,11 +3144,7 @@ paths:
   /grades/v1/courses/{course_id}/:
     get:
       operationId: grades_v1_courses_read
-      description: "Gets a course progress status.\nArgs:\n    request (Request):\
-        \ Django request object.\n    course_id (string): URI element specifying the\
-        \ course location.\n                        Can also be passed as a GET parameter\
-        \ instead.\nReturn:\n    A JSON serialized representation of the requesting\
-        \ user's current grade status."
+      description: Gets a course progress status.
       parameters: []
       responses:
         '200':
@@ -3156,10 +3251,7 @@ paths:
     get:
       operationId: grades_v1_subsection_read
       description: "Returns subection grade data, override grade data and a history\
-        \ of changes made to\na specific users specific subsection grade.\n\nArgs:\n\
-        \    subsection_id: String representation of a usage_key, which is an opaque\
-        \ key of\n    a persistant subection grade.\n    user_id: An integer represenation\
-        \ of a user"
+        \ of changes made to\na specific users specific subsection grade."
       parameters: []
       responses:
         '200':
@@ -3457,8 +3549,9 @@ paths:
   /organizations/v0/organizations/:
     get:
       operationId: organizations_v0_organizations_list
-      description: "Organization view to fetch list organization data or single organization\n\
-        using organization short name."
+      description: "Organization view to:\n    - fetch list organization data or single\
+        \ organization using organization short name.\n    - create or update an organization\
+        \ via the PUT endpoint."
       parameters:
         - name: page
           in: query
@@ -3499,9 +3592,43 @@ paths:
   /organizations/v0/organizations/{short_name}/:
     get:
       operationId: organizations_v0_organizations_read
-      description: "Organization view to fetch list organization data or single organization\n\
-        using organization short name."
+      description: "Organization view to:\n    - fetch list organization data or single\
+        \ organization using organization short name.\n    - create or update an organization\
+        \ via the PUT endpoint."
       parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Organization'
+      tags:
+        - organizations
+    put:
+      operationId: organizations_v0_organizations_update
+      description: We perform both Update and Create action via the PUT method.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Organization'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Organization'
+      tags:
+        - organizations
+    patch:
+      operationId: organizations_v0_organizations_partial_update
+      description: We disable PATCH because all updates and creates should use the
+        PUT action above.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Organization'
       responses:
         '200':
           description: ''
@@ -3721,17 +3848,132 @@ paths:
         type: string
   /program_enrollments/v1/programs/{program_uuid}/overview/:
     get:
-      operationId: program_enrollments_v1_programs_overview_list
-      description: "Defines the GET endpoint for overviews of course enrollments\n\
-        for a user as part of a program."
+      operationId: program_enrollments_v1_programs_overview_read
+      description: "A view for getting data associated with a user's course enrollments\n\
+        as part of a program enrollment."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CourseRunOverviewList'
+      tags:
+        - program_enrollments
+    parameters:
+      - name: program_uuid
+        in: path
+        required: true
+        type: string
+  /program_enrollments/v1/users/{username}/programs/{program_uuid}/courses:
+    get:
+      operationId: program_enrollments_v1_users_programs_courses_list
+      summary: Get an overview of each of a user's course enrollments associated with
+        a program.
+      description: "This endpoint exists to get an overview of each course-run enrollment\n\
+        that a user has for course-runs within a given program.\nFields included are\
+        \ the title, upcoming due dates, etc.\nThis API endpoint is intended for use\
+        \ with the\n[Program Learner Portal MFE](https://github.com/edx/frontend-app-learner-portal-programs).\n\
+        \nIt is important to note that the set of enrollments that this endpoint returns\n\
+        is different than a user's set of *program-course-run enrollments*.\nSpecifically,\
+        \ this endpoint may include course runs that are *within*\nthe specified program\
+        \ but were not *enrolled in* via the specified program.\n\n**Example Response:**\n\
+        ```json\n{\n    \"next\": null,\n    \"previous\": null,\n    \"results\"\
+        : [\n        {\n            \"course_run_id\": \"edX+AnimalsX+Aardvarks\"\
+        ,\n            \"display_name\": \"Astonishing Aardvarks\",\n            \"\
+        course_run_url\": \"https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/course/\"\
+        ,\n            \"start_date\": \"2017-02-05T05:00:00Z\",\n            \"end_date\"\
+        : \"2018-02-05T05:00:00Z\",\n            \"course_run_status\": \"completed\"\
+        \n            \"emails_enabled\": true,\n            \"due_dates\": [\n  \
+        \              {\n                    \"name\": \"Introduction: What even\
+        \ is an aardvark?\",\n                    \"url\": \"https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/jump_to/\n\
+        \                          block-v1:edX+AnimalsX+Aardvarks+type@chapter+block@1414ffd5143b4b508f739b563ab468b7\"\
+        ,\n                    \"date\": \"2017-05-01T05:00:00Z\"\n              \
+        \  },\n                {\n                    \"name\": \"Quiz: Aardvark or\
+        \ Anteater?\",\n                    \"url\": \"https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/jump_to/\n\
+        \                            block-v1:edX+AnimalsX+Aardvarks+type@sequential+block@edx_introduction\"\
+        ,\n                    \"date\": \"2017-03-05T00:00:00Z\"\n              \
+        \  }\n            ],\n            \"micromasters_title\": \"Animals\",\n \
+        \           \"certificate_download_url\": \"https://courses.edx.org/certificates/123\"\
+        \n        },\n        {\n            \"course_run_id\": \"edX+AnimalsX+Baboons\"\
+        ,\n            \"display_name\": \"Breathtaking Baboons\",\n            \"\
+        course_run_url\": \"https://courses.edx.org/courses/course-v1:edX+AnimalsX+Baboons/course/\"\
+        ,\n            \"start_date\": \"2018-02-05T05:00:00Z\",\n            \"end_date\"\
+        : null,\n            \"course_run_status\": \"in_progress\"\n            \"\
+        emails_enabled\": false,\n            \"due_dates\": [],\n            \"micromasters_title\"\
+        : \"Animals\",\n            \"certificate_download_url\": \"https://courses.edx.org/certificates/123\"\
+        ,\n            \"resume_course_run_url\": \"https://courses.edx.org/courses/course-v1:edX+AnimalsX+Baboons/jump_to/\n\
+        \                                       block-v1:edX+AnimalsX+Baboons+type@sequential+block@edx_introduction\"\
+        \n        }\n    ]\n}\n```"
+      parameters:
+        - name: cursor
+          in: query
+          description: The pagination cursor value.
+          required: false
+          type: string
+        - name: page_size
+          in: query
+          description: Number of results to return per page. Defaults to 10. Maximum
+            is 25.
+          type: integer
+        - name: username
+          in: path
+          description: The username of the user for which enrollment overviews will
+            be fetched. For now, this must be the requesting user; otherwise, 403
+            will be returned. In the future, global staff users may be able to supply
+            other usernames.
+          type: string
+          required: true
+        - name: program_uuid
+          in: path
+          description: UUID of a program. Enrollments will be returned for course
+            runs in this program.
+          type: string
+          required: true
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/PageOfCourseRunOverview'
+        '401':
+          description: The requester is not authenticated.
+        '403':
+          description: The requester cannot access the specified program and/or the
+            requester may not retrieve this data for the specified user.
+        '404':
+          description: The requested program does not exist.
+      tags:
+        - program_enrollments
+    parameters:
+      - name: program_uuid
+        in: path
+        required: true
+        type: string
+      - name: username
+        in: path
+        required: true
+        type: string
+  /team/v0/bulk_team_membership/{course_id}:
+    get:
+      operationId: team_v0_bulk_team_membership_read
+      description: Download CSV with team membership data for given course run.
       parameters: []
       responses:
         '200':
           description: ''
       tags:
-        - program_enrollments
+        - team
+    post:
+      operationId: team_v0_bulk_team_membership_create
+      description: Process uploaded CSV to modify team memberships for given course
+        run.
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - team
     parameters:
-      - name: program_uuid
+      - name: course_id
         in: path
         required: true
         type: string
@@ -3907,10 +4149,10 @@ paths:
     get:
       operationId: third_party_auth_v0_providers_user_status_list
       summary: GET /api/third_party_auth/v0/providers/user_status/
-      description: "**GET Response Values**\n{\n    \"accepts_logins\": true,\n  \
-        \  \"name\": \"Google\",\n    \"disconnect_url\": \"/auth/disconnect/google-oauth2/?\"\
+      description: "**GET Response Values**\n```\n{\n    \"accepts_logins\": true,\n\
+        \    \"name\": \"Google\",\n    \"disconnect_url\": \"/auth/disconnect/google-oauth2/?\"\
         ,\n    \"connect_url\": \"/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings\"\
-        ,\n    \"connected\": false,\n    \"id\": \"oa2-google-oauth2\"\n}"
+        ,\n    \"connected\": false,\n    \"id\": \"oa2-google-oauth2\"\n}\n```"
       parameters: []
       responses:
         '200':
@@ -4004,11 +4246,7 @@ paths:
     get:
       operationId: third_party_auth_v0_users_list
       summary: Read provider information for a user.
-      description: "Allows reading the list of providers for a specified user.\n\n\
-        Args:\n    request (Request): The HTTP GET request\n\nRequest Parameters:\n\
-        \    Must provide one of 'email' or 'username'.  If both are provided,\n \
-        \   the username will be ignored.\n\nReturn:\n    JSON serialized list of\
-        \ the providers linked to this user."
+      description: Allows reading the list of providers for a specified user.
       parameters: []
       responses:
         '200':
@@ -4020,10 +4258,7 @@ paths:
     get:
       operationId: third_party_auth_v0_users_read
       summary: Read provider information for a user.
-      description: "Allows reading the list of providers for a specified user.\n\n\
-        Args:\n    request (Request): The HTTP GET request\n    username (str): Fetch\
-        \ the list of providers linked to this user\n\nReturn:\n    JSON serialized\
-        \ list of the providers linked to this user."
+      description: Allows reading the list of providers for a specified user.
       parameters: []
       responses:
         '200':
@@ -4038,7 +4273,8 @@ paths:
   /user/v1/accounts:
     get:
       operationId: user_v1_accounts_list
-      description: GET /api/user/v1/accounts?username={username1,username2}
+      description: "GET /api/user/v1/accounts?username={username1,username2}\nGET\
+        \ /api/user/v1/accounts?email={user_email}"
       parameters: []
       responses:
         '200':
@@ -4064,16 +4300,17 @@ paths:
   /user/v1/accounts/replace_usernames/:
     post:
       operationId: user_v1_accounts_replace_usernames_create
-      description: "POST /api/user/v1/accounts/replace_usernames/\n{\n    \"username_mappings\"\
-        : [\n        {\"current_username_1\": \"desired_username_1\"},\n        {\"\
-        current_username_2\": \"desired_username_2\"}\n    ]\n}\n\n**POST Parameters**\n\
-        \nA POST request must include the following parameter.\n\n* username_mappings:\
-        \ Required. A list of objects that map the current username (key)\n  to the\
-        \ desired username (value)\n\n**POST Response Values**\n\nAs long as data\
-        \ validation passes, the request will return a 200 with a new mapping\nof\
-        \ old usernames (key) to new username (value)\n\n{\n    \"successful_replacements\"\
-        : [\n        {\"old_username_1\": \"new_username_1\"}\n    ],\n    \"failed_replacements\"\
-        : [\n        {\"old_username_2\": \"new_username_2\"}\n    ]\n}"
+      description: "POST /api/user/v1/accounts/replace_usernames/\n```\n{\n    \"\
+        username_mappings\": [\n        {\"current_username_1\": \"desired_username_1\"\
+        },\n        {\"current_username_2\": \"desired_username_2\"}\n    ]\n}\n```\n\
+        \n**POST Parameters**\n\nA POST request must include the following parameter.\n\
+        \n* username_mappings: Required. A list of objects that map the current username\
+        \ (key)\n  to the desired username (value)\n\n**POST Response Values**\n\n\
+        As long as data validation passes, the request will return a 200 with a new\
+        \ mapping\nof old usernames (key) to new username (value)\n\n```\n{\n    \"\
+        successful_replacements\": [\n        {\"old_username_1\": \"new_username_1\"\
+        }\n    ],\n    \"failed_replacements\": [\n        {\"old_username_2\": \"\
+        new_username_2\"}\n    ]\n}\n```"
       parameters: []
       responses:
         '201':
@@ -4085,9 +4322,9 @@ paths:
     post:
       operationId: user_v1_accounts_post
       summary: POST /api/user/v1/accounts/retire/
-      description: "{\n    'username': 'user_to_retire'\n}\n\nRetires the user with\
-        \ the given username.  This includes\nretiring this username, the associated\
-        \ email address, and\nany other PII associated with this user."
+      description: "```\n{\n    'username': 'user_to_retire'\n}\n```\n\nRetires the\
+        \ user with the given username.  This includes\nretiring this username, the\
+        \ associated email address, and\nany other PII associated with this user."
       parameters: []
       responses:
         '201':
@@ -4099,8 +4336,8 @@ paths:
     post:
       operationId: user_v1_accounts_post
       summary: POST /api/user/v1/accounts/retire_misc/
-      description: "{\n    'username': 'user_to_retire'\n}\n\nRetires the user with\
-        \ the given username in the LMS."
+      description: "```\n{\n    'username': 'user_to_retire'\n}\n```\n\nRetires the\
+        \ user with the given username in the LMS."
       parameters: []
       responses:
         '201':
@@ -4112,8 +4349,8 @@ paths:
     post:
       operationId: user_v1_accounts_cleanup
       summary: POST /api/user/v1/accounts/retirement_cleanup/
-      description: "{\n    'usernames': ['user1', 'user2', ...]\n}\n\nDeletes a batch\
-        \ of retirement requests by username."
+      description: "```\n{\n    'usernames': ['user1', 'user2', ...]\n}\n```\n\nDeletes\
+        \ a batch of retirement requests by username."
       parameters: []
       responses:
         '201':
@@ -4137,8 +4374,9 @@ paths:
     put:
       operationId: user_v1_accounts_retirement_partner_report_update
       summary: PUT /api/user/v1/accounts/retirement_partner_report/
-      description: "{\n    'username': 'user_to_retire'\n}\n\nCreates a UserRetirementPartnerReportingStatus\
-        \ object for the given user\nas part of the retirement pipeline."
+      description: "```\n{\n    'username': 'user_to_retire'\n}\n```\n\nCreates a\
+        \ UserRetirementPartnerReportingStatus object for the given user\nas part\
+        \ of the retirement pipeline."
       parameters: []
       responses:
         '200':
@@ -4193,13 +4431,13 @@ paths:
     patch:
       operationId: user_v1_accounts_update_retirement_status_partial_update
       summary: PATCH /api/user/v1/accounts/update_retirement_status/
-      description: "{\n    'username': 'user_to_retire',\n    'new_state': 'LOCKING_COMPLETE',\n\
-        \    'response': 'User account locked and logged out.'\n}\n\nUpdates the RetirementStatus\
-        \ row for the given user to the new\nstatus, and append any messages to the\
-        \ message log.\n\nNote that this implementation DOES NOT use the \"merge patch\"\
-        \nimplementation seen in AccountViewSet. Slumber, the project\nwe use to power\
-        \ edx-rest-api-client, does not currently support\nit. The content type for\
-        \ this request is 'application/json'."
+      description: "```\n{\n    'username': 'user_to_retire',\n    'new_state': 'LOCKING_COMPLETE',\n\
+        \    'response': 'User account locked and logged out.'\n}\n```\n\nUpdates\
+        \ the RetirementStatus row for the given user to the new\nstatus, and append\
+        \ any messages to the message log.\n\nNote that this implementation DOES NOT\
+        \ use the \"merge patch\"\nimplementation seen in AccountViewSet. Slumber,\
+        \ the project\nwe use to power edx-rest-api-client, does not currently support\n\
+        it. The content type for this request is 'application/json'."
       parameters: []
       responses:
         '200':
@@ -4222,10 +4460,8 @@ paths:
     patch:
       operationId: user_v1_accounts_partial_update
       summary: PATCH /api/user/v1/accounts/{username}/
-      description: "Note that this implementation is the \"merge patch\" implementation\
-        \ proposed in\nhttps://tools.ietf.org/html/rfc7396. The content_type must\
-        \ be \"application/merge-patch+json\" or\nelse an error response with status\
-        \ code 415 will be returned."
+      description: Note that this implementation is the "merge patch" implementation
+        proposed in
       parameters: []
       responses:
         '200':
@@ -4398,14 +4634,13 @@ paths:
     post:
       operationId: user_v1_validation_registration_create
       summary: POST /api/user/v1/validation/registration/
-      description: "Expects request of the form\n>>> {\n>>>     \"name\": \"Dan the\
-        \ Validator\",\n>>>     \"username\": \"mslm\",\n>>>     \"email\": \"mslm@gmail.com\"\
-        ,\n>>>     \"confirm_email\": \"mslm@gmail.com\",\n>>>     \"password\": \"\
-        password123\",\n>>>     \"country\": \"PK\"\n>>> }\nwhere each key is the\
-        \ appropriate form field name and the value is\nuser input. One may enter\
-        \ individual inputs if needed. Some inputs\ncan get extra verification checks\
-        \ if entered along with others,\nlike when the password may not equal the\
-        \ username."
+      description: "Expects request of the form\n```\n{\n    \"name\": \"Dan the Validator\"\
+        ,\n    \"username\": \"mslm\",\n    \"email\": \"mslm@gmail.com\",\n    \"\
+        confirm_email\": \"mslm@gmail.com\",\n    \"password\": \"password123\",\n\
+        \    \"country\": \"PK\"\n}\n```\nwhere each key is the appropriate form field\
+        \ name and the value is\nuser input. One may enter individual inputs if needed.\
+        \ Some inputs\ncan get extra verification checks if entered along with others,\n\
+        like when the password may not equal the username."
       parameters: []
       responses:
         '201':
@@ -4517,6 +4752,63 @@ paths:
       tags:
         - val
     parameters: []
+  /val/v0/videos/transcript-credentials/{provider}/{org}:
+    get:
+      operationId: val_v0_videos_transcript-credentials_read
+      summary: Retrieves the transcript credentials for a given organization and provider.
+      description: "**Example requests**:\n\n    GET api/val/v0/videos/transcript-credentials/{provider}/{org}\n\
+        \n**GET Parameters**:\n\n    The following parameters are required to get\
+        \ the credentials:\n\n        * provider(str): transcript provider, which\
+        \ is either 3PlayMedia or Cielo24.\n\n        * org(str): organization whose\
+        \ credentials are to be fetch.\n\n**Response Values**\n\n    For a successful\
+        \ request, the following values are returned along with 200 status:\n\n  \
+        \      * api_key(str): provider key\n\n        * api_secret_key(str): provider\
+        \ api secret key(only for 3PlayMedia)\n\n        * provider(str): transcript\
+        \ provider\n\n        * org(str): organization whose credentials are fetched.\n\
+        \n    For the error, 400 response code is returned with:\n\n        * message(str):\
+        \ error message"
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - val
+    parameters:
+      - name: org
+        in: path
+        description: This value must match the value of organization in studio/edx-platform.
+        required: true
+        type: string
+      - name: provider
+        in: path
+        required: true
+        type: string
+  /val/v0/videos/transcript-preferences/{course_id}:
+    get:
+      operationId: val_v0_videos_transcript-preferences_read
+      summary: Retrieves the transcript preferences for a given course.
+      description: "**Example requests**\n\n    GET api/val/v0/videos/transcript-preferences/{course_id}\n\
+        \n**Parameters**\n\n    * course_id(str): course whose preferences are to\
+        \ be fetched\n\n**Response Values**\n\n    * course_id(str): course id whose\
+        \ preferences are fetched\n\n    * provider(str): transcript provider name\n\
+        \n    * cielo24_fidelity(str/None): Cielo24 fidelity choice\n\n    * cielo24_turnaround(str/None):\
+        \ Cielo24 turnaround time choice\n\n    * three_play_turnaround(str/None):\
+        \ 3playMedia turnaround\n\n    * preferred_languages(list): list of languages(str\
+        \ values)\n\n    * video_source_language(str): video language\n\n    * modified(datetime):\
+        \ last modified date"
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TranscriptPreference'
+      tags:
+        - val
+    parameters:
+      - name: course_id
+        in: path
+        required: true
+        type: string
   /val/v0/videos/video-images/update/:
     post:
       operationId: val_v0_videos_video-images_update_create
@@ -4532,8 +4824,7 @@ paths:
   /val/v0/videos/video-transcripts/create/:
     post:
       operationId: val_v0_videos_video-transcripts_create_create
-      summary: Creates a video transcript instance with the given information.
-      description: "Arguments:\n    request: A WSGI request."
+      description: Creates a video transcript instance with the given information.
       parameters: []
       responses:
         '201':
@@ -4603,7 +4894,10 @@ paths:
   /xblock/v2/xblocks/{usage_key_str}/:
     get:
       operationId: xblock_v2_xblocks_read
-      description: Get metadata about the specified block.
+      summary: Get metadata about the specified block.
+      description: "Accepts an \"include\" query parameter which must be a comma separated\
+        \ list of keys to include. Valid keys are\n\"index_dictionary\" and \"student_view_data\"\
+        ."
       parameters: []
       responses:
         '200':
@@ -5320,6 +5614,7 @@ definitions:
         title: Order number
         type: string
         maxLength: 128
+        minLength: 1
         x-nullable: true
       support_details:
         title: Support details
@@ -5569,6 +5864,136 @@ definitions:
       active:
         title: Active
         type: boolean
+      logo_url:
+        title: Logo url
+        type: string
+        minLength: 1
+  DueDate:
+    required:
+      - name
+      - url
+      - date
+    type: object
+    properties:
+      name:
+        title: Name
+        type: string
+        minLength: 1
+      url:
+        title: Url
+        type: string
+        minLength: 1
+      date:
+        title: Date
+        type: string
+        format: date-time
+  CourseRunOverview:
+    required:
+      - course_run_id
+      - display_name
+      - course_run_url
+      - start_date
+      - end_date
+      - course_run_status
+      - due_dates
+    type: object
+    properties:
+      course_run_id:
+        title: Course run id
+        description: ID for the course run.
+        type: string
+        minLength: 1
+      display_name:
+        title: Display name
+        description: Display name of the course run.
+        type: string
+        minLength: 1
+      resume_course_run_url:
+        title: Resume course run url
+        description: The absolute url that takes the user back to their position in
+          the course run; if absent, user has not made progress in the course.
+        type: string
+        minLength: 1
+      course_run_url:
+        title: Course run url
+        description: The absolute url for the course run.
+        type: string
+        minLength: 1
+      start_date:
+        title: Start date
+        description: Start date for the course run; null if no start date.
+        type: string
+        format: date-time
+      end_date:
+        title: End date
+        description: End date for the course run; null if no end date.
+        type: string
+        format: date-time
+      course_run_status:
+        title: Course run status
+        description: The user's status of the course run.
+        type: string
+        enum:
+          - in_progress
+          - upcoming
+          - completed
+      emails_enabled:
+        title: Emails enabled
+        description: Boolean representing whether emails are enabled for the course;if
+          absent, the bulk email feature is either not enable at the platformlevel
+          or is not enabled for the course; if True or False, bulk emailfeature is
+          enabled, and value represents whether or not user wantsto receive emails.
+        type: boolean
+      due_dates:
+        description: List of subsection due dates for the course run. Due dates are
+          only returned if the course run is in progress.
+        type: array
+        items:
+          $ref: '#/definitions/DueDate'
+      micromasters_title:
+        title: Micromasters title
+        description: Title of the MicroMasters program that the course run is a part
+          of; if absent, the course run is not a part of a MicroMasters program.
+        type: string
+        minLength: 1
+      certificate_download_url:
+        title: Certificate download url
+        description: URL to download a certificate, if available; if absent, certificate
+          is not downloadable.
+        type: string
+        minLength: 1
+  CourseRunOverviewList:
+    required:
+      - course_runs
+    type: object
+    properties:
+      course_runs:
+        type: array
+        items:
+          $ref: '#/definitions/CourseRunOverview'
+  PageOfCourseRunOverview:
+    required:
+      - results
+    type: object
+    properties:
+      previous:
+        title: Previous
+        description: Link to the previous page or results, or null if this is the
+          first.
+        type: string
+        format: uri
+        minLength: 1
+      next:
+        title: Next
+        description: Link to the next page of results, or null if this is the last.
+        type: string
+        format: uri
+        minLength: 1
+      results:
+        description: The list of result objects on this page.
+        type: array
+        items:
+          $ref: '#/definitions/CourseRunOverview'
   UserMapping:
     type: object
     properties:
@@ -5657,3 +6082,66 @@ definitions:
         type: string
         maxLength: 255
         minLength: 1
+      error_description:
+        title: Error Description
+        type: string
+        x-nullable: true
+  TranscriptPreference:
+    required:
+      - course_id
+      - provider
+    type: object
+    properties:
+      course_id:
+        title: Course ID
+        type: string
+        maxLength: 255
+        minLength: 1
+      provider:
+        title: Provider
+        type: string
+        enum:
+          - Custom
+          - 3PlayMedia
+          - Cielo24
+      cielo24_fidelity:
+        title: Cielo24 Fidelity
+        type: string
+        enum:
+          - MECHANICAL
+          - PREMIUM
+          - PROFESSIONAL
+        x-nullable: true
+      cielo24_turnaround:
+        title: Cielo24 Turnaround
+        type: string
+        enum:
+          - STANDARD
+          - PRIORITY
+        x-nullable: true
+      three_play_turnaround:
+        title: 3PlayMedia Turnaround
+        type: string
+        enum:
+          - extended
+          - standard
+          - expedited
+          - rush
+          - same_day
+          - two_hour
+        x-nullable: true
+      preferred_languages:
+        title: Preferred languages
+        type: string
+        readOnly: true
+      video_source_language:
+        title: Video Source Language
+        description: This specifies the speech language of a Video.
+        type: string
+        maxLength: 50
+        x-nullable: true
+      modified:
+        title: Modified
+        type: string
+        format: date-time
+        readOnly: true

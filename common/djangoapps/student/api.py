@@ -1,7 +1,14 @@
+# pylint: disable=unused-import
+"""
+Python APIs exposed by the student app to other in-process apps.
+"""
+
+
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
 from student.models_api import create_manual_enrollment_audit as _create_manual_enrollment_audit
+from student.models_api import get_course_access_role
 from student.models_api import get_course_enrollment as _get_course_enrollment
 from student.models_api import (
     ENROLLED_TO_ENROLLED as _ENROLLED_TO_ENROLLED,
@@ -13,6 +20,7 @@ from student.models_api import (
     ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
 )
+from student.roles import REGISTERED_ACCESS_ROLES as _REGISTERED_ACCESS_ROLES
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
@@ -41,6 +49,8 @@ MANUAL_ENROLLMENT_ROLE_CHOICES = configuration_helpers.get_value(
     'MANUAL_ENROLLMENT_ROLE_CHOICES',
     settings.MANUAL_ENROLLMENT_ROLE_CHOICES
 )
+
+COURSE_DASHBOARD_PLUGIN_VIEW_NAME = "course_dashboard"
 
 
 def create_manual_enrollment_audit(
@@ -88,3 +98,16 @@ def create_manual_enrollment_audit(
         enrollment,
         role
     )
+
+
+def get_access_role_by_role_name(role_name):
+    """
+    Get the concrete child class of the AccessRole abstract class associated with the string role_name
+    by looking in REGISTERED_ACCESS_ROLES. If there is no class associated with this name, return None.
+
+    Note that this will only return classes that are registered in _REGISTERED_ACCESS_ROLES.
+
+    Arguments:
+        role_name: the name of the role
+    """
+    return _REGISTERED_ACCESS_ROLES.get(role_name, None)

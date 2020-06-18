@@ -16,6 +16,7 @@ from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.middleware.csrf import CsrfViewMiddleware
 from django.template.context_processors import csrf
@@ -68,7 +69,7 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.djangolib.markup import HTML
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
@@ -994,6 +995,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
 
 @csrf_exempt
 @xframe_options_exempt
+@transaction.non_atomic_requests
 def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
     """
     Entry point for unauthenticated XBlock handlers.
@@ -1008,6 +1010,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
 
 @csrf_exempt
 @xframe_options_exempt
+@transaction.non_atomic_requests
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
@@ -1033,7 +1036,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     # to avoid introducing backwards-incompatible changes.
     # You can see https://github.com/edx/XBlock/pull/383 for more details.
     else:
-        authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser)
+        authentication_classes = (JwtAuthentication, BearerAuthenticationAllowInactiveUser)
         authenticators = [auth() for auth in authentication_classes]
 
         for authenticator in authenticators:
@@ -1087,7 +1090,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         descriptor = modulestore().get_item(usage_key)
         descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
-        log.warn(
+        log.warning(
             u"Invalid location for course id %s: %s",
             usage_key.course_key,
             usage_key
@@ -1233,8 +1236,8 @@ def xblock_view(request, course_id, usage_id, view_name):
             the second is the resource description
     """
     if not settings.FEATURES.get('ENABLE_XBLOCK_VIEW_ENDPOINT', False):
-        log.warn("Attempt to use deactivated XBlock view endpoint -"
-                 " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
+        log.warning("Attempt to use deactivated XBlock view endpoint -"
+                    " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
         raise Http404
 
     try:

@@ -267,13 +267,16 @@
     }
 
     // location widget
-    .unit-location, .library-location {
+    .unit-location,
+    .library-location {
       @extend %bar-module;
 
       border-top: none;
 
-      .wrapper-unit-id, .wrapper-library-id {
-        .unit-id-value, .library-id-value {
+      .wrapper-unit-id,
+      .wrapper-library-id {
+        .unit-id-value,
+        .library-id-value {
           @extend %status-value-base;
 
           display: inline-block;
@@ -315,7 +318,8 @@
         }
 
         // typographical overrides (based off of outline-simple)
-        .section-header, .subsection-header {
+        .section-header,
+        .subsection-header {
           line-height: 0;
           margin-bottom: ($baseline/2);
         }
@@ -377,7 +381,8 @@
       }
 
       .bc-container:not(.last) {
-        button, .parent-displayname {
+        button,
+        .parent-displayname {
           text-decoration: underline;
           color: $ui-link-color;
         }
@@ -412,7 +417,8 @@
         @include float(left);
       }
 
-      .button-forward, .component {
+      .button-forward,
+      .component {
         border: none;
       }
 

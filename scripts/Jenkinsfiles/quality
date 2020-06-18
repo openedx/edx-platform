@@ -74,7 +74,8 @@ pipeline {
         stage('Run Tests') {
             parallel {
                 stage("commonlib pylint") {
-                    agent { label "jenkins-worker" }
+                    // "pylint common" requires 5.5 GB of RAM, so use js-worker (8 GB) instead of jenkins-worker (4 GB)
+                    agent { label "js-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 1

@@ -48,8 +48,8 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.djangolib.oauth2_retirement_utils import retire_dop_oauth2_models, retire_dot_oauth2_models
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
     AccountRecovery,
@@ -94,6 +94,7 @@ USER_PROFILE_PII = {
     'city': None,
     'country': None,
     'bio': None,
+    'phone_number': None,
 }
 
 
@@ -125,6 +126,7 @@ class AccountViewSet(ViewSet):
 
             GET /api/user/v1/me[?view=shared]
             GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
+            GET /api/user/v1/accounts?email={user_email}
             GET /api/user/v1/accounts/{username}/[?view=shared]
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
@@ -148,7 +150,7 @@ class AccountViewSet(ViewSet):
 
         **Response Values for GET requests to /accounts endpoints**
 
-            If no user exists with the specified username, an HTTP 404 "Not
+            If no user exists with the specified username, or email, an HTTP 404 "Not
             Found" response is returned.
 
             If the user makes the request for her own account, or makes a
@@ -227,6 +229,9 @@ class AccountViewSet(ViewSet):
             * accomplishments_shared: Signals whether badges are enabled on the
               platform and should be fetched.
 
+            * phone_number: The phone number for the user. String of numbers with
+              an optional `+` sign at the start.
+
             For all text fields, plain text instead of HTML is supported. The
             data is stored exactly as specified. Clients must HTML escape
             rendered values to avoid script injections.
@@ -267,7 +272,7 @@ class AccountViewSet(ViewSet):
             If the update is successful, updated user account data is returned.
     """
     authentication_classes = (
-        JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
+        JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
@@ -281,13 +286,24 @@ class AccountViewSet(ViewSet):
     def list(self, request):
         """
         GET /api/user/v1/accounts?username={username1,username2}
+        GET /api/user/v1/accounts?email={user_email}
         """
         usernames = request.GET.get('username')
+        user_email = request.GET.get('email')
+        search_usernames = []
+
+        if usernames:
+            search_usernames = usernames.strip(',').split(',')
+        elif user_email:
+            user_email = user_email.strip('')
+            try:
+                user = User.objects.get(email=user_email)
+            except (UserNotFound, User.DoesNotExist):
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            search_usernames = [user.username]
         try:
-            if usernames:
-                usernames = usernames.strip(',').split(',')
             account_settings = get_account_settings(
-                request, usernames, view=request.query_params.get('view'))
+                request, search_usernames, view=request.query_params.get('view'))
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -418,7 +434,6 @@ class DeactivateLogoutView(APIView):
                 Registration.objects.filter(user=request.user).delete()
 
                 # Delete OAuth tokens associated with the user.
-                retire_dop_oauth2_models(request.user)
                 retire_dot_oauth2_models(request.user)
                 AccountRecovery.retire_recovery_email(request.user.id)
 
@@ -446,12 +461,15 @@ class DeactivateLogoutView(APIView):
                 logout(request)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except KeyError:
+            log.exception('Username not specified {}'.format(request.user))
             return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
         except user_model.DoesNotExist:
+            log.exception('The user "{}" does not exist.'.format(request.user.username))
             return Response(
                 u'The user "{}" does not exist.'.format(request.user.username), status=status.HTTP_404_NOT_FOUND
             )
         except Exception as exc:  # pylint: disable=broad-except
+            log.exception('500 error deactivating account {}'.format(exc))
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def _verify_user_password(self, request):
@@ -472,6 +490,9 @@ class DeactivateLogoutView(APIView):
             else:
                 self._handle_failed_authentication(request.user)
         except AuthFailedError as err:
+            log.exception(
+                "The user password to deactivate was incorrect. {}".format(request.user.username)
+            )
             return Response(text_type(err), status=status.HTTP_403_FORBIDDEN)
         except Exception as err:  # pylint: disable=broad-except
             return Response(u"Could not verify user password: {}".format(err), status=status.HTTP_400_BAD_REQUEST)
@@ -571,9 +592,11 @@ class AccountRetirementPartnerReportView(ViewSet):
         """
         PUT /api/user/v1/accounts/retirement_partner_report/
 
+        ```
         {
             'username': 'user_to_retire'
         }
+        ```
 
         Creates a UserRetirementPartnerReportingStatus object for the given user
         as part of the retirement pipeline.
@@ -758,11 +781,13 @@ class AccountRetirementStatusView(ViewSet):
         """
         PATCH /api/user/v1/accounts/update_retirement_status/
 
+        ```
         {
             'username': 'user_to_retire',
             'new_state': 'LOCKING_COMPLETE',
             'response': 'User account locked and logged out.'
         }
+        ```
 
         Updates the RetirementStatus row for the given user to the new
         status, and append any messages to the message log.
@@ -805,9 +830,11 @@ class AccountRetirementStatusView(ViewSet):
         """
         POST /api/user/v1/accounts/retirement_cleanup/
 
+        ```
         {
             'usernames': ['user1', 'user2', ...]
         }
+        ```
 
         Deletes a batch of retirement requests by username.
         """
@@ -848,9 +875,11 @@ class LMSAccountRetirementView(ViewSet):
         """
         POST /api/user/v1/accounts/retire_misc/
 
+        ```
         {
             'username': 'user_to_retire'
         }
+        ```
 
         Retires the user with the given username in the LMS.
         """
@@ -902,9 +931,11 @@ class AccountRetirementView(ViewSet):
         """
         POST /api/user/v1/accounts/retire/
 
+        ```
         {
             'username': 'user_to_retire'
         }
+        ```
 
         Retires the user with the given username.  This includes
         retiring this username, the associated email address, and
@@ -1037,12 +1068,14 @@ class UsernameReplacementView(APIView):
     def post(self, request):
         """
         POST /api/user/v1/accounts/replace_usernames/
+        ```
         {
             "username_mappings": [
                 {"current_username_1": "desired_username_1"},
                 {"current_username_2": "desired_username_2"}
             ]
         }
+        ```
 
         **POST Parameters**
 
@@ -1056,6 +1089,7 @@ class UsernameReplacementView(APIView):
         As long as data validation passes, the request will return a 200 with a new mapping
         of old usernames (key) to new username (value)
 
+        ```
         {
             "successful_replacements": [
                 {"old_username_1": "new_username_1"}
@@ -1064,6 +1098,8 @@ class UsernameReplacementView(APIView):
                 {"old_username_2": "new_username_2"}
             ]
         }
+        ```
+
         """
 
         # (model_name, column_name)

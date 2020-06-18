@@ -37,10 +37,10 @@ When refering to XBlocks, we use the entry-point name. For example,
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=unused-import
 
+# pylint: disable=unused-import, useless-suppression, wrong-import-order, wrong-import-position
 
-import imp
+import importlib.util
 import os
 import sys
 from datetime import timedelta
@@ -53,7 +53,7 @@ from lms.envs.common import (
     # indirectly accessed through the email opt-in API, which is
     # technically accessible through the CMS via legacy URLs.
     PROFILE_IMAGE_BACKEND, PROFILE_IMAGE_DEFAULT_FILENAME, PROFILE_IMAGE_DEFAULT_FILE_EXTENSION,
-    PROFILE_IMAGE_SECRET_KEY, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_SIZES_MAP,
+    PROFILE_IMAGE_HASH_SEED, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_SIZES_MAP,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL,
@@ -111,7 +111,7 @@ from lms.envs.common import (
     _make_locale_paths,
 )
 from path import Path as path
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
@@ -123,6 +123,8 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.license import LicenseMixin
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
+
+# pylint: enable=useless-suppression
 
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
@@ -311,7 +313,6 @@ FEATURES = {
     # Prevent auto auth from creating superusers or modifying existing users
     'RESTRICT_AUTOMATIC_AUTH': True,
 
-    'AUTH_USE_OPENID_PROVIDER': True,
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
     'PREVIEW_LMS_BASE': "preview.localhost:18000",
     'ENABLE_GRADE_DOWNLOADS': True,
@@ -328,6 +329,64 @@ FEATURES = {
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
     'ENABLE_ENROLLMENT_RESET': False,
+    'DISABLE_MOBILE_COURSE_AVAILABLE': False,
+
+    # .. toggle_name: ENABLE_CHANGE_USER_PASSWORD_ADMIN
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by default because enabling allows a method to bypass password policy.
+    # .. toggle_category: admin
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2020-02-21
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
+
+    ### ORA Feature Flags ###
+
+    # .. toggle_name: ENABLE_ORA_TEAM_SUBMISSIONS
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable team-based ORA submissions.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: incremental_release
+    # .. toggle_creation_date: 2020-03-03
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_TEAM_SUBMISSIONS': False,
+
+    # .. toggle_name: ENABLE_ORA_ALL_FILE_URLS
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
+    #      discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
+    #      file metadata in staff assessments.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: graceful_degradation
+    # .. toggle_creation_date: 2020-03-03
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_ALL_FILE_URLS': False,
+
+    # .. toggle_name: ENABLE_ORA_USER_STATE_UPLOAD_DATA
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
+    #      discoverable.  If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
+    # .. toggle_category: ora
+    # .. toggle_use_cases: graceful_degradation
+    # .. toggle_creation_date: 2020-03-03
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
+    # .. toggle_status: supported
+    # .. toggle_warnings: None
+    'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 }
 
 ENABLE_JASMINE = False
@@ -566,7 +625,7 @@ XQUEUE_INTERFACE = {
 
 ################################# Middleware ###################################
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
     'crum.CurrentRequestUserMiddleware',
@@ -697,7 +756,7 @@ DOC_STORE_CONFIG = {
     # https://api.mongodb.com/python/2.9.1/api/pymongo/mongo_client.html#module-pymongo.mongo_client
     # default is never timeout while the connection is open,
     #this means it needs to explicitly close raising pymongo.errors.NetworkTimeout
-    'socketTimeoutMS': 3000,
+    'socketTimeoutMS': 6000,
     'connectTimeoutMS': 2000,  # default is 20000, I believe raises pymongo.errors.ConnectionFailure
     # Not setting waitQueueTimeoutMS and waitQueueMultiple since pymongo defaults to nobody being allowed to wait
     'auth_source': None,
@@ -780,7 +839,7 @@ DATABASES = {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
         'HOST': 'localhost',
-        'NAME': 'dxapp',
+        'NAME': 'edxapp',
         'OPTIONS': {},
         'PASSWORD': 'password',
         'PORT': '3306',
@@ -837,7 +896,7 @@ COURSES_WITH_UNSAFE_CODE = []
 DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
-SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleV2Serializer'
+SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
 SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
@@ -1205,9 +1264,10 @@ YOUTUBE = {
 
 YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
 
-############################# VIDEO UPLOAD PIPELINE #############################
+############################# SETTINGS FOR VIDEO UPLOAD PIPELINE #############################
 
 VIDEO_UPLOAD_PIPELINE = {
+    'VEM_S3_BUCKET': '',
     'BUCKET': '',
     'ROOT_PATH': '',
     'CONCURRENT_UPLOAD_LIMIT': 4,
@@ -1343,10 +1403,8 @@ INSTALLED_APPS = [
     # Catalog integration
     'openedx.core.djangoapps.catalog',
 
-    # django-oauth2-provider (deprecated)
-    'provider',
-    'provider.oauth2',
-    'edx_oauth2_provider',
+    # Programs support
+    'openedx.core.djangoapps.programs.apps.ProgramsConfig',
 
     # django-oauth-toolkit
     'oauth2_provider',
@@ -1355,7 +1413,6 @@ INSTALLED_APPS = [
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
-    'oauth_provider',
     'lms.djangoapps.courseware',
     'coursewarehistoryextended',
     'survey.apps.SurveyConfig',
@@ -1415,8 +1472,19 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'experiments',
 
+    'openedx.core.djangoapps.external_user_ids',
     # so sample_task is available to celery workers
     'openedx.core.djangoapps.heartbeat',
+
+    # signal handlers to capture course dates into edx-when
+    'openedx.core.djangoapps.course_date_signals',
+
+    # Management of per-user schedules
+    'openedx.core.djangoapps.schedules',
+    'rest_framework_jwt',
+
+    # Learning Sequence Navigation
+    'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 ]
 
 
@@ -1427,6 +1495,7 @@ EDXMKTG_USER_INFO_COOKIE_NAME = 'edx-user-info'
 EDXMKTG_USER_INFO_COOKIE_VERSION = 1
 
 MKTG_URLS = {}
+MKTG_URL_OVERRIDES = {}
 MKTG_URL_LINK_MAP = {
 
 }
@@ -1561,10 +1630,8 @@ OPTIONAL_APPS = (
 for app_name, insert_before in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
     # to avoid circular references - only try to import if it can't be found
-    # by find_module, which doesn't work with import hooks
-    try:
-        imp.find_module(app_name)
-    except ImportError:
+    # by find_spec, which doesn't work with import hooks
+    if importlib.util.find_spec(app_name) is None:
         try:
             __import__(app_name)
         except ImportError:
@@ -1578,7 +1645,6 @@ for app_name, insert_before in OPTIONAL_APPS:
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
-OPENID_DOMAIN_PREFIX = 'openid:'
 
 # Set request limits for maximum size of a request body and maximum number of GET/POST parameters. (>=Django 1.10)
 # Limits are currently disabled - but can be used for finer-grained denial-of-service protection.
@@ -1814,8 +1880,6 @@ CACHES = {
 
 ############################ OAUTH2 Provider ###################################
 
-# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
-OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
 
 # 5 minute expiration time for JWT id tokens issued for external API requests.
 OAUTH_ID_TOKEN_EXPIRATION = 5 * 60
@@ -1840,6 +1904,12 @@ derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 # Used with Email sending
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
 RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
+
+# Software Secure request retry settings
+# Time in seconds before a retry of the task should be 60 mints.
+SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
+# Maximum of 6 retries before giving up.
+SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
 
 ############## DJANGO-USER-TASKS ##############
 
@@ -1892,6 +1962,8 @@ RECALCULATE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 # Queue to use for updating grades due to grading policy change
 POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
+
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 
 # Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
@@ -1989,12 +2061,6 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 LOGIN_REDIRECT_WHITELIST = []
 
-############### Settings for video pipeline ##################
-VIDEO_UPLOAD_PIPELINE = {
-    'BUCKET': '',
-    'ROOT_PATH': '',
-}
-
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 ########################## VIDEO IMAGE STORAGE ############################
@@ -2028,6 +2094,7 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
+
 
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'billing@example.com'
@@ -2166,3 +2233,6 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_tickets: ARCH-1253
 # .. toggle_status: supported
 DISABLE_DEPRECATED_SIGNUP_URL = False
+
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = '500/5m'
