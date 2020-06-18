@@ -43,7 +43,8 @@ These APIs can be removed entirely, as they are adequately covered by existing f
 
 1. Delete a cms user.
 
-  This functionality should be removed entirely. CMS user accounts should be retired using the procedure described
-  ... instead of simply deleting them.
+  This functionality should be removed entirely. CMS user accounts should be retired using the existing `edX User
+  Retirement Feature<https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/>`_.
+
 
 
