@@ -87,6 +87,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     can_load_courseware = serializers.DictField()
     notes = serializers.DictField()
     marketing_url = serializers.CharField()
+    celebrations = serializers.DictField()
 
     def __init__(self, *args, **kwargs):
         """

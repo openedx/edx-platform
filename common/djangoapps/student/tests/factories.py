@@ -19,6 +19,7 @@ from student.models import (
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    CourseEnrollmentCelebration,
     PendingEmailChange,
     Registration,
     User,
@@ -163,6 +164,13 @@ class CourseEnrollmentFactory(DjangoModelFactory):
             kwargs['course'] = course_overview
 
         return manager.create(*args, **kwargs)
+
+
+class CourseEnrollmentCelebrationFactory(DjangoModelFactory):
+    class Meta:
+        model = CourseEnrollmentCelebration
+
+    enrollment = factory.SubFactory(CourseEnrollmentFactory)
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):
