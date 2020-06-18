@@ -28,7 +28,7 @@ from lms.djangoapps.onboarding import forms
 from lms.djangoapps.onboarding.decorators import can_save_org_data, can_save_org_details
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, \
     send_admin_update_email
-from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner, \
+from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, \
     get_close_matching_orgs_with_suggestions, get_alquity_community_url, serialize_partner_networks, \
     affiliated_unattended_surveys
 from lms.djangoapps.onboarding.models import (
@@ -161,18 +161,11 @@ def interests(request):
     if request.path == reverse('update_interests'):
         template = 'myaccount/interests.html'
 
-    initial = {
-        "interests": user_extended_profile.get_user_selected_interests(_type="fields"),
-        "interested_learners": user_extended_profile.get_user_selected_interested_learners(_type="fields"),
-        "personal_goals": user_extended_profile.get_user_selected_personal_goal(_type="fields"),
-        "hear_about_philanthropy": user_extended_profile.get_user_hear_about_philanthropy(_type="fields")
-    }
-
     if request.method == 'POST':
-        form = forms.InterestsForm(request.POST, initial=initial)
+        form = forms.InterestsForm(request.POST, instance=user_extended_profile)
 
         is_action_update = user_extended_profile.is_interests_data_submitted
-        form.save(request, user_extended_profile)
+        form.save(request)
         save_interests.send(sender=UserExtendedProfile, instance=user_extended_profile)
 
         are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
@@ -181,7 +174,7 @@ def interests(request):
             update_nodebb_for_user_status(request.user.username)
 
     else:
-        form = forms.InterestsForm(initial=initial)
+        form = forms.InterestsForm(instance=user_extended_profile)
     context = {'form': form, 'are_forms_complete': are_forms_complete}
 
     user = request.user

@@ -24,8 +24,6 @@ from constants import (
     TAKE_ME_THERE_VAL
 )
 from openedx.features.custom_fields.multiselect_with_other.db.fields import MultiSelectWithOtherField
-from openedx.features.custom_fields.multiselect_with_other.helpers import \
-    filter_other_field_checkbox_value
 from student.models import UserProfile
 
 log = logging.getLogger("edx.onboarding")
@@ -517,87 +515,62 @@ class UserExtendedProfile(TimeStampedModel):
     def __str__(self):
         return str(self.user)
 
-    def get_user_selected_functions(self, _type="labels"):
+    def get_user_selected_functions(self, _type='labels'):
         """
         :return: Users selected function areas
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-        if _type == "labels":
+        if _type == 'labels':
             return [self.function_areas.choices.get(function_area)
                     for function_area in self.function_areas]
 
         return list(self.function_areas)
 
-    def get_user_selected_interests(self, _type="labels"):
+    def get_user_selected_interests(self, _type='labels'):
         """
         :return: Users selected interest
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-        if _type == "labels":
+        if _type == 'labels':
             return map(self.interests.choices.get, self.interests)
 
         return list(self.interests)
 
-    def get_user_selected_interested_learners(self, _type="labels"):
+    def get_user_selected_interested_learners(self, _type='labels'):
         """
         :return: Users selected interested learners
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-        if _type == "labels":
+        if _type == 'labels':
             return map(self.learners_related.choices.get, self.learners_related)
 
         return list(self.learners_related)
 
-    def get_user_selected_personal_goal(self, _type="labels"):
+    def get_user_selected_personal_goal(self, _type='labels'):
         """
         :return: Users selected personal goals
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-        if _type == "labels":
+        if _type == 'labels':
             return map(self.goals.choices.get, self.goals)
 
         return list(self.goals)
 
-    def get_user_hear_about_philanthropy(self, _type="labels"):
+    def get_user_hear_about_philanthropy(self, _type='labels'):
         """
         :return: Users selected here about philanthropy university
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-        if _type == "labels":
+        if _type == 'labels':
             return map(lambda x: self.hear_about_philanthropyu.choices.get(x, x),
                        self.hear_about_philanthropyu)
 
         return list(self.hear_about_philanthropyu)
-
-    def save_user_hear_about_philanthropy_result(self, selected_values):
-        self.hear_about_philanthropyu = \
-            filter_other_field_checkbox_value(selected_values)
-
-    def save_user_function_areas(self, selected_values):
-        """
-        Save users selected function areas
-        :param selected_values: selected values list
-        """
-        self.function_areas = selected_values
-
-    def save_user_interests(self, selected_values):
-        """
-        Save users selected interests
-        :param selected_values: selected values list
-        """
-        self.interests = selected_values
-
-    def save_user_interested_learners(self, selected_values):
-        """
-        Save users selected interested learners
-        :param selected_values: selected values list
-        """
-        self.learners_related = selected_values
 
     def is_organization_data_filled(self):
         """
@@ -611,13 +584,6 @@ class UserExtendedProfile(TimeStampedModel):
         :return: Status for registration fourth step completion
         """
         return self.is_organization_metrics_submitted
-
-    def save_user_personal_goals(self, selected_values):
-        """
-        Save data for users personal goals
-        :param selected_values: list of selected goals
-        """
-        self.goals = selected_values
 
     def get_normal_user_attend_surveys(self):
         """

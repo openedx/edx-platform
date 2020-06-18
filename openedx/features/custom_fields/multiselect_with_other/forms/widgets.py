@@ -1,7 +1,9 @@
 from django.forms.widgets import CheckboxSelectMultiple
 
-from openedx.features.custom_fields.multiselect_with_other.helpers import \
-    get_other_values, filter_other_field_checkbox_value
+from openedx.features.custom_fields.multiselect_with_other.helpers import (
+    filter_other_field_checkbox_value,
+    get_other_values
+)
 
 
 class CheckboxSelectMultipleWithOther(CheckboxSelectMultiple):

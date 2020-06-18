@@ -2,11 +2,15 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectFormField
 
-from openedx.features.custom_fields.multiselect_with_other.helpers import (
-    add_other_field_in_choices, get_other_values, filter_other_field_checkbox_value
+from openedx.features.custom_fields.multiselect_with_other.forms.widgets import (
+    CheckboxSelectMultipleWithOther,
+    RadioSelectWithOther
 )
-from openedx.features.custom_fields.multiselect_with_other.forms.widgets import \
-    CheckboxSelectMultipleWithOther, RadioSelectWithOther
+from openedx.features.custom_fields.multiselect_with_other.helpers import (
+    add_other_field_in_choices,
+    filter_other_field_checkbox_value,
+    get_other_values
+)
 
 
 class MultiSelectWithOtherFormField(MultiSelectFormField):

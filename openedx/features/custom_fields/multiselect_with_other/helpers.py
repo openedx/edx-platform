@@ -1,5 +1,4 @@
-from openedx.features.custom_fields.multiselect_with_other.constants import \
-    OTHER_FIELD_CHECKBOX_VALUE
+from openedx.features.custom_fields.multiselect_with_other.constants import OTHER_FIELD_CHECKBOX_VALUE
 
 
 def add_other_field_in_choices(choices):
@@ -34,7 +33,7 @@ def get_other_values(choices, value):
 
 def filter_other_field_checkbox_value(values):
     """
-    This functions filter for the value that is automatically put
+    This functions filters for the value that is automatically put
     into the form payload when other field is selected in usage of
     MultiSelectWithOtherField
     :param values: list of strings
