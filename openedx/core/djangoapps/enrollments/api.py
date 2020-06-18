@@ -266,7 +266,7 @@ def update_enrollment(
     enrollment = _data_api().update_course_enrollment(username, course_id, mode=mode, is_active=is_active)
     if enrollment is None:
         msg = u"Course Enrollment not found for user {user} in course {course}".format(user=username, course=course_id)
-        log.warn(msg)
+        log.warning(msg)
         raise errors.EnrollmentNotFoundError(msg)
     else:
         if enrollment_attributes is not None:
@@ -455,7 +455,7 @@ def validate_course_mode(course_id, mode, is_active=None, include_expired=False)
             course_id=course_id,
             available=", ".join(available_modes)
         )
-        log.warn(msg)
+        log.warning(msg)
         raise errors.CourseModeNotFoundError(msg, course_enrollment_info)
 
 
