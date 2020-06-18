@@ -6,16 +6,70 @@ from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollment
 from lms.djangoapps.teams import csv
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from openedx.core.lib.teams_config import TeamsConfig
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.lib.teams_config import TeamsConfig
+
+
+def csv_import(course, csv_dict_rows):
+    """
+    Create a csv file with the given contents and pass it to the csv import manager to test the full
+    csv import flow
+
+    Parameters:
+        - csv_dict_rows: list of dicts, representing a row of the csv file
+    """
+    # initialize import manager
+    import_manager = csv.TeamMembershipImportManager(course)
+    import_manager.teamset_ids = {ts.teamset_id for ts in course.teamsets}
+
+    with BytesIO() as mock_csv_file:
+        with TextIOWrapper(mock_csv_file, write_through=True) as text_wrapper:
+            # pylint: disable=protected-access
+            header_fields = csv._get_team_membership_csv_headers(course)
+            csv_writer = DictWriter(text_wrapper, fieldnames=header_fields)
+            csv_writer.writeheader()
+            csv_writer.writerows(csv_dict_rows)
+            mock_csv_file.seek(0)
+            import_manager.set_team_membership_from_csv(mock_csv_file)
+
+
+def csv_export(course):
+    """
+    Call csv.load_team_membership_csv for the given course, and return the result.
+    The result is returned in the form of a dictionary keyed by the 'user' identifiers for each row,
+    mapping to the full parsed dictionary for that row of the csv.
+
+    Returns: DictReader for the returned csv file
+    """
+    with StringIO() as read_buf:
+        csv.load_team_membership_csv(course, read_buf)
+        read_buf.seek(0)
+        return DictReader(read_buf.readlines())
+
+
+def _user_keyed_dict(reader):
+    """ create a dict of the rows of the csv, keyed by the "user" value """
+    return {row['user']: row for row in reader}
+
+
+def _csv_dict_row(user, mode, **kwargs):
+    """
+    Convenience method to create dicts to pass to csv_import
+    """
+    csv_dict_row = dict(kwargs)
+    csv_dict_row['user'] = user
+    csv_dict_row['mode'] = mode
+    return csv_dict_row
 
 
 class TeamMembershipCsvTests(SharedModuleStoreTestCase):
     """ Tests for functionality related to the team membership csv report """
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=no-member
         super(TeamMembershipCsvTests, cls).setUpClass()
         teams_config = TeamsConfig({
             'team_sets': [
@@ -69,10 +123,6 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
 
         team3_2.add_user(user4)
 
-    def setUp(self):
-        super(TeamMembershipCsvTests, self).setUp()
-        self.buf = StringIO()
-
     def test_get_headers(self):
         # pylint: disable=protected-access
         headers = csv._get_team_membership_csv_headers(self.course)
@@ -122,18 +172,66 @@ class TeamMembershipCsvTests(SharedModuleStoreTestCase):
         self.assertEqual(user_row.get('teamset_3'), expected_teamset_3_team)
 
     def test_load_team_membership_csv(self):
-        expected_csv_output = ('user,mode,teamset_1,teamset_2,teamset_3,teamset_4\r\n'
-                               'user1,audit,team_1_1,team_2_2,team_3_1,\r\n'
-                               'user2,verified,team_1_1,team_2_2,team_3_1,\r\n'
-                               'user3,honors,,team_2_1,team_3_1,\r\n'
-                               'user4,masters,,,team_3_2,\r\n'
-                               'user5,masters,,,,\r\n')
-        csv.load_team_membership_csv(self.course, self.buf)
-        self.assertEqual(expected_csv_output, self.buf.getvalue())
+        expected_csv_headers = ['user', 'mode', 'teamset_1', 'teamset_2', 'teamset_3', 'teamset_4']
+        expected_data = {}
+        expected_data['user1'] = _csv_dict_row(
+            'user1',
+            'audit',
+            teamset_1='team_1_1',
+            teamset_2='team_2_2',
+            teamset_3='team_3_1',
+        )
+        expected_data['user2'] = _csv_dict_row(
+            'user2',
+            'verified',
+            teamset_1='team_1_1',
+            teamset_2='team_2_2',
+            teamset_3='team_3_1',
+        )
+        expected_data['user3'] = _csv_dict_row('user3', 'honors', teamset_2='team_2_1', teamset_3='team_3_1')
+        expected_data['user4'] = _csv_dict_row('user4', 'masters', teamset_3='team_3_2')
+        expected_data['user5'] = _csv_dict_row('user5', 'masters')
+        self._add_blanks_to_expected_data(expected_data, expected_csv_headers)
+
+        reader = csv_export(self.course)
+        self.assertEqual(expected_csv_headers, reader.fieldnames)
+        self.assertDictEqual(expected_data, _user_keyed_dict(reader))
+
+    def _add_blanks_to_expected_data(self, expected_data, headers):
+        """ Helper method to fill in the "blanks" in test data """
+        for user in expected_data:
+            user_row = expected_data[user]
+            for header in headers:
+                if header not in user_row:
+                    user_row[header] = ''
+
+
+class TeamMembershipEventTestMixin(EventTestMixin):
+    """ Mixin to provide functionality for testing signals emitted by csv code """
+
+    def setUp(self):
+        # pylint: disable=arguments-differ
+        super().setUp('lms.djangoapps.teams.utils.tracker')
+
+    def assert_learner_added_emitted(self, team_id, user_id):
+        self.assert_event_emitted(
+            'edx.team.learner_added',
+            team_id=team_id,
+            user_id=user_id,
+            add_method='team_csv_import'
+        )
+
+    def assert_learner_removed_emitted(self, team_id, user_id):
+        self.assert_event_emitted(
+            'edx.team.learner_removed',
+            team_id=team_id,
+            user_id=user_id,
+            remove_method='team_csv_import'
+        )
 
 
 # pylint: disable=no-member
-class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
+class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModuleStoreTestCase):
     """ Tests for TeamMembershipImportManager """
     @classmethod
     def setUpClass(cls):
@@ -163,7 +261,9 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
         }
 
         self.import_manager.add_user_to_team(row)
-        self.assertTrue(CourseTeam.objects.get(team_id__startswith='new_protected_team').organization_protected)
+        team = CourseTeam.objects.get(team_id__startswith='new_protected_team')
+        self.assertTrue(team.organization_protected)
+        self.assert_learner_added_emitted(team.team_id, masters_learner.id)
 
     def test_add_user_to_new_unprotected_team(self):
         """Adding a non-masters learner to a new team should create a team with no organization protected status"""
@@ -176,7 +276,9 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
         }
 
         self.import_manager.add_user_to_team(row)
-        self.assertFalse(CourseTeam.objects.get(team_id__startswith='new_unprotected_team').organization_protected)
+        team = CourseTeam.objects.get(team_id__startswith='new_unprotected_team')
+        self.assertFalse(team.organization_protected)
+        self.assert_learner_added_emitted(team.team_id, audit_learner.id)
 
     def test_team_removals_are_scoped_correctly(self):
         """ Team memberships should not search across topics in different courses """
@@ -207,9 +309,29 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
 
         # They are successfully removed from the team
         self.assertFalse(CourseTeamMembership.is_user_on_team(audit_learner, course_1_team))
+        self.assert_learner_removed_emitted(course_1_team.team_id, audit_learner.id)
+
+    def test_user_moved_to_another_team(self):
+        """ We should be able to move a user from one team to another """
+        # Create a learner, enroll in course
+        audit_learner = UserFactory.create(username='audit_learner')
+        CourseEnrollmentFactory.create(user=audit_learner, course_id=self.course.id, mode='audit')
+        # Make two teams in the same teamset, enroll the user in one
+        team_1 = CourseTeamFactory(course_id=self.course.id, name='test_team_1', topic_id='teamset_1')
+        team_2 = CourseTeamFactory(course_id=self.course.id, name='test_team_2', topic_id='teamset_1')
+        team_1.add_user(audit_learner)
+
+        csv_row = _csv_dict_row(audit_learner, 'audit', teamset_1=team_2.name)
+        csv_import(self.course, [csv_row])
+
+        self.assertFalse(CourseTeamMembership.is_user_on_team(audit_learner, team_1))
+        self.assertTrue(CourseTeamMembership.is_user_on_team(audit_learner, team_2))
+
+        self.assert_learner_removed_emitted(team_1.team_id, audit_learner.id)
+        self.assert_learner_added_emitted(team_2.team_id, audit_learner.id)
 
 
-class ExternalKeyCsvTests(SharedModuleStoreTestCase):
+class ExternalKeyCsvTests(TeamMembershipEventTestMixin, SharedModuleStoreTestCase):
     """ Tests for functionality related to external_user_keys"""
 
     @classmethod
@@ -251,10 +373,6 @@ class ExternalKeyCsvTests(SharedModuleStoreTestCase):
             cls.user_in_program_not_enrolled_through_program, connect_enrollments=False
         )
 
-        # initialize import manager
-        cls.import_manager = csv.TeamMembershipImportManager(cls.course)
-        cls.import_manager.teamset_ids = {ts.teamset_id for ts in cls.course.teamsets}
-
     @classmethod
     def add_user_to_course_program_team(
         cls, user, add_to_team=True, enroll_in_program=True, connect_enrollments=True, external_user_key=None
@@ -289,33 +407,20 @@ class ExternalKeyCsvTests(SharedModuleStoreTestCase):
         self.add_user_to_course_program_team(new_user, add_to_team=False, external_user_key=new_ext_key)
         self.assert_user_not_on_team(new_user)
 
-        with BytesIO() as mock_csv_file:
-            with TextIOWrapper(mock_csv_file, write_through=True) as text_wrapper:
-                # Create the fake csv file
-                csv_writer = DictWriter(text_wrapper, fieldnames=self.header_fields)
-                csv_writer.writeheader()
-                # Add the new user to the team via CSV upload, identified by their external key
-                csv_writer.writerow({'user': new_ext_key, 'mode': 'audit', self.teamset_id: self.team.name})
-                # We need to seek to the beginning of the file so the csv import manager can read it
-                mock_csv_file.seek(0)
-                #After processing the file, the user should be on the team
-                self.import_manager.set_team_membership_from_csv(mock_csv_file)
-
+        csv_import_row = _csv_dict_row(new_ext_key, 'audit', teamset_id=self.team.name)
+        csv_import(self.course, [csv_import_row])
         self.assert_user_on_team(new_user)
+        self.assert_learner_added_emitted(self.team.team_id, new_user.id)
 
     def test_lookup_team_membership_data(self):
         with self.assertNumQueries(3):
             # pylint: disable=protected-access
             data = csv._lookup_team_membership_data(self.course)
-        self._assert_test_users_on_team(data)
+        self._assert_test_users_on_team(_user_keyed_dict(data))
 
     def test_get_csv(self):
-        with StringIO() as read_buf:
-            csv.load_team_membership_csv(self.course, read_buf)
-            read_buf.seek(0)
-            reader = DictReader(read_buf)
-            team_memberships = list(reader)
-        self._assert_test_users_on_team(team_memberships)
+        reader = csv_export(self.course)
+        self._assert_test_users_on_team(_user_keyed_dict(reader))
 
     def _assert_test_users_on_team(self, data):
         """
@@ -323,16 +428,13 @@ class ExternalKeyCsvTests(SharedModuleStoreTestCase):
         and user_in_program should be identified by their external_user_key
         """
         self.assertEqual(len(data), 4)
-        self.assertEqual(
-            {user_row['user'] for user_row in data},
-            {
+        expected_data = {
+            user_identifier: _csv_dict_row(user_identifier, 'audit', teamset_id=self.team.name)
+            for user_identifier in [
                 self.user_no_program.username,
                 self.user_in_program_no_external_id.username,
                 self.user_in_program_not_enrolled_through_program.username,
                 self.external_user_key
-            }
-        )
-        for user_row in data:
-            self.assertEqual(len(user_row), 3)
-            self.assertEqual(user_row['mode'], 'audit')
-            self.assertEqual(user_row[self.teamset_id], self.team.name)
+            ]
+        }
+        self.assertDictEqual(expected_data, data)
