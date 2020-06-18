@@ -33,11 +33,6 @@ would need to be added and/or moved into the cms application
 
   https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L383-L408
 
-4. Staffing and Enrollment (TBD)
-
-  https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477
-
-  This functionality may be redundant to features in the Insights application
 
 These APIs can be removed entirely, as they are adequately covered by existing functionality:
 
@@ -46,5 +41,10 @@ These APIs can be removed entirely, as they are adequately covered by existing f
   This functionality should be removed entirely. CMS user accounts should be retired using the existing `edX User
   Retirement Feature<https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/>`_.
 
+2. Staffing and Enrollment (TBD)
+
+  https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477
+
+  This functionality may be redundant to features in the Insights application
 
 
