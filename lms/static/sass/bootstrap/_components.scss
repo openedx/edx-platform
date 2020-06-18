@@ -45,3 +45,57 @@
   text-decoration: underline;
   font-weight: bold;
 }
+
+.alert-error {
+  box-shadow: inset 0 0 0 4px $palette-error-back;
+
+  .alert-copy:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.alert-error .alert-icon {
+  align-self: center;
+  color: $white;
+  background-color: $palette-error-accent;
+  display: none;
+  border-radius: 50%;
+  padding: 0.625rem;
+
+  @include media-breakpoint-up(md) {
+    display: block;
+  }
+}
+
+.alert-message-with-action {
+  @include media-breakpoint-up(md) {
+    width: 80%;
+    padding: 1.25rem;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .alert-copy {
+    display: inline-block;
+    vertical-align: sub;
+  }
+}
+
+// Discussion
+.discussion {
+  .btn-link {
+    border-color: transparent
+  }
+
+  .breadcrumbs {
+    font-size: 0.875rem;
+
+    .all-topics {
+      border: none;
+    }
+  }
+
+  .field-label-text {
+    font-size: 1rem
+  }
+}
