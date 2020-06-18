@@ -351,7 +351,7 @@ class TeamAccessTests(SharedModuleStoreTestCase):
         ('user_unenrolled', 3),
     )
     @ddt.unpack
-    def test_team_counter_get_team_count_query_set(self, username, expected_count):
+    def test_team_counter_get_teams_accessible_by_user(self, username, expected_count):
         user = self.users[username]
         try:
             organization_protection_status = teams_api.user_organization_protection_status(
@@ -361,7 +361,8 @@ class TeamAccessTests(SharedModuleStoreTestCase):
         except ValueError:
             self.assertFalse(CourseEnrollment.is_enrolled(user, COURSE_KEY1))
             return
-        teams_query_set = teams_api.get_team_count_query_set(
+        teams_query_set = teams_api.get_teams_accessible_by_user(
+            user,
             [self.topic_id],
             COURSE_KEY1,
             organization_protection_status
@@ -392,6 +393,7 @@ class TeamAccessTests(SharedModuleStoreTestCase):
             'id': self.topic_id
         }
         teams_api.add_team_count(
+            user,
             [topic],
             COURSE_KEY1,
             organization_protection_status
