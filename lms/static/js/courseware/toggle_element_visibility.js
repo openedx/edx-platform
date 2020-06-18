@@ -40,10 +40,6 @@
                         event.preventDefault();
                         toggleTargetElement.toggleClass('hidden');
                         updateToggleActionText(!toggleTargetElement.hasClass('hidden'), $toggleActionElement);
-                        Logger.log('edx.course.home.course_update.toggled', {
-                            action: elementIsHidden ? 'hide' : 'show',
-                            publish_date: moment(date, 'MMM DD, YYYY').format()
-                        });
                     });
                 });
             };
