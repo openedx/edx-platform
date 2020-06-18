@@ -42,7 +42,11 @@ def delete_logged_in_edly_cookies(response):
     Returns:
         HttpResponse
     """
-    response.delete_cookie(settings.EDLY_USER_INFO_COOKIE_NAME)
+    response.delete_cookie(
+        settings.EDLY_USER_INFO_COOKIE_NAME,
+        path='/',
+        domain=settings.SESSION_COOKIE_DOMAIN
+    )
 
     return response
 
