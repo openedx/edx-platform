@@ -408,6 +408,16 @@
       }
     }
   }
+
+  .fa-chevron-right {
+    transform: rotateY(0deg) #{"/*rtl: rotateY(180deg)*/"};
+    font-size: inherit;
+
+    &.fa-rotate-90 {
+      transform: rotate(90deg) #{"/*rtl: rotate(90deg)*/"};
+      font-size: inherit;
+    }
+  }
 }
 
 #expand-collapse-outline-all-button {
