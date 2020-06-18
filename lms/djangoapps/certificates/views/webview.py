@@ -397,7 +397,7 @@ def _track_certificate_events(request, context, course, user, user_certificate):
                 }
             )
         else:
-            log.warn(
+            log.warning(
                 u"Could not find badge for %s on course %s.",
                 user.id,
                 course_key,
