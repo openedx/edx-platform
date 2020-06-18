@@ -1,4 +1,4 @@
-1. Deprecating the Sysadmin Dashboard
+2. Deprecating the Sysadmin Dashboard
 ---------------------
 
 Status
@@ -10,7 +10,7 @@ Context
 -------
 
 Maintaining the sysadmin dashboard is challenging, and it is not widely used. The code is part of the lms
-application, even though most of it's use cases are relevant to course authoring.
+application, even though most of its use cases are relevant to course authoring.
 
 The sysadmin dashboard would be better suited as a pluggable django application, using appropriate APIs in the
 cms application
@@ -23,23 +23,27 @@ would need to be added and/or moved into the cms application
 
 1. Create a cms user account
 
-  https://github.com/mitodl/edx-platform/blob/50dd1238408dc6785f022d8540961f96e0d6bb4f/lms/djangoapps/dashboard/sysadmin.py#L113-L151
+  https://github.com/edx/edx-platform/blob/50dd1238408dc6785f022d8540961f96e0d6bb4f/lms/djangoapps/dashboard/sysadmin.py#L113-L151
 
-2. Delete a cms user.
+2. Import a course from git
+
+  https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/git_import.py
+
+3. Delete a course
+
+  https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L383-L408
+
+4. Staffing and Enrollment (TBD)
+
+  https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477
+
+  This functionality may be redundant to features in the Insights application
+
+These APIs can be removed entirely, as they are adequately covered by existing functionality:
+
+1. Delete a cms user.
 
   This functionality should be removed entirely. CMS user accounts should be retired using the procedure described
   ... instead of simply deleting them.
 
-3. Import a course from git
 
-  https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/git_import.py
-
-4. Delete a course
-
-https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L383-L408
-
-5. Staffing and Enrollment (TBD)
-
-https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477
-
-  This functionality may be redundant to features in the Insights application
