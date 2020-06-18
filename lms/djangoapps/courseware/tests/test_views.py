@@ -86,7 +86,6 @@ from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
     RELATIVE_DATES_FLAG,
-    UNIFIED_COURSE_TAB_FLAG
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -906,29 +905,6 @@ class ViewsTestCase(BaseViewsTestCase):
             self.client.logout()
             response = self.client.get(url)
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
-
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
-    def test_bypass_course_info(self):
-        course_id = six.text_type(self.course_key)
-
-        self.assertFalse(self.course.bypass_home)
-
-        response = self.client.get(reverse('info', args=[course_id]))
-        self.assertEqual(response.status_code, 200)
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
-        self.assertEqual(response.status_code, 200)
-
-        self.course.bypass_home = True
-        self.store.update_item(self.course, self.user.id)
-        self.assertTrue(self.course.bypass_home)
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
-
-        self.assertRedirects(response, reverse('courseware', args=[course_id]), fetch_redirect_response=False)
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER='foo')
-        self.assertEqual(response.status_code, 200)
 
     # TODO: TNL-6387: Remove test
     @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)

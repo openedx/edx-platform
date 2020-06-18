@@ -113,7 +113,6 @@ from openedx.features.course_duration_limits.access import generate_course_expir
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     RELATIVE_DATES_FLAG,
-    UNIFIED_COURSE_TAB_FLAG,
     course_home_url_name
 )
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
@@ -396,151 +395,10 @@ def course_info(request, course_id):
     Display the course's info.html, or 404 if there is no such course.
     Assumes the course_id is in a valid format.
     """
-    # TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
-    #    Course Home is using its own processing of last accessed.
-    def get_last_accessed_courseware(course, request, user):
-        """
-        Returns the courseware module URL that the user last accessed, or None if it cannot be found.
-        """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2
-        )
-        course_module = get_module_for_descriptor(
-            user,
-            request,
-            course,
-            field_data_cache,
-            course.id,
-            course=course,
-            will_recheck_access=True,
-        )
-        chapter_module = get_current_child(course_module)
-        if chapter_module is not None:
-            section_module = get_current_child(chapter_module)
-            if section_module is not None:
-                url = reverse('courseware_section', kwargs={
-                    'course_id': text_type(course.id),
-                    'chapter': chapter_module.url_name,
-                    'section': section_module.url_name
-                })
-                return url
-        return None
-
     course_key = CourseKey.from_string(course_id)
 
-    # If the unified course experience is enabled, redirect to the "Course" tab
-    if UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
-
-    with modulestore().bulk_operations(course_key):
-        course = get_course_with_access(request.user, 'load', course_key)
-
-        can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
-        masquerade, user = setup_masquerade(request, course_key, can_masquerade, reset_masquerade_data=True)
-
-        # LEARNER-612: CCX redirect handled by new Course Home (DONE)
-        # LEARNER-1697: Transition banner messages to new Course Home (DONE)
-        # if user is not enrolled in a course then app will show enroll/get register link inside course info page.
-        user_is_enrolled = CourseEnrollment.is_enrolled(user, course.id)
-        show_enroll_banner = request.user.is_authenticated and not user_is_enrolled
-
-        # If the user is not enrolled but this is a course that does not support
-        # direct enrollment then redirect them to the dashboard.
-        if not user_is_enrolled and not can_self_enroll_in_course(course_key):
-            return redirect(reverse('dashboard'))
-
-        # LEARNER-170: Entrance exam is handled by new Course Outline. (DONE)
-        # If the user needs to take an entrance exam to access this course, then we'll need
-        # to send them to that specific course module before allowing them into other areas
-        if not user_can_skip_entrance_exam(user, course):
-            return redirect(reverse('courseware', args=[text_type(course.id)]))
-
-        # TODO: LEARNER-611: Remove deprecated course.bypass_home.
-        # If the user is coming from the dashboard and bypass_home setting is set,
-        # redirect them straight to the courseware page.
-        is_from_dashboard = reverse('dashboard') in request.META.get('HTTP_REFERER', [])
-        if course.bypass_home and is_from_dashboard:
-            return redirect(reverse('courseware', args=[course_id]))
-
-        # Construct the dates fragment
-        dates_fragment = None
-
-        if request.user.is_authenticated:
-            # TODO: LEARNER-611: Remove enable_course_home_improvements
-            if SelfPacedConfiguration.current().enable_course_home_improvements:
-                # Shared code with the new Course Home (DONE)
-                dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
-
-        # This local import is due to the circularity of lms and openedx references.
-        # This may be resolved by using stevedore to allow web fragments to be used
-        # as plugins, and to avoid the direct import.
-        from openedx.features.course_experience.views.course_reviews import CourseReviewsModuleFragmentView
-
-        # Shared code with the new Course Home (DONE)
-        # Get the course tools enabled for this user and course
-        course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
-
-        course_homepage_invert_title =\
-            configuration_helpers.get_value(
-                'COURSE_HOMEPAGE_INVERT_TITLE',
-                False
-            )
-
-        course_homepage_show_subtitle =\
-            configuration_helpers.get_value(
-                'COURSE_HOMEPAGE_SHOW_SUBTITLE',
-                True
-            )
-
-        course_homepage_show_org =\
-            configuration_helpers.get_value('COURSE_HOMEPAGE_SHOW_ORG', True)
-
-        course_title = course.display_number_with_default
-        course_subtitle = course.display_name_with_default
-        if course_homepage_invert_title:
-            course_title = course.display_name_with_default
-            course_subtitle = course.display_number_with_default
-
-        context = {
-            'request': request,
-            'masquerade_user': user,
-            'course_id': text_type(course_key),
-            'url_to_enroll': CourseTabView.url_to_enroll(course_key),
-            'cache': None,
-            'course': course,
-            'course_title': course_title,
-            'course_subtitle': course_subtitle,
-            'show_subtitle': course_homepage_show_subtitle,
-            'show_org': course_homepage_show_org,
-            'can_masquerade': can_masquerade,
-            'masquerade': masquerade,
-            'supports_preview_menu': True,
-            'studio_url': get_studio_url(course, 'course_info'),
-            'show_enroll_banner': show_enroll_banner,
-            'user_is_enrolled': user_is_enrolled,
-            'dates_fragment': dates_fragment,
-            'course_tools': course_tools,
-        }
-        context.update(
-            get_experiment_user_metadata_context(
-                course,
-                user,
-            )
-        )
-
-        # Get the URL of the user's last position in order to display the 'where you were last' message
-        context['resume_course_url'] = None
-        # TODO: LEARNER-611: Remove enable_course_home_improvements
-        if SelfPacedConfiguration.current().enable_course_home_improvements:
-            context['resume_course_url'] = get_last_accessed_courseware(course, request, user)
-
-        if not check_course_open_for_learner(user, course):
-            # Disable student view button if user is staff and
-            # course is not yet visible to students.
-            context['disable_student_access'] = True
-            context['supports_preview_menu'] = False
-
-        return render_to_response('courseware/info.html', context)
+    # Redirect to the "Course" tab
+    return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
 
 
 class StaticCourseTabView(EdxFragmentView):
