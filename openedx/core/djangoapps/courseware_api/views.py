@@ -21,6 +21,13 @@ from edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import check_course_access
+from lms.djangoapps.courseware.masquerade import is_masquerading
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_audit_enrollment
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_full_access
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_limited_access
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_non_audit_enrollment
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_staff
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
@@ -47,16 +54,20 @@ class CoursewareMeta:
             course_key,
         )
         self.effective_user = self.overview.effective_user
+        # We need to memoize `is_staff` _before_ we configure masquerade.
+        self.is_staff = has_access(self.effective_user, 'staff', self.overview).has_access
         self.course_key = course_key
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration'])
+        course_masquerade, _user = setup_masquerade(
+            request,
+            course_key,
+            staff_access=self.is_staff,
+        )
+        self.course_masquerade = course_masquerade
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
-
-    @property
-    def is_staff(self):
-        return has_access(self.effective_user, 'staff', self.overview).has_access
 
     @property
     def enrollment(self):
@@ -85,10 +96,27 @@ class CoursewareMeta:
 
     @property
     def content_type_gating_enabled(self):
-        return ContentTypeGatingConfig.enabled_for_enrollment(
-            user=self.effective_user,
-            course_key=self.course_key,
-        )
+        course_key = self.course_key
+        user = self.effective_user
+        is_enabled = None
+        course_masquerade = self.course_masquerade
+        if is_masquerading(user, course_key, course_masquerade):
+            if is_masquerading_as_staff(user, course_key):
+                is_enabled = False
+            elif is_masquerading_as_full_access(user, course_key, course_masquerade):
+                is_enabled = False
+            elif is_masquerading_as_non_audit_enrollment(user, course_key, course_masquerade):
+                is_enabled = False
+            elif is_masquerading_as_audit_enrollment(user, course_key, course_masquerade):
+                is_enabled = ContentTypeGatingConfig.enabled_for_course(course_key)
+            elif is_masquerading_as_limited_access(user, course_key, course_masquerade):
+                is_enabled = ContentTypeGatingConfig.enabled_for_course(course_key)
+        if is_enabled is None:
+            is_enabled = ContentTypeGatingConfig.enabled_for_enrollment(
+                user=user,
+                course_key=course_key,
+            )
+        return is_enabled
 
     @property
     def can_show_upgrade_sock(self):
