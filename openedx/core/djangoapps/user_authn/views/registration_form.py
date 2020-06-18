@@ -23,6 +23,7 @@ from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
+from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.models import (
@@ -373,7 +374,7 @@ class RegistrationFormFactory(object):
         Returns:
             HttpResponse
         """
-        form_desc = FormDescription("post", self._get_submit_url(request))
+        form_desc = FormDescription("post", self._get_registration_submit_url(request))
         self._apply_third_party_auth_overrides(request, form_desc)
 
         # Custom form fields can be added via the form set in settings.REGISTRATION_EXTENSION_FORM
@@ -430,18 +431,15 @@ class RegistrationFormFactory(object):
                         required=self._is_field_required(field_name)
                     )
         # remove confirm_email form v1 registration form
-        if 'v1' in request.get_full_path():
+        if is_api_v1(request):
             for index, field in enumerate(form_desc.fields):
                 if field['name'] == 'confirm_email':
                     del form_desc.fields[index]
                     break
         return form_desc
 
-    def _get_submit_url(self, request):
-        return reverse("user_api_registration") if self._is_v1(request) else reverse("user_api_registration_v2")
-
-    def _is_v1(self, request):
-        return 'v1' in request.get_full_path() and 'register' not in request.get_full_path()
+    def _get_registration_submit_url(self, request):
+        return reverse("user_api_registration") if is_api_v1(request) else reverse("user_api_registration_v2")
 
     def _add_email_field(self, form_desc, required=True):
         """Add an email field to a form description.

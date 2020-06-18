@@ -48,7 +48,7 @@ from openedx.core.djangoapps.user_api.accounts.api import (
     get_username_existence_validation_error,
     get_username_validation_error
 )
-from openedx.core.djangoapps.user_authn.utils import generate_password
+from openedx.core.djangoapps.user_authn.utils import generate_password, is_registration_api_v1
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.registration_form import (
@@ -157,7 +157,7 @@ def create_account_with_params(request, params):
         'REGISTRATION_EXTRA_FIELDS',
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     )
-    if 'v1' in request.get_full_path():
+    if is_registration_api_v1(request):
         if 'confirm_email' in extra_fields:
             del extra_fields['confirm_email']
 
