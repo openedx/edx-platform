@@ -1,20 +1,17 @@
+from datetime import datetime
 from logging import getLogger
 
-from pytz import utc
-from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand
+from pytz import utc
 
-from submissions.models import Submission
-from student.models import CourseEnrollment, AnonymousUserId
-from openassessment.workflow.models import AssessmentWorkflow
-
-from xmodule.modulestore.django import modulestore
-from openedx.features.assessment.helpers import autoscore_ora
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.assessment.constants import ORA_BLOCK_TYPE
+from openedx.features.assessment.helpers import autoscore_ora, can_auto_score_ora
+from openedx.features.philu_utils.utils import get_anonymous_user
+from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
 
 log = getLogger(__name__)
-
-DAYS_TO_WAIT_AUTO_ASSESSMENT = 14
 
 
 class Command(BaseCommand):
@@ -42,7 +39,6 @@ class Command(BaseCommand):
                 if current_module < 3:
                     log.info('Current module is less than 3')
                     continue
-
                 else:
                     max_module = 1
 
@@ -58,47 +54,12 @@ class Command(BaseCommand):
                                 for index_vertical, vertical in enumerate(verticals.children):
                                     vertical_blocks = modulestore().get_item(vertical)
                                     for index_block, block in enumerate(vertical_blocks.children):
-                                        if block.block_type == 'openassessment':
-
-                                            try:
-                                                anonymous_user = AnonymousUserId.objects.get(user=user,
-                                                                                             course_id=course.id)
-                                            except AnonymousUserId.DoesNotExist:
-                                                log.info('Anonymous Id doesn\'t exists for User: %s', user)
-                                                continue
-                                            except AnonymousUserId.MultipleObjectsReturned:
-                                                log.info('Multiple Anonymous Ids for User: %s', user)
-                                                continue
-
-                                            try:
-                                                response_submissions = Submission.objects.get(
-                                                    student_item__student_id=anonymous_user.anonymous_user_id,
-                                                    student_item__item_id=block)
-                                                log.info('Response Created at: %s',
-                                                         response_submissions.created_at.date())
-
-                                                response_submission_delta = today - response_submissions.created_at.date()
-
-                                                # check if this chapter is 2 weeks older or not.
-                                                module_access_days = delta_days.days - (index_chapter * 7)
-
-                                                if module_access_days >= DAYS_TO_WAIT_AUTO_ASSESSMENT \
-                                                        and response_submission_delta.days >= DAYS_TO_WAIT_AUTO_ASSESSMENT:
-                                                    try:
-                                                        # Status[0] is the status of assessment that are in waiting mode
-                                                        AssessmentWorkflow.objects.get(
-                                                            status=AssessmentWorkflow.STATUSES[0],
-                                                            course_id=course.id, item_id=block,
-                                                            submission_uuid=response_submissions.uuid)
-                                                        student = {'id': user.id, 'username': user.username,
-                                                                   'email': user.email,
-                                                                   'anonymous_user_id': anonymous_user.anonymous_user_id
-                                                                   }
-                                                        autoscore_ora(course.id, unicode(block), student)
-                                                    except AssessmentWorkflow.DoesNotExist:
-                                                        continue
-
-                                            except Submission.DoesNotExist:
-                                                continue
+                                        if (block.block_type == ORA_BLOCK_TYPE and
+                                                can_auto_score_ora(enrollment, course, block, index_chapter)):
+                                            anonymous_user = get_anonymous_user(user, course.id)
+                                            student = {
+                                                'anonymous_user_id': anonymous_user.anonymous_user_id
+                                            }
+                                            autoscore_ora(course.id, unicode(block), student)
 
                         max_module = max_module + 1
