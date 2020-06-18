@@ -8,10 +8,11 @@ define([
     'js/views/list_item_editor',
     'js/certificates/models/signatory',
     'js/certificates/views/signatory_editor',
-    'text!templates/certificate-editor.underscore'
+    'text!templates/certificate-editor.underscore',
+    'edx-ui-toolkit/js/utils/html-utils'
 ],
 function($, _, Backbone, gettext,
-         ListItemEditorView, SignatoryModel, SignatoryEditorView, certificateEditorTemplate) {
+         ListItemEditorView, SignatoryModel, SignatoryEditorView, certificateEditorTemplate, HtmlUtils) {
     'use strict';
 
     // If signatories limit is required to specific value then we can change it.
@@ -75,7 +76,7 @@ function($, _, Backbone, gettext,
                     isEditingAllCollections: true,
                     eventAgg: self.eventAgg
                 });
-                self.$('div.signatory-edit-list').append($(signatory_view.render()));
+                self.$('div.signatory-edit-list').append(HtmlUtils.HTML((signatory_view.render())).toString());
             });
             this.disableAddSignatoryButton();
             return this;
