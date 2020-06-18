@@ -11,7 +11,8 @@ from django.db.models import Prefetch
 from lms.djangoapps.teams.api import (
     OrganizationProtectionStatus,
     user_organization_protection_status,
-    ORGANIZATION_PROTECTED_MODES
+    ORGANIZATION_PROTECTED_MODES,
+    user_protection_status_matches_team
 )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
@@ -359,6 +360,7 @@ class TeamMembershipImportManager(object):
         """
         Validates that only students enrolled in a masters track are on a single team. Disallows mixing of masters
         with other enrollment modes on a single team.
+        Masters track students can't be added to existing non-protected teams
         """
         if(teamset_id, team_name) not in self.user_enrollment_by_team:
             self.user_enrollment_by_team[teamset_id, team_name] = set()
@@ -368,7 +370,24 @@ class TeamMembershipImportManager(object):
                 'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(team_name)
             self.add_error_and_check_if_max_exceeded(error_message)
             return False
+        if not self.is_enrollment_protection_for_existing_team_matches_user(user, team_name, teamset_id):
+            error_message = \
+                'User {} does not have access to team {}.'.format(user.username, team_name)
+            self.add_error_and_check_if_max_exceeded(error_message)
+            return False
         return True
+
+    def is_enrollment_protection_for_existing_team_matches_user(self, user, team_name, teamset_id):
+        """
+        Applies only to existing teams.
+        Returns True if no violations
+        False if there is a mismatch
+        """
+        try:
+            team = self.existing_course_teams[(team_name, teamset_id)]
+            return user_protection_status_matches_team(user, team)
+        except KeyError:
+            return True
 
     def is_FERPA_bubble_breached(self, teamset_id, team_name):
         """
