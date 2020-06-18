@@ -1,5 +1,5 @@
 """ Tests for the functionality in csv """
-from csv import DictWriter
+from csv import DictWriter, DictReader
 from io import BytesIO, StringIO, TextIOWrapper
 
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
@@ -307,30 +307,32 @@ class ExternalKeyCsvTests(SharedModuleStoreTestCase):
         with self.assertNumQueries(3):
             # pylint: disable=protected-access
             data = csv._lookup_team_membership_data(self.course)
-
-        team_membership = lambda user: {'user': user, 'mode': 'audit', self.teamset_id: self.team.name}
-
-        # The four test users should be listed as members of the team, and user_in_program should be identified
-        #   by their external_user_key
-        self.assertEqual(len(data), 4)
-        self.assertDictEqual(data[0], team_membership(self.user_no_program.username))
-        self.assertDictEqual(data[1], team_membership(self.external_user_key))
-        self.assertDictEqual(data[2], team_membership(self.user_in_program_no_external_id.username))
-        self.assertDictEqual(data[3], team_membership(self.user_in_program_not_enrolled_through_program.username))
+        self._assert_test_users_on_team(data)
 
     def test_get_csv(self):
-        expected_csv_output = (
-            'user,mode,teamset_id\r\n'
-            '{},audit,team_name\r\n'
-            '{},audit,team_name\r\n'
-            '{},audit,team_name\r\n'
-            '{},audit,team_name\r\n'
-        ).format(
-            self.user_no_program.username,
-            self.external_user_key,
-            self.user_in_program_no_external_id.username,
-            self.user_in_program_not_enrolled_through_program.username,
-        )
         with StringIO() as read_buf:
             csv.load_team_membership_csv(self.course, read_buf)
-            self.assertEqual(expected_csv_output, read_buf.getvalue())
+            read_buf.seek(0)
+            reader = DictReader(read_buf)
+            team_memberships = list(reader)
+        self._assert_test_users_on_team(team_memberships)
+
+    def _assert_test_users_on_team(self, data):
+        """
+        Assert that the four test users should be listed as members of the team,
+        and user_in_program should be identified by their external_user_key
+        """
+        self.assertEqual(len(data), 4)
+        self.assertEqual(
+            {user_row['user'] for user_row in data},
+            {
+                self.user_no_program.username,
+                self.user_in_program_no_external_id.username,
+                self.user_in_program_not_enrolled_through_program.username,
+                self.external_user_key
+            }
+        )
+        for user_row in data:
+            self.assertEqual(len(user_row), 3)
+            self.assertEqual(user_row['mode'], 'audit')
+            self.assertEqual(user_row[self.teamset_id], self.team.name)
