@@ -40,11 +40,6 @@ class CourseUpdateTest(CourseTestCase):
 
             return json.loads(resp.content.decode('utf-8'))
 
-        resp = self.client.get_html(
-            reverse_course_url('course_info_handler', self.course.id)
-        )
-        self.assertContains(resp, 'Course Updates', status_code=200)
-
         init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'
         content = init_content + '</iframe>'
         payload = get_response(content, 'January 8, 2013')

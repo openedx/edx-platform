@@ -1564,7 +1564,6 @@ class ContentStoreTest(ContentStoreTestCase):
         test_get_html('import_handler')
         test_get_html('export_handler')
         test_get_html('course_team_handler')
-        test_get_html('course_info_handler')
         test_get_html('assets_handler')
         test_get_html('tabs_handler')
         test_get_html('settings_handler')

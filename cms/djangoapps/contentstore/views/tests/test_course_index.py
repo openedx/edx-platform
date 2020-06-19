@@ -250,30 +250,6 @@ class TestCourseIndex(CourseTestCase):
             for child_response in json_response['child_info']['children']:
                 self.assert_correct_json_response(child_response)
 
-    def test_course_updates_invalid_url(self):
-        """
-        Tests the error conditions for the invalid course updates URL.
-        """
-        # Testing the response code by passing slash separated course id whose format is valid but no course
-        # having this id exists.
-        invalid_course_key = '{}_blah_blah_blah'.format(self.course.id)
-        course_updates_url = reverse_course_url('course_info_handler', invalid_course_key)
-        response = self.client.get(course_updates_url)
-        self.assertEqual(response.status_code, 404)
-
-        # Testing the response code by passing split course id whose format is valid but no course
-        # having this id exists.
-        split_course_key = CourseLocator(org='orgASD', course='course_01213', run='Run_0_hhh_hhh_hhh')
-        course_updates_url_split = reverse_course_url('course_info_handler', split_course_key)
-        response = self.client.get(course_updates_url_split)
-        self.assertEqual(response.status_code, 404)
-
-        # Testing the response by passing split course id whose format is invalid.
-        invalid_course_id = 'invalid.course.key/{}'.format(split_course_key)
-        course_updates_url_split = reverse_course_url('course_info_handler', invalid_course_id)
-        response = self.client.get(course_updates_url_split)
-        self.assertEqual(response.status_code, 404)
-
     def test_course_index_invalid_url(self):
         """
         Tests the error conditions for the invalid course index URL.
