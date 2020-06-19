@@ -25,6 +25,11 @@ from xmodule.modulestore.modulestore_settings import convert_module_store_settin
 # force S3 v4 (temporary until we can upgrade to django-storages 1.9)
 S3_USE_SIGV4 = True
 
+# for some buckets like London ones, we need these non documented django-storages vars
+# https://github.com/jschneier/django-storages/issues/28#issuecomment-265876674
+AWS_S3_REGION_NAME = ENV_TOKENS.get('AWS_S3_REGION_NAME', '')
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
