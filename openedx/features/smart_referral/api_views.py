@@ -23,6 +23,8 @@ class FilterContactsAPIView(APIView):
         user = request.user
         user_contacts = request.data.get('contacts_list', [])
 
+        user_contacts = {contact['contact_email']: contact for contact in user_contacts}.values()
+
         platform_contacts, non_platform_contacts = get_platform_contacts_and_non_platform_contacts(user_contacts)
 
         platform_contacts = sort_contacts_by_org_and_user_domain(platform_contacts, user)
