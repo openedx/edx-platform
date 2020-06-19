@@ -469,14 +469,14 @@ class ProctoringProviderTestCase(unittest.TestCase):
         throws a ValueError with the correct error message.
         """
         provider = 'invalid-provider'
-        proctoring_provider_whitelist = [u'mock', u'mock_proctoring_without_rules']
+        allowed_proctoring_providers = [u'mock', u'mock_proctoring_without_rules']
 
         with self.assertRaises(ValueError) as context_manager:
             self.proctoring_provider.from_json(provider)
         self.assertEqual(
             context_manager.exception.args[0],
             ['The selected proctoring provider, {}, is not a valid provider. Please select from one of {}.'
-                .format(provider, proctoring_provider_whitelist)]
+                .format(provider, allowed_proctoring_providers)]
         )
 
     def test_from_json_adds_platform_default_for_missing_provider(self):

@@ -27,9 +27,9 @@ class CourseMetadata(object):
     editable metadata.
     '''
     # The list of fields that wouldn't be shown in Advanced Settings.
-    # Should not be used directly. Instead the get_blacklist_of_fields method should
+    # Should not be used directly. Instead the get_exclude_list_of_fields method should
     # be used if the field needs to be filtered depending on the feature flag.
-    FIELDS_BLACK_LIST = [
+    FIELDS_EXCLUDE_LIST = [
         'cohort_config',
         'xml_attributes',
         'start',
@@ -73,77 +73,77 @@ class CourseMetadata(object):
     ]
 
     @classmethod
-    def get_blacklist_of_fields(cls, course_key):
+    def get_exclude_list_of_fields(cls, course_key):
         """
-        Returns a list of fields to not include in Studio Advanced settings based on a
+        Returns a list of fields to exclude from the Studio Advanced settings based on a
         feature flag (i.e. enabled or disabled).
         """
         # Copy the filtered list to avoid permanently changing the class attribute.
-        black_list = list(cls.FIELDS_BLACK_LIST)
+        exclude_list = list(cls.FIELDS_EXCLUDE_LIST)
 
         # Do not show giturl if feature is not enabled.
         if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
-            black_list.append('giturl')
+            exclude_list.append('giturl')
 
         # Do not show edxnotes if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_EDXNOTES'):
-            black_list.append('edxnotes')
+            exclude_list.append('edxnotes')
 
         # Do not show video auto advance if the feature is disabled
         if not settings.FEATURES.get('ENABLE_OTHER_COURSE_SETTINGS'):
-            black_list.append('other_course_settings')
+            exclude_list.append('other_course_settings')
 
         # Do not show video_upload_pipeline if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_VIDEO_UPLOAD_PIPELINE'):
-            black_list.append('video_upload_pipeline')
+            exclude_list.append('video_upload_pipeline')
 
         # Do not show video auto advance if the feature is disabled
         if not settings.FEATURES.get('ENABLE_AUTOADVANCE_VIDEOS'):
-            black_list.append('video_auto_advance')
+            exclude_list.append('video_auto_advance')
 
         # Do not show social sharing url field if the feature is disabled.
         if (not hasattr(settings, 'SOCIAL_SHARING_SETTINGS') or
                 not getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}).get("CUSTOM_COURSE_URLS")):
-            black_list.append('social_sharing_url')
+            exclude_list.append('social_sharing_url')
 
         # Do not show teams configuration if feature is disabled.
         if not settings.FEATURES.get('ENABLE_TEAMS'):
-            black_list.append('teams_configuration')
+            exclude_list.append('teams_configuration')
 
         if not settings.FEATURES.get('ENABLE_VIDEO_BUMPER'):
-            black_list.append('video_bumper')
+            exclude_list.append('video_bumper')
 
         # Do not show enable_ccx if feature is not enabled.
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX'):
-            black_list.append('enable_ccx')
-            black_list.append('ccx_connector')
+            exclude_list.append('enable_ccx')
+            exclude_list.append('ccx_connector')
 
         # Do not show "Issue Open Badges" in Studio Advanced Settings
         # if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_OPENBADGES'):
-            black_list.append('issue_badges')
+            exclude_list.append('issue_badges')
 
         # If the XBlockStudioConfiguration table is not being used, there is no need to
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
-            black_list.append('allow_unsupported_xblocks')
+            exclude_list.append('allow_unsupported_xblocks')
 
         # If the ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled,
         # do not show "Proctoring Configuration" in Studio Advanced Settings.
         if not ENABLE_PROCTORING_PROVIDER_OVERRIDES.is_enabled(course_key):
-            black_list.append('proctoring_provider')
+            exclude_list.append('proctoring_provider')
 
         # Do not show "Course Visibility For Unenrolled Learners" in Studio Advanced Settings
         # if the enable_anonymous_access flag is not enabled
         if not COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key=course_key):
-            black_list.append('course_visibility')
+            exclude_list.append('course_visibility')
 
         # Do not show "Create Zendesk Tickets For Suspicious Proctored Exam Attempts" in
         # Studio Advanced Settings if the user is not edX staff.
         if not GlobalStaff().has_user(get_current_user()):
-            black_list.append('create_zendesk_tickets')
+            exclude_list.append('create_zendesk_tickets')
 
-        return black_list
+        return exclude_list
 
     @classmethod
     def fetch(cls, descriptor):
@@ -153,10 +153,10 @@ class CourseMetadata(object):
         """
         result = {}
         metadata = cls.fetch_all(descriptor)
-        black_list_of_fields = cls.get_blacklist_of_fields(descriptor.id)
+        exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
 
         for key, value in six.iteritems(metadata):
-            if key in black_list_of_fields:
+            if key in exclude_list_of_fields:
                 continue
             result[key] = value
         return result
@@ -190,19 +190,19 @@ class CourseMetadata(object):
         """
         Decode the json into CourseMetadata and save any changed attrs to the db.
 
-        Ensures none of the fields are in the blacklist.
+        Ensures none of the fields are in the exclude list.
         """
-        blacklist_of_fields = cls.get_blacklist_of_fields(descriptor.id)
+        exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
         # Don't filter on the tab attribute if filter_tabs is False.
         if not filter_tabs:
-            blacklist_of_fields.remove("tabs")
+            exclude_list_of_fields.remove("tabs")
 
         # Validate the values before actually setting them.
         key_values = {}
 
         for key, model in six.iteritems(jsondict):
             # should it be an error if one of the filtered list items is in the payload?
-            if key in blacklist_of_fields:
+            if key in exclude_list_of_fields:
                 continue
             try:
                 val = model['value']
@@ -228,12 +228,12 @@ class CourseMetadata(object):
             errors: list of error objects
             result: the updated course metadata or None if error
         """
-        blacklist_of_fields = cls.get_blacklist_of_fields(descriptor.id)
+        exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
 
         if not filter_tabs:
-            blacklist_of_fields.remove("tabs")
+            exclude_list_of_fields.remove("tabs")
 
-        filtered_dict = dict((k, v) for k, v in six.iteritems(jsondict) if k not in blacklist_of_fields)
+        filtered_dict = dict((k, v) for k, v in six.iteritems(jsondict) if k not in exclude_list_of_fields)
         did_validate = True
         errors = []
         key_values = {}
