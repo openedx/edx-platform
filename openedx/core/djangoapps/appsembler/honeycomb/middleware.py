@@ -29,6 +29,8 @@ class HoneycombLegacyMiddleware(object):
         request_context = self.get_context_from_request(request)
         request.honeycomb_trace = beeline.start_trace(context=request_context)
 
+        # propagate request.path to all child spans, to enable sampling
+        beeline.add_trace_field("request.path", request_context['request.path'])
         return None
 
     def process_response(self, request, response):
