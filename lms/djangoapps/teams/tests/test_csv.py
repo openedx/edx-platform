@@ -3,6 +3,8 @@
 from csv import DictReader
 from io import StringIO
 
+from django.contrib.auth.models import User
+
 from lms.djangoapps.teams import csv
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
@@ -148,10 +150,20 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
         })
         cls.course = CourseFactory(teams_configuration=teams_config)
         cls.second_course = CourseFactory(teams_configuration=teams_config)
+        cls.import_manager = None
 
+    def setUp(self):
         # initialize import manager
-        cls.import_manager = csv.TeamMembershipImportManager(cls.course)
-        cls.import_manager.teamset_ids = {ts.teamset_id for ts in cls.course.teamsets}
+        super(TeamMembershipImportManagerTests, self).setUp()
+        self.import_manager = csv.TeamMembershipImportManager(self.course)
+        self.import_manager.teamset_ids = {ts.teamset_id for ts in self.course.teamsets}
+
+    def tearDown(self):
+        """ Clean up users, teams, and memberships created during tests """
+        super(TeamMembershipImportManagerTests, self).tearDown()
+        CourseTeamMembership.objects.all().delete()
+        CourseTeam.objects.all().delete()
+        User.objects.all().delete()
 
     def test_add_user_to_new_protected_team(self):
         """Adding a masters learner to a new team should create a team with organization protected status"""
