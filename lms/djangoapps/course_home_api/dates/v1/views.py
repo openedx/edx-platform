@@ -15,7 +15,6 @@ from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course
 from lms.djangoapps.courseware.date_summary import TodaysDate, verified_upgrade_deadline_link
 from lms.djangoapps.course_home_api.dates.v1.serializers import DatesTabSerializer
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
-from openedx.core.djangoapps.enrollments.api import get_enrollment
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
