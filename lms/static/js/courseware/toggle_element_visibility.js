@@ -1,28 +1,28 @@
 (function(define) {
     'use strict';
 
-    define(['jquery', 'logger', 'moment'],
-        function($, Logger, moment) {
+    define(['jquery'],
+        function($) {
             return function() {
                 // define variables for code legibility
                 var $toggleActionElements = $('.toggle-visibility-button');
 
                 var updateToggleActionText = function(elementIsHidden, actionElement) {
-                    var show_text = actionElement.data('show'),
-                        hide_text = actionElement.data('hide'),
-                        first_hidden_update = $('.old-updates .toggle-visibility-button').first();
+                    var showText = actionElement.data('show'),
+                        hideText = actionElement.data('hide'),
+                        firstHiddenUpdate = $('.old-updates .toggle-visibility-button').first();
 
                     actionElement.attr('aria-expanded', elementIsHidden);
 
                     if (elementIsHidden) {
-                        if (hide_text) {
+                        if (hideText) {
                             actionElement.html(actionElement.data('hide'));
                         } else {
                             actionElement.hide();
-                            first_hidden_update.focus();
+                            firstHiddenUpdate.focus();
                         }
                     } else {
-                        if (show_text) {
+                        if (showText) {
                             actionElement.html(actionElement.data('show'));
                         }
                     }
@@ -31,8 +31,7 @@
                 $.each($toggleActionElements, function(i, elem) {
                     var $toggleActionElement = $(elem),
                         toggleTargetElement = $toggleActionElement.siblings('.toggle-visibility-element'),
-                        elementIsHidden = toggleTargetElement.is(':visible'),
-                        date = toggleTargetElement.siblings('.date').text();
+                        elementIsHidden = toggleTargetElement.is(':visible');
 
                     updateToggleActionText(elementIsHidden, $toggleActionElement);
 
