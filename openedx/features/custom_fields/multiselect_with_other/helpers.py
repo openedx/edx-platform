@@ -33,7 +33,7 @@ def get_other_values(choices, value):
 
 def filter_other_field_checkbox_value(values):
     """
-    This functions filters for the value that is automatically put
+    This function filters for the value that is automatically put
     into the form payload when other field is selected in usage of
     MultiSelectWithOtherField
     :param values: list of strings

@@ -15,30 +15,42 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect
-from django.http import JsonResponse
-from django.shortcuts import redirect, get_object_or_404
-from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _, ugettext_noop
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_noop
 from django.views.decorators.csrf import csrf_exempt
-from edxmako.shortcuts import render_to_response
-from nodebb.helpers import update_nodebb_for_user_status
 
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding import forms
 from lms.djangoapps.onboarding.decorators import can_save_org_data, can_save_org_details
-from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, \
+from lms.djangoapps.onboarding.email_utils import (
+    send_admin_activation_email,
+    send_admin_update_confirmation_email,
     send_admin_update_email
-from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, \
-    get_close_matching_orgs_with_suggestions, get_alquity_community_url, serialize_partner_networks, \
-    affiliated_unattended_surveys
+)
+from lms.djangoapps.onboarding.helpers import (
+    COUNTRIES,
+    LANGUAGES,
+    affiliated_unattended_surveys,
+    calculate_age_years,
+    get_alquity_community_url,
+    get_close_matching_orgs_with_suggestions,
+    serialize_partner_networks
+)
 from lms.djangoapps.onboarding.models import (
+    Currency,
     Organization,
-    Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
-from lms.djangoapps.onboarding.models import UserExtendedProfile
+    OrganizationAdminHashKeys,
+    OrganizationMetric,
+    PartnerNetwork,
+    UserExtendedProfile
+)
 from lms.djangoapps.onboarding.serializers import PartnerNetworkSerializer
 from lms.djangoapps.onboarding.signals import save_interests
 from lms.djangoapps.philu_overrides.helpers import save_user_partner_network_consent
-from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_joined_communities
+from lms.djangoapps.student_dashboard.views import get_joined_communities, get_recommended_xmodule_courses
+from nodebb.helpers import update_nodebb_for_user_status
 
 log = logging.getLogger("edx.onboarding")
 

@@ -442,8 +442,8 @@ class RadioSelectNotNull(forms.RadioSelect):
 class InterestsForm(BaseOnboardingModelForm):
     class Meta:
         """
-                The meta class used to customize the default behaviour of form fields
-                """
+        The meta class used to customize the default behaviour of form fields
+        """
         model = UserExtendedProfile
         fields = [
             'interests', 'learners_related', 'goals', 'hear_about_philanthropyu'

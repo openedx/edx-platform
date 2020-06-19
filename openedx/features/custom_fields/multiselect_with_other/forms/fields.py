@@ -54,6 +54,9 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
                     )
 
     def to_python(self, value):
+        """
+        Returns a list of strings
+        """
         return filter_other_field_checkbox_value(
             super(MultiSelectWithOtherFormField, self).to_python(value)
         )
