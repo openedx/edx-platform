@@ -148,6 +148,7 @@ simplejson
 sailthru-client==2.2.3              # For Sailthru integration
 Shapely                             # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
+social-auth-app-django
 sorl-thumbnail
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
 sqlparse                            # Required by Django to run migrations.RunSQL
