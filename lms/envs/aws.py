@@ -30,14 +30,6 @@ import os
 from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
-# force S3 v4 (temporary until we can upgrade to django-storages 1.9)
-S3_USE_SIGV4 = True
-
-# for some buckets like London ones, we need these non documented django-storages vars
-# https://github.com/jschneier/django-storages/issues/28#issuecomment-265876674
-AWS_S3_REGION_NAME = ENV_TOKENS.get('AWS_S3_REGION_NAME', '')
-AWS_S3_SIGNATURE_VERSION = 's3v4'
-
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
@@ -114,6 +106,14 @@ CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this d
 
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
+
+# force S3 v4 (temporary until we can upgrade to django-storages 1.9)
+S3_USE_SIGV4 = True
+
+# for some buckets like London ones, we need these non documented django-storages vars
+# https://github.com/jschneier/django-storages/issues/28#issuecomment-265876674
+AWS_S3_REGION_NAME = ENV_TOKENS.get('AWS_S3_REGION_NAME', '')
+AWS_S3_SIGNATURE_VERSION = 's3v4'
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
