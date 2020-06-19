@@ -138,7 +138,7 @@ def get_lms_link_for_item(location, preview=False):
     )
 
 
-def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
+def get_lms_link_for_certificate_web_view(course_key, mode):
     """
     Returns the url to the certificate web view.
     """
@@ -150,9 +150,8 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     if lms_base is None:
         return None
 
-    return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
+    return u"//{certificate_web_base}/certificates/course/{course_id}?preview={mode}".format(
         certificate_web_base=lms_base,
-        user_id=user_id,
         course_id=six.text_type(course_key),
         mode=mode
     )
