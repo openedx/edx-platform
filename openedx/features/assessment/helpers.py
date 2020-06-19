@@ -25,17 +25,29 @@ from .constants import (
 log = getLogger(__name__)
 
 
+def _log_multiple_submissions_info(submissions):
+    if len(submissions) > 1:
+        submission_ids = map(str, [submission.id for submission in submissions])
+
+        log.info('Multiple submissions found having ids {ids} in can_auto_score_ora'.format(
+            ids=','.join(submission_ids)
+        ))
+
+
 def can_auto_score_ora(enrollment, course, block, index_chapter):
     anonymous_user = get_anonymous_user(enrollment.user, course.id)
     if not anonymous_user:
         return False
-    response_submission = Submission.objects.filter(
+    response_submissions = Submission.objects.filter(
         student_item__student_id=anonymous_user.anonymous_user_id,
         student_item__item_id=block
-    ).order_by('submitted_at').first()
+    ).order_by('submitted_at')
+    _log_multiple_submissions_info(response_submissions)
+    response_submission = response_submissions.first()
     if not response_submission:
         return False
-    log.info('Response Created at: {created_date}'.format(
+    log.info('Submission with id {id} was created at: {created_date}'.format(
+        id=response_submission.id,
         created_date=response_submission.created_at.date()
     ))
     today = datetime.now(utc).date()
@@ -67,12 +79,15 @@ def autoscore_ora(course_id, usage_key, student):
     options_selected, earned, possible = select_options(rubric_dict)
 
     # Use usage key and student id to get the submission of the user.
-    submission = Submission.objects.filter(
-        student_item__course_id=course_id.to_deprecated_string(),
+    course_id_str = course_id.to_deprecated_string()
+    submissions = Submission.objects.filter(
+        student_item__course_id=course_id_str,
         student_item__student_id=anonymous_user_id,
         student_item__item_id=usage_key,
         student_item__item_type=ORA_BLOCK_TYPE
-    ).order_by('submitted_at').first()
+    ).order_by('submitted_at')
+    _log_multiple_submissions_info(submissions)
+    submission = submissions.first()
     if not submission:
         log.warn(u"No submission found for user {user_id}".format(user_id=anonymous_user_id))
         return
@@ -94,7 +109,7 @@ def autoscore_ora(course_id, usage_key, student):
         u"course {course_id}, item {item_id} with rubric {rubric} by PhilU Bot.".format(
             user_id=anonymous_user_id,
             submission=submission.uuid,
-            course_id=course_id.to_deprecated_string(),
+            course_id=course_id_str,
             item_id=usage_key,
             rubric=rubric.content_hash
         )
@@ -102,12 +117,12 @@ def autoscore_ora(course_id, usage_key, student):
 
     reset_score(
         student_id=anonymous_user_id,
-        course_id=course_id.to_deprecated_string(),
+        course_id=course_id_str,
         item_id=usage_key
     )
 
     set_score(
-        submission_uuid=submission.uuid,
+        submission_uuid=str(submission.uuid),
         points_earned=earned,
         points_possible=possible
     )
