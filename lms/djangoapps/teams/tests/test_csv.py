@@ -221,7 +221,53 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
         # They are successfully removed from the team
         self.assertFalse(CourseTeamMembership.is_user_on_team(audit_learner, course_1_team))
 
-    def test_validate_max_size_correctly(self):
+    def test_exceed_max_size(self):
+        # Given a bunch of students enrolled in a course
+        users = []
+        for i in range(5):
+            user = UserFactory.create(username='max_size_{id}'.format(id=i))
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode='audit')
+            users.append(user)
+
+        # When a team is already near capaciy
+        for i in range(2):
+            user = users[i]
+            row = {'user': user, 'teamset_1': 'team_1', 'mode': 'audit'}
+            self.import_manager.add_user_to_team(row)
+
+        # ... and I try to add members in excess of capacity
+        csv_data = self._csv_reader_from_array([
+            ['user','mode', 'teamset_1'],
+            ['max_size_2', 'audit', 'team_1'],
+            ['max_size_3', 'audit', 'team_1']
+        ])
+
+        result = self.import_manager.set_team_memberships(csv_data)
+
+        # Then membership size is exceeded and the import fails with a "team is full" error
+        self.assertFalse(result)
+        self.assertEqual(self.import_manager.validation_errors[0], 'Team team_1 is full.')
+
+    def test_remove_from_team(self):
+        # Given a user already in a course and on a team
+        user = UserFactory.create(username='learner_1')
+        mode = 'audit'
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode=mode)
+        team = CourseTeamFactory(course_id=self.course.id, name='team_1', topic_id='teamset_1')
+        team.add_user(user)
+        self.assertTrue(CourseTeamMembership.is_user_on_team(user, team))
+
+        # When I try to remove them from the team
+        csv_data = self._csv_reader_from_array([
+            ['user','mode', 'teamset_1'],
+            [user.username, mode, ''],
+        ])
+        result = self.import_manager.set_team_memberships(csv_data)
+
+        # Then they are removed from the team
+        self.assertFalse(CourseTeamMembership.is_user_on_team(user, team))
+
+    def test_switch_memberships(self):
         # Given a bunch of students enrolled in a course
         users = []
         for i in range(5):
@@ -239,14 +285,39 @@ class TeamMembershipImportManagerTests(SharedModuleStoreTestCase):
         csv_data = self._csv_reader_from_array([
             ['user','mode', 'teamset_1'],
             ['learner_4', 'audit', 'team_1'],
-            ['learner_0', 'audit', ''],
+            ['learner_0', 'audit', 'team_2'],
         ])
 
         result = self.import_manager.set_team_memberships(csv_data)
 
-        # Existing behavior is to fail since learner is added to team (max size exceeded)
-        # before learner is removed
-        self.assertFalse(result)
+        # Then membership size is calculated correctly, import finishes w/out error
+        self.assertTrue(result)
+        # ... and the users are assigned to the correct teams
+        team_1 = CourseTeam.objects.get(course_id=self.course.id, topic_id='teamset_1', name='team_1')
+        team_2 = CourseTeam.objects.get(course_id=self.course.id, topic_id='teamset_1', name='team_2')
+        self.assertTrue(CourseTeamMembership.is_user_on_team(users[4], team_1))
+        self.assertTrue(CourseTeamMembership.is_user_on_team(users[0], team_2))
+
+    def test_create_new_team_from_import(self):
+        # Given a user in a course
+        user = UserFactory.create(username='learner_1')
+        mode = 'audit'
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id, mode=mode)
+
+        # When I add them to a team that does not exist
+        self.assertEquals(CourseTeam.objects.all().count(), 0)
+        csv_data = self._csv_reader_from_array([
+            ['user','mode', 'teamset_1'],
+            [user.username, mode, 'new_exciting_team'],
+        ])
+        result = self.import_manager.set_team_memberships(csv_data)
+
+        # Then a new team is created
+        self.assertEqual(CourseTeam.objects.all().count(), 1)
+
+        # ... and the user is assigned to the team
+        new_team = CourseTeam.objects.get(topic_id='teamset_1', name='new_exciting_team')
+        self.assertTrue(CourseTeamMembership.is_user_on_team(user, new_team))
 
     def _csv_reader_from_array(self, rows):
         """

@@ -178,6 +178,9 @@ class TeamMembershipImportManager(object):
             self.remove_user_from_team_for_reassignment(row)
             row_dictionaries.append(row)
 
+        if not self.validate_team_sizes_not_exceeded():
+            return False
+
         if not self.validation_errors:
             for row in row_dictionaries:
                 self.add_user_to_team(row)
@@ -198,9 +201,11 @@ class TeamMembershipImportManager(object):
     def load_course_teams(self):
         """
         Caches existing course teams by (team_name, topic_id)
+        and existing membership counts by (topic_id, team_name)
         """
         for team in CourseTeam.objects.filter(course_id=self.course.id):
             self.existing_course_teams[(team.name, team.topic_id)] = team
+            self.user_count_by_team[(team.topic_id, team.name)] = team.users.count()
 
     def validate_header(self, header):
         """
@@ -300,32 +305,39 @@ class TeamMembershipImportManager(object):
         user = row['user']
         for teamset_id in self.teamset_ids:
             team_name = row[teamset_id]
-            if not team_name:
-                # we will be removing a user from their current team in a given teamset
-                # decrement the team membership, if it exists
-                try:
-                    current_team_name = self.existing_course_team_memberships[(user.id, teamset_id)].name
-                    if (teamset_id, current_team_name) not in self.user_to_remove_by_team:
-                        self.user_to_remove_by_team[(teamset_id, current_team_name)] = 1
-                    else:
-                        self.user_to_remove_by_team[(teamset_id, current_team_name)] += 1
-                except KeyError:
-                    # happens when a user is not on any team in a team set
-                    pass
-                continue
+
+            # See if the user is already on a team in the teamset
             try:
-                if not self.validate_compatible_enrollment_modes(user, team_name, teamset_id):
-                    return False
-                # checks for a team inside a specific team set. This way team names can be duplicated across
-                # teamsets
-                team = self.existing_course_teams[(team_name, teamset_id)]
-                if (teamset_id, team_name) not in self.user_count_by_team:
-                    self.user_count_by_team[(teamset_id, team_name)] = team.users.count()
+                current_team_name = self.existing_course_team_memberships[(user.id, teamset_id)].name
             except KeyError:
+                current_team_name = None
                 pass
 
-            if not self.validate_proposed_team_size_wont_exceed_maximum(team_name, teamset_id):
+            if current_team_name == team_name:
+                # We don't need to do anything if the user isn't moving to a different team
+                continue
+
+            # If the user is on a team currently, mark them for removal
+            if current_team_name is not None:
+                if (teamset_id, current_team_name) not in self.user_to_remove_by_team:
+                    self.user_to_remove_by_team[(teamset_id, current_team_name)] = 1
+                else:
+                    self.user_to_remove_by_team[(teamset_id, current_team_name)] += 1
+
+            # If we aren't moving them to a new team, we can go to the next team-set
+            if not team_name:
+                continue
+
+            # Check that user enrollment mode is compatible for the target team
+            if not self.validate_compatible_enrollment_modes(user, team_name, teamset_id):
                 return False
+
+           # Update proposed team counts, initializing the team count if it doesn't exist
+            if (teamset_id, team_name) not in self.user_count_by_team:
+                self.user_count_by_team[(teamset_id, team_name)] = 1
+            else:
+                self.user_count_by_team[(teamset_id, team_name)] += 1
+
         return True
 
     def validate_compatible_enrollment_modes(self, user, team_name, teamset_id):
@@ -360,21 +372,31 @@ class TeamMembershipImportManager(object):
         else:
             return True
 
-    def validate_proposed_team_size_wont_exceed_maximum(self, team_name, teamset_id):
+    def validate_team_sizes_not_exceeded(self):
         """
         Validates that the number of users we want to add to a team won't exceed maximum team size.
         """
-        if self.course.teams_configuration.teamsets_by_id[teamset_id].max_team_size is None:
-            max_team_size = self.course.teams_configuration.default_max_team_size
-        else:
-            max_team_size = self.course.teams_configuration.teamsets_by_id[teamset_id].max_team_size
+        for teamset_id in self.teamset_ids:
+            # Get max size for team-set
+            if self.course.teams_configuration.teamsets_by_id[teamset_id].max_team_size is None:
+                max_team_size = self.course.teams_configuration.default_max_team_size
+            else:
+                max_team_size = self.course.teams_configuration.teamsets_by_id[teamset_id].max_team_size
 
-        if max_team_size is not None:
-            key = (teamset_id, team_name)
-            if (self.user_count_by_team[key] - self.user_to_remove_by_team[key]) + 1 > max_team_size:
-                self.add_error_and_check_if_max_exceeded('Team ' + team_name + ' is full.')
-                return False
-        self.user_count_by_team[(teamset_id, team_name)] += 1
+            if max_team_size is not None:
+                # Get teams in teamset
+                team_names = [
+                    team_to_teamset[0] for team_to_teamset in self.existing_course_teams
+                    if team_to_teamset[1] == teamset_id
+                ]
+
+                for team_name in team_names:
+                    # Calculate team size
+                    key = (teamset_id, team_name)
+                    if (self.user_count_by_team[key] - self.user_to_remove_by_team[key]) > max_team_size:
+                        self.add_error_and_check_if_max_exceeded('Team ' + team_name + ' is full.')
+                        return False
+
         return True
 
     def remove_user_from_team_for_reassignment(self, row):
