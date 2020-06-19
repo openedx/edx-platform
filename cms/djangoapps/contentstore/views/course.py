@@ -104,7 +104,7 @@ from .library import LIBRARIES_ENABLED, get_library_creator_status
 log = logging.getLogger(__name__)
 
 
-__all__ = ['course_info_handler', 'course_handler', 'course_listing',
+__all__ = ['course_handler', 'course_listing',
            'course_info_update_handler', 'course_search_index_handler',
            'course_rerun_handler',
            'settings_handler',

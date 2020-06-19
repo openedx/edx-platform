@@ -89,8 +89,6 @@ urlpatterns = [
     url(r'^request_course_creator$', contentstore.views.request_course_creator, name='request_course_creator'),
     url(r'^course_team/{}(?:/(?P<email>.+))?$'.format(COURSELIKE_KEY_PATTERN),
         contentstore.views.course_team_handler, name='course_team_handler'),
-    url(r'^course_info/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.course_info_handler,
-        name='course_info_handler'),
     url(r'^course_info_update/{}/(?P<provided_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.course_info_update_handler, name='course_info_update_handler'
         ),
