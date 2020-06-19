@@ -949,37 +949,6 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
 
 @login_required
 @ensure_csrf_cookie
-@require_http_methods(["GET"])
-def course_info_handler(request, course_key_string):
-    """
-    GET
-        html: return html for editing the course info handouts and updates.
-    """
-    try:
-        course_key = CourseKey.from_string(course_key_string)
-    except InvalidKeyError:
-        raise Http404
-
-    with modulestore().bulk_operations(course_key):
-        course_module = get_course_and_check_access(course_key, request.user)
-        if not course_module:
-            raise Http404
-        if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-            return render_to_response(
-                'course_info.html',
-                {
-                    'context_course': course_module,
-                    'updates_url': reverse_course_url('course_info_update_handler', course_key),
-                    'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
-                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id),
-                }
-            )
-        else:
-            return HttpResponseBadRequest("Only supports html requests")
-
-
-@login_required
-@ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
 def course_info_update_handler(request, course_key_string, provided_id=None):
