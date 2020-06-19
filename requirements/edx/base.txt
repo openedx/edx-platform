@@ -48,7 +48,7 @@ cryptography==2.9.2       # via -r requirements/edx/../edx-sandbox/shared.txt, d
 cssutils==1.0.2           # via pynliner
 ddt==1.3.1                # via -c requirements/edx/../constraints.txt, xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via pycontracts
-defusedxml==0.6.0         # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
+defusedxml==0.7.0rc1      # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
 django-appconf==1.0.4     # via -r requirements/edx/base.in, django-statici18n
 django-celery==3.3.1      # via -r requirements/edx/base.in
 django-classy-tags==1.0.0  # via django-sekizai
@@ -65,7 +65,7 @@ django-method-override==1.0.4  # via -r requirements/edx/base.in
 django-model-utils==4.0.0  # via -r requirements/edx/base.in, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/base.in, django-wiki
 django-multi-email-field==0.6.1  # via edx-enterprise
-django-mysql==3.7.0       # via -r requirements/edx/base.in
+django-mysql==3.7.1       # via -r requirements/edx/base.in
 django-oauth-toolkit==1.3.2  # via -r requirements/edx/base.in
 django-object-actions==2.0.0  # via edx-enterprise
 django-pipeline==1.7.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
@@ -182,12 +182,12 @@ py2neo==3.1.2             # via -r requirements/edx/base.in
 pycontracts==1.8.14       # via -r requirements/edx/base.in, edx-user-state-client
 pycountry==19.8.18        # via -r requirements/edx/base.in
 pycparser==2.20           # via -r requirements/edx/../edx-sandbox/shared.txt, cffi
-pycryptodome==3.9.7       # via pdfminer.six
-pycryptodomex==3.9.7      # via -r requirements/edx/base.in, edx-proctoring, pyjwkest
+pycryptodome==3.9.8       # via pdfminer.six
+pycryptodomex==3.9.8      # via -r requirements/edx/base.in, edx-proctoring, pyjwkest
 pygments==2.6.1           # via -r requirements/edx/base.in
 pyjwkest==1.4.2           # via -r requirements/edx/base.in, edx-drf-extensions
 pyjwt==1.5.2              # via -r requirements/edx/base.in, drf-jwt, edx-rest-api-client, social-auth-core
-pymongo==3.9.0            # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
+pymongo==3.10.1           # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/base.in
 pyparsing==2.4.7          # via chem, openedx-calc, packaging, pycontracts
 pysrt==1.1.2              # via -r requirements/edx/base.in, edxval
