@@ -299,26 +299,19 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
 
     def _set_waffle_flag_metric(self, name, value):
         """
-        If ENABLE_WAFFLE_FLAG_METRIC is True, adds name/value to cached values
-        and sets metric if the value changed.
+        For any flag name in _WAFFLE_FLAG_CUSTOM_METRIC_SET, add name/value
+        to cached values and set custom metric if the value changed.
 
-        Metric flag values could be False, True, or Both. The value Both would
-        mean that the flag had both a True and False value at different times
-        through the transaction. This is most likely due to having a
-        check_before_waffle_callback, as is the case with CourseWaffleFlag.
+        The name of the custom metric will match the name of the flag.
+        The value of the custom metric could be False, True, or Both.
 
-        Example metric value::
-
-            "{'another.course.flag': 'False', 'some.flag': 'False', 'some.course.flag': 'Both'}"
-
-        Warning: NewRelic does not recommend large custom metric values due to
-        the potential performance impact on the agent, so you may just want to
-        enable when researching usage of a particular flag. Metric values longer
-        than 255 are truncated.
+          The value Both would mean that the flag had both a True and False
+          value at different times during the transaction. This is most
+          likely due to having a check_before_waffle_callback, as is the
+          case with CourseWaffleFlag.
 
         """
-        is_waffle_flag_metric_enabled = getattr(settings, _ENABLE_WAFFLE_FLAG_METRIC, False)
-        if not is_waffle_flag_metric_enabled:
+        if name not in _WAFFLE_FLAG_CUSTOM_METRIC_SET:
             return
 
         flag_metric_data = self._get_request_cache().setdefault('flag_metric', {})
@@ -332,20 +325,32 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                 is_value_change = True
 
         if is_value_change:
-            set_custom_metric('waffle_flags', str(flag_metric_data))
+            set_custom_metric(name, flag_metric_data[name])
+
+
+def _get_waffle_flag_custom_metrics_set():
+    """
+    Returns a set based on the Django setting WAFFLE_FLAG_CUSTOM_METRICS (list).
+    """
+    waffle_flag_custom_metrics = getattr(settings, _WAFFLE_FLAG_CUSTOM_METRICS, None)
+    waffle_flag_custom_metrics = waffle_flag_custom_metrics if waffle_flag_custom_metrics else []
+    return set(waffle_flag_custom_metrics)
 
     # .. toggle_name: ENABLE_WAFFLE_FLAG_METRIC
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Set to True to enable a custom metric with waffle flag values (True, False, Both).
+    # .. toggle_description: A list of waffle flag to track with custom metrics having values of (True, False, or Both).
     # .. toggle_category: monitoring
-    # .. toggle_use_cases: opt_out
+    # .. toggle_use_cases: opt_in
     # .. toggle_creation_date: 2020-06-17
     # .. toggle_expiration_date: None
     # .. toggle_tickets: None
     # .. toggle_status: supported
-    # .. toggle_warnings: Metric of flags could be large and heavier than typical metrics.
-_ENABLE_WAFFLE_FLAG_METRIC = 'ENABLE_WAFFLE_FLAG_METRIC'
+    # .. toggle_warnings: Intent is for temporary research (1 day - several weeks) of a flag's usage.
+_WAFFLE_FLAG_CUSTOM_METRICS = 'WAFFLE_FLAG_CUSTOM_METRICS'
+
+# set of waffle flags that should be instrumented with custom metrics
+_WAFFLE_FLAG_CUSTOM_METRIC_SET = _get_waffle_flag_custom_metrics_set()
 
 
 class WaffleFlag(object):
