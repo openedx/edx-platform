@@ -45,10 +45,10 @@ class ThirdClassification(models.Model):
 class CourseClassification(models.Model):
 
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True,verbose_name=_('course'))
-    MainClass = models.ForeignKey(MainClassification,verbose_name=u'Clasificación Principal', on_delete=models.CASCADE)
-    FirstClass = models.ForeignKey(FirstClassification,verbose_name=u'Clasificación 1',blank=True,null=True, on_delete=models.CASCADE)
-    SecondClass = models.ForeignKey(SecondClassification,verbose_name=u'Clasificación 2',blank=True,null=True, on_delete=models.CASCADE)
-    ThirdClass = models.ForeignKey(ThirdClassification,verbose_name=u'Clasificación 3',blank=True,null=True, on_delete=models.CASCADE)
+    MainClass = models.ForeignKey(MainClassification,verbose_name='Clasificación Principal', on_delete=models.CASCADE)
+    FirstClass = models.ForeignKey(FirstClassification,verbose_name='Clasificación 1',blank=True,null=True, on_delete=models.CASCADE)
+    SecondClass = models.ForeignKey(SecondClassification,verbose_name='Clasificación 2',blank=True,null=True, on_delete=models.CASCADE)
+    ThirdClass = models.ForeignKey(ThirdClassification,verbose_name='Clasificación 3',blank=True,null=True, on_delete=models.CASCADE)
 
     class Meta(object):
         ordering = ('course_id',)

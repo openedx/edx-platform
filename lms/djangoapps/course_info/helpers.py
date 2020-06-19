@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from models import MainClassification,FirstClassification,SecondClassification,ThirdClassification,CourseClassification
+from .models import MainClassification,FirstClassification,SecondClassification,ThirdClassification,CourseClassification
 
 def get_course_class(courses):
     CourseClass = [[course.course_id,course.MainClass] for course in CourseClassification.objects.all()]
