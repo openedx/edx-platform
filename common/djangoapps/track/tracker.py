@@ -20,6 +20,7 @@ below::
 
 
 import inspect
+import logging
 from importlib import import_module
 
 import six
@@ -31,6 +32,7 @@ __all__ = ['send']
 
 
 backends = {}
+LOGGER = logging.getLogger(__name__)
 
 
 def _initialize_backends_from_django_settings():
@@ -87,7 +89,9 @@ def send(event):
     Send an event object to all the initialized backends.
 
     """
-
+    LOGGER.warning(
+        'Tracker is deprecated. Please use eventtracking to generate tracking logs.'
+    )
     for name, backend in six.iteritems(backends):
         backend.send(event)
 
