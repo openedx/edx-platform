@@ -624,7 +624,6 @@
     "Default (Local Time Zone)": "Standard (Lokale Zeitzone)",
     "Default Timed Transcript": "Standard, zeitbehaftetes Transkript",
     "Delete": "L\u00f6schen",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "L\u00f6sche \"<%= signatoryName %>\" von der Liste der Unterzeichner?",
     "Delete File Confirmation": "Dateibest\u00e4tigung l\u00f6schen",
     "Delete My Account": "Meinen Account l\u00f6schen",
     "Delete Page Confirmation": "Seitenbest\u00e4tigung l\u00f6schen",
