@@ -255,7 +255,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-11 14:03+0000\n"
+"POT-Creation-Date: 2020-06-18 18:51+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -625,13 +625,13 @@ msgstr "No existe usuario con este correo electrónico en el sistema."
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
-msgid "An account with the Public Username '{username}' already exists."
-msgstr "Ya existe una cuenta con el nombre de usuario '{username}'."
+msgid "An account with the Email '{email}' already exists."
+msgstr "Ya existe una cuenta con el correo electrónico '{email}'."
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
-msgid "An account with the Email '{email}' already exists."
-msgstr "Ya existe una cuenta con el correo electrónico '{email}'."
+msgid "An account with the Public Username '{username}' already exists."
+msgstr "Ya existe una cuenta con el nombre de usuario '{username}'."
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Removed group: \"{}\""
@@ -14241,21 +14241,6 @@ msgid "Unenroll"
 msgstr "Cancelar la inscripción"
 
 #: lms/templates/dates_banner.html
-msgid "We've built a suggested schedule to help you stay on track."
-msgstr ""
-"Hemos creado un cronograma sugerido para ayudarlo a mantenerse encaminado."
-
-#: lms/templates/dates_banner.html
-msgid ""
-"But don't worry—it's flexible so you can learn at your own pace. If you "
-"happen to fall behind on our suggested dates, you'll be able to adjust them "
-"to keep yourself on track."
-msgstr ""
-"Pero no te preocupes—es flexible, por lo que puedes aprender a tu propio "
-"ritmo. Si te pierdes las fechas sugeridas, podrás ajustarlas para asegurar "
-"que puedes mantenerte al día."
-
-#: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
 "schedule. "
@@ -14269,7 +14254,7 @@ msgstr ""
 
 #: lms/templates/dates_banner.html
 msgid ""
-" Don’t worry—you won’t lose any of the progress you’ve made when you shift "
+" Don't worry—you won't lose any of the progress you've made when you shift "
 "your due dates."
 msgstr ""
 
@@ -14284,13 +14269,13 @@ msgstr ""
 #: lms/templates/dates_banner.html
 msgid ""
 "To keep yourself on track, you can update this schedule and shift the past "
-"due assignments into the future. Don’t worry—you won’t lose any of the "
-"progress you’ve made when you shift your due dates."
+"due assignments into the future. Don't worry—you won't lose any of the "
+"progress you've made when you shift your due dates."
 msgstr ""
 
 #: lms/templates/dates_banner.html
-msgid "Reset my deadlines"
-msgstr "Reiniciar mis fechas límite"
+msgid "Shift due dates"
+msgstr ""
 
 #: lms/templates/dates_banner.html
 msgid "You are auditing this course,"
@@ -14332,6 +14317,21 @@ msgid ""
 msgstr ""
 "Para completar las asignaciones calificables como parte de este curso, puede"
 " mejorar su inscripción hoy."
+
+#: lms/templates/dates_banner.html
+msgid "We've built a suggested schedule to help you stay on track."
+msgstr ""
+"Hemos creado un cronograma sugerido para ayudarlo a mantenerse encaminado."
+
+#: lms/templates/dates_banner.html
+msgid ""
+"But don't worry—it's flexible so you can learn at your own pace. If you "
+"happen to fall behind on our suggested dates, you'll be able to adjust them "
+"to keep yourself on track."
+msgstr ""
+"Pero no te preocupes—es flexible, por lo que puedes aprender a tu propio "
+"ritmo. Si te pierdes las fechas sugeridas, podrás ajustarlas para asegurar "
+"que puedes mantenerte al día."
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"

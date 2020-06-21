@@ -365,7 +365,6 @@
     "Default (Local Time Zone)": "\u65e2\u5b9a\u5024 (\u5730\u57df\u5225\u30bf\u30a4\u30e0\u30be\u30fc\u30f3)",
     "Default Timed Transcript": "\u65e2\u5b9a\u306e\u6642\u9593\u4ed8\u304d\u306e\u5b57\u5e55",
     "Delete": "\u524a\u9664",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "\u7f72\u540d\u4e00\u89a7\u304b\u3089 \"<%= signatoryName %>\" \u3092\u524a\u9664\u3057\u307e\u3059\u304b\uff1f",
     "Delete File Confirmation": "\u30d5\u30a1\u30a4\u30eb\u524a\u9664\u78ba\u8a8d",
     "Delete Team": "\u30c1\u30fc\u30e0\u3092\u524a\u9664",
     "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?": "\u53d7\u8b1b\u8005 '<%- student_id %>' \u306e\u554f\u984c '<%- problem_id %>' \u306e\u56de\u7b54\u3092\u524a\u9664\u3057\u3066\u3088\u308d\u3057\u3044\u3067\u3059\u304b\uff1f",

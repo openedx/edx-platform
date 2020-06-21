@@ -641,7 +641,6 @@
     "Default (Local Time Zone)": "Por defecto (Zona horaria local)",
     "Default Timed Transcript": "Transcripci\u00f3n con tiempos por defecto",
     "Delete": "Borrar",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "\u00bfDesea borrar \"<%= signatoryName %>\" de la lista de signatarios?",
     "Delete File Confirmation": "Confirmaci\u00f3n de borrado de archivo",
     "Delete My Account": "Eliminar mi cuenta",
     "Delete Page Confirmation": "Confirmaci\u00f3n de eliminaci\u00f3n de p\u00e1gina",

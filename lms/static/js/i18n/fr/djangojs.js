@@ -505,7 +505,6 @@
     "Default (Local Time Zone)": "D\u00e9faut (fuseau horaire local)",
     "Default Timed Transcript": "Transcription synchronis\u00e9e par d\u00e9faut",
     "Delete": "Supprimer",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "Supprimer \"<%= signatoryName %>\" de la liste de signataires.",
     "Delete File Confirmation": "Confirmation de la suppression du fichier",
     "Delete My Account": "Supprimer mon compte",
     "Delete Team": "Supprimer l'\u00e9quipe",
