@@ -613,10 +613,10 @@ class CourseGradingTest(CourseTestCase):
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
                     'course_id': six.text_type(self.course.id),
-                    'event_transaction_type': 'edx.grades.grading_policy_changed',
-                    'grading_policy_hash': policy_hash,
                     'user_id': six.text_type(self.user.id),
+                    'grading_policy_hash': policy_hash,
                     'event_transaction_id': 'mockUUID',
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
                 }
             ) for policy_hash in {grading_policy_1, grading_policy_2, grading_policy_3}
         ])
