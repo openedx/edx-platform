@@ -6,6 +6,8 @@ import mock
 from mock import MagicMock
 
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -176,6 +178,17 @@ class UtilsTests(TestCase):
         assert self._get_course_creator_status(self.user) == 'unrequested'
         assert not auth.user_has_role(self.user, CourseCreatorRole())
 
+        self.admin_user.is_staff = False
+        self.admin_user.save()
+        with self.assertRaises(PermissionDenied):
+            update_course_creator_status(self.admin_user, self.user, True)
+
+        edly_panel_admin_user_group, __ = Group.objects.get_or_create(name=settings.EDLY_PANEL_ADMIN_USERS_GROUP)
+        self.admin_user.groups.add(edly_panel_admin_user_group)
+        update_course_creator_status(self.admin_user, self.user, False)
+        assert self._get_course_creator_status(self.user) == 'unrequested'
+        assert not auth.user_has_role(self.user, CourseCreatorRole())
+
     @skip_unless_cms
     @mock.patch('course_creators.admin.render_to_string', mock.Mock(side_effect=mock_render_to_string, autospec=True))
     def test_set_global_course_creator_status(self):
@@ -183,7 +196,7 @@ class UtilsTests(TestCase):
         Test that "set_global_course_creator_status" method sets/removes a User as Global Course Creator correctly.
         """
         self._create_edly_sub_organization()
-        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user)
+        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user, cookie_settings(self.request))
         self._copy_cookies_to_request(response, self.request)
         edly_user_info_cookie = self.request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME)
         edx_org = get_edx_org_from_cookie(edly_user_info_cookie)
@@ -196,3 +209,14 @@ class UtilsTests(TestCase):
         set_global_course_creator_status(self.request, self.user, False)
         assert self._get_course_creator_status(self.user) == 'unrequested'
         assert not auth.user_has_role(self.user, GlobalCourseCreatorRole(edx_org))
+
+        self.admin_user.is_staff = False
+        self.admin_user.save()
+        with self.assertRaises(PermissionDenied):
+            set_global_course_creator_status(self.request, self.user, True)
+
+        edly_panel_admin_user_group, __ = Group.objects.get_or_create(name=settings.EDLY_PANEL_ADMIN_USERS_GROUP)
+        self.admin_user.groups.add(edly_panel_admin_user_group)
+        set_global_course_creator_status(self.request, self.user, True)
+        assert self._get_course_creator_status(self.user) == 'granted'
+        assert auth.user_has_role(self.user, CourseCreatorRole())

@@ -3,6 +3,7 @@ import logging
 import jwt
 import waffle
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.forms.models import model_to_dict
 
@@ -12,6 +13,7 @@ from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     GlobalCourseCreatorRole,
+    GlobalStaff,
     UserBasedRole,
 )
 from util.organizations_helpers import get_organizations
@@ -188,6 +190,10 @@ def set_global_course_creator_status(request, user, set_global_creator):
     from course_creators.models import CourseCreator
 
     request_user = request.user
+    is_edly_panel_admin_user = request_user.groups.filter(name=settings.EDLY_PANEL_ADMIN_USERS_GROUP).exists()
+    if not GlobalStaff().has_user(request_user) and not is_edly_panel_admin_user:
+        raise PermissionDenied
+
     course_creator, __ = CourseCreator.objects.get_or_create(user=user)
     course_creator.state = CourseCreator.GRANTED if set_global_creator else CourseCreator.UNREQUESTED
     course_creator.note = 'Global course creator user was updated by panel admin {}'.format(request_user.email)
