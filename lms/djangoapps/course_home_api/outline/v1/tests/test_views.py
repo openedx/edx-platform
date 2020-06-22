@@ -2,7 +2,6 @@
 Tests for Outline Tab API in the Course Home API
 """
 
-
 import ddt
 
 from django.urls import reverse
@@ -17,6 +16,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     """
     Tests for the Outline Tab API
     """
+
     @classmethod
     def setUpClass(cls):
         BaseCourseHomeTests.setUpClass()
@@ -32,6 +32,12 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.assertTrue(course_tools)
         self.assertEquals(course_tools[0]['analytics_id'], 'edx.bookmarks')
 
+        dates_widget = response.data.get('dates_widget')
+        self.assertTrue(dates_widget)
+        date_blocks = dates_widget.get('course_date_blocks')
+        self.assertTrue(all((block.get('title') != "") for block in date_blocks))
+        self.assertTrue(all(block.get('date') for block in date_blocks))
+
     def test_get_authenticated_user_not_enrolled(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -39,6 +45,12 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
         course_tools = response.data.get('course_tools')
         self.assertEqual(len(course_tools), 0)
+
+        dates_widget = response.data.get('dates_widget')
+        self.assertTrue(dates_widget)
+        date_blocks = dates_widget.get('course_date_blocks')
+        self.assertTrue(all((block.get('title') != "") for block in date_blocks))
+        self.assertTrue(all(block.get('date') for block in date_blocks))
 
     def test_get_unauthenticated_user(self):
         self.client.logout()
