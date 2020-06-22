@@ -436,12 +436,7 @@ class TeamMembershipImportManager(object):
             if row[ts_id] is None:
                 # remove this student from the teamset
                 try:
-                    membership = CourseTeamMembership.objects.get(
-                        user_id=row['user'].id,
-                        team__topic_id=ts_id,
-                        team__course_id=self.course.id
-                    )
-                    membership.delete()
+                    self._remove_user_from_teamset_and_emit_signal(row['user'].id, ts_id, self.course.id)
                 except CourseTeamMembership.DoesNotExist:
                     pass
             else:
@@ -450,12 +445,7 @@ class TeamMembershipImportManager(object):
                     current_user_teams_name = self.existing_course_team_memberships[row['user'].id, ts_id].name
                     if current_user_teams_name != row[ts_id]:
                         try:
-                            membership = CourseTeamMembership.objects.get(
-                                user_id=row['user'].id,
-                                team__topic_id=ts_id,
-                                team__course_id=self.course.id
-                            )
-                            membership.delete()
+                            self._remove_user_from_teamset_and_emit_signal(row['user'].id, ts_id, self.course.id)
                             del self.existing_course_team_memberships[row['user'].id, ts_id]
                             self.user_ids_by_teamset_id[ts_id].remove(row['user'].id)
                         except CourseTeamMembership.DoesNotExist:
@@ -464,6 +454,30 @@ class TeamMembershipImportManager(object):
                         # the user will remain in the same team. In order to avoid validation/attempting
                         # to readd the user, null out the team name
                         row[ts_id] = None
+
+    def _remove_user_from_teamset_and_emit_signal(self, user_id, ts_id, course_id):
+        """
+        If a team membership exists for the specified user, in the specified course and teamset, delete it.
+        This removes the user from the team.
+        Then, emit an event.
+
+        If the membership doesn't exist, don't emit the event and instead raise CourseTeamMembership.DoesNotExist
+        """
+        membership = CourseTeamMembership.objects.select_related('team').get(
+            user_id=user_id,
+            team__topic_id=ts_id,
+            team__course_id=course_id
+        )
+        membership.delete()
+        emit_team_event(
+            'edx.team.learner_removed',
+            course_id,
+            {
+                'team_id': membership.team.team_id,
+                'user_id': membership.user_id,
+                'remove_method': 'team_csv_import'
+            }
+        )
 
     def add_error_and_check_if_max_exceeded(self, error_message):
         """
