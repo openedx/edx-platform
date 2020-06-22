@@ -250,9 +250,15 @@ class CourseMetadata(object):
 
         # Disallow updates to the proctoring provider after course start
         proctoring_provider_model = filtered_dict.get('proctoring_provider')
+
+        # If the user is not edX staff, the user has requested a change to the proctoring_provider
+        # Advanced Setting, and and it is after course start, prevent the user from changing the
+        # proctoring provider.
         if (
             not user.is_staff and
-            proctoring_provider_model != descriptor.proctoring_provider and
+            cls._has_requested_proctoring_provider_changed(
+                descriptor.proctoring_provider, proctoring_provider_model
+            ) and
             datetime.now(pytz.UTC) > descriptor.start
         ):
             did_validate = False
@@ -260,13 +266,28 @@ class CourseMetadata(object):
                 'The proctoring provider cannot be modified after a course has started.'
                 ' Contact {support_email} for assistance'
             ).format(support_email=settings.PARTNER_SUPPORT_EMAIL or 'support')
-            errors.append({'message': message, 'model': filtered_dict.get('proctoring_provider')})
+            errors.append({'message': message, 'model': proctoring_provider_model})
 
         # If did validate, go ahead and update the metadata
         if did_validate:
             updated_data = cls.update_from_dict(key_values, descriptor, user, save=False)
 
         return did_validate, errors, updated_data
+
+    @staticmethod
+    def _has_requested_proctoring_provider_changed(current_provider, requested_provider):
+        """
+        Return whether the requested proctoring provider is different than the current proctoring provider, indicating
+        that the user has requested a change to the proctoring_provider Advanced Setting.
+
+        The requested_provider will be None if the proctoring_provider setting is not available (e.g. if the
+        ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled for the course). In this case, we consider
+        that there is no change in the requested proctoring provider.
+        """
+        if requested_provider is None:
+            return False
+        else:
+            return current_provider != requested_provider
 
     @classmethod
     def update_from_dict(cls, key_values, descriptor, user, save=True):
