@@ -170,7 +170,7 @@ def _check_caller_authority(caller, role):
     if not (caller.is_authenticated and caller.is_active):
         raise PermissionDenied
     # superuser
-    if GlobalStaff().has_user(caller) or GlobalCourseCreatorRole().has_user(caller):
+    if GlobalStaff().has_user(caller) or caller.groups.filter(name=settings.EDLY_PANEL_ADMIN_USERS_GROUP).exists():
         return
 
     if isinstance(role, (GlobalStaff, CourseCreatorRole)):
