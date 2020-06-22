@@ -7,18 +7,18 @@ If student have answered - Question with statistics for each answers.
 """
 
 
-import cgi
+import html
 import json
 import logging
 from collections import OrderedDict
 from copy import deepcopy
 
-from pkg_resources import resource_string
-
 import six
 from lxml import etree
-from openedx.core.djangolib.markup import Text
+from pkg_resources import resource_string
 from xblock.fields import Boolean, Dict, List, Scope, String
+
+from openedx.core.djangolib.markup import Text
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
@@ -152,12 +152,12 @@ class PollModule(PollFields, XModule):
             # Set default count for answer = 0.
             if answer['id'] not in temp_poll_answers:
                 temp_poll_answers[answer['id']] = 0
-            answers_to_json[answer['id']] = cgi.escape(answer['text'])
+            answers_to_json[answer['id']] = html.escape(answer['text'])
         self.poll_answers = temp_poll_answers
 
         return json.dumps({
             'answers': answers_to_json,
-            'question': cgi.escape(self.question),
+            'question': html.escape(self.question),
             # to show answered poll after reload:
             'poll_answer': self.poll_answer,
             'poll_answers': self.poll_answers if self.voted else {},
@@ -215,7 +215,8 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
-        poll_str = u'<{tag_name}>{text}</{tag_name}>'.format(
+        # xss-lint: disable=python-wrap-html
+        poll_str = '<{tag_name}>{text}</{tag_name}>'.format(
             tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
         xml_object.set('display_name', self.display_name)
@@ -223,7 +224,8 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
         def add_child(xml_obj, answer):
             # Escape answer text before adding to xml tree.
             answer_text = six.text_type(Text(answer['text']))
-            child_str = u'<{tag_name} id="{id}">{text}</{tag_name}>'.format(
+            # xss-lint: disable=python-wrap-html
+            child_str = '<{tag_name} id="{id}">{text}</{tag_name}>'.format(
                 tag_name=self._child_tag_name, id=answer['id'],
                 text=answer_text)
             child_node = etree.fromstring(child_str)
