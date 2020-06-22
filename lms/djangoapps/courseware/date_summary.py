@@ -434,7 +434,7 @@ class CourseExpiredDate(DateSummary):
 
     @property
     def date(self):
-        if not CourseDurationLimitConfig.enabled_for_enrollment(user=self.user, course_key=self.course_id):
+        if not CourseDurationLimitConfig.enabled_for_enrollment(self.user, self.course):
             return
         return get_user_course_expiration_date(self.user, self.course)
 

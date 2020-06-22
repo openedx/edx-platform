@@ -96,7 +96,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         """
         Returns expiration date for a course audit expiration, if any or null
         """
-        if not CourseDurationLimitConfig.enabled_for_enrollment(user=model.user, course_key=model.course.id):
+        if not CourseDurationLimitConfig.enabled_for_enrollment(model.user, model.course):
             return None
 
         return get_user_course_expiration_date(model.user, model.course)

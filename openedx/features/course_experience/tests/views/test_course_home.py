@@ -219,7 +219,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(74, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(72, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -252,7 +252,8 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         super(TestCourseHomePageAccess, self).setUp()
 
         # Make this a verified course so that an upgrade message might be shown
-        add_course_mode(self.course, upgrade_deadline_expired=False)
+        add_course_mode(self.course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(self.course)
 
         # Add a welcome message
         create_course_update(self.course, self.staff_user, TEST_WELCOME_MESSAGE)
@@ -709,6 +710,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # Verify that unenrolled users visiting a course with a Master's track
         # that is not the only track are shown an enroll call to action message
         add_course_mode(self.course, CourseMode.MASTERS, 'Master\'s Mode', upgrade_deadline_expired=False)
+        remove_course_mode(self.course, CourseMode.AUDIT)
 
         self.create_user_for_course(self.course, CourseUserType.UNENROLLED)
         url = course_home_url(self.course)

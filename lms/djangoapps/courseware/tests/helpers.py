@@ -329,6 +329,52 @@ class CourseAccessTestMixin(TestCase):
         self.assertFalse(has_access(user, action, CourseOverview.get_from_id(course.id)))
 
 
+class MasqueradeMixin:
+    """
+    Adds masquerade utilities for your TestCase.
+
+    Your test case class must have self.client. And can optionally have self.course if you don't want
+    to pass in the course parameter below.
+    """
+
+    def update_masquerade(self, course=None, role='student', group_id=None, username=None, user_partition_id=None):
+        """
+        Installs a masquerade for the specified user and course, to enable
+        the user to masquerade as belonging to the specific partition/group
+        combination.
+
+        Arguments:
+            course (object): a course or None for self.course
+            user_partition_id (int): the integer partition id, referring to partitions already
+               configured in the course.
+            group_id (int); the integer group id, within the specified partition.
+            username (str): user to masquerade as
+            role (str): role to masquerade as
+
+        Returns: the response object for the AJAX call to update the user's masquerade.
+        """
+        course = course or self.course
+        masquerade_url = reverse(
+            'masquerade_update',
+            kwargs={
+                'course_key_string': str(course.id),
+            }
+        )
+        response = self.client.post(
+            masquerade_url,
+            json.dumps({
+                'role': role,
+                'group_id': group_id,
+                'user_name': username,
+                'user_partition_id': user_partition_id,
+            }),
+            'application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'], response.json().get('error'))
+        return response
+
+
 def masquerade_as_group_member(user, course, partition_id, group_id):
     """
     Installs a masquerade for the specified user and course, to enable

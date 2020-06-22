@@ -21,12 +21,6 @@ from edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import check_course_access
-from lms.djangoapps.courseware.masquerade import is_masquerading
-from lms.djangoapps.courseware.masquerade import is_masquerading_as_audit_enrollment
-from lms.djangoapps.courseware.masquerade import is_masquerading_as_full_access
-from lms.djangoapps.courseware.masquerade import is_masquerading_as_limited_access
-from lms.djangoapps.courseware.masquerade import is_masquerading_as_non_audit_enrollment
-from lms.djangoapps.courseware.masquerade import is_masquerading_as_staff
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
@@ -96,27 +90,10 @@ class CoursewareMeta:
 
     @property
     def content_type_gating_enabled(self):
-        course_key = self.course_key
-        user = self.effective_user
-        is_enabled = None
-        course_masquerade = self.course_masquerade
-        if is_masquerading(user, course_key, course_masquerade):
-            if is_masquerading_as_staff(user, course_key):
-                is_enabled = False
-            elif is_masquerading_as_full_access(user, course_key, course_masquerade):
-                is_enabled = False
-            elif is_masquerading_as_non_audit_enrollment(user, course_key, course_masquerade):
-                is_enabled = False
-            elif is_masquerading_as_audit_enrollment(user, course_key, course_masquerade):
-                is_enabled = ContentTypeGatingConfig.enabled_for_course(course_key)
-            elif is_masquerading_as_limited_access(user, course_key, course_masquerade):
-                is_enabled = ContentTypeGatingConfig.enabled_for_course(course_key)
-        if is_enabled is None:
-            is_enabled = ContentTypeGatingConfig.enabled_for_enrollment(
-                user=user,
-                course_key=course_key,
-            )
-        return is_enabled
+        return ContentTypeGatingConfig.enabled_for_enrollment(
+            user=self.effective_user,
+            course_key=self.course_key,
+        )
 
     @property
     def can_show_upgrade_sock(self):
@@ -396,7 +373,7 @@ class Celebration(DeveloperErrorViewMixin, APIView):
 
     **Returns**
 
-        * 200 or 201 on success with above fields.
+        * 200 or 201 or 202 on success with above fields.
         * 400 if an invalid parameter was sent.
         * 404 if the course is not available or cannot be seen.
     """
@@ -413,6 +390,16 @@ class Celebration(DeveloperErrorViewMixin, APIView):
         Handle a POST request.
         """
         course_key = CourseKey.from_string(course_key_string)
+
+        # Check if we're masquerading as someone else. If so, we should just ignore this request.
+        _, user = setup_masquerade(
+            request,
+            course_key,
+            staff_access=has_access(request.user, 'staff', course_key),
+            reset_masquerade_data=True,
+        )
+        if user != request.user:
+            return Response(status=202)  # "Accepted"
 
         data = dict(request.data)
         first_section = data.pop('first_section', None)
