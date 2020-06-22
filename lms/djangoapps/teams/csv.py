@@ -308,11 +308,10 @@ class TeamMembershipImportManager(object):
             team_name = row[teamset_id]
 
             # See if the user is already on a team in the teamset
-            try:
+            if (user.id, teamset_id) in self.existing_course_team_memberships:
                 current_team_name = self.existing_course_team_memberships[(user.id, teamset_id)].name
-            except KeyError:
+            else:
                 current_team_name = None
-                pass
 
             if current_team_name == team_name:
                 # We don't need to do anything if the user isn't moving to a different team
