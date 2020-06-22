@@ -5,6 +5,6 @@
   <div class="badge-details">
     <div class="badge-name"><%- gettext("What's Your Next Accomplishment?") %></div>
     <p class="badge-description"><%- gettext('Start working toward your next learning goal.') %></p>
-    <a class="find-course" href="<%= find_courses_url %>"><span class="find-button-container"><%- gettext('Find a course') %></span></a>
+    <a class="find-course" href="<%- find_courses_url %>"><span class="find-button-container"><%- gettext('Find a course') %></span></a>
   </div>
 </div>
