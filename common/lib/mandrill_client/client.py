@@ -33,6 +33,8 @@ class MandrillClient(object):
     CHANGE_USER_EMAIL_ALERT = 'change-user-email-alert'
     DOWNLOAD_CERTIFICATE = 'download-certificate'
     USER_BADGE_EMAIL_TEMPLATE = 'user-badge-email'
+    REFERRAL_INITIAL_EMAIL = 'referral-email'
+    REFERRAL_SOCIAL_IMPACT_TOOLKIT = 'social-impact-toolkit'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)

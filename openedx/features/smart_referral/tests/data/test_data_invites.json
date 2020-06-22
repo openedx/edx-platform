@@ -1,0 +1,18 @@
+{
+  "contact_list": [
+    {
+      "selected_contacts_list": [
+        {
+          "first_name": "T1 First Name",
+          "last_name": "T1 Last Name",
+          "contact_email": "testing.101@test.com"
+        },
+        {
+          "first_name": "T2 First Name",
+          "last_name": "T2 Last Name",
+          "contact_email": "testing.102@test.com"
+        }
+      ]
+    }
+  ]
+}
