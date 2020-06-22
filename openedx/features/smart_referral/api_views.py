@@ -23,6 +23,7 @@ class FilterContactsAPIView(APIView):
         user = request.user
         user_contacts = request.data.get('contacts_list', [])
 
+        # Removing duplicate emails. Same email can present multiple time with different first and last names.
         user_contacts = {contact['contact_email']: contact for contact in user_contacts}.values()
 
         platform_contacts, non_platform_contacts = get_platform_contacts_and_non_platform_contacts(user_contacts)
