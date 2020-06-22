@@ -258,7 +258,6 @@
     "December": "Dezembro",
     "Default Timed Transcript": "Transcri\u00e7\u00e3o Sincronizada Padr\u00e3o",
     "Delete": "Apagar",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "Apagar \"<%= signatoryName %>\" da lista de emissores?",
     "Delete File Confirmation": "Confirma\u00e7\u00e3o da exclus\u00e3o do arquivo",
     "Delete Team": "Apagar equipe.",
     "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?": "Excluir status do aluno '<%- student_id %>' para o problema '<%- problem_id %>'?",

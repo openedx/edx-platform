@@ -6,8 +6,6 @@ Configuration for the ``student`` Django application.
 import os
 
 from django.apps import AppConfig
-from django.contrib.auth.signals import user_logged_in
-from django.db.models.signals import pre_save
 
 
 class StudentConfig(AppConfig):
@@ -17,10 +15,8 @@ class StudentConfig(AppConfig):
     name = 'student'
 
     def ready(self):
-
-        from django.contrib.auth.models import User
-        from .signals.receivers import on_user_updated
-        pre_save.connect(on_user_updated, sender=User)
+        # Connect signal handlers.
+        from .signals import receivers  # pylint: disable=unused-import
 
         # The django-simple-history model on CourseEnrollment creates performance
         # problems in testing, we mock it here so that the mock impacts all tests.

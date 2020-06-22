@@ -124,7 +124,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         if not request:
             return 0
 
-        if not request.user.id:
+        if not hasattr(request, 'user') or not request.user.id:
             # We need username for stable bucketing and id for tracking, so just skip anonymous (not-logged-in) users
             return 0
 

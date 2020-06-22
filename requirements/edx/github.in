@@ -61,14 +61,9 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 # The latest 2.0.0 release doesn't yet support Django 2.2, this commit from master does
 -e git+https://github.com/jsocol/django-ratelimit.git@72edbe8949fbf6699848e5847645a1998f121d46#egg=ratelimit
 
-# Forked to get Django 2.2 support from unreleased master branch from social-app-django repo.
-# This can be removed once an official social-auth-app-django Pypi release with Django 2.2 support is available in the future.
--e git+https://github.com/python-social-auth/social-app-django.git@c00d23c2b45c3317bd35b15ad1b959338689cef8#egg=social-auth-app-django
-
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@v2.7.10#egg=ora2==v2.7.10
 -e git+https://github.com/edx/RateXBlock.git@2.0#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@2.0.2#egg=done-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive

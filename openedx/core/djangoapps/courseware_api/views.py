@@ -21,6 +21,13 @@ from edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import check_course_access
+from lms.djangoapps.courseware.masquerade import is_masquerading
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_audit_enrollment
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_full_access
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_limited_access
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_non_audit_enrollment
+from lms.djangoapps.courseware.masquerade import is_masquerading_as_staff
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
@@ -29,7 +36,7 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_message
 from openedx.features.discounts.utils import generate_offer_html
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseEnrollmentCelebration
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
 
@@ -47,14 +54,20 @@ class CoursewareMeta:
             course_key,
         )
         self.effective_user = self.overview.effective_user
+        # We need to memoize `is_staff` _before_ we configure masquerade.
+        self.is_staff = has_access(self.effective_user, 'staff', self.overview).has_access
         self.course_key = course_key
+        self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
+                                                                 select_related=['celebration'])
+        course_masquerade, _user = setup_masquerade(
+            request,
+            course_key,
+            staff_access=self.is_staff,
+        )
+        self.course_masquerade = course_masquerade
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
-
-    @property
-    def is_staff(self):
-        return has_access(self.effective_user, 'staff', self.overview).has_access
 
     @property
     def enrollment(self):
@@ -83,15 +96,31 @@ class CoursewareMeta:
 
     @property
     def content_type_gating_enabled(self):
-        return ContentTypeGatingConfig.enabled_for_enrollment(
-            user=self.effective_user,
-            course_key=self.course_key,
-        )
+        course_key = self.course_key
+        user = self.effective_user
+        is_enabled = None
+        course_masquerade = self.course_masquerade
+        if is_masquerading(user, course_key, course_masquerade):
+            if is_masquerading_as_staff(user, course_key):
+                is_enabled = False
+            elif is_masquerading_as_full_access(user, course_key, course_masquerade):
+                is_enabled = False
+            elif is_masquerading_as_non_audit_enrollment(user, course_key, course_masquerade):
+                is_enabled = False
+            elif is_masquerading_as_audit_enrollment(user, course_key, course_masquerade):
+                is_enabled = ContentTypeGatingConfig.enabled_for_course(course_key)
+            elif is_masquerading_as_limited_access(user, course_key, course_masquerade):
+                is_enabled = ContentTypeGatingConfig.enabled_for_course(course_key)
+        if is_enabled is None:
+            is_enabled = ContentTypeGatingConfig.enabled_for_enrollment(
+                user=user,
+                course_key=course_key,
+            )
+        return is_enabled
 
     @property
     def can_show_upgrade_sock(self):
-        enrollment = CourseEnrollment.get_enrollment(self.effective_user, self.course_key)
-        can_show = can_show_verified_upgrade(self.effective_user, enrollment)
+        can_show = can_show_verified_upgrade(self.effective_user, self.enrollment_object)
         return can_show
 
     @property
@@ -144,6 +173,15 @@ class CoursewareMeta:
         return {
             'enabled': is_feature_enabled(self.overview, self.effective_user),
             'visible': self.overview.edxnotes_visibility,
+        }
+
+    @property
+    def celebrations(self):
+        """
+        Returns a list of celebrations that should be performed.
+        """
+        return {
+            'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(self.enrollment_object),
         }
 
 
@@ -338,3 +376,59 @@ class Resume(DeveloperErrorViewMixin, APIView):
             pass
 
         return Response(resp)
+
+
+class Celebration(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+
+        Marks a particular celebration as complete
+
+    **Example Requests**
+
+        POST /api/courseware/celebration/{course_key}
+
+    **Request Parameters**
+
+        Body consists of the following fields:
+
+            * first_section (bool): whether we should celebrate when a user finishes their first section of a course
+
+    **Returns**
+
+        * 200 or 201 on success with above fields.
+        * 400 if an invalid parameter was sent.
+        * 404 if the course is not available or cannot be seen.
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, )
+    http_method_names = ['post']
+
+    def post(self, request, course_key_string, *args, **kwargs):
+        """
+        Handle a POST request.
+        """
+        course_key = CourseKey.from_string(course_key_string)
+
+        data = dict(request.data)
+        first_section = data.pop('first_section', None)
+        if data:
+            return Response(status=400)  # there were parameters we didn't recognize
+
+        enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
+        if not enrollment:
+            return Response(status=404)
+
+        defaults = {}
+        if first_section is not None:
+            defaults['celebrate_first_section'] = first_section
+
+        if defaults:
+            _, created = CourseEnrollmentCelebration.objects.update_or_create(enrollment=enrollment, defaults=defaults)
+            return Response(status=201 if created else 200)
+        else:
+            return Response(status=200)  # just silently allow it

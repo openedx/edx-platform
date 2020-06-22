@@ -139,6 +139,7 @@ class TeamsDashboardView(GenericAPIView):
         # to the serializer so that the paginated results indicate how they were sorted.
         sort_order = 'name'
         topics = get_alphabetical_topics(course)
+        topics = _filter_hidden_private_teamsets(user, topics, course)
         organization_protection_status = user_organization_protection_status(request.user, course_key)
 
         # We have some frontend logic that needs to know if we have any open, public, or managed teamsets,
@@ -442,10 +443,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                     topic_id=topic_id
                 )
                 return Response(error, status=status.HTTP_400_BAD_REQUEST)
-
-            if course_module.teamsets_by_id[topic_id].is_private_managed \
-                    and not has_access(request.user, 'staff', course_key):
-                result_filter.update({'membership__user__username': request.user})
 
             result_filter.update({'topic_id': topic_id})
 
@@ -1020,15 +1017,15 @@ class TopicListView(GenericAPIView):
         # in the case of "team_count".
         organization_protection_status = user_organization_protection_status(request.user, course_id)
         topics = get_alphabetical_topics(course_module)
-        topics = self._filter_hidden_private_teamsets(topics, course_module)
+        topics = _filter_hidden_private_teamsets(request.user, topics, course_module)
 
         if ordering == 'team_count':
-            add_team_count(topics, course_id, organization_protection_status)
+            add_team_count(request.user, topics, course_id, organization_protection_status)
             topics.sort(key=lambda t: t['team_count'], reverse=True)
             page = self.paginate_queryset(topics)
             serializer = TopicSerializer(
                 page,
-                context={'course_id': course_id},
+                context={'course_id': course_id, 'user': request.user},
                 many=True,
             )
         else:
@@ -1037,6 +1034,7 @@ class TopicListView(GenericAPIView):
             serializer = BulkTeamCountTopicSerializer(
                 page,
                 context={
+                    'request': request,
                     'course_id': course_id,
                     'organization_protection_status': organization_protection_status
                 },
@@ -1048,25 +1046,26 @@ class TopicListView(GenericAPIView):
 
         return response
 
-    def _filter_hidden_private_teamsets(self, teamsets, course_module):
-        """
-        Return a filtered list of teamsets, removing any private teamsets that a user doesn't have access to.
-        Follows the same logic as `has_specific_teamset_access` but in bulk rather than for one teamset at a time
-        """
-        if has_course_staff_privileges(self.request.user, course_module.id):
-            return teamsets
-        private_teamset_ids = [teamset.teamset_id for teamset in course_module.teamsets if teamset.is_private_managed]
-        teamset_ids_user_has_access_to = set(
-            CourseTeam.objects.filter(
-                course_id=course_module.id,
-                topic_id__in=private_teamset_ids,
-                membership__user=self.request.user
-            ).values_list('topic_id', flat=True)
-        )
-        return [
-            teamset for teamset in teamsets
-            if teamset['type'] != TeamsetType.private_managed.value or teamset['id'] in teamset_ids_user_has_access_to
-        ]
+
+def _filter_hidden_private_teamsets(user, teamsets, course_module):
+    """
+    Return a filtered list of teamsets, removing any private teamsets that a user doesn't have access to.
+    Follows the same logic as `has_specific_teamset_access` but in bulk rather than for one teamset at a time
+    """
+    if has_course_staff_privileges(user, course_module.id):
+        return teamsets
+    private_teamset_ids = [teamset.teamset_id for teamset in course_module.teamsets if teamset.is_private_managed]
+    teamset_ids_user_has_access_to = set(
+        CourseTeam.objects.filter(
+            course_id=course_module.id,
+            topic_id__in=private_teamset_ids,
+            membership__user=user
+        ).values_list('topic_id', flat=True)
+    )
+    return [
+        teamset for teamset in teamsets
+        if teamset['type'] != TeamsetType.private_managed.value or teamset['id'] in teamset_ids_user_has_access_to
+    ]
 
 
 def get_alphabetical_topics(course_module):
@@ -1159,7 +1158,8 @@ class TopicDetailView(APIView):
             topic.cleaned_data,
             context={
                 'course_id': course_id,
-                'organization_protection_status': organization_protection_status
+                'organization_protection_status': organization_protection_status,
+                'user': request.user
             }
         )
         return Response(serializer.data)

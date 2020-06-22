@@ -6,7 +6,7 @@ Includes namespacing, caching, and course overrides for waffle flags.
 Usage:
 
 For Waffle Flags, first set up the namespace, and then create flags using the
-namespace.  For example:
+namespace.  For example::
 
    WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 
@@ -15,7 +15,7 @@ namespace.  For example:
    # Use WaffleFlag when outside the context of a course.
    HIDE_SEARCH_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'hide_search')
 
-You can check these flags in code using the following:
+You can check these flags in code using the following::
 
     HIDE_SEARCH_FLAG.is_enabled()
     UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key)
@@ -29,13 +29,13 @@ You could also use the Django Admin "waffle_utils" section to configure a course
 override for this same flag (e.g. course_experience.unified_course_tab).
 
 For Waffle Switches, first set up the namespace, and then create the flag name.
-For example:
+For example::
 
     WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 
     ESTIMATE_FIRST_ATTEMPTED = 'estimate_first_attempted'
 
-You can then use the switch as follows:
+You can then use the switch as follows::
 
     WAFFLE_SWITCHES.is_enabled(waffle.ESTIMATE_FIRST_ATTEMPTED)
 
@@ -47,26 +47,23 @@ To test WaffleSwitchNamespace, use the provided context managers.  For example:
 For long-lived flags, you may want to change the default for the flag from "off"
 to "on", so that it is "on" by default in devstack, sandboxes, or new Open edX
 releases, more closely matching what is in Production. This is for flags that
-can't yet be deleted, for example if there are straggling course overrides.
+can't yet be deleted, for example if there are still course overrides.
 
-    * WaffleFlag has a DEPRECATED argument flag_undefined_default that we don't
-    recommend you use any more. Although this can work, it is proven not ideal to
-    have a value that isn't immediately obvious via Django admin.
-
-    * At this time, the proper alternative has not been fully designed. The
-    following food-for-thought could provide ideas for this design when needed:
-    using migrations, using app-level configuration, using management commands,
-    and/or creating records up front so all toggle defaults are explicit rather
-    than implicit.
+  * To do so, add a migration that adds the flag as active if the record doesn't
+    already exist. For more details, see:
+    openedx/core/djangoapps/waffle_utils/docs/decisions/0001-refactor-waffle-flag-default.rst
 
 """
 
 import logging
+import warnings
 from abc import ABCMeta
 from contextlib import contextmanager
 
 import crum
 import six
+from django.conf import settings
+from edx_django_utils.monitoring import set_custom_metric
 from opaque_keys.edx.keys import CourseKey
 from waffle import flag_is_active, switch_is_active
 
@@ -253,10 +250,17 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                 used.
             DEPRECATED flag_undefined_default (Boolean): A default value to be
                 returned if the waffle flag is to be checked, but doesn't exist.
-                See docs for alternatives.
+                See module docstring for alternative.
         """
         # Import is placed here to avoid model import at project startup.
         from waffle.models import Flag
+
+        if flag_undefined_default:
+            warnings.warn(
+                # NOTE: This will be removed once ARCHBOM-132, currently in-progress, is complete.
+                'flag_undefined_default has been deprecated. For existing uses this is already actively being fixed.',
+                DeprecationWarning
+            )
 
         # validate arguments
         namespaced_flag_name = self._namespaced_name(flag_name)
@@ -275,6 +279,10 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                     try:
                         Flag.objects.get(name=namespaced_flag_name)
                     except Flag.DoesNotExist:
+                        if flag_undefined_default:
+                            # This metric will go away once this has been fully retired with ARCHBOM-132.
+                            # Also, even though the value will only track the last flag, that should be enough.
+                            set_custom_metric('temp_flag_default_used', namespaced_flag_name)
                         value = flag_undefined_default
 
                 if value is None:
@@ -283,15 +291,75 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                         value = flag_is_active(request, namespaced_flag_name)
                     else:
                         log.warning(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
+                        set_custom_metric('warn_flag_no_request', True)
                         # Return the default value if not in a request context.
                         # Note: this skips the cache as the value might be different
                         # in a normal request context. This case seems to occur when
                         # a page redirects to a 404. In this case, we'll just return
                         # the default value.
-                        return bool(flag_undefined_default)
+                        value = bool(flag_undefined_default)
+                        self._set_waffle_flag_metric(namespaced_flag_name, value)
+                        return value
 
                 self._cached_flags[namespaced_flag_name] = value
+
+        self._set_waffle_flag_metric(namespaced_flag_name, value)
         return value
+
+    def _set_waffle_flag_metric(self, name, value):
+        """
+        For any flag name in _WAFFLE_FLAG_CUSTOM_METRIC_SET, add name/value
+        to cached values and set custom metric if the value changed.
+
+        The name of the custom metric will match the name of the flag.
+        The value of the custom metric could be False, True, or Both.
+
+          The value Both would mean that the flag had both a True and False
+          value at different times during the transaction. This is most
+          likely due to having a check_before_waffle_callback, as is the
+          case with CourseWaffleFlag.
+
+        """
+        if name not in _WAFFLE_FLAG_CUSTOM_METRIC_SET:
+            return
+
+        flag_metric_data = self._get_request_cache().setdefault('flag_metric', {})
+        is_value_change = False
+        if name not in flag_metric_data:
+            flag_metric_data[name] = str(value)
+            is_value_change = True
+        else:
+            if flag_metric_data[name] != str(value):
+                flag_metric_data[name] = 'Both'
+                is_value_change = True
+
+        if is_value_change:
+            set_custom_metric(name, flag_metric_data[name])
+
+
+def _get_waffle_flag_custom_metrics_set():
+    """
+    Returns a set based on the Django setting WAFFLE_FLAG_CUSTOM_METRICS (list).
+    """
+    waffle_flag_custom_metrics = getattr(settings, _WAFFLE_FLAG_CUSTOM_METRICS, None)
+    waffle_flag_custom_metrics = waffle_flag_custom_metrics if waffle_flag_custom_metrics else []
+    return set(waffle_flag_custom_metrics)
+
+    # .. toggle_name: ENABLE_WAFFLE_FLAG_METRIC
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: A list of waffle flag to track with custom metrics having values of (True, False, or Both).
+    # .. toggle_category: monitoring
+    # .. toggle_use_cases: opt_in
+    # .. toggle_creation_date: 2020-06-17
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: None
+    # .. toggle_status: supported
+    # .. toggle_warnings: Intent is for temporary research (1 day - several weeks) of a flag's usage.
+_WAFFLE_FLAG_CUSTOM_METRICS = 'WAFFLE_FLAG_CUSTOM_METRICS'
+
+# set of waffle flags that should be instrumented with custom metrics
+_WAFFLE_FLAG_CUSTOM_METRIC_SET = _get_waffle_flag_custom_metrics_set()
 
 
 class WaffleFlag(object):
@@ -306,8 +374,9 @@ class WaffleFlag(object):
         Arguments:
             waffle_namespace (WaffleFlagNamespace | String): Namespace for this flag.
             flag_name (String): The name of the flag (without namespacing).
-            flag_undefined_default (Boolean): A default value to be returned if
-                the waffle flag is to be checked, but doesn't exist.
+            DEPRECATED flag_undefined_default (Boolean): A default value to be returned
+                if the waffle flag is to be checked, but doesn't exist. See module
+                docstring for alternative.
         """
         if isinstance(waffle_namespace, six.string_types):
             waffle_namespace = WaffleFlagNamespace(name=waffle_namespace)

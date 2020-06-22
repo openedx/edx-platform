@@ -228,8 +228,8 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         # warning)
         with patch('openedx.core.djangoapps.course_groups.partition_scheme.log') as mock_log:
             self.assert_student_in_group(None, new_user_partition)
-            self.assertTrue(mock_log.warn.called)
-            self.assertRegex(mock_log.warn.call_args[0][0], 'group not found')
+            self.assertTrue(mock_log.warning.called)
+            self.assertRegex(mock_log.warning.call_args[0][0], 'group not found')
 
     def test_missing_partition(self):
         """
@@ -253,8 +253,8 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         # scheme returns None (and logs a warning).
         with patch('openedx.core.djangoapps.course_groups.partition_scheme.log') as mock_log:
             self.assert_student_in_group(None, new_user_partition)
-            self.assertTrue(mock_log.warn.called)
-            self.assertRegex(mock_log.warn.call_args[0][0], 'partition mismatch')
+            self.assertTrue(mock_log.warning.called)
+            self.assertRegex(mock_log.warning.call_args[0][0], 'partition mismatch')
 
 
 class TestExtension(django.test.TestCase):

@@ -143,6 +143,9 @@ $state-danger-text: $black !default;
 $state-danger-bg: #f2dede !default;
 $state-danger-border: darken($state-danger-bg, 5%) !default;
 
+$palette-error-accent: #cb0712;
+$palette-error-back: #feeced;
+
 // logo colors
 $micromasters-color: #005585 !default;
 $zebra-stripe-color: rgb(249, 250, 252) !default;

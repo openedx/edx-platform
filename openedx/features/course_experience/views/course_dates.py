@@ -49,6 +49,7 @@ class CourseDatesFragmentMobileView(CourseDatesFragmentView):
     mechanism to automatically create/recreate session with the server for all
     authenticated requests if the server returns 404.
     """
+    _uses_pattern_library = False
     template_name = 'course_experience/mobile/course-dates-fragment.html'
 
     def get(self, request, *args, **kwargs):

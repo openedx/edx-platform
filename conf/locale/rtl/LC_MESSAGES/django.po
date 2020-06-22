@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-14 20:50+0000\n"
-"PO-Revision-Date: 2020-06-14 20:50:08.991211\n"
+"POT-Creation-Date: 2020-06-21 20:50+0000\n"
+"PO-Revision-Date: 2020-06-21 20:50:24.457974\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -406,13 +406,13 @@ msgstr "عسثق صهفا فاهس ثوشهم يخثسر'ف ثطهسف هر سغ
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
-msgid "An account with the Public Username '{username}' already exists."
-msgstr "شر شذذخعرف صهفا فاث حعزمهذ عسثقرشوث '{username}' شمقثشيغ ثطهسفس."
+msgid "An account with the Email '{email}' already exists."
+msgstr "شر شذذخعرف صهفا فاث ثوشهم '{email}' شمقثشيغ ثطهسفس."
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
-msgid "An account with the Email '{email}' already exists."
-msgstr "شر شذذخعرف صهفا فاث ثوشهم '{email}' شمقثشيغ ثطهسفس."
+msgid "An account with the Public Username '{username}' already exists."
+msgstr "شر شذذخعرف صهفا فاث حعزمهذ عسثقرشوث '{username}' شمقثشيغ ثطهسفس."
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Removed group: \"{}\""
@@ -6015,6 +6015,11 @@ msgid "in {relative} - {absolute}"
 msgstr "هر {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+msgid "Enrollment Date"
+msgstr "ثرقخمموثرف يشفث"
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr "ذخعقسث سفشقفس"
 
@@ -7681,10 +7686,6 @@ msgstr "فهفمث"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "غثشق خب زهقفا"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Date"
-msgstr "ثرقخمموثرف يشفث"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Currently Enrolled"
@@ -13702,10 +13703,10 @@ msgstr ""
 
 #: lms/templates/dates_banner.html
 msgid ""
-" Don’t worry—you won’t lose any of the progress you’ve made when you shift "
+" Don't worry—you won't lose any of the progress you've made when you shift "
 "your due dates."
 msgstr ""
-" يخر’ف صخققغ—غخع صخر’ف مخسث شرغ خب فاث حقخلقثسس غخع’دث وشيث صاثر غخع ساهبف "
+" يخر'ف صخققغ—غخع صخر'ف مخسث شرغ خب فاث حقخلقثسس غخع'دث وشيث صاثر غخع ساهبف "
 "غخعق يعث يشفثس."
 
 #: lms/templates/dates_banner.html
@@ -13719,16 +13720,16 @@ msgstr ""
 #: lms/templates/dates_banner.html
 msgid ""
 "To keep yourself on track, you can update this schedule and shift the past "
-"due assignments into the future. Don’t worry—you won’t lose any of the "
-"progress you’ve made when you shift your due dates."
+"due assignments into the future. Don't worry—you won't lose any of the "
+"progress you've made when you shift your due dates."
 msgstr ""
 "فخ نثثح غخعقسثمب خر فقشذن, غخع ذشر عحيشفث فاهس سذاثيعمث شري ساهبف فاث حشسف "
-"يعث شسسهلروثرفس هرفخ فاث بعفعقث. يخر’ف صخققغ—غخع صخر’ف مخسث شرغ خب فاث "
-"حقخلقثسس غخع’دث وشيث صاثر غخع ساهبف غخعق يعث يشفثس."
+"يعث شسسهلروثرفس هرفخ فاث بعفعقث. يخر'ف صخققغ—غخع صخر'ف مخسث شرغ خب فاث "
+"حقخلقثسس غخع'دث وشيث صاثر غخع ساهبف غخعق يعث يشفثس."
 
 #: lms/templates/dates_banner.html
-msgid "Reset my deadlines"
-msgstr "قثسثف وغ يثشيمهرثس"
+msgid "Shift due dates"
+msgstr "ساهبف يعث يشفثس"
 
 #: lms/templates/dates_banner.html
 msgid "You are auditing this course,"

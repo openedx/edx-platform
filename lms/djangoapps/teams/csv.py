@@ -6,14 +6,16 @@ import csv
 from collections import Counter
 
 from django.contrib.auth.models import User
+from django.db.models import Prefetch
 
 from lms.djangoapps.teams.api import (
     OrganizationProtectionStatus,
     user_organization_protection_status,
-    ORGANIZATION_PROTECTED_MODES
+    ORGANIZATION_PROTECTED_MODES,
+    user_protection_status_matches_team
 )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from lms.djangoapps.program_enrollments.models import ProgramEnrollment
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from student.models import CourseEnrollment
 from .utils import emit_team_event
 
@@ -51,27 +53,67 @@ def _lookup_team_membership_data(course):
     Returns a list of dicts, in the following form:
     [
         {
-            'user': <username>,
+            'user': If the user is enrolled in this course as a part of a program,
+                    this will be <external_user_key> if the user has one, otherwise <username>,
             'mode': <student enrollment mode for the given course>,
             <teamset id>: <team name> for each teamset in which the given user is on a team
         }
         for student in course
     ]
     """
-    course_students = CourseEnrollment.objects.users_enrolled_in(course.id).order_by('username')
-    CourseEnrollment.bulk_fetch_enrollment_states(course_students, course.id)
-
+    # Get course enrollments and team memberships for the given course
+    course_enrollments = _fetch_course_enrollments_with_related_models(course.id)
     course_team_memberships = CourseTeamMembership.objects.filter(
         team__course_id=course.id
     ).select_related('team', 'user').all()
     teamset_memberships_by_user = _group_teamset_memberships_by_user(course_team_memberships)
+
     team_membership_data = []
-    for user in course_students:
-        student_row = teamset_memberships_by_user.get(user, dict())
-        student_row['user'] = user.username
-        student_row['mode'], _ = CourseEnrollment.enrollment_mode_for_user(user, course.id)
+    for course_enrollment in course_enrollments:
+        # This dict contains all the user's team memberships keyed by teamset
+        student_row = teamset_memberships_by_user.get(course_enrollment.user, dict())
+        student_row['user'] = _get_displayed_user_identifier(course_enrollment)
+        student_row['mode'] = course_enrollment.mode
         team_membership_data.append(student_row)
     return team_membership_data
+
+
+def _fetch_course_enrollments_with_related_models(course_id):
+    """
+    Look up active course enrollments for this course. Fetch the user.
+    Fetch the ProgramCourseEnrollment and ProgramEnrollment if any of the CourseEnrollments are associated with
+        a program enrollment (so we have access to an external_user_id if it exists).
+    Order by the username of the enrolled user.
+
+    Returns a QuerySet
+    """
+    return CourseEnrollment.objects.filter(
+        course_id=course_id,
+        is_active=True
+    ).prefetch_related(
+        Prefetch(
+            'programcourseenrollment_set',
+            queryset=ProgramCourseEnrollment.objects.select_related('program_enrollment')
+        )
+    ).select_related(
+        'user'
+    ).order_by('user__username')
+
+
+def _get_displayed_user_identifier(course_enrollment):
+    """
+    If a user is enrolled in the course as a part of a program and the program identifies them
+        with an external_user_key, use that as the value of the 'user' column.
+    Otherwise, use the user's username.
+    """
+    program_course_enrollments = course_enrollment.programcourseenrollment_set
+    if program_course_enrollments.exists():
+        # A user should only have one or zero ProgramCourseEnrollments associated with a given CourseEnrollment
+        program_course_enrollment = program_course_enrollments.all()[0]
+        external_user_key = program_course_enrollment.program_enrollment.external_user_key
+        if external_user_key:
+            return external_user_key
+    return course_enrollment.user.username
 
 
 def _group_teamset_memberships_by_user(course_team_memberships):
@@ -344,6 +386,7 @@ class TeamMembershipImportManager(object):
         """
         Validates that only students enrolled in a masters track are on a single team. Disallows mixing of masters
         with other enrollment modes on a single team.
+        Masters track students can't be added to existing non-protected teams
         """
         if(teamset_id, team_name) not in self.user_enrollment_by_team:
             self.user_enrollment_by_team[teamset_id, team_name] = set()
@@ -353,7 +396,24 @@ class TeamMembershipImportManager(object):
                 'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(team_name)
             self.add_error_and_check_if_max_exceeded(error_message)
             return False
+        if not self.is_enrollment_protection_for_existing_team_matches_user(user, team_name, teamset_id):
+            error_message = \
+                'User {} does not have access to team {}.'.format(user.username, team_name)
+            self.add_error_and_check_if_max_exceeded(error_message)
+            return False
         return True
+
+    def is_enrollment_protection_for_existing_team_matches_user(self, user, team_name, teamset_id):
+        """
+        Applies only to existing teams.
+        Returns True if no violations
+        False if there is a mismatch
+        """
+        try:
+            team = self.existing_course_teams[(team_name, teamset_id)]
+            return user_protection_status_matches_team(user, team)
+        except KeyError:
+            return True
 
     def is_FERPA_bubble_breached(self, teamset_id, team_name):
         """
@@ -412,12 +472,7 @@ class TeamMembershipImportManager(object):
             if row[ts_id] is None:
                 # remove this student from the teamset
                 try:
-                    membership = CourseTeamMembership.objects.get(
-                        user_id=row['user'].id,
-                        team__topic_id=ts_id,
-                        team__course_id=self.course.id
-                    )
-                    membership.delete()
+                    self._remove_user_from_teamset_and_emit_signal(row['user'].id, ts_id, self.course.id)
                 except CourseTeamMembership.DoesNotExist:
                     pass
             else:
@@ -426,12 +481,7 @@ class TeamMembershipImportManager(object):
                     current_user_teams_name = self.existing_course_team_memberships[row['user'].id, ts_id].name
                     if current_user_teams_name != row[ts_id]:
                         try:
-                            membership = CourseTeamMembership.objects.get(
-                                user_id=row['user'].id,
-                                team__topic_id=ts_id,
-                                team__course_id=self.course.id
-                            )
-                            membership.delete()
+                            self._remove_user_from_teamset_and_emit_signal(row['user'].id, ts_id, self.course.id)
                             del self.existing_course_team_memberships[row['user'].id, ts_id]
                             self.user_ids_by_teamset_id[ts_id].remove(row['user'].id)
                         except CourseTeamMembership.DoesNotExist:
@@ -440,6 +490,30 @@ class TeamMembershipImportManager(object):
                         # the user will remain in the same team. In order to avoid validation/attempting
                         # to readd the user, null out the team name
                         row[ts_id] = None
+
+    def _remove_user_from_teamset_and_emit_signal(self, user_id, ts_id, course_id):
+        """
+        If a team membership exists for the specified user, in the specified course and teamset, delete it.
+        This removes the user from the team.
+        Then, emit an event.
+
+        If the membership doesn't exist, don't emit the event and instead raise CourseTeamMembership.DoesNotExist
+        """
+        membership = CourseTeamMembership.objects.select_related('team').get(
+            user_id=user_id,
+            team__topic_id=ts_id,
+            team__course_id=course_id
+        )
+        membership.delete()
+        emit_team_event(
+            'edx.team.learner_removed',
+            course_id,
+            {
+                'team_id': membership.team.team_id,
+                'user_id': membership.user_id,
+                'remove_method': 'team_csv_import'
+            }
+        )
 
     def add_error_and_check_if_max_exceeded(self, error_message):
         """

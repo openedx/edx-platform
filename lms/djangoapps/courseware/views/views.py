@@ -308,7 +308,16 @@ def load_metadata_from_youtube(video_id, request):
         yt_timeout = settings.YOUTUBE.get('TEST_TIMEOUT', 1500) / 1000  # converting milli seconds to seconds
 
         headers = {}
-        http_referer = request.META.get('HTTP_REFERER')
+        http_referer = None
+
+        try:
+            # This raises an attribute error if called from the xblock yt_video_metadata handler, which passes
+            # a webob request instead of a django request.
+            http_referer = request.META.get('HTTP_REFERER')
+        except AttributeError:
+            # So here, let's assume it's a webob request and access the referer the webob way.
+            http_referer = request.referer
+
         if http_referer:
             headers['Referer'] = http_referer
 

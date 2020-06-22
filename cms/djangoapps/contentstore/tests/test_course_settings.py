@@ -613,10 +613,10 @@ class CourseGradingTest(CourseTestCase):
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
                     'course_id': six.text_type(self.course.id),
-                    'event_transaction_type': 'edx.grades.grading_policy_changed',
-                    'grading_policy_hash': policy_hash,
                     'user_id': six.text_type(self.user.id),
+                    'grading_policy_hash': policy_hash,
                     'event_transaction_id': 'mockUUID',
+                    'event_transaction_type': 'edx.grades.grading_policy_changed',
                 }
             ) for policy_hash in {grading_policy_1, grading_policy_2, grading_policy_3}
         ])
@@ -1241,6 +1241,31 @@ class CourseMetadataEditingTest(CourseTestCase):
                 )
             )
             self.assertIsNone(test_model)
+
+    @ddt.data(True, False)
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
+    def test_validate_update_allows_changes_to_settings_when_proctoring_provider_disabled(self, staff_user):
+        """
+        Course staff can modify Advanced Settings when the proctoring_provider settings is not available (i.e. when
+        the ENABLE_PROCTORING_PROVIDER_OVERRIDES is not enabled for the course). This ensures that our restrictions
+        on changing the proctoring_provider do not inhibit users from changing Advanced Settings when the
+        proctoring_provider setting is not available.
+        """
+        # It doesn't matter what the field is - just check that we can change any field.
+        field_name = "enable_proctored_exams"
+        course = CourseFactory.create(start=datetime.datetime.now(UTC) - datetime.timedelta(days=1))
+        user = UserFactory.create(is_staff=staff_user)
+
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            course,
+            {
+                field_name: {"value": True},
+            },
+            user=user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn(field_name, test_model)
 
     @override_settings(
         PROCTORING_BACKENDS={
