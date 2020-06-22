@@ -522,8 +522,7 @@ class UserExtendedProfile(TimeStampedModel):
         :return: list of labels / names of fields
         """
         if _type == 'labels':
-            return [self.function_areas.choices.get(function_area)
-                    for function_area in self.function_areas]
+            return map(choices.FUNCTIONS_DICT.get, self.function_areas)
 
         return list(self.function_areas)
 
@@ -534,43 +533,9 @@ class UserExtendedProfile(TimeStampedModel):
         :return: list of labels / names of fields
         """
         if _type == 'labels':
-            return map(self.interests.choices.get, self.interests)
+            return map(choices.INTERESTS_DICT.get, self.interests)
 
         return list(self.interests)
-
-    def get_user_selected_interested_learners(self, _type='labels'):
-        """
-        :return: Users selected interested learners
-        :param _type: labels / fields
-        :return: list of labels / names of fields
-        """
-        if _type == 'labels':
-            return map(self.learners_related.choices.get, self.learners_related)
-
-        return list(self.learners_related)
-
-    def get_user_selected_personal_goal(self, _type='labels'):
-        """
-        :return: Users selected personal goals
-        :param _type: labels / fields
-        :return: list of labels / names of fields
-        """
-        if _type == 'labels':
-            return map(self.goals.choices.get, self.goals)
-
-        return list(self.goals)
-
-    def get_user_hear_about_philanthropy(self, _type='labels'):
-        """
-        :return: Users selected here about philanthropy university
-        :param _type: labels / fields
-        :return: list of labels / names of fields
-        """
-        if _type == 'labels':
-            return map(lambda x: self.hear_about_philanthropyu.choices.get(x, x),
-                       self.hear_about_philanthropyu)
-
-        return list(self.hear_about_philanthropyu)
 
     def is_organization_data_filled(self):
         """

@@ -439,7 +439,7 @@ class RadioSelectNotNull(forms.RadioSelect):
         return super(RadioSelectNotNull, self).optgroups(name, value, attrs)
 
 
-class InterestsForm(BaseOnboardingModelForm):
+class InterestsModelForm(BaseOnboardingModelForm):
     class Meta:
         """
         The meta class used to customize the default behaviour of form fields

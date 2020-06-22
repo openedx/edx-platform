@@ -88,9 +88,7 @@ def sync_extended_profile_info_with_nodebb(sender, instance, **kwargs):
 
     changed_fields = getattr(instance, '_changed_fields', {})
 
-    relevant_signal_fields = ['country_of_employment', 'city_of_employment']
-    relevant_signal_fields += instance.get_user_selected_functions(_type='field_name')
-    relevant_signal_fields += instance.get_user_selected_interests(_type='field_name')
+    relevant_signal_fields = ('country_of_employment', 'city_of_employment', 'interests', 'function_areas')
 
     # return if fields to be updated on nodebb haven't changed
     if not request or not any([field in changed_fields for field in relevant_signal_fields]):

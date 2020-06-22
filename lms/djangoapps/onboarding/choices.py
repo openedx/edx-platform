@@ -47,3 +47,6 @@ HEAR_ABOUT_PHILANTHROPY = (
     ('hear_about_facebook_advertisement', 'A Facebook Advertisement'),
     ('hear_about_twitter_not_colleague', 'Twitter (Not From A Colleague)')
 )
+
+FUNCTIONS_DICT = dict(FUNCTIONS)
+INTERESTS_DICT = dict(INTERESTS)

@@ -91,7 +91,6 @@ def user_info(request):
         'level_of_education': userprofile.level_of_education,
         'hours_per_week': user_extended_profile.hours_per_week if user_extended_profile.hours_per_week else '',
         'is_emp_location_different': True if user_extended_profile.country_of_employment else False,
-        "function_areas": user_extended_profile.get_user_selected_functions(_type="fields"),
         'organization_name': user_extended_profile.organization.label if user_extended_profile.organization else "",
         'is_poc': "1" if user_extended_profile.is_organization_admin else "0",
         'is_currently_employed': request.POST.get('is_currently_employed'),
@@ -174,7 +173,7 @@ def interests(request):
         template = 'myaccount/interests.html'
 
     if request.method == 'POST':
-        form = forms.InterestsForm(request.POST, instance=user_extended_profile)
+        form = forms.InterestsModelForm(request.POST, instance=user_extended_profile)
 
         is_action_update = user_extended_profile.is_interests_data_submitted
         form.save(request)
@@ -186,7 +185,7 @@ def interests(request):
             update_nodebb_for_user_status(request.user.username)
 
     else:
-        form = forms.InterestsForm(instance=user_extended_profile)
+        form = forms.InterestsModelForm(instance=user_extended_profile)
     context = {'form': form, 'are_forms_complete': are_forms_complete}
 
     user = request.user
