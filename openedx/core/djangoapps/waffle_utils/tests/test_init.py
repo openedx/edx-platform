@@ -127,7 +127,11 @@ class TestCourseWaffleFlag(TestCase):
                     self.TEST_COURSE_KEY
                 )
 
-        self._assert_waffle_flag_metric(mock_set_custom_metric, expected_flag_value=str(data['result']))
+        self._assert_waffle_flag_metric(
+            mock_set_custom_metric,
+            expected_flag_value=str(data['result']),
+            flag_undefined_default=data['flag_undefined_default'],
+        )
 
     @ddt.data(
         {'flag_undefined_default': None, 'result': False},
@@ -165,11 +169,12 @@ class TestCourseWaffleFlag(TestCase):
 
         self.assertEqual(mock_set_custom_metric.call_count, data['expected_count'])
 
-    def _assert_waffle_flag_metric(self, mock_set_custom_metric, expected_flag_value=None):
+    def _assert_waffle_flag_metric(self, mock_set_custom_metric, expected_flag_value=None, flag_undefined_default=None):
         if expected_flag_value:
             expected_calls = [call(self.NAMESPACED_FLAG_NAME, expected_flag_value)]
             mock_set_custom_metric.assert_has_calls(expected_calls)
-            self.assertEqual(mock_set_custom_metric.call_count, 1)
+            expected_call_count = 2 if flag_undefined_default else 1
+            self.assertEqual(mock_set_custom_metric.call_count, expected_call_count)
         else:
             self.assertEqual(mock_set_custom_metric.call_count, 0)
 

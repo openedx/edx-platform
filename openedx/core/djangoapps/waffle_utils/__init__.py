@@ -56,6 +56,7 @@ can't yet be deleted, for example if there are still course overrides.
 """
 
 import logging
+import warnings
 from abc import ABCMeta
 from contextlib import contextmanager
 
@@ -254,6 +255,13 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
         # Import is placed here to avoid model import at project startup.
         from waffle.models import Flag
 
+        if flag_undefined_default:
+            warnings.warn(
+                # NOTE: This will be removed once ARCHBOM-132, currently in-progress, is complete.
+                'flag_undefined_default has been deprecated. For existing uses this is already actively being fixed.',
+                DeprecationWarning
+            )
+
         # validate arguments
         namespaced_flag_name = self._namespaced_name(flag_name)
         value = None
@@ -271,6 +279,10 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                     try:
                         Flag.objects.get(name=namespaced_flag_name)
                     except Flag.DoesNotExist:
+                        if flag_undefined_default:
+                            # This metric will go away once this has been fully retired with ARCHBOM-132.
+                            # Also, even though the value will only track the last flag, that should be enough.
+                            set_custom_metric('temp_flag_default_used', namespaced_flag_name)
                         value = flag_undefined_default
 
                 if value is None:
@@ -279,12 +291,15 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                         value = flag_is_active(request, namespaced_flag_name)
                     else:
                         log.warning(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
+                        set_custom_metric('warn_flag_no_request', True)
                         # Return the default value if not in a request context.
                         # Note: this skips the cache as the value might be different
                         # in a normal request context. This case seems to occur when
                         # a page redirects to a 404. In this case, we'll just return
                         # the default value.
-                        return bool(flag_undefined_default)
+                        value = bool(flag_undefined_default)
+                        self._set_waffle_flag_metric(namespaced_flag_name, value)
+                        return value
 
                 self._cached_flags[namespaced_flag_name] = value
 
