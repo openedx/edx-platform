@@ -6,7 +6,6 @@ Configuration for the ``student`` Django application.
 import os
 
 from django.apps import AppConfig
-from django.contrib.auth.signals import user_logged_in
 from django.db.models.signals import pre_save
 
 
