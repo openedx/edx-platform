@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-certifi==2020.4.5.2       # via requests
+certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
 edx-opaque-keys==2.1.0    # via -r requirements/edx/paver.in
 idna==2.9                 # via requests
