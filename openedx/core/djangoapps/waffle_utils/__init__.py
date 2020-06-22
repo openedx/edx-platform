@@ -44,14 +44,12 @@ To test WaffleSwitchNamespace, use the provided context managers.  For example:
     with WAFFLE_SWITCHES.override(waffle.ESTIMATE_FIRST_ATTEMPTED, active=True):
         ...
 
-For long-lived flags, you may want to change the default for the flag from "off"
-to "on", so that it is "on" by default in devstack, sandboxes, or new Open edX
-releases, more closely matching what is in Production. This is for flags that
-can't yet be deleted, for example if there are still course overrides.
+For long-lived flags, you may want to change the default for devstack, sandboxes,
+or new Open edX releases. For help with this, see:
+openedx/core/djangoapps/waffle_utils/docs/decisions/0001-refactor-waffle-flag-default.rst
 
-  * To do so, add a migration that adds the flag as active if the record doesn't
-    already exist. For more details, see:
-    openedx/core/djangoapps/waffle_utils/docs/decisions/0001-refactor-waffle-flag-default.rst
+Also see ``WAFFLE_FLAG_CUSTOM_METRICS`` and docstring for _set_waffle_flag_metric
+for temporarily instrumenting/monitoring waffle flag usage.
 
 """
 
@@ -311,13 +309,26 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
         For any flag name in _WAFFLE_FLAG_CUSTOM_METRIC_SET, add name/value
         to cached values and set custom metric if the value changed.
 
-        The name of the custom metric will match the name of the flag.
+        The name of the custom metric will have the prefix ``flag_`` and the
+        suffix will match the name of the flag.
         The value of the custom metric could be False, True, or Both.
 
           The value Both would mean that the flag had both a True and False
           value at different times during the transaction. This is most
           likely due to having a check_before_waffle_callback, as is the
           case with CourseWaffleFlag.
+
+        An example NewRelic query to see the values of a flag in different
+        environments, if your waffle flag was named ``my.waffle.flag`` might
+        look like::
+
+          SELECT count(*) FROM Transaction
+          WHERE flag_my.waffle.flag IS NOT NULL
+          FACET appName, flag_my.waffle.flag
+
+        Important: Remember to configure ``WAFFLE_FLAG_CUSTOM_METRICS`` for
+          LMS, Studio and Workers in order to see waffle flag usage in all
+          edx-platform environments.
 
         """
         if name not in _WAFFLE_FLAG_CUSTOM_METRIC_SET:
@@ -334,7 +345,8 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                 is_value_change = True
 
         if is_value_change:
-            set_custom_metric(name, flag_metric_data[name])
+            metric_name = 'flag_{}'.format(name)
+            set_custom_metric(metric_name, flag_metric_data[name])
 
 
 def _get_waffle_flag_custom_metrics_set():
@@ -345,7 +357,7 @@ def _get_waffle_flag_custom_metrics_set():
     waffle_flag_custom_metrics = waffle_flag_custom_metrics if waffle_flag_custom_metrics else []
     return set(waffle_flag_custom_metrics)
 
-    # .. toggle_name: ENABLE_WAFFLE_FLAG_METRIC
+    # .. toggle_name: WAFFLE_FLAG_CUSTOM_METRICS
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: A list of waffle flag to track with custom metrics having values of (True, False, or Both).

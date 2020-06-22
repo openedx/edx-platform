@@ -17,14 +17,18 @@ Decision
 ========
 
 * Retire the ``flag_undefined_default`` argument for WaffleFlag and CourseWaffleFlag that allowed you to change the default to True in code.
-* In the future, the alternative would be to add a migration that adds an active (True) waffle flag database record if a record doesn't already exist.
+* Do not introduce any new ability to adjust the default in code.
+* In the future, alternative solutions might include:
 
-  * If the record already exists, do not replace it whether or not it is active. Its value is already represented in the database and may have been set via admin.
+  * The flag can simply be removed at this time if it was meant to be temporary.
+  * The flag could be replaced with a Django Setting, if the features of a flag are not needed for the permanent toggle.
+  * You could a migration that adds an active (True) waffle flag database record if a record doesn't already exist.
+  * You could introduce and replace an *enable* flag with a new *disable* flag. This might be useful when a permanent toggle is desired that requires features of a waffle flag, and where disabling would now be the exceptional case, since the default would be inactive (False).
 
 Consequences
 ============
 
-* We will need to add the appropriate migrations for each flag currently using ``flag_undefined_default=True``, and then finally remove the deprecated ``flag_undefined_default`` argument.
+* We will need to implement one of the alternate solutions for each flag currently using ``flag_undefined_default=True``, and then finally remove the deprecated ``flag_undefined_default`` argument.
 
 Rejected Alternatives
 =====================
