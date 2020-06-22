@@ -37,7 +37,7 @@ boto==2.39.0              # via -r requirements/edx/base.txt, django-ses, edxval
 botocore==1.8.17          # via -r requirements/edx/base.txt, boto3, s3transfer
 bridgekeeper==0.8         # via -r requirements/edx/base.txt
 celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-celery, django-user-tasks, edx-celeryutils, edx-enterprise
-certifi==2020.4.5.2       # via -r requirements/edx/base.txt, requests
+certifi==2020.6.20        # via -r requirements/edx/base.txt, requests
 cffi==1.14.0              # via -r requirements/edx/base.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/base.txt, pdfminer.six, pysrt, requests
 chem==1.2.0               # via -r requirements/edx/base.txt
@@ -84,7 +84,7 @@ django-ratelimit-backend==2.0  # via -r requirements/edx/base.txt
 django-require==1.0.11    # via -r requirements/edx/base.txt
 django-sekizai==1.1.0     # via -r requirements/edx/base.txt, django-wiki
 django-ses==0.8.14        # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
-django-simple-history==2.10.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-organizations, ora2
+django-simple-history==2.11.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-organizations, ora2
 django-splash==0.2.9      # via -r requirements/edx/base.txt
 django-statici18n==1.9.0  # via -r requirements/edx/base.txt
 django-storages==1.8      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edxval
@@ -270,7 +270,7 @@ singledispatch==3.4.0.3   # via -r requirements/edx/testing.in
 six==1.15.0               # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, analytics-python, astroid, bleach, bok-choy, chem, crowdsourcehinter-xblock, cryptography, diff-cover, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, libsass, mando, mock, openedx-calc, packaging, pathlib2, paver, pycontracts, pyjwkest, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 smmap==3.0.4              # via gitdb
-social-auth-app-django==3.4.0  # via -r requirements/edx/base.txt
+social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt
 social-auth-core==3.3.3   # via -r requirements/edx/base.txt, social-auth-app-django
 sorl-thumbnail==12.6.3    # via -r requirements/edx/base.txt
 sortedcontainers==2.2.2   # via -r requirements/edx/base.txt, pdfminer.six
@@ -293,7 +293,7 @@ unidiff==0.6.0            # via -r requirements/edx/testing.in, coverage-pytest-
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.9           # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/base.txt
-virtualenv==20.0.23       # via tox
+virtualenv==20.0.24       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.2          # via -r requirements/edx/base.txt
 wcwidth==0.2.4            # via pytest
