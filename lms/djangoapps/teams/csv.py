@@ -387,8 +387,8 @@ class TeamMembershipImportManager(object):
             if max_team_size is not None:
                 # Get teams in teamset
                 team_names = [
-                    team_to_teamset[0] for team_to_teamset in self.existing_course_teams
-                    if team_to_teamset[1] == teamset_id
+                    teamset_to_team[1] for teamset_to_team in self.user_count_by_team
+                    if teamset_to_team[0] == teamset_id
                 ]
 
                 for team_name in team_names:
