@@ -229,13 +229,14 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         self.cert = GeneratedCertificate.eligible_certificates.create(
             user=self.user,
             course_id=self.course_id,
-            download_uuid=uuid4(),
+            download_uuid=uuid4().hex,
             grade="0.95",
             key='the_key',
             distinction=True,
             status='downloadable',
             mode='honor',
             name=self.user.profile.name,
+            verify_uuid=uuid4().hex
         )
         self._setup_configuration()
 
@@ -284,7 +285,8 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     def test_html_view_for_site(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=six.text_type(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
@@ -302,7 +304,8 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     def test_html_view_site_configuration_missing(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=six.text_type(self.course.id)
+            course_id=six.text_type(self.course.id),
+            uuid=self.cert.verify_uuid
         )
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url)
