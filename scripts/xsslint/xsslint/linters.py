@@ -329,7 +329,6 @@ class JavaScriptLinter(BaseLinter):
         javascript_jquery_html='javascript-jquery-html',
         javascript_concat_html='javascript-concat-html',
         javascript_escape='javascript-escape',
-        javascript_interpolate='javascript-interpolate',
     )
 
     def __init__(self, underscore_linter, javascript_skip_dirs=None):
@@ -401,7 +400,6 @@ class JavaScriptLinter(BaseLinter):
             file_contents, "html", self.ruleset.javascript_jquery_html, no_caller_check,
             self._is_jquery_html_argument_safe, results
         )
-        self._check_javascript_interpolate(file_contents, results)
         self._check_javascript_escape(file_contents, results)
         self._check_concat_with_html(file_contents, self.ruleset.javascript_concat_html, results)
         self.underscore_linter.check_underscore_file_is_safe(file_contents, results)
@@ -435,37 +433,18 @@ class JavaScriptLinter(BaseLinter):
             expression = Expression(start_index)
         return expression
 
-    def _check_javascript_interpolate(self, file_contents, results):
-        """
-        Checks that interpolate() calls are safe.
-
-        Only use of StringUtils.interpolate() or HtmlUtils.interpolateText()
-        are safe.
-
-        Arguments:
-            file_contents: The contents of the JavaScript file.
-            results: A file results objects to which violations will be added.
-
-        """
-        # Ignores calls starting with "StringUtils.", because those are safe
-        regex = re.compile(r"(?<!StringUtils).interpolate\(")
-        for function_match in regex.finditer(file_contents):
-            expression = self._get_expression_for_function(file_contents, function_match)
-            results.violations.append(ExpressionRuleViolation(self.ruleset.javascript_interpolate, expression))
-
     def _check_javascript_escape(self, file_contents, results):
         """
-        Checks that only necessary escape() are used.
-
-        Allows for _.escape(), although this shouldn't be the recommendation.
+        Checks that escape() is not used. escape() is not recommended.
+        ref. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/escape
 
         Arguments:
             file_contents: The contents of the JavaScript file.
             results: A file results objects to which violations will be added.
 
         """
-        # Ignores calls starting with "_.", because those are safe
-        regex = regex = re.compile(r"(?<!_).escape\(")
+        # Regex to match uses of escape() or window.escape().
+        regex = re.compile(r"(?:^|(?<=window\.)|(?<![\w.$]))escape\(")
         for function_match in regex.finditer(file_contents):
             expression = self._get_expression_for_function(file_contents, function_match)
             results.violations.append(ExpressionRuleViolation(self.ruleset.javascript_escape, expression))

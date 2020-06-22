@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-14 20:49+0000\n"
-"PO-Revision-Date: 2020-06-14 20:50:09.210426\n"
+"POT-Creation-Date: 2020-06-21 20:50+0000\n"
+"PO-Revision-Date: 2020-06-21 20:50:24.441486\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -5206,6 +5206,10 @@ msgstr ""
 msgid "certificate"
 msgstr ""
 
+#: cms/static/js/certificates/views/certificate_preview.js
+msgid "Deactivating"
+msgstr ""
+
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
 msgstr ""
@@ -5217,7 +5221,7 @@ msgid "You have not created any certificates yet."
 msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
+msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
 msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js

@@ -377,7 +377,6 @@
     "Default": "Berezkoa",
     "Default (Local Time Zone)": "Berezko (tokian tokiko ordu-eremua)",
     "Delete": "Ezabatu",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "\"<%= signatoryName %>\" ezabatu nahi duzu sinatzaileen zerrendatik?",
     "Delete File Confirmation": "Fitxategia ezabatzeko konfirmazioa",
     "Delete My Account": "Ezabatu nire kontua",
     "Delete Page Confirmation": "Orria ezabatzeko konfirmazioa",

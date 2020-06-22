@@ -402,7 +402,6 @@
     "Default (Local Time Zone)": "Domy\u015blna (lokalna strefa czasowa)",
     "Default Timed Transcript": "Domy\u015blna transkrypcja",
     "Delete": "Usu\u0144",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "Usun\u0105\u0107 \"<%= signatoryName %>\" z listy sygnatariuszy?",
     "Delete File Confirmation": "Potwierdzenie usuni\u0119cia pliku",
     "Delete Team": "Usu\u0144 zesp\u00f3\u0142",
     "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?": "Czy usun\u0105\u0107 stan studenta '<%- student_id %>' dla \u0107wiczenia '<%- problem_id %>'?",

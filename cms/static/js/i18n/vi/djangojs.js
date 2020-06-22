@@ -419,7 +419,6 @@
     "Default (Local Time Zone)": "M\u1eb7c \u0111\u1ecbnh (M\u00fai gi\u1edd \u0111\u1ecba ph\u01b0\u01a1ng)",
     "Default Timed Transcript": "M\u1eb7c \u0111\u1ecbnh Timed Transcript",
     "Delete": "X\u00f3a",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "Xo\u00e1 \"<%= signatoryName %>\" t\u1eeb danh s\u00e1ch k\u00fd t\u00ean?",
     "Delete File Confirmation": "X\u00e1c Nh\u1eadn X\u00f3a File",
     "Delete My Account": "X\u00f3a t\u00e0i kho\u1ea3n",
     "Delete Page Confirmation": "X\u00e1c Nh\u1eadn X\u00f3a Trang",

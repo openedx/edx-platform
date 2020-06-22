@@ -22,10 +22,9 @@ from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
-from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
-from edx_when.api import get_overrides_for_user
+from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
@@ -3901,9 +3900,16 @@ def get_extended_due(course, unit, user):
     for override in dates:
         if text_type(override['location']) == location:
             return override['actual_date']
-    print(unit.location)
-    print(dates)
     return None
+
+
+def get_date_for_block(course, unit, user):
+    """
+    Gets the due date for the given user on the given unit (overridden or original).
+    Returns `None` if there is no date set.
+    (Differs from edx-when's get_date_for_block only in that we skip the cache.
+    """
+    return get_dates_for_course(course.id, user=user, use_cached=False).get((unit.location, 'due'), None)
 
 
 class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -4041,6 +4047,28 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             self.due,
             get_extended_due(self.course, self.week1, self.user1)
         )
+
+    @RELATIVE_DATES_FLAG.override(True)
+    def test_reset_date_only_in_edx_when(self):
+        # Start with a unit that only has a date in edx-when
+        self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), None)
+        original_due = datetime.datetime(2010, 4, 1, tzinfo=UTC)
+        set_date_for_block(self.course.id, self.week3.location, 'due', original_due)
+        self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), original_due)
+
+        # set override, confirm it took
+        override = datetime.datetime(2010, 7, 1, tzinfo=UTC)
+        set_date_for_block(self.course.id, self.week3.location, 'due', override, user=self.user1)
+        self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), override)
+
+        # Now test that we noticed the edx-when date
+        url = reverse('reset_due_date', kwargs={'course_id': text_type(self.course.id)})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': text_type(self.week3.location),
+        })
+        self.assertContains(response, 'Successfully reset due date for student')
+        self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), original_due)
 
     def test_show_unit_extensions(self):
         self.test_change_due_date()

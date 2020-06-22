@@ -580,7 +580,6 @@
     "Default (Local Time Zone)": "\u9ed8\u8ba4 (\u672c\u5730\u65f6\u533a)",
     "Default Timed Transcript": "\u9ed8\u8ba4\u5b57\u5e55",
     "Delete": "\u5220\u9664",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "\u786e\u5b9a\u8981\u4ece\u7b7e\u7f72\u8005\u5217\u8868\u4e2d\u5220\u9664 \"<%= signatoryName %>\" \u5417\uff1f",
     "Delete File Confirmation": "\u5220\u9664\u6587\u4ef6\u786e\u8ba4",
     "Delete My Account": "\u5220\u9664\u6211\u7684\u8d26\u53f7",
     "Delete Page Confirmation": "\u786e\u8ba4\u5220\u9664\u9875\u9762",

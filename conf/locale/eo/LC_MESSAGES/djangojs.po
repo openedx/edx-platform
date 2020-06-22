@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-14 20:49+0000\n"
-"PO-Revision-Date: 2020-06-14 20:50:09.210426\n"
+"POT-Creation-Date: 2020-06-21 20:50+0000\n"
+"PO-Revision-Date: 2020-06-21 20:50:24.441486\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -6240,6 +6240,10 @@ msgstr ""
 msgid "certificate"
 msgstr "çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
+#: cms/static/js/certificates/views/certificate_preview.js
+msgid "Deactivating"
+msgstr "Déäçtïvätïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
 msgstr "Sét üp ýöür çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
@@ -6253,9 +6257,9 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
+msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
 msgstr ""
-"Délété \"<%= signatoryName %>\" fröm thé lïst öf sïgnätörïés? Ⱡ'σяєм ιρѕυм "
+"Délété \"<%- signatoryName %>\" fröm thé lïst öf sïgnätörïés? Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/static/js/certificates/views/signatory_editor.js
