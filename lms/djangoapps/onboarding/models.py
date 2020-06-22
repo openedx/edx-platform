@@ -9,19 +9,11 @@ from django.db import models
 from django.utils.translation import ugettext_noop
 from model_utils.models import TimeStampedModel
 from pytz import utc
-from simple_history import register
-from simple_history.models import HistoricalRecords
-from student.models import UserProfile
 
 from constants import ORG_PARTNERSHIP_END_DATE_PLACEHOLDER, REMIND_ME_LATER_KEY, REMIND_ME_LATER_VAL, \
     TAKE_ME_THERE_KEY, TAKE_ME_THERE_VAL, NOT_INTERESTED_KEY, NOT_INTERESTED_VAL
 
 log = logging.getLogger("edx.onboarding")
-
-
-# register User and UserProfile models for django-simple-history module
-register(User, app=__package__, table_name='auth_historicaluser')
-register(UserProfile, table_name='auth_historicaluserprofile')
 
 
 class SchemaOrNoSchemaURLValidator(URLValidator):
@@ -219,8 +211,6 @@ class Organization(TimeStampedModel):
     # If organization has affiliation with some affiliated partners,
     # this flag will be True
     has_affiliated_partner = models.BooleanField(default=False)
-
-    history = HistoricalRecords()
 
     def users_count(self):
         """
@@ -492,8 +482,6 @@ class UserExtendedProfile(TimeStampedModel):
     is_organization_metrics_submitted = models.BooleanField(default=False)
     is_first_learner = models.BooleanField(default=False)
     is_alquity_user = models.BooleanField(default=False)
-
-    history = HistoricalRecords()
 
     def __str__(self):
         return str(self.user)

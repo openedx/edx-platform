@@ -107,7 +107,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
--e git+https://github.com/philanthropy-u/django-simple-history.git@9187c9b4907da5a2a0564eff45929fd15b784309#egg=django-simple-history
+django-simple-history==2.7.0
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
