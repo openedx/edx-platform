@@ -34,7 +34,7 @@ def program_details(request, program_uuid):
     """View details about a specific program."""
     programs_config = ProgramsApiConfig.current()
     program_fragment = ProgramDetailsFragmentView().render_to_fragment(
-        request, program_uuid, programs_config=programs_config
+        request, program_uuid=program_uuid, programs_config=programs_config
     )
 
     context = {
