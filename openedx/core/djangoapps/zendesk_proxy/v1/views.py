@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 
 logger = logging.getLogger(__name__)
-REQUESTS_PER_HOUR = 50
+ZENDESK_PROXY_RATE = '1/m'
 
 
 class ZendeskProxyThrottle(UserRateThrottle):
@@ -21,7 +21,7 @@ class ZendeskProxyThrottle(UserRateThrottle):
     """
 
     def __init__(self):
-        self.rate = '{}/hour'.format(REQUESTS_PER_HOUR)
+        self.rate = ZENDESK_PROXY_RATE
         super(ZendeskProxyThrottle, self).__init__()
 
 

@@ -5,13 +5,13 @@ from copy import deepcopy
 import json
 
 import ddt
-from django.urls import reverse
+from django.core.cache import cache
 from django.test.utils import override_settings
+from django.urls import reverse
 from mock import MagicMock, patch
 import six
 from six.moves import range
 
-from openedx.core.djangoapps.zendesk_proxy.v1.views import ZendeskProxyThrottle
 from openedx.core.lib.api.test_utils import ApiTestCase
 
 
@@ -24,6 +24,7 @@ class ZendeskProxyTestCase(ApiTestCase):
     """Tests for zendesk_proxy views."""
 
     def setUp(self):
+        cache.clear()
         self.url = reverse('zendesk_proxy_v1')
         self.request_data = {
             'requester': {
@@ -108,8 +109,8 @@ class ZendeskProxyTestCase(ApiTestCase):
         Confirm rate limits work as expected. Note that drf's rate limiting makes use of the default cache to enforce
         limits; that's why this test needs a "real" default cache (as opposed to the usual-for-tests DummyCache)
         """
+        response = self.request_without_auth('post', self.url)
+        self.assertNotEqual(response.status_code, 429)
 
-        for _ in range(ZendeskProxyThrottle().num_requests):
-            self.request_without_auth('post', self.url)
         response = self.request_without_auth('post', self.url)
         self.assertEqual(response.status_code, 429)

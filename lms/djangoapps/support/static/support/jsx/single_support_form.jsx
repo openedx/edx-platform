@@ -19,6 +19,7 @@ const initialFormErrors = {
   subject: undefined,
   message: undefined,
   request: undefined,
+  forbidden: undefined,
 };
 
 class RenderForm extends React.Component {
@@ -43,6 +44,7 @@ class RenderForm extends React.Component {
       subject: gettext('Select a subject for your support request.'),
       message: gettext('Enter some details for your support request.'),
       request: gettext('Something went wrong. Please try again later.'),
+      forbidden: gettext('Your previous request is still in progress, please try again in a few minutes.'),
     };
     this.submitForm = this.submitForm.bind(this);
     this.reDirectUser = this.reDirectUser.bind(this);
@@ -141,10 +143,15 @@ class RenderForm extends React.Component {
     request.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
     request.send(JSON.stringify(data));
     request.onreadystatechange = function success() {
-      if (request.readyState === 4 && request.status === 201) {
-        this.setState({
-          success: true,
-        });
+      if (request.readyState === 4) {
+        if (request.status === 201) {
+            this.setState({
+                success: true,
+            });
+        } else if (request.status === 429) {
+            this.updateErrorInState('request', this.formValidationErrors.forbidden);
+            this.scrollToTop();
+        }
       }
     }.bind(this);
 
