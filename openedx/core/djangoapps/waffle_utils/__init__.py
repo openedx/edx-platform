@@ -6,7 +6,7 @@ Includes namespacing, caching, and course overrides for waffle flags.
 Usage:
 
 For Waffle Flags, first set up the namespace, and then create flags using the
-namespace.  For example:
+namespace.  For example::
 
    WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 
@@ -15,7 +15,7 @@ namespace.  For example:
    # Use WaffleFlag when outside the context of a course.
    HIDE_SEARCH_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'hide_search')
 
-You can check these flags in code using the following:
+You can check these flags in code using the following::
 
     HIDE_SEARCH_FLAG.is_enabled()
     UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key)
@@ -29,13 +29,13 @@ You could also use the Django Admin "waffle_utils" section to configure a course
 override for this same flag (e.g. course_experience.unified_course_tab).
 
 For Waffle Switches, first set up the namespace, and then create the flag name.
-For example:
+For example::
 
     WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 
     ESTIMATE_FIRST_ATTEMPTED = 'estimate_first_attempted'
 
-You can then use the switch as follows:
+You can then use the switch as follows::
 
     WAFFLE_SWITCHES.is_enabled(waffle.ESTIMATE_FIRST_ATTEMPTED)
 
@@ -47,17 +47,11 @@ To test WaffleSwitchNamespace, use the provided context managers.  For example:
 For long-lived flags, you may want to change the default for the flag from "off"
 to "on", so that it is "on" by default in devstack, sandboxes, or new Open edX
 releases, more closely matching what is in Production. This is for flags that
-can't yet be deleted, for example if there are straggling course overrides.
+can't yet be deleted, for example if there are still course overrides.
 
-    * WaffleFlag has a DEPRECATED argument flag_undefined_default that we don't
-    recommend you use any more. Although this can work, it is proven not ideal to
-    have a value that isn't immediately obvious via Django admin.
-
-    * At this time, the proper alternative has not been fully designed. The
-    following food-for-thought could provide ideas for this design when needed:
-    using migrations, using app-level configuration, using management commands,
-    and/or creating records up front so all toggle defaults are explicit rather
-    than implicit.
+  * To do so, add a migration that adds the flag as active if the record doesn't
+    already exist. For more details, see:
+    openedx/core/djangoapps/waffle_utils/docs/decisions/0001-refactor-waffle-flag-default.rst
 
 """
 
@@ -255,7 +249,7 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                 used.
             DEPRECATED flag_undefined_default (Boolean): A default value to be
                 returned if the waffle flag is to be checked, but doesn't exist.
-                See docs for alternatives.
+                See module docstring for alternative.
         """
         # Import is placed here to avoid model import at project startup.
         from waffle.models import Flag
@@ -365,8 +359,9 @@ class WaffleFlag(object):
         Arguments:
             waffle_namespace (WaffleFlagNamespace | String): Namespace for this flag.
             flag_name (String): The name of the flag (without namespacing).
-            flag_undefined_default (Boolean): A default value to be returned if
-                the waffle flag is to be checked, but doesn't exist.
+            DEPRECATED flag_undefined_default (Boolean): A default value to be returned
+                if the waffle flag is to be checked, but doesn't exist. See module
+                docstring for alternative.
         """
         if isinstance(waffle_namespace, six.string_types):
             waffle_namespace = WaffleFlagNamespace(name=waffle_namespace)
