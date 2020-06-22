@@ -61,7 +61,7 @@ ENV PATH /openedx/bin:${PATH}
 COPY .github/build/settings/lms/*.py ./lms/envs/prod/
 COPY .github/build/settings/cms/*.py ./cms/envs/prod/
 RUN mkdir -p /openedx/config ./lms/envs/prod ./cms/envs/prod \
-  && echo ${EDX_PLATFORM_VERSION} > /openedx/config/revision.yml
+  && echo "EDX_PLATFORM_REVISION: ${EDX_PLATFORM_VERSION}" > /openedx/config/revision.yml
 
 ENV CONFIG_ROOT /openedx/config
 ENV LMS_CFG /openedx/config/lms.yml
