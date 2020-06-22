@@ -26,8 +26,10 @@
                 accomplishments_shared: false,
                 default_public_account_fields: [],
                 extended_profile: [],
-                secondary_email: ''
+                secondary_email: '',
+                profile_visibility_override_flag: null
             },
+
 
             parse: function(response) {
                 if (_.isNull(response) || _.isUndefined(response)) {
@@ -38,7 +40,7 @@
                 // profile is public is to check if the api has returned fields other than the default public fields
                 // specified in settings.ACCOUNT_VISIBILITY_CONFIGURATION.
                 var responseKeys = _.filter(_.keys(response), function(key) {
-                    return key !== 'default_public_account_fields';
+                    return key !== 'default_public_account_fields' && key !== 'profile_visibility_override_flag';
                 });
 
                 var isPublic = _.size(_.difference(responseKeys, response.default_public_account_fields)) > 0;
@@ -56,6 +58,9 @@
             },
 
             isAboveMinimumAge: function() {
+                if (this.get('profile_visibility_override_flag')){
+                    return true;
+                }
                 var yearOfBirth = this.get('year_of_birth');
                 var isBirthDefined = !(_.isUndefined(yearOfBirth) || _.isNull(yearOfBirth));
                 return isBirthDefined && !(this.get('requires_parental_consent'));

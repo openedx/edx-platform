@@ -33,7 +33,10 @@
             var accountSettingsModel = new AccountSettingsModel(
                 _.extend(
                     options.account_settings_data,
-                    {default_public_account_fields: options.default_public_account_fields}
+                    {
+                      default_public_account_fields: options.default_public_account_fields,
+                      profile_visibility_override_flag: options.profile_visibility_override_flag
+                    }
                 ),
                 {parse: true}
             );
@@ -206,7 +209,8 @@
                 sectionOneFieldViews: sectionOneFieldViews,
                 sectionTwoFieldViews: sectionTwoFieldViews,
                 badgeListContainer: badgeListContainer,
-                platformName: options.platform_name
+                platformName: options.platform_name,
+                profile_visibility_override_flag: options.profile_visibility_override_flag
             });
 
             getProfileVisibility = function() {
@@ -230,7 +234,7 @@
             };
 
             if (options.has_preferences_access) {
-                if (accountSettingsModel.get('requires_parental_consent')) {
+                if (accountSettingsModel.get('requires_parental_consent') && !options.profile_visibility_override_flag) {
                     accountPreferencesModel.set('account_privacy', 'private');
                 }
             }
