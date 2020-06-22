@@ -1,8 +1,8 @@
 (function(define) {
     'use strict';
 
-    define(['jquery'],
-        function($) {
+    define(['jquery', 'edx-ui-toolkit/js/utils/html-utils'],
+        function($, HtmlUtils) {
             return function() {
                 // define variables for code legibility
                 var $toggleActionElements = $('.toggle-visibility-button');
