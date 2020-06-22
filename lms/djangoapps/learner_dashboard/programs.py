@@ -82,10 +82,11 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     """
     Render the program details fragment.
     """
-    def render_to_fragment(self, request, program_uuid, **kwargs):
+    def render_to_fragment(self, request, **kwargs):
         """View details about a specific program."""
+        program_uuid = kwargs.get('program_uuid') or None
         programs_config = kwargs.get('programs_config') or ProgramsApiConfig.current()
-        if not programs_config.enabled or not request.user.is_authenticated:
+        if not programs_config.enabled or not request.user.is_authenticated or program_uuid is None:
             raise Http404
 
         meter = ProgramProgressMeter(request.site, request.user, uuid=program_uuid)
