@@ -3,13 +3,19 @@
 
 from django.conf.urls import include, url
 
+from rest_framework import routers
+
 from .views import (
     IdPRedirectView,
     inactive_user_view,
     lti_login_and_complete_view,
     post_to_custom_auth_form,
-    saml_metadata_view
+    saml_metadata_view,
+    SAMLProviderConfigViewSet,
 )
+
+samlprovider_router = routers.SimpleRouter()
+samlprovider_router.register(r'^auth/samlproviderconfig', SAMLProviderConfigViewSet, basename='samlproviderconfig')
 
 urlpatterns = [
     url(r'^auth/inactive', inactive_user_view, name="third_party_inactive_redirect"),
@@ -19,3 +25,6 @@ urlpatterns = [
     url(r'^auth/idp_redirect/(?P<provider_slug>[\w-]+)', IdPRedirectView.as_view(), name="idp_redirect"),
     url(r'^auth/', include('social_django.urls', namespace='social')),
 ]
+
+urlpatterns += samlprovider_router.urls
+
