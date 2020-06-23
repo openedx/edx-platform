@@ -25,4 +25,3 @@ HIDE_ACCESS_DENIALS_FLAG = WaffleFlag(
     flag_name=u'hide_access_denials',
     flag_undefined_default=False
 )
-
