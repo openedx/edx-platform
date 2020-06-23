@@ -150,7 +150,7 @@ gitpython==3.1.3          # via -r requirements/edx/testing.txt, transifex-clien
 glob2==0.7                # via -r requirements/edx/testing.txt
 gunicorn==20.0.4          # via -r requirements/edx/testing.txt
 help-tokens==1.1.2        # via -r requirements/edx/testing.txt
-html5lib==1.0.1           # via -r requirements/edx/testing.txt, ora2
+html5lib==1.1             # via -r requirements/edx/testing.txt, ora2
 httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 icalendar==4.0.6          # via -r requirements/edx/testing.txt
 idna==2.9                 # via -r requirements/edx/testing.txt, requests
@@ -251,7 +251,7 @@ python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requi
 python-levenshtein==0.12.0  # via -r requirements/edx/testing.txt
 python-memcached==1.59    # via -r requirements/edx/testing.txt
 python-slugify==4.0.0     # via -r requirements/edx/testing.txt, code-annotations, transifex-client
-python-swiftclient==3.9.0  # via -r requirements/edx/testing.txt, ora2
+python-swiftclient==3.10.0  # via -r requirements/edx/testing.txt, ora2
 python3-openid==3.1.0 ; python_version >= "3"  # via -r requirements/edx/testing.txt, social-auth-core
 python3-saml==1.9.0       # via -r requirements/edx/testing.txt
 pytz==2020.1              # via -r requirements/edx/testing.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, xblock
