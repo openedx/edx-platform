@@ -758,13 +758,13 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
 
         data = self.command.process_courses([organization])
         assert data == [{
-                'course_id': course.course_id,
-                'active': course.active,
-                'enrollments': [],
-                'course_overview': {},
-                'enrollment_allowed': [],
-                'access_roles': [],
-            } for course in query_set]
+            'course_id': course.course_id,
+            'active': course.active,
+            'enrollments': [],
+            'course_overview': {},
+            'enrollment_allowed': [],
+            'access_roles': [],
+        } for course in query_set]
 
     @patch('django.core.files.File.write')
     def test_write_to_file(self, mock_write):
