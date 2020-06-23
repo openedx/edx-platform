@@ -157,7 +157,6 @@ class TeamMembershipImportManager(object):
         self.existing_course_teams = {}
         self.user_count_by_team = Counter()
         self.user_enrollment_by_team = {}
-        self.user_to_remove_by_team = Counter()
         self.number_of_learners_assigned = 0
         self.user_to_actual_enrollment_mode = {}
 
@@ -346,24 +345,21 @@ class TeamMembershipImportManager(object):
         """
         user = row['user']
         for teamset_id in self.teamset_ids:
-            team_name = row[teamset_id]
-
             # See if the user is already on a team in the teamset
             if (user.id, teamset_id) in self.existing_course_team_memberships:
                 current_team_name = self.existing_course_team_memberships[(user.id, teamset_id)].name
             else:
                 current_team_name = None
 
+            team_name = row[teamset_id]
+
+            # We don't need to do anything if the user isn't moving to a different team
             if current_team_name == team_name:
-                # We don't need to do anything if the user isn't moving to a different team
                 continue
 
-            # If the user is on a team currently, mark them for removal
+            # If the user is on a team currently, remove them in from the updated count
             if current_team_name is not None:
-                if (teamset_id, current_team_name) not in self.user_to_remove_by_team:
-                    self.user_to_remove_by_team[(teamset_id, current_team_name)] = 1
-                else:
-                    self.user_to_remove_by_team[(teamset_id, current_team_name)] += 1
+                self.user_count_by_team[(teamset_id, current_team_name)] -= 1
 
             # If we aren't moving them to a new team, we can go to the next team-set
             if not team_name:
@@ -451,7 +447,7 @@ class TeamMembershipImportManager(object):
             # Calculate proposed team size and return False if it exceeds capacity
             for team_name in team_names:
                 key = (teamset_id, team_name)
-                if (self.user_count_by_team[key] - self.user_to_remove_by_team[key]) > max_team_size:
+                if self.user_count_by_team[key] > max_team_size:
                     self.add_error_and_check_if_max_exceeded('Team {} is full.'.format(team_name))
                     return False
 
