@@ -473,16 +473,18 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     if not enterprise_learner_details:
         consent_needed = False
     else:
+        currently_active_enterprise = enterprise_customer_uuid_for_request(request)
         client = ConsentApiClient(user=request.user)
         consent_needed = any(
-            Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
+            learner_detail['enterprise_customer']['uuid'] == currently_active_enterprise
+            and Site.objects.get(domain=learner_detail['enterprise_customer']['site']['domain']) == request.site
             and client.consent_required(
                 username=user.username,
                 course_id=course_id,
-                enterprise_customer_uuid=learner['enterprise_customer']['uuid'],
+                enterprise_customer_uuid=learner_detail['enterprise_customer']['uuid'],
                 enrollment_exists=enrollment_exists,
             )
-            for learner in enterprise_learner_details
+            for learner_detail in enterprise_learner_details
         )
     if not consent_needed:
         # Set an ephemeral item in the cache to prevent us from needing
