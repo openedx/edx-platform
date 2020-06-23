@@ -261,9 +261,6 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
 
         return qs, use_distinct
 
-    def queryset(self, request):
-        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
-
     @_Check.is_enabled(COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled)
     def has_view_permission(self, request, obj=None):
         """
