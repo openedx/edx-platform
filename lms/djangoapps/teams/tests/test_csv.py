@@ -359,8 +359,10 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         # ... and I try to add members in excess of capacity
         csv_data = self._csv_reader_from_array([
             ['user', 'mode', 'teamset_1'],
+            ['max_size_0', 'audit', ''],
             ['max_size_2', 'audit', 'team_1'],
-            ['max_size_3', 'audit', 'team_1']
+            ['max_size_3', 'audit', 'team_1'],
+            ['max_size_4', 'audit', 'team_1']
         ])
 
         result = self.import_manager.set_team_memberships(csv_data)
