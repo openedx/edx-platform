@@ -166,6 +166,12 @@ class CourseEnrollmentFactory(DjangoModelFactory):
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):
+    """
+    Create a CourseAccessRole object
+        user
+        course_id
+        role
+    """
     class Meta(object):
         model = CourseAccessRole
 
