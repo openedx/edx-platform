@@ -6,14 +6,10 @@ Run just this test with: paver test_lib -t pavelib/paver_tests/test_paver_bok_ch
 
 import os
 import unittest
-import six
 
 from pavelib.utils.test.suites import BokChoyTestSuite
 
-if six.PY2:
-    from test_support import EnvironmentVarGuard
-else:
-    from test.support import EnvironmentVarGuard
+from test.support import EnvironmentVarGuard
 
 REPO_DIR = os.getcwd()
 
