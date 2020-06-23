@@ -171,7 +171,8 @@ class TestCourseWaffleFlag(TestCase):
 
     def _assert_waffle_flag_metric(self, mock_set_custom_metric, expected_flag_value=None, flag_undefined_default=None):
         if expected_flag_value:
-            expected_calls = [call(self.NAMESPACED_FLAG_NAME, expected_flag_value)]
+            expected_flag_name = 'flag_{}'.format(self.NAMESPACED_FLAG_NAME)
+            expected_calls = [call(expected_flag_name, expected_flag_value)]
             mock_set_custom_metric.assert_has_calls(expected_calls)
             expected_call_count = 2 if flag_undefined_default else 1
             self.assertEqual(mock_set_custom_metric.call_count, expected_call_count)
