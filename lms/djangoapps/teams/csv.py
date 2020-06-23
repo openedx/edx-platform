@@ -443,19 +443,18 @@ class TeamMembershipImportManager(object):
             else:
                 max_team_size = self.course.teams_configuration.teamsets_by_id[teamset_id].max_team_size
 
-            if max_team_size is not None:
-                # Get teams in teamset
-                team_names = [
-                    teamset_to_team[1] for teamset_to_team in self.user_count_by_team
-                    if teamset_to_team[0] == teamset_id
-                ]
+            # Get teams in team-set
+            team_names = [
+                teamset_to_team[1] for teamset_to_team in self.user_count_by_team
+                if teamset_to_team[0] == teamset_id
+            ]
 
-                for team_name in team_names:
-                    # Calculate team size
-                    key = (teamset_id, team_name)
-                    if (self.user_count_by_team[key] - self.user_to_remove_by_team[key]) > max_team_size:
-                        self.add_error_and_check_if_max_exceeded('Team ' + team_name + ' is full.')
-                        return False
+            # Calculate proposed team size and return False if it exceeds capacity
+            for team_name in team_names:
+                key = (teamset_id, team_name)
+                if (self.user_count_by_team[key] - self.user_to_remove_by_team[key]) > max_team_size:
+                    self.add_error_and_check_if_max_exceeded('Team {} is full.'.format(team_name))
+                    return False
 
         return True
 
