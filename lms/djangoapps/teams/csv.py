@@ -172,21 +172,21 @@ class TeamMembershipImportManager(object):
         """
         Parse an input CSV file and pass to `set_team_memberships` for processing
         """
-        csv_data = csv.DictReader((line.decode('utf-8-sig').strip() for line in input_file.readlines()))
-        return self.set_team_memberships(csv_data)
+        csv_reader = csv.DictReader((line.decode('utf-8-sig').strip() for line in input_file.readlines()))
+        return self.set_team_memberships(csv_reader)
 
-    def set_team_memberships(self, csv_data):
+    def set_team_memberships(self, csv_reader):
         """
         Assigns team membership based on the data from an uploaded CSV file.
         Returns true if there were no issues.
         """
         # File-level validation
-        if not self.validate_header(csv_data):
+        if not self.validate_header(csv_reader):
             return False
-        if not self.validate_teamsets(csv_data):
+        if not self.validate_teamsets(csv_reader):
             return False
 
-        self.teamset_ids = csv_data.fieldnames[2:]
+        self.teamset_ids = csv_reader.fieldnames[2:]
         row_dictionaries = []
         csv_usernames = set()
 
@@ -196,7 +196,7 @@ class TeamMembershipImportManager(object):
         self.load_course_teams()
 
         # process student rows:
-        for row in csv_data:
+        for row in csv_reader:
             if not self.validate_teams_have_matching_teamsets(row):
                 return False
             username = row['user']
@@ -246,12 +246,12 @@ class TeamMembershipImportManager(object):
             self.existing_course_teams[(team.name, team.topic_id)] = team
             self.user_count_by_team[(team.topic_id, team.name)] = team.users.count()
 
-    def validate_header(self, csv_data):
+    def validate_header(self, csv_reader):
         """
         Validates header row to ensure that it contains at a minimum columns called 'user', 'mode'.
         Teamset validation is handled separately
         """
-        header = csv_data.fieldnames
+        header = csv_reader.fieldnames
         if 'user' not in header:
             self.validation_errors.append("Header must contain column 'user'.")
             return False
@@ -260,14 +260,14 @@ class TeamMembershipImportManager(object):
             return False
         return True
 
-    def validate_teamsets(self, csv_data):
+    def validate_teamsets(self, csv_reader):
         """
         Validates team set ids. Returns true if there are no errors.
         The following conditions result in errors:
         Teamset does not exist
         Teamset id is duplicated
         """
-        teamset_ids = csv_data.fieldnames[2:]
+        teamset_ids = csv_reader.fieldnames[2:]
         valid_teamset_ids = {ts.teamset_id for ts in self.course.teams_configuration.teamsets}
 
         dupe_set = set()
