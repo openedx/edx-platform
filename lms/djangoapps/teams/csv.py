@@ -374,7 +374,7 @@ class TeamMembershipImportManager(object):
             if not self.validate_compatible_enrollment_modes(user, team_name, teamset_id):
                 return False
 
-           # Update proposed team counts, initializing the team count if it doesn't exist
+            # Update proposed team counts, initializing the team count if it doesn't exist
             if (teamset_id, team_name) not in self.user_count_by_team:
                 self.user_count_by_team[(teamset_id, team_name)] = 1
             else:

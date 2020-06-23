@@ -359,7 +359,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
 
         # ... and I try to add members in excess of capacity
         csv_data = self._csv_reader_from_array([
-            ['user','mode', 'teamset_1'],
+            ['user', 'mode', 'teamset_1'],
             ['max_size_2', 'audit', 'team_1'],
             ['max_size_3', 'audit', 'team_1']
         ])
@@ -381,7 +381,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
 
         # When I try to remove them from the team
         csv_data = self._csv_reader_from_array([
-            ['user','mode', 'teamset_1'],
+            ['user', 'mode', 'teamset_1'],
             [user.username, mode, ''],
         ])
         result = self.import_manager.set_team_memberships(csv_data)
@@ -405,7 +405,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
 
         # ... and I try to switch membership (add/remove)
         csv_data = self._csv_reader_from_array([
-            ['user','mode', 'teamset_1'],
+            ['user', 'mode', 'teamset_1'],
             ['learner_4', 'audit', 'team_1'],
             ['learner_0', 'audit', 'team_2'],
         ])
@@ -429,7 +429,7 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         # When I add them to a team that does not exist
         self.assertEquals(CourseTeam.objects.all().count(), 0)
         csv_data = self._csv_reader_from_array([
-            ['user','mode', 'teamset_1'],
+            ['user', 'mode', 'teamset_1'],
             [user.username, mode, 'new_exciting_team'],
         ])
         result = self.import_manager.set_team_memberships(csv_data)
