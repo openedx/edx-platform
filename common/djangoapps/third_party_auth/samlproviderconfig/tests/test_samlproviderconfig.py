@@ -1,5 +1,3 @@
-import unittest
-
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -11,7 +9,8 @@ class SAMLProviderConfigTests(APITestCase):
     """
     def test_fetch_one_config(self):
         # ^^auth/samlproviderconfig/(?P<pk>[^/.]+)/$ [name='samlproviderconfig-detail']
-        url = reverse('samlproviderconfig-detail')
+        url = reverse('samlproviderconfig-detail', kwargs={'pk': 1})
+        print(url)
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(SAMLProviderConfig.objects.count(), 1)

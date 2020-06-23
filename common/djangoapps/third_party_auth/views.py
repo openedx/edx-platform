@@ -5,7 +5,7 @@ Extra views required for SSO
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
@@ -18,12 +18,6 @@ from student.helpers import get_next_url_for_login_page
 from student.models import UserProfile
 from student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
-
-from rest_framework import viewsets
-from rest_framework.response import Response
-
-from .models import SAMLConfiguration, SAMLProviderConfig
-from .serializers import SAMLProviderConfigSerializer
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
 
@@ -156,35 +150,3 @@ class IdPRedirectView(View):
             return redirect(url)
         except ValueError:
             return HttpResponseNotFound()
-
-class SAMLProviderConfigViewSet(viewsets.ViewSet):
-    """
-    A ViewSet to handle SAMLProviderConfig CRUD
-
-    Usage:
-        [HttpVerb] /auth/samlproviderconfig/
-    """
-
-    def retrieve(self, request, pk=None):
-        """
-            GET /auth/samlproviderconfig/{samlproviderconfigId}
-        """
-        queryset = SAMLProviderConfig.objects.all()
-        samlprovider_config = get_object_or_404(queryset, pk=pk)
-        serializer = SAMLProviderConfigSerializer(samlprovider_config)
-        return Response(serializer.data)
-    
-    def list(self, request):
-        pass
-
-    def create(self, request):
-        pass
-
-    def update(self, request, pk=None):
-        pass
-
-    def partial_update(self, request, pk=None):
-        pass
-
-    def destroy(self, request, pk=None):
-        pass
