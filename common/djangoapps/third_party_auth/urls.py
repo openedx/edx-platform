@@ -2,6 +2,7 @@
 
 
 from django.conf.urls import include, url
+from third_party_auth.samlproviderconfig.views import SAMLProviderConfigView
 
 from .views import (
     IdPRedirectView,
@@ -12,6 +13,7 @@ from .views import (
 )
 
 urlpatterns = [
+    url(r'^auth/samlproviderconfig/(?P<config_id>)\d+', SAMLProviderConfigView.as_view(), name='samlproviderconfig'),
     url(r'^auth/inactive', inactive_user_view, name="third_party_inactive_redirect"),
     url(r'^auth/custom_auth_entry', post_to_custom_auth_form, name='tpa_post_to_custom_auth_form'),
     url(r'^auth/saml/metadata.xml', saml_metadata_view),
