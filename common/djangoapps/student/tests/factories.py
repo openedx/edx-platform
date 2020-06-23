@@ -211,6 +211,11 @@ class ContentTypeFactory(DjangoModelFactory):
 
 
 class PermissionFactory(DjangoModelFactory):
+    """
+    Create a Permission object
+        codename
+        content_type
+    """
     class Meta(object):
         model = Permission
 
