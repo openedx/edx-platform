@@ -122,9 +122,15 @@
                     if (this.options.ownProfile) {
                         fieldView = this.options.accountPrivacyFieldView;
                         settings = this.options.accountSettingsModel;
-                        fieldView.profileIsPrivate = !settings.get('year_of_birth');
-                        fieldView.requiresParentalConsent = settings.get('requires_parental_consent');
-                        fieldView.isAboveMinimumAge = settings.isAboveMinimumAge();
+                        if (this.options.profile_visibility_override_flag) {
+                          fieldView.profileIsPrivate = false;
+                          fieldView.requiresParentalConsent = false;
+                          fieldView.isAboveMinimumAge = true;
+                        } else {
+                          fieldView.profileIsPrivate = !settings.get('year_of_birth');
+                          fieldView.requiresParentalConsent = settings.get('requires_parental_consent');
+                          fieldView.isAboveMinimumAge = settings.isAboveMinimumAge();
+                        }
                         fieldView.undelegateEvents();
                         this.$('.wrapper-profile-field-account-privacy').prepend(fieldView.render().el);
                         fieldView.delegateEvents();
