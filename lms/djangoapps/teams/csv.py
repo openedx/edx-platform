@@ -211,7 +211,6 @@ class TeamMembershipImportManager(object):
             row['user'] = user
             if not self.validate_user_assignment_to_team_and_teamset(row):
                 return False
-            self.remove_user_from_team_for_reassignment(row)
             row_dictionaries.append(row)
 
         if not self.validate_team_sizes_not_exceeded():
@@ -219,6 +218,7 @@ class TeamMembershipImportManager(object):
 
         if not self.validation_errors:
             for row in row_dictionaries:
+                self.remove_user_from_team_for_reassignment(row)
                 self.add_user_to_team(row)
             self.number_of_learners_assigned = len(row_dictionaries)
             return True

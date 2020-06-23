@@ -351,10 +351,15 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
             users.append(user)
 
         # When a team is already near capaciy
+        team = CourseTeam.objects.create(
+            name='team_1',
+            course_id=self.course.id,
+            topic_id='teamset_1',
+            description='Team 1!',
+        )
         for i in range(2):
             user = users[i]
-            row = {'user': user, 'teamset_1': 'team_1', 'mode': 'audit'}
-            self.import_manager.add_user_to_team(row)
+            team.add_user(user)
 
         # ... and I try to add members in excess of capacity
         csv_data = self._csv_reader_from_array([
@@ -362,16 +367,19 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
             ['max_size_0', 'audit', ''],
             ['max_size_2', 'audit', 'team_1'],
             ['max_size_3', 'audit', 'team_1'],
-            ['max_size_4', 'audit', 'team_1']
+            ['max_size_4', 'audit', 'team_1'],
         ])
 
         result = self.import_manager.set_team_memberships(csv_data)
 
         # Then the import fails with no events emitted and a "team is full" error
         self.assertFalse(result)
-        # TODO - this actually fails because of a bad ordering in our logic, fix
-        # self.assert_no_events_were_emitted()
+        self.assert_no_events_were_emitted()
         self.assertEqual(self.import_manager.validation_errors[0], 'Team team_1 is full.')
+
+        # Confirm that memberships were not altered
+        for i in range(2):
+            self.assertTrue(CourseTeamMembership.is_user_on_team(user, team))
 
     def test_remove_from_team(self):
         # Given a user already in a course and on a team
