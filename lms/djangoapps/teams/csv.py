@@ -170,8 +170,7 @@ class TeamMembershipImportManager(object):
 
     def set_team_membership_from_csv(self, input_file):
         """
-        Wrapper to parse CSV file to use for setting team memberships.
-        Returns true for success, false for failure
+        Parse an input CSV file and pass to `set_team_memberships` for processing
         """
         csv_data = csv.DictReader((line.decode('utf-8-sig').strip() for line in input_file.readlines()))
         return self.set_team_memberships(csv_data)
