@@ -829,12 +829,12 @@ def run_pii_check(options):
             print("-" * 45)
             run_output_file = six.text_type(output_file).format(env_name.lower())
             sh(
-                "mkdir -p {} && "
-                "export DJANGO_SETTINGS_MODULE={}; "
+                "mkdir -p {report_dir} && "
+                "export DJANGO_SETTINGS_MODULE={env_settings_file}; "
                 "code_annotations django_find_annotations "
-                "--config_file .pii_annotations.yml --report_path {} --app_name {} "
-                "--lint --report --coverage | tee {}".format(
-                    report_dir, env_settings_file, report_dir, env_name.lower(), run_output_file
+                "--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name} "
+                "--lint --report --coverage | tee {run_output_file}".format(
+                    report_dir=report_dir, env_settings_file=env_settings_file, env_name=env_name.lower(), run_output_file=run_output_file
                 )
             )
             uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)

@@ -345,10 +345,12 @@ def install_prereqs():
 def log_installed_python_prereqs():
     """  Logs output of pip freeze for debugging. """
     sh(u"pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
-    return
 
 
 def print_devstack_warning():
+    """
+    Show a warning for Mac users.
+    """
     if Env.USING_DOCKER:  # pragma: no cover
         print("********************************************************************************")
         print("* WARNING: Mac users should run this from both the lms and studio shells")
