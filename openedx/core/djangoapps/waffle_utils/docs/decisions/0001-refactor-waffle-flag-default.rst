@@ -18,11 +18,11 @@ Decision
 
 * Retire the ``flag_undefined_default`` argument for WaffleFlag and CourseWaffleFlag that allowed you to change the default to True in code.
 * Do not introduce any new ability to adjust the default in code.
-* In the future, alternative solutions might include:
+* Teams can use any of the following alternatives instead:
 
   * The flag can simply be removed at this time if it was meant to be temporary.
   * The flag could be replaced with a Django Setting, if the features of a flag are not needed for the permanent toggle.
-  * You could a migration that adds an active (True) waffle flag database record if a record doesn't already exist.
+  * You could add a migration that adds an active (True) waffle flag database record if a record doesn't already exist.
   * You could introduce and replace an *enable* flag with a new *disable* flag. This might be useful when a permanent toggle is desired that requires features of a waffle flag, and where disabling would now be the exceptional case, since the default would be inactive (False).
 
 Consequences
