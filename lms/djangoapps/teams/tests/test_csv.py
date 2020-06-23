@@ -258,7 +258,6 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
 
     def tearDown(self):
         """ Clean up users, teams, and memberships created during tests """
-        super(TeamMembershipImportManagerTests, self).tearDown()
         CourseTeamMembership.objects.all().delete()
         CourseTeam.objects.all().delete()
         User.objects.all().delete()
