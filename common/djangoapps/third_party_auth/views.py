@@ -19,6 +19,8 @@ from student.models import UserProfile
 from student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
 
+from .models import SAMLConfiguration, SAMLProviderConfig
+
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
 
 
