@@ -1,14 +1,13 @@
 """
 Script to process pytest warnings output by pytest-json-report plugin and output it as a html
 """
-from __future__ import absolute_import
-from __future__ import print_function
-import json
-import os
+
+import argparse
 import io
 import itertools
+import json
+import os
 import re
-import argparse
 from collections import Counter
 
 from write_to_html import (
