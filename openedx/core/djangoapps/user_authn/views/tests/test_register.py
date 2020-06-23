@@ -1894,7 +1894,7 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             {"confirm_email": "required"},
             {
                 "name": "confirm_email",
-                "type": "email",
+                "type": "text",
                 "required": True,
                 "label": "Confirm Email",
                 "errorMessages": {
