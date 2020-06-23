@@ -47,8 +47,7 @@ class CoursewareTab(EnrolledTab):
         """
         Returns true if this tab is enabled.
         """
-        # This is the unified course tab so it is always enabled
-        return True
+        return False
 
     @property
     def link_func(self):
