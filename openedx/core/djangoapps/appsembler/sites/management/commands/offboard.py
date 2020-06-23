@@ -70,7 +70,7 @@ class Command(BaseCommand):
         self.stdout.write('Inspecting project for potential problems...')
         self.check(display_num_errors=True)
 
-        self.stdout.write(self.style.MIGRATE_HEADING('Exporting "%s" in progress...' % domain))
+        self.stdout.write(self.style.MIGRATE_HEADING('Offboarding "%s" in progress...' % domain))
         site = self.get_site(domain)
 
         export_data = {
@@ -92,11 +92,11 @@ class Command(BaseCommand):
         path = self.generate_file_path(site, options['output'])
         self.write_to_file(path, output)
 
-        self.stdout.write(self.style.SUCCESS('\nSuccessfully exported "%s" site' % site.domain))
+        self.stdout.write(self.style.SUCCESS('\nSuccessfully offboarded "%s" site' % site.domain))
 
     def get_site(self, domain):
         """
-        Locates the site to be exported and return its instance.
+        Locates the site to be offboarded and return its instance.
 
         :param domain: The domain of the ite to be returned.
         :return: Returns the site object.
