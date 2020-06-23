@@ -45,10 +45,16 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'js/views/xblock
             },
 
             getDefaultModes: function() {
-                return [
+                var defaultModes = [
                     {id: 'editor', name: gettext('Editor')},
                     {id: 'settings', name: gettext('Settings')}
-                ];
+                ]
+                if (window.LXCData !== undefined) {
+                    defaultModes.unshift({
+                        id: 'visual-editor', name: gettext('Visual Editor')
+                    });
+                }
+                return defaultModes;
             },
 
             hasCustomTabs: function() {
@@ -154,10 +160,16 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'js/views/xblock
                 return this.mode;
             },
 
+            getVisualEditor: function() {
+                var editor = this.$('.visual-editor');
+                return editor.length === 1 ? editor : null;
+            },
+
             selectMode: function(mode) {
                 var dataEditor = this.getDataEditor(),
                     metadataEditor = this.getMetadataEditor(),
-                    pluginEditor = this.getPluginEditor();
+                    pluginEditor = this.getPluginEditor(),
+                    visualEditor = this.getVisualEditor();
                 if (dataEditor) {
                     this.setEditorActivation(dataEditor, mode === 'editor');
                 }
@@ -166,6 +178,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'js/views/xblock
                 }
                 if (pluginEditor) {
                     this.setEditorActivation(pluginEditor.$el, mode === 'plugins');
+                }
+                if (visualEditor) {
+                    this.setEditorActivation(visualEditor, mode === 'visual-editor');
                 }
                 this.mode = mode;
             },

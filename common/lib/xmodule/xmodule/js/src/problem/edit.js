@@ -179,10 +179,15 @@
             this.element.off('click', '.xml-tab', this.changeEditor);
             this.element.off('click', '.format-buttons button', this.onToolbarButton);
             if (this.current_editor === this.markdown_editor) {
+                var markdown = this.markdown_editor.getValue();
+                // If the visual editor has been used to make edits, get the latest markdown from it:
+                if (window.LXCData && window.LXCData.editorHasChanges) {
+                    markdown = window.LXCData.markdown;
+                }
                 return {
-                    data: MarkdownEditingDescriptor.markdownToXml(this.markdown_editor.getValue()),
+                    data: MarkdownEditingDescriptor.markdownToXml(markdown),
                     metadata: {
-                        markdown: this.markdown_editor.getValue()
+                        markdown: markdown
                     }
                 };
             } else {

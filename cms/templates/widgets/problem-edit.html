@@ -1,4 +1,7 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+    from django.utils.translation import ugettext as _
+    from openedx.core.djangolib.js_utils import dump_js_escaped_json
+%>
 <%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -9,6 +12,7 @@
 % else:
 <div class="wrapper-comp-editor" id="editor-tab">
 % endif
+
 <section class="problem-editor editor">
     <div class="row">
         %if enable_markdown:
@@ -171,4 +175,15 @@ or= mouse</code></pre>
 
 </script>
 </div>
+<div id="visual-editor" class="visual-editor is-inactive"></div>
+<script>
+    var max_attempts_value = ${editable_metadata_fields.get('max_attempts', {}).get('value')| n, dump_js_escaped_json};
+    var weight_value = ${editable_metadata_fields.get('weight', {}).get('value')| n, dump_js_escaped_json};
+    LXCData = window.LXCData = {};
+    LXCData.markdown = ${markdown | n, dump_js_escaped_json};
+    LXCData.max_attempts = max_attempts_value;
+    LXCData.weight = weight_value;
+    LXCData.editorHasChanges = false;
+</script>
+<script src="${static.url('visual-editor/bundle.js')}"></script>
 <%include file="metadata-edit.html" />
