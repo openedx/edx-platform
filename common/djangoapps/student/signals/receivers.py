@@ -5,7 +5,7 @@ Signal receivers for the "student" application.
 
 from django.conf import settings
 
-from student.helpers import USERNAME_EXISTS_MSG_FMT, AccountValidationError
+from student.helpers import USERNAME_EXISTS_MSG_FMT, EMAIL_EXISTS_MSG_FMT, AccountValidationError
 from student.models import is_email_retired, is_username_retired
 
 
