@@ -150,7 +150,6 @@ class TeamMembershipImportManager(object):
     def __init__(self, course):
         self.validation_errors = []
         self.teamset_ids = []
-        self.user_ids_by_teamset_id = {}
         self.course = course
         self.max_errors = 0
         self.existing_course_team_memberships = {}
@@ -190,7 +189,6 @@ class TeamMembershipImportManager(object):
         csv_usernames = set()
 
         # Get existing team membership data
-        self.load_user_ids_by_teamset_id()
         self.load_course_team_memberships()
         self.load_course_teams()
 
@@ -279,19 +277,6 @@ class TeamMembershipImportManager(object):
                 self.validation_errors.append("Teamset with id " + teamset_id + " does not exist.")
                 return False
         return True
-
-    def load_user_ids_by_teamset_id(self):
-        """
-        Get users associations with each teamset in a course and
-        save to `self.user_ids_by_teamset_id`
-        """
-        for teamset_id in self.teamset_ids:
-            self.user_ids_by_teamset_id[teamset_id] = {
-                membership.user_id for membership in
-                CourseTeamMembership.objects.filter(
-                    team__course_id=self.course.id, team__topic_id=teamset_id
-                )
-            }
 
     def validate_user_enrollment_is_valid(self, user, supplied_enrollment):
         """
@@ -477,7 +462,6 @@ class TeamMembershipImportManager(object):
                         try:
                             self._remove_user_from_teamset_and_emit_signal(row['user'].id, ts_id, self.course.id)
                             del self.existing_course_team_memberships[row['user'].id, ts_id]
-                            self.user_ids_by_teamset_id[ts_id].remove(row['user'].id)
                         except CourseTeamMembership.DoesNotExist:
                             pass
                     else:
