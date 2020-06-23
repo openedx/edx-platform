@@ -47,7 +47,7 @@ class IdentityServer3Test(testutil.TestCase):
         test that a KeyError is thrown if the "sub" claim does not exist
         """
         response = {"id": 1}
-        self.assertRaises(KeyError, self.id3_instance.get_user_id({}, response))
+        self.assertRaises(TypeError, self.id3_instance.get_user_id({}, response))
 
     def test_proper_config_access(self):
         """
