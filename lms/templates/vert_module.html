@@ -1,8 +1,29 @@
 <%page expression_filter="h"/>
-<%! from openedx.core.djangolib.markup import HTML %>
+
+<%namespace name='static' file='/static_content.html'/>
+
+<%!
+from django.utils.translation import gettext as _
+
+from openedx.core.djangolib.markup import HTML
+%>
 
 %if unit_title and show_title:
   <h2 class="hd hd-2 unit-title">${unit_title}</h2>
+% endif
+
+% if due:
+  <%
+  data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection_format)
+  %>
+  <div class="vert-due-date">
+    <div class="localized-datetime" data-datetime="${due}" data-string="${data_string}" data-timezone="${user_timezone}"></div>
+    % if completed:
+      <div class="pill completed">${_('Completed')}</div>
+    % elif past_due:
+      <div class="pill past-due">${_('Past Due')}</div>
+    %endif
+  </div>
 % endif
 
 % if show_bookmark_button:
@@ -18,3 +39,7 @@
   %endif
 % endfor
 </div>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform('.localized-datetime');
+</%static:require_module_async>
