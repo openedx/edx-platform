@@ -108,7 +108,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.txt
 edx-django-utils==3.2.3   # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.0.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.3.7     # via -r requirements/edx/base.txt
+edx-enterprise==3.3.8     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.4.1           # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
@@ -293,10 +293,10 @@ unidiff==0.6.0            # via -r requirements/edx/testing.in, coverage-pytest-
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.9           # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/base.txt
-virtualenv==20.0.24       # via tox
+virtualenv==20.0.25       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.2          # via -r requirements/edx/base.txt
-wcwidth==0.2.4            # via pytest
+wcwidth==0.2.5            # via pytest
 web-fragments==0.3.2      # via -r requirements/edx/base.txt, crowdsourcehinter-xblock, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via -r requirements/edx/base.txt, bleach, html5lib
 webob==1.8.6              # via -r requirements/edx/base.txt, xblock, xmodule
