@@ -394,47 +394,7 @@ class VideoBlock(
         autoadvance_this_video = self.auto_advance and autoadvance_enabled
 
         metadata = {
-            'saveStateEnabled': view != PUBLIC_VIEW,
-            'saveStateUrl': self.ajax_url + '/save_user_state',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
-            'streams': self.youtube_streams,
-            'sources': sources,
-            'poster': poster,
-            'duration': video_duration,
-            # This won't work when we move to data that
-            # isn't on the filesystem
-            'captionDataDir': getattr(self, 'data_dir', None),
-
-            'showCaptions': json.dumps(self.show_captions),
-            'generalSpeed': self.global_speed,
-            'speed': self.speed,
             'autoAdvance': autoadvance_this_video,
-            'savedVideoPosition': self.saved_video_position.total_seconds(),
-            'start': self.start_time.total_seconds(),
-            'end': self.end_time.total_seconds(),
-            'completionEnabled': completion_enabled,
-            'completionPercentage': settings.COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
-            'transcriptLanguage': transcript_language,
-            'transcriptLanguages': sorted_languages,
-            'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
-            'ytApiUrl': settings.YOUTUBE['API'],
-            'lmsRootURL': settings.LMS_ROOT_URL,
-            'ytMetadataEndpoint': (
-                # In the new runtime, get YouTube metadata via a handler. The handler supports anonymous users and
-                # can work in sandboxed iframes. In the old runtime, the JS will call the LMS's yt_video_metadata
-                # API endpoint directly (not an XBlock handler).
-                self.runtime.handler_url(self, 'yt_video_metadata')
-                if getattr(self.runtime, 'suppports_state_for_anonymous_users', False) else ''
-            ),
-
-            'transcriptTranslationUrl': self.runtime.handler_url(
-                self, 'transcript', 'translation/__lang__'
-            ).rstrip('/?'),
-            'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
-                self, 'transcript', 'available_translations'
-            ).rstrip('/?'),
-            'publishCompletionUrl': self.runtime.handler_url(self, 'publish_completion', '').rstrip('?'),
-
             # For now, the option "data-autohide-html5" is hard coded. This option
             # either enables or disables autohiding of controls and captions on mouse
             # inactivity. If set to true, controls and captions will autohide for
@@ -447,12 +407,48 @@ class VideoBlock(
             # this option will have an effect if changed to "True". The code on
             # front-end exists.
             'autohideHtml5': False,
-
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
+            # This won't work when we move to data that
+            # isn't on the filesystem
+            'captionDataDir': getattr(self, 'data_dir', None),
+            'completionEnabled': completion_enabled,
+            'completionPercentage': settings.COMPLETION_VIDEO_COMPLETE_PERCENTAGE,
+            'duration': video_duration,
+            'end': self.end_time.total_seconds(),
+            'generalSpeed': self.global_speed,
+            'lmsRootURL': settings.LMS_ROOT_URL,
+            'poster': poster,
+            'prioritizeHls': self.prioritize_hls(self.youtube_streams, sources),
+            'publishCompletionUrl': self.runtime.handler_url(self, 'publish_completion', '').rstrip('?'),
             # This is the server's guess at whether youtube is available for
             # this user, based on what was recorded the last time we saw the
             # user, and defaulting to True.
             'recordedYoutubeIsAvailable': self.youtube_is_available,
-            'prioritizeHls': self.prioritize_hls(self.youtube_streams, sources),
+            'savedVideoPosition': self.saved_video_position.total_seconds(),
+            'saveStateEnabled': view != PUBLIC_VIEW,
+            'saveStateUrl': self.ajax_url + '/save_user_state',
+            'showCaptions': json.dumps(self.show_captions),
+            'sources': sources,
+            'speed': self.speed,
+            'start': self.start_time.total_seconds(),
+            'streams': self.youtube_streams,
+            'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
+                self, 'transcript', 'available_translations'
+            ).rstrip('/?'),
+            'transcriptLanguage': transcript_language,
+            'transcriptLanguages': sorted_languages,
+            'transcriptTranslationUrl': self.runtime.handler_url(
+                self, 'transcript', 'translation/__lang__'
+            ).rstrip('/?'),
+            'ytApiUrl': settings.YOUTUBE['API'],
+            'ytMetadataEndpoint': (
+                # In the new runtime, get YouTube metadata via a handler. The handler supports anonymous users and
+                # can work in sandboxed iframes. In the old runtime, the JS will call the LMS's yt_video_metadata
+                # API endpoint directly (not an XBlock handler).
+                self.runtime.handler_url(self, 'yt_video_metadata')
+                if getattr(self.runtime, 'suppports_state_for_anonymous_users', False) else ''
+            ),
+            'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
         }
 
         bumperize(self)
