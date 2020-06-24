@@ -576,9 +576,19 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         # These sub-lists will fail assertCountEqual if they're out of order
         for expected_user in expected_users:
             expected_user['orgs'].sort()
+            if AccountRetirementPartnerReportView.ORGS_CONFIG_KEY in expected_user:
+                orgs_config = expected_user[AccountRetirementPartnerReportView.ORGS_CONFIG_KEY]
+                orgs_config.sort()
+                for config in orgs_config:
+                    config[AccountRetirementPartnerReportView.ORGS_CONFIG_FIELD_HEADINGS_KEY].sort()
 
         for returned_user in returned_users:
             returned_user['orgs'].sort()
+            if AccountRetirementPartnerReportView.ORGS_CONFIG_KEY in returned_user:
+                orgs_config = returned_user[AccountRetirementPartnerReportView.ORGS_CONFIG_KEY]
+                orgs_config.sort()
+                for config in orgs_config:
+                    config[AccountRetirementPartnerReportView.ORGS_CONFIG_FIELD_HEADINGS_KEY].sort()
 
         self.assertCountEqual(returned_users, expected_users)
 
