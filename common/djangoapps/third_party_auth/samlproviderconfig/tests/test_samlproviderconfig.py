@@ -7,11 +7,10 @@ class SAMLProviderConfigTests(APITestCase):
     """
         API Tests for SAMLProviderConfig REST endpoints
     """
-    def test_endpoint_authenticated(self):
-        # ^^auth/samlproviderconfig/(?P<pk>[^/.]+)/$ [name='samlproviderconfig']
-        url = reverse('samlproviderconfig', kwargs={'config_id':1})
-        print(url)
+    def test_get_single_config(self):
+        # ^^auth/saml/v0/providerconfig/
+        url = reverse('samlproviderconfig-detail', args=[1])
         response = self.client.get(url, format='json')
         # only admin user has access, as of now
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(SAMLProviderConfig.objects.count(), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(SAMLProviderConfig.objects.count(), 1)
