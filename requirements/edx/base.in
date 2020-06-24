@@ -108,7 +108,7 @@ lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
-mongoengine==0.10.0                 # Object-document mapper for MongoDB, used in the LMS dashboard
+mongoengine                         # Object-document mapper for MongoDB, used in the LMS dashboard
 mysqlclient                         # Driver for the default production relational database
 newrelic                            # New Relic agent for performance monitoring
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
