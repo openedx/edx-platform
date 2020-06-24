@@ -168,7 +168,7 @@ def course_home_url_name(course_key):
             requested.
 
     """
-    return 'info'
+    return 'openedx.course_experience.course_home'
 
 
 class CourseHomeMessages(UserMessageCollection):
