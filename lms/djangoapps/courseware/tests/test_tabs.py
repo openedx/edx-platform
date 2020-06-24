@@ -781,14 +781,12 @@ class CourseInfoTabTestCase(TabTestCase):
         tabs = get_course_tab_list(self.user, self.course)
         self.assertEqual(tabs[0].type, 'course_info')
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_default_tab_for_new_course_experience(self):
         # Verify that the unified course experience hides the course info tab
         tabs = get_course_tab_list(self.user, self.course)
         self.assertEqual(tabs[0].type, 'courseware')
 
     # TODO: LEARNER-611 - remove once course_info is removed.
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_default_tab_for_displayable(self):
         tabs = xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.user)
         for i, tab in enumerate(tabs):

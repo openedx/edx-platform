@@ -12,11 +12,36 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, W
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 
+
+class AlwaysEnabledCourseFlag(CourseWaffleFlag):
+    """
+    This is a replacement for a CourseWaffleFlag that will always return True,
+    except possibly for tests.
+
+    TODO: TNL-7061: Perform the actual clean-up required to remove these flags
+        and refactor/fix any tests that shouldn't be removed.
+
+    """
+    def is_enabled(self, course_key=None):
+        if self.namespaced_flag_name in self.waffle_namespace._cached_flags:
+            # Note: This enables @override_waffle_flag(SOME_FLAG, active=False) to continue to work.
+            #   I couldn't simply delete these tests, because in some cases we don't have coverage
+            #   for both the active=True and active=False case. During final clean-up, some of these
+            #   tests may need to be refactored rather than deleted.
+            return self.waffle_namespace._cached_flags[self.namespaced_flag_name]
+
+        return True
+
+
 # Waffle flag to enable the separate course outline page and full width content.
-COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_outline_page', flag_undefined_default=True)
+# NOTE: This is no longer a real flag. It is always True.
+# TODO: TNL-7061: Perform the actual clean-up required to remove this flag.
+COURSE_OUTLINE_PAGE_FLAG = AlwaysEnabledCourseFlag(WAFFLE_FLAG_NAMESPACE, 'course_outline_page')
 
 # Waffle flag to enable a single unified "Course" tab.
-UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab', flag_undefined_default=True)
+# NOTE: This is no longer a real flag. It is always True.
+# TODO: TNL-7061: Perform the actual clean-up required to remove this flag.
+UNIFIED_COURSE_TAB_FLAG = AlwaysEnabledCourseFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
 
 # Waffle flag to enable the sock on the footer of the home and courseware pages.
 DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock')

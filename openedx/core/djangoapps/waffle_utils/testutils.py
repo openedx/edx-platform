@@ -19,7 +19,7 @@ class override_waffle_flag(override_flag):
     It accepts two parameters, the flag itself and its intended state. Example
     usage::
 
-        with override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True):
+        with override_waffle_flag(SOME_COURSE_FLAG, active=True):
             ...
 
     If the flag already exists, its value will be changed inside the context
@@ -29,11 +29,12 @@ class override_waffle_flag(override_flag):
 
     It can also act as a decorator::
 
-        @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
+        @override_waffle_flag(SOME_COURSE_FLAG, active=True)
         def test_happy_mode_enabled():
             ...
     """
-    _cached_value = None
+    _NO_CACHED_VALUE = object()
+    _cached_value = _NO_CACHED_VALUE
 
     def __init__(self, flag, active):
         """
@@ -52,7 +53,7 @@ class override_waffle_flag(override_flag):
 
         # pylint: disable=protected-access
         # Store values that have been cached on the flag
-        self._cached_value = self.flag.waffle_namespace._cached_flags.get(self.name)
+        self._cached_value = self.flag.waffle_namespace._cached_flags.get(self.name, self._NO_CACHED_VALUE)
         self.flag.waffle_namespace._cached_flags[self.name] = self.active
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -61,7 +62,7 @@ class override_waffle_flag(override_flag):
         # pylint: disable=protected-access
         # Restore the cached values
         waffle_namespace = self.flag.waffle_namespace
-        waffle_namespace._cached_flags.pop(self.name, None)
+        waffle_namespace._cached_flags.pop(self.name)
 
-        if self._cached_value is not None:
+        if self._cached_value != self._NO_CACHED_VALUE:
             waffle_namespace._cached_flags[self.name] = self._cached_value

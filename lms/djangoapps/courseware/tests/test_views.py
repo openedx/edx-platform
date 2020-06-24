@@ -81,7 +81,6 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    COURSE_OUTLINE_PAGE_FLAG,
     RELATIVE_DATES_FLAG,
     UNIFIED_COURSE_TAB_FLAG
 )
@@ -926,26 +925,6 @@ class ViewsTestCase(BaseViewsTestCase):
         response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER='foo')
         self.assertEqual(response.status_code, 200)
 
-    # TODO: TNL-6387: Remove test
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
-    def test_accordion(self):
-        """
-        This needs a response_context, which is not included in the render_accordion's main method
-        returning a render_to_string, so we will render via the courseware URL in order to include
-        the needed context
-        """
-        course_id = quote(six.text_type(self.course.id).encode("utf-8"))
-        response = self.client.get(
-            reverse('courseware', args=[six.text_type(course_id)]),
-            follow=True
-        )
-        test_responses = [
-            '<p class="accordion-display-name">Sequential 1 <span class="sr">current section</span></p>',
-            '<p class="accordion-display-name">Sequential 2 </p>'
-        ]
-        for test in test_responses:
-            self.assertContains(response, test)
-
 
 # Patching 'lms.djangoapps.courseware.views.views.get_programs' would be ideal,
 # but for some unknown reason that patch doesn't seem to be applied.
@@ -1076,46 +1055,6 @@ class TestProgressDueDate(BaseDueDateTests):
     def get_response(self, course):
         """ Returns the HTML for the progress page """
         return self.client.get(reverse('progress', args=[six.text_type(course.id)]))
-
-
-# TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-class TestAccordionDueDate(BaseDueDateTests):
-    """
-    Test that the accordion page displays due dates correctly
-    """
-    __test__ = True
-
-    def get_response(self, course):
-        """ Returns the HTML for the accordion """
-        return self.client.get(
-            reverse('courseware', args=[six.text_type(course.id)]),
-            follow=True
-        )
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
-    def test_backwards_compatibility(self):
-        super(TestAccordionDueDate, self).test_backwards_compatibility()
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
-    def test_defaults(self):
-        super(TestAccordionDueDate, self).test_defaults()
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
-    def test_format_date(self):
-        super(TestAccordionDueDate, self).test_format_date()
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
-    def test_format_invalid(self):
-        super(TestAccordionDueDate, self).test_format_invalid()
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
-    def test_format_none(self):
-        super(TestAccordionDueDate, self).test_format_none()
 
 
 class StartDateTests(ModuleStoreTestCase):
