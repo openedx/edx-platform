@@ -433,7 +433,11 @@ class TeamMembershipImportManager(object):
             for team_name in team_names:
                 key = (teamset_id, team_name)
                 if self.user_count_by_team[key] > max_team_size:
-                    self.add_error_and_check_if_max_exceeded('Team {} is full.'.format(team_name))
+                    self.add_error_and_check_if_max_exceeded(
+                        'New membership for team {} would exceed max size of {}.'.format(
+                            team_name, max_team_size
+                        )
+                    )
                     return False
 
         return True

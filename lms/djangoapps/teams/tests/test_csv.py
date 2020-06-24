@@ -375,7 +375,10 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         # Then the import fails with no events emitted and a "team is full" error
         self.assertFalse(result)
         self.assert_no_events_were_emitted()
-        self.assertEqual(self.import_manager.validation_errors[0], 'Team team_1 is full.')
+        self.assertEqual(
+            self.import_manager.validation_errors[0],
+            'New membership for team team_1 would exceed max size of 3.'
+        )
 
         # Confirm that memberships were not altered
         for i in range(2):
