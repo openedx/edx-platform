@@ -58,7 +58,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(CourseDateSummaryTest, self).setUp()
-        SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
     def make_request(self, user):
         """ Creates a request """
@@ -69,7 +68,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         return request
 
     def test_course_info_feature_flag(self):
-        SelfPacedConfiguration(enable_course_home_improvements=False).save()
         course = create_course_run()
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
