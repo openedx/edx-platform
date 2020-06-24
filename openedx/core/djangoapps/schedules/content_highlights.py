@@ -6,8 +6,7 @@ schedule experience built on the Schedules app.
 
 import logging
 
-from datetime import datetime, timedelta
-
+from openedx.core.djangoapps.course_date_signals.utils import spaced_out_sections
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.lib.request_utils import get_request_or_stub
@@ -64,7 +63,7 @@ def get_week_highlights(user, course_key, week_num):
     return highlights
 
 
-def get_next_section_highlights(user, course_key, target_date):
+def get_next_section_highlights(user, course_key, start_date, target_date):
     """
     Get highlights (list of unicode strings) for a week, based upon the current date.
 
@@ -75,8 +74,9 @@ def get_next_section_highlights(user, course_key, target_date):
     course_module = _get_course_module(course_descriptor, user)
     sections_with_highlights = _get_sections_with_highlights(course_module)
     highlights = _get_highlights_for_next_section(
+        course_module,
         sections_with_highlights,
-        course_key,
+        start_date,
         target_date
     )
     return highlights
@@ -124,16 +124,20 @@ def _get_course_module(course_descriptor, user):
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_descriptor.id, user, course_descriptor, depth=1, read_only=True,
     )
-    return get_module_for_descriptor(
+    course_module = get_module_for_descriptor(
         user, request, course_descriptor, field_data_cache, course_descriptor.id, course=course_descriptor,
     )
+    if not course_module:
+        raise CourseUpdateDoesNotExist('Course module {} not found'.format(course_descriptor.id))
+    return course_module
+
+
+def _section_has_highlights(section):
+    return section.highlights and not section.hide_from_toc
 
 
 def _get_sections_with_highlights(course_module):
-    return [
-        section for section in course_module.get_children()
-        if section.highlights and not section.hide_from_toc
-    ]
+    return list(filter(_section_has_highlights, course_module.get_children()))
 
 
 def _get_highlights_for_week(sections, week_num, course_key):
@@ -150,15 +154,23 @@ def _get_highlights_for_week(sections, week_num, course_key):
     return section.highlights
 
 
-def _get_highlights_for_next_section(sections, course_key, target_date):
-    sorted_sections = sorted(sections, key=lambda section: section.due)
-    for index, sorted_section in enumerate(sorted_sections):
-        if sorted_section.due.date() == target_date and index + 1 < len(sorted_sections):
+def _get_highlights_for_next_section(course_module, sections, start_date, target_date):
+    for index, section, weeks_to_complete in spaced_out_sections(course_module):
+        if not _section_has_highlights(section):
+            continue
+
+        # We calculate section due date ourselves (rather than grabbing the due attribute),
+        # since not every section has a real due date (i.e. not all are graded), but we still
+        # want to know when this section should have been completed by the learner.
+        section_due_date = start_date + weeks_to_complete
+
+        if section_due_date.date() == target_date and index + 1 < len(sections):
             # Return index + 2 for "week_num", since weeks start at 1 as opposed to indexes,
             # and we want the next week, so +1 for index and +1 for next
             return sections[index + 1].highlights, index + 2
+
     raise CourseUpdateDoesNotExist(
         u"No section found ending on {} for {}".format(
-            target_date, course_key
+            target_date, course_module.id
         )
     )

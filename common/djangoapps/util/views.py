@@ -21,6 +21,7 @@ from six.moves import map
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
+from openedx.features.course_experience.utils import dates_banner_should_display
 
 import track.views
 from edxmako.shortcuts import render_to_response
@@ -218,7 +219,10 @@ def reset_course_deadlines(request):
         user = masquerade_user
     else:
         user = request.user
-    reset_self_paced_schedule(user, course_key)
+
+    missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, user)
+    if missed_deadlines and not missed_gated_content:
+        reset_self_paced_schedule(user, course_key)
     if redirect_url == RENDER_XBLOCK_NAME:
         detail_id_dict.pop('course_id')
     return redirect(reverse(redirect_url, kwargs=detail_id_dict))

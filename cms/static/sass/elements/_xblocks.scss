@@ -34,8 +34,7 @@
 
   // UI: xblock header primary for main title and xblock actions
   .xblock-header-primary {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     border-bottom: 1px solid $gray-l4;
     border-radius: ($baseline/5) ($baseline/5) 0 0;
     min-height: ($baseline*2.5);
@@ -541,8 +540,7 @@
       @extend %t-action3;
       @extend %t-strong;
 
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       display: inline-block;
       padding: ($baseline/2);
       width: 49%;
@@ -554,8 +552,7 @@
       @extend %t-action4;
       @extend %t-strong;
 
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       display: inline-block;
       padding: ($baseline/2);
       width: 49%;
@@ -749,7 +746,7 @@
     // TYPE: enumerated lists of metadata sets
     .metadata-list-enum {
       * {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
       }
 
       // label
@@ -819,7 +816,7 @@
     // TYPE: Dict
     .metadata-dict {
       * {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
       }
 
       // label

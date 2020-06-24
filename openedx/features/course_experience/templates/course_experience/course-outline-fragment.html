@@ -13,15 +13,20 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
+from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
 %>
 
 <%
 course_sections = blocks.get('children')
 self_paced = context.get('self_paced', False)
-reset_deadlines_banner_displayed = False
+relative_dates_flag_is_enabled = RELATIVE_DATES_FLAG.is_enabled(str(course_key))
+is_course_staff = bool(user and course and has_access(user, 'staff', course, course.id))
+dates_banner_displayed = False
 %>
 <main role="main" class="course-outline" id="main" tabindex="-1">
+    <%include file="/dates_banner.html" />
     % if course_sections is not None:
         <button class="btn btn-primary"
                 id="expand-collapse-outline-all-button"
@@ -60,15 +65,7 @@ reset_deadlines_banner_displayed = False
                 scored = 'scored' if subsection.get('scored', False) else ''
                 graded = 'graded' if subsection.get('graded') else ''
                 num_graded_problems = subsection.get('num_graded_problems', 0)
-                due_date = subsection.get('due')
-                overdue = due_date is not None and due_date < timezone.now() and not subsection.get('complete', True)
                 %>
-                % if graded and overdue and not reset_deadlines_banner_displayed:
-                    <% reset_deadlines_banner_displayed = True %>
-                    <script type="text/javascript">
-                        $('.reset-deadlines-banner').css('display', 'flex');
-                    </script>
-                % endif
                         <li class="subsection accordion ${ 'current' if subsection.get('resume_block') else '' } ${graded} ${scored}">
                             <a
                             % if enable_links:

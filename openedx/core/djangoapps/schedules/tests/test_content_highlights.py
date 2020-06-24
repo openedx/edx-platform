@@ -2,6 +2,8 @@
 
 import datetime
 
+import mock
+
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.content_highlights import (
     course_has_highlights, get_week_highlights, get_next_section_highlights,
@@ -135,23 +137,39 @@ class TestContentHighlights(ModuleStoreTestCase):
             get_week_highlights(self.user, self.course_key, week_num=1)
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
-    def test_get_next_section_highlights(self):
+    @mock.patch('openedx.core.djangoapps.course_date_signals.utils.get_expected_duration')
+    def test_get_next_section_highlights(self, mock_duration):
+        mock_duration.return_value = datetime.timedelta(days=2)
         yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
         today = datetime.datetime.utcnow()
         tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
         with self.store.bulk_operations(self.course_key):
             self._create_chapter(  # Week 1
                 highlights=[u'a', u'b', u'á'],
-                due=yesterday,
             )
             self._create_chapter(  # Week 2
                 highlights=[u'skipped a week'],
-                due=today,
             )
 
         self.assertEqual(
-            get_next_section_highlights(self.user, self.course_key, yesterday.date()),
+            get_next_section_highlights(self.user, self.course_key, yesterday, today.date()),
             ([u'skipped a week'], 2),
         )
         with self.assertRaises(CourseUpdateDoesNotExist):
-            get_next_section_highlights(self.user, self.course_key, tomorrow.date())
+            get_next_section_highlights(self.user, self.course_key, yesterday, tomorrow.date())
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    @mock.patch('lms.djangoapps.courseware.module_render.get_module_for_descriptor')
+    def test_get_highlights_without_module(self, mock_get_module):
+        mock_get_module.return_value = None
+
+        with self.store.bulk_operations(self.course_key):
+            self._create_chapter(highlights='Test highlight')
+
+        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
+            get_week_highlights(self.user, self.course_key, 1)
+
+        yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        today = datetime.datetime.utcnow()
+        with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
+            get_next_section_highlights(self.user, self.course_key, yesterday, today.date())

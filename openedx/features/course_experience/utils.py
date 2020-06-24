@@ -3,24 +3,24 @@ Common utilities for the course experience, including course outline.
 """
 
 
-import logging
 from datetime import timedelta
 
 from completion.models import BlockCompletion
+from django.db.models import Q
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
 from course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.api import get_blocks
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
+from openedx.features.course_experience import RELATIVE_DATES_FLAG
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
-
-log = logging.getLogger(__name__)
 
 
 @request_cached()
@@ -202,7 +202,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
     all_blocks = get_blocks(
         request,
         course_usage_key,
-        user=request.user,
+        user=user,
         nav_depth=3,
         requested_fields=[
             'children',
@@ -232,7 +232,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
             set_last_accessed_default(course_outline_root_block)
             mark_blocks_completed(
                 block=course_outline_root_block,
-                user=request.user,
+                user=user,
                 course_key=course_key
             )
     return course_outline_root_block
@@ -255,46 +255,58 @@ def get_resume_block(block):
     return block
 
 
-def reset_deadlines_banner_should_display(course_key, request):
+def dates_banner_should_display(course_key, user):
     """
     Return whether or not the reset banner should display,
     determined by whether or not a course has any past-due,
-    incomplete sequentials
+    incomplete sequentials and which enrollment mode is being
+    dealt with for the current user and course.
+
+    Returns:
+        (missed_deadlines, missed_gated_content):
+            missed_deadlines is True if the user has missed any graded content deadlines
+            missed_gated_content is True if the first content that the user missed was gated content
     """
-    display_reset_dates_banner = False
+    if not RELATIVE_DATES_FLAG.is_enabled(course_key):
+        return False, False
+
     course_overview = CourseOverview.objects.get(id=str(course_key))
     course_end_date = getattr(course_overview, 'end_date', None)
     is_self_paced = getattr(course_overview, 'self_paced', False)
+
+    # Only display the banner for self-paced courses
+    if not is_self_paced:
+        return False, False
+
+    # Only display the banner for enrolled users
+    if not CourseEnrollment.is_enrolled(user, course_key):
+        return False, False
+
+    # Don't display the banner for course staff
     is_course_staff = bool(
-        request.user and course_overview and has_access(request.user, 'staff', course_overview, course_overview.id)
+        user and course_overview and has_access(user, 'staff', course_overview, course_overview.id)
     )
-    if is_self_paced and (not is_course_staff) and (not course_end_date or timezone.now() < course_end_date):
-        if (CourseEnrollment.objects.filter(
-            course=course_overview, user=request.user, mode=CourseMode.VERIFIED
-        ).exists()):
-            course_block_tree = get_course_outline_block_tree(
-                request, str(course_key), request.user
-            )
-            course_sections = course_block_tree.get('children', [])
-            for section in course_sections:
-                if display_reset_dates_banner:
-                    break
-                for subsection in section.get('children', []):
-                    if str(course_key) == 'course-v1:BabsonX+BPET.ACCx+2T2018':
-                        log.info('**********DEBUGGING FOR RESET DATES BANNER FOR %s**********', request.user.username)
-                        log.info(u'ALL SUBSECTION INFO: %s', subsection)
-                        log.info(u'SUBSECTION COMPLETE: %s', subsection.get('complete', True))
-                        log.info(u'SUBSECTION GRADED: %s', subsection.get('graded', False))
-                        log.info(
-                            u'SUBSECTION PAST DUE: %s',
-                            subsection.get('due', timezone.now() + timedelta(1)) < timezone.now(),
-                        )
-                        log.info('*********END**********')
-                    if (
-                        not subsection.get('complete', True)
-                        and subsection.get('graded', False)
-                        and subsection.get('due', timezone.now() + timedelta(1)) < timezone.now()
-                    ):
-                        display_reset_dates_banner = True
-                        break
-    return display_reset_dates_banner
+    if is_course_staff:
+        return False, False
+
+    # Don't display the banner if the course has ended
+    if course_end_date and course_end_date < timezone.now():
+        return False, False
+
+    store = modulestore()
+    course_usage_key = store.make_course_usage_key(course_key)
+    block_data = get_course_blocks(user, course_usage_key, include_completion=True)
+    for section_key in block_data.get_children(course_usage_key):
+        for subsection_key in block_data.get_children(section_key):
+            subsection_due_date = block_data.get_xblock_field(subsection_key, 'due', None)
+            if subsection_due_date and (
+                not block_data.get_xblock_field(subsection_key, 'complete', False)
+                and block_data.get_xblock_field(subsection_key, 'graded', False)
+                and subsection_due_date < timezone.now()
+            ):
+                # Display the banner if the due date for an incomplete graded subsection
+                # has passed
+                return True, block_data.get_xblock_field(subsection_key, 'contains_gated_content', False)
+
+    # Don't display the banner if there were no missed deadlines
+    return False, False

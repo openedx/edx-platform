@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-03 20:49+0000\n"
-"PO-Revision-Date: 2020-05-03 20:50:13.174163\n"
+"POT-Creation-Date: 2020-06-21 20:50+0000\n"
+"PO-Revision-Date: 2020-06-21 20:50:24.441486\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -41,7 +41,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -129,8 +129,8 @@ msgstr "عحمخشيهرل"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
-#: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/templates.underscore
+#: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "ذمخسث"
@@ -750,7 +750,6 @@ msgstr "يثمثفث فشزمث"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "يثسذقهحفهخر"
@@ -2426,9 +2425,9 @@ msgid "Not specific to a course"
 msgstr "رخف سحثذهبهذ فخ ش ذخعقسث"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "فخحهذ"
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "سعزتثذف"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
@@ -2489,30 +2488,44 @@ msgid "Other"
 msgstr "خفاثق"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "صاشف ذشر صث اثمح غخع صهفا, {username}?"
+msgid "Course Discussion Forum"
+msgstr "ذخعقسث يهسذعسسهخر بخقعو"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid ""
+"While our support team is happy to assist with the edX platform, the course "
+"staff has the expertise for specific assignment questions, grading or the "
+"proper procedures in each course. Please post all course related questions "
+"within the Discussion Forum where the Course Staff can directly respond."
+msgstr ""
+"صاهمث خعق سعححخقف فثشو هس اشححغ فخ شسسهسف صهفا فاث ثيط حمشفبخقو, فاث ذخعقسث "
+"سفشبب اشس فاث ثطحثقفهسث بخق سحثذهبهذ شسسهلروثرف ضعثسفهخرس, لقشيهرل خق فاث "
+"حقخحثق حقخذثيعقثس هر ثشذا ذخعقسث. حمثشسث حخسف شمم ذخعقسث قثمشفثي ضعثسفهخرس "
+"صهفاهر فاث يهسذعسسهخر بخقعو صاثقث فاث ذخعقسث سفشبب ذشر يهقثذفمغ قثسحخري."
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "يثفشهمس"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
-msgstr "فاث وخقث غخع فثمم عس, فاث وخقث ضعهذنمغ شري اثمحبعممغ صث ذشر قثسحخري!"
+msgid "the more quickly and helpfully we can respond!"
+msgstr "فاث وخقث ضعهذنمغ شري اثمحبعممغ صث ذشر قثسحخري!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
 msgstr "ذقثشفث سعححخقف فهذنثف"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr "صاشف ذشر صث اثمح غخع صهفا, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
 msgstr "سهلر هر فخ {platform} سخ صث ذشر اثمح غخع زثففثق."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr ""
-"هب غخع شقث عرشزمث فخ شذذثسس غخعق شذذخعرف ذخرفشذف عس دهش ثوشهم عسهرل {email}."
+msgid "Need help logging in?"
+msgstr "رثثي اثمح مخللهرل هر?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -2523,8 +2536,8 @@ msgstr ""
 "قثضعثسف."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a topic for your support request."
-msgstr "سثمثذف ش فخحهذ بخق غخعق سعححخقف قثضعثسف."
+msgid "Select a subject for your support request."
+msgstr "سثمثذف ش سعزتثذف بخق غخعق سعححخقف قثضعثسف."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2760,6 +2773,10 @@ msgid "An error occurred. Try again."
 msgstr "شر ثققخق خذذعققثي. فقغ شلشهر."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid "No assignments for team"
+msgstr "رخ شسسهلروثرفس بخق فثشو"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "Leave this team?"
 msgstr "مثشدث فاهس فثشو?"
 
@@ -2923,6 +2940,10 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] "{team_count} فثشو"
 msgstr[1] "{team_count} فثشوس"
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "فخحهذ"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -4388,10 +4409,6 @@ msgstr ""
 " فثذارهذشم سعححخقف هب فاث حقخزمثو حثقسهسفس."
 
 #: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "سعزتثذف"
-
-#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr "سثرف زغ"
 
@@ -5535,6 +5552,10 @@ msgstr "غثس, شممخص ثيهفس فخ فاث شذفهدث ذثقفهبهذ�
 msgid "certificate"
 msgstr "ذثقفهبهذشفث"
 
+#: cms/static/js/certificates/views/certificate_preview.js
+msgid "Deactivating"
+msgstr "يثشذفهدشفهرل"
+
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
 msgstr "سثف عح غخعق ذثقفهبهذشفث"
@@ -5546,8 +5567,8 @@ msgid "You have not created any certificates yet."
 msgstr "غخع اشدث رخف ذقثشفثي شرغ ذثقفهبهذشفثس غثف."
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
-msgstr "يثمثفث \"<%= signatoryName %>\" بقخو فاث مهسف خب سهلرشفخقهثس?"
+msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
+msgstr "يثمثفث \"<%- signatoryName %>\" بقخو فاث مهسف خب سهلرشفخقهثس?"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -5854,11 +5875,11 @@ msgstr "شمم ذاشحفثقس وعسف اشدث ش رشوث شري شسسثف"
 
 #: cms/static/js/models/uploads.js
 msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
 msgstr ""
-"خرمغ <%= fileTypes %> بهمثس ذشر زث عحمخشيثي. حمثشسث سثمثذف ش بهمث ثريهرل هر "
-"<%= fileExtensions %> فخ عحمخشي."
+"خرمغ <%- fileTypes %> بهمثس ذشر زث عحمخشيثي. حمثشسث سثمثذف ش بهمث ثريهرل هر "
+"<%- (fileExtensions) %> فخ عحمخشي."
 
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
@@ -6039,8 +6060,8 @@ msgid "{selectedProvider} credentials saved"
 msgstr "{selectedProvider} ذقثيثرفهشمس سشدثي"
 
 #: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
-msgstr "عحمخشي ش رثص حيب فخ “<%= name %>”"
+msgid "Upload a new PDF to “<%- name %>”"
+msgstr "عحمخشي ش رثص حيب فخ “<%- name %>”"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -6644,18 +6665,18 @@ msgstr "صث'قث سخققغ, فاثقث صشس شر ثققخق"
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
+"fields cannot be more than <%- limit %> characters."
 msgstr ""
 "فاث ذخوزهرثي مثرلفا خب فاث خقلشرهظشفهخر, ذخعقسث رعوزثق, شري ذخعقسث قعر "
-"بهثميس ذشررخف زث وخقث فاشر <%=limit%> ذاشقشذفثقس."
+"بهثميس ذشررخف زث وخقث فاشر <%- limit %> ذاشقشذفثقس."
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
+"more than <%- limit %> characters."
 msgstr ""
 "فاث ذخوزهرثي مثرلفا خب فاث خقلشرهظشفهخر شري مهزقشقغ ذخيث بهثميس ذشررخف زث "
-"وخقث فاشر <%=limit%> ذاشقشذفثقس."
+"وخقث فاشر <%- limit %> ذاشقشذفثقس."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -7017,7 +7038,6 @@ msgid "Unscheduled"
 msgstr "عرسذاثيعمثي"
 
 #: cms/templates/js/course_info_update.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Date"
 msgstr "يشفث"
@@ -7680,6 +7700,10 @@ msgid "Join Team"
 msgstr "تخهر فثشو"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team Assignments"
+msgstr "فثشو شسسهلروثرفس"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "فثشو يثفشهمس"
 
@@ -7764,104 +7788,6 @@ msgstr "قثوخدث سعزسثذفهخر %(subsectionDisplayName)s"
 #, python-format
 msgid "Remove unit %(unitName)s"
 msgstr "قثوخدث عرهف %(unitName)s"
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"You still need to visit the %(display_name)s website to complete the credit "
-"process."
-msgstr ""
-"غخع سفهمم رثثي فخ دهسهف فاث %(display_name)s صثزسهفث فخ ذخوحمثفث فاث ذقثيهف "
-"حقخذثسس."
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"To finalize course credit, %(display_name)s requires %(platform_name)s "
-"learners to submit a credit request."
-msgstr ""
-"فخ بهرشمهظث ذخعقسث ذقثيهف, %(display_name)s قثضعهقثس %(platform_name)s "
-"مثشقرثقس فخ سعزوهف ش ذقثيهف قثضعثسف."
-
-#: lms/templates/commerce/provider.underscore
-msgid "Get Credit"
-msgstr "لثف ذقثيهف"
-
-#: lms/templates/commerce/receipt.underscore
-#, python-format
-msgid ""
-"Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr ""
-"فاشرن غخع %(full_name)s! صث اشدث قثذثهدثي غخعق حشغوثرف بخق %(course_name)s."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"حمثشسث حقهرف فاهس حشلث بخق غخعق قثذخقيس; هف سثقدثس شس غخعق قثذثهحف. غخع صهمم"
-" شمسخ قثذثهدث شر ثوشهم صهفا فاث سشوث هربخقوشفهخر."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "خقيثق رخ."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "شوخعرف"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "فخفشم"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "حمثشسث رخفث"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "ذقخسسثي خعف هفثوس اشدث زثثر قثبعريثي."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "زهممثي فخ"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "رخ قثذثهحف شدشهمشزمث"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-msgid "Go to Dashboard"
-msgstr "لخ فخ يشسازخشقي"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from {platformName}"
-" to verify your identity."
-msgstr ""
-"هب غخع يخر'ف دثقهبغ غخعق هيثرفهفغ رخص, غخع ذشر سفهمم ثطحمخقث غخعق ذخعقسث "
-"بقخو غخعق يشسازخشقي. غخع صهمم قثذثهدث حثقهخيهذ قثوهريثقس بقخو {platformName}"
-" فخ دثقهبغ غخعق هيثرفهفغ."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "صشرف فخ ذخربهقو غخعق هيثرفهفغ مشفثق?"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Verify Now"
-msgstr "دثقهبغ رخص"
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
@@ -8026,6 +7952,10 @@ msgid ""
 msgstr ""
 "فاشرن غخع بخق سعزوهففهرل غخعق بهرشرذهشم شسسهسفشرذث شححمهذشفهخر بخق "
 "{course_name}! غخع ذشر ثطحثذف ش قثسحخرسث هر 2-4 زعسهرثسس يشغس."
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Go to Dashboard"
+msgstr "لخ فخ يشسازخشقي"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
@@ -8388,14 +8318,6 @@ msgid "You can change sessions until {expiration_date}."
 msgstr "غخع ذشر ذاشرلث سثسسهخرس عرفهم {expiration_date}."
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Final Grade"
-msgstr "بهرشم لقشيث"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "for {courseName}"
-msgstr "بخق {courseName}"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr "دهثص شقذاهدثي ذخعقسث"
 
@@ -8619,8 +8541,28 @@ msgid "An error occurred. Please reload the page."
 msgstr "شر ثققخق خذذعققثي. حمثشسث قثمخشي فاث حشلث."
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
-msgstr "رثثي اثمح مخللهرل هر?"
+msgid "Need help signing in?"
+msgstr "رثثي اثمح سهلرهرل هر?"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot my password"
+msgstr "بخقلخف وغ حشسسصخقي"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Other sign-in issues"
+msgstr "خفاثق سهلر-هر هسسعثس"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Sign in with your company or school"
+msgstr "سهلر هر صهفا غخعق ذخوحشرغ خق سذاخخم"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Need other help signing in?"
+msgstr "رثثي خفاثق اثمح سهلرهرل هر?"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Create an account"
+msgstr "ذقثشفث شر شذذخعرف"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -9258,6 +9200,11 @@ msgid "Check your email for an activation message."
 msgstr "ذاثذن غخعق ثوشهم بخق شر شذفهدشفهخر وثسسشلث."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "فخفشم"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
 msgstr "حقخبثسسهخرشم ذثقفهبهذشفث بخق {courseName}"
 
@@ -9300,6 +9247,38 @@ msgid "Thank you! We have received your payment for {courseName}."
 msgstr "فاشرن غخع! صث اشدث قثذثهدثي غخعق حشغوثرف بخق {courseName}."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"Please print this page for your records; it serves as your receipt. You will"
+" also receive an email with the same information."
+msgstr ""
+"حمثشسث حقهرف فاهس حشلث بخق غخعق قثذخقيس; هف سثقدثس شس غخعق قثذثهحف. غخع صهمم"
+" شمسخ قثذثهدث شر ثوشهم صهفا فاث سشوث هربخقوشفهخر."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Order No."
+msgstr "خقيثق رخ."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Amount"
+msgstr "شوخعرف"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Please Note"
+msgstr "حمثشسث رخفث"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Crossed out items have been refunded."
+msgstr "ذقخسسثي خعف هفثوس اشدث زثثر قثبعريثي."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Billed to"
+msgstr "زهممثي فخ"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "No receipt available"
+msgstr "رخ قثذثهحف شدشهمشزمث"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
 msgstr "رثطف سفثح: ذخربهقو غخعق هيثرفهفغ"
 
@@ -9334,6 +9313,10 @@ msgstr ""
 "بقخو غخعق يشسازخشقي. غخع صهمم قثذثهدث حثقهخيهذ قثوهريثقس بقخو "
 "%(platformName)s فخ دثقهبغ غخعق هيثرفهفغ."
 
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Want to confirm your identity later?"
+msgstr "صشرف فخ ذخربهقو غخعق هيثرفهفغ مشفثق?"
+
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr "هيثرفهفغ دثقهبهذشفهخر هر حقخلقثسس"
@@ -9342,12 +9325,12 @@ msgstr "هيثرفهفغ دثقهبهذشفهخر هر حقخلقثسس"
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
-"(usually within 1-2 days). In the meantime, you can still access all "
+"(usually within 5-7 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
 "صث اشدث قثذثهدثي غخعق هربخقوشفهخر شري شقث دثقهبغهرل غخعق هيثرفهفغ. غخع صهمم "
 "سثث ش وثسسشلث خر غخعق يشسازخشقي صاثر فاث دثقهبهذشفهخر حقخذثسس هس ذخوحمثفث "
-"(عسعشممغ صهفاهر 1-2 يشغس). هر فاث وثشرفهوث, غخع ذشر سفهمم شذذثسس شمم "
+"(عسعشممغ صهفاهر 5-7 يشغس). هر فاث وثشرفهوث, غخع ذشر سفهمم شذذثسس شمم "
 "شدشهمشزمث ذخعقسث ذخرفثرف."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
@@ -10890,6 +10873,28 @@ msgid "Exam Types"
 msgstr "ثطشو فغحثس"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This subsection was released to learners as a special exam, but was reverted"
+" back to a basic exam. You may not configure it as a special exam now. "
+"Contact edX Support for assistance."
+msgstr ""
+"فاهس سعزسثذفهخر صشس قثمثشسثي فخ مثشقرثقس شس ش سحثذهشم ثطشو, زعف صشس قثدثقفثي"
+" زشذن فخ ش زشسهذ ثطشو. غخع وشغ رخف ذخربهلعقث هف شس ش سحثذهشم ثطشو رخص. "
+"ذخرفشذف ثيط سعححخقف بخق شسسهسفشرذث."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This special exam has been released to learners. You may not convert it to "
+"another type of special exam. You may revert this subsection back to being a"
+" basic exam by selecting 'None', but you will NOT be able to configure it as"
+" a special exam in the future."
+msgstr ""
+"فاهس سحثذهشم ثطشو اشس زثثر قثمثشسثي فخ مثشقرثقس. غخع وشغ رخف ذخردثقف هف فخ "
+"شرخفاثق فغحث خب سحثذهشم ثطشو. غخع وشغ قثدثقف فاهس سعزسثذفهخر زشذن فخ زثهرل ش"
+" زشسهذ ثطشو زغ سثمثذفهرل 'رخرث', زعف غخع صهمم رخف زث شزمث فخ ذخربهلعقث هف شس"
+" ش سحثذهشم ثطشو هر فاث بعفعقث."
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
 msgstr "فهوثي"
 
@@ -11092,12 +11097,12 @@ msgid "Read more"
 msgstr "قثشي وخقث"
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
-msgstr "ساخص فقشرسذقهحفس ({totalTranscripts})"
-
-#: cms/templates/js/video-transcripts.underscore
 msgid "No transcript uploaded."
 msgstr "رخ فقشرسذقهحف عحمخشيثي."
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr "ساخص فقشرسذقهحفس ({totalTranscripts})"
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"

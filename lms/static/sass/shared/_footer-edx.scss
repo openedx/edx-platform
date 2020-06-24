@@ -167,7 +167,8 @@ footer#footer-edx-v3 {
 
   .footer-content-wrapper {
     @include outer-container;
-    @include box-sizing(border-box);
+
+    box-sizing: border-box;
   }
 
   p {

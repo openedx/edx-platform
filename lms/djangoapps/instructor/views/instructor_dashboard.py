@@ -144,7 +144,7 @@ def instructor_dashboard_2(request, course_id):
         sections.append(_section_data_download(course, access))
 
     analytics_dashboard_message = None
-    if show_analytics_dashboard_message(course_key):
+    if show_analytics_dashboard_message(course_key) and (access['staff'] or access['instructor']):
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, six.text_type(course_key))
         link_start = HTML(u"<a href=\"{}\" rel=\"noopener\" target=\"_blank\">").format(analytics_dashboard_url)
@@ -174,7 +174,7 @@ def instructor_dashboard_2(request, course_id):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if is_bulk_email_feature_enabled(course_key):
+    if is_bulk_email_feature_enabled(course_key) and (access['staff'] or access['instructor']):
         sections.append(_section_send_email(course, access))
 
     # Gate access to Ecommerce tab

@@ -17,6 +17,7 @@ from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.tabs import (
     CourseInfoTab,
     CoursewareTab,
+    DatesTab,
     ExternalDiscussionCourseTab,
     ExternalLinkCourseTab,
     ProgressTab,
@@ -543,6 +544,7 @@ class TabListTestCase(TabTestCase):
             [
                 {'type': CoursewareTab.type},
                 {'type': CourseInfoTab.type, 'name': 'fake_name'},
+                {'type': DatesTab.type},  # Add this even though we filter it out, for testing purposes
                 {'type': 'discussion', 'name': 'fake_name'},
                 {'type': ExternalLinkCourseTab.type, 'name': 'fake_name', 'link': 'fake_link'},
                 {'type': ExternalLinkCourseTab.type, 'name': 'fake_name', 'link': 'fake_link'},
@@ -656,13 +658,16 @@ class CourseTabListTestCase(TabListTestCase):
         # enumerate the tabs with a staff user
         user = UserFactory(is_staff=True)
         CourseEnrollment.enroll(user, self.course.id)
-        for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(self.course, user=user)):
-            if getattr(tab, 'is_collection_item', False):
-                # a collection item was found as a result of a collection tab
-                self.assertTrue(getattr(self.course.tabs[i], 'is_collection', False))
-            else:
-                # all other tabs must match the expected type
-                self.assertEqual(tab.type, self.course.tabs[i].type)
+        # Need to mock this flag as we care that orders match, and a tab not enabled will result in a failure
+        with patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG') as mock_flag:
+            mock_flag.is_enabled().return_value = True
+            for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(self.course, user=user)):
+                if getattr(tab, 'is_collection_item', False):
+                    # a collection item was found as a result of a collection tab
+                    self.assertTrue(getattr(self.course.tabs[i], 'is_collection', False))
+                else:
+                    # all other tabs must match the expected type
+                    self.assertEqual(tab.type, self.course.tabs[i].type)
 
         # test including non-empty collections
         self.assertIn(
@@ -895,3 +900,29 @@ class DiscussionLinkTestCase(TabTestCase):
             is_enrolled=is_enrolled,
             is_staff=is_staff
         )
+
+
+class DatesTabTestCase(TabListTestCase):
+    """Test cases for making sure no persisted dates tab is surfaced"""
+
+    def test_singular_dates_tab(self):
+        user = self.create_mock_user()
+        self.course.tabs = self.all_valid_tab_list
+        self.course.save()
+
+        # Verify that there is a dates tab in the modulestore
+        has_dates_tab = False
+        for tab in self.course.tabs:
+            if tab.type == 'dates':
+                has_dates_tab = True
+        self.assertTrue(has_dates_tab)
+
+        # Verify that there is only 1 'dates' tab in the returned result from get_course_tab_list()
+        with patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG') as mock_flag:
+            mock_flag.is_enabled().return_value = True
+            tabs = get_course_tab_list(user, self.course)
+            num_dates_tabs = 0
+            for tab in tabs:
+                if tab.type == 'dates':
+                    num_dates_tabs += 1
+            self.assertEqual(num_dates_tabs, 1)

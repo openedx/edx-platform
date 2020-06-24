@@ -399,6 +399,7 @@ class ThirdPartyAuthUserStatusView(APIView):
         GET /api/third_party_auth/v0/providers/user_status/
 
         **GET Response Values**
+        ```
         {
             "accepts_logins": true,
             "name": "Google",
@@ -407,6 +408,7 @@ class ThirdPartyAuthUserStatusView(APIView):
             "connected": false,
             "id": "oa2-google-oauth2"
         }
+        ```
         """
         tpa_states = []
         for state in pipeline.get_provider_user_states(request.user):

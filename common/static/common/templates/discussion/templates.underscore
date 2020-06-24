@@ -140,7 +140,7 @@
         <input id='edit-discussion-forum-title' aria-describedby="field_help_title" type="text" class="edit-post-title field-input" name="title" value="<%- title %>">
     </label>
 </div>
-<div class="form-row post-field">
+<div class="post-field">
     <p class="sr-only field-help" id="edit-post-editor-description"><%- gettext('Edit your post below.') %></p>
     <div class="edit-post-body" aria-describedby="edit-post-editor-description" name="body"><%- body %></div>
 </div>
@@ -241,9 +241,7 @@
 <div class="edit-post-form">
     <h<%- startHeader %>><%- gettext("Editing response") %></h<%- startHeader %>>
     <ul class="edit-post-form-errors"></ul>
-    <div class="form-row">
-        <div class="edit-post-body" name="body" data-id="<%- id %>"><%- body %></div>
-    </div>
+      <div class="edit-post-body" name="body" data-id="<%- id %>"><%- body %></div>
     <button type="submit" id="edit-response-submit"class="btn btn-primary post-update"><%- gettext("Update response") %></button>
     <button class="btn btn-outline-primary post-cancel"><%- gettext("Cancel") %></button>
 </div>
@@ -290,9 +288,7 @@
 <div class="edit-post-form" id="comment_<%- id %>">
     <h<%- startHeader %> ><%- gettext("Editing comment") %></h<%- startHeader%>>
     <ul class="edit-comment-form-errors"></ul>
-    <div class="form-row">
-        <div class="edit-comment-body" name="body" data-id="<%- id %>"><%- body %></div>
-    </div>
+      <div class="edit-comment-body" name="body" data-id="<%- id %>"><%- body %></div>
     <button type="submit" id="edit-comment-submit" class="btn btn-primary post-update"><%- gettext("Update comment") %></button>
     <button class="btn btn-outline-primary post-cancel"><%- gettext("Cancel") %></button>
 </div>

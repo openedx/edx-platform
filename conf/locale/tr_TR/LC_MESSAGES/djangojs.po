@@ -50,7 +50,7 @@
 # Kubilay <kubilayinceoren10@gmail.com>, 2015
 # msare <mervesareakin@gmail.com>, 2014
 # Onur Bektas <mustafaonurbektas@gmail.com>, 2013
-# serd@r <inactive+serince@transifex.com>, 2015
+# 169685c64da20f8565d5bb4b5fa14388_0122c8a <d6cdb6a8d55668108fbee6af67afa0d1_255939>, 2015
 # umit.dogan <umitgri@gmail.com>, 2014
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
@@ -107,16 +107,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-05-03 20:42+0000\n"
-"PO-Revision-Date: 2020-04-28 20:25+0000\n"
-"Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
+"POT-Creation-Date: 2020-06-21 20:42+0000\n"
+"PO-Revision-Date: 2020-06-14 20:45+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -204,8 +204,8 @@ msgstr "Yüklüyor"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
-#: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/templates.underscore
+#: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Kapat"
@@ -827,7 +827,6 @@ msgstr "Tabloyu sil"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "Açıklama"
@@ -2106,6 +2105,7 @@ msgid "Your request could not be processed. Refresh the page and try again."
 msgstr "İsteğiniz işlenemiyor. Tekrar denemek için sayfayı yeniden yükleyin."
 
 #: common/static/common/js/discussion/utils.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "…"
 msgstr "..."
 
@@ -2510,8 +2510,8 @@ msgid "Not specific to a course"
 msgstr "Bir derse özel değil"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
 msgstr "Konu"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2573,22 +2573,32 @@ msgid "Other"
 msgstr "Diğer"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "Sana nasıl yardımcı olabiliriz,  {username}?"
+msgid "Course Discussion Forum"
+msgstr "Ders Tartışma Forumu"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid ""
+"While our support team is happy to assist with the edX platform, the course "
+"staff has the expertise for specific assignment questions, grading or the "
+"proper procedures in each course. Please post all course related questions "
+"within the Discussion Forum where the Course Staff can directly respond."
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "Ayrıntılar"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgid "the more quickly and helpfully we can respond!"
 msgstr ""
-"Bize ne kadar çok ayrıntı verirseniz, size o kadar hızlı ve faydalı bir "
-"şekilde cevap verebiliriz!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
 msgstr ""
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr "Sana nasıl yardımcı olabiliriz,  {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2597,11 +2607,8 @@ msgstr ""
 "sağlayabilirsiniz."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr ""
-"Hesabınıza ulaşamıyorsanız bizimle {email} e-posta adresi üzerinden "
-"iletişime geçebilirsiniz."
+msgid "Need help logging in?"
+msgstr "Oturum açmak için yardıma mı ihtiyacınız var?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -2612,8 +2619,8 @@ msgstr ""
 "belirtin."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a topic for your support request."
-msgstr ""
+msgid "Select a subject for your support request."
+msgstr "Destek talebiniz için bir konu seçin."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2843,6 +2850,10 @@ msgid "An error occurred. Try again."
 msgstr "Bir hata oluştu. Tekrar deneyin."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid "No assignments for team"
+msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "Leave this team?"
 msgstr "Bu takımdan ayrıl?"
 
@@ -2999,6 +3010,10 @@ msgid "{team_count} Team"
 msgid_plural "{team_count} Teams"
 msgstr[0] "{team_count} Takım"
 msgstr[1] "{team_count} Takım"
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
+msgid "Topic"
+msgstr "Konu"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
@@ -3380,6 +3395,7 @@ msgid "HTML preview of post"
 msgstr "Gönderinin HTML önizlemesi"
 
 #: lms/static/js/customwmd.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Your question or idea (required)"
 msgstr "Sorunuz veya fikriniz (gerekli)"
 
@@ -3435,6 +3451,8 @@ msgid ""
 "Unable to determine whether we should give you a refund because of System "
 "Error. Please try again later."
 msgstr ""
+"Şu anda Sistem Hatasından dolayı geri ödeme verip veremeyeceğimizi "
+"saptayamıyoruz. Lütfen daha sonra tekrar deneyiniz."
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -4434,10 +4452,6 @@ msgstr ""
 "deneyiniz, ve eğer problem devam ederse teknik destek ile iletişime geçiniz."
 
 #: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Konu"
-
-#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr "Gönderen:"
 
@@ -5414,10 +5428,12 @@ msgstr "Tümünü Aç"
 msgid "Collapse All"
 msgstr "Tümünü Kapa"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show More"
 msgstr "Daha Fazla Göster"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show Less"
 msgstr "Daha Az Göster"
@@ -5574,6 +5590,10 @@ msgstr "Evet, etkinleştirilmiş Sertifikayı düzenlemeye izin ver"
 msgid "certificate"
 msgstr "sertifika"
 
+#: cms/static/js/certificates/views/certificate_preview.js
+msgid "Deactivating"
+msgstr ""
+
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
 msgstr "Sertifikanızı kurun"
@@ -5585,8 +5605,8 @@ msgid "You have not created any certificates yet."
 msgstr "Henüz bir sertifika oluşturmadınız."
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
-msgstr "İmza sahipleri listesinden \"<%= signatoryName %>\" sil?"
+msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
+msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -5638,6 +5658,7 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Staff"
 msgstr "Personel"
 
@@ -5895,11 +5916,9 @@ msgstr "Tüm bölümlerin bir adı ve varlığı olmalı"
 
 #: cms/static/js/models/uploads.js
 msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
 msgstr ""
-"Sadece <%= fileTypes %> dosya uzantılarını yükleyebilirsiniz. Lütfen sonunda"
-" <%= fileExtensions %> uzantısı olan bir dosya yükleyin."
 
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
@@ -6083,8 +6102,8 @@ msgid "{selectedProvider} credentials saved"
 msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
-msgstr " Şu konuma “<%= name %>” yeni bir PDF dosyası yükle"
+msgid "Upload a new PDF to “<%- name %>”"
+msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -6685,18 +6704,14 @@ msgstr "Özür dileriz, bir hata oluştu"
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
+"fields cannot be more than <%- limit %> characters."
 msgstr ""
-"Organizasyonun birleşik boyutu, ders sayısı, ve ders alanları <%=limit%> "
-"karakterden fazla olamaz."
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
+"more than <%- limit %> characters."
 msgstr ""
-"Organizasyonun birleşik boyutu ve kütüphane kodu alanları <%=limit%> "
-"karakterden fazla olamaz."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -7048,7 +7063,6 @@ msgid "Unscheduled"
 msgstr "Planlanmamış"
 
 #: cms/templates/js/course_info_update.underscore
-#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Date"
 msgstr "Tarih"
@@ -7145,7 +7159,7 @@ msgstr "Kapatıldı"
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
-msgstr ""
+msgstr "İlgili: %(courseware_title_linked)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7154,24 +7168,25 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "This post is visible to everyone."
-msgstr ""
+msgstr "Bu gönderi herkese açıktır"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Editing post"
-msgstr ""
+msgstr "İleti düzenleniyor"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
 msgstr ""
+"Katılıma teşvik etmek için açık ve tanıtıcı bir başlık ekle. (Gerekli)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Edit your post below."
-msgstr ""
+msgstr "İletinizi aşağıda düzenleyin."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Update post"
-msgstr ""
+msgstr "İleti güncelle"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7182,7 +7197,7 @@ msgstr[1] ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a comment"
-msgstr ""
+msgstr "Bir yorum ekleyin"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7206,16 +7221,16 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Editing response"
-msgstr ""
+msgstr "Cevap düzenleniyor"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Update response"
-msgstr ""
+msgstr "Cevabı güncelle"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "%(author)s tarafından %(time_ago)s önce gönderildi"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Editing comment"
@@ -7231,23 +7246,23 @@ msgstr "tartışma"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "answered question"
-msgstr ""
+msgstr "soru cevaplandı"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "unanswered question"
-msgstr ""
+msgstr "cevaplanmayan soru"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Following"
-msgstr ""
+msgstr "Takip ediliyor"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Community TA"
-msgstr ""
+msgstr "Topluluk Öğretim Elemanı"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "{unread_comments_count} new"
-msgstr ""
+msgstr "{unread_comments_count} yeni"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7263,11 +7278,11 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "İleti Ekle"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Visible to"
-msgstr ""
+msgstr "Görünecek kişiler"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid ""
@@ -7277,15 +7292,15 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "All Groups"
-msgstr ""
+msgstr "Bütün Gruplar"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "follow this post"
-msgstr ""
+msgstr "bu iletiyi takip et"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously"
-msgstr ""
+msgstr "isimsiz olarak ileti yolla"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
@@ -7302,7 +7317,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "This post will be visible to everyone."
-msgstr ""
+msgstr "Bu ileti herkese görünür olacak."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Topic area"
@@ -7331,15 +7346,15 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "View discussion"
-msgstr ""
+msgstr "Tartışmayı görüntüle"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Load more"
-msgstr ""
+msgstr "Daha fazla yükle"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Post type"
-msgstr ""
+msgstr "Gönderi türü"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid ""
@@ -7349,63 +7364,63 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
-msgstr ""
+msgstr "Soru"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Discussion"
-msgstr ""
+msgstr "Forum"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Endorse"
-msgstr ""
+msgstr "Destekle"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unendorse"
-msgstr ""
+msgstr "Destekleme"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Mark as Answer"
-msgstr ""
+msgstr "Cevap olarak İşaretle"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unmark as Answer"
-msgstr ""
+msgstr "Cevap işaretini Kaldır"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Follow"
-msgstr ""
+msgstr "Takip et"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unfollow"
-msgstr ""
+msgstr "Takibi bırak"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Vote for this post,"
-msgstr ""
+msgstr "Bu ileti için oyla,"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Report abuse"
-msgstr ""
+msgstr "Kötü kullanımı bildir"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Report"
-msgstr ""
+msgstr "Raporla"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unreport"
-msgstr ""
+msgstr "Bildirme"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pin"
-msgstr ""
+msgstr "İşaretle"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unpin"
-msgstr ""
+msgstr "İşareti kaldır"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Open"
-msgstr ""
+msgstr "Aç"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7686,7 +7701,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Assign Team Memberships"
-msgstr ""
+msgstr "Takım Üyeliklerini Belirle"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Upload Memberships"
@@ -7703,6 +7718,10 @@ msgstr "Katılacak bir takım bulmada sorun mu yaşıyorsunuz?"
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
 msgid "Join Team"
 msgstr "Takıma Katıl"
+
+#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
+msgid "Team Assignments"
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
@@ -7789,104 +7808,6 @@ msgstr "Altbölümü kaldır %(subsectionDisplayName)s"
 #, python-format
 msgid "Remove unit %(unitName)s"
 msgstr "Birimi kaldır %(unitName)s"
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"You still need to visit the %(display_name)s website to complete the credit "
-"process."
-msgstr ""
-"Sizin hala daha kredi işlemini tamamlamak için %(display_name)s websitesine "
-"ziyaret etmeniz gerekmektedir."
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"To finalize course credit, %(display_name)s requires %(platform_name)s "
-"learners to submit a credit request."
-msgstr ""
-"Ders kredisini sonlandırmak için, %(display_name)s, kredi talebini yüklemek "
-"için %(platform_name)s öğrencilerini gerektirir."
-
-#: lms/templates/commerce/provider.underscore
-msgid "Get Credit"
-msgstr "Kredi Al"
-
-#: lms/templates/commerce/receipt.underscore
-#, python-format
-msgid ""
-"Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr ""
-"%(course_name)s dersi için ödemenizi aldık. Teşekkürler %(full_name)s!"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"Lütfen kayıtlarınız için bu sayfanın çıktısını fatura olarak alın. Aynı "
-"bilgileri içeren bir de e-posta alacaksınız."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "Sipariş No."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "Miktar"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "Toplam"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "Lütfen Bildirin"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "Üzerinde çarpı işareti öğeler iade edilmiştir."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "Faturalandı"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "Fatura bulunamadı"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-msgid "Go to Dashboard"
-msgstr "Ana Panele Git"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from {platformName}"
-" to verify your identity."
-msgstr ""
-"Şu an kimliğinizi onaylamasanız da, dersinize hâlâ panelinizden "
-"ulaşabilirsiniz. Kimliğinizi onaylamanız için, {platformName} size düzenli "
-"bildirimler gönderecek."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "Kimliğinizi daha sonra mı doğrulamak istersiniz?"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Verify Now"
-msgstr "Şimdi Doğrula"
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
@@ -8045,6 +7966,10 @@ msgid ""
 msgstr ""
 "{course_name} için mali yardım başvurunuzu gönderdiğiniz için teşekkürler ! "
 "2-4 iş günü içerisinde size geri döneceğiz. "
+
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Go to Dashboard"
+msgstr "Ana Panele Git"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
@@ -8408,14 +8333,6 @@ msgid "You can change sessions until {expiration_date}."
 msgstr "{expiration_date} tarihine kadar oturumları değiştirebilirsiniz"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Final Grade"
-msgstr "Final Notu"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "for {courseName}"
-msgstr "{courseName} için"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr "Arşivlenmiş Dersleri Görüntüle"
 
@@ -8499,7 +8416,7 @@ msgstr "Yeni Programları Keşfedin"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
 msgid_plural "Courses"
-msgstr[0] ""
+msgstr[0] "Ders"
 msgstr[1] "Dersler"
 
 #: lms/templates/learner_dashboard/program_card.underscore
@@ -8599,7 +8516,7 @@ msgstr "Derslerinizi bitirdikçe, burada listelenmiş halde göreceksiniz."
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
-msgstr ""
+msgstr "Alanınızda öne çıkmanızı sağlamak için derslerinizi tamamlayın!"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
@@ -8634,8 +8551,28 @@ msgid "An error occurred. Please reload the page."
 msgstr "Bir hata oluştu. Lütfen sayfayı tekrar yükleyin."
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
-msgstr "Oturum açmak için yardıma mı ihtiyacınız var?"
+msgid "Need help signing in?"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot my password"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Other sign-in issues"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Sign in with your company or school"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Need other help signing in?"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Create an account"
+msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -9229,6 +9166,11 @@ msgid "Check your email for an activation message."
 msgstr "Aktivasyon mesajı için e-postanızı kontrol edin."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "Toplam"
+
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
 msgstr "{courseName} için Profesyonel Sertifika"
 
@@ -9273,6 +9215,38 @@ msgid "Thank you! We have received your payment for {courseName}."
 msgstr "Teşekkürler! {courseName} için olan ödemenizi aldık."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"Please print this page for your records; it serves as your receipt. You will"
+" also receive an email with the same information."
+msgstr ""
+"Lütfen kayıtlarınız için bu sayfanın çıktısını fatura olarak alın. Aynı "
+"bilgileri içeren bir de e-posta alacaksınız."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Order No."
+msgstr "Sipariş No."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Amount"
+msgstr "Miktar"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Please Note"
+msgstr "Lütfen Bildirin"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Crossed out items have been refunded."
+msgstr "Üzerinde çarpı işareti öğeler iade edilmiştir."
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Billed to"
+msgstr "Faturalandı"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "No receipt available"
+msgstr "Fatura bulunamadı"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
 msgstr "Sonraki Adım: Kimliğinizi doğrulayın"
 
@@ -9307,6 +9281,10 @@ msgstr ""
 " keşfedebilirsiniz. Kimliğinizi doğrulamak için %(platformName)s üzerinden "
 "periyodik hatırlatma alacaksınız."
 
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Want to confirm your identity later?"
+msgstr "Kimliğinizi daha sonra mı doğrulamak istersiniz?"
+
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr "Süreç İçinde Kimlik Doğrulama"
@@ -9315,12 +9293,9 @@ msgstr "Süreç İçinde Kimlik Doğrulama"
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
-"(usually within 1-2 days). In the meantime, you can still access all "
+"(usually within 5-7 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
-"Bilgilerinizi aldık ve kimliğinizi doğruluyoruz. Doğrulama süreci "
-"tamalandığında (genelde 1-2 gün içerisinde tamamlanır) ana panelinize mesaj "
-"gelecektir. Bu süre içinde mevcut olan ders içeriklerine ulaşabilirsiniz."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
@@ -10851,6 +10826,21 @@ msgid "Exam Types"
 msgstr "Sınav Türleri"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This subsection was released to learners as a special exam, but was reverted"
+" back to a basic exam. You may not configure it as a special exam now. "
+"Contact edX Support for assistance."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
+msgid ""
+"This special exam has been released to learners. You may not convert it to "
+"another type of special exam. You may revert this subsection back to being a"
+" basic exam by selecting 'None', but you will NOT be able to configure it as"
+" a special exam in the future."
+msgstr ""
+
+#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
 msgstr "Zamanlanmış"
 
@@ -11049,12 +11039,12 @@ msgid "Read more"
 msgstr "Daha fazlası"
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
-msgstr "Altyazıları göster ({totalTranscripts})"
-
-#: cms/templates/js/video-transcripts.underscore
 msgid "No transcript uploaded."
 msgstr "Herhangi bir altyazı yüklenmedi."
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr "Altyazıları göster ({totalTranscripts})"
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"

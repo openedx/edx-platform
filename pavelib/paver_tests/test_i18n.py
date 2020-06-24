@@ -141,7 +141,7 @@ class TestI18nDummy(PaverTestCase):
     Test the Paver i18n_dummy task.
     """
     def setUp(self):
-        super(TestI18nDummy, self).setUp()
+        super().setUp()
 
         # Mock the paver @needs decorator for i18n_extract
         self._mock_paver_needs = patch.object(pavelib.i18n.i18n_extract, 'needs').start()
@@ -160,9 +160,9 @@ class TestI18nDummy(PaverTestCase):
         self.assertEqual(
             self.task_messages,
             [
-                u'i18n_tool extract',
-                u'i18n_tool dummy',
-                u'i18n_tool generate',
+                'i18n_tool extract',
+                'i18n_tool dummy',
+                'i18n_tool generate',
             ]
         )
 
@@ -172,7 +172,7 @@ class TestI18nCompileJS(PaverTestCase):
     Test the Paver i18n_compilejs task.
     """
     def setUp(self):
-        super(TestI18nCompileJS, self).setUp()
+        super().setUp()
 
         # Mock the paver @needs decorator for i18n_extract
         self._mock_paver_needs = patch.object(pavelib.i18n.i18n_extract, 'needs').start()
@@ -193,7 +193,7 @@ class TestI18nCompileJS(PaverTestCase):
         self.assertEqual(
             self.task_messages,
             [
-                u'python manage.py lms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
-                u'python manage.py cms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
+                'python manage.py lms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
+                'python manage.py cms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
             ]
         )

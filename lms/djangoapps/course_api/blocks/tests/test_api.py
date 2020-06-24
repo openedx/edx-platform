@@ -20,7 +20,6 @@ from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo
 from xmodule.modulestore.tests.sample_courses import BlockInfo
 
 from ..api import get_blocks
-from ..toggles import ENABLE_VIDEO_URL_REWRITE
 
 
 class TestGetBlocks(SharedModuleStoreTestCase):
@@ -159,10 +158,7 @@ class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
         assert_containment(str(empty_container_key), blocks['blocks'])
 
     @patch('xmodule.video_module.VideoBlock.student_view_data')
-    @ddt.data(
-        True, False
-    )
-    def test_video_urls_rewrite(self, waffle_flag_value, video_data_patch):
+    def test_video_urls_rewrite(self, video_data_patch):
         """
         Verify the video blocks returned have their URL re-written for
         encoded videos.
@@ -179,17 +175,13 @@ class TestGetBlocksMobileHack(SharedModuleStoreTestCase):
                 }
             }
         }
-        with override_waffle_flag(ENABLE_VIDEO_URL_REWRITE, waffle_flag_value):
-            blocks = get_blocks(
-                self.request, self.course.location, requested_fields=['student_view_data'], student_view_data=['video']
-            )
+        blocks = get_blocks(
+            self.request, self.course.location, requested_fields=['student_view_data'], student_view_data=['video']
+        )
         video_block_key = str(self.course.id.make_usage_key('video', 'sample_video'))
         video_block_data = blocks['blocks'][video_block_key]
         for video_data in six.itervalues(video_block_data['student_view_data']['encoded_videos']):
-            if waffle_flag_value:
-                self.assertNotIn('cloudfront', video_data['url'])
-            else:
-                self.assertIn('cloudfront', video_data['url'])
+            self.assertNotIn('cloudfront', video_data['url'])
 
 
 @ddt.ddt
@@ -243,7 +235,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=13 if with_storage_backing else 12,
+                expected_sql_queries=11 if with_storage_backing else 10,
             )
 
     @ddt.data(
@@ -260,9 +252,9 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                num_sql_queries = 23
+                num_sql_queries = 21
             else:
-                num_sql_queries = 13
+                num_sql_queries = 11
 
             self._get_blocks(
                 course,

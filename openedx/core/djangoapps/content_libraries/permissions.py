@@ -17,17 +17,16 @@ is_global_staff = is_user_active & rules.is_staff
 # Does the user have at least read permission for the specified library?
 has_explicit_read_permission_for_library = (
     ManyRelation(
-        # In newer versions of bridgekeeper, the 1st and 3rd arguments below aren't needed.
-        'permission_grants', 'contentlibrarypermission', ContentLibraryPermission,
-        Attribute('user', lambda user: user) | Relation('group', Group, in_current_groups)
+        'contentlibrarypermission',
+        (Attribute('user', lambda user: user) | Relation('group', in_current_groups))
     )
     # We don't check 'access_level' here because all access levels grant read permission
 )
 # Does the user have at least author permission for the specified library?
 has_explicit_author_permission_for_library = (
     ManyRelation(
-        'permission_grants', 'contentlibrarypermission', ContentLibraryPermission,
-        (Attribute('user', lambda user: user) | Relation('group', Group, in_current_groups)) & (
+        'contentlibrarypermission',
+        (Attribute('user', lambda user: user) | Relation('group', in_current_groups)) & (
             Attribute('access_level', ContentLibraryPermission.AUTHOR_LEVEL) |
             Attribute('access_level', ContentLibraryPermission.ADMIN_LEVEL)
         )
@@ -36,8 +35,8 @@ has_explicit_author_permission_for_library = (
 # Does the user have admin permission for the specified library?
 has_explicit_admin_permission_for_library = (
     ManyRelation(
-        'permission_grants', 'contentlibrarypermission', ContentLibraryPermission,
-        (Attribute('user', lambda user: user) | Relation('group', Group, in_current_groups)) &
+        'contentlibrarypermission',
+        (Attribute('user', lambda user: user) | Relation('group', in_current_groups)) &
         Attribute('access_level', ContentLibraryPermission.ADMIN_LEVEL)
     )
 )
@@ -56,7 +55,7 @@ perms[CAN_LEARN_FROM_THIS_CONTENT_LIBRARY] = (
     # Regular users can learn if the library allows public learning:
     Attribute('allow_public_learning', True) |
     # Users/groups who are explicitly granted permission can learn from the library:
-    has_explicit_read_permission_for_library
+    (is_user_active & has_explicit_read_permission_for_library)
 )
 
 # Is the user allowed to create content libraries?

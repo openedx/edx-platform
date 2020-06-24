@@ -48,6 +48,7 @@ from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFl
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
+    ENABLE_VEM_PIPELINE,
     waffle_flags
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
@@ -531,7 +532,7 @@ def convert_video_status(video, is_video_encodes_ready=False):
         ])
     elif video['status'] == 'invalid_token':
         status = StatusDisplayStrings.get('youtube_duplicate')
-    elif is_video_encodes_ready or video['status'] == 'transcript_ready':
+    elif is_video_encodes_ready:
         status = StatusDisplayStrings.get('file_complete')
     else:
         status = StatusDisplayStrings.get(video['status'])
@@ -553,26 +554,19 @@ def _get_videos(course, pagination_conf=None):
 
     # This is required to see if edx video pipeline is enabled while converting the video status.
     course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
-    # TODO: add 'transcript_ready' when we have moved to VEM to keep transcript and encode status separate
-    transcription_statuses = ['partial_failure', 'transcription_in_progress']
+    transcription_statuses = ['transcription_in_progress', 'transcript_ready', 'partial_failure', 'transcript_failed']
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
-        # If we are using "new video workflow" and status is `transcription_in_progress` then video encodes are ready.
+        # If we are using "new video workflow" and status is in `transcription_statuses` then video encodes are ready.
         # This is because Transcription starts once all the encodes are complete except for YT, but according to
         # "new video workflow" YT is disabled as well as deprecated. So, Its precise to say that the Transcription
         # starts once all the encodings are complete *for the new video workflow*.
-        # If the video status is 'partial_failure', it means during the transcription flow, some transcription jobs
-        # failed. As mentioned, transcript jobs start only when the encodes have finished
         is_video_encodes_ready = not course_video_upload_token and (video['status'] in transcription_statuses)
         # Update with transcript languages
         video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
-        # Transcription status should only be visible if 3rd party transcripts are pending.
-        # TODO: change logic to separate transcript status from video status
         video['transcription_status'] = (
-            StatusDisplayStrings.get(video['status'])
-            if not video['transcripts'] and is_video_encodes_ready else
-            ''
+            StatusDisplayStrings.get(video['status']) if is_video_encodes_ready else ''
         )
         # Convert the video status.
         video['status'] = convert_video_status(video, is_video_encodes_ready)
@@ -595,6 +589,7 @@ def _get_index_videos(course, pagination_conf=None):
     attrs = [
         'edx_video_id', 'client_video_id', 'created', 'duration',
         'status', 'courses', 'transcripts', 'transcription_status',
+        'error_description'
     ]
 
     def _get_values(video):
@@ -752,7 +747,7 @@ def videos_post(course, request):
     if error:
         return JsonResponse({'error': error}, status=400)
 
-    bucket = storage_service_bucket()
+    bucket = storage_service_bucket(course.id)
     req_files = data['files']
     resp_files = []
 
@@ -810,9 +805,10 @@ def videos_post(course, request):
     return JsonResponse({'files': resp_files}, status=200)
 
 
-def storage_service_bucket():
+def storage_service_bucket(course_key=None):
     """
-    Returns an S3 bucket for video uploads.
+    Returns an S3 bucket for video upload. The S3 bucket returned depends on
+    which pipeline, VEDA or VEM, is enabled.
     """
     if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
         credentials = AssumeRole.get_instance().credentials
@@ -832,7 +828,10 @@ def storage_service_bucket():
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each
     # environment (since we share a single bucket for multiple deployments in some configurations)
-    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"], validate=False)
+    if course_key and waffle_flags()[ENABLE_VEM_PIPELINE].is_enabled(course_key):
+        return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False)
+    else:
+        return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['BUCKET'], validate=False)
 
 
 def storage_service_key(bucket, file_name):

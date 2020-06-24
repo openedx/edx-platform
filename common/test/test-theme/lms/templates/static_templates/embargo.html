@@ -12,12 +12,12 @@ from openedx.core.djangolib.markup import HTML, Text
     <section class="outside-app">
     <p>
     ${Text(_("Our system indicates that you are trying to access this {platform_name} "
-        "course from a country or region currently subject to U.S. economic and trade sanctions." 
-        "Unfortunately, because {platform_name} is required to comply with export controls," 
+        "course from a country or region currently subject to U.S. economic and trade sanctions. "
+        "Unfortunately, because {platform_name} is required to comply with export controls, "
         "we cannot allow you to access this course at this time."
-      )).format(
+    )).format(
         platform_name=Text(settings.PLATFORM_NAME),
-      )}
+    )}
     </p>
     </section>
 </main>

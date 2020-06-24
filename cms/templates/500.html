@@ -29,10 +29,6 @@ ${Text(_("{studio_name} Server Error")).format(
           studio_name=Text(settings.STUDIO_SHORT_NAME),
         )}
         ${_("We've logged the error and our staff is currently working to resolve this error as soon as possible.")}
-        ${Text(_(u'If the problem persists, please email us at {email_link}.')).format(
-          email_link=HTML(u'<a href="mailto:{email_address}">{email_address}</a>').format(
-            email_address=Text(settings.TECH_SUPPORT_EMAIL),
-          )
         )}
       </p>
     </article>

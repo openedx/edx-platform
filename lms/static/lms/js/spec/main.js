@@ -79,7 +79,6 @@
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
-            'js/commerce/views/receipt_view': 'js/commerce/views/receipt_view',
             'js/staff_debug_actions': 'js/staff_debug_actions',
             'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
             'js/utils/navigation': 'js/utils/navigation',
@@ -346,10 +345,6 @@
             'js/ccx/schedule': {
                 exports: 'js/ccx/schedule',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'moment']
-            },
-            'js/commerce/views/receipt_view': {
-                exports: 'edx.commerce.ReceiptView',
-                deps: ['jquery', 'jquery.url', 'backbone', 'underscore', 'string_utils']
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
@@ -714,7 +709,6 @@
         'js/learner_dashboard/spec/unenroll_view_spec.js',
         'js/spec/api_admin/catalog_preview_spec.js',
         'js/spec/ccx/schedule_spec.js',
-        'js/spec/commerce/receipt_view_spec.js',
         'js/spec/components/card/card_spec.js',
         'js/spec/components/header/header_spec.js',
         'js/spec/course_sharing/course_sharing_events_spec.js',

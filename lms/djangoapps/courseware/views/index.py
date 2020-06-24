@@ -10,7 +10,6 @@ import logging
 import six
 from six.moves import urllib
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.auth.views import redirect_to_login
 from django.db import transaction
 from django.http import Http404
@@ -46,12 +45,9 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG,
 )
 from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
-from openedx.features.course_experience.utils import reset_deadlines_banner_should_display
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
-from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
@@ -227,7 +223,6 @@ class CoursewareIndex(View):
         """
         Render the index page.
         """
-        self._redirect_if_needed_to_pay_for_course()
         self._prefetch_and_bind_course(request)
 
         if self.course.has_children_at_depth(CONTENT_DEPTH):
@@ -302,31 +297,6 @@ class CoursewareIndex(View):
                 self.position = max(int(self.position), 1)
             except ValueError:
                 raise Http404(u"Position {} is not an integer!".format(self.position))
-
-    def _redirect_if_needed_to_pay_for_course(self):
-        """
-        Redirect to dashboard if the course is blocked due to non-payment.
-        """
-        redeemed_registration_codes = []
-
-        if self.request.user.is_authenticated:
-            self.real_user = User.objects.prefetch_related("groups").get(id=self.real_user.id)
-            redeemed_registration_codes = CourseRegistrationCode.objects.filter(
-                course_id=self.course_key,
-                registrationcoderedemption__redeemed_by=self.real_user
-            )
-
-        if is_course_blocked(self.request, redeemed_registration_codes, self.course_key):
-            # registration codes may be generated via Bulk Purchase Scenario
-            # we have to check only for the invoice generated registration codes
-            # that their invoice is valid or not
-            # TODO Update message to account for the fact that the user is not authenticated.
-            log.warning(
-                u'User %s cannot access the course %s because payment has not yet been received',
-                self.real_user,
-                six.text_type(self.course_key),
-            )
-            raise CourseAccessRedirect(reverse('dashboard'))
 
     def _reset_section_to_exam_if_required(self):
         """
@@ -453,7 +423,6 @@ class CoursewareIndex(View):
         Returns and creates the rendering context for the courseware.
         Also returns the table of contents for the courseware.
         """
-        from lms.urls import RESET_COURSE_DEADLINES_NAME
 
         course_url_name = default_course_url_name(self.course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(self.course.id)})
@@ -462,15 +431,6 @@ class CoursewareIndex(View):
             (settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF') and self.is_staff)
         )
         staff_access = self.is_staff
-
-        allow_anonymous = check_public_access(self.course, [COURSE_VISIBILITY_PUBLIC])
-        display_reset_dates_banner = False
-        if not allow_anonymous and RELATIVE_DATES_FLAG.is_enabled(self.course.id):
-            display_reset_dates_banner = reset_deadlines_banner_should_display(self.course_key, request)
-
-        reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME) if display_reset_dates_banner else None
-
-        reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME if reset_deadlines_url else None
 
         courseware_context = {
             'csrf': csrf(self.request)['csrf_token'],
@@ -493,11 +453,6 @@ class CoursewareIndex(View):
             'sequence_title': None,
             'disable_accordion': COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id),
             'show_search': show_search,
-            'relative_dates_is_enabled': RELATIVE_DATES_FLAG.is_enabled(self.course.id),
-            'display_reset_dates_banner': display_reset_dates_banner,
-            'reset_deadlines_url': reset_deadlines_url,
-            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
-            'reset_deadlines_redirect_url_id_dict': {'course_id': str(self.course.id)},
         }
         courseware_context.update(
             get_experiment_user_metadata_context(

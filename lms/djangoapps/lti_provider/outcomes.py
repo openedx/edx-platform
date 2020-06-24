@@ -37,7 +37,7 @@ def store_outcome_parameters(request_params, user, lti_consumer):
             # the LTI consumer that the request comes from then we may be able
             # to figure out the result service URL. As it stands, though, this
             # is a badly-formed LTI request
-            log.warn(
+            log.warning(
                 u"Outcome Service: lis_outcome_service_url parameter missing "
                 u"from scored assignment; we will be unable to return a score. "
                 u"Request parameters: %s",
@@ -168,7 +168,8 @@ def sign_and_send_replace_result(assignment, xml):
         consumer_key,
         consumer_secret,
         signature_method='HMAC-SHA1',
-        force_include_body=True
+        force_include_body=True,
+        decoding=None,
     )
 
     headers = {'content-type': 'application/xml'}

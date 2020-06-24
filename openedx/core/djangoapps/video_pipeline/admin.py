@@ -8,6 +8,7 @@ from django.contrib import admin
 from openedx.core.djangoapps.video_config.admin import CourseSpecificEnabledFlagBaseAdmin
 from openedx.core.djangoapps.video_pipeline.forms import CourseVideoUploadsEnabledByDefaultAdminForm
 from openedx.core.djangoapps.video_pipeline.models import (
+    VEMPipelineIntegration,
     VideoPipelineIntegration,
     VideoUploadsEnabledByDefault,
     CourseVideoUploadsEnabledByDefault,
@@ -22,6 +23,7 @@ class CourseVideoUploadsEnabledByDefaultAdmin(CourseSpecificEnabledFlagBaseAdmin
     form = CourseVideoUploadsEnabledByDefaultAdminForm
 
 admin.site.register(VideoPipelineIntegration, ConfigurationModelAdmin)
+admin.site.register(VEMPipelineIntegration, ConfigurationModelAdmin)
 
 admin.site.register(VideoUploadsEnabledByDefault, ConfigurationModelAdmin)
 admin.site.register(CourseVideoUploadsEnabledByDefault, CourseVideoUploadsEnabledByDefaultAdmin)

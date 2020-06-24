@@ -47,7 +47,6 @@ from rest_framework.throttling import UserRateThrottle
 from six import text_type
 from web_fragments.fragment import Fragment
 
-import shoppingcart
 import survey.views
 from course_modes.models import CourseMode, get_course_prices
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
@@ -108,6 +107,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
@@ -116,12 +117,11 @@ from openedx.features.course_experience import (
     course_home_url_name
 )
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-from openedx.features.course_experience.utils import reset_deadlines_banner_should_display
+from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.enterprise_support.api import data_sharing_consent_required
-from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from track import segment
 from util.cache import cache, cache_if_anonymous
@@ -289,11 +289,11 @@ def yt_video_metadata(request):
     :return: youtube video metadata
     """
     video_id = request.GET.get('id', None)
-    metadata, status_code = load_metadata_from_youtube(video_id)
+    metadata, status_code = load_metadata_from_youtube(video_id, request)
     return Response(metadata, status=status_code, content_type='application/json')
 
 
-def load_metadata_from_youtube(video_id):
+def load_metadata_from_youtube(video_id, request):
     """
     Get metadata about a YouTube video.
 
@@ -306,9 +306,24 @@ def load_metadata_from_youtube(video_id):
         yt_api_key = settings.YOUTUBE_API_KEY
         yt_metadata_url = settings.YOUTUBE['METADATA_URL']
         yt_timeout = settings.YOUTUBE.get('TEST_TIMEOUT', 1500) / 1000  # converting milli seconds to seconds
+
+        headers = {}
+        http_referer = None
+
+        try:
+            # This raises an attribute error if called from the xblock yt_video_metadata handler, which passes
+            # a webob request instead of a django request.
+            http_referer = request.META.get('HTTP_REFERER')
+        except AttributeError:
+            # So here, let's assume it's a webob request and access the referer the webob way.
+            http_referer = request.referer
+
+        if http_referer:
+            headers['Referer'] = http_referer
+
         payload = {'id': video_id, 'part': 'contentDetails', 'key': yt_api_key}
         try:
-            res = requests.get(yt_metadata_url, params=payload, timeout=yt_timeout)
+            res = requests.get(yt_metadata_url, params=payload, timeout=yt_timeout, headers=headers)
             status_code = res.status_code
             if res.status_code == 200:
                 try:
@@ -736,19 +751,6 @@ class CourseTabView(EdxFragmentView):
         else:
             masquerade = None
 
-        display_reset_dates_banner = False
-        if RELATIVE_DATES_FLAG.is_enabled(course.id):
-            course_overview = CourseOverview.get_from_id(course.id)
-            end_date = getattr(course_overview, 'end_date', None)
-            if (not end_date or timezone.now() < end_date and CourseEnrollment.objects.filter(
-                course=course_overview, user=request.user, mode=CourseMode.VERIFIED
-            ).exists()):
-                display_reset_dates_banner = True
-
-        reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME) if display_reset_dates_banner else None
-
-        reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME if reset_deadlines_url else None
-
         context = {
             'course': course,
             'tab': tab,
@@ -759,10 +761,6 @@ class CourseTabView(EdxFragmentView):
             'uses_bootstrap': uses_bootstrap,
             'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
-            'display_reset_dates_banner': display_reset_dates_banner,
-            'reset_deadlines_url': reset_deadlines_url,
-            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
-            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
         }
         # Avoid Multiple Mathjax loading on the 'user_profile'
         if 'profile_page_context' in kwargs:
@@ -921,21 +919,6 @@ def course_about(request, course_id):
             ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
         )
 
-        # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
-        in_cart = False
-        reg_then_add_to_cart_link = ""
-
-        _is_shopping_cart_enabled = is_shopping_cart_enabled()
-        if _is_shopping_cart_enabled:
-            if request.user.is_authenticated:
-                cart = shoppingcart.models.Order.get_cart_for_user(request.user)
-                in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
-                    shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
-
-            reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-                reg_url=reverse('register_user'), course_id=six.moves.urllib.parse.quote(str(course_id))
-            )
-
         # If the ecommerce checkout flow is enabled and the mode of the course is
         # professional or no id professional, we construct links for the enrollment
         # button to add the course to the ecommerce basket.
@@ -957,9 +940,6 @@ def course_about(request, course_id):
                 ecommerce_bulk_checkout_link = ecomm_service.get_checkout_page_url(single_paid_mode.bulk_sku)
 
         registration_price, course_price = get_course_prices(course)
-
-        # Determine which checkout workflow to use -- LMS shoppingcart or Otto basket
-        can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
@@ -1001,12 +981,10 @@ def course_about(request, course_id):
             'course_target': course_target,
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
-            'in_cart': in_cart,
             'ecommerce_checkout': ecommerce_checkout,
             'ecommerce_checkout_link': ecommerce_checkout_link,
             'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
             'single_paid_mode': single_paid_mode,
-            'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
             'show_courseware_link': show_courseware_link,
             'is_course_full': is_course_full,
             'can_enroll': can_enroll,
@@ -1016,8 +994,6 @@ def course_about(request, course_id):
             # We do not want to display the internal courseware header, which is used when the course is found in the
             # context. This value is therefor explicitly set to render the appropriate header.
             'disable_courseware_header': True,
-            'can_add_course_to_cart': can_add_course_to_cart,
-            'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
             'reviews_fragment_view': reviews_fragment_view,
@@ -1061,6 +1037,8 @@ def dates(request, course_id):
     Display the course's dates.html, or 404 if there is no such course.
     Assumes the course_id is in a valid format.
     """
+    from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
+
     course_key = CourseKey.from_string(course_id)
 
     # Enable NR tracing for this view based on course
@@ -1084,26 +1062,36 @@ def dates(request, course_id):
     course_date_blocks = get_course_date_blocks(course, request.user, request,
                                                 include_access=True, include_past_dates=True)
 
-    learner_is_verified = False
-    enrollment = get_enrollment(request.user.username, course_id)
-    if enrollment:
-        learner_is_verified = enrollment.get('mode') == 'verified'
+    learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(request.user, course_key)
 
     # User locale settings
     user_timezone_locale = user_timezone_locale_prefs(request)
     user_timezone = user_timezone_locale['user_timezone']
     user_language = user_timezone_locale['user_language']
 
+    missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
+
     context = {
         'course': course,
         'course_date_blocks': course_date_blocks,
         'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
-        'learner_is_verified': learner_is_verified,
+        'learner_is_full_access': learner_is_full_access,
         'user_timezone': user_timezone,
         'user_language': user_language,
         'supports_preview_menu': True,
         'can_masquerade': can_masquerade,
         'masquerade': masquerade,
+        'on_dates_tab': True,
+        'content_type_gating_enabled': ContentTypeGatingConfig.enabled_for_enrollment(
+            user=request.user,
+            course_key=course_key,
+        ),
+        'missed_deadlines': missed_deadlines,
+        'missed_gated_content': missed_gated_content,
+        'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+        'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
+        'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)},
+        'has_ended': course.has_ended(),
     }
 
     return render_to_response('courseware/dates.html', context)
@@ -1647,7 +1635,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
-    from lms.urls import RENDER_XBLOCK_NAME, RESET_COURSE_DEADLINES_NAME
+    from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
     from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 
     usage_key = UsageKey.from_string(usage_key_string)
@@ -1686,9 +1674,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
                 }
 
-        display_reset_dates_banner = False
-        if RELATIVE_DATES_FLAG.is_enabled(course.id):
-            display_reset_dates_banner = reset_deadlines_banner_should_display(course_key, request)
+        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         context = {
             'fragment': block.render('student_view', context=student_view_context),
@@ -1702,9 +1688,17 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'edx_notes_enabled': is_feature_enabled(course, request.user),
             'staff_access': bool(request.user.has_perm(VIEW_XQA_INTERFACE, course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
-            'display_reset_dates_banner': display_reset_dates_banner,
+            'missed_deadlines': missed_deadlines,
+            'missed_gated_content': missed_gated_content,
+            'has_ended': course.has_ended(),
             'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
+            'on_courseware_page': True,
+            'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'is_learning_mfe': request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL),
+            'is_mobile_app': is_request_from_mobile_app(request),
+            'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
+            'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
+            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 

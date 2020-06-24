@@ -1,2 +1,0 @@
-{% load i18n %}{% autoescape off %}
-{{ calendar_sync_body }}

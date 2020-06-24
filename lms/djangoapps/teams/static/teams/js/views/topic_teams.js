@@ -21,7 +21,6 @@
                 this.options = _.extend({}, options);
                 this.showSortControls = options.showSortControls;
                 this.context = options.context;
-                this.myTeamsCollection = options.myTeamsCollection;
                 TeamsView.prototype.initialize.call(this, options);
             },
 
@@ -33,7 +32,7 @@
                 return this.context.userInfo.staff
                     || this.context.userInfo.privileged
                     || (!TeamUtils.isInstructorManagedTopic(this.model.attributes.type)
-                        && this.myTeamsCollection.length === 0);
+                        && this.options.myTopicTeamsCollection.length === 0);
             },
 
             render: function() {

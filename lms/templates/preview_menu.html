@@ -26,10 +26,34 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
     staff_selected = selected(not masquerade or masquerade.role != "student")
     specific_student_selected = selected(not staff_selected and masquerade.user_name)
     student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
+
+    if settings.HTTPS == 'on':
+        protocol = 'https'
+    else:
+        protocol = 'http'
+    insights_base_url = ''
+    if settings.ANALYTICS_DASHBOARD_URL:
+        insights_base_url = settings.ANALYTICS_DASHBOARD_URL + '/courses'
+    studio_base_url = ''
+    if settings.CMS_BASE:
+        studio_base_url = protocol + '://' + settings.CMS_BASE
+    insights_url = insights_base_url
+    studio_url = studio_base_url
+    if course and course.id:
+        if insights_base_url:
+            insights_url = "{base_url}/{course_id}".format(
+                base_url=insights_base_url,
+                course_id=course.id,
+            )
+        if studio_base_url:
+            studio_url = "{base_url}/course/{course_id}".format(
+                base_url=studio_base_url,
+                course_id=course.id,
+            )
     %>
     <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
         <div class="preview-menu" style="display: flex; align-items: center;">
-            <ol class="preview-actions">
+            <ol class="preview-actions" style="flex-grow: 1;">
                 <li class="action-preview">
                     <form action="#" class="action-preview-form" method="post">
                         <label for="action-preview-select" class="action-preview-label">${_("View this course as:")}</label>
@@ -66,13 +90,59 @@ show_preview_menu = course and can_masquerade and supports_preview_menu
                     </p>
                 </div>
             % endif
+            <div style="flex-shrink: 1; text-align: center;">
             % if microfrontend_link:
-            <div style="flex-grow: 1; text-align: right;">
                 <a class="btn btn-primary" style="border: solid 1px white;" href="${microfrontend_link}">
-                    ${_("View this unit in the new experience")}
+                    ${_("View in the new experience")}
                 </a>
-            </div>
             % endif
+            % if studio_url:
+                <a
+                    class="btn btn-primary view-in-studio"
+                    style="border: solid 1px white;"
+                    href="${studio_url}"
+                    data-studio-base-url="${studio_base_url}"
+                >
+                    ${_("View in Studio")}
+                </a>
+                <script type="text/javascript">
+                  $(function () {
+                      $('.wrapper-preview-menu a.view-in-studio').click(function (event) {
+                          /*
+                          When we start rendering this template, we
+                          don't yet have a vertical in the context
+                          (that happens in a separate `render` call,
+                          if this is even on a unit-level page),
+                          so we dynamically lookup the vertical element in
+                          the DOM and use its data-* attributes to
+                          construct a Studio link directly to this unit.
+                          If no vertical is present, the link behaves as
+                          normal.
+                          */
+                          var verticals = $('.xblock-student_view-vertical');
+                          if (verticals.length > 0) {
+                              var blockId = verticals[0].dataset.usageId;
+                              var url = [
+                                this.dataset.studioBaseUrl,
+                                'container',
+                                blockId,
+                              ].join('/');
+                              window.location.href = url;
+                              return false;
+                          }
+                          // There's no vertical, so let the event
+                          // bubble up, ie, work like a normal link.
+                          return true;
+                      });
+                    });
+                  </script>
+            % endif
+            % if insights_url:
+                <a class="btn btn-primary" style="border: solid 1px white;" href="${insights_url}">
+                    ${_("View in Insights")}
+                </a>
+            % endif
+            </div>
         </div>
     </nav>
 

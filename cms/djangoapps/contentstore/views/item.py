@@ -15,7 +15,12 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
-from edx_proctoring.api import does_backend_support_onboarding, get_exam_configuration_dashboard_url
+from edx_proctoring.api import (
+    does_backend_support_onboarding,
+    get_exam_by_content_id,
+    get_exam_configuration_dashboard_url
+)
+from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
@@ -1244,6 +1249,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,
+                    'was_ever_special_exam': _was_xblock_ever_special_exam(
+                        course, xblock
+                    ),
                     'online_proctoring_rules': rules_url,
                     'is_practice_exam': xblock.is_practice_exam,
                     'is_onboarding_exam': xblock.is_onboarding_exam,
@@ -1293,6 +1301,32 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['user_partition_info'] = get_visibility_partition_info(xblock, course=course)
 
     return xblock_info
+
+
+def _was_xblock_ever_special_exam(course, xblock):
+    """
+    Determine whether this XBlock is or was ever configured as a special exam.
+
+    If this block is *not* currently a special exam, the best way for us to tell
+    whether it was was *ever* configured as a special exam is by checking whether
+    edx-proctoring has an exam record associated with the block's ID.
+    If an exception is not raised, then we know that such a record exists,
+    indicating that this *was* once a special exam.
+
+    Arguments:
+        course (CourseDescriptor)
+        xblock (XBlock)
+
+    Returns: bool
+    """
+    if xblock.is_time_limited:
+        return True
+    try:
+        get_exam_by_content_id(course.id, xblock.location)
+    except ProctoredExamNotFoundException:
+        return False
+    else:
+        return True
 
 
 def add_container_page_publishing_info(xblock, xblock_info):
@@ -1394,10 +1428,10 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_cours
             return VisibilityState.live if is_live else VisibilityState.needs_attention
         else:
             return VisibilityState.ready if not is_unscheduled else VisibilityState.needs_attention
-    if is_unscheduled:
-        return VisibilityState.unscheduled
-    elif is_live:
+    if is_live:
         return VisibilityState.live
+    elif is_unscheduled:
+        return VisibilityState.unscheduled
     else:
         return VisibilityState.ready
 

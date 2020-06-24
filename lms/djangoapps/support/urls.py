@@ -13,7 +13,6 @@ from support.views.feature_based_enrollments import FeatureBasedEnrollmentsSuppo
 from support.views.index import index
 from support.views.manage_user import ManageUserDetailView, ManageUserSupportView
 from support.views.program_enrollments import LinkProgramEnrollmentSupportView, ProgramEnrollmentsInspectorView
-from support.views.refund import RefundSupportView
 
 COURSE_ENTITLEMENTS_VIEW = EntitlementSupportView.as_view()
 
@@ -21,7 +20,6 @@ app_name = 'support'
 urlpatterns = [
     url(r'^$', index, name="index"),
     url(r'^certificates/?$', CertificatesSupportView.as_view(), name="certificates"),
-    url(r'^refund/?$', RefundSupportView.as_view(), name="refund"),
     url(r'^enrollment/?$', EnrollmentSupportView.as_view(), name="enrollment"),
     url(r'^course_entitlement/?$', COURSE_ENTITLEMENTS_VIEW, name="course_entitlement"),
     url(r'^contact_us/?$', ContactUsView.as_view(), name="contact_us"),

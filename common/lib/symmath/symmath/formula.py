@@ -84,7 +84,7 @@ def to_latex(expr):
     # sometimes get 'script(N)__B' or more complicated terms
     expr_s = re.sub(
         r'script([a-zA-Z0-9]+)',
-        '\\mathcal{\\1}',
+        r'\\mathcal{\\1}',
         expr_s
     )
 

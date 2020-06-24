@@ -45,6 +45,38 @@ class VideoPipelineIntegration(ConfigurationModel):
         return User.objects.get(username=self.service_username)
 
 
+class VEMPipelineIntegration(ConfigurationModel):
+    """
+    Manages configuration for connecting to the video encode manager service and using its API.
+
+    .. no_pii:
+    """
+    client_name = models.CharField(
+        max_length=100,
+        default='VEM-Prod',
+        null=False,
+        blank=False,
+        help_text=_('Oauth client name of VEM service.')
+    )
+
+    api_url = models.URLField(
+        verbose_name=_('Internal API URL'),
+        help_text=_('video encode manager API URL.')
+    )
+
+    service_username = models.CharField(
+        max_length=100,
+        default='vem_service_user',
+        null=False,
+        blank=False,
+        help_text=_('Username created for VEM Integration, e.g. vem_service_user.')
+    )
+
+    def get_service_user(self):
+        User = get_user_model()  # pylint: disable=invalid-name
+        return User.objects.get(username=self.service_username)
+
+
 @python_2_unicode_compatible
 class VideoUploadsEnabledByDefault(ConfigurationModel):
     """

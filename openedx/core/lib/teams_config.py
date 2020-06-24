@@ -84,21 +84,6 @@ class TeamsConfig(object):
             ]
         }
 
-    @cached_property
-    def cleaned_data_old_format(self):
-        """
-        JSON-friendly dictionary containing cleaned data from this TeamsConfig,
-        excluding newly added fields.
-
-        Here for backwards compatibility; to be removed (TODO MST-40).
-        """
-        return {
-            'max_team_size': self.default_max_team_size,
-            'topics': [
-                teamset.cleaned_data_old_format for teamset in self.teamsets
-            ]
-        }
-
     @property
     def is_enabled(self):
         """
@@ -244,20 +229,6 @@ class TeamsetConfig(object):
             'description': self.description,
             'max_team_size': self.max_team_size,
             'type': self.teamset_type.value,
-        }
-
-    @cached_property
-    def cleaned_data_old_format(self):
-        """
-        JSON-friendly dictionary containing cleaned data from this TeamsConfig,
-        excluding newly added fields.
-
-        Here for backwards compatibility; to be removed (TODO MST-40).
-        """
-        return {
-            'id': self.teamset_id,
-            'name': self.name,
-            'description': self.description,
         }
 
     @cached_property

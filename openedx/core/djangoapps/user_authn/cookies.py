@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import Signal
 from django.urls import NoReverseMatch, reverse
-from django.utils.http import cookie_date
+from django.utils.http import http_date
 from edx_rest_framework_extensions.auth.jwt import cookies as jwt_cookies
 from edx_rest_framework_extensions.auth.jwt.constants import JWT_DELIMITER
 from oauth2_provider.models import Application
@@ -113,7 +113,7 @@ def _set_expires_in_cookie_settings(cookie_settings, expires_in):
     based on the value of expires_in.
     """
     expires_time = time.time() + expires_in
-    expires = cookie_date(expires_time)
+    expires = http_date(expires_time)
 
     cookie_settings.update({
         'max_age': expires_in,

@@ -295,7 +295,13 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         topic_id = "topic_id_{}".format(next_num)
         name = "Name {}".format(next_num)
         description = "Description {}".format(next_num)
-        return {"name": name, "description": description, "id": topic_id}
+        return {
+            "name": name,
+            "description": description,
+            "id": topic_id,
+            "type": "open",
+            "max_team_size": None
+        }
 
     def test_teams_enabled_new_course(self):
         # Make sure we can detect when no teams exist.
@@ -341,7 +347,7 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.add_team_configuration(max_team_size=4, topics=topics)
         self.assertTrue(self.course.teams_enabled)
         expected_teamsets_data = [
-            teamset.cleaned_data_old_format
+            teamset.cleaned_data
             for teamset in self.course.teamsets
         ]
         self.assertEqual(expected_teamsets_data, topics)
@@ -463,14 +469,14 @@ class ProctoringProviderTestCase(unittest.TestCase):
         throws a ValueError with the correct error message.
         """
         provider = 'invalid-provider'
-        proctoring_provider_whitelist = [u'mock', u'mock_proctoring_without_rules']
+        allowed_proctoring_providers = [u'mock', u'mock_proctoring_without_rules']
 
         with self.assertRaises(ValueError) as context_manager:
             self.proctoring_provider.from_json(provider)
         self.assertEqual(
             context_manager.exception.args[0],
             ['The selected proctoring provider, {}, is not a valid provider. Please select from one of {}.'
-                .format(provider, proctoring_provider_whitelist)]
+                .format(provider, allowed_proctoring_providers)]
         )
 
     def test_from_json_adds_platform_default_for_missing_provider(self):

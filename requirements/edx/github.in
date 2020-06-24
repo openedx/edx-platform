@@ -52,52 +52,24 @@
 
 
 # Python libraries to install directly from github
-git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 
 # Third-party:
 -e git+https://github.com/edx/django-wiki.git@0.0.27#egg=django-wiki
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
--e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
+
+# The latest 2.0.0 release doesn't yet support Django 2.2, this commit from master does
 -e git+https://github.com/jsocol/django-ratelimit.git@72edbe8949fbf6699848e5847645a1998f121d46#egg=ratelimit
-
-# This fork adds django>1.11 and django<3 compatibility for django-babel-underscore. Enmerkar is
-# being installed from github to add backward compatibility for django1.11 as named versions are not
-# backward compatible.
-git+https://github.com/edx/django-babel-underscore.git@37705f7377a4d0a4e673f1431895ce28a8860cd7#egg=django-babel-underscore==0.6.0
-git+https://github.com/Zegocover/enmerkar.git@dbc113798aa4beabdfa2d00e6fef48248eb0f185#egg=django-babel==0.6.3.dev0
-
-# Forked to get Django 2.2 support from unreleased master branch from social-app-django repo.
-# This can be removed once an official social-auth-app-django Pypi release with Django 2.2 support is available in the future.
--e git+https://github.com/python-social-auth/social-app-django.git@c00d23c2b45c3317bd35b15ad1b959338689cef8#egg=social-auth-app-django
-
-# Why install sorl-thumbnail directly from github? To use the latest, Django 2.2 compatible version that is not available on PyPi yet.
-# This dependency will be removed after package is updated at PyPi
-git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef79318a6fa80ac2#egg=sorl-thumbnail
-
-# Forked to fix predicate inversion and keep support for Django 1.1 alive
-# Once https://github.com/excitedleigh/bridgekeeper/pull/10 is merged, and we get to django 2, we can
-# remove this fork
-git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0
-
-# Forked to get Django 1.11 new style middleware support from django-method-override.
-# This can be removed once edx-platform is using django>=2.x.
-git+https://gitlab.com/Ayub-khan/django-method-override.git@5270af321be2e576d8e8b3c4191711a19975c356#egg=django-method-override==1.0.4
 
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@2.6.25#egg=ora2==2.6.25
-git+https://github.com/edx/crowdsourcehinter.git@2178ac72891392106ffef389651aef374177d294#egg=crowdsourcehinter-xblock==0.4
 -e git+https://github.com/edx/RateXBlock.git@2.0#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@2.0.2#egg=done-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
-git+https://github.com/edx/xblock-lti-consumer.git@v1.2.6#egg=lti_consumer-xblock==1.2.6
 
 
 # Third Party XBlocks
 
-git+https://github.com/joestump/python-oauth2.git@b94f69b1ad195513547924e380d9265133e995fa#egg=oauth2
 git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee579e00f#egg=xblock-poll==1.9.6
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10
-git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf

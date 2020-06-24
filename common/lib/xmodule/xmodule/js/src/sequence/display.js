@@ -329,7 +329,6 @@
                 this.render(newPosition);
             } else {
                 alertTemplate = gettext('Sequence error! Cannot navigate to %(tab_name)s in the current SequenceModule. Please contact the course staff.');  // eslint-disable-line max-len
-                // xss-lint: disable=javascript-interpolate
                 alertText = interpolate(alertTemplate, {
                     tab_name: newPosition
                 }, true);

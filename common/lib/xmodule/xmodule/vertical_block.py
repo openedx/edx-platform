@@ -5,8 +5,10 @@ VerticalBlock - an XBlock which renders its children in a column.
 
 import logging
 from copy import copy
+from datetime import datetime
 from functools import reduce
 
+import pytz
 import six
 from lxml import etree
 from web_fragments.fragment import Fragment
@@ -89,10 +91,16 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
                 'content': rendered_child.content
             })
 
+        completed = completion_service and completion_service.vertical_is_complete(self)
+        past_due = not completed and self.due and self.due < datetime.now(pytz.UTC)
         fragment_context = {
             'items': contents,
             'xblock_context': context,
             'unit_title': self.display_name_with_default if not is_child_of_vertical else None,
+            'due': self.due,
+            'completed': completed,
+            'past_due': past_due,
+            'subsection_format': context.get('format', ''),
         }
 
         if view == STUDENT_VIEW:

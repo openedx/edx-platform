@@ -13,7 +13,6 @@ file and check it in at the same time as your model changes. To do that,
 
 
 import hashlib
-import inspect
 import json
 import logging
 import uuid
@@ -500,6 +499,64 @@ class UserProfile(models.Model):
     mailing_address = models.TextField(blank=True, null=True)
     city = models.TextField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
+    COUNTRY_WITH_STATES = u'US'
+    STATE_CHOICES = (
+        ('AL', 'Alabama'),
+        ('AK', 'Alaska'),
+        ('AZ', 'Arizona'),
+        ('AR', 'Arkansas'),
+        ('AA', 'Armed Forces Americas'),
+        ('AE', 'Armed Forces Europe'),
+        ('AP', 'Armed Forces Pacific'),
+        ('CA', 'California'),
+        ('CO', 'Colorado'),
+        ('CT', 'Connecticut'),
+        ('DE', 'Delaware'),
+        ('DC', 'District Of Columbia'),
+        ('FL', 'Florida'),
+        ('GA', 'Georgia'),
+        ('HI', 'Hawaii'),
+        ('ID', 'Idaho'),
+        ('IL', 'Illinois'),
+        ('IN', 'Indiana'),
+        ('IA', 'Iowa'),
+        ('KS', 'Kansas'),
+        ('KY', 'Kentucky'),
+        ('LA', 'Louisiana'),
+        ('ME', 'Maine'),
+        ('MD', 'Maryland'),
+        ('MA', 'Massachusetts'),
+        ('MI', 'Michigan'),
+        ('MN', 'Minnesota'),
+        ('MS', 'Mississippi'),
+        ('MO', 'Missouri'),
+        ('MT', 'Montana'),
+        ('NE', 'Nebraska'),
+        ('NV', 'Nevada'),
+        ('NH', 'New Hampshire'),
+        ('NJ', 'New Jersey'),
+        ('NM', 'New Mexico'),
+        ('NY', 'New York'),
+        ('NC', 'North Carolina'),
+        ('ND', 'North Dakota'),
+        ('OH', 'Ohio'),
+        ('OK', 'Oklahoma'),
+        ('OR', 'Oregon'),
+        ('PA', 'Pennsylvania'),
+        ('RI', 'Rhode Island'),
+        ('SC', 'South Carolina'),
+        ('SD', 'South Dakota'),
+        ('TN', 'Tennessee'),
+        ('TX', 'Texas'),
+        ('UT', 'Utah'),
+        ('VT', 'Vermont'),
+        ('VA', 'Virginia'),
+        ('WA', 'Washington'),
+        ('WV', 'West Virginia'),
+        ('WI', 'Wisconsin'),
+        ('WY', 'Wyoming'),
+    )
+    state = models.CharField(blank=True, null=True, max_length=2, choices=STATE_CHOICES)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
@@ -911,6 +968,16 @@ class LoginFailures(models.Model):
             record.lockout_until = datetime.now(UTC) + timedelta(seconds=lockout_period_secs)
 
         record.save()
+
+    @classmethod
+    def check_user_reset_password_threshold(cls, user):
+        """
+        Checks if the user is above threshold for reset password message.
+        """
+        record, _ = LoginFailures.objects.get_or_create(user=user)
+        max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
+
+        return record.failure_count >= max_failures_allowed / 2, record.failure_count
 
     @classmethod
     def clear_lockout_counter(cls, user):
@@ -2980,3 +3047,39 @@ class AccountRecoveryConfiguration(ConfigurationModel):
                     first row being the header and columns will be as follows: \
                     username, email, new_email")
     )
+
+
+class CourseEnrollmentCelebration(TimeStampedModel):
+    """
+    Keeps track of how we've celebrated a user's course progress.
+
+    An example of a celebration is a dialog that pops up after you complete your first section
+    in a course saying "good job!". Just some positive feedback like that. (This specific example is
+    controlled by the celebrated_first_section field below.)
+
+    In general, if a row does not exist for an enrollment, we don't want to show any celebrations.
+    We don't want to suddenly inject celebrations in the middle of a course, because they
+    might not make contextual sense and it's an inconsistent experience. The helper methods below
+    (starting with "should_") can help by looking up values with appropriate fallbacks.
+
+    See the create_course_enrollment_celebration signal handler for how these get created.
+
+    .. no_pii:
+    """
+    enrollment = models.OneToOneField(CourseEnrollment, models.CASCADE, related_name='celebration')
+    celebrate_first_section = models.BooleanField(default=False)
+
+    def __str__(self):
+        return (
+            "[CourseEnrollmentCelebration] course: {}; user: {}; first_section: {}"
+        ).format(self.enrollment.course.id, self.enrollment.user.username, self.celebrate_first_section)
+
+    @staticmethod
+    def should_celebrate_first_section(enrollment):
+        """ Returns the celebration value for first_section with appropriate fallback if it doesn't exist """
+        if not enrollment:
+            return False
+        try:
+            return enrollment.celebration.celebrate_first_section
+        except CourseEnrollmentCelebration.DoesNotExist:
+            return False

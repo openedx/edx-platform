@@ -179,7 +179,10 @@ from student.models import CourseEnrollment
                 pseudo_session = unfulfilled_entitlement_pseudo_sessions[str(entitlement.uuid)]
                 if not pseudo_session:
                     continue
-                enrollment = CourseEnrollment(user=user, course=CourseOverview.get_from_id(pseudo_session['key']), mode=pseudo_session['type'])
+                pseudo_key = pseudo_session['key']
+                if not isinstance(pseudo_key, CourseKey):
+                  pseudo_key = CourseKey.from_string(pseudo_session['key'])
+                enrollment = CourseEnrollment(user=user, course=CourseOverview.get_from_id(pseudo_key), mode=pseudo_session['type'])
               # We only show email settings for entitlement cards if the entitlement has an associated enrollment
               show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
             else:
@@ -282,7 +285,10 @@ from student.models import CourseEnrollment
       </div>
   % endif
 
-  <% account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or '' %>
+  <%
+    account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
+    coaching_consent_url = "%s/coaching_consent?next=%s" % (account_mfe_url, getattr(settings, 'LMS_ROOT_URL', '') + reverse('dashboard'))
+  %>
   % if plugins.get("coaching", {}).get("show_coaching_aside"):
     <div class="wrapper-coaching">
         <div class="coaching-signup">
@@ -290,7 +296,7 @@ from student.models import CourseEnrollment
                 ${_("Take advantage of free coaching!")}
             </div>
             <div class="coaching-link">
-                <a class="btn-neutral" href="${account_mfe_url}">
+                <a class="btn-neutral" href="${coaching_consent_url}">
                   ${_("Get Started")}
                 </a>
             </div>

@@ -4,7 +4,6 @@ Discussion settings and flags.
 
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 
-USE_BOOTSTRAP = 'use_bootstrap'
 ENABLE_FORUM_DAILY_DIGEST = 'enable_forum_daily_digest'
 
 
@@ -14,12 +13,6 @@ def waffle_flags():
     """
     namespace = WaffleFlagNamespace(name='edx_discussions')
     return {
-        # Waffle flag to enable the use of Bootstrap
-        USE_BOOTSTRAP: WaffleFlag(
-            namespace,
-            USE_BOOTSTRAP,
-            flag_undefined_default=True
-        ),
         # By default, enable forum notifications. Can be disabled platform wide.
         ENABLE_FORUM_DAILY_DIGEST: WaffleFlag(
             namespace,
@@ -27,11 +20,6 @@ def waffle_flags():
             flag_undefined_default=True
         ),
     }
-
-
-def use_bootstrap_flag_enabled():
-    """Returns whether use of bootstrap is enabled."""
-    return waffle_flags()[USE_BOOTSTRAP].is_enabled()
 
 
 def is_forum_daily_digest_enabled():

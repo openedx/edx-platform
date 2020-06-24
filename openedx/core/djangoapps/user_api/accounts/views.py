@@ -94,6 +94,7 @@ USER_PROFILE_PII = {
     'city': None,
     'country': None,
     'bio': None,
+    'phone_number': None,
 }
 
 
@@ -591,9 +592,11 @@ class AccountRetirementPartnerReportView(ViewSet):
         """
         PUT /api/user/v1/accounts/retirement_partner_report/
 
+        ```
         {
             'username': 'user_to_retire'
         }
+        ```
 
         Creates a UserRetirementPartnerReportingStatus object for the given user
         as part of the retirement pipeline.
@@ -778,11 +781,13 @@ class AccountRetirementStatusView(ViewSet):
         """
         PATCH /api/user/v1/accounts/update_retirement_status/
 
+        ```
         {
             'username': 'user_to_retire',
             'new_state': 'LOCKING_COMPLETE',
             'response': 'User account locked and logged out.'
         }
+        ```
 
         Updates the RetirementStatus row for the given user to the new
         status, and append any messages to the message log.
@@ -825,9 +830,11 @@ class AccountRetirementStatusView(ViewSet):
         """
         POST /api/user/v1/accounts/retirement_cleanup/
 
+        ```
         {
             'usernames': ['user1', 'user2', ...]
         }
+        ```
 
         Deletes a batch of retirement requests by username.
         """
@@ -868,9 +875,11 @@ class LMSAccountRetirementView(ViewSet):
         """
         POST /api/user/v1/accounts/retire_misc/
 
+        ```
         {
             'username': 'user_to_retire'
         }
+        ```
 
         Retires the user with the given username in the LMS.
         """
@@ -922,9 +931,11 @@ class AccountRetirementView(ViewSet):
         """
         POST /api/user/v1/accounts/retire/
 
+        ```
         {
             'username': 'user_to_retire'
         }
+        ```
 
         Retires the user with the given username.  This includes
         retiring this username, the associated email address, and
@@ -1057,12 +1068,14 @@ class UsernameReplacementView(APIView):
     def post(self, request):
         """
         POST /api/user/v1/accounts/replace_usernames/
+        ```
         {
             "username_mappings": [
                 {"current_username_1": "desired_username_1"},
                 {"current_username_2": "desired_username_2"}
             ]
         }
+        ```
 
         **POST Parameters**
 
@@ -1076,6 +1089,7 @@ class UsernameReplacementView(APIView):
         As long as data validation passes, the request will return a 200 with a new mapping
         of old usernames (key) to new username (value)
 
+        ```
         {
             "successful_replacements": [
                 {"old_username_1": "new_username_1"}
@@ -1084,6 +1098,8 @@ class UsernameReplacementView(APIView):
                 {"old_username_2": "new_username_2"}
             ]
         }
+        ```
+
         """
 
         # (model_name, column_name)

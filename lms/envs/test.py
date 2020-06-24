@@ -590,3 +590,6 @@ PROCTORING_SETTINGS = {}
 ############### Settings for Django Rate limit #####################
 
 RATELIMIT_RATE = '2/m'
+
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = '5/5m'

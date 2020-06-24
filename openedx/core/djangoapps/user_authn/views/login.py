@@ -113,8 +113,21 @@ def _check_excessive_login_attempts(user):
     """
     if user and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user):
-            raise AuthFailedError(_('This account has been temporarily locked due '
-                                    'to excessive login failures. Try again later.'))
+            _generate_locked_out_error_message()
+
+
+def _generate_locked_out_error_message():
+
+    locked_out_period_in_sec = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
+    raise AuthFailedError(Text(_('To protect your account, it’s been temporarily '
+                                 'locked. Try again in {locked_out_period} minutes.'
+                                 '{li_start}To be on the safe side, you can reset your '
+                                 'password {link_start}here{link_end} before you try again.')).format(
+        link_start=HTML('<a "#login" class="form-toggle" data-type="password-reset">'),
+        link_end=HTML('</a>'),
+        li_start=HTML('<li>'),
+        li_end=HTML('</li>'),
+        locked_out_period=int(locked_out_period_in_sec / 60)))
 
 
 def _enforce_password_policy_compliance(request, user):
@@ -229,6 +242,27 @@ def _handle_failed_authentication(user, authenticated_user):
             AUDIT_LOG.warning(u"Login failed - password for user.id: {0} is invalid".format(loggable_id))
         else:
             AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(user.email))
+
+    if user and LoginFailures.is_feature_enabled():
+        blocked_threshold, failure_count = LoginFailures.check_user_reset_password_threshold(user)
+        if blocked_threshold:
+            if not LoginFailures.is_user_locked_out(user):
+                max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
+                remaining_attempts = max_failures_allowed - failure_count
+                raise AuthFailedError(Text(_('Email or password is incorrect.'
+                                             '{li_start}You have {remaining_attempts} more sign-in '
+                                             'attempts before your account is temporarily locked.{li_end}'
+                                             '{li_start}If you\'ve forgotten your password, click '
+                                             '{link_start}here{link_end} to reset.{li_end}'
+                                             ))
+                                      .format(
+                    link_start=HTML('<a http="#login" class="form-toggle" data-type="password-reset">'),
+                    link_end=HTML('</a>'),
+                    li_start=HTML('<li>'),
+                    li_end=HTML('</li>'),
+                    remaining_attempts=remaining_attempts))
+            else:
+                _generate_locked_out_error_message()
 
     raise AuthFailedError(_('Email or password is incorrect.'))
 

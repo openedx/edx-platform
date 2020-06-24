@@ -19,8 +19,6 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
 from student.models import CourseEnrollment
 
-from .. import USE_BOOTSTRAP_FLAG
-
 
 class CourseReviewsView(CourseTabView):
     """
@@ -36,9 +34,9 @@ class CourseReviewsView(CourseTabView):
 
     def uses_bootstrap(self, request, course, tab):
         """
-        Returns true if the USE_BOOTSTRAP Waffle flag is enabled.
+        Always render this tab with bootstrap.
         """
-        return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
+        return True
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = six.text_type(course.id)
