@@ -299,27 +299,6 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
             self.client.cookies[settings.LANGUAGE_COOKIE].value, expected_language_code
         )
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_masquerade_as_specific_user_on_self_paced(self):
-        """
-        Test masquerading as a specific user for course info page when self paced configuration
-        "enable_course_home_improvements" flag is set
-
-        Login as a staff user and visit course info page.
-        set masquerade to view same page as a specific student and revisit the course info page.
-        """
-        # Log in as staff, and check we can see the info page.
-        self.login_staff()
-        response = self.get_course_info_page()
-        self.assertContains(response, "OOGIE BLOOGIE")
-
-        # Masquerade as the student,enable the self paced configuration, and check we can see the info page.
-        SelfPacedConfiguration(enable_course_home_improvements=True).save()
-        self.update_masquerade(role='student', username=self.student_user.username)
-        response = self.get_course_info_page()
-        self.assertContains(response, "OOGIE BLOOGIE")
-
     @ddt.data(
         'john',  # Non-unicode username
         u'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
