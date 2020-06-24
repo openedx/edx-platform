@@ -459,13 +459,6 @@ def course_info(request, course_id):
         if not user_can_skip_entrance_exam(user, course):
             return redirect(reverse('courseware', args=[text_type(course.id)]))
 
-        # TODO: LEARNER-611: Remove deprecated course.bypass_home.
-        # If the user is coming from the dashboard and bypass_home setting is set,
-        # redirect them straight to the courseware page.
-        is_from_dashboard = reverse('dashboard') in request.META.get('HTTP_REFERER', [])
-        if course.bypass_home and is_from_dashboard:
-            return redirect(reverse('courseware', args=[course_id]))
-
         # Construct the dates fragment
         dates_fragment = None
 
