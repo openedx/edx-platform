@@ -561,6 +561,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
             context['show_bookmark_button'] = show_bookmark_button
             context['bookmarked'] = is_bookmarked
+            context['format'] = getattr(self, 'format', '')
 
             if render_items:
                 rendered_item = item.render(view, context)
