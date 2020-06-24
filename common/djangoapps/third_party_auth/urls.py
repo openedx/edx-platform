@@ -3,6 +3,7 @@
 from django.conf.urls import include, url
 from rest_framework import routers
 from third_party_auth.samlproviderconfig.views import SAMLProviderConfigViewSet
+from third_party_auth.samlproviderdata.views import SAMLProviderDataViewSet
 
 from .views import (
     IdPRedirectView,
@@ -21,7 +22,8 @@ urlpatterns = [
     url(r'^auth/', include('social_django.urls', namespace='social')),
 ]
 
-# samlproviderconfig urls
+# samlproviderconfig/samlproviderdata urls
 router = routers.DefaultRouter()
 router.register(r'^auth/saml/v0/providerconfig', SAMLProviderConfigViewSet, basename="samlproviderconfig")
+router.register(r'^auth/saml/v0/providerdata', SAMLProviderDataViewSet, basename="samlproviderdata")
 urlpatterns += router.urls
