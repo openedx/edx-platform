@@ -20,6 +20,7 @@ At this time, these custom metrics will only be reported to New Relic.
 TODO: supply additional public functions for storing strings and booleans.
 
 """
+import beeline
 from contextlib import contextmanager
 
 from . import middleware
@@ -61,6 +62,7 @@ def increment(name):
     accumulate(name, 1)
 
 
+@beeline.traced(name="set_custom_metrics_for_course_key")
 def set_custom_metrics_for_course_key(course_key):
     """
     Set monitoring custom metrics related to a course key.

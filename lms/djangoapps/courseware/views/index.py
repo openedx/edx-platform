@@ -4,6 +4,7 @@ View for Courseware Index
 
 # pylint: disable=attribute-defined-outside-init
 
+import beeline
 import logging
 import urllib
 
@@ -72,6 +73,7 @@ class CoursewareIndex(View):
         waffle_flag = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
         return waffle_flag.is_enabled(self.course_key)
 
+    @beeline.traced(name="CoursewareIndex.get")
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
@@ -99,7 +101,11 @@ class CoursewareIndex(View):
 
         if not (request.user.is_authenticated or self.enable_anonymous_courseware_access):
             return redirect_to_login(request.get_full_path())
-
+        beeline.add_context_field("course_id", course_id)
+        beeline.add_context_field("course_key", self.course_key)
+        beeline.add_context_field("chapter", chapter)
+        beeline.add_context_field("section", section)
+        beeline.add_context_field("position", position)
         self.original_chapter_url_name = chapter
         self.original_section_url_name = section
         self.chapter_url_name = chapter
@@ -124,6 +130,7 @@ class CoursewareIndex(View):
         except Exception as exception:  # pylint: disable=broad-except
             return CourseTabView.handle_exceptions(request, self.course, exception)
 
+    @beeline.traced(name="CoursewareIndex._setup_masquerade_for_effective_user")
     def _setup_masquerade_for_effective_user(self):
         """
         Setup the masquerade information to allow the request to
@@ -139,6 +146,7 @@ class CoursewareIndex(View):
         # Set the user in the request to the effective user.
         self.request.user = self.effective_user
 
+    @beeline.traced(name="CoursewareIndex.render")
     def render(self, request):
         """
         Render the index page.
@@ -180,6 +188,7 @@ class CoursewareIndex(View):
 
         return render_to_response('courseware/courseware.html', self._create_courseware_context(request))
 
+    @beeline.traced(name="CoursewareIndex._redirect_if_not_requested_section")
     def _redirect_if_not_requested_section(self):
         """
         If the resulting section and chapter are different from what was initially
@@ -202,6 +211,7 @@ class CoursewareIndex(View):
                 )
             )
 
+    @beeline.traced(name="CoursewareIndex._clean_position")
     def _clean_position(self):
         """
         Verify that the given position is an integer. If it is not positive, set it to 1.
@@ -212,6 +222,7 @@ class CoursewareIndex(View):
             except ValueError:
                 raise Http404(u"Position {} is not an integer!".format(self.position))
 
+    @beeline.traced(name="CoursewareIndex._redirect_if_needed_to_pay_for_course")
     def _redirect_if_needed_to_pay_for_course(self):
         """
         Redirect to dashboard if the course is blocked due to non-payment.
@@ -237,6 +248,7 @@ class CoursewareIndex(View):
             )
             raise CourseAccessRedirect(reverse('dashboard'))
 
+    @beeline.traced(name="CoursewareIndex._reset_section_to_exam_if_required")
     def _reset_section_to_exam_if_required(self):
         """
         Check to see if an Entrance Exam is required for the user.
@@ -249,6 +261,7 @@ class CoursewareIndex(View):
                     self.chapter_url_name = exam_chapter.url_name
                     self.section_url_name = exam_section.url_name
 
+    @beeline.traced(name="CoursewareIndex._get_language_preference")
     def _get_language_preference(self):
         """
         Returns the preferred language for the actual user making the request.
@@ -260,18 +273,21 @@ class CoursewareIndex(View):
 
         return language_preference
 
+    @beeline.traced(name="CoursewareIndex._is_masquerading_as_student")
     def _is_masquerading_as_student(self):
         """
         Returns whether the current request is masquerading as a student.
         """
         return self.masquerade and self.masquerade.role == 'student'
 
+    @beeline.traced(name="CoursewareIndex._is_masquerading_as_specific_student")
     def _is_masquerading_as_specific_student(self):
         """
         Returns whether the current request is masqueurading as a specific student.
         """
         return self._is_masquerading_as_student() and self.masquerade.user_name
 
+    @beeline.traced(name="CoursewareIndex._find_block")
     def _find_block(self, parent, url_name, block_type, min_depth=None):
         """
         Finds the block in the parent with the specified url_name.
@@ -293,12 +309,14 @@ class CoursewareIndex(View):
             child = get_current_child(parent, min_depth=min_depth, requested_child=self.request.GET.get("child"))
         return child
 
+    @beeline.traced(name="CoursewareIndex._find_chapter")
     def _find_chapter(self):
         """
         Finds the requested chapter.
         """
         return self._find_block(self.course, self.chapter_url_name, 'chapter', CONTENT_DEPTH - 1)
 
+    @beeline.traced(name="CoursewareIndex._find_section")
     def _find_section(self):
         """
         Finds the requested section.
@@ -306,6 +324,7 @@ class CoursewareIndex(View):
         if self.chapter:
             return self._find_block(self.chapter, self.section_url_name, 'section')
 
+    @beeline.traced(name="CoursewareIndex._prefetch_and_bind_course")
     def _prefetch_and_bind_course(self, request):
         """
         Prefetches all descendant data for the requested section and
@@ -328,6 +347,7 @@ class CoursewareIndex(View):
             course=self.course,
         )
 
+    @beeline.traced(name="CoursewareIndex._prefetch_and_bind_section")
     def _prefetch_and_bind_section(self):
         """
         Prefetches all descendant data for the requested section and
@@ -348,6 +368,7 @@ class CoursewareIndex(View):
             course=self.course,
         )
 
+    @beeline.traced(name="CoursewareIndex._save_positions")
     def _save_positions(self):
         """
         Save where we are in the course and chapter.
@@ -355,6 +376,7 @@ class CoursewareIndex(View):
         save_child_position(self.course, self.chapter_url_name)
         save_child_position(self.chapter, self.section_url_name)
 
+    @beeline.traced(name="CoursewareIndex._create_courseware_context")
     def _create_courseware_context(self, request):
         """
         Returns and creates the rendering context for the courseware.
@@ -441,6 +463,7 @@ class CoursewareIndex(View):
 
         return courseware_context
 
+    @beeline.traced(name="CoursewareIndex._add_sequence_title_to_context")
     def _add_sequence_title_to_context(self, courseware_context):
         """
         Adds sequence title to the given context.
@@ -456,6 +479,7 @@ class CoursewareIndex(View):
             self.section.position = 1
         courseware_context['sequence_title'] = display_items[self.section.position - 1].display_name_with_default
 
+    @beeline.traced(name="CoursewareIndex._add_entrance_exam_to_context")
     def _add_entrance_exam_to_context(self, courseware_context):
         """
         Adds entrance exam related information to the given context.
@@ -467,6 +491,7 @@ class CoursewareIndex(View):
                 get_entrance_exam_usage_key(self.course),
             )
 
+    @beeline.traced(name="CoursewareIndex._create_section_context")
     def _create_section_context(self, previous_of_active_section, next_of_active_section):
         """
         Returns and creates the rendering context for the section.
@@ -502,6 +527,7 @@ class CoursewareIndex(View):
         return section_context
 
 
+@beeline.traced(name="render_accordian")
 def render_accordion(request, course, table_of_contents):
     """
     Returns the HTML that renders the navigation for the given course.
@@ -519,6 +545,7 @@ def render_accordion(request, course, table_of_contents):
     return render_to_string('courseware/accordion.html', context)
 
 
+@beeline.traced(name="save_child_position")
 def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
@@ -532,6 +559,7 @@ def save_child_position(seq_module, child_name):
     seq_module.save()
 
 
+@beeline.traced(name="save_position_recursively_up")
 def save_positions_recursively_up(user, request, field_data_cache, xmodule, course=None):
     """
     Recurses up the course tree starting from a leaf

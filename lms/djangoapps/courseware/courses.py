@@ -2,6 +2,7 @@
 Functions for accessing and displaying courses within the
 courseware.
 """
+import beeline
 import logging
 from collections import defaultdict
 from datetime import datetime
@@ -60,6 +61,7 @@ def get_course(course_id, depth=0):
     return course
 
 
+@beeline.traced(name="get_course_by_id")
 def get_course_by_id(course_key, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
@@ -76,6 +78,7 @@ def get_course_by_id(course_key, depth=0):
         raise Http404("Course not found: {}.".format(unicode(course_key)))
 
 
+@beeline.traced(name="get_course_with_access")
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True):
     """
     Given a course_key, look up the corresponding course descriptor,
@@ -118,6 +121,7 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     return course_overview
 
 
+@beeline.traced(name="check_course_access")
 def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True):
     """
     Check that the user has the access to perform the specified action
