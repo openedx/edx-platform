@@ -110,7 +110,11 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
+from openedx.features.course_experience import (
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    RELATIVE_DATES_FLAG,
+    course_home_url_name
+)
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
@@ -431,10 +435,6 @@ def course_info(request, course_id):
         return None
 
     course_key = CourseKey.from_string(course_id)
-
-    # If the unified course experience is enabled, redirect to the "Course" tab
-    if UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
