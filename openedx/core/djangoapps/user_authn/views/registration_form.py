@@ -220,6 +220,10 @@ class AccountCreationForm(forms.Form):
             if field not in self.fields:
                 self.fields[field] = forms.CharField(required=False)
 
+        # EOL
+        self.ignore_email_blacklist = ignore_email_blacklist
+        # EOL
+
     def clean_password(self):
         """Enforce password policies (if applicable)"""
         password = self.cleaned_data["password"]
@@ -246,6 +250,17 @@ class AccountCreationForm(forms.Form):
                 # reject the registration.
                 if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
                     raise ValidationError(_(u"Unauthorized email address."))
+        # EOL
+        if settings.REGISTRATION_EMAIL_PATTERNS_DISALLOWED is not None and not self.ignore_email_blacklist:
+            # This Open edX instance has restrictions on what email addresses are allowed.
+            disallowed_patterns = settings.REGISTRATION_EMAIL_PATTERNS_DISALLOWED
+            # We append a '$' to the regexs to prevent the common mistake of using a
+            # pattern like '.*@edx\\.org' which would match 'bob@edx.org.badguy.com'
+            if any(re.match(pattern + "$", email, flags=re.IGNORECASE) for pattern in disallowed_patterns):
+                # This email is not on the whitelist of allowed emails.
+                raise ValidationError(_("Unauthorized email address."))
+        # EOL
+
         if email_exists_or_retired(email):
             raise ValidationError(
                 _(
