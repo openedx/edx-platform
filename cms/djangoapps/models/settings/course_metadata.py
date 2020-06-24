@@ -249,7 +249,7 @@ class CourseMetadata(object):
                 errors.append({'message': text_type(err), 'model': model})
 
         # Disallow updates to the proctoring provider after course start
-        proctoring_provider_model = filtered_dict.get('proctoring_provider')
+        proctoring_provider_model = filtered_dict.get('proctoring_provider', {})
 
         # If the user is not edX staff, the user has requested a change to the proctoring_provider
         # Advanced Setting, and and it is after course start, prevent the user from changing the
@@ -257,7 +257,7 @@ class CourseMetadata(object):
         if (
             not user.is_staff and
             cls._has_requested_proctoring_provider_changed(
-                descriptor.proctoring_provider, proctoring_provider_model
+                descriptor.proctoring_provider, proctoring_provider_model.get('value')
             ) and
             datetime.now(pytz.UTC) > descriptor.start
         ):
