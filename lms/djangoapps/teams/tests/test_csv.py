@@ -256,6 +256,19 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         self.import_manager = csv.TeamMembershipImportManager(self.course)
         self.import_manager.teamset_ids = {ts.teamset_id for ts in self.course.teamsets}
 
+    def test_load_course_teams(self):
+        """
+        Lodaing course teams shold get the users by team with only 2 queries
+        1 for teams, 1 for user count
+        """
+        team1 = CourseTeamFactory.create(course_id=self.course.id)
+        team2 = CourseTeamFactory.create(course_id=self.course.id)
+        team3 = CourseTeamFactory.create(course_id=self.course.id)
+        team4 = CourseTeamFactory.create(course_id=self.course.id)
+
+        with self.assertNumQueries(2):
+            self.import_manager.load_course_teams()
+
     def test_add_user_to_new_protected_team(self):
         """Adding a masters learner to a new team should create a team with organization protected status"""
         masters_learner = UserFactory.create(username='masters_learner')

@@ -239,7 +239,7 @@ class TeamMembershipImportManager(object):
         Caches existing course teams by (team_name, topic_id)
         and existing membership counts by (topic_id, team_name)
         """
-        for team in CourseTeam.objects.filter(course_id=self.course.id):
+        for team in CourseTeam.objects.filter(course_id=self.course.id).prefetch_related('users'):
             self.existing_course_teams[(team.name, team.topic_id)] = team
             self.user_count_by_team[(team.topic_id, team.name)] = team.users.count()
 
