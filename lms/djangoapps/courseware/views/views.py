@@ -27,6 +27,7 @@ from django.utils.http import urlquote_plus
 from django.utils.text import slugify
 from django.utils.translation import ugettext
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -1714,12 +1715,10 @@ def _get_fa_header(header):
 
 
 FA_INCOME_LABEL = _('Annual Household Income')
-FA_REASON_FOR_APPLYING_LABEL = 'Tell us about your current financial situation. Why do you need assistance?'
-FA_GOALS_LABEL = 'Tell us about your learning or professional goals. How will a Verified Certificate in ' \
-                 'this course help you achieve these goals?'
+FA_REASON_FOR_APPLYING_LABEL = ugettext_noop('Tell us about your current financial situation. Why do you need assistance?')
+FA_GOALS_LABEL = ugettext_noop('Tell us about your learning or professional goals. How will a Verified Certificate in this course help you achieve these goals?')
 
-FA_EFFORT_LABEL = 'Tell us about your plans for this course. What steps will you take to help you complete ' \
-                  'the course work and receive a certificate?'
+FA_EFFORT_LABEL = ugettext_noop('Tell us about your plans for this course. What steps will you take to help you complete the course work and receive a certificate?')
 
 FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in your response.')
 
