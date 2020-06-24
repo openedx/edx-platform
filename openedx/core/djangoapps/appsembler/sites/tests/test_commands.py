@@ -12,8 +12,6 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import override_settings, TestCase
 
-from student.models import ManualEnrollmentAudit, UserTestGroup, LanguageProficiency, SocialLink, UserAttribute, CourseAccessRole, UserSignupSource, CourseEnrollmentAllowed, ManualEnrollmentAudit, CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, UserStandingFactory, CourseAccessRoleFactory, CourseEnrollmentAllowedFactory
 from openedx.core.djangoapps.appsembler.sites.management.commands.create_devstack_site import Command
 from openedx.core.djangoapps.appsembler.sites.management.commands.export_site import Command as ExportSiteCommand
 from openedx.core.djangoapps.appsembler.sites.management.commands.offboard import Command as OffboardSiteCommand
@@ -27,6 +25,24 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     OrganizationFactory,
     OrganizationCourseFactory,
     UserOrganizationMappingFactory,
+)
+from student.models import (
+    CourseAccessRole,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    LanguageProficiency,
+    ManualEnrollmentAudit,
+    SocialLink,
+    UserAttribute,
+    UserSignupSource,
+    UserTestGroup,
+)
+from student.tests.factories import (
+    CourseAccessRoleFactory,
+    CourseEnrollmentAllowedFactory,
+    CourseEnrollmentFactory,
+    UserFactory,
+    UserStandingFactory,
 )
 
 from organizations.models import Organization, OrganizationCourse
