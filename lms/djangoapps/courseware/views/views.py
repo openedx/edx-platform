@@ -462,12 +462,6 @@ def course_info(request, course_id):
         # Construct the dates fragment
         dates_fragment = None
 
-        if request.user.is_authenticated:
-            # TODO: LEARNER-611: Remove enable_course_home_improvements
-            if SelfPacedConfiguration.current().enable_course_home_improvements:
-                # Shared code with the new Course Home (DONE)
-                dates_fragment = CourseDatesFragmentView().render_to_fragment(request, course_id=course_id)
-
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used
         # as plugins, and to avoid the direct import.
@@ -527,9 +521,6 @@ def course_info(request, course_id):
 
         # Get the URL of the user's last position in order to display the 'where you were last' message
         context['resume_course_url'] = None
-        # TODO: LEARNER-611: Remove enable_course_home_improvements
-        if SelfPacedConfiguration.current().enable_course_home_improvements:
-            context['resume_course_url'] = get_last_accessed_courseware(course, request, user)
 
         if not check_course_open_for_learner(user, course):
             # Disable student view button if user is staff and
