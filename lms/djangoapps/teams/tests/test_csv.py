@@ -256,11 +256,6 @@ class TeamMembershipImportManagerTests(TeamMembershipEventTestMixin, SharedModul
         self.import_manager = csv.TeamMembershipImportManager(self.course)
         self.import_manager.teamset_ids = {ts.teamset_id for ts in self.course.teamsets}
 
-    def tearDown(self):
-        """ Clean up users, teams, and memberships created during tests """
-        CourseTeamMembership.objects.all().delete()
-        CourseTeam.objects.all().delete()
-        User.objects.all().delete()
 
     def test_add_user_to_new_protected_team(self):
         """Adding a masters learner to a new team should create a team with organization protected status"""
