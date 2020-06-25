@@ -1023,6 +1023,16 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    discussions_enabled = Boolean(
+        display_name=_("Discussions Enabled"),
+        help=_(
+            "Enter true or false. If this value is False, you can not enable discussion for any "
+            "section/subsection/unit."
+        ),
+        default=True,
+        scope=Scope.settings,
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """

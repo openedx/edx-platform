@@ -11,6 +11,7 @@ import six
 from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
+from xblock.fields import Boolean, Scope
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
@@ -25,10 +26,29 @@ log = logging.getLogger(__name__)
 # OBSOLETE: This obsoletes 'type'
 CLASS_PRIORITY = ['video', 'problem']
 
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
+
+
+class VerticalFields(object):
+
+    discussions_enabled = Boolean(
+        display_name=_("Discussions Enabled"),
+        help=_(
+            "This setting enable discussions for this course unit. A discussion UI will show up under this Unit."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
 
 @XBlock.needs('user', 'bookmarks')
 @XBlock.wants('completion')
-class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
+class VerticalBlock(
+    SequenceFields, XModuleFields, StudioEditableBlock,
+    XmlParserMixin, MakoTemplateBlockBase, XBlock, VerticalFields
+):
     """
     Layout XBlock for rendering subblocks vertically.
     """
@@ -216,3 +236,9 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         xblock_body["content_type"] = "Sequence"
 
         return xblock_body
+
+    def set_discussion_status(self, is_enable_discussion):
+        self.discussions_enabled = is_enable_discussion
+
+    def get_discussion_status(self):
+        return self.discussions_enabled

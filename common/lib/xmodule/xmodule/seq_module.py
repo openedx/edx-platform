@@ -775,6 +775,18 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
 
         return xblock_body
 
+    def set_discussion_status(self, is_enable_discussion):
+        ''' Enable or disable the disussion.
+        '''
+        for child in self.get_children():
+            child.set_discussion_status(is_enable_discussion)
+
+    def get_discussion_status(self):
+        for child in self.get_children():
+            if not child.get_discussion_status():
+                return False
+        return True
+
 
 class HighlightsFields(object):
     """Only Sections have summaries now, but we may expand that later."""
