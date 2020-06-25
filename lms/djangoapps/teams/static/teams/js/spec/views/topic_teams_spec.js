@@ -2,14 +2,25 @@ define([
     'backbone',
     'underscore',
     'teams/js/views/topic_teams',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'teams/js/spec_helpers/team_spec_helpers',
     'common/js/spec_helpers/page_helpers'
-], function(Backbone, _, TopicTeamsView, TeamSpecHelpers, PageHelpers) {
+], function(Backbone, _, TopicTeamsView, AjaxHelpers, TeamSpecHelpers, PageHelpers) {
     'use strict';
     describe('Topic Teams View', function() {
-        var createTopicTeamsView = function(options, isInstructorManagedTopic) {
+        var buildTeamMembershipURL = function(username, courseID, teamsetID) {
+            var url = '/api/team/v0/team_memberships/?';
+            url += 'username=' + encodeURIComponent(username);
+            url += '&course_id=' + encodeURIComponent(courseID);
+            url += '&teamset_id=' + encodeURIComponent(teamsetID);
+            return url;
+        };
+
+        var createTopicTeamsView = function(options, isInstructorManagedTopic, isUserInTeamInTeamset) {
+            var requests, topicTeamsView, result;
+            requests = AjaxHelpers.requests(this);
             options = options || {}; // eslint-disable-line no-param-reassign
-            return new TopicTeamsView({
+            topicTeamsView = new TopicTeamsView({
                 el: '.teams-container',
                 model: isInstructorManagedTopic ?
                     TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
@@ -18,7 +29,25 @@ define([
                   options.myTopicTeamsCollection || TeamSpecHelpers.createMockTeams({results: []})
                 ),
                 context: _.extend({}, TeamSpecHelpers.testContext, options)
-            }).render();
+            });
+            result = topicTeamsView.render();
+            if (topicTeamsView.context.userInfo.staff ||
+                topicTeamsView.context.userInfo.privileged ||
+                isInstructorManagedTopic) {
+                AjaxHelpers.expectNoRequests(requests);
+            } else {
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'GET',
+                    buildTeamMembershipURL(
+                        topicTeamsView.context.userInfo.username,
+                        topicTeamsView.context.courseID,
+                        topicTeamsView.model.get('id')
+                    )
+                );
+                AjaxHelpers.respondWithJson(requests, {count: isUserInTeamInTeamset ? 1 : 0});
+            }
+            return result;
         };
 
         var verifyActions = function(teamsView, options) {
@@ -83,8 +112,7 @@ define([
         });
 
         it('does not show actions for a user already in a team in the teamset', function() {
-            var options = {myTopicTeamsCollection: TeamSpecHelpers.createMockTeams()};
-            var teamsView = createTopicTeamsView(options);
+            var teamsView = createTopicTeamsView({}, false, true);
             verifyActions(teamsView, {showActions: false});
         });
 

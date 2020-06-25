@@ -301,8 +301,10 @@ define([
                     text_search: 'foo'
                 });
                 AjaxHelpers.respondWithJson(reqs, TeamSpecHelpers.createMockTeamsResponse({results: []}));
+                AjaxHelpers.respondWithJson(requests, {count: 0});
 
-                // Expect exactly one search request to be fired
+                // Expect exactly one search request to be fired, and one request to see if the user is
+                // in a team in the current teamset
                 AjaxHelpers.expectNoRequests(reqs);
             };
 
@@ -314,6 +316,8 @@ define([
                     text_search: ''
                 });
                 AjaxHelpers.respondWithJson(requests, {});
+                AjaxHelpers.respondWithJson(requests, {count: 0});
+
                 performSearch(requests, teamsTabView);
                 expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
                 expect(teamsTabView.$('.page-description').text()).toBe('Showing results for "foo"');
@@ -323,6 +327,7 @@ define([
                 var teamsTabView = createTeamsTabView(this);
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
                 AjaxHelpers.respondWithJson(requests, {});
+                AjaxHelpers.respondWithJson(requests, {count: 0});
 
                 // Perform a search
                 performSearch(requests, teamsTabView);
@@ -335,6 +340,7 @@ define([
                     order_by: 'last_activity_at'
                 });
                 AjaxHelpers.respondWithJson(requests, {});
+                AjaxHelpers.respondWithJson(requests, {count: 0});
                 expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
                 expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
             });
@@ -343,6 +349,7 @@ define([
                 var teamsTabView = createTeamsTabView(this);
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
                 AjaxHelpers.respondWithJson(requests, {});
+                AjaxHelpers.respondWithJson(requests, {count: 0});
 
                 // Perform a search
                 performSearch(requests, teamsTabView);
@@ -355,6 +362,7 @@ define([
                     text_search: ''
                 });
                 AjaxHelpers.respondWithJson(requests, {});
+                AjaxHelpers.respondWithJson(requests, {count: 0});
                 expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
                 expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
             });
