@@ -1,8 +1,8 @@
 (function(define) {
     'use strict';
 
-    define(['jquery', 'logger', 'moment'],
-        function($, Logger, moment) {
+    define(['jquery'],
+        function($) {
             return function() {
                 // define variables for code legibility
                 var $toggleActionElements = $('.toggle-visibility-button');
@@ -40,10 +40,6 @@
                         event.preventDefault();
                         toggleTargetElement.toggleClass('hidden');
                         updateToggleActionText(!toggleTargetElement.hasClass('hidden'), $toggleActionElement);
-                        Logger.log('edx.course.home.course_update.toggled', {
-                            action: elementIsHidden ? 'hide' : 'show',
-                            publish_date: moment(date, 'MMM DD, YYYY').format()
-                        });
                     });
                 });
             };

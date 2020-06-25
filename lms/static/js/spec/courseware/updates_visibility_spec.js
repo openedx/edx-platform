@@ -38,10 +38,6 @@ define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment']
             it('sends a tracking event on hide and show', function() {
                 var $update = $('.toggle-visibility-element:not(.hidden)').first();
                 $update.siblings('.toggle-visibility-button').trigger('click');
-                expect(Logger.log).toHaveBeenCalledWith('edx.course.home.course_update.toggled', {
-                    action: 'hide',
-                    publish_date: moment('December 1, 2015', 'MMM DD, YYYY').format()
-                });
             });
         });
     });
