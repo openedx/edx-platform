@@ -1,9 +1,8 @@
 """
 XBlock runtime services for LibraryContentModule
 """
-
-
 import six
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from search.search_engine_base import SearchEngine
@@ -23,8 +22,9 @@ class LibraryToolsService(object):
     Service that allows LibraryContentModule to interact with libraries in the
     modulestore.
     """
-    def __init__(self, modulestore):
+    def __init__(self, modulestore, user_id):
         self.store = modulestore
+        self.user_id = user_id
 
     def _get_library(self, library_key):
         """
@@ -127,7 +127,7 @@ class LibraryToolsService(object):
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def update_children(self, dest_block, user_id, user_perms=None, version=None):
+    def update_children(self, dest_block, user_perms=None, version=None):
         """
         This method is to be used when the library that a LibraryContentModule
         references has been updated. It will re-fetch all matching blocks from
@@ -163,11 +163,11 @@ class LibraryToolsService(object):
             source_blocks.extend(library.children)
 
         with self.store.bulk_operations(dest_block.location.course_key):
-            dest_block.source_library_version = six.text_type(library.location.library_key.version_guid)
-            self.store.update_item(dest_block, user_id)
+            dest_block.source_library_version = str(library.location.library_key.version_guid)
+            self.store.update_item(dest_block, self.user_id)
             head_validation = not version
             dest_block.children = self.store.copy_from_template(
-                source_blocks, dest_block.location, user_id, head_validation=head_validation
+                source_blocks, dest_block.location, self.user_id, head_validation=head_validation
             )
             # ^-- copy_from_template updates the children in the DB
             # but we must also set .children here to avoid overwriting the DB again

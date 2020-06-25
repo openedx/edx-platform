@@ -435,7 +435,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         user_id = self.get_user_id()
         if not self.tools:
             return Response("Library Tools unavailable in current runtime.", status=400)
-        self.tools.update_children(self, user_id, user_perms)
+        self.tools.update_children(self, user_perms)
         return Response()
 
     # Copy over any overridden settings the course author may have applied to the blocks.
@@ -467,7 +467,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not self.tools:
             raise RuntimeError("Library tools unavailable, duplication will not be sane!")
-        self.tools.update_children(self, user_id, user_perms, version=self.source_library_version)
+        self.tools.update_children(self, user_perms, version=self.source_library_version)
 
         self._copy_overrides(store, user_id, source_block, self)
 

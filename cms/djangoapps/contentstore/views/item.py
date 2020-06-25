@@ -67,6 +67,7 @@ from util.milestones_helpers import is_entrance_exams_enabled
 from xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
@@ -294,6 +295,8 @@ class StudioEditModuleRuntime(object):
                 return ConfigurationService(CourseEditLTIFieldsEnabledFlag)
             if service_name == "teams_configuration":
                 return TeamsConfigurationService()
+            if service_name == "library_tools":
+                return LibraryToolsService(modulestore(), self._user.id)
         return None
 
 

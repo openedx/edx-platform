@@ -1,9 +1,7 @@
 """
 Tests for library tools service.
 """
-
-
-from mock import patch
+from unittest.mock import patch
 
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.tests.factories import LibraryFactory
@@ -16,9 +14,8 @@ class LibraryToolsServiceTest(MixedSplitTestCase):
     """
 
     def setUp(self):
-        super(LibraryToolsServiceTest, self).setUp()
-
-        self.tools = LibraryToolsService(self.store)
+        super().setUp()
+        self.tools = LibraryToolsService(self.store, self.user_id)
 
     def test_list_available_libraries(self):
         """
