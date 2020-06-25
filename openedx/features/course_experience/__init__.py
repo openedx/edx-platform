@@ -74,9 +74,6 @@ DEFAULT_TRUE_WAFFLE_FLAG_NAMESPACE = DefaultTrueWaffleFlagNamespace(name='course
 # TODO: TNL-7061: Perform the actual clean-up required to remove this flag.
 COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(DEFAULT_TRUE_WAFFLE_FLAG_NAMESPACE, 'course_outline_page')
 
-# Waffle flag to enable a single unified "Course" tab.
-UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab', flag_undefined_default=True)
-
 # Waffle flag to enable the sock on the footer of the home and courseware pages.
 DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock')
 
@@ -171,10 +168,7 @@ def course_home_url_name(course_key):
             requested.
 
     """
-    if UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return 'openedx.course_experience.course_home'
-    else:
-        return 'info'
+    return 'openedx.course_experience.course_home'
 
 
 class CourseHomeMessages(UserMessageCollection):

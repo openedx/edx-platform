@@ -113,7 +113,6 @@ from openedx.features.course_duration_limits.access import generate_course_expir
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     RELATIVE_DATES_FLAG,
-    UNIFIED_COURSE_TAB_FLAG,
     course_home_url_name
 )
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
@@ -438,8 +437,9 @@ def course_info(request, course_id):
     course_key = CourseKey.from_string(course_id)
 
     # If the unified course experience is enabled, redirect to the "Course" tab
-    if UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
-        return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
+    #if UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
+    #    return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
+    return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)

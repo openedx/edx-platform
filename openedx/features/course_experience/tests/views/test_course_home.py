@@ -54,7 +54,6 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG,
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-    UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment, FBEEnrollmentExclusion
 from student.tests.factories import UserFactory
@@ -185,15 +184,6 @@ class TestCourseHomePage(CourseHomePageTestCase):
         url = course_home_url(self.course)
         response = self.client.get(url)
         self.assertContains(response, TEST_WELCOME_MESSAGE, status_code=200)
-
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
-    def test_welcome_message_when_not_unified(self):
-        # Create a welcome message
-        create_course_update(self.course, self.user, TEST_WELCOME_MESSAGE)
-
-        url = course_home_url(self.course)
-        response = self.client.get(url)
-        self.assertNotContains(response, TEST_WELCOME_MESSAGE, status_code=200)
 
     def test_updates_tool_visibility(self):
         """
@@ -343,45 +333,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                 if expected_enroll_message:
                     self.assertContains(private_response,
                                         'You must be enrolled in the course to see course content.')
-
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
-    @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
-    @ddt.data(
-        [CourseUserType.ANONYMOUS, 'To see course content'],
-        [CourseUserType.ENROLLED, None],
-        [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
-        [CourseUserType.UNENROLLED_STAFF, 'You must be enrolled in the course to see course content.'],
-    )
-    @ddt.unpack
-    def test_home_page_not_unified(self, user_type, expected_message):
-        """
-        Verifies the course home tab when not unified.
-        """
-        self.create_user_for_course(self.course, user_type)
-
-        # Render the course home page
-        url = course_home_url(self.course)
-        response = self.client.get(url)
-
-        # Verify that the course tools and dates are always shown
-        self.assertContains(response, TEST_COURSE_TOOLS)
-
-        # Verify that welcome messages are never shown
-        self.assertNotContains(response, TEST_WELCOME_MESSAGE)
-
-        # Verify that the outline, start button, course sock, and welcome message
-        # are only shown to enrolled users.
-        is_enrolled = user_type is CourseUserType.ENROLLED
-        is_unenrolled_staff = user_type is CourseUserType.UNENROLLED_STAFF
-        expected_count = 1 if (is_enrolled or is_unenrolled_staff) else 0
-        self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
-        self.assertContains(response, 'Start Course', count=expected_count)
-        self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
-
-        # Verify that the expected message is shown to the user
-        self.assertContains(response, '<div class="user-messages"', count=1 if expected_message else 0)
-        if expected_message:
-            self.assertContains(response, expected_message)
 
     def test_sign_in_button(self):
         """

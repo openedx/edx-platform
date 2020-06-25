@@ -44,7 +44,7 @@ from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
-    RELATIVE_DATES_FLAG, UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
+    RELATIVE_DATES_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 )
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -418,7 +418,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_todays_date_no_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
@@ -440,7 +439,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_todays_date_timezone(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
@@ -470,7 +468,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_start_date_render(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
@@ -488,7 +485,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_start_date_render_time_zone(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
@@ -727,7 +723,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_dates_tab_link_render(self, url_name):
         with freeze_time('2015-01-02'):
             course = create_course_run()
