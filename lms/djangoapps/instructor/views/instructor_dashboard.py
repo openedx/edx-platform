@@ -342,11 +342,10 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
 def _section_special_exams(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = six.text_type(course.id)
-    proctoring_provider = six.text_type(course.proctoring_provider)
+    proctoring_provider = course.proctoring_provider
+    escalation_email = None
     if proctoring_provider == 'proctortrack':
-        escalation_email = six.text_type(course.proctoring_escalation_email)
-    else:
-        escalation_email = None
+        escalation_email = course.proctoring_escalation_email
     from edx_proctoring.api import is_backend_dashboard_available
 
     section_data = {
