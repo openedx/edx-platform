@@ -2,9 +2,9 @@
 Utility functions used during user authentication.
 """
 
-
 import random
 import string
+import third_party_auth
 
 from django.conf import settings
 from django.utils import http
@@ -67,3 +67,12 @@ def is_registration_api_v1(request):
     :return: Bool
     """
     return 'v1' in request.get_full_path() and 'register' not in request.get_full_path()
+
+
+def is_sso_request(request):
+    """
+    Checks registration request is single sign on request.
+    :param request: request Object:
+    :return: Bool
+    """
+    return third_party_auth.is_enabled() and third_party_auth.pipeline.running(request) or 'provider' in request.POST

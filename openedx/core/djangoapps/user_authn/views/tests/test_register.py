@@ -670,6 +670,37 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }
             )
 
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"confirm_email": "required"})
+    def test_register_form_third_party_auth_running_google_with_confirm_email(self):
+        self.configure_google_provider(enabled=True)
+        with simulate_running_pipeline(
+            "openedx.core.djangoapps.user_authn.views.login_form.third_party_auth.pipeline", "google-oauth2",
+            email=self.EMAIL,
+            fullname=self.NAME,
+            username=self.USERNAME,
+            country=self.COUNTRY
+        ):
+            form_desc = self.client.get(self.url)
+            form_desc = json.loads(form_desc.content.decode('utf-8'))
+
+            confirm_email_field = None
+            for field in form_desc["fields"]:
+                if field["name"] == "confirm_email":
+                    confirm_email_field = field
+                    break
+            # makes sure that confirm email is not present in form
+            self.assertEqual(confirm_email_field, None)
+
+            response = self.client.post(self.url, {
+                "email": self.EMAIL,
+                "name": self.NAME,
+                "username": self.USERNAME,
+                "country": self.COUNTRY,
+                "honor_code": "true",
+            })
+            # makes sure that registration form submitted successfully
+            self.assertHttpOK(response)
+
     def test_register_form_level_of_education(self):
         self._assert_reg_field(
             {"level_of_education": "optional"},

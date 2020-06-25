@@ -49,6 +49,7 @@ from openedx.core.djangoapps.user_api.accounts.api import (
     get_username_existence_validation_error,
     get_username_validation_error
 )
+from openedx.core.djangoapps.user_authn.utils import generate_password, is_registration_api_v1, is_sso_request
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import generate_password, is_registration_api_v1
@@ -156,9 +157,6 @@ def create_account_with_params(request, params):
         'REGISTRATION_EXTRA_FIELDS',
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     )
-    if is_registration_api_v1(request):
-        if 'confirm_email' in extra_fields:
-            del extra_fields['confirm_email']
 
     # registration via third party (Google, Facebook) using mobile application
     # doesn't use social auth pipeline (no redirect uri(s) etc involved).
@@ -169,8 +167,13 @@ def create_account_with_params(request, params):
     third_party_auth_credentials_in_api = 'provider' in params
     is_third_party_auth_enabled = third_party_auth.is_enabled()
 
-    if is_third_party_auth_enabled and (pipeline.running(request) or third_party_auth_credentials_in_api):
+    is_sso = is_sso_request(request)
+    if is_sso:
         params["password"] = generate_password()
+
+    if is_registration_api_v1(request) or is_sso:
+        if 'confirm_email' in extra_fields:
+            del extra_fields['confirm_email']
 
     # in case user is registering via third party (Google, Facebook) and pipeline has expired, show appropriate
     # error message
@@ -589,17 +592,17 @@ class RegistrationValidationView(APIView):
 
             - Checks the validity of the username and email inputs separately.
             POST /api/user/v1/validation/registration/
-            >>> {
-            >>>     "username": "hi_im_new",
-            >>>     "email": "newguy101@edx.org"
-            >>> }
+             {
+                 "username": "hi_im_new",
+                 "email": "newguy101@edx.org"
+             }
             RESPONSE
-            >>> {
-            >>>     "validation_decisions": {
-            >>>         "username": "",
-            >>>         "email": ""
-            >>>     }
-            >>> }
+             {
+                 "validation_decisions": {
+                     "username": "",
+                     "email": ""
+                 }
+             }
             Empty strings indicate that there was no problem with the input.
 
             - Checks the validity of the password field (its validity depends
@@ -607,36 +610,36 @@ class RegistrationValidationView(APIView):
               only password is input, we don't check for password/username
               compatibility issues.
             POST /api/user/v1/validation/registration/
-            >>> {
-            >>>     "username": "myname",
-            >>>     "password": "myname"
-            >>> }
+             {
+                 "username": "myname",
+                 "password": "myname"
+             }
             RESPONSE
-            >>> {
-            >>>     "validation_decisions": {
-            >>>         "username": "",
-            >>>         "password": "Password cannot be the same as the username."
-            >>>     }
-            >>> }
+             {
+                 "validation_decisions": {
+                     "username": "",
+                     "password": "Password cannot be the same as the username."
+                 }
+             }
 
             - Checks the validity of the username, email, and password fields
               separately, and also tells whether an account exists. The password
               field's validity depends upon both the username and password, and
               the account's existence depends upon both the username and email.
             POST /api/user/v1/validation/registration/
-            >>> {
-            >>>     "username": "hi_im_new",
-            >>>     "email": "cto@edx.org",
-            >>>     "password": "p"
-            >>> }
+             {
+                 "username": "hi_im_new",
+                 "email": "cto@edx.org",
+                 "password": "p"
+             }
             RESPONSE
-            >>> {
-            >>>     "validation_decisions": {
-            >>>         "username": "",
-            >>>         "email": "It looks like cto@edx.org belongs to an existing account. Try again with a different email address.",
-            >>>         "password": "Password must be at least 2 characters long",
-            >>>     }
-            >>> }
+             {
+                 "validation_decisions": {
+                     "username": "",
+                     "email": "It looks like cto@edx.org belongs to an existing account. Try again with a different email address.",
+                     "password": "Password must be at least 2 characters long",
+                 }
+             }
             In this example, username is valid and (we assume) there is
             a preexisting account with that email. The password also seems
             to contain the username.

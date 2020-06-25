@@ -23,7 +23,7 @@ from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
-from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1
+from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1, is_sso_request
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.models import (
@@ -431,7 +431,7 @@ class RegistrationFormFactory(object):
                         required=self._is_field_required(field_name)
                     )
         # remove confirm_email form v1 registration form
-        if is_api_v1(request):
+        if is_api_v1(request) or is_sso_request(request):
             for index, field in enumerate(form_desc.fields):
                 if field['name'] == 'confirm_email':
                     del form_desc.fields[index]
@@ -1089,17 +1089,6 @@ class RegistrationFormFactory(object):
                                     label="",
                                     instructions="",
                                 )
-
-                    # Hide the confirm_email field
-                    form_desc.override_field_properties(
-                        "confirm_email",
-                        default="",
-                        field_type="hidden",
-                        required=False,
-                        label="",
-                        instructions="",
-                        restrictions={}
-                    )
 
                     # Hide the password field
                     form_desc.override_field_properties(
