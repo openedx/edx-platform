@@ -1,0 +1,58 @@
+.dashboard {
+  .demographics-banner {
+    background-color: #23419f;
+    border-radius: 12px;
+    @media (min-width: 1200px) {
+      height: 64px;
+    }
+    .demographics-banner-icon {
+      height: 140px;
+    }
+    .demographics-banner-prompt {
+      font-size: 24px;
+      line-height: 24px;
+    }
+    .demographics-banner-btn {
+      color: #23419f;
+      border-radius: 20px;
+      font-size: 14px;
+      min-width: 150px;
+      /* Below are to override the overly-broad `button` selectors in lms/static/sass/shared/_forms.scss */
+      box-shadow: unset;
+      text-shadow: unset;
+      font: unset;
+      letter-spacing: unset;
+      background-image: unset;
+
+      .fa-thumbs-up {
+        font-size: 24px;
+      }
+    }
+  }
+  .side-container {
+    .wrapper-coaching {
+      border: 1px solid $gray-500;
+      margin-bottom: $baseline * 0.5;
+
+      .coaching-signup {
+        padding: 20px;
+
+        .coaching-prompt {
+          font-size: 20px;
+          line-height: 28px;
+          font-weight: bold;
+        }
+
+
+        .coaching-link .btn-neutral {
+          display: block;
+          text-align: center;
+          margin: 20px 20px 0;
+          border-radius: 20px;
+          padding: 10px;
+          border: 1px solid theme-color('primary');
+        }
+      }
+    }
+  }
+}
