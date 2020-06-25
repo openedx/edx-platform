@@ -829,10 +829,10 @@ def run_pii_check(options):
                 "code_annotations django_find_annotations "
                 "--config_file .pii_annotations.yml --report_path {report_dir} --app_name {env_name} "
                 "--lint --report --coverage | tee {run_output_file}".format(
-                    report_dir = report_dir,
-                    env_settings_file = env_settings_file,
-                    env_name = env_name.lower(),
-                    run_output_file = run_output_file
+                    report_dir=report_dir,
+                    env_settings_file=env_settings_file,
+                    env_name=env_name.lower(),
+                    run_output_file=run_output_file
                 )
             )
             uncovered_model_count, pii_check_passed_env, full_log = _extract_missing_pii_annotations(run_output_file)
