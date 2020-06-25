@@ -607,7 +607,7 @@ class CourseGradingTest(CourseTestCase):
             # pylint: enable=line-too-long
         ])
 
-        # one for each of the calls to update_grader_from_json()
+        # one for each of the calls to update_grader_from_json().
         tracker.emit.assert_has_calls([
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
