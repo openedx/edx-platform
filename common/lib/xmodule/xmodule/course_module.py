@@ -1027,6 +1027,14 @@ class CourseFields(object):
         ),
         scope=Scope.settings
     )
+    discussion_enabled = Boolean(
+        display_name=_("Enable Discussion"),
+        help=_(
+            "Enter true or false. This enables/disables discussion tools for the entire course run."
+        ),
+        default=True,
+        scope=Scope.settings,
+    )
 
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method

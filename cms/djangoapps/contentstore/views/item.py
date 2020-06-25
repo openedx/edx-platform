@@ -104,6 +104,21 @@ def _filter_entrance_exam_grader(graders):
     return graders
 
 
+def set_discussion_toggle(value, xblock, user):
+    """
+    Recursively update all children of given xblock in modulestore
+    """
+    if xblock.category not in ["vertical", "sequential", "chapter", "course"]:
+        return
+
+    if hasattr(xblock, "is_discussable"):
+        xblock.is_discussable = value
+        _update_with_callback(xblock, user)
+    else:
+        for child in xblock.get_children():
+            set_discussion_toggle(value, child, user)
+
+
 def _is_library_component_limit_reached(usage_key):
     """
     Verify if the library has reached the maximum number of components allowed in it
@@ -115,6 +130,18 @@ def _is_library_component_limit_reached(usage_key):
         return False
     total_children = len(parent.children)
     return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
+
+
+def set_discussion_toggle(value, xblock, user):
+    """
+    Recursively update all children of given xblock in modulestore
+    """
+    for child in xblock.get_children():
+        if child.category in ["chapter", "sequential"]:
+            set_discussion_toggle(value, child, user)
+        else:
+            child.discussion_enabled = value
+            _save_xblock(user, child)
 
 
 @require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
@@ -613,6 +640,10 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
             # the intent is to make it None, use the nullout field
             if metadata is not None:
+                discussion_toggle = metadata.pop('is_discussable', None)
+                if discussion_toggle is not None:
+                    set_discussion_toggle(discussion_toggle, xblock, user)
+
                 for metadata_key, value in metadata.items():
                     field = xblock.fields[metadata_key]
 
@@ -1243,6 +1274,10 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             'user_partitions': user_partitions,
             'show_correctness': xblock.show_correctness,
         })
+        if hasattr(xblock, 'discussion_enabled'):
+            xblock_info['discussion_enabled'] = xblock.discussion_enabled
+        elif hasattr(xblock, 'is_discussable'):
+            xblock_info['is_discussable'] = xblock.is_discussable
 
         if xblock.category == 'sequential':
             xblock_info.update({

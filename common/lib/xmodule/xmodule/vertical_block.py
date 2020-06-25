@@ -13,6 +13,7 @@ import six
 from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
+from xblock.fields import Boolean, Scope
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
@@ -26,6 +27,38 @@ log = logging.getLogger(__name__)
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
 CLASS_PRIORITY = ['video', 'problem']
+
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
+
+
+class VerticalFields(object):
+    is_discussable = Boolean(
+        display_name=_("Enable Discussion"),
+        help=_(
+            "This setting enables a discussion for this entire Unit. If enabled, a discussion component "
+            "will show up with this Unit."
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
+
+    @property
+    def enable_discussion(self):
+        return self.enable_discussion_flag
+
+    @enable_discussion.setter
+    def enable_discussion(self, value):
+        def get_course_node(node):
+            node = node.get_parent()
+            while node.xml_element_name() != "course":
+                node = node.get_parent()
+            return node
+
+        # We shouldn't override what is set at course level
+        if get_course_node(self).enable_discussion:
+            self.enable_discussion_flag = value
 
 
 @XBlock.needs('user', 'bookmarks')
@@ -44,6 +77,15 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
     has_children = True
 
     show_in_read_only_mode = True
+
+    is_discussable = Boolean(
+        display_name=_("Show Discussion UI for Unit"),
+        help=_(
+            "Marks this unit as discussable, which will show a discussion UI for this unit"
+        ),
+        default=False,
+        scope=Scope.settings,
+    )
 
     def _student_or_public_view(self, context, view):
         """
@@ -267,3 +309,9 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
                 all_complete = True
 
         return all_complete
+
+    def set_discussion_status(self, is_enable_discussion):
+        self.discussions_enabled = is_enable_discussion
+
+    def get_discussion_status(self):
+        return self.discussions_enabled
