@@ -292,6 +292,10 @@
       background-color: $m-blue-d6;
       border-color: $m-blue-d6;
     }
+
+    &[disabled] {
+        color: $white;
+    }
   }
 
   .file-loading,
