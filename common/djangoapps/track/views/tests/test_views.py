@@ -266,7 +266,8 @@ class TestTrackViews(EventTrackingTestCase):
                 'name': self.path_with_course,
                 'context': {
                     'username': 'anonymous',
-                    'user_id': '', 'accept_language': '',
+                    'user_id': '',
+                    'accept_language': '',
                     'ip': '127.0.0.1',
                     'org_id': 'foo',
                     'agent': '',
@@ -329,6 +330,9 @@ class TestTrackViews(EventTrackingTestCase):
             'name': str(sentinel.event_type),
             'context': {
                 'username': 'anonymous',
+                'ip': '127.0.0.1',
+                'agent': 'agent',
+                'host': 'testserver',
                 'page': None,
                 'event_source': 'task'
             }

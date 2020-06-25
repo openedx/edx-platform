@@ -1,4 +1,5 @@
 """
+WARNING! track.tracker module is deprecated please use eventtracking app to track events
 Module that tracks analytics events by sending them to different
 configurable backends.
 
@@ -21,6 +22,7 @@ below::
 
 import inspect
 import logging
+import warnings
 from importlib import import_module
 
 import six
@@ -89,8 +91,8 @@ def send(event):
     Send an event object to all the initialized backends.
 
     """
-    LOGGER.warning(
-        'Tracker is deprecated. Please use eventtracking to generate tracking logs.'
+    warnings.warn(
+        'track.tracker module is deprecated. Please use eventtracking to send events.', DeprecationWarning
     )
     for name, backend in six.iteritems(backends):
         backend.send(event)

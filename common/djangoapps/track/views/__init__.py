@@ -1,20 +1,14 @@
 
 
-import datetime
 import json
-
-import pytz
 import six
-from django.contrib.auth.decorators import login_required
+
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.views.decorators.csrf import ensure_csrf_cookie
 from eventtracking import tracker as eventtracker
 from ipware.ip import get_ip
 
-from edxmako.shortcuts import render_to_response
-from track import contexts, shim, tracker
+from track import contexts, shim
 
 
 def _get_request_header(request, header_name, default=''):
@@ -157,6 +151,9 @@ def task_track(request_info, task_info, event_type, event, page=None):
     context_override = _get_course_context(page)
     context_override.update({
         'username': request_info.get('username', 'unknown'),
+        'ip': request_info.get('ip', 'unknown'),
+        'agent': request_info.get('agent', 'unknown'),
+        'host': request_info.get('host', 'unknown'),
         'event_source': 'task',
         'page': page,
     })
