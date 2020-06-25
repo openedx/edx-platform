@@ -301,9 +301,6 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
 
         return qs, use_distinct
 
-    def queryset(self, request):
-        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
-
 
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """
