@@ -1,11 +1,16 @@
 """
 XBlock runtime services for LibraryContentModule
 """
+import hashlib
+
 import six
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator, BlockUsageLocator
+from openedx.core.djangoapps.xblock.api import load_block
 from search.search_engine_base import SearchEngine
+from student.auth import has_studio_write_access
 from xmodule.capa_module import ProblemBlock
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
@@ -181,3 +186,69 @@ class LibraryToolsService(object):
             (lib.location.library_key.replace(version_guid=None, branch=None), lib.display_name)
             for lib in self.store.get_library_summaries()
         ]
+
+    def import_as_children(self, dest_block, blockstore_block_ids):
+        """
+        Given an ordered list of IDs in a blockstore-based learning context
+        (usually a content library), import them into modulestore as the new
+        children of dest_block. If dest_block already has children, they'll be
+        replaced with the imported children.
+
+        This is only used by LibrarySourcedBlock. It should verify first that
+        the number of block IDs is reasonable.
+        """
+        dest_key = dest_block.scope_ids.usage_id
+        if not isinstance(dest_key, BlockUsageLocator):
+            raise TypeError("import_as_children can only import into modulestore courses.")
+        if self.user_id is None:
+            raise ValueError("Cannot check user permissions - LibraryTools user_id is None")
+        if len(set(blockstore_block_ids)) != len(blockstore_block_ids):
+            # We don't support importing the exact same block twice because it would break the way we generate new IDs
+            # for each block and then overwrite existing copies of blocks when re-importing the same blocks.
+            raise ValueError("One or more library component IDs is a duplicate.")
+
+        dest_course_key = dest_key.context_key
+        user = User.objects.get(id=self.user_id)
+        if not has_studio_write_access(user, dest_course_key):
+            raise PermissionDenied()
+
+        # Read all the blocks; this will also confirm the user has permission to read them.
+        # (This could be slow and use lots of memory, except for the fact that LibrarySourcedBlock which calls this
+        # should be limiting the number of blocks to a reasonable limit. We load them all now instead of one at a
+        # time in order to raise any errors before we start actually copying blocks over.)
+        orig_blocks = [load_block(UsageKey.from_string(key), user) for key in blockstore_block_ids]
+
+        with self.store.bulk_operations(dest_course_key):
+            for block in orig_blocks:
+                orig_key = block.scope_ids.usage_id
+                # Deterministically generate a new ID for this block 
+                new_block_id = dest_key.block_id[:10] + '-' + hashlib.sha1(str(orig_key).encode('utf-8')).hexdigest()[:10]
+                new_block_key = dest_key.context_key.make_usage_key(orig_key.block_type, new_block_id)
+
+                try:
+                    new_block = self.store.get_item(new_block_key)
+                    if new_block.parent != dest_key:
+                        raise ValueError(
+                            "Expected existing block {} to be a child of {}".format(new_block_key, dest_key)
+                        )
+                except ItemNotFoundError:
+                    new_block = self.store.create_child(
+                        user_id=self.user_id,
+                        parent_usage_key=dest_key,
+                        block_type=orig_key.block_type,
+                        block_id=new_block_id,
+                    )
+                for field_name, field in block.fields.items():
+                    if field_name in ('children', 'parent', 'content'):
+                        continue
+                    if field.is_set_on(block) or field.is_set_on(new_block):
+                        setattr(new_block, field_name, getattr(block, field_name))
+
+                # TODO: handle children recursively.
+
+                # TODO: handle static assets
+
+                new_block.save()
+                self.store.update_item(new_block, user_id=self.user_id)
+
+            # TODO: delete any out of date children

@@ -1,8 +1,7 @@
 """
 Helper methods for working with learning contexts
 """
-
-
+from opaque_keys import OpaqueKey
 from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
