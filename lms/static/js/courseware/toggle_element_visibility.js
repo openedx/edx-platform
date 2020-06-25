@@ -16,14 +16,14 @@
 
                     if (elementIsHidden) {
                         if (hide_text) {
-                            actionElement.html(actionElement.data('hide'));
+							HtmlUtils.setHtml(actionElement, actionElement.data('hide'));
                         } else {
                             actionElement.hide();
                             first_hidden_update.focus();
                         }
                     } else {
                         if (show_text) {
-                            actionElement.html(actionElement.data('show'));
+							HtmlUtils.setHtml(actionElement, actionElement.data('show'));
                         }
                     }
                 };
