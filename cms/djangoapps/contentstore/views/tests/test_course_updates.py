@@ -40,7 +40,8 @@ class CourseUpdateTest(CourseTestCase):
 
             return json.loads(resp.content.decode('utf-8'))
 
-        init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'
+        init_content = '''<iframe width="560" height="315"
+            src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'''
         content = init_content + '</iframe>'
         payload = get_response(content, 'January 8, 2013')
         self.assertHTMLEqual(payload['content'], content)
