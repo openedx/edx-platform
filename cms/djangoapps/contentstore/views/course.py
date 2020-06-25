@@ -519,8 +519,8 @@ def course_listing(request):
             u'org': uca.course_key.org,
             u'number': uca.course_key.course,
             u'run': uca.course_key.run,
-            u'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
-            u'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
+            u'is_failed': uca.state == CourseRerunUIStateManager.State.FAILED,
+            u'is_in_progress': uca.state == CourseRerunUIStateManager.State.IN_PROGRESS,
             u'dismiss_link': reverse_course_url(
                 u'course_notifications_handler',
                 uca.course_key,

@@ -342,6 +342,7 @@ def log_installed_python_prereqs():
 
 
 def print_devstack_warning():
+    """ Show a warning for Mac users regarnding running from both lms and studio shells"""
     if Env.USING_DOCKER:  # pragma: no cover
         print("********************************************************************************")
         print("* WARNING: Mac users should run this from both the lms and studio shells")

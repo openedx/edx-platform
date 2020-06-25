@@ -859,8 +859,7 @@ def watch_assets(options):
     if not theme_dirs and themes:
         # We can not add theme sass watchers without knowing the directory that contains the themes.
         raise ValueError('theme-dirs must be provided for watching theme sass.')
-    else:
-        theme_dirs = [path(_dir) for _dir in theme_dirs]
+    theme_dirs = [path(_dir) for _dir in theme_dirs]
 
     sass_directories = get_watcher_dirs(theme_dirs, themes)
     observer = Observer(timeout=wait)

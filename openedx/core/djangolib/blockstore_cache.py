@@ -102,6 +102,9 @@ class BundleCache(object):
 
 
 def _construct_versioned_cache_key(bundle_uuid, version_num, key_parts, draft_name=None):
+    """
+    Create a versioned cache key string that includes the draft name only if supplied
+    """
     cache_key = str(bundle_uuid)
     if draft_name:
         cache_key += ":" + draft_name

@@ -15,10 +15,9 @@ from copy import deepcopy
 
 from pkg_resources import resource_string
 
-import six
 from lxml import etree
-from openedx.core.djangolib.markup import Text, HTML
 from xblock.fields import Boolean, Dict, List, Scope, String
+from openedx.core.djangolib.markup import Text, HTML
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule

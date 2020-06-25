@@ -174,6 +174,12 @@ class CourseEnrollmentCelebrationFactory(DjangoModelFactory):
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):
+    """
+    Create CourseAccessRole object
+        user
+        course_id
+        role
+    """
     class Meta(object):
         model = CourseAccessRole
 
@@ -221,6 +227,12 @@ class PermissionFactory(DjangoModelFactory):
 
 
 class AccountRecoveryFactory(DjangoModelFactory):
+    """
+    Create AccountRecovery object
+        user
+        secondary_email
+        is_active
+    """
     class Meta(object):
         model = AccountRecovery
         django_get_or_create = ('user',)
