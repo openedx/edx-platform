@@ -22,7 +22,7 @@ class LegacyFieldMappingProcessor(object):
     def __call__(self, event):
         context = event.get('context', {})
         if 'context' in event:
-            delete_from_context = True if context.get('event_source', '') != 'task' else False
+            delete_from_context = bool(context.get('event_source', '') != 'task')
             for field in CONTEXT_FIELDS_TO_INCLUDE:
                 self.move_from_context(field, event, delete_from_context=delete_from_context)
             if delete_from_context:

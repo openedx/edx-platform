@@ -21,7 +21,6 @@ below::
 
 
 import inspect
-import logging
 import warnings
 from importlib import import_module
 
@@ -34,7 +33,6 @@ __all__ = ['send']
 
 
 backends = {}
-LOGGER = logging.getLogger(__name__)
 
 
 def _initialize_backends_from_django_settings():
