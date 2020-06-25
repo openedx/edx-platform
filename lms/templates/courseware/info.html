@@ -103,7 +103,6 @@ from openedx.core.djangolib.markup import HTML, Text
           % if SelfPacedConfiguration.current().enable_course_home_improvements:
             ${HTML(dates_fragment.body_html())}
           % endif
-          <h3 class="hd hd-3  handouts-header">${_(course.info_sidebar_name)}</h3>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
         </section>
       % else:
