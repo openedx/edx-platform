@@ -6,7 +6,7 @@ import pytz
 %>
 <div class="proctoring-wrapper">
   % if section_data.get('escalation_email'):
-  <h6 class = "hd hd-6">${_('Proctortrack Escalation Email:')} ${ section_data['escalation_email'] }</h6>
+  <h6 class = "hd hd-6 escalation-email-container">${_('Proctortrack Escalation Email:')} ${ section_data['escalation_email'] }</h6>
   % endif
   <div id="proctoring-accordion">
     <div class="wrap">
