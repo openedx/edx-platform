@@ -89,6 +89,16 @@ def get_certificate_description(mode, certificate_type, platform_name):
                                          u"the student's identity.").format(cert_type=certificate_type)
     return certificate_type_description
 
+def grade_percent_scaled(grade_percent, grade_cutoff):
+    """
+        EOL: Scale grade percent by grade cutoff. Grade between 1.0 - 7.0
+    """
+    if grade_percent == 0.:
+        return 1.
+    if grade_percent < grade_cutoff:
+        return round(10. * (3. / grade_cutoff * grade_percent + 1.)) / 10.
+    return round((3. / (1. - grade_cutoff) * grade_percent + (7. - (3. / (1. - grade_cutoff)))) * 10.) / 10.
+
 
 def _update_certificate_context(context, course, user_certificate, platform_name):
     """
@@ -141,6 +151,15 @@ def _update_certificate_context(context, course, user_certificate, platform_name
     certificate_type_description = get_certificate_description(user_certificate.mode, certificate_type, platform_name)
     if certificate_type_description:
         context['certificate_type_description'] = certificate_type_description
+
+    # EOL
+    grade_cutoff = min(course.grade_cutoffs.values())  # Get the min value
+    try:
+        grade_percent = float(user_certificate.grade)
+    except ValueError:
+        grade_percent = 0.0
+    context['eol_grade'] = grade_percent_scaled(grade_percent, grade_cutoff)
+    # EOL
 
     # Translators: This text describes the purpose (and therefore, value) of a course certificate
     context['certificate_info_description'] = _(u"{platform_name} acknowledges achievements through "
