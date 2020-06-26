@@ -55,11 +55,11 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         """
         Create course based on proctoring provider and escalation email values
         """
-        self.course = CourseFactory.create(enable_proctored_exams=True,
+        course = CourseFactory.create(enable_proctored_exams=True,
                                            enable_timed_exams=True,
                                            proctoring_provider=proctoring_provider,
                                            proctoring_escalation_email=escalation_email)
-        self.setup_course_url(self.course)
+        self.setup_course_url(course)
 
     @ddt.data(
         (True, False),
