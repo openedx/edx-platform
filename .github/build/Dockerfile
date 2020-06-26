@@ -100,7 +100,7 @@ RUN grep -v -x -f /openedx/edx-platform/requirements/edx/base.txt /openedx/edx-p
 
 ## Update sqlite3 to prevent segfaults on tests
 RUN cd /tmp \
-    && curl -O http://sqlite.org/2016/sqlite-autoconf-3140100.tar.gz \
+    && curl -O https://sqlite.org/2016/sqlite-autoconf-3140100.tar.gz \
     && tar -xzvf sqlite-autoconf-3140100.tar.gz \
     && cd sqlite-autoconf-3140100 \
     && ./configure --prefix=/usr --disable-static CFLAGS="-g" \
