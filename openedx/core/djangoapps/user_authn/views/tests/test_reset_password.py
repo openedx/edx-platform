@@ -85,6 +85,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         """
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
+        bad_pwd_req.user = AnonymousUser()
         bad_pwd_resp = password_reset(bad_pwd_req)
         # If they've got an unusable password, we return a successful response code
         self.assertEqual(bad_pwd_resp.status_code, 200)
@@ -105,6 +106,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         """
 
         bad_email_req = self.request_factory.post('/password_reset/', {'email': self.user.email + "makeItFail"})
+        bad_email_req.user = AnonymousUser()
         bad_email_resp = password_reset(bad_email_req)
         # Note: even if the email is bad, we return a successful response code
         # This prevents someone potentially trying to "brute-force" find out which
@@ -121,24 +123,87 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
         Mock(side_effect=mock_render_to_string, autospec=True)
     )
-    def test_password_reset_ratelimited(self):
+    def test_password_reset_ratelimited_for_non_existing_user(self):
         """
-        Try (and fail) resetting password 30 times in a row on an non-existant email address
+        Test that reset password endpoint only allow one request per minute
+        for non-existing user.
+        """
+        self.assert_password_reset_ratelimitted('thisdoesnotexist@foo.com', AnonymousUser())
+        self.assert_no_events_were_emitted()
+
+    @patch(
+        'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
+        Mock(side_effect=mock_render_to_string, autospec=True)
+    )
+    def test_password_reset_ratelimited_for_existing_user(self):
+        """
+        Test that reset password endpoint only allow one request per minute
+        for existing user.
+        """
+        self.assert_password_reset_ratelimitted(self.user.email, self.user)
+        self.assert_event_emission_count(SETTING_CHANGE_INITIATED, 1)
+
+    def assert_password_reset_ratelimitted(self, email, user):
+        """
+        Assert that password reset endpoint allow one request per minute per email.
         """
         cache.clear()
-
-        for i in range(30):
-            good_req = self.request_factory.post('/password_reset/', {
-                'email': 'thisdoesnotexist{0}@foo.com'.format(i)
-            })
-            good_resp = password_reset(good_req)
-            self.assertEqual(good_resp.status_code, 200)
+        password_reset_req = self.request_factory.post('/password_reset/', {'email': email})
+        password_reset_req.user = user
+        password_reset_req.site = Mock(domain='example.com')
+        good_resp = password_reset(password_reset_req)
+        self.assertEqual(good_resp.status_code, 200)
 
         # then the rate limiter should kick in and give a HttpForbidden response
-        bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        bad_resp = password_reset(password_reset_req)
+        self.assertEqual(bad_resp.status_code, 403)
+
+        cache.clear()
+
+    def test_ratelimitted_from_same_ip_with_different_email(self):
+        """
+        Test that password reset endpoint allow only one request per minute per IP.
+        """
+        cache.clear()
+        good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        good_req.user = AnonymousUser()
+        good_resp = password_reset(good_req)
+        self.assertEqual(good_resp.status_code, 200)
+
+        # change the email ID and verify that the rate limiter should kick in and
+        # give a Forbidden response if the request is from same IP.
+        bad_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist2@foo.com'})
+        bad_req.user = AnonymousUser()
         bad_resp = password_reset(bad_req)
         self.assertEqual(bad_resp.status_code, 403)
-        self.assert_no_events_were_emitted()
+
+        cache.clear()
+
+    def test_ratelimited_from_different_ips_with_same_email(self):
+        """
+        Test that password reset endpoint allow only one request per minute
+        per email address.
+        """
+        cache.clear()
+        good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
+        good_req.user = AnonymousUser()
+        good_resp = password_reset(good_req)
+        self.assertEqual(good_resp.status_code, 200)
+
+        # change the IP and verify that the rate limiter should kick in and
+        # give a Forbidden response if the request is for same email address.
+        new_ip = "8.8.8.8"
+        self.assertNotEqual(good_req.META.get('REMOTE_ADDR'), new_ip)
+
+        bad_req = self.request_factory.post(
+            '/password_reset/',
+            {'email': 'thisdoesnotexist@foo.com'},
+            REMOTE_ADDR=new_ip
+        )
+        bad_req.user = AnonymousUser()
+        bad_resp = password_reset(bad_req)
+        self.assertEqual(bad_resp.status_code, 403)
+        self.assertEqual(bad_req.META.get('REMOTE_ADDR'), new_ip)
 
         cache.clear()
 

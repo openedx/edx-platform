@@ -193,11 +193,6 @@ DATABASES = {
     },
 }
 
-if os.environ.get('DISABLE_MIGRATIONS'):
-    # Create tables directly from apps' models. This can be removed once we upgrade
-    # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
-    MIGRATION_MODULES = NoOpMigrationModules()
-
 CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
@@ -529,7 +524,6 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 )
 
 ####################### Authentication Settings ##########################
-# pylint: disable=unicode-format-string
 JWT_AUTH.update({
     'JWT_PUBLIC_SIGNING_JWK_SET': (
         '{"keys": [{"kid": "BTZ9HA6K", "e": "AQAB", "kty": "RSA", "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6'
@@ -596,3 +590,6 @@ PROCTORING_SETTINGS = {}
 ############### Settings for Django Rate limit #####################
 
 RATELIMIT_RATE = '2/m'
+
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = '5/5m'

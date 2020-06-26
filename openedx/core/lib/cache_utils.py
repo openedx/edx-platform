@@ -159,6 +159,7 @@ class CacheInvalidationManager:
 
     To use, instantiate with a namespace or django model class:
     `manager = CacheInvalidationManager(model=User)`
+    One of namespace or model should be specified, but not both.
 
     Then use it as a decorator on functions with no arguments
     `@manager
@@ -173,7 +174,7 @@ class CacheInvalidationManager:
         if model:
             post_save.connect(self.invalidate, sender=model)
             post_delete.connect(self.invalidate, sender=model)
-            namespace = str(model)
+            namespace = "{}.{}".format(model.__module__, model.__qualname__)
         self.namespace = namespace
         self.cache_time = cache_time
         self.keys = set()

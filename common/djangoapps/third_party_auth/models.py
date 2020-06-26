@@ -332,7 +332,7 @@ class ProviderConfig(ConfigurationModel):
         """
         Determines if the provider is able to be used with the current site.
         """
-        return self.enabled and self.site == Site.objects.get_current(get_current_request())
+        return self.enabled and self.site_id == Site.objects.get_current(get_current_request()).id
 
 
 class OAuth2ProviderConfig(ProviderConfig):
@@ -366,7 +366,7 @@ class OAuth2ProviderConfig(ProviderConfig):
         help_text=(
             u'For increased security, you can avoid storing this in your database by leaving '
             ' this field blank and setting '
-            'SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} '  # pylint: disable=unicode-format-string
+            'SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} '
             'in your instance\'s Django settings (or lms.auth.json)'
         )
     )
@@ -622,9 +622,9 @@ class SAMLProviderConfig(ProviderConfig):
         verbose_name=u"Advanced settings", blank=True,
         help_text=(
             u'For advanced use cases, enter a JSON object with addtional configuration. '
-            'The tpa-saml backend supports {"requiredEntitlements": ["urn:..."]}, '  # pylint: disable=unicode-format-string
+            'The tpa-saml backend supports {"requiredEntitlements": ["urn:..."]}, '
             'which can be used to require the presence of a specific eduPersonEntitlement, '
-            'and {"extra_field_definitions": [{"name": "...", "urn": "..."},...]}, which can be '  # pylint: disable=unicode-format-string
+            'and {"extra_field_definitions": [{"name": "...", "urn": "..."},...]}, which can be '
             'used to define registration form fields and the URNs that can be used to retrieve '
             'the relevant values from the SAML response. Custom provider types, as selected '
             'in the "Identity Provider Type" field, may make use of the information stored '
@@ -718,7 +718,7 @@ class SAMLProviderConfig(ProviderConfig):
         data = SAMLProviderData.current(self.entity_id)
         if not data or not data.is_valid():
             log.error(
-                'No SAMLProviderData found for provider "%s" with entity id "%s" and IdP slug "%s". '  # pylint: disable=unicode-format-string
+                'No SAMLProviderData found for provider "%s" with entity id "%s" and IdP slug "%s". '
                 'Run "manage.py saml pull" to fix or debug.',
                 self.name, self.entity_id, self.slug
             )
@@ -833,7 +833,7 @@ class LTIProviderConfig(ProviderConfig):
             'tool consumer instance should know this value. '
             'For increased security, you can avoid storing this in '
             'your database by leaving this field blank and setting '
-            'SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} '  # pylint: disable=unicode-format-string
+            'SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} '
             'in your instance\'s Django setttigs (or lms.auth.json)'
         ),
         blank=True,

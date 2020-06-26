@@ -308,16 +308,25 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             # logs - one for the request and one for the response
             self.assertEqual(mock_log.call_count, 4)
 
-            (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[0]
+            expected_next_url = "/dashboard"
+            (msg, action_type, idp_name, request_data, next_url, xml), _kwargs = mock_log.call_args_list[0]
             self.assertTrue(msg.startswith(u"SAML login %s"))
             self.assertEqual(action_type, "request")
             self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
+            self.assertDictContainsSubset(
+                {"idp": idp_name, "auth_entry": "login", "next": expected_next_url},
+                request_data
+            )
+            self.assertEqual(next_url, expected_next_url)
             self.assertIn('<samlp:AuthnRequest', xml)
 
-            (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[1]
+            (msg, action_type, idp_name, response_data, next_url, xml), _kwargs = mock_log.call_args_list[1]
             self.assertTrue(msg.startswith(u"SAML login %s"))
             self.assertEqual(action_type, "response")
             self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
+            self.assertDictContainsSubset({"RelayState": idp_name}, response_data)
+            self.assertIn('SAMLResponse', response_data)
+            self.assertEqual(next_url, expected_next_url)
             self.assertIn('<saml2p:Response', xml)
         else:
             self.assertFalse(mock_log.called)
@@ -454,7 +463,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         Mock an error response when calling the OData API for user details.
         """
 
-        def callback(request, uri, headers):  # pylint: disable=unused-argument
+        def callback(request, uri, headers):
             """
             Return a 500 error when someone tries to call the URL.
             """

@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ('_expiration_datetime', models.DateTimeField(blank=True, db_column=u'expiration_datetime', default=None, help_text='OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. Leave this blank if users can enroll in this mode until enrollment closes for the course.', null=True, verbose_name='Upgrade Deadline')),
                 ('expiration_datetime_is_explicit', models.BooleanField(default=False)),
                 ('expiration_date', models.DateField(blank=True, default=None, null=True)),
-                ('suggested_prices', models.CharField(blank=True, default=u'', max_length=255, validators=[django.core.validators.RegexValidator(re.compile('^\\d+(?:\\,\\d+)*\\Z'), code='invalid', message='Enter only digits separated by commas.')])),
+                ('suggested_prices', models.CharField(blank=True, default=u'', max_length=255, validators=[django.core.validators.RegexValidator(re.compile('^\\d+(?:{escaped_comma}\\d+)*\\Z'.format(escaped_comma=re.escape(','))), code='invalid', message='Enter only digits separated by commas.')])),
                 ('description', models.TextField(blank=True, null=True)),
                 ('sku', models.CharField(blank=True, help_text='OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external ecommerce service.  Leave this blank if the course has not yet been migrated to the ecommerce service.', max_length=255, null=True, verbose_name=u'SKU')),
                 ('bulk_sku', models.CharField(blank=True, default=None, help_text='This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service.', max_length=255, null=True, verbose_name=u'Bulk SKU')),

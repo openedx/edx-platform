@@ -6,7 +6,7 @@ Module to define url helpers functions
 import six
 from django.conf import settings
 from django.urls import reverse
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location

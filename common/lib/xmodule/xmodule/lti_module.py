@@ -345,7 +345,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         ]
     }
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
-    js_module_name = "LTI"
+    js_module_name = 'LTI'
 
     def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
@@ -557,6 +557,12 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         }
         return roles.get(self.system.get_user_role(), u'Student')
 
+    def get_icon_class(self):
+        """ Returns the icon class """
+        if self.graded and self.has_score:  # pylint: disable=no-member
+            return 'problem'
+        return 'other'
+
     def oauth_params(self, custom_parameters, client_key, client_secret):
         """
         Signs request and returns signature and OAuth parameters.
@@ -662,7 +668,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
     @XBlock.handler
-    def grade_handler(self, request, suffix):  # pylint: disable=unused-argument
+    def grade_handler(self, request, suffix):
         """
         This is called by courseware.module_render, to handle an AJAX call.
 

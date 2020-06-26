@@ -89,7 +89,6 @@ def search_certificates(request):
         ]
 
     """
-    # pylint: disable=too-many-function-args
     unbleached_filter = six.moves.urllib.parse.unquote(six.moves.urllib.parse.quote_plus(request.GET.get("user", "")))
     user_filter = bleach.clean(unbleached_filter)
     if not user_filter:
@@ -108,7 +107,6 @@ def search_certificates(request):
         cert["modified"] = cert["modified"].isoformat()
         cert["regenerate"] = not cert['is_pdf_certificate']
 
-    # pylint: disable=redundant-keyword-arg
     course_id = six.moves.urllib.parse.quote_plus(request.GET.get("course_id", ""), safe=':/')
     if course_id:
         try:

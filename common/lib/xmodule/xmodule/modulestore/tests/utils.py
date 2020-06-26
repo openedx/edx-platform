@@ -171,9 +171,9 @@ class ProceduralCourseTestMixin(object):
         Add k chapters, k^2 sections, k^3 verticals, k^4 problems to self.course (where k = branching)
         """
         user_id = self.user.id
-        self.populated_usage_keys = {}  # pylint: disable=attribute-defined-outside-init
+        self.populated_usage_keys = {}
 
-        def descend(parent, stack):  # pylint: disable=missing-docstring
+        def descend(parent, stack):
             if not stack:
                 return
 

@@ -26,7 +26,7 @@ from mock import Mock, patch
 from pytz import UTC
 from six import text_type
 from six.moves import range
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse
 
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
@@ -750,7 +750,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(self.cart.orderitem_set.count(), 1)
         info_log.assert_called_with(
-            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',  # pylint: disable=unicode-format-string
+            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
             self.coupon_code,
             self.user,
             str(reg_item.id)
@@ -1240,94 +1240,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertEqual(context['currency'], 'PKR')
 
     @patch('shoppingcart.views.render_to_response', render_mock)
-    def test_courseregcode_item_total_price(self):
-        self.cart.order_type = 'business'
-        self.cart.save()
-        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2, mode_slug=self.course_mode.mode_slug)
-        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-        self.assertEqual(CourseRegCodeItem.get_total_amount_of_purchased_item(self.course_key), 80)
-
-    @patch('shoppingcart.views.render_to_response', render_mock)
-    def test_show_receipt_success_with_order_type_business(self):
-        self.cart.order_type = 'business'
-        self.cart.save()
-        reg_item = CourseRegCodeItem.add_to_order(
-            self.cart,
-            self.course_key,
-            2,
-            mode_slug=self.course_mode.mode_slug
-        )
-        self.cart.add_billing_details(company_name='T1Omega', company_contact_name='C1',
-                                      company_contact_email='test@t1.com', recipient_email='test@t2.com')
-        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-
-        # mail is sent to these emails recipient_email, company_contact_email, order.user.email
-        self.assertEqual(len(mail.outbox), 3)
-
-        self.login_user()
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
-        self.assertEqual(resp.status_code, 200)
-
-        # when order_type = 'business' the user is not enrolled in the
-        # course but presented with the enrollment links
-        self.assertFalse(CourseEnrollment.is_enrolled(self.cart.user, self.course_key))
-        self.assertContains(resp, 'FirstNameTesting123')
-        self.assertContains(resp, '80.00')
-        # check for the enrollment codes content
-        self.assertContains(
-            resp,
-            'Please send each professional one of these unique registration codes to enroll into the course.',
-        )
-
-        # fetch the newly generated registration codes
-        course_registration_codes = CourseRegistrationCode.objects.filter(order=self.cart)
-
-        ((template, context), _) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertEqual(template, 'shoppingcart/receipt.html')
-        self.assertEqual(context['order'], self.cart)
-        self.assertIn(reg_item, context['shoppingcart_items'][0])
-        # now check for all the registration codes in the receipt
-        # and all the codes should be unused at this point
-        self.assertIn(course_registration_codes[0].code, context['reg_code_info_list'][0]['code'])
-        self.assertIn(course_registration_codes[1].code, context['reg_code_info_list'][1]['code'])
-        self.assertFalse(context['reg_code_info_list'][0]['is_redeemed'])
-        self.assertFalse(context['reg_code_info_list'][1]['is_redeemed'])
-
-        self.assertContains(
-            resp,
-            self.cart.purchase_time.strftime(u"%B %d, %Y"),
-        )
-        self.assertContains(resp, self.cart.company_name)
-        self.assertContains(resp, self.cart.company_contact_name)
-        self.assertContains(resp, self.cart.company_contact_email)
-        self.assertContains(resp, self.cart.recipient_email)
-        self.assertIn(u"Invoice #{order_id}".format(order_id=self.cart.id), resp.content.decode(resp.charset))
-        codes_string = u'You have successfully purchased <b>{total_registration_codes} course registration codes'
-        self.assertIn(codes_string.format(
-            total_registration_codes=context['total_registration_codes']),
-            resp.content.decode(resp.charset)
-        )
-
-        # now redeem one of registration code from the previous order
-        redeem_url = reverse('register_code_redemption', args=[context['reg_code_info_list'][0]['code']])
-
-        #now activate the user by enrolling him/her to the course
-        response = self.client.post(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'View Dashboard')
-
-        # now view the receipt page again to see if any registration codes
-        # has been expired or not
-        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
-        self.assertEqual(resp.status_code, 200)
-        ((template, context), _) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
-        self.assertEqual(template, 'shoppingcart/receipt.html')
-        # now check for all the registration codes in the receipt
-        # and one of code should be used at this point
-        self.assertTrue(context['reg_code_info_list'][0]['is_redeemed'])
-        self.assertFalse(context['reg_code_info_list'][1]['is_redeemed'])
-
-    @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_with_upgrade(self):
 
         reg_item = PaidCourseRegistration.add_to_order(
@@ -1470,25 +1382,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
                 'mode': 'verified'
             }
         )
-
-    def test_shopping_cart_navigation_link(self):
-        """
-        Tests shopping cart link is available in navigation header.
-        """
-        CourseEnrollment.enroll(self.user, self.course_key)
-        self.add_course_to_user_cart(self.testing_course.id)
-        resp = self.client.get(reverse('courseware', kwargs={'course_id': text_type(self.course.id)}))
-        self.assertContains(resp, '<a class="shopping-cart"')
-
-    def test_shopping_cart_navigation_link_and_not_on_courseware(self):
-        """
-        Tests shopping cart link is available in navigation header
-        and requested page is not courseware too.
-        """
-        CourseEnrollment.enroll(self.user, self.course_key)
-        self.add_course_to_user_cart(self.testing_course.id)
-        resp = self.client.get(reverse('dashboard'))
-        self.assertContains(resp, '<a class="shopping-cart"')
 
 
 class ReceiptRedirectTest(SharedModuleStoreTestCase):
@@ -1798,108 +1691,6 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
             self.assertEqual(response.status_code, 404)
 
         cache.clear()
-
-    def test_course_enrollment_active_registration_code_redemption(self):
-        """
-        Test for active registration code course enrollment
-        """
-        cache.clear()
-        instructor = InstructorFactory(course_key=self.course_key)
-        self.client.login(username=instructor.username, password='test')
-
-        # Registration Code Generation only available to Sales Admins.
-        CourseSalesAdminRole(self.course.id).add_users(instructor)
-
-        url = reverse('generate_registration_codes',
-                      kwargs={'course_id': text_type(self.course.id)})
-
-        data = {
-            'total_registration_codes': 12, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
-            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street',
-            'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
-        }
-
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
-        # get the first registration from the newly created registration codes
-        registration_code = CourseRegistrationCode.objects.all()[0].code
-        redeem_url = reverse('register_code_redemption', args=[registration_code])
-        self.login_user()
-
-        response = self.client.get(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        # check button text
-        self.assertContains(response, 'Activate Course Enrollment')
-
-        #now activate the user by enrolling him/her to the course
-        response = self.client.post(redeem_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'View Dashboard')
-
-        #now check that the registration code has already been redeemed and user is already registered in the course
-        RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)
-        response = self.client.get(redeem_url)
-        self.assertEqual(len(RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)), 1)
-        self.assertContains(response, "You&#39;ve clicked a link for an enrollment code that has already been used.")
-
-        #now check that the registration code has already been redeemed
-        response = self.client.post(redeem_url)
-        self.assertContains(response, "You&#39;ve clicked a link for an enrollment code that has already been used.")
-
-        #now check the response of the dashboard page
-        dashboard_url = reverse('dashboard')
-        response = self.client.get(dashboard_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.course.display_name.encode('utf-8'))
-
-
-@ddt.ddt
-class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
-    """Test blocking redeem code redemption based on country access rules. """
-
-    USERNAME = 'bob'
-    PASSWORD = 'test'
-
-    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
-
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
-    def setUp(self):
-        super(RedeemCodeEmbargoTests, self).setUp()
-        self.course = CourseFactory.create()
-        self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
-        result = self.client.login(username=self.user.username, password=self.PASSWORD)
-        self.assertTrue(result, msg="Could not log in")
-
-    @ddt.data('get', 'post')
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
-    def test_registration_code_redemption_embargo(self, method):
-        # Create a valid registration code
-        reg_code = CourseRegistrationCode.objects.create(
-            code="abcd1234",
-            course_id=self.course.id,
-            created_by=self.user
-        )
-
-        # Try to redeem the code from a restricted country
-        with restrict_course(self.course.id) as redirect_url:
-            url = reverse(
-                'register_code_redemption',
-                kwargs={'registration_code': 'abcd1234'}
-            )
-            response = getattr(self.client, method)(url)
-            self.assertRedirects(response, redirect_url)
-
-        # The registration code should NOT be redeemed
-        is_redeemed = RegistrationCodeRedemption.objects.filter(
-            registration_code=reg_code
-        ).exists()
-        self.assertFalse(is_redeemed)
-
-        # The user should NOT be enrolled
-        is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
-        self.assertFalse(is_enrolled)
 
 
 @ddt.ddt

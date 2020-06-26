@@ -6,11 +6,12 @@ The Python API other app should use to work with Teams feature
 import logging
 from enum import Enum
 
-from django.db.models import Count
+from django.db.models import Count, Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
+from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
@@ -251,7 +252,7 @@ def user_protection_status_matches_team(user, team):
         return OrganizationProtectionStatus.unprotected == protection_status
 
 
-def get_team_count_query_set(topic_id_set, course_id, organization_protection_status):
+def _get_team_filter_query(topic_id_set, course_id, organization_protection_status):
     """ Helper function to get the team count query set based on the filters provided """
 
     filter_query = {'course_id': course_id}
@@ -264,16 +265,34 @@ def get_team_count_query_set(topic_id_set, course_id, organization_protection_st
         filter_query.update(
             {'organization_protected': organization_protection_status == OrganizationProtectionStatus.protected}
         )
-    return CourseTeam.objects.filter(**filter_query)
+    return filter_query
 
 
-def add_team_count(topics, course_id, organization_protection_status):
+def get_teams_accessible_by_user(user, topic_id_set, course_id, organization_protection_status):
+    """ Get teams taking for a user, taking into account user visibility privileges """
+    # Filter by topics, course, and protection status
+    filter_query = _get_team_filter_query(topic_id_set, course_id, organization_protection_status)
+
+    # Staff gets unfiltered list of teams
+    if has_access(user, 'staff', course_id):
+        return CourseTeam.objects.filter(**filter_query)
+
+    # Private teams should be hidden unless the student is a member
+    course_module = modulestore().get_course(course_id)
+    private_teamset_ids = [ts.teamset_id for ts in course_module.teamsets if ts.is_private_managed]
+    return CourseTeam.objects.filter(**filter_query).exclude(
+        Q(topic_id__in=private_teamset_ids), ~Q(membership__user=user)
+    )
+
+
+def add_team_count(user, topics, course_id, organization_protection_status):
     """
     Helper method to add team_count for a list of topics.
     This allows for a more efficient single query.
     """
     topic_ids = [topic['id'] for topic in topics]
-    teams_query_set = get_team_count_query_set(
+    teams_query_set = get_teams_accessible_by_user(
+        user,
         topic_ids,
         course_id,
         organization_protection_status
@@ -365,3 +384,20 @@ def anonymous_user_ids_for_team(user, team):
         anonymous_id_for_user(user=team_member, course_id=team.course_id, save=False)
         for team_member in team.users.all()
     ])
+
+
+def get_assignments_for_team(user, team):
+    """ Get openassessment XBlocks configured for the current teamset """
+    # Confirm access
+    if not has_specific_team_access(user, team):
+        raise Exception("User {user} is not permitted to access team info for {team}".format(
+            user=user.username,
+            team=team.team_id
+        ))
+
+    # Limit to team-enabled ORAs for the matching teamset in the course
+    return modulestore().get_items(
+        team.course_id,
+        qualifiers={'category': 'openassessment'},
+        settings={'teams_enabled': True, 'selected_teamset_id': team.topic_id}
+    )

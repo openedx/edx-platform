@@ -43,7 +43,7 @@ from student.forms import send_account_recovery_email_for_user
 from student.models import AccountRecovery
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
-from util.request_rate_limiter import BadRequestRateLimiter, PasswordResetEmailRateLimiter
+from util.request_rate_limiter import PasswordResetEmailRateLimiter
 
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 
@@ -242,11 +242,18 @@ def password_reset(request):
     """
     Attempts to send a password reset e-mail.
     """
-    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
-        AUDIT_LOG.warning("Rate limit exceeded in password_reset")
-        return HttpResponseForbidden()
+
+    password_reset_email_limiter = PasswordResetEmailRateLimiter()
+
+    if password_reset_email_limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Password reset rate limit exceeded")
+        return JsonResponse(
+            {
+                'success': False,
+                'value': _("Your previous request is in progress, please try again in a few moments.")
+            },
+            status=403
+        )
 
     form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
@@ -269,7 +276,8 @@ def password_reset(request):
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
-        limiter.tick_request_counter(request)
+
+    password_reset_email_limiter.tick_request_counter(request)
 
     return JsonResponse({
         'success': True,

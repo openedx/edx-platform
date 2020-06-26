@@ -31,32 +31,6 @@ from six import string_types
       event.preventDefault();
     });
 
-    % if can_add_course_to_cart:
-      add_course_complete_handler = function(jqXHR, textStatus) {
-        if (jqXHR.status == 200) {
-          location.href = "${cart_link | n, js_escaped_string}";
-        }
-        if (jqXHR.status == 400) {
-          $("#register_error")
-            .text(jqXHR.responseText ? jqXHR.responseText : "${_("An error occurred. Please try again later.") | n, js_escaped_string}")
-            .css("display", "block");
-        }
-        else if (jqXHR.status == 403) {
-            location.href = "${reg_then_add_to_cart_link | n, js_escaped_string}";
-        }
-      };
-
-      $("#add_to_cart_post").click(function(event){
-        $.ajax({
-          url: "${reverse('add_course_to_cart', args=[text_type(course.id)]) | n, js_escaped_string}",
-          type: "POST",
-          /* Using `complete` as promise.done did not work on this page */
-          complete: add_course_complete_handler
-        })
-        event.preventDefault();
-      });
-    % endif
-
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if (xhr.status == 200) {
         if (xhr.responseText == "") {
@@ -112,13 +86,6 @@ from six import string_types
             </a>
           %endif
 
-        %elif in_cart:
-          <span class="add-to-cart">
-            ${Text(_('This course is in your {start_cart_link}cart{end_cart_link}.')).format(
-                start_cart_link=HTML('<a href="{cart_link}">').format(cart_link=cart_link),
-                end_cart_link=HTML("</a>"),
-            )}
-          </span>
         % elif is_course_full:
           <span class="register disabled">
             ${_("Course is full")}
@@ -130,28 +97,6 @@ from six import string_types
         ## so that they can register and become a real user that can enroll.
         % elif not is_shib_course and not can_enroll:
           <span class="register disabled">${_("Enrollment is Closed")}</span>
-        %elif can_add_course_to_cart:
-          <%
-          if user.is_authenticated:
-            reg_href = "#"
-            reg_element_id = "add_to_cart_post"
-          else:
-            reg_href = reg_then_add_to_cart_link
-            reg_element_id = "reg_then_add_to_cart"
-          %>
-          <% if ecommerce_checkout:
-              reg_href = ecommerce_checkout_link
-              reg_element_id = ""
-          %>
-          <a href="${reg_href}" class="add-to-cart" id="${reg_element_id}">
-            ${Text(_("Add {course_name} to Cart {start_span}({price} USD){end_span}")).format(
-                course_name=course.display_number_with_default,
-                price=course_price,
-                start_span=HTML("<span>"),
-                end_span=HTML("</span>"),
-            )}
-          </a>
-          <div id="register_error"></div>
         %elif allow_anonymous:
           %if show_courseware_link:
             <a href="${course_target}">
@@ -264,7 +209,7 @@ from six import string_types
 
           ##<li class="important-dates-item"><span class="icon fa fa-clock-o" aria-hidden="true"></span><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
-          %if course_price and (can_add_course_to_cart or is_cosmetic_price_enabled):
+          %if course_price and (is_cosmetic_price_enabled):
             <li class="important-dates-item">
               <span class="icon fa fa-money" aria-hidden="true"></span>
               <p class="important-dates-item-title">${_("Price")}</p>

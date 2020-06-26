@@ -56,7 +56,8 @@
 }
 
 .login-register-content {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include outer-container;
 
   width: 100%;
@@ -97,6 +98,16 @@
   }
 }
 
+#login-help, #reset-help {
+    padding-left: 8px;
+}
+ul.fa-ul{
+    margin: 0 0 0 0;
+    i {
+        margin-right: 5px;
+    }
+}
+
 .login-register {
   $grid-columns: 12;
 
@@ -116,13 +127,13 @@
 
   /* Temp. fix until applied globally */
   > {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
 
   /* Remove autocomplete yellow background */
   input:-webkit-autofill {
-    -webkit-box-shadow:0 0 0 50px white inset;
+    -webkit-box-shadow: 0 0 0 50px white inset;
     -webkit-text-fill-color: #333;
   }
 
@@ -141,7 +152,8 @@
     overflow: hidden;
 
     .headline {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include font-size(35);
 
       padding: 0 10px;
@@ -153,7 +165,8 @@
     }
 
     .tagline {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include font-size(24);
 
       padding: 0 10px;
@@ -215,8 +228,7 @@
 
   .form-type,
   .toggle-form {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     max-width: 600px;
     min-width: 250px;
     margin: 0 auto;
@@ -371,8 +383,8 @@
       @extend %t-copy-sub2;
 
       display: block;
-      margin-bottom: ($baseline/2);
-      margin-top: ($baseline/4);
+      margin-bottom: 5px;
+      margin-top: 5px;
       border: none;
       padding: 0;
       background: transparent;
@@ -388,6 +400,11 @@
       &:hover,
       &:focus {
         text-decoration: underline;
+      }
+      > i {
+        border: none;
+        padding: 0;
+        margin: 0 2px 0 0;
       }
     }
 
@@ -468,7 +485,8 @@
       }
     }
 
-    .tip, .label-optional {
+    .tip,
+    .label-optional {
       @extend %t-copy-sub1;
 
       color: $uxpl-gray-base;
@@ -632,7 +650,6 @@
         color: $white;
       }
     }
-
   }
 
   .button-secondary-login {
@@ -647,18 +664,16 @@
     &:hover {
       border-color: $m-blue-d3;
       box-shadow: none;
-
     }
   }
 
   /** Error Container - from _account.scss **/
   .status {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     margin: 0 0 25px;
     border-bottom: 3px solid shade($yellow, 10%);
     padding: 25px;
-    background: tint($yellow,20%);
+    background: tint($yellow, 20%);
 
     .message-title {
       @extend %t-title5;
@@ -706,17 +721,14 @@
     }
   }
 
-  .submission-error, .system-error {
+  .submission-error,
+  .system-error {
     box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
     border-bottom: 3px solid shade($red, 10%);
-    background: tint($red,95%);
+    background: tint($red, 95%);
 
     .message-title {
       color: shade($red, 10%) !important;
-    }
-
-    .message-copy {
-
     }
   }
 
@@ -727,10 +739,6 @@
 
     .message-title {
       color: shade($green, 10%) !important;
-    }
-
-    .message-copy {
-
     }
   }
 
@@ -754,7 +762,8 @@
 }
 
 .finish-auth {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include outer-container;
   $grid-columns: 12;
 
@@ -763,8 +772,7 @@
   width: 100%;
 
   .finish-auth-inner {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     max-width: 650px;
     margin: 1em auto;
   }

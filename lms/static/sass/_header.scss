@@ -209,7 +209,9 @@
           position: absolute;
           background-color: theme-color("inverse");
           color: theme-color("secondary");
+
           @include right(30px);
+
           top: 55px;
           z-index: 10;
 

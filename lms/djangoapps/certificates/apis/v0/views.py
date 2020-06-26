@@ -23,6 +23,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
+from .permissions import IsOwnerOrPublicCertificates
+
 log = logging.getLogger(__name__)
 User = get_user_model()
 
@@ -158,6 +160,7 @@ class CertificatesListView(APIView):
                 permissions.JwtHasUserFilterForRequestedUser
             )
         ),
+        (C(permissions.IsStaff) | IsOwnerOrPublicCertificates),
     )
 
     required_scopes = ['certificates:read']

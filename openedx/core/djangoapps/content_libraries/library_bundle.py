@@ -18,6 +18,7 @@ from openedx.core.djangoapps.xblock.runtime.olx_parsing import (
 )
 from openedx.core.djangolib.blockstore_cache import (
     BundleCache,
+    get_bundle_direct_links_with_cache,
     get_bundle_files_cached,
     get_bundle_file_metadata_with_cache,
     get_bundle_version_number,
@@ -298,6 +299,12 @@ class LibraryBundle(object):
             if getattr(file_, 'modified', False):
                 has_unpublished_changes = True
                 break
+
+        if not has_unpublished_changes:
+            # Check if any links have changed:
+            old_links = set(get_bundle_direct_links_with_cache(self.bundle_uuid).items())
+            new_links = set(get_bundle_direct_links_with_cache(self.bundle_uuid, draft_name=self.draft_name).items())
+            has_unpublished_changes = new_links != old_links
 
         published_file_paths = set(f.path for f in get_bundle_files_cached(self.bundle_uuid))
         draft_file_paths = set(f.path for f in draft_files)

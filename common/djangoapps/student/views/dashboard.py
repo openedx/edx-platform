@@ -25,7 +25,7 @@ from bulk_email.models import Optout
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
-from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.experiments.utils import get_dashboard_course_info
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -40,12 +40,12 @@ from openedx.core.djangoapps.plugins.plugin_contexts import get_plugins_view_con
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
-from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
+from shoppingcart.models import DonationConfiguration
 from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from student.models import (
@@ -150,7 +150,7 @@ def _allow_donation(course_modes, course_id, enrollment):
     )
 
 
-def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name
+def _create_recent_enrollment_message(course_enrollments, course_modes):
     """
     Builds a recent course enrollment message.
 
@@ -313,37 +313,6 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
             mode_info['days_for_upsell'] = (modes['verified'].expiration_datetime.date() - today).days
 
     return mode_info
-
-
-def is_course_blocked(request, redeemed_registration_codes, course_key):
-    """
-    Checking if registration is blocked or not.
-    """
-    blocked = False
-    for redeemed_registration in redeemed_registration_codes:
-        # registration codes may be generated via Bulk Purchase Scenario
-        # we have to check only for the invoice generated registration codes
-        # that their invoice is valid or not
-        if redeemed_registration.invoice_item:
-            if not redeemed_registration.invoice_item.invoice.is_valid:
-                blocked = True
-                # disabling email notifications for unpaid registration courses
-                Optout.objects.get_or_create(user=request.user, course_id=course_key)
-                log.info(
-                    u"User %s (%s) opted out of receiving emails from course %s",
-                    request.user.username,
-                    request.user.email,
-                    course_key,
-                )
-                track.views.server_track(
-                    request,
-                    "change-email1-settings",
-                    {"receive_emails": "no", "course": text_type(course_key)},
-                    page='dashboard',
-                )
-                break
-
-    return blocked
 
 
 def get_verification_error_reasons_for_display(verification_error_codes):
@@ -655,7 +624,7 @@ def student_dashboard(request):
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
     recovery_email_message = recovery_email_activation_message = None
-    if is_secondary_email_feature_enabled_for_user(user=user):
+    if is_secondary_email_feature_enabled():
         try:
             pending_email = PendingSecondaryEmailChange.objects.get(user=user)
         except PendingSecondaryEmailChange.DoesNotExist:
@@ -776,18 +745,6 @@ def student_dashboard(request):
     statuses = ["approved", "denied", "pending", "must_reverify"]
     reverifications = reverification_info(statuses)
 
-    block_courses = frozenset(
-        enrollment.course_id for enrollment in course_enrollments
-        if is_course_blocked(
-            request,
-            CourseRegistrationCode.objects.filter(
-                course_id=enrollment.course_id,
-                registrationcoderedemption__redeemed_by=request.user
-            ),
-            enrollment.course_id
-        )
-    )
-
     enrolled_courses_either_paid = frozenset(
         enrollment.course_id for enrollment in course_enrollments
         if enrollment.is_paid_course()
@@ -828,6 +785,14 @@ def student_dashboard(request):
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
 
+    # Collect all program types the user is enrolled in
+    enrolled_program_types = []
+    if getattr(settings, 'ENABLE_DEMOGRAPHICS_COLLECTION', False):
+        enrolled_program_types = {
+            _program.get('type_attrs', {}).get('slug')
+            for _program in meter.engaged_programs
+            if _program.get('type_attrs', {}).get('slug') is not None
+        }
     context = {
         'urls': urls,
         'programs_data': programs_data,
@@ -856,7 +821,6 @@ def student_dashboard(request):
         'verification_expiry': verification_status['verification_expiry'],
         'verification_status_by_course': verify_status_by_course,
         'verification_errors': verification_errors,
-        'block_courses': block_courses,
         'denied_banner': denied_banner,
         'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
         'user': user,
@@ -878,6 +842,7 @@ def student_dashboard(request):
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
         'show_load_all_courses_link': show_load_all_courses_link(user, course_limit, course_enrollments),
+        'enrolled_program_types': enrolled_program_types,
         # TODO START: clean up as part of REVEM-199 (START)
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)

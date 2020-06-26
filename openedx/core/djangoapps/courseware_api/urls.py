@@ -15,4 +15,10 @@ urlpatterns = [
     url(r'^sequence/{}'.format(settings.USAGE_KEY_PATTERN),
         views.SequenceMetadata.as_view(),
         name="sequence-api"),
+    url(r'^resume/{}'.format(settings.COURSE_KEY_PATTERN),
+        views.Resume.as_view(),
+        name="resume-api"),
+    url(r'^celebration/{}'.format(settings.COURSE_KEY_PATTERN),
+        views.Celebration.as_view(),
+        name="celebration-api"),
 ]

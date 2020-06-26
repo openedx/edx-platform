@@ -33,11 +33,16 @@ bleach                              # Allowed-list-based HTML sanitizing library
 boto==2.39.0                        # Deprecated version of the AWS SDK; we should stop using this
 boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
+bridgekeeper                        # Used for determining permissions for courseware.
 celery                              # Asynchronous task execution library
+chem                                # A helper library for chemistry calculations
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
+crowdsourcehinter-xblock
 defusedxml
 Django                              # Web application framework
+django-appconf
 django-celery                       # Only used for the CacheBackend for celery results
+django-cookies-samesite             # Middleware which allows SameSite=None flag for session and csrf cookies in Django<3.0.5
 django-config-models>=1.0.0         # Configuration models for Django allowing config management with auditing
 django-cors-headers                 # Used to allow to configure CORS headers for cross-domain requests
 django-countries                    # Country data for Django forms and model fields
@@ -45,6 +50,7 @@ django-crum                         # Middleware that stores the current request
 django-fernet-fields                # via edx-enterprise (should be added to its setup.py)
 django-filter                       # Allows users to filter Django querysets dynamically
 django-ipware                       # Get the client's real IP address
+django-method-override              # Allow use of HTTP methods normally not supported by browsers via the X-HTTP-Method-Override header
 django-model-utils
 django-mptt
 django-mysql
@@ -60,7 +66,7 @@ django-splash
 django-statici18n
 django-storages
 django-user-tasks
-django-waffle==0.18.0
+django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework==3.9.4
 edx-ace
@@ -98,15 +104,17 @@ icalendar                           # .ics generator, used by calendar_sync
 ipaddress                           # Ip network support for Embargo feature
 jsonfield2                          # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
+lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
-mako==1.0.2                         # Primary template language used for server-side page rendering
+mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
-mongoengine==0.10.0                 # Object-document mapper for MongoDB, used in the LMS dashboard
+mongoengine                         # Object-document mapper for MongoDB, used in the LMS dashboard
 mysqlclient                         # Driver for the default production relational database
 newrelic                            # New Relic agent for performance monitoring
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 openedx-calc                        # Library supporting mathematical calculations for Open edX
+ora2
 pdfminer.six                        # Used in shoppingcart for extracting/parsing pdf text
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
@@ -140,6 +148,8 @@ simplejson
 sailthru-client==2.2.3              # For Sailthru integration
 Shapely                             # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
+social-auth-app-django
+sorl-thumbnail
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
 sqlparse                            # Required by Django to run migrations.RunSQL
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
@@ -151,3 +161,5 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
+enmerkar-underscore                 # Implements a underscore extractor for django-babel.
+

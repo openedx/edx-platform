@@ -31,9 +31,12 @@ class TestIcsGeneration(TestCase):
         self.request.site = SiteFactory()
         self.request.user = self.user
 
-    def make_assigment(self, block_key=None, title=None, url=None, date=None, requires_file_access=False):
+    def make_assigment(
+        self, block_key=None, title=None, url=None, date=None, contains_gated_content=False, complete=False,
+        past_due=False, assignment_type=None
+    ):
         """ Bundles given info into a namedtupled like get_course_assignments returns """
-        return _Assignment(block_key, title, url, date, requires_file_access)
+        return _Assignment(block_key, title, url, date, contains_gated_content, complete, past_due, assignment_type)
 
     def expected_ics(self, *assignments):
         """ Returns hardcoded expected ics strings for given assignments """

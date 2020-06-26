@@ -1320,6 +1320,7 @@ class TestAccountRetirementPost(RetirementTestCase):
             'city': None,
             'country': None,
             'bio': None,
+            'phone_number': None,
         }
         self.assertEqual(expected_user_profile_pii, USER_PROFILE_PII)
 

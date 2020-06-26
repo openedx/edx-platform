@@ -114,8 +114,8 @@
 // used for page/view-level wrappers (for centering/grids)
 %ui-wrapper {
   @include clearfix();
-  @include box-sizing(border-box);
 
+  box-sizing: border-box;
   width: 100%;
 }
 
@@ -198,7 +198,8 @@
 // +UI - Buttons - Extends
 // ====================
 %ui-btn {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include transition(color $tmg-f2 ease-in-out 0s, border-color $tmg-f2 ease-in-out 0s, background $tmg-f2 ease-in-out 0s, box-shadow $tmg-f2 ease-in-out 0s);
 
   display: inline-block;
@@ -440,8 +441,7 @@
 // +Content - Text Truncate - Extend
 // ====================
 %cont-truncated {
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

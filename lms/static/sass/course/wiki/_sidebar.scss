@@ -26,8 +26,7 @@ div#wiki_panel {
     }
 
     input[type="text"] {
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       display: block;
       width: 100%;
       margin-bottom: lh(0.5);

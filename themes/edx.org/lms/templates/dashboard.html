@@ -136,16 +136,30 @@ from student.models import CourseEnrollment
         % endfor
       </div>
     %endif
-
-    ${static.renderReact(
-      component="EnterpriseLearnerPortalBanner",
-      id="enterprise-learner-portal-banner",
-      props={}
-    )}
 </div>
 
 <section class="dashboard" id="dashboard-main">
 <main class="main-container" id="main" aria-label="Content" tabindex="-1">
+  <%
+    MB_SLUG = "microbachelors"
+    enrolled_in_mb_program = MB_SLUG in enrolled_program_types
+    account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
+  %>
+  % if getattr(settings, 'ENABLE_DEMOGRAPHICS_COLLECTION', False) and enrolled_in_mb_program:
+    <a href="${account_mfe_url}#demographics">
+      <div
+        class="demographics-banner d-flex justify-content-left align-items-center flex-column flex-lg-row py-1 px-4 mb-2 mb-lg-4">
+        <img class="demographics-banner-icon d-none d-lg-inline-block" src="${static.url('edx.org/images/quote_prompt.png')}" alt="" aria-hidden="true">
+        <div class="demographics-banner-prompt d-inline-block font-weight-bold text-white py-4 px-2 px-lg-3">
+          ${_("Want to make edX better for everyone?")}
+        </div>
+        <button class="demographics-banner-btn d-flex align-items-center bg-white font-weight-bold border-0 py-2 px-3 mx-2 mb-3 m-lg-0 shadow">
+          <span class="fa fa-thumbs-up px-2" aria-hidden="true"></span>
+          ${_("Get started")}
+        </button>
+      </div>
+    </a>
+  % endif
   <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
@@ -185,7 +199,10 @@ from student.models import CourseEnrollment
                 pseudo_session = unfulfilled_entitlement_pseudo_sessions[str(entitlement.uuid)]
                 if not pseudo_session:
                     continue
-                enrollment = CourseEnrollment(user=user, course=CourseOverview.get_from_id(pseudo_session['key']), mode=pseudo_session['type'])
+                pseudo_key = pseudo_session['key']
+                if not isinstance(pseudo_key, CourseKey):
+                  pseudo_key = CourseKey.from_string(pseudo_session['key'])
+                enrollment = CourseEnrollment(user=user, course=CourseOverview.get_from_id(pseudo_key), mode=pseudo_session['type'])
               # We only show email settings for entitlement cards if the entitlement has an associated enrollment
               show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
             else:
@@ -199,7 +216,6 @@ from student.models import CourseEnrollment
             credit_status = credit_statuses.get(session_id)
             course_mode_info = all_course_modes.get(session_id)
             is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
-            is_course_blocked = (session_id in block_courses)
             course_verification_status = verification_status_by_course.get(session_id, {})
             course_requirements = courses_requirements_not_met.get(session_id)
             related_programs = inverted_programs.get(six.text_type(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
@@ -207,7 +223,7 @@ from student.models import CourseEnrollment
             course_overview = enrollment.course_overview
             resume_button_url = resume_button_urls[dashboard_index]
           %>
-          <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url' />
+          <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url' />
         % endfor
         % if show_load_all_courses_link:
                 <br/>
@@ -288,7 +304,10 @@ from student.models import CourseEnrollment
       </div>
   % endif
 
-  <% account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or '' %>
+  <%
+    account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
+    coaching_consent_url = "%s/coaching_consent?next=%s" % (account_mfe_url, getattr(settings, 'LMS_ROOT_URL', '') + reverse('dashboard'))
+  %>
   % if plugins.get("coaching", {}).get("show_coaching_aside"):
     <div class="wrapper-coaching">
         <div class="coaching-signup">
@@ -296,7 +315,7 @@ from student.models import CourseEnrollment
                 ${_("Take advantage of free coaching!")}
             </div>
             <div class="coaching-link">
-                <a class="btn-neutral" href="${account_mfe_url}">
+                <a class="btn-neutral" href="${coaching_consent_url}">
                   ${_("Get Started")}
                 </a>
             </div>

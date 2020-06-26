@@ -8,7 +8,7 @@ import logging
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from web_fragments.views import FragmentView
 
 from edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
@@ -21,6 +21,7 @@ class EdxFragmentView(FragmentView):
     The base class of all Open edX fragment views.
     """
     page_title = None
+    _uses_pattern_library = True
 
     @staticmethod
     def get_css_dependencies(group):
@@ -84,7 +85,8 @@ class EdxFragmentView(FragmentView):
         Creates the base context for rendering a fragment as a standalone page.
         """
         return {
-            'uses_pattern_library': True,
+            'uses_pattern_library': self.uses_pattern_library,
+            'uses_bootstrap': not self.uses_pattern_library,
             'disable_accordion': True,
             'allow_iframing': True,
             'disable_header': True,
@@ -139,4 +141,15 @@ class EdxFragmentView(FragmentView):
         else:
             template = 'fragments/standalone-page-v1.html'
 
-        return render_to_response(template, context)
+        return render(
+            request=request,
+            template_name=template,
+            context=context
+        )
+
+    @property
+    def uses_pattern_library(self):
+        """
+        Returns true if this fragment is rendered with edx-pattern-library.
+        """
+        return self._uses_pattern_library

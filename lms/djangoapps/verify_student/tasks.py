@@ -11,8 +11,8 @@ from celery import Task, task
 from celery.states import FAILURE
 from django.conf import settings
 from django.core.mail import EmailMessage
+
 from edxmako.shortcuts import render_to_string
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 ACE_ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
@@ -41,8 +41,9 @@ class BaseSoftwareSecureTask(Task):
             'response_ok': boolean, indicating if the response was ok
             'response_text': string, indicating the response text in case of failure.
         """
-        user_verification_id = kwargs['user_verification_id']
-        user_verification = SoftwareSecurePhotoVerification.objects.get(id=user_verification_id)
+        from .models import SoftwareSecurePhotoVerification
+
+        user_verification = SoftwareSecurePhotoVerification.objects.get(id=kwargs['user_verification_id'])
         if retval['response_ok']:
             user_verification.mark_submit()
             log.info(
@@ -60,6 +61,8 @@ class BaseSoftwareSecureTask(Task):
         with "must_retry" so that it can be retried latter.
         """
         if self.max_retries == self.request.retries and status == FAILURE:
+            from .models import SoftwareSecurePhotoVerification
+
             user_verification_id = kwargs['user_verification_id']
             user_verification = SoftwareSecurePhotoVerification.objects.get(id=user_verification_id)
             user_verification.mark_must_retry()
@@ -110,6 +113,8 @@ def send_request_to_ss_for_user(self, user_verification_id, copy_id_photo_from):
     Returns:
         request.Response
     """
+    from .models import SoftwareSecurePhotoVerification
+
     user_verification = SoftwareSecurePhotoVerification.objects.get(id=user_verification_id)
     log.info('=>New Verification Task Received %r', user_verification.user.username)
     try:
@@ -125,7 +130,7 @@ def send_request_to_ss_for_user(self, user_verification_id, copy_id_photo_from):
             'response_ok': getattr(response, 'ok', False),
             'response_text': getattr(response, 'text', '')
         }
-    except Exception as exc:  # pylint: disable=bare-except
+    except Exception as exc:  # pylint: disable=broad-except
         log.error(
             (
                 'Retrying sending request to Software Secure for user: %r, Receipt ID: %r '

@@ -13,12 +13,14 @@ from django.urls import reverse
 from edx_ace.recipient import Recipient
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_django_utils.monitoring import function_trace, set_custom_metric
+from edx_when.api import get_schedules_with_due_date
+from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
+from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH
-from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights
+from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights, get_next_section_highlights
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.message_types import CourseUpdate, InstructorLedCourseUpdate
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
@@ -343,7 +345,7 @@ def _get_upsell_information_for_schedule(user, schedule):
 
 def _get_verified_upgrade_link(user, schedule):
     enrollment = schedule.enrollment
-    if enrollment.dynamic_upgrade_deadline is not None and verified_upgrade_link_is_valid(enrollment):
+    if enrollment.dynamic_upgrade_deadline is not None and can_show_verified_upgrade(user, enrollment):
         return verified_upgrade_deadline_link(user, enrollment.course)
 
 
@@ -415,6 +417,94 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
                 yield (user, schedule.enrollment.course.closest_released_language, template_context, course.self_paced)
+
+
+@attr.s
+class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
+    """
+    Send a message to all users whose schedule gives them a due date of yesterday.
+    """
+    async_send_task = attr.ib()
+    site = attr.ib()
+    target_datetime = attr.ib()
+    course_id = attr.ib()
+    override_recipient_email = attr.ib(default=None)
+
+    log_prefix = 'Next Section Course Update'
+    experience_filter = Q(experience__experience_type=ScheduleExperience.EXPERIENCES.course_updates)
+
+    def send(self):
+        schedules = self.get_schedules()
+        for (user, language, context, is_self_paced) in schedules:
+            msg_type = CourseUpdate() if is_self_paced else InstructorLedCourseUpdate()
+            msg = msg_type.personalize(
+                Recipient(
+                    user.username,
+                    self.override_recipient_email or user.email,
+                ),
+                language,
+                context,
+            )
+            LOG.info(
+                u'Sending email to user: {} for course-key: {}'.format(
+                    user.username,
+                    self.course_id
+                )
+            )
+            with function_trace('enqueue_send_task'):
+                self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)
+
+    def get_schedules(self):
+        course_key = CourseKey.from_string(self.course_id)
+        target_date = self.target_datetime.date()
+        schedules = get_schedules_with_due_date(course_key, target_date).filter(
+            self.experience_filter,
+            active=True,
+            enrollment__user__is_active=True,
+        )
+
+        template_context = get_base_template_context(self.site)
+        for schedule in schedules:
+            enrollment = schedule.enrollment
+            course = schedule.enrollment.course
+            user = enrollment.user
+            start_date = schedule.start_date
+            LOG.info(u'Received a schedule for user {} in course {} for date {}'.format(
+                user.username,
+                self.course_id,
+                target_date,
+            ))
+
+            try:
+                week_highlights, week_num = get_next_section_highlights(user, course.id, start_date, target_date)
+            except CourseUpdateDoesNotExist:
+                LOG.warning(
+                    u'Weekly highlights for user {} of course {} does not exist or is disabled'.format(
+                        user, course.id
+                    )
+                )
+                # continue to the next schedule, don't yield an email for this one
+                continue
+            unsubscribe_url = None
+            if (COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH.is_enabled() and
+                    'bulk_email_optout' in settings.ACE_ENABLED_POLICIES):
+                unsubscribe_url = reverse('bulk_email_opt_out', kwargs={
+                    'token': UsernameCipher.encrypt(user.username),
+                    'course_id': str(enrollment.course_id),
+                })
+
+            template_context.update({
+                'course_name': course.display_name,
+                'course_url': _get_trackable_course_home_url(enrollment.course_id),
+                'week_num': week_num,
+                'week_highlights': week_highlights,
+                # This is used by the bulk email optout policy
+                'course_ids': [str(enrollment.course_id)],
+                'unsubscribe_url': unsubscribe_url,
+            })
+            template_context.update(_get_upsell_information_for_schedule(user, schedule))
+
+            yield (user, enrollment.course.closest_released_language, template_context, course.self_paced)
 
 
 def _get_trackable_course_home_url(course_id):

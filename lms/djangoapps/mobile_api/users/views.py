@@ -179,7 +179,7 @@ class UserCourseStatus(views.APIView):
         return self._get_course_info(request, course)
 
     @mobile_course_access(depth=2)
-    def get(self, request, course, *args, **kwargs):  # pylint: disable=unused-argument
+    def get(self, request, course, *args, **kwargs):
         """
         Get the ID of the module that the specified user last visited in the specified course.
         """
@@ -187,7 +187,7 @@ class UserCourseStatus(views.APIView):
         return self._get_course_info(request, course)
 
     @mobile_course_access(depth=2)
-    def patch(self, request, course, *args, **kwargs):  # pylint: disable=unused-argument
+    def patch(self, request, course, *args, **kwargs):
         """
         Update the ID of the module that the specified user last visited in the specified course.
         """

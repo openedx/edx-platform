@@ -12,7 +12,7 @@ import ddt
 import jwt
 import six
 from six import text_type
-from six.moves.urllib.parse import urlparse, parse_qs  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse, parse_qs
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured

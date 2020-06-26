@@ -263,10 +263,14 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
 LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ###################### JWTs ######################
-# pylint: disable=unicode-format-string
 JWT_AUTH.update({
-    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
     'JWT_AUDIENCE': 'lms-key',
+    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+    'JWT_ISSUERS': [{
+        'AUDIENCE': 'lms-key',
+        'ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+        'SECRET_KEY': 'lms-secret',
+    }],
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_PRIVATE_SIGNING_JWK': (
@@ -366,6 +370,9 @@ SYSTEM_WIDE_ROLE_CLASSES.extend(['system_wide_roles.SystemWideRoleAssignment'])
 
 if FEATURES['ENABLE_ENTERPRISE_INTEGRATION']:
     SYSTEM_WIDE_ROLE_CLASSES.extend(['enterprise.SystemWideEnterpriseUserRoleAssignment'])
+
+# List of enterprise customer uuids to exclude from transition to use of enterprise-catalog
+ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG = ()
 
 #####################################################################
 # See if the developer has any local overrides.

@@ -72,7 +72,8 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
             parent=sequence,
             attribs={
                 'user_partition_id': '0',
-                'group_id_to_child': '{"0": "i4x://edX/xml_test_course/html/split_test_cond0", "1": "i4x://edX/xml_test_course/html/split_test_cond1"}'  # pylint: disable=line-too-long
+                'group_id_to_child': '{"0": "i4x://edX/xml_test_course/html/split_test_cond0", "1":'
+                                     ' "i4x://edX/xml_test_course/html/split_test_cond1"}'
             }
         )
         xml.HtmlFactory(parent=split_test, url_name='split_test_cond0', text='HTML FOR GROUP 0')

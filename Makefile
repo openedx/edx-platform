@@ -61,7 +61,8 @@ pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
 requirements: ## install development environment requirements
-	pip install -qr requirements/edx/development.txt --exists-action w
+	pip install -qr requirements/edx/pip-tools.txt
+	pip-sync -q requirements/edx/development.txt requirements/edx/private.*
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
 	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
@@ -95,7 +96,7 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
-	# Let tox control the Django version & django-oauth-toolkit version for tests
-	grep -e "^django==" -e "^django-oauth-toolkit==" requirements/edx/base.txt > requirements/edx/django.txt
-	sed '/^[dD]jango==/d;/^django-oauth-toolkit==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
+	# Let tox control the Django version for tests
+	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
+	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt

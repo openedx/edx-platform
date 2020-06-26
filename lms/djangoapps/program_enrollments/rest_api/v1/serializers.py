@@ -37,12 +37,24 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
     status = serializers.CharField()
     account_exists = serializers.SerializerMethodField()
     curriculum_uuid = serializers.UUIDField()
+    username = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
 
     class Meta(object):
         model = ProgramEnrollment
 
     def get_account_exists(self, obj):
         return bool(obj.user)
+
+    def get_username(self, obj):
+        if obj.user:
+            return obj.user.username
+        return ""
+
+    def get_email(self, obj):
+        if obj.user:
+            return obj.user.email
+        return ""
 
 
 class ProgramEnrollmentRequestMixin(InvalidStatusMixin, serializers.Serializer):
@@ -68,7 +80,6 @@ class ProgramEnrollmentUpdateRequestSerializer(ProgramEnrollmentRequestMixin):
     """
     Serializer for program enrollment update requests.
     """
-    pass
 
 
 class ProgramCourseEnrollmentSerializer(serializers.Serializer):
@@ -150,17 +161,64 @@ class CourseRunOverviewSerializer(serializers.Serializer):
         CourseRunProgressStatuses.COMPLETED
     ]
 
-    course_run_id = serializers.CharField()
-    display_name = serializers.CharField()
-    resume_course_run_url = serializers.CharField(required=False)
-    course_run_url = serializers.CharField()
-    start_date = serializers.DateTimeField()
-    end_date = serializers.DateTimeField()
-    course_run_status = serializers.ChoiceField(allow_blank=False, choices=STATUS_CHOICES)
-    emails_enabled = serializers.BooleanField(required=False)
-    due_dates = serializers.ListField(child=DueDateSerializer())
-    micromasters_title = serializers.CharField(required=False)
-    certificate_download_url = serializers.CharField(required=False)
+    course_run_id = serializers.CharField(
+        help_text="ID for the course run.",
+    )
+    display_name = serializers.CharField(
+        help_text="Display name of the course run.",
+    )
+    resume_course_run_url = serializers.CharField(
+        required=False,
+        help_text=(
+            "The absolute url that takes the user back to their position in the "
+            "course run; if absent, user has not made progress in the course."
+        ),
+    )
+    course_run_url = serializers.CharField(
+        help_text="The absolute url for the course run.",
+    )
+    start_date = serializers.DateTimeField(
+        help_text="Start date for the course run; null if no start date.",
+    )
+    end_date = serializers.DateTimeField(
+        help_text="End date for the course run; null if no end date.",
+    )
+    course_run_status = serializers.ChoiceField(
+        allow_blank=False,
+        choices=STATUS_CHOICES,
+        help_text="The user's status of the course run.",
+    )
+    emails_enabled = serializers.BooleanField(
+        required=False,
+        help_text=(
+            "Boolean representing whether emails are enabled for the course;"
+            "if absent, the bulk email feature is either not enable at the platform"
+            "level or is not enabled for the course; if True or False, bulk email"
+            "feature is enabled, and value represents whether or not user wants"
+            "to receive emails."
+        ),
+    )
+    due_dates = serializers.ListField(
+        child=DueDateSerializer(),
+        help_text=(
+            "List of subsection due dates for the course run. "
+            "Due dates are only returned if the course run is in progress."
+        ),
+    )
+    micromasters_title = serializers.CharField(
+        required=False,
+        help_text=(
+            "Title of the MicroMasters program that the course run is a part of; "
+            "if absent, the course run is not a part of a MicroMasters program."
+        ),
+    )
+    certificate_download_url = serializers.CharField(
+        required=False,
+        help_text=(
+            "URL to download a certificate, if available; "
+            "if absent, certificate is not downloadable."
+        ),
+    )
 
 
 class CourseRunOverviewListSerializer(serializers.Serializer):

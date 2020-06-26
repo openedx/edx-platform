@@ -23,7 +23,9 @@
             events: {
                 'click .js-login': 'submitForm',
                 'click .forgot-password': 'forgotPassword',
-                'click .login-provider': 'thirdPartyAuth'
+                'click .login-provider': 'thirdPartyAuth',
+                'click .enterprise-login': 'enterpriseSlugLogin',
+                'click .login-help': 'toggleLoginHelp'
             },
             formType: 'login',
             requiredStr: '',
@@ -54,6 +56,7 @@
                 this.hideAuthWarnings = data.hideAuthWarnings;
                 this.pipelineUserDetails = data.pipelineUserDetails;
                 this.enterpriseName = data.enterpriseName;
+                this.enterpriseSlugLoginURL = data.enterpriseSlugLoginURL;
 
                 this.listenTo(this.model, 'sync', this.saveSuccess);
                 this.listenTo(this.resetModel, 'sync', this.resetEmail);
@@ -135,6 +138,20 @@
 
                 this.trigger('password-help');
                 this.clearPasswordResetSuccess();
+            },
+
+            toggleLoginHelp: function(event) {
+                var $help;
+                event.preventDefault();
+                $help = $('#login-help');
+                this.toggleHelp(event, $help);
+            },
+
+            enterpriseSlugLogin: function(event) {
+                event.preventDefault();
+                if (this.enterpriseSlugLoginURL) {
+                    window.location.href = this.enterpriseSlugLoginURL;
+                }
             },
 
             postFormSubmission: function() {

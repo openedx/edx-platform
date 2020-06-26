@@ -588,7 +588,9 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         audit_user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
         audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
-        ScheduleFactory(start_date=THREE_YEARS_AGO + timedelta(days=1), enrollment=audit_enrollment)
+        audit_enrollment.created = THREE_YEARS_AGO + timedelta(days=1)
+        audit_enrollment.save()
+        ScheduleFactory(enrollment=audit_enrollment)
 
         response = self.client.get(url)
 
@@ -1022,10 +1024,3 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
             response = self.client.get(self.url)
 
         self.assertContains(response, "<span>DISCOUNT_PRICE</span>")
-
-    @RELATIVE_DATES_FLAG.override(active=True)
-    def test_reset_deadline_banner_is_present_on_course_tab(self):
-        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)  # pylint: disable=no-member
-        response = self.client.get(self.url)
-
-        self.assertContains(response, '<div class="reset-deadlines-banner">')

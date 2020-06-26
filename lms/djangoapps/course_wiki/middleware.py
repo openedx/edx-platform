@@ -7,7 +7,7 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
 from six import text_type
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
+from six.moves.urllib.parse import urlparse
 from wiki.models import reverse
 
 from lms.djangoapps.courseware.access import has_access
@@ -40,7 +40,7 @@ class WikiAccessMiddleware(MiddlewareMixin):
                 # Even though we came from the course, we can't see it. So don't worry about it.
                 pass
 
-    def process_view(self, request, view_func, view_args, view_kwargs):  # pylint: disable=unused-argument
+    def process_view(self, request, view_func, view_args, view_kwargs):
         """
         This function handles authentication logic for wiki urls and redirects from
         the "root wiki" to the "course wiki" if the user accesses the wiki from a course url

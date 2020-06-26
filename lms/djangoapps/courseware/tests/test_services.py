@@ -96,7 +96,8 @@ class TestUserStateService(ModuleStoreTestCase):
     @ddt.data(
         *itertools.product(
             [
-                ({'username_or_email': 'no_user', 'block_id': 'block-v1:myOrg+123+2030_T2+type@openassessment+block@hash'}),  # pylint: disable=line-too-long
+                ({'username_or_email': 'no_user', 'block_id':
+                    'block-v1:myOrg+123+2030_T2+type@openassessment+block@hash'}),
                 ({'username_or_email': 'no_user'}),
                 ({'block_id': 'block-v1:myOrg+1234+2030_T2+type@openassessment+block@hash'})
             ], [

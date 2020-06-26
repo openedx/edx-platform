@@ -168,8 +168,6 @@
   }
 
   .progress-container {
-    max-width: inherit;
-
     .progress-bar {
       height: 5px;
       display: flex;
@@ -198,5 +196,4 @@
       }
     }
   }
-
 }

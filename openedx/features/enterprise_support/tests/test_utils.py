@@ -30,7 +30,6 @@ class TestEnterpriseUtils(TestCase):
 
     @ddt.data(
         ('notfoundpage', 0),
-        (reverse('dashboard'), 1),
     )
     @ddt.unpack
     def test_enterprise_customer_for_request_called_on_404(self, resource, expected_calls):

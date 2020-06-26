@@ -6,7 +6,7 @@
 
   
   django.pluralidx = function(n) {
-    var v=0;
+    var v=(n > 1);
     if (typeof(v) == 'boolean') {
       return v ? 1 : 0;
     } else {
@@ -21,6 +21,7 @@
   
   var newcatalog = {
     "%(sel)s of %(cnt)s selected": [
+      " %(sel)s \u0627\u0632 %(cnt)s \u0627\u0646\u062a\u062e\u0627\u0628 \u0634\u062f\u0647\u200c\u0627\u0646\u062f",
       " %(sel)s \u0627\u0632 %(cnt)s \u0627\u0646\u062a\u062e\u0627\u0628 \u0634\u062f\u0647\u200c\u0627\u0646\u062f"
     ],
     "6 a.m.": "\u06f6 \u0635\u0628\u062d",
@@ -49,9 +50,11 @@
     "Midnight": "\u0646\u06cc\u0645\u0647\u200c\u0634\u0628",
     "Noon": "\u0638\u0647\u0631",
     "Note: You are %s hour ahead of server time.": [
+      "\u062a\u0648\u062c\u0647: \u0634\u0645\u0627 %s \u0633\u0627\u0639\u062a \u0627\u0632 \u0632\u0645\u0627\u0646 \u0633\u0631\u0648\u0631 \u062c\u0644\u0648 \u0647\u0633\u062a\u06cc\u062f.",
       "\u062a\u0648\u062c\u0647: \u0634\u0645\u0627 %s \u0633\u0627\u0639\u062a \u0627\u0632 \u0632\u0645\u0627\u0646 \u0633\u0631\u0648\u0631 \u062c\u0644\u0648 \u0647\u0633\u062a\u06cc\u062f."
     ],
     "Note: You are %s hour behind server time.": [
+      "\u062a\u0648\u062c\u0647: \u0634\u0645\u0627 %s \u0633\u0627\u0639\u062a \u0627\u0632 \u0632\u0645\u0627\u0646 \u0633\u0631\u0648\u0631 \u0639\u0642\u0628 \u0647\u0633\u062a\u06cc\u062f.",
       "\u062a\u0648\u062c\u0647: \u0634\u0645\u0627 %s \u0633\u0627\u0639\u062a \u0627\u0632 \u0632\u0645\u0627\u0646 \u0633\u0631\u0648\u0631 \u0639\u0642\u0628 \u0647\u0633\u062a\u06cc\u062f."
     ],
     "November": "\u0646\u0648\u0627\u0645\u0628\u0631",
@@ -98,7 +101,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -162,9 +165,9 @@
       "%d %B, %Y"
     ],
     "DECIMAL_SEPARATOR": ".",
-    "FIRST_DAY_OF_WEEK": "6",
+    "FIRST_DAY_OF_WEEK": 6,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "0",
+    "NUMBER_GROUPING": 0,
     "SHORT_DATETIME_FORMAT": "Y/n/j\u060c\u200f G:i",
     "SHORT_DATE_FORMAT": "Y/n/j",
     "THOUSAND_SEPARATOR": ",",

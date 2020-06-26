@@ -21,7 +21,9 @@
   @extend %text-sr;
 }
 
-.nav-contents, .nav-skip, .transcript-skip {
+.nav-contents,
+.nav-skip,
+.transcript-skip {
   @extend %nav-skip;
 }
 
@@ -55,7 +57,8 @@
     color: $white;
 
     // STATE: hover/active
-    &:hover, &:active {
+    &:hover,
+    &:active {
       background: $gray-d1;
     }
 
@@ -76,7 +79,9 @@
     border-radius: 0;
 
     // STATE: hover/active
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       border: none;
       box-shadow: none;
     }
@@ -161,12 +166,6 @@
 
 // +tabs - styles for tabs and tabpanels (teams and learner profile, currently)
 // --------------------
-.page-content-nav {
-  .tab {
-        
-  }
-}
-
 .page-content-main {
   .tabs {
     .tabpanel {

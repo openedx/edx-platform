@@ -10,7 +10,8 @@
 
 .message-status {
   @include border-top-radius(2px);
-  @include box-sizing(border-box);
+
+  box-sizing: border-box;
 
   @extend %t-strong;
 
@@ -52,7 +53,7 @@
 .wrapper-notification,
 .wrapper-alert,
 .prompt {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 
   .copy {
     @extend %t-copy-sub1;
@@ -415,7 +416,8 @@
     padding: ($baseline/2) $baseline;
 
     .notification {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include clearfix();
 
       width: 100%;
@@ -448,7 +450,8 @@
     padding: $baseline;
 
     .notification {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
+
       @include clearfix();
 
       width: 100%;
@@ -472,7 +475,8 @@
 }
 
 .notification {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include clearfix();
 
   margin: 0 auto;
@@ -602,8 +606,7 @@
 .wrapper-alert {
   @extend %ui-depth2;
 
-  @include box-sizing(border-box);
-
+  box-sizing: border-box;
   box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
   position: relative;
   overflow: hidden;
@@ -663,7 +666,8 @@
 
 // adopted alerts
 .alert {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include clearfix();
 
   margin: 0 auto;
@@ -921,8 +925,7 @@
 body.uxdesign.alerts {
   .content-primary,
   .content-supplementary {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     float: left;
   }
 

@@ -29,11 +29,13 @@ from lms.djangoapps.grades.api import prefetch_course_and_subsection_grades
 from lms.djangoapps.instructor_analytics.basic import list_problem_responses
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.config.waffle import (
-    generate_grade_report_for_verified_only,
-    optimize_get_learners_switch_enabled
+    course_grade_report_verified_only,
+    optimize_get_learners_switch_enabled,
+    problem_grade_report_verified_only
 )
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.lib.cache_utils import get_cache
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
@@ -220,6 +222,7 @@ class _CourseGradeReportContext(object):
         self.action_name = action_name
         self.course_id = course_id
         self.task_progress = TaskProgress(self.action_name, total=None, start_time=time())
+        self.report_for_verified_only = course_grade_report_verified_only(self.course_id)
 
     @lazy
     def course(self):
@@ -311,7 +314,7 @@ class _ProblemGradeReportContext(object):
         self.task_input = _task_input
         self.action_name = action_name
         self.course_id = course_id
-        self.report_for_verified_only = generate_grade_report_for_verified_only()
+        self.report_for_verified_only = problem_grade_report_verified_only(self.course_id)
         self.task_progress = TaskProgress(self.action_name, total=None, start_time=time())
         self.file_name = 'problem_grade_report'
 
@@ -560,11 +563,9 @@ class CourseGradeReport(object):
                     **filter_kwargs
                 ).select_related('profile')
                 yield users
-
         course_id = context.course_id
         task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
-        report_for_verified_only = generate_grade_report_for_verified_only()
-        return get_enrolled_learners_for_course(course_id=course_id, verified_only=report_for_verified_only)
+        return get_enrolled_learners_for_course(course_id=course_id, verified_only=context.report_for_verified_only)
 
     def _user_grades(self, course_grade, context):
         """
@@ -811,6 +812,9 @@ class ProblemGradeReport(GradeReportBase):
         """
         for users in self._batch_users(context):
             yield self._rows_for_users(context, users)
+            # Clear the CourseEnrollment caches after each batch of users has been processed
+            get_cache('get_enrollment').clear()
+            get_cache(CourseEnrollment.MODE_CACHE_NAMESPACE).clear()
 
 
 class ProblemResponses(object):

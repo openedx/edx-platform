@@ -35,8 +35,10 @@
                 {% endblocktrans %}
                 {% endfilter %}
             </p>
-            {# xss-lint: disable=django-trans-missing-escape #}
-            {% trans "Resume your course now" as course_cta_text %}
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Resume your course now{% endblocktrans %}
+            {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
 
             {% include "ace_common/edx_ace/common/upsell_cta.html"%}

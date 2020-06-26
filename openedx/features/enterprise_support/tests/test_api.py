@@ -13,7 +13,7 @@ from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_django_utils.cache.utils import get_cache_key
+from edx_django_utils.cache import get_cache_key
 from six.moves.urllib.parse import parse_qs
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory

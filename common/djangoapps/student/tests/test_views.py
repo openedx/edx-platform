@@ -389,7 +389,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertNotContains(response, '<li class="course-item">')
 
-    @patch('entitlements.api.v1.views.get_course_runs_for_course')
+    @patch('entitlements.rest_api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
     def test_sessions_for_entitlement_course_runs(self, mock_course_overview, mock_course_runs):
         """
@@ -774,7 +774,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Links will be removed from the course title, course image and button (View Course/Resume Course).
         The course card should have an access expired message.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=self.THREE_YEARS_AGO - timedelta(days=30))
         self.override_waffle_switch(True)
 
         course = CourseFactory.create(start=self.THREE_YEARS_AGO)
@@ -783,9 +783,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             user=self.user,
             course_id=course.id
         )
+        enrollment.created = self.THREE_YEARS_AGO + timedelta(days=1)
+        enrollment.save()
 
         # pylint: disable=unused-variable
-        schedule = ScheduleFactory(start_date=self.THREE_YEARS_AGO + timedelta(days=1), enrollment=enrollment)
+        schedule = ScheduleFactory(enrollment=enrollment)
 
         response = self.client.get(reverse('dashboard'))
         dashboard_html = self._remove_whitespace_from_response(response)

@@ -6,6 +6,7 @@ import logging
 import pytz
 from django.db.models import F, Subquery
 from django.db.models.functions import Greatest
+from django.db import transaction
 
 from openedx.core.djangoapps.schedules.models import Schedule
 from student.models import CourseEnrollment
@@ -48,25 +49,20 @@ def reset_self_paced_schedule(user, course_key, use_availability_date=False):
         course_key (CourseKey or str)
         use_availability_date (bool): if False, reset to now, else reset to when user got access to course material
     """
-    schedule = Schedule.objects.filter(
-        enrollment__user=user,
-        enrollment__course__id=course_key,
-        enrollment__course__self_paced=True,
-    )
+    with transaction.atomic(savepoint=False):
+        try:
+            schedule = Schedule.objects.select_related('enrollment', 'enrollment__course').get(
+                enrollment__user=user,
+                enrollment__course__id=course_key,
+                enrollment__course__self_paced=True,
+            )
+        except Schedule.DoesNotExist:
+            return
 
-    if use_availability_date:
-        # Query enrollments to find availability date -- very similar to query above, but we can't reuse that query
-        # object because mysql doesn't like a subquery of an update to reference the same table being updated.
-        # Be careful attempting to remove this logic because you can't reproduce a problem locally -- in my own testing,
-        # I could not reproduce in devstack, but it was happening on prod databases. So implementations vary.
-        # See https://dev.mysql.com/doc/refman/8.0/en/subquery-restrictions.html
-        enrollments = CourseEnrollment.objects.filter(
-            user=user,
-            course__id=course_key,
-            course__self_paced=True,
-        ).annotate(
-            availability=Greatest(F('created'), F('course__start')),
-        )
-        schedule.update(start_date=Subquery(enrollments.values('availability')[:1]))
-    else:
-        schedule.update(start_date=datetime.datetime.now(pytz.utc))
+        if use_availability_date:
+            enrollment = schedule.enrollment
+            schedule.start_date = max(enrollment.created, enrollment.course.start)
+            schedule.save()
+        else:
+            schedule.start_date = datetime.datetime.now(pytz.utc)
+            schedule.save()

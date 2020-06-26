@@ -13,4 +13,3 @@ class ProgressFactory(factory.Factory):
     completed = 0
     in_progress = 0
     not_started = 0
-    grades = dict()

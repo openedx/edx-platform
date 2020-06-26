@@ -17,8 +17,8 @@ class RequireJSPathOverridesTest(TestCase):
 
     OVERRIDES = {
         'jquery': 'common/js/vendor/jquery.js',
-        'backbone': 'common/js/vendor/backbone.js',
-        'text': 'js/vendor/text.js'
+        'text': 'js/vendor/text.js',
+        'backbone': 'common/js/vendor/backbone.js'
     }
 
     OVERRIDES_JS = [

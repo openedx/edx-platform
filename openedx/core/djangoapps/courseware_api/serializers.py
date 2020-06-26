@@ -2,15 +2,7 @@
 Course API Serializers.  Representing course catalog data
 """
 
-from babel.numbers import get_currency_symbol
-
-from django.urls import reverse
 from rest_framework import serializers
-
-from course_modes.models import CourseMode
-from edxnotes.helpers import is_feature_enabled
-from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 
 from openedx.core.lib.api.fields import AbsoluteURLField
 
@@ -69,6 +61,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     Compare this with CourseDetailSerializer.
     """
 
+    can_show_upgrade_sock = serializers.BooleanField()
     content_type_gating_enabled = serializers.BooleanField()
     course_expired_message = serializers.CharField()
     effort = serializers.CharField()
@@ -79,6 +72,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     number = serializers.CharField(source='display_number_with_default')
+    offer_html = serializers.CharField()
     org = serializers.CharField(source='display_org_with_default')
     short_description = serializers.CharField()
     start = serializers.DateTimeField()
@@ -86,12 +80,14 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     start_type = serializers.CharField()
     pacing = serializers.CharField()
     enrollment = serializers.DictField()
-    tabs = serializers.SerializerMethodField()
-    verified_mode = serializers.SerializerMethodField()
+    tabs = serializers.ListField()
+    verified_mode = serializers.DictField()
     show_calculator = serializers.BooleanField()
     is_staff = serializers.BooleanField()
     can_load_courseware = serializers.DictField()
-    notes = serializers.SerializerMethodField()
+    notes = serializers.DictField()
+    marketing_url = serializers.CharField()
+    celebrations = serializers.DictField()
 
     def __init__(self, *args, **kwargs):
         """
@@ -105,41 +101,3 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
-
-    def get_tabs(self, course_overview):
-        """
-        Return course tab metadata.
-        """
-        tabs = []
-        for priority, tab in enumerate(get_course_tab_list(course_overview.effective_user, course_overview)):
-            tabs.append({
-                'title': tab.title or tab.get('name', ''),
-                'slug': tab.tab_id,
-                'priority': priority,
-                'type': tab.type,
-                'url': tab.link_func(course_overview, reverse),
-            })
-        return tabs
-
-    def get_verified_mode(self, course_overview):
-        """
-        Return verified mode information, or None.
-        """
-        mode = CourseMode.verified_mode_for_course(course_overview.id)
-        if mode:
-            return {
-                'price': mode.min_price,
-                'currency': mode.currency.upper(),
-                'currency_symbol': get_currency_symbol(mode.currency.upper()),
-                'sku': mode.sku,
-                'upgrade_url': verified_upgrade_deadline_link(course_overview.effective_user, course_overview),
-            }
-
-    def get_notes(self, course_overview):
-        """
-        Return whether edxnotes is enabled and visible.
-        """
-        return {
-            'enabled': is_feature_enabled(course_overview, course_overview.effective_user),
-            'visible': course_overview.edxnotes_visibility,
-        }

@@ -40,6 +40,10 @@ from xmodule.tabs import CourseTab
 log = logging.getLogger(__name__)
 
 
+class CourseOverviewCaseMismatchException(Exception):
+    pass
+
+
 @python_2_unicode_compatible
 class CourseOverview(TimeStampedModel):
     """
@@ -59,7 +63,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 9
+    VERSION = 11  # this one goes to eleven
 
     # Cache entry versioning.
     version = IntegerField()
@@ -167,6 +171,11 @@ class CourseOverview(TimeStampedModel):
         if course_overview.exists():
             log.info(u'Updating course overview for %s.', six.text_type(course.id))
             course_overview = course_overview.first()
+            # MySQL ignores casing, but CourseKey doesn't. To prevent multiple
+            # courses with different cased keys from overriding each other, we'll
+            # check for equality here in python.
+            if course_overview.id != course.id:
+                raise CourseOverviewCaseMismatchException(course_overview.id, course.id)
         else:
             log.info(u'Creating course overview for %s.', six.text_type(course.id))
             course_overview = cls()
@@ -248,8 +257,8 @@ class CourseOverview(TimeStampedModel):
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
             if isinstance(course, CourseDescriptor):
-                course_overview = cls._create_or_update(course)
                 try:
+                    course_overview = cls._create_or_update(course)
                     with transaction.atomic():
                         course_overview.save()
                         # Remove and recreate all the course tabs
@@ -261,6 +270,8 @@ class CourseOverview(TimeStampedModel):
                                 name=tab.name,
                                 course_staff_only=tab.course_staff_only,
                                 url_slug=tab.get('url_slug'),
+                                link=tab.get('link'),
+                                is_hidden=tab.get('is_hidden', False),
                                 course_overview=course_overview)
                             for tab in course.tabs
                         ])
@@ -862,6 +873,8 @@ class CourseOverviewTab(models.Model):
     name = models.TextField(null=True)
     course_staff_only = models.BooleanField(default=False)
     url_slug = models.TextField(null=True)
+    link = models.TextField(null=True)
+    is_hidden = models.BooleanField(default=False)
 
     def __str__(self):
         return self.tab_id

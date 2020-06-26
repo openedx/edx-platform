@@ -460,15 +460,19 @@ class ImportManager(object):
                     if self.verbose:
                         log.debug('importing module location %s', child.location)
 
-                    _update_and_import_module(
-                        child,
-                        self.store,
-                        self.user_id,
-                        courselike_key,
-                        dest_id,
-                        do_import_static=self.do_import_static,
-                        runtime=courselike.runtime,
-                    )
+                    try:
+                        _update_and_import_module(
+                            child,
+                            self.store,
+                            self.user_id,
+                            courselike_key,
+                            dest_id,
+                            do_import_static=self.do_import_static,
+                            runtime=courselike.runtime,
+                        )
+                    except Exception:
+                        log.error('failed to import module location %s', child.location)
+                        raise
 
                     depth_first(child)
 
@@ -478,15 +482,19 @@ class ImportManager(object):
             if self.verbose:
                 log.debug('importing module location %s', leftover)
 
-            _update_and_import_module(
-                self.xml_module_store.get_item(leftover),
-                self.store,
-                self.user_id,
-                courselike_key,
-                dest_id,
-                do_import_static=self.do_import_static,
-                runtime=courselike.runtime,
-            )
+            try:
+                _update_and_import_module(
+                    self.xml_module_store.get_item(leftover),
+                    self.store,
+                    self.user_id,
+                    courselike_key,
+                    dest_id,
+                    do_import_static=self.do_import_static,
+                    runtime=courselike.runtime,
+                )
+            except Exception:
+                log.error('failed to import module location %s', leftover)
+                raise
 
     def run_imports(self):
         """
@@ -689,7 +697,7 @@ class LibraryImportManager(ImportManager):
         """
         Get the descriptor of the library from the XML import modulestore.
         """
-        source_library = self.xml_module_store.get_library(courselike_key)  # pylint: disable=no-member
+        source_library = self.xml_module_store.get_library(courselike_key)
         library, library_data_path = self.import_courselike(
             runtime, courselike_key, dest_id, source_library,
         )
@@ -745,7 +753,7 @@ def _update_and_import_module(
         """
         Move the module to a new course.
         """
-        def _convert_ref_fields_to_new_namespace(reference):  # pylint: disable=invalid-name
+        def _convert_ref_fields_to_new_namespace(reference):
             """
             Convert a reference to the new namespace, but only
             if the original namespace matched the original course.

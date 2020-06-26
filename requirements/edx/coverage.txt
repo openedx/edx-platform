@@ -5,18 +5,14 @@
 #    make upgrade
 #
 coverage==5.1             # via -r requirements/edx/coverage.in
-diff-cover==2.6.1         # via -r requirements/edx/coverage.in
-importlib-metadata==1.6.0  # via inflect, pluggy
+diff-cover==3.0.1         # via -r requirements/edx/coverage.in
+importlib-metadata==1.6.1  # via inflect, pluggy
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.11.2            # via diff-cover, jinja2-pluralize
 markupsafe==1.1.1         # via jinja2
-more-itertools==8.2.0     # via zipp
-numpy==1.18.2             # via pandas
-pandas==0.22.0            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.in
+more-itertools==8.4.0     # via zipp
 pluggy==0.13.1            # via diff-cover
 pygments==2.6.1           # via diff-cover
-python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, pandas
-pytz==2019.3              # via pandas
-six==1.14.0               # via diff-cover, python-dateutil
+six==1.15.0               # via diff-cover
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, importlib-metadata

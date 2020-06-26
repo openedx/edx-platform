@@ -24,6 +24,7 @@ from lms.djangoapps.course_goals.api import (
     has_course_goal_permission
 )
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -40,7 +41,6 @@ from .. import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     LATEST_UPDATE_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-    USE_BOOTSTRAP_FLAG
 )
 from ..utils import get_course_outline_block_tree, get_resume_block
 from .course_dates import CourseDatesFragmentView
@@ -70,9 +70,9 @@ class CourseHomeView(CourseTabView):
 
     def uses_bootstrap(self, request, course, tab):
         """
-        Returns true if the USE_BOOTSTRAP Waffle flag is enabled.
+        Always render this tab with bootstrap.
         """
-        return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
+        return True
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = six.text_type(course.id)
@@ -165,7 +165,7 @@ class CourseHomeFragmentView(EdxFragmentView):
                     request, course_id=course_id, **kwargs
                 )
             course_sock_fragment = CourseSockFragmentView().render_to_fragment(
-                request, course=course_overview, **kwargs
+                request, course=course, **kwargs
             )
             has_visited_course, resume_course_url, resume_course_title = self._get_resume_course_info(
                 request, course_id
@@ -222,8 +222,12 @@ class CourseHomeFragmentView(EdxFragmentView):
         has_discount = False
 
         # TODO Add switch to control deployment
-        if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and enrollment and enrollment.upgrade_deadline:
-            upgrade_url = EcommerceService().upgrade_url(request.user, course_key)
+        if SHOW_UPGRADE_MSG_ON_COURSE_HOME.is_enabled(course_key) and can_show_verified_upgrade(
+            request.user,
+            enrollment,
+            course
+        ):
+            upgrade_url = verified_upgrade_deadline_link(request.user, course_id=course_key)
             upgrade_price, has_discount = format_strikeout_price(request.user, course_overview)
 
         show_search = (

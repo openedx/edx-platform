@@ -1,6 +1,6 @@
 Status
 ======
-Draft
+Accepted
 
 
 Context
@@ -46,7 +46,7 @@ Test Plan
 #. Collect data on which issues bokchoy would have caught by running them manually out-of-band from the standard CI/CD process.
 
   * We'll look at the failures on the out-of-band bokchoy job to find any true failures that would be caught by the removed tests.
-  * On a Daily cadense for 1 month.
+  * On a Daily cadence for 1 month.
 
 #. Assess Impact of change.
 
@@ -59,15 +59,24 @@ Outcome: Decision on whether or not to reduce the number of bokchoy tests.
 Experiment Results
 ==================
 
-TBD
+Bokchoy tests were disabled for PRs for 3 weeks.  In that time only one change went out that was not caught by other test suites.  The change in question did not impact edx.org and was specific how configuration is read into the system.  The bokchoy tests did not detect any other failures that were not caught by other tests.  The `PR` where we monitored Bokchoy daily has more specific details.
+
+.. _PR: https://github.com/edx/edx-platform/pull/23682
 
 Decision
 ========
 
-TBD - Based on experiment outcome.
+We initially used the a11y suite as a placeholder for a set of reduced tests.  Given the results of the tests, we will not pull in any tests from the full bokchoy suite and only keep the a11y tests.
 
 Consequences
 ============
 
-TBD
+* Bokchoy testing infrastructure will remain off
+* Bokchoy tests jobs will be removed all together rather than just disabled
+* All bokchoy code in edx-platform not related to the a11y tests will be removed
+* Testing Strategy for UI that is not part of a microfrontend
+  * end-to-end smoke tests via the e2e-tests suite should only be for critical happy paths
+  * UI and frontend logic should be tested using UI unit tests(currently Jasmine).
+  * Django backends and rendered HTML should be tested with integration tests that use the `Django test client`
 
+.. _Django test client: https://docs.djangoproject.com/en/2.2/topics/testing/tools/#the-test-client

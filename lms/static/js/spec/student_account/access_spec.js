@@ -179,8 +179,8 @@
                 // Simulate a click on the reset password link
                     view.resetPassword();
 
-                // Verify that the login-anchor is hidden
-                    expect($('#login-anchor')).toHaveClass('hidden');
+                // Verify that the login-form is hidden
+                    expect($('#login-form')).toHaveClass('hidden');
 
                 // Verify that the password reset form is not hidden
                     expect($('#password-reset-form')).not.toHaveClass('hidden');

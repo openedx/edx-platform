@@ -1,26 +1,21 @@
 """
 Tests for courseware API
 """
-from datetime import datetime
 import unittest
+from datetime import datetime
+
 import ddt
 import mock
-
+from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 
-from lms.djangoapps.courseware.access_utils import (
-    ACCESS_DENIED,
-    ACCESS_GRANTED
-)
+from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
+from lms.djangoapps.courseware.tabs import ExternalLinkCourseTab
+from student.models import CourseEnrollment, CourseEnrollmentCelebration
+from student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
 from xmodule.modulestore.django import modulestore
-
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE,
-    SharedModuleStoreTestCase
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -29,6 +24,7 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
     Base class for courseware API tests
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -40,6 +36,10 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
             emit_signals=True,
             modulestore=cls.store,
         )
+        cls.chapter = ItemFactory(parent=cls.course, category='chapter')
+        cls.sequence = ItemFactory(parent=cls.chapter, category='sequential', display_name='sequence')
+        cls.unit = ItemFactory.create(parent=cls.sequence, category='vertical', display_name="Vertical")
+
         cls.user = UserFactory(
             username='student',
             email=u'user@example.com',
@@ -63,6 +63,15 @@ class CourseApiTestViews(BaseCoursewareTests):
     """
     Tests for the courseware REST API
     """
+    @classmethod
+    def setUpClass(cls):
+        BaseCoursewareTests.setUpClass()
+        cls.course.tabs.append(ExternalLinkCourseTab.load('external_link', name='Zombo', link='http://zombo.com'))
+        cls.course.tabs.append(
+            ExternalLinkCourseTab.load('external_link', name='Hidden', link='http://hidden.com', is_hidden=True)
+        )
+        cls.store.update_item(cls.course, cls.user.id)
+
     @ddt.data(
         (True, None, ACCESS_DENIED),
         (True, 'audit', ACCESS_DENIED),
@@ -85,7 +94,14 @@ class CourseApiTestViews(BaseCoursewareTests):
                 enrollment = response.data['enrollment']
                 assert enrollment_mode == enrollment['mode']
                 assert enrollment['is_active']
-                assert len(response.data['tabs']) == 4
+                assert len(response.data['tabs']) == 5
+                found = False
+                for tab in response.data['tabs']:
+                    if tab['type'] == 'external_link':
+                        assert tab['url'] != 'http://hidden.com', "Hidden tab is not hidden"
+                        if tab['url'] == 'http://zombo.com':
+                            found = True
+                assert found, 'external link not in course tabs'
             elif enable_anonymous and not logged_in:
                 # multiple checks use this handler
                 check_public_access.assert_called()
@@ -102,9 +118,6 @@ class SequenceApiTestViews(BaseCoursewareTests):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        chapter = ItemFactory(parent=cls.course, category='chapter')
-        cls.sequence = ItemFactory(parent=chapter, category='sequential', display_name='sequence')
-        ItemFactory.create(parent=cls.sequence, category='vertical', display_name="Vertical")
         cls.url = '/api/courseware/sequence/{}'.format(cls.sequence.location)
 
     @classmethod
@@ -113,9 +126,84 @@ class SequenceApiTestViews(BaseCoursewareTests):
         super().tearDownClass()
 
     def test_sequence_metadata(self):
-        print(self.url)
-        print(self.course.location)
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.data['display_name'] == 'sequence'
         assert len(response.data['items']) == 1
+
+
+class ResumeApiTestViews(BaseCoursewareTests, CompletionWaffleTestMixin):
+    """
+    Tests for the resume API
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.url = '/api/courseware/resume/{}'.format(cls.course.id)
+
+    def test_resume_no_completion(self):
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['block_id'] is None
+        assert response.data['unit_id'] is None
+        assert response.data['section_id'] is None
+
+    def test_resume_with_completion(self):
+        self.override_waffle_switch(True)
+        submit_completions_for_testing(self.user, [self.unit.location])
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['block_id'] == str(self.unit.location)
+        assert response.data['unit_id'] == str(self.unit.location)
+        assert response.data['section_id'] == str(self.sequence.location)
+
+
+@ddt.ddt
+class CelebrationApiTestViews(BaseCoursewareTests):
+    """
+    Tests for the celebration API
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.url = '/api/courseware/celebration/{}'.format(cls.course.id)
+
+    def setUp(self):
+        super().setUp()
+        self.enrollment = CourseEnrollment.enroll(self.user, self.course.id, 'verified')
+
+    @ddt.data(True, False)
+    def test_happy_path(self, update):
+        if update:
+            CourseEnrollmentCelebrationFactory(enrollment=self.enrollment, celebrate_first_section=False)
+
+        response = self.client.post(self.url, {'first_section': True}, content_type='application/json')
+        assert response.status_code == (200 if update else 201)
+
+        celebration = CourseEnrollmentCelebration.objects.first()
+        assert celebration.celebrate_first_section
+        assert celebration.enrollment.id == self.enrollment.id
+
+    def test_extra_data(self):
+        response = self.client.post(self.url, {'extra': True}, content_type='application/json')
+        assert response.status_code == 400
+
+    def test_no_data(self):
+        response = self.client.post(self.url, {}, content_type='application/json')
+        assert response.status_code == 200
+        assert CourseEnrollmentCelebration.objects.count() == 0
+
+    def test_no_enrollment(self):
+        self.enrollment.delete()
+        response = self.client.post(self.url, {'first_section': True}, content_type='application/json')
+        assert response.status_code == 404
+
+    def test_no_login(self):
+        self.client.logout()
+        response = self.client.post(self.url, {'first_section': True}, content_type='application/json')
+        assert response.status_code == 401
+
+    def test_invalid_course(self):
+        response = self.client.post('/api/courseware/celebration/course-v1:does+not+exist',
+                                    {'first_section': True}, content_type='application/json')
+        assert response.status_code == 404

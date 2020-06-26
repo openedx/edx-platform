@@ -21,7 +21,9 @@
                 <br />
             </p>
 
-            {% trans "Access the Course Materials Now" as course_cta_text %}
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Access the Course Materials Now{% endblocktrans %}
+            {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_url %}
 
             <p style="color: rgba(0,0,0,.75);">

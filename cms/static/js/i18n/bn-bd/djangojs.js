@@ -68,7 +68,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -120,9 +120,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ".",
-    "FIRST_DAY_OF_WEEK": "6",
+    "FIRST_DAY_OF_WEEK": 6,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "0",
+    "NUMBER_GROUPING": 0,
     "SHORT_DATETIME_FORMAT": "m/d/Y P",
     "SHORT_DATE_FORMAT": "j M, Y",
     "THOUSAND_SEPARATOR": ",",

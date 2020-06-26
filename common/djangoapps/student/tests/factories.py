@@ -19,6 +19,7 @@ from student.models import (
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
+    CourseEnrollmentCelebration,
     PendingEmailChange,
     Registration,
     User,
@@ -27,7 +28,6 @@ from student.models import (
 )
 
 # Factories are self documenting
-# pylint: disable=missing-docstring
 
 TEST_PASSWORD = 'test'
 
@@ -90,7 +90,7 @@ class UserFactory(DjangoModelFactory):
     date_joined = datetime(2011, 1, 1, tzinfo=UTC)
 
     @factory.post_generation
-    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, no-self-argument
+    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, missing-function-docstring
         if create:
             obj.save()
             return UserProfileFactory.create(user=obj, **kwargs)
@@ -164,6 +164,13 @@ class CourseEnrollmentFactory(DjangoModelFactory):
             kwargs['course'] = course_overview
 
         return manager.create(*args, **kwargs)
+
+
+class CourseEnrollmentCelebrationFactory(DjangoModelFactory):
+    class Meta:
+        model = CourseEnrollmentCelebration
+
+    enrollment = factory.SubFactory(CourseEnrollmentFactory)
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):

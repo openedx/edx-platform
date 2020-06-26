@@ -11,7 +11,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from opaque_keys.edx.locator import AssetLocator
 from PIL import Image
-from six.moves.urllib.parse import parse_qsl, quote_plus, urlencode, urlparse, urlunparse   # pylint: disable=import-error
+from six.moves.urllib.parse import parse_qsl, quote_plus, urlencode, urlparse, urlunparse
 
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.exceptions import NotFoundError
@@ -61,7 +61,7 @@ class StaticContent(object):
             name_root = name_root + ext.replace(u'.', u'-')
 
         if dimensions:
-            width, height = dimensions  # pylint: disable=unpacking-non-sequence
+            width, height = dimensions
             name_root += "-{}x{}".format(width, height)
 
         return u"{name_root}{extension}".format(

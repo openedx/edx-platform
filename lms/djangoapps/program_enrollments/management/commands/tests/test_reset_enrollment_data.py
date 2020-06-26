@@ -34,6 +34,9 @@ class TestResetEnrollmentData(TestCase):
 
     @contextmanager
     def _replace_stdin(self, text):
+        """
+        Mock out standard input to return `text` when read from.
+        """
         orig = sys.stdin
         sys.stdin = StringIO(text)
         yield

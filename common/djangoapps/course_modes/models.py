@@ -191,13 +191,6 @@ class CourseMode(models.Model):
         unique_together = ('course', 'mode_slug', 'currency')
 
     def __init__(self, *args, **kwargs):
-        if 'course_id' in kwargs:
-            course_id = kwargs['course_id']
-            if isinstance(course_id, str):
-                kwargs['course_id'] = CourseKey.from_string(course_id)
-                call_location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in inspect.stack()[::-1])
-                log.warning("Forced to coerce course_id in CourseMode instantiation: %s", call_location)
-
         super(CourseMode, self).__init__(*args, **kwargs)
 
     def clean(self):
@@ -544,6 +537,19 @@ class CourseMode(models.Model):
             bool
         """
         return cls.PROFESSIONAL in modes_dict or cls.NO_ID_PROFESSIONAL_MODE in modes_dict
+
+    @classmethod
+    def contains_audit_mode(cls, modes_dict):
+        """
+        Check whether the modes_dict contains an audit mode.
+
+        Args:
+            modes_dict (dict): a dict of course modes
+
+        Returns:
+            bool: whether modes_dict contains an audit mode
+        """
+        return cls.AUDIT in modes_dict
 
     @classmethod
     def is_professional_mode(cls, course_mode_tuple):

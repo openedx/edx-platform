@@ -41,6 +41,7 @@ import json
 import sys
 import unittest
 from datetime import datetime, timedelta
+import html
 
 import mock
 import pytz
@@ -449,7 +450,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         '''
         usage_id = self.xblocks[urlname].scope_ids.usage_id
         # First, we get out our <div>
-        soup_html = BeautifulSoup(content)
+        soup_html = BeautifulSoup(markup=content, features="lxml")
         xblock_html = six.text_type(soup_html.find(id="seq_contents_0"))
         # Now, we get out the text of the <div>
         try:
@@ -466,7 +467,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
             print("Dice 2", repr(xblock_html.split('<')[1].split('>')[1]), file=sys.stderr)
             raise
         # Finally, we unescape the contents
-        decoded_html = six.moves.html_parser.HTMLParser().unescape(escaped_html).strip()
+        decoded_html = html.unescape(escaped_html).strip()
 
         return decoded_html
 

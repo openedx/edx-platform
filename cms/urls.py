@@ -274,6 +274,16 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
 urlpatterns.append(url(r'^template/(?P<template>.+)$', openedx.core.djangoapps.debug.views.show_reference_template,
                        name='openedx.core.djangoapps.debug.views.show_reference_template'))
 
+urlpatterns.append(
+    url(
+        r'^api/learning_sequences/',
+        include(
+            ('openedx.core.djangoapps.content.learning_sequences.urls', 'learning_sequences'),
+            namespace='learning_sequences'
+        ),
+    ),
+)
+
 # display error page templates, for testing purposes
 urlpatterns += [
     url(r'^404$', handler404),

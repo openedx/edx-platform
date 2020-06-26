@@ -128,7 +128,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         try:
             mongoengine.connect(TEST_MONGODB_LOG['db'])
             CourseImportLog.objects.all().delete()
-        except mongoengine.connection.ConnectionError:
+        except mongoengine.connection.ConnectionFailure:
             pass
 
     def _setstaff_login(self):
@@ -193,7 +193,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Make sure we don't have any git hashes on the page
         response = self.client.get(reverse('sysadmin_courses'))
-        self.assertNotRegexpMatches(response.content.decode('utf-8'), table_re)
+        self.assertNotRegex(response.content.decode('utf-8'), table_re)
 
         # Now add the course and make sure it does match
         response = self._add_edx4edx()

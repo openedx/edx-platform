@@ -27,6 +27,10 @@ urlpatterns = [
     url(r'^user_api/v1/account/registration/$', register.RegistrationView.as_view(),
         name="user_api_registration"),
 
+    # V2 is created to avoid backward compatibility issue with confirm_email
+    url(r'^user_api/v2/account/registration/$', register.RegistrationView.as_view(),
+        name="user_api_registration_v2"),
+
     # Moved from user_api/urls.py
     # `api/user` prefix is preserved for backwards compatibility.
     url(

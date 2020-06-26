@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
 from six.moves import range
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
+from six.moves.urllib.parse import urlencode
 
 from course_modes.models import CourseMode
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
@@ -1582,7 +1582,13 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
         )
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
-        actual_event = self.get_event()
+
+        # There are two events being emitted in this flow.
+        # One for page hit (due to the tracker in the middleware) and
+        # one due to the certificate being visited.
+        # We are interested in the second one.
+        actual_event = self.get_event(1)
+
         self.assertEqual(actual_event['name'], 'edx.certificate.evidence_visited')
         assert_event_matches(
             {
@@ -1617,6 +1623,13 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
             }
         )
         response = self.client.get(test_url)
+
+        # There are two events being emitted in this flow.
+        # One for page hit (due to the tracker in the middleware) and
+        # one due to the certificate being visited.
+        # We are interested in the second one.
+        actual_event = self.get_event(1)
+
         self.assertEqual(response.status_code, 200)
         assert_event_matches(
             {
@@ -1635,5 +1648,5 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
                     'enrollment_mode': 'honor',
                 },
             },
-            self.get_event()
+            actual_event
         )

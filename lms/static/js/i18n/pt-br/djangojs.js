@@ -258,7 +258,6 @@
     "December": "Dezembro",
     "Default Timed Transcript": "Transcri\u00e7\u00e3o Sincronizada Padr\u00e3o",
     "Delete": "Apagar",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "Apagar \"<%= signatoryName %>\" da lista de emissores?",
     "Delete File Confirmation": "Confirma\u00e7\u00e3o da exclus\u00e3o do arquivo",
     "Delete Team": "Apagar equipe.",
     "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?": "Excluir status do aluno '<%- student_id %>' para o problema '<%- problem_id %>'?",
@@ -277,7 +276,6 @@
     "Do you want to replace the edX transcript with the YouTube transcript?": "Voc\u00ea quer substituir a transcri\u00e7\u00e3o do edX pela do YouTube?",
     "Do you want to upload your file before submitting?": "Voc\u00ea deseja fazer upload de seu arquivo antes de enviar?",
     "Does the name on your ID match your account name: %(fullName)s?": "O nome de sua identifica\u00e7\u00e3o correspondo ao nome de sua conta: %(fullName)s?",
-    "Does the photo of you match your ID photo?": "A foto a seguir \u00e9 a mesma foto de sua identidade?",
     "Does the photo of you show your whole face?": "A sua foto escolhida exibe todo o seu rosto?",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "N\u00e3o v\u00ea sua fotografia? Certifique-se de permitir que o seu navegador utilize a c\u00e2mera quando ele pedir permiss\u00e3o.",
     "Donate": "Doar",
@@ -385,7 +383,6 @@
     "Generate": "Emitir",
     "Generate Exception Certificates": "Gerar certificados de exce\u00e7\u00e3o",
     "Generate the user's certificate": "Emitir certificado do usu\u00e1rio",
-    "Get Credit": "Obter Cr\u00e9dito",
     "Go to Dashboard": "Ir para a P\u00e1gina Inicial",
     "Go to your Dashboard": "Ir para o seu Painel de controle",
     "Government-Issued Photo ID": "Foto de um documento de identidade oficial",
@@ -772,8 +769,6 @@
     "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again.": "Obrigado por enviar suas fotos. N\u00f3s vamos analis\u00e1-las rapidamente. Voc\u00ea pode inscrever-se para qualquer curso da plataforma %(platformName)s que ofere\u00e7a certificados verificados. A verifica\u00e7\u00e3o \u00e9 v\u00e1lida por um ano. Depois disso, voc\u00ea precisa enviar fotos para verificar novamente.",
     "The cohort cannot be added": "O grupo n\u00e3o pode ser adicionado",
     "The cohort cannot be saved": "O grupo n\u00e3o p\u00f4de ser salvo",
-    "The combined length of the organization and library code fields cannot be more than <%=limit%> characters.": "Os campos comprimento combinando da Organiza\u00e7\u00e3o e c\u00f3digo da biblioteca n\u00e3o podem ultrapassar <%=limit%> caracteres. ",
-    "The combined length of the organization, course number, and course run fields cannot be more than <%=limit%> characters.": "Os campos comprimento total da Organiza\u00e7\u00e3o, n\u00famero do curso e funcionamento do curso n\u00e3o podem exceder <%=limit%>  caracteres. ",
     "The country that team members primarily identify with.": "O pa\u00eds com o qual os membros da equipe se identificam.",
     "The course end date must be later than the course start date.": "A data do final do curso deve ser posterior \u00e0 data de in\u00edcio da matr\u00edcula. ",
     "The course must have an assigned start date.": "O curso deve ter uma data de in\u00edcio designada.",
@@ -787,7 +782,6 @@
     "The following email addresses and/or usernames are invalid:": "Os seguintes endere\u00e7os de email e/ou nomes de usu\u00e1rio s\u00e3o inv\u00e1lidos:",
     "The following errors were generated:": "Os seguintes erros foram gerados:",
     "The following file types are not allowed: ": "Os seguintes tipos de arquivos n\u00e3o s\u00e3o permitidos:",
-    "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "As informa\u00e7\u00f5es a seguir j\u00e1 fazem parte do seu perfil {platform}. N\u00f3s as inclu\u00edmos aqui para seu pedido.",
     "The following message will be displayed at the bottom of the courseware pages within your course:": "A mensagem a seguir ser\u00e1 exibida na parte inferior das p\u00e1ginas do seu curso:",
     "The following options are available for the {license_name} license.": "As seguintes op\u00e7\u00f5es est\u00e3o dispon\u00edveis para a licen\u00e7a {license_name}.",
     "The following users are no longer enrolled in the course:": "Os seguintes usu\u00e1rios n\u00e3o est\u00e3o mais inscritos no curso:",
@@ -796,7 +790,6 @@
     "The minimum grade for course credit is not set.": "A nota m\u00ednima para obter cr\u00e9ditos para o curso n\u00e3o est\u00e1 especificada.",
     "The name of this signatory as it should appear on certificates.": "O nome deste signat\u00e1rio conforme deve aparecer nos certificados.",
     "The organization that this signatory belongs to, as it should appear on certificates.": "A organiza\u00e7\u00e3o a qual este signat\u00e1rio pertence, conforme deve aparecer nos certificados.",
-    "The photo of your face matches the photo on your ID.": "A foto do seu rosto corresponde \u00e0 foto no seu documento.",
     "The raw error message is:": "A mensagem bruta de erro \u00e9:",
     "The selected content group does not exist": "O grupo de conte\u00fado selecionado n\u00e3o existe",
     "The server could not be contacted.": "N\u00e3o foi poss\u00edvel contactar o servidor.",
@@ -860,7 +853,6 @@
     "Title of the signatory": "T\u00edtulo da assinatura",
     "Titles more than 100 characters may prevent students from printing their certificate on a single page.": "T\u00edtulos com mais de 100 caracteres podem impedir que os estudantes imprimam seu certificado em uma \u00fanica p\u00e1gina.",
     "To be sure all students can access the video, we recommend providing both an .mp4 and a .webm version of your video. Click below to add a URL for another version. These URLs cannot be YouTube URLs. The first listed video that's compatible with the student's computer will play.": "Para garantir que todos os estudantes poder\u00e3o acessar o video, n\u00f3s recomendamos providenciar vers\u00f5es em .mp4 e .webm do video. Clique abaixo para adicionar um URL  para outra vers\u00e3o. Esses URLs n\u00e3o podem ser do YouTube. O primeiro v\u00eddeo que for compat\u00edvel com o computador dos alunos ser\u00e1 exibido.",
-    "To finalize course credit, %(display_name)s requires %(platform_name)s learners to submit a credit request.": "Para finalizar os cr\u00e9ditos do curso, %(display_name)s exige que os alunos %(platform_name)s enviem uma solicita\u00e7\u00e3o de cr\u00e9ditos. ",
     "To invalidate a certificate for a particular learner, add the username or email address below.": "Para invalidar um certificado para um aluno em particular, adicionar o nome do usu\u00e1rio ou endere\u00e7o de e-mail abaixo",
     "To receive a certificate, you must also verify your identity.": "Para receber um certificado, voc\u00ea tamb\u00e9m deve verificar a sua identidade.",
     "To take a successful photo, make sure that:": "Para tirar uma foto corretamente, certifique-se que:",
@@ -917,7 +909,6 @@
     "Use a practice proctored exam to introduce learners to the proctoring tools and processes. Results of a practice exam do not affect a learner's grade.": "Usar uma prova supervisionada pr\u00e1tica para apresentar aos alunos as ferramentas e processos de supervis\u00e3o. Os resultados de prova pr\u00e1tica n\u00e3o afetam a nota dos alunos",
     "Use a timed exam to limit the time learners can spend on problems in this subsection. Learners must submit answers before the time expires. You can allow additional time for individual learners through the Instructor Dashboard.": "Use uma prova cronometrada para limitar o tempo que os alunos podem gastar nos problemas nesta subse\u00e7\u00e3o. Os alunos devem enviar as respostas antes que o tempo acabe. Voc\u00ea pode permitir um tempo adicional para alunos individuais atrav\u00e9s do Painel do Instrutor.",
     "Use my institution/campus credentials": "Entrar com credenciais de Institui\u00e7\u00e3o/Campus",
-    "Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.": "Use a webcam para tirar uma foto do seu documento. N\u00f3s vamos conferir esta foto com a foto do seu rosto e o nome na sua conta.",
     "Use your webcam to take a photo of your face. We will match this photo with the photo on your ID.": "Use a webcam para tirar uma foto do seu rosto. N\u00f3s vamos conferir essa foto com a do seu documento de identidade.",
     "Used": "Usado",
     "User Email": "E-mail do Usu\u00e1rio",
@@ -934,7 +925,6 @@
     "Verified Certificate upgrade": "Atualiza\u00e7\u00e3o do certificado verificado",
     "Verified Status": "Status verificado",
     "Verified mode price": "Pre\u00e7o de modo verificado",
-    "Verify Now": "Verifique agora",
     "Video Capture Error": "Falha na captura de v\u00eddeo",
     "Video ID": "ID do V\u00eddeo",
     "View": "Visualizar",
@@ -950,7 +940,6 @@
     "Warning": "Aviso",
     "Warnings": "Avisos",
     "We couldn't find any results for \"%s\".": "N\u00e3o foi poss\u00edvel encontrar resultados para \"%s\".",
-    "We have received your information and are verifying your identity. You will see a message on your dashboard when the verification process is complete (usually within 1-2 days). In the meantime, you can still access all available course content.": "Recebemos as suas informa\u00e7\u00f5es e estamos verificando a sua identifica\u00e7\u00e3o. Voc\u00ea receber\u00e1 uma mensagem em seu painel de controle quando o processo de verifica\u00e7\u00e3o estiver conclu\u00eddo (normalmente entre 1-2 dias). Enquanto isso, voc\u00ea ainda pode acessar a todo o conte\u00fado do curso.",
     "We use the highest levels of security available to encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete.": "N\u00f3s usamos os mais altos n\u00edveis de seguran\u00e7a dispon\u00edveis para encriptar sua foto e envi\u00e1-la para no servi\u00e7o de autoriza\u00e7\u00e3o para an\u00e1lise. Informa\u00e7\u00f5es sobre voc\u00ea e sua foto n\u00e3o s\u00e3o salvas ou vis\u00edveis em qualquer lugar em %(platformName)s depois que o processo de verifica\u00e7\u00e3o \u00e9 completado.",
     "We've encountered an error. Refresh your browser and then try again.": "Encontramos um erro. Atualize seu navegador e tente novamente.",
     "Web:": "Web:",
@@ -1001,11 +990,8 @@
     "You must provide a learner name.": "Voc\u00ea deve fornecer o nome do aluno.",
     "You must sign out and sign back in before your language changes take effect.": "Voc\u00ea deve sair e entrar antes que as mudan\u00e7as de idioma tenham efeito.",
     "You must specify a name for the cohort": "Voc\u00ea deve especificar um nome para o grupo",
-    "You need a driver's license, passport, or other government-issued ID that has your name and photo.": "Voc\u00ea precisa de uma carteira de habilita\u00e7\u00e3o, passaporte ou outra identifica\u00e7\u00e3o emitida pelo governo que possua o seu nome e foto.",
-    "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable.": "Voc\u00ea precisa de um documento com o seu nome e foto. Uma carteira de motorista, passaporte ou outro documento emitido pelo governo s\u00e3o aceit\u00e1veis.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email.": "Voc\u00ea precisa ativar a sua conta antes de se matricular nos cursos. Verifique em sua caixa de entrada o e-mail de ativa\u00e7\u00e3o.",
     "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page.": "Voc\u00ea precisa ativar a sua conta antes de matricular-se nos cursos. Confira se o e-mail de ativa\u00e7\u00e3o est\u00e1 na sua caixa de entrada. Depois de completar a ativa\u00e7\u00e3o, voc\u00ea pode voltar e atualizar esta p\u00e1gina.",
-    "You still need to visit the %(display_name)s website to complete the credit process.": "Voc\u00ea ainda precisa visitar o site %(display_name)s para completar o processo de cr\u00e9dito.",
     "You will not receive notification for emails that bounce, so double-check your spelling.": "Voc\u00ea n\u00e3o receber\u00e1 notifica\u00e7\u00f5es de e-mails que n\u00e3o entregues, ent\u00e3o verifique novamente se digitou corretamente.",
     "You will use your webcam to take a picture of your face and of your government-issued photo ID.": "Voc\u00ea vai usar sua webcam para tirar uma foto do seu rosto e do seu documento com foto emitido pelo governo.",
     "You!": "Voc\u00ea!",
@@ -1102,7 +1088,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -1158,9 +1144,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "0",
+    "FIRST_DAY_OF_WEEK": 0,
     "MONTH_DAY_FORMAT": "j \\d\\e F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "d/m/Y H:i",
     "SHORT_DATE_FORMAT": "d/m/Y",
     "THOUSAND_SEPARATOR": ".",

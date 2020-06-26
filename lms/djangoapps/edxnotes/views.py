@@ -180,7 +180,6 @@ def notes(request, course_id):
     return HttpResponse(json.dumps(notes_info, cls=NoteJSONEncoder), content_type="application/json")
 
 
-# pylint: disable=unused-argument
 @login_required
 def get_token(request, course_id):
     """

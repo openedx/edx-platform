@@ -44,7 +44,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
 
-from .utils import auto_verify_for_testing_enabled, earliest_allowed_verification_date
+from .utils import auto_verify_for_testing_enabled, earliest_allowed_verification_date, submit_request_to_ss
 
 log = logging.getLogger(__name__)
 
@@ -741,7 +741,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     def submit(self, copy_id_photo_from=None):
         """
         Submit our verification attempt to Software Secure for validation. This
-        will set our status to "submitted" if the post is successful, and
+        will set our status to "submitted", if the post is successful or will set to
         "must_retry" if the post fails.
 
         Keyword Arguments:
@@ -749,7 +749,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 data from this attempt.  This is used for re-verification, in which new face photos
                 are sent with previously-submitted ID photos.
         """
-        from .tasks import send_request_to_ss_for_user
         if auto_verify_for_testing_enabled():
             self.mark_submit()
             fake_response = requests.Response()
@@ -764,9 +763,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 self.receipt_id,
                 copy_id_photo_from.receipt_id,
             )
+
         transaction.on_commit(
-            lambda:
-            send_request_to_ss_for_user.delay(user_verification_id=self.id, copy_id_photo_from=copy_id_photo_from)
+            lambda: submit_request_to_ss(user_verification=self, copy_id_photo_from=copy_id_photo_from)
         )
 
     def parsed_error_msg(self):

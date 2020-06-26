@@ -1326,7 +1326,6 @@ class TestEditorSavedMethod(BaseTestVideoXBlock):
         }
         # path to subs_3_yD_cEKoCk.srt.sjson file
         self.file_name = 'subs_3_yD_cEKoCk.srt.sjson'
-        # pylint: disable=no-value-for-parameter
         self.test_dir = path(__file__).abspath().dirname().dirname().dirname().dirname().dirname()
         self.file_path = self.test_dir + '/common/test/data/uploads/' + self.file_name
 
