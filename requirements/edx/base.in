@@ -66,7 +66,7 @@ django-splash
 django-statici18n
 django-storages
 django-user-tasks
-django-waffle==0.18.0
+django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework==3.9.4
 edx-ace
