@@ -148,7 +148,7 @@ def task_track(request_info, task_info, event_type, event, page=None):
     # about the task in which it is running.
     data = dict(event, **task_info)
 
-    context_override = _get_course_context(page)
+    context_override = contexts.course_context_from_url(page)
     context_override.update({
         'username': request_info.get('username', 'unknown'),
         'ip': request_info.get('ip', 'unknown'),

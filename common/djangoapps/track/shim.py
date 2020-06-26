@@ -22,11 +22,9 @@ class LegacyFieldMappingProcessor(object):
     def __call__(self, event):
         context = event.get('context', {})
         if 'context' in event:
-            delete_from_context = bool(context.get('event_source', '') != 'task')
             for field in CONTEXT_FIELDS_TO_INCLUDE:
-                self.move_from_context(field, event, delete_from_context=delete_from_context)
-            if delete_from_context:
-                remove_shim_context(event)
+                self.move_from_context(field, event)
+            remove_shim_context(event)
 
         if 'data' in event:
             if context.get('event_source', '') == 'browser' and isinstance(event['data'], dict):
@@ -50,13 +48,12 @@ class LegacyFieldMappingProcessor(object):
         self.move_from_context('event_source', event, 'server')
         self.move_from_context('page', event, None)
 
-    def move_from_context(self, field, event, default_value='', delete_from_context=True):
+    def move_from_context(self, field, event, default_value=''):
         """Move a field from the context to the top level of the event."""
         context = event.get('context', {})
         if field in context:
             event[field] = context[field]
-            if delete_from_context:
-                del context[field]
+            del context[field]
         else:
             event[field] = default_value
 
