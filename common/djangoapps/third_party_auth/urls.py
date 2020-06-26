@@ -24,6 +24,6 @@ urlpatterns = [
 
 # samlproviderconfig/samlproviderdata urls
 router = routers.DefaultRouter()
-router.register(r'^auth/saml/v0/providerconfig', SAMLProviderConfigViewSet, basename="samlproviderconfig")
-router.register(r'^auth/saml/v0/providerdata', SAMLProviderDataViewSet, basename="samlproviderdata")
+router.register(r'auth/saml/v0/providerconfig', SAMLProviderConfigViewSet, basename="samlproviderconfig")
+router.register(r'auth/saml/v0/providerdata', SAMLProviderDataViewSet, basename="samlproviderdata")
 urlpatterns += router.urls
