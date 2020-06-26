@@ -6,11 +6,11 @@ import ddt
 from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
-from edx_proctoring.api import create_exam
-from edx_proctoring.backends.tests.test_backend import TestBackendProvider
 from mock import patch
 from six import text_type
 
+from edx_proctoring.api import create_exam
+from edx_proctoring.backends.tests.test_backend import TestBackendProvider
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -56,9 +56,9 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         Create course based on proctoring provider and escalation email values
         """
         course = CourseFactory.create(enable_proctored_exams=True,
-                                           enable_timed_exams=True,
-                                           proctoring_provider=proctoring_provider,
-                                           proctoring_escalation_email=escalation_email)
+                                      enable_timed_exams=True,
+                                      proctoring_provider=proctoring_provider,
+                                      proctoring_escalation_email=escalation_email)
         self.setup_course_url(course)
 
     @ddt.data(
