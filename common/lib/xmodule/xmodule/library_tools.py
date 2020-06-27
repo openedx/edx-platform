@@ -7,7 +7,8 @@ import six
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator, BlockUsageLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator, LibraryUsageLocatorV2, BlockUsageLocator
+from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.xblock.api import load_block
 from search.search_engine_base import SearchEngine
 from student.auth import has_studio_write_access
@@ -246,15 +247,32 @@ class LibraryToolsService(object):
                         block_type=source_key.block_type,
                         block_id=new_block_id,
                     )
+
+                # Prepare a list of this block's static assets; any that are referenced as /static/foo.png etc. (the
+                # recommended way for referencing assets) will stop working unless we rewrite the URL or copied the
+                # the assets into the course. Since blockstore namespaces assets to each block but modulestore dumps all
+                # of a course's asset files into a common namespace, it's not a good idea to copy the files into the
+                # course's static asset store (contentstore) because we may get conflicts (same asset filename used for
+                # different library blocks or same asset filename used in a library block as in the destination course)
+                if isinstance(source_key, LibraryUsageLocatorV2):
+                    all_assets = library_api.get_library_block_static_asset_files(source_key)
+                else:
+                    all_assets = []
+
                 for field_name, field in source_block.fields.items():
                     if field.scope not in (Scope.settings, Scope.content):
                         continue  # Only copy authored field data
                     if field.is_set_on(source_block) or field.is_set_on(new_block):
-                        setattr(new_block, field_name, getattr(source_block, field_name))
+                        field_value = getattr(source_block, field_name)
+                        if isinstance(field_value, str):
+                            # If this is a string field (which may also be JSON/XML data), rewrite /static/... URLs to
+                            # point to blockstore, so the runtime doesn't try to load the assets from contentstore which
+                            # doesn't have them.
+                            for asset in all_assets:
+                                field_value = field_value.replace('/static/{}'.format(asset.path), asset.url)
+                        setattr(new_block, field_name, field_value)
                 new_block.save()
                 self.store.update_item(new_block, self.user_id)
-
-                # TODO: handle static assets
 
                 # Recursively import children
                 if new_block.has_children:
