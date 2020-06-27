@@ -54,6 +54,7 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
         """
         fragment = Fragment()
         # EditableChildrenMixin.render_children will render HTML that allows instructors to make edits to the children
+        # TODO: Need to disable its "Move" button too
         self.render_children(context, fragment, can_reorder=False, can_add=False)
         return fragment
 
@@ -61,26 +62,14 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
         """
         Renders the view that learners see.
         """
-        fragment = Fragment()
-        contents = []
-        child_context = {} if not context else copy(context)
-
-        for child in self.get_children():
-            rendered_child = child.render('student_view', child_context)
-            fragment.add_fragment_resources(rendered_child)
-            contents.append({
-                'id': text_type(displayable.location),
-                'content': rendered_child.content,
-            })
-
-        fragment.add_content(self.system.render_template('vert_module.html', {
-            'items': contents,
-            'xblock_context': context,
-            'show_bookmark_button': False,
-            'watched_completable_blocks': set(),
-            'completion_delay_ms': None,
-        }))
-        return fragment
+        result = Fragment()
+        child_frags = self.runtime.render_children(self, context=context)
+        result.add_resources(child_frags)
+        result.add_content('<div class="library-sourced-content">')
+        for frag in child_frags:
+            result.add_content(frag.content)
+        result.add_content('</div>')
+        return result
 
     def validate_field_data(self, validation, data):
         """
