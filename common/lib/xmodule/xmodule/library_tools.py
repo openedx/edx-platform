@@ -238,7 +238,9 @@ class LibraryToolsService(object):
                     new_block = self.store.get_item(new_block_key)
                     if new_block.parent != dest_parent_key:
                         raise ValueError(
-                            "Expected existing block {} to be a child of {}".format(new_block_key, dest_parent_key)
+                            "Expected existing block {} to be a child of {} but instead it's a child of {}".format(
+                                new_block_key, dest_parent_key, new_block.parent,
+                            )
                         )
                 except ItemNotFoundError:
                     new_block = self.store.create_child(
@@ -295,3 +297,7 @@ class LibraryToolsService(object):
             existing_children_to_delete = set(dest_block.children) - child_ids_updated
             for old_child_id in existing_children_to_delete:
                 self.store.delete_item(old_child_id, self.user_id)
+
+        # If this was called from a handler, it will save dest_block at the end, so we must update
+        # dest_block.children to avoid it saving the old value of children and deleting the new children.
+        dest_block.children = self.store.get_item(dest_key).children

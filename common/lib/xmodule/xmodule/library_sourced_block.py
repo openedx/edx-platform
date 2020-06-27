@@ -3,6 +3,7 @@ Library Sourced Content XBlock
 """
 import logging
 
+from copy import copy
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import JsonHandlerError
@@ -53,6 +54,7 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
         Renders the Studio preview view.
         """
         fragment = Fragment()
+        context = {} if not context else copy(context)  # Isolate context - without this there are weird bugs in Studio
         # EditableChildrenMixin.render_children will render HTML that allows instructors to make edits to the children
         # TODO: Need to disable its "Move" button too
         self.render_children(context, fragment, can_reorder=False, can_add=False)
