@@ -1,16 +1,17 @@
 """Signal handlers for writing course dates into edx_when."""
-from __future__ import absolute_import, unicode_literals
+
 
 import logging
 
 from django.dispatch import receiver
+from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 from six import text_type
 from xblock.fields import Scope
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
+
 from .models import SelfPacedRelativeDatesConfig
 from .utils import spaced_out_sections
-from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
 
 log = logging.getLogger(__name__)
 

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import migrations
 
 from ..models import save_siteconfig_without_historical_record
+
 
 def copy_column_values(apps, schema_editor):
     """

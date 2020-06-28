@@ -3,12 +3,11 @@ Tests for Outline Tab API in the Course Home API
 """
 
 import ddt
-
-from django.urls import reverse
-
 from course_modes.models import CourseMode
-from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
+from django.urls import reverse
 from student.models import CourseEnrollment
+
+from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 
 
 @ddt.ddt
@@ -30,7 +29,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
         course_tools = response.data.get('course_tools')
         self.assertTrue(course_tools)
-        self.assertEquals(course_tools[0]['analytics_id'], 'edx.bookmarks')
+        self.assertEqual(course_tools[0]['analytics_id'], 'edx.bookmarks')
 
         dates_widget = response.data.get('dates_widget')
         self.assertTrue(dates_widget)
