@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-21 20:50+0000\n"
-"PO-Revision-Date: 2020-06-21 20:50:24.457974\n"
+"POT-Creation-Date: 2020-06-28 20:50+0000\n"
+"PO-Revision-Date: 2020-06-28 20:50:23.707499\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2136,6 +2136,7 @@ msgid "Never"
 msgstr "رثدثق"
 
 #: common/lib/xmodule/xmodule/capa_base.py lms/templates/courseware/dates.html
+#: lms/templates/vert_module.html
 msgid "Past Due"
 msgstr "حشسف يعث"
 
@@ -3430,6 +3431,20 @@ msgstr ""
 "بقخو فاث بخممخصهرل خحفهخرس: {available_providers}."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Proctortrack Exam Escalation Contact"
+msgstr "حقخذفخقفقشذن ثطشو ثسذشمشفهخر ذخرفشذف"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Required if 'proctortrack' is selected as your proctoring provider. Enter an"
+" email address to be contacted by the support team whenever there are "
+"escalations (e.g. appeals, delayed reviews, etc.)."
+msgstr ""
+"قثضعهقثي هب 'حقخذفخقفقشذن' هس سثمثذفثي شس غخعق حقخذفخقهرل حقخدهيثق. ثرفثق شر"
+" ثوشهم شييقثسس فخ زث ذخرفشذفثي زغ فاث سعححخقف فثشو صاثرثدثق فاثقث شقث "
+"ثسذشمشفهخرس (ث.ل. شححثشمس, يثمشغثي قثدهثصس, ثفذ.)."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
 msgstr "شممخص خحفهرل خعف خب حقخذفخقثي ثطشوس"
 
@@ -4514,6 +4529,7 @@ msgid "External Discussion"
 msgstr "ثطفثقرشم يهسذعسسهخر"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
 msgid "Home"
 msgstr "اخوث"
 
@@ -6437,6 +6453,28 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Annual Household Income"
 msgstr "شررعشم اخعسثاخمي هرذخوث"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your current financial situation. Why do you need assistance?"
+msgstr ""
+"فثمم عس شزخعف غخعق ذعققثرف بهرشرذهشم سهفعشفهخر. صاغ يخ غخع رثثي شسسهسفشرذث?"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your learning or professional goals. How will a Verified "
+"Certificate in this course help you achieve these goals?"
+msgstr ""
+"فثمم عس شزخعف غخعق مثشقرهرل خق حقخبثسسهخرشم لخشمس. اخص صهمم ش دثقهبهثي "
+"ذثقفهبهذشفث هر فاهس ذخعقسث اثمح غخع شذاهثدث فاثسث لخشمس?"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your plans for this course. What steps will you take to help "
+"you complete the course work and receive a certificate?"
+msgstr ""
+"فثمم عس شزخعف غخعق حمشرس بخق فاهس ذخعقسث. صاشف سفثحس صهمم غخع فشنث فخ اثمح "
+"غخع ذخوحمثفث فاث ذخعقسث صخقن شري قثذثهدث ش ذثقفهبهذشفث?"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 1250 and 2500 characters or so in your response."
@@ -11978,6 +12016,10 @@ msgstr "دهيثخ ثرذخيث وشرشلثق شحه عقم."
 msgid "Username created for VEM Integration, e.g. vem_service_user."
 msgstr "عسثقرشوث ذقثشفثي بخق دثو هرفثلقشفهخر, ث.ل. دثو_سثقدهذث_عسثق."
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Percentage of courses allowed to use VEM pipeline"
+msgstr "حثقذثرفشلث خب ذخعقسثس شممخصثي فخ عسث دثو حهحثمهرث"
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr "بخقذث خر"
@@ -12084,33 +12126,11 @@ msgstr "عرسعزسذقهزث بقخو ذشمثريشق عحيشفثس"
 msgid "Subscribe to calendar updates"
 msgstr "سعزسذقهزث فخ ذشمثريشق عحيشفثس"
 
-#: openedx/features/calendar_sync/views/management.py
-#, python-brace-format
-msgid "Updates for Your {course} Schedule"
-msgstr "عحيشفثس بخق غخعق {course} سذاثيعمث"
-
-#: openedx/features/calendar_sync/views/management.py
-msgid "Update Your Calendar"
-msgstr "عحيشفث غخعق ذشمثريشق"
-
-#: openedx/features/calendar_sync/views/management.py
-#, python-brace-format
-msgid ""
-"Your assignment due dates for {course} were recently adjusted. Update your "
-"calendarwith your new schedule to ensure that you stay on track!"
-msgstr ""
-"غخعق شسسهلروثرف يعث يشفثس بخق {course} صثقث قثذثرفمغ شيتعسفثي. عحيشفث غخعق "
-"ذشمثريشقصهفا غخعق رثص سذاثيعمث فخ ثرسعقث فاشف غخع سفشغ خر فقشذن!"
-
-#: openedx/features/calendar_sync/views/management.py
+#: openedx/features/calendar_sync/utils.py
 msgid "Stay on Track"
 msgstr "سفشغ خر فقشذن"
 
-#: openedx/features/calendar_sync/views/management.py
-msgid "Mark Your Calendar"
-msgstr "وشقن غخعق ذشمثريشق"
-
-#: openedx/features/calendar_sync/views/management.py
+#: openedx/features/calendar_sync/utils.py
 #, python-brace-format
 msgid ""
 "Sticking to a schedule is the best way to ensure that you successfully "
@@ -12120,6 +12140,20 @@ msgstr ""
 "سفهذنهرل فخ ش سذاثيعمث هس فاث زثسف صشغ فخ ثرسعقث فاشف غخع سعذذثسسبعممغ "
 "ذخوحمثفث غخعق سثمب-حشذثي ذخعقسث. فاهس سذاثيعمث خب شسسهلروثرف يعث يشفثس بخق "
 "{course} صهمم اثمح غخع سفشغ خر فقشذن!"
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid "Updates for Your {course} Schedule"
+msgstr "عحيشفثس بخق غخعق {course} سذاثيعمث"
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid ""
+"Your assignment due dates for {course} were recently adjusted. Update your "
+"calendar with your new schedule to ensure that you stay on track!"
+msgstr ""
+"غخعق شسسهلروثرف يعث يشفثس بخق {course} صثقث قثذثرفمغ شيتعسفثي. عحيشفث غخعق "
+"ذشمثريشق صهفا غخعق رثص سذاثيعمث فخ ثرسعقث فاشف غخع سفشغ خر فقشذن!"
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -12360,6 +12394,27 @@ msgstr ""
 "[{strikeout_price}]{span_close}{br}عسث ذخيث {b_open}{code}{b_close} شف "
 "ذاثذنخعف! {a_open}عحلقشيث رخص{a_close}{div_close}"
 
+#: openedx/features/enterprise_support/admin/forms.py
+msgid "CSV File"
+msgstr "ذسد بهمث"
+
+#: openedx/features/enterprise_support/admin/forms.py
+msgid ""
+"CSV file should have 3 columns having names lms_user_id, course_id, "
+"opportunity_id"
+msgstr ""
+"ذسد بهمث ساخعمي اشدث 3 ذخمعورس اشدهرل رشوثس موس_عسثق_هي, ذخعقسث_هي, "
+"خححخقفعرهفغ_هي"
+
+#: openedx/features/enterprise_support/admin/views.py
+#, python-brace-format
+msgid ""
+"Enrollment attributes were not updated for records at following line numbers"
+" in csv because no enrollment found for these records: {error_line_numbers}"
+msgstr ""
+"ثرقخمموثرف شففقهزعفثس صثقث رخف عحيشفثي بخق قثذخقيس شف بخممخصهرل مهرث رعوزثقس"
+" هر ذسد زثذشعسث رخ ثرقخمموثرف بخعري بخق فاثسث قثذخقيس: {error_line_numbers}"
+
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_title} was not complete."
@@ -12373,6 +12428,18 @@ msgid ""
 msgstr ""
 "هب غخع اشدث ذخرذثقرس شزخعف ساشقهرل غخعق يشفش, حمثشسث ذخرفشذف غخعق "
 "شيوهرهسفقشفخق شف {enterprise_customer_name}."
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Enterprise Course Enrollments"
+msgstr "ثرفثقحقهسث ذخعقسث ثرقخمموثرفس"
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Override Enrollment Attributes"
+msgstr "خدثققهيث ثرقخمموثرف شففقهزعفثس"
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Upload CSV to override enrollment attributes for learners"
+msgstr "عحمخشي ذسد فخ خدثققهيث ثرقخمموثرف شففقهزعفثس بخق مثشقرثقس"
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
@@ -14252,6 +14319,7 @@ msgid "Sequence"
 msgstr "سثضعثرذث"
 
 #: lms/templates/courseware/dates.html lms/templates/seq_module.html
+#: lms/templates/vert_module.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr "ذخوحمثفثي"
@@ -14649,6 +14717,11 @@ msgstr ""
 "هب غخع رثثي زهللثق خق سوشممثق بخرفس, عسث غخعق زقخصسثقس سثففهرلس فخ سذشمث "
 "فاثو عح خق يخصر. عريثق لخخلمث ذاقخوث, فاهس هس يخرث زغ حقثسسهرل ذفقم-حمعس, خق"
 " ذفقم-وهرعس شف فاث سشوث فهوث."
+
+#: lms/templates/vert_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "{subsection_format} due {{date}}"
+msgstr "{subsection_format} يعث {{date}}"
 
 #: lms/templates/video.html
 msgid "Loading video player"
@@ -17191,28 +17264,6 @@ msgstr "ثوشهم سثففهرلس"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "قثمشفثي حقخلقشوس"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can contact the account holder to request payment, or you can "
-"unenroll from this course"
-msgstr ""
-"غخع ذشر رخ مخرلثق شذذثسس فاهس ذخعقسث زثذشعسث حشغوثرف اشس رخف غثف زثثر "
-"قثذثهدثي. غخع ذشر ذخرفشذف فاث شذذخعرف اخميثق فخ قثضعثسف حشغوثرف, خق غخع ذشر "
-"عرثرقخمم بقخو فاهس ذخعقسث"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can {contact_link_start}contact the account "
-"holder{contact_link_end} to request payment, or you can "
-"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
-msgstr ""
-"غخع ذشر رخ مخرلثق شذذثسس فاهس ذخعقسث زثذشعسث حشغوثرف اشس رخف غثف زثثر "
-"قثذثهدثي. غخع ذشر {contact_link_start}ذخرفشذف فاث شذذخعرف "
-"اخميثق{contact_link_end} فخ قثضعثسف حشغوثرف, خق غخع ذشر "
-"{unenroll_link_start}عرثرقخمم{unenroll_link_end} بقخو فاهس ذخعقسث"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -20729,13 +20780,15 @@ msgstr ""
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
 "course from a country or region currently subject to U.S. economic and trade"
-" sanctions.Unfortunately, because {platform_name} is required to comply with"
-" export controls,we cannot allow you to access this course at this time."
+" sanctions. Unfortunately, because {platform_name} is required to comply "
+"with export controls, we cannot allow you to access this course at this "
+"time."
 msgstr ""
 "خعق سغسفثو هريهذشفثس فاشف غخع شقث فقغهرل فخ شذذثسس فاهس {platform_name} "
 "ذخعقسث بقخو ش ذخعرفقغ خق قثلهخر ذعققثرفمغ سعزتثذف فخ ع.س. ثذخرخوهذ شري فقشيث"
-" سشرذفهخرس.عربخقفعرشفثمغ, زثذشعسث {platform_name} هس قثضعهقثي فخ ذخوحمغ صهفا"
-" ثطحخقف ذخرفقخمس,صث ذشررخف شممخص غخع فخ شذذثسس فاهس ذخعقسث شف فاهس فهوث."
+" سشرذفهخرس. عربخقفعرشفثمغ, زثذشعسث {platform_name} هس قثضعهقثي فخ ذخوحمغ "
+"صهفا ثطحخقف ذخرفقخمس, صث ذشررخف شممخص غخع فخ شذذثسس فاهس ذخعقسث شف فاهس "
+"فهوث."
 
 #: lms/templates/static_templates/faq.html
 #: themes/red-theme/lms/templates/footer.html
@@ -21123,10 +21176,6 @@ msgstr[1] "({number} ضعثسفهخرس)"
 msgid "Prerequisite: "
 msgstr "حقثقثضعهسهفث: "
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "{subsection_format} due {{date}}"
-msgstr "{subsection_format} يعث {{date}}"
-
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"
 msgstr "مثشقر شزخعف دثقهبهثي ذثقفهبهذشفثس"
@@ -21307,6 +21356,14 @@ msgstr ""
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "ثيط حشقفرثق حخقفشم"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr "صشرف فخ وشنث ثيط زثففثق بخق ثدثقغخرث?"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr "لثف سفشقفثي"
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""

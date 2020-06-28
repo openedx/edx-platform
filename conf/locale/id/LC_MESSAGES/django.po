@@ -11,6 +11,7 @@
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
 # ichs <ichsansp@outlook.com>, 2014
+# Imron ras <ombak147@gmail.com>, 2020
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Muhammad Herdiansyah <herdiansyah@openmailbox.org>, 2016
 # Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2015,2018
@@ -51,6 +52,7 @@
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
 # hafizhuddin amin, 2013
+# Imron ras <ombak147@gmail.com>, 2020
 # Mardiyanto Saahi, 2016
 # masrosid2 <masrosid@live.com>, 2014
 # masrosid2 <masrosid@live.com>, 2014
@@ -99,7 +101,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-18 18:51+0000\n"
+"POT-Creation-Date: 2020-06-21 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -6031,6 +6033,11 @@ msgid "in {relative} - {absolute}"
 msgstr "di {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+msgid "Enrollment Date"
+msgstr "Tanggal Pendaftaran"
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr "Awal Mulai Pelatihan"
 
@@ -7719,10 +7726,6 @@ msgstr "Judul"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Tahun Lahir"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Date"
-msgstr "Tanggal Pendaftaran"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Currently Enrolled"
