@@ -1,5 +1,10 @@
-define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/views/baseview', 'xblock/runtime.v1'],
-    function($, _, ViewUtils, BaseView, XBlock) {
+define(['jquery',
+    'underscore',
+    'common/js/components/utils/view_utils',
+    'js/views/baseview',
+    'xblock/runtime.v1',
+    'edx-ui-toolkit/js/utils/html-utils'],
+    function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
         'use strict';
 
         var XBlockView = BaseView.extend({
@@ -157,7 +162,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
              * @param html The desired HTML.
              */
             updateHtml: function(element, html) {
-                element.html(html);
+                HtmlUtils.setHtml(element, HtmlUtils.HTML(html));
             },
 
             /**
@@ -214,19 +219,22 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                     data = resource.data;
                 if (mimetype === 'text/css') {
                     if (kind === 'text') {
-                        $head.append("<style type='text/css'>" + data + '</style>');
+                        // xss-lint: disable=javascript-jquery-append,javascript-concat-html
+                        $head.append('<style type="text/css">' + data + '</style>');
                     } else if (kind === 'url') {
-                        $head.append("<link rel='stylesheet' href='" + data + "' type='text/css'>");
+                        // xss-lint: disable=javascript-jquery-append,javascript-concat-html
+                        $head.append('<link rel="stylesheet" href="' + data + '" type="text/css">');
                     }
                 } else if (mimetype === 'application/javascript') {
                     if (kind === 'text') {
+                        // xss-lint: disable=javascript-jquery-append,javascript-concat-html
                         $head.append('<script>' + data + '</script>');
                     } else if (kind === 'url') {
                         return ViewUtils.loadJavaScript(data);
                     }
                 } else if (mimetype === 'text/html') {
                     if (placement === 'head') {
-                        $head.append(data);
+                        HtmlUtils.append($head, HtmlUtils.HTML(data));
                     }
                 }
                 // Return an already resolved promise for synchronous updates
