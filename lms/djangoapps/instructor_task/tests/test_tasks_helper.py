@@ -44,7 +44,6 @@ from lms.djangoapps.instructor_analytics.basic import UNAVAILABLE, list_problem_
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
 from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
     upload_enrollment_report,
-    upload_exec_summary_report,
     upload_may_enroll_csv,
     upload_students_csv
 )
@@ -1028,49 +1027,6 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         # Verify generated grades and expected grades match
         expected_grades = [self._format_user_grade(header_row, **user_grade) for user_grade in user_grades]
         self.verify_rows_in_csv(expected_grades)
-
-
-@ddt.ddt
-class TestExecutiveSummaryReport(TestReportMixin, InstructorTaskCourseTestCase):
-    """
-    Tests that Executive Summary report generation works.
-    """
-    def setUp(self):
-        super(TestExecutiveSummaryReport, self).setUp()
-        self.course = CourseFactory.create()
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            min_price=50,
-            mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
-        )
-
-        self.instructor = InstructorFactory(course_key=self.course.id)
-        self.student1 = UserFactory()
-        self.student2 = UserFactory()
-
-    def test_successfully_generate_executive_summary_report(self):
-        """
-        Test that successfully generates the executive summary report.
-        """
-        task_input = {'features': []}
-        with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            result = upload_exec_summary_report(
-                None, None, self.course.id,
-                task_input, 'generating executive summary report'
-            )
-        ReportStore.from_config(config_name='FINANCIAL_REPORTS')
-        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
-
-    def _verify_html_file_report(self, report_store, expected_data):
-        """
-        Verify grade report data.
-        """
-        report_html_filename = report_store.links_for(self.course.id)[0][0]
-        report_path = report_store.path_to(self.course.id, report_html_filename)
-        with report_store.storage.open(report_path) as html_file:
-            html_file_data = html_file.read().decode('utf-8')
-            for data in expected_data:
-                self.assertIn(data, html_file_data)
 
 
 @ddt.ddt
