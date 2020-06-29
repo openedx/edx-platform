@@ -541,6 +541,11 @@ class UserProfile(models.Model):
         Returns:
              True if the user requires parental consent.
         """
+        # [UCSD_COUSTOM] if 'DISABLE_AGE_LIMIT_FOR_PROFILE' feature is enabled, it means we are not restricting the
+        # user for setting year_of_birth and bypassing the 13 year's age limit check for setting profile.
+        if settings.FEATURES.get('DISABLE_AGE_LIMIT_FOR_PROFILE'):
+            return False
+
         if age_limit is None:
             age_limit = getattr(settings, 'PARENTAL_CONSENT_AGE_LIMIT', None)
             if age_limit is None:
