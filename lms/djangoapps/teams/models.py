@@ -321,10 +321,7 @@ class CourseTeamMembership(models.Model):
     @classmethod
     def user_in_team_for_teamset(cls, user, course_id, topic_id=None):
         """
-        Checks user membership in two ways:
-        if topic_id is None, checks to see if a user is assigned to any team in the teamsets associated with this
-        course.
-        if topic_id (teamset) is provided, checks to see if a user is assigned to a specific team in the course.
+        Using the provided topic_id (teamset), checks to see if a user is assigned to a specific team in the course.
 
         Args:
             user: the user that we want to query on
@@ -332,7 +329,7 @@ class CourseTeamMembership(models.Model):
             topic_id: optional the topic_id (teamset) of the course we are interested in
 
         Returns:
-            True if the user is on a team in the course already
+            True if the user is on a team in a teamset in the course already
             False if not
         """
         return cls.objects.filter(user=user, team__course_id=course_id, team__topic_id=topic_id).exists()
