@@ -18,12 +18,8 @@ from django.contrib.auth.models import User
 from mock import patch, Mock
 from pyquery import PyQuery as pq
 
-from six.moves.html_parser import HTMLParser
-
-from course_modes.models import CourseMode
 from course_api.blocks.api import get_blocks
 from course_modes.tests.factories import CourseModeFactory
-from experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
@@ -33,6 +29,7 @@ from lms.djangoapps.courseware.tests.factories import (
     OrgStaffFactory,
     StaffFactory
 )
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -166,7 +163,7 @@ def _assert_block_is_empty(block, user_id, course, request_factory):
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
 ))
-class TestProblemTypeAccess(SharedModuleStoreTestCase):
+class TestProblemTypeAccess(SharedModuleStoreTestCase, MasqueradeMixin):
 
     PROBLEM_TYPES = ['problem', 'openassessment', 'drag-and-drop-v2', 'done', 'edx_sga']
     # 'html' is a component that just displays html, in these tests it is used to test that users who do not have access
@@ -690,29 +687,6 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         else:
             self.assertEqual(response.status_code, 200)
 
-    def update_masquerade(self, role='student', group_id=None, username=None, user_partition_id=None):
-        """
-        Toggle masquerade state.
-        """
-        masquerade_url = reverse(
-            'masquerade_update',
-            kwargs={
-                'course_key_string': six.text_type(self.course.id),
-            }
-        )
-        response = self.client.post(
-            masquerade_url,
-            json.dumps({
-                'role': role,
-                'group_id': group_id,
-                'user_name': username,
-                'user_partition_id': user_partition_id,
-            }),
-            'application/json'
-        )
-        self.assertEqual(response.status_code, 200)
-        return response
-
     @ddt.data(
         InstructorFactory,
         StaffFactory,
@@ -740,6 +714,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             user = role_factory.create()
         else:
             user = role_factory.create(course_key=self.course.id)
+        CourseEnrollment.enroll(user, self.course.id)
         self.update_masquerade(username=user.username)
 
         block = self.blocks_dict['problem']

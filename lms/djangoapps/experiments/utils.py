@@ -348,7 +348,7 @@ def get_audit_access_expiration(user, course):
     """
     Return the expiration date and course duration for the user's audit access to this course.
     """
-    if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
+    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
         return None, None
 
     return get_user_course_expiration_date(user, course), get_user_course_duration(user, course)
