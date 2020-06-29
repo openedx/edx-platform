@@ -59,7 +59,7 @@ from .api import (
     user_organization_protection_status
 )
 from .csv import load_team_membership_csv, TeamMembershipImportManager
-from .errors import AlreadyOnTeamInCourse, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
+from .errors import AlreadyOnTeamInTeamset, ElasticSearchConnectionError, NotEnrolledInCourseForTeam
 from .search_indexes import CourseTeamIndexer
 from .serializers import (
     BulkTeamCountTopicSerializer,
@@ -586,7 +586,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         is_team_administrator = (has_access(request.user, 'staff', course_key)
                                  or has_discussion_privileges(request.user, course_key))
         if not is_team_administrator and (
-            CourseTeamMembership.user_in_team_for_course(request.user, course_key, topic_id=topic_id)
+            CourseTeamMembership.user_in_team_for_teamset(request.user, course_key, topic_id=topic_id)
         ):
             error_message = build_api_error(
                 ugettext_noop('You are already in a team in this teamset.'),
@@ -1164,12 +1164,11 @@ class TopicDetailView(APIView):
         )
         return Response(serializer.data)
 
-
 class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
     """
         **Use Cases**
 
-            List course team memberships or add a user to a course team.
+            List teamset team memberships or add a user to a teamset.
 
         **Example Requests**:
 
@@ -1183,12 +1182,12 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
             * username: Returns membership records only for the specified user.
               If the requesting user is not staff then only memberships for
-              teams associated with courses in which the requesting user is
+              teams associated with teamsets in which the requesting user is
               enrolled are returned.
 
             * team_id: Returns only membership records associated with the
-              specified team. The requesting user must be staff or enrolled in
-              the course associated with the team.
+              specified team. The requesting user must be staff or a member of
+              the teamset associated with the team.
 
             * teamset_id: Returns membership records only for the specified teamset.
               if teamset_id is specified, course_id must also be specified.
@@ -1461,10 +1460,10 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     'add_method': 'joined_from_team_view' if user == request.user else 'added_by_another_user'
                 }
             )
-        except AlreadyOnTeamInCourse:
+        except AlreadyOnTeamInTeamset:
             return Response(
                 build_api_error(
-                    ugettext_noop(u"The user {username} is already a member of a team in this course."),
+                    ugettext_noop(u"The user {username} is already a member of a team in this teamset."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST

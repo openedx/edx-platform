@@ -238,7 +238,7 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
     def test_user_in_team_for_course(self, username, course_id, expected_value):
         user = getattr(self, username)
         self.assertEqual(
-            CourseTeamMembership.user_in_team_for_course(user, course_id),
+            CourseTeamMembership.user_in_team_for_teamset(user, course_id),
             expected_value
         )
 
@@ -254,7 +254,7 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
     def test_user_in_team_for_course_teamset(self, username, course_id, teamset_id, expected_value):
         user = getattr(self, username)
         self.assertEqual(
-            CourseTeamMembership.user_in_team_for_course(user, course_id, teamset_id),
+            CourseTeamMembership.user_in_team_for_teamset(user, course_id, teamset_id),
             expected_value
         )
 

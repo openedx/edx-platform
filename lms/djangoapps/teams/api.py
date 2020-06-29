@@ -218,7 +218,7 @@ def teamset_is_public_or_user_is_on_team_in_teamset(user, course_module, teamset
     teamset = course_module.teams_configuration.teamsets_by_id[teamset_id]
     if teamset.teamset_type != TeamsetType.private_managed:
         return True
-    return CourseTeamMembership.user_in_team_for_course(user, course_module.id, topic_id=teamset_id)
+    return CourseTeamMembership.user_in_team_for_teamset(user, course_module.id, topic_id=teamset_id)
 
 
 def user_on_team_or_team_is_public(user, team):

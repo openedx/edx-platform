@@ -36,7 +36,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
 from student.models import CourseEnrollment, LanguageField
 
 from .errors import (
-    AlreadyOnTeamInCourse,
+    AlreadyOnTeamInTeamset,
     ImmutableMembershipFieldException,
     NotEnrolledInCourseForTeam,
     AddToIncompatibleTeamError
@@ -209,8 +209,8 @@ class CourseTeam(models.Model):
 
         if not CourseEnrollment.is_enrolled(user, self.course_id):
             raise NotEnrolledInCourseForTeam
-        if CourseTeamMembership.user_in_team_for_course(user, self.course_id, self.topic_id):
-            raise AlreadyOnTeamInCourse
+        if CourseTeamMembership.user_in_team_for_teamset(user, self.course_id, self.topic_id):
+            raise AlreadyOnTeamInTeamset
         if not user_protection_status_matches_team(user, self):
             raise AddToIncompatibleTeamError
         return CourseTeamMembership.objects.create(
@@ -319,10 +319,11 @@ class CourseTeamMembership(models.Model):
         return queryset
 
     @classmethod
-    def user_in_team_for_course(cls, user, course_id, topic_id=None):
+    def user_in_team_for_teamset(cls, user, course_id, topic_id=None):
         """
         Checks user membership in two ways:
-        if topic_id is None, checks to see if a user is assigned to any team in the course
+        if topic_id is None, checks to see if a user is assigned to any team in the teamsets associated with this
+        course.
         if topic_id (teamset) is provided, checks to see if a user is assigned to a specific team in the course.
 
         Args:
@@ -334,10 +335,7 @@ class CourseTeamMembership(models.Model):
             True if the user is on a team in the course already
             False if not
         """
-        if topic_id is None:
-            return cls.objects.filter(user=user, team__course_id=course_id).exists()
-        else:
-            return cls.objects.filter(user=user, team__course_id=course_id, team__topic_id=topic_id).exists()
+        return cls.objects.filter(user=user, team__course_id=course_id, team__topic_id=topic_id).exists()
 
     @classmethod
     def update_last_activity(cls, user, discussion_topic_id):
