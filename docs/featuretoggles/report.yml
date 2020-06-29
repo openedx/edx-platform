@@ -1,0 +1,2091 @@
+cms/envs/common.py:
+- annotation_data: ENABLE_CHANGE_USER_PASSWORD_ADMIN
+  annotation_token: '.. toggle_name:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 334
+  report_group_id: 25
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 335
+  report_group_id: 25
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 336
+  report_group_id: 25
+- annotation_data: Set to True to enable changing a user password through django admin.
+    This is disabled by default because enabling allows a method to bypass password
+    policy.
+  annotation_token: '.. toggle_description:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 337
+  report_group_id: 25
+- annotation_data: admin
+  annotation_token: '.. toggle_category:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 338
+  report_group_id: 25
+- annotation_data:
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 339
+  report_group_id: 25
+- annotation_data: '2020-02-21'
+  annotation_token: '.. toggle_creation_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 340
+  report_group_id: 25
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 341
+  report_group_id: 25
+- annotation_data: '''https://github.com/edx/edx-platform/pull/21616'''
+  annotation_token: '.. toggle_tickets:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 342
+  report_group_id: 25
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 343
+  report_group_id: 25
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 344
+  report_group_id: 25
+- annotation_data: ENABLE_ORA_TEAM_SUBMISSIONS
+  annotation_token: '.. toggle_name:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 349
+  report_group_id: 26
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 350
+  report_group_id: 26
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 351
+  report_group_id: 26
+- annotation_data: Set to True to enable team-based ORA submissions.
+  annotation_token: '.. toggle_description:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 352
+  report_group_id: 26
+- annotation_data: ora
+  annotation_token: '.. toggle_category:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 353
+  report_group_id: 26
+- annotation_data:
+  - incremental_release
+  annotation_token: '.. toggle_use_cases:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 354
+  report_group_id: 26
+- annotation_data: '2020-03-03'
+  annotation_token: '.. toggle_creation_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 355
+  report_group_id: 26
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 356
+  report_group_id: 26
+- annotation_data: https://openedx.atlassian.net/browse/EDUCATOR-4951
+  annotation_token: '.. toggle_tickets:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 357
+  report_group_id: 26
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 358
+  report_group_id: 26
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 359
+  report_group_id: 26
+- annotation_data: ENABLE_ORA_ALL_FILE_URLS
+  annotation_token: '.. toggle_name:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 362
+  report_group_id: 27
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 363
+  report_group_id: 27
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 364
+  report_group_id: 27
+- annotation_data: A "work-around" feature toggle meant to help in cases where some
+    file uploads are not
+  annotation_token: '.. toggle_description:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 365
+  report_group_id: 27
+- annotation_data: ora
+  annotation_token: '.. toggle_category:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 368
+  report_group_id: 27
+- annotation_data:
+  - graceful_degradation
+  annotation_token: '.. toggle_use_cases:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 369
+  report_group_id: 27
+- annotation_data: '2020-03-03'
+  annotation_token: '.. toggle_creation_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 370
+  report_group_id: 27
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 371
+  report_group_id: 27
+- annotation_data: https://openedx.atlassian.net/browse/EDUCATOR-4951
+  annotation_token: '.. toggle_tickets:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 372
+  report_group_id: 27
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 373
+  report_group_id: 27
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 374
+  report_group_id: 27
+- annotation_data: ENABLE_ORA_USER_STATE_UPLOAD_DATA
+  annotation_token: '.. toggle_name:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 377
+  report_group_id: 28
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 378
+  report_group_id: 28
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 379
+  report_group_id: 28
+- annotation_data: A "work-around" feature toggle meant to help in cases where some
+    file uploads are not
+  annotation_token: '.. toggle_description:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 380
+  report_group_id: 28
+- annotation_data: ora
+  annotation_token: '.. toggle_category:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 382
+  report_group_id: 28
+- annotation_data:
+  - graceful_degradation
+  annotation_token: '.. toggle_use_cases:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 383
+  report_group_id: 28
+- annotation_data: '2020-03-03'
+  annotation_token: '.. toggle_creation_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 384
+  report_group_id: 28
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 385
+  report_group_id: 28
+- annotation_data: https://openedx.atlassian.net/browse/EDUCATOR-4951
+  annotation_token: '.. toggle_tickets:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 386
+  report_group_id: 28
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 387
+  report_group_id: 28
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 388
+  report_group_id: 28
+- annotation_data: DISABLE_DEPRECATED_SIGNIN_URL
+  annotation_token: '.. toggle_name:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2211
+  report_group_id: 29
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2212
+  report_group_id: 29
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2213
+  report_group_id: 29
+- annotation_data: Toggle for removing the deprecated /signin url.
+  annotation_token: '.. toggle_description:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2214
+  report_group_id: 29
+- annotation_data: n/a
+  annotation_token: '.. toggle_category:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2215
+  report_group_id: 29
+- annotation_data:
+  - incremental_release
+  annotation_token: '.. toggle_use_cases:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2216
+  report_group_id: 29
+- annotation_data: '2019-12-02'
+  annotation_token: '.. toggle_creation_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2217
+  report_group_id: 29
+- annotation_data: '2020-06-01'
+  annotation_token: '.. toggle_expiration_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2218
+  report_group_id: 29
+- annotation_data: This url can be removed once it no longer has any real traffic.
+  annotation_token: '.. toggle_warnings:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2219
+  report_group_id: 29
+- annotation_data: ARCH-1253
+  annotation_token: '.. toggle_tickets:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2220
+  report_group_id: 29
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2221
+  report_group_id: 29
+- annotation_data: DISABLE_DEPRECATED_SIGNUP_URL
+  annotation_token: '.. toggle_name:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2224
+  report_group_id: 30
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2225
+  report_group_id: 30
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2226
+  report_group_id: 30
+- annotation_data: Toggle for removing the deprecated /signup url.
+  annotation_token: '.. toggle_description:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2227
+  report_group_id: 30
+- annotation_data: n/a
+  annotation_token: '.. toggle_category:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2228
+  report_group_id: 30
+- annotation_data:
+  - incremental_release
+  annotation_token: '.. toggle_use_cases:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2229
+  report_group_id: 30
+- annotation_data: '2019-12-02'
+  annotation_token: '.. toggle_creation_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2230
+  report_group_id: 30
+- annotation_data: '2020-06-01'
+  annotation_token: '.. toggle_expiration_date:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2231
+  report_group_id: 30
+- annotation_data: This url can be removed once it no longer has any real traffic.
+  annotation_token: '.. toggle_warnings:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2232
+  report_group_id: 30
+- annotation_data: ARCH-1253
+  annotation_token: '.. toggle_tickets:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2233
+  report_group_id: 30
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: cms/envs/common.py
+  found_by: python
+  line_number: 2234
+  report_group_id: 30
+lms/djangoapps/bulk_email/models.py:
+- annotation_data: require_course_email_auth
+  annotation_token: '.. toggle_name:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 471
+  report_group_id: 3
+- annotation_data:
+  - ConfigurationModel
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 472
+  report_group_id: 3
+- annotation_data: True (enabled)
+  annotation_token: '.. toggle_default:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 473
+  report_group_id: 3
+- annotation_data: If the flag is enabled, course-specific authorization is required,
+    and the course_id is either
+  annotation_token: '.. toggle_description:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 474
+  report_group_id: 3
+- annotation_data: bulk email
+  annotation_token: '.. toggle_category:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 476
+  report_group_id: 3
+- annotation_data:
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 477
+  report_group_id: 3
+- annotation_data: '2016-05-05'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 478
+  report_group_id: 3
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 479
+  report_group_id: 3
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 480
+  report_group_id: 3
+- annotation_data: None
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 481
+  report_group_id: 3
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/djangoapps/bulk_email/models.py
+  found_by: python
+  line_number: 482
+  report_group_id: 3
+lms/djangoapps/course_api/blocks/toggles.py:
+- annotation_data: course_blocks_api.hide_access_denials
+  annotation_token: '.. toggle_name:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 12
+  report_group_id: 13
+- annotation_data:
+  - WaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 13
+  report_group_id: 13
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 14
+  report_group_id: 13
+- annotation_data: ??
+  annotation_token: '.. toggle_description:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 15
+  report_group_id: 13
+- annotation_data: course api
+  annotation_token: '.. toggle_category:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 16
+  report_group_id: 13
+- annotation_data:
+  - incremental_release
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 17
+  report_group_id: 13
+- annotation_data: '2019-04-10'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 18
+  report_group_id: 13
+- annotation_data: ??
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 19
+  report_group_id: 13
+- annotation_data: ??
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 20
+  report_group_id: 13
+- annotation_data: ??
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 21
+  report_group_id: 13
+- annotation_data: ??
+  annotation_token: '.. toggle_status:'
+  filename: lms/djangoapps/course_api/blocks/toggles.py
+  found_by: python
+  line_number: 22
+  report_group_id: 13
+lms/djangoapps/courseware/toggles.py:
+- annotation_data: courseware.courseware_mfe
+  annotation_token: '.. toggle_name:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 13
+  report_group_id: 1
+- annotation_data:
+  - ExperimentWaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 14
+  report_group_id: 1
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 15
+  report_group_id: 1
+- annotation_data: Supports staged rollout to students for a new micro-frontend-based
+    implementation of the courseware page.
+  annotation_token: '.. toggle_description:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 16
+  report_group_id: 1
+- annotation_data: micro-frontend
+  annotation_token: '.. toggle_category:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 17
+  report_group_id: 1
+- annotation_data:
+  - incremental_release
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 18
+  report_group_id: 1
+- annotation_data: '2020-01-29'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 19
+  report_group_id: 1
+- annotation_data: '2020-12-31'
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 20
+  report_group_id: 1
+- annotation_data: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 21
+  report_group_id: 1
+- annotation_data: TNL-7000
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 22
+  report_group_id: 1
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 23
+  report_group_id: 1
+- annotation_data: courseware.microfrontend_course_team_preview
+  annotation_token: '.. toggle_name:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 28
+  report_group_id: 2
+- annotation_data:
+  - CourseWaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 29
+  report_group_id: 2
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 30
+  report_group_id: 2
+- annotation_data: Supports staged rollout to course teams of a new micro-frontend-based
+    implementation of the courseware page.
+  annotation_token: '.. toggle_description:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 31
+  report_group_id: 2
+- annotation_data: micro-frontend
+  annotation_token: '.. toggle_category:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 32
+  report_group_id: 2
+- annotation_data:
+  - incremental_release
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 33
+  report_group_id: 2
+- annotation_data: '2020-03-09'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 34
+  report_group_id: 2
+- annotation_data: '2020-12-31'
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 35
+  report_group_id: 2
+- annotation_data: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 36
+  report_group_id: 2
+- annotation_data: TNL-6982
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 37
+  report_group_id: 2
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/djangoapps/courseware/toggles.py
+  found_by: python
+  line_number: 38
+  report_group_id: 2
+lms/djangoapps/experiments/utils.py:
+- annotation_data: experiments.add_programs
+  annotation_token: '.. toggle_name:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 37
+  report_group_id: 23
+- annotation_data:
+  - WaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 38
+  report_group_id: 23
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 39
+  report_group_id: 23
+- annotation_data: Toggle for adding the current course's program information to user
+    metadata
+  annotation_token: '.. toggle_description:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 40
+  report_group_id: 23
+- annotation_data: experiments
+  annotation_token: '.. toggle_category:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 41
+  report_group_id: 23
+- annotation_data:
+  - monitored_rollout
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 42
+  report_group_id: 23
+- annotation_data: 2019-2-25
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 43
+  report_group_id: 23
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 44
+  report_group_id: 23
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 45
+  report_group_id: 23
+- annotation_data: REVEM-63, REVEM-198
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 46
+  report_group_id: 23
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 47
+  report_group_id: 23
+- annotation_data: experiments.add_dashboard_info
+  annotation_token: '.. toggle_name:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 54
+  report_group_id: 24
+- annotation_data:
+  - WaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 55
+  report_group_id: 24
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 56
+  report_group_id: 24
+- annotation_data: Toggle for adding info about each course to the dashboard metadata
+  annotation_token: '.. toggle_description:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 57
+  report_group_id: 24
+- annotation_data: experiments
+  annotation_token: '.. toggle_category:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 58
+  report_group_id: 24
+- annotation_data:
+  - monitored_rollout
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 59
+  report_group_id: 24
+- annotation_data: 2019-3-28
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 60
+  report_group_id: 24
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 61
+  report_group_id: 24
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 62
+  report_group_id: 24
+- annotation_data: REVEM-118
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 63
+  report_group_id: 24
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/djangoapps/experiments/utils.py
+  found_by: python
+  line_number: 64
+  report_group_id: 24
+lms/djangoapps/monitoring/utils.py:
+- annotation_data: CODE_OWNER_MAPPINGS
+  annotation_token: '.. toggle_name:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 95
+  report_group_id: 14
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 96
+  report_group_id: 14
+- annotation_data: None
+  annotation_token: '.. toggle_default:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 97
+  report_group_id: 14
+- annotation_data: Used to set monitoring custom metrics for owner. Dict with keys
+    of code owner and value as list of dotted path module names owned by code owner.
+  annotation_token: '.. toggle_description:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 98
+  report_group_id: 14
+- annotation_data: monitoring
+  annotation_token: '.. toggle_category:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 99
+  report_group_id: 14
+- annotation_data:
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 100
+  report_group_id: 14
+- annotation_data: '2020-05-29'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 101
+  report_group_id: 14
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 102
+  report_group_id: 14
+- annotation_data: None
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 103
+  report_group_id: 14
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 104
+  report_group_id: 14
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/djangoapps/monitoring/utils.py
+  found_by: python
+  line_number: 105
+  report_group_id: 14
+lms/envs/common.py:
+- annotation_data: ENABLE_SYSADMIN_DASHBOARD
+  annotation_token: '.. toggle_name:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 120
+  report_group_id: 5
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 121
+  report_group_id: 5
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 122
+  report_group_id: 5
+- annotation_data: enables dashboard at /syadmin/ for django staff, for seeing overview
+    of system status, for deleting and loading courses, for seeing log of git imports
+    of courseware.
+  annotation_token: '.. toggle_description:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 123
+  report_group_id: 5
+- annotation_data: admin
+  annotation_token: '.. toggle_category:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 124
+  report_group_id: 5
+- annotation_data:
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 125
+  report_group_id: 5
+- annotation_data: '2013-12-12'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 126
+  report_group_id: 5
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 127
+  report_group_id: 5
+- annotation_data: some views are not performant when there are more than 100 courses
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 128
+  report_group_id: 5
+- annotation_data: None
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 129
+  report_group_id: 5
+- annotation_data: unsupported
+  annotation_token: '.. toggle_status:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 130
+  report_group_id: 5
+- annotation_data: DISABLE_HONOR_CERTIFICATES
+  annotation_token: '.. toggle_name:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 185
+  report_group_id: 6
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 186
+  report_group_id: 6
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 187
+  report_group_id: 6
+- annotation_data: Set to True to disable honor certificates. Typically used when
+    your installation only allows verified certificates, like courses.edx.org.
+  annotation_token: '.. toggle_description:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 188
+  report_group_id: 6
+- annotation_data: certificates
+  annotation_token: '.. toggle_category:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 189
+  report_group_id: 6
+- annotation_data:
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 190
+  report_group_id: 6
+- annotation_data: '2019-05-14'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 191
+  report_group_id: 6
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 192
+  report_group_id: 6
+- annotation_data: https://openedx.atlassian.net/browse/PROD-269
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 193
+  report_group_id: 6
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 194
+  report_group_id: 6
+- annotation_data: ???
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 195
+  report_group_id: 6
+- annotation_data: ENABLE_CHANGE_USER_PASSWORD_ADMIN
+  annotation_token: '.. toggle_name:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 412
+  report_group_id: 7
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 413
+  report_group_id: 7
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 414
+  report_group_id: 7
+- annotation_data: Set to True to enable changing a user password through django admin.
+    This is disabled by default because enabling allows a method to bypass password
+    policy.
+  annotation_token: '.. toggle_description:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 415
+  report_group_id: 7
+- annotation_data: admin
+  annotation_token: '.. toggle_category:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 416
+  report_group_id: 7
+- annotation_data:
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 417
+  report_group_id: 7
+- annotation_data: '2020-02-21'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 418
+  report_group_id: 7
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 419
+  report_group_id: 7
+- annotation_data: '''https://github.com/edx/edx-platform/pull/21616'''
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 420
+  report_group_id: 7
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 421
+  report_group_id: 7
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 422
+  report_group_id: 7
+- annotation_data: ENABLE_COURSEWARE_MICROFRONTEND
+  annotation_token: '.. toggle_name:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 425
+  report_group_id: 8
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 426
+  report_group_id: 8
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 427
+  report_group_id: 8
+- annotation_data: Set to True to enable the Courseware MFE at the platform level
+    for global staff (see REDIRECT_TO_COURSEWARE_MICROFRONTEND for course rollout)
+  annotation_token: '.. toggle_description:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 428
+  report_group_id: 8
+- annotation_data: admin
+  annotation_token: '.. toggle_category:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 429
+  report_group_id: 8
+- annotation_data:
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 430
+  report_group_id: 8
+- annotation_data: '2020-03-05'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 431
+  report_group_id: 8
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 432
+  report_group_id: 8
+- annotation_data: '''https://github.com/edx/edx-platform/pull/23317'''
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 433
+  report_group_id: 8
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 434
+  report_group_id: 8
+- annotation_data: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND
+    for rollout.
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 435
+  report_group_id: 8
+- annotation_data: ENABLE_ORA_TEAM_SUBMISSIONS
+  annotation_token: '.. toggle_name:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 440
+  report_group_id: 9
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 441
+  report_group_id: 9
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 442
+  report_group_id: 9
+- annotation_data: Set to True to enable team-based ORA submissions.
+  annotation_token: '.. toggle_description:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 443
+  report_group_id: 9
+- annotation_data: ora
+  annotation_token: '.. toggle_category:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 444
+  report_group_id: 9
+- annotation_data:
+  - incremental_release
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 445
+  report_group_id: 9
+- annotation_data: '2020-03-03'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 446
+  report_group_id: 9
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 447
+  report_group_id: 9
+- annotation_data: https://openedx.atlassian.net/browse/EDUCATOR-4951
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 448
+  report_group_id: 9
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 449
+  report_group_id: 9
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 450
+  report_group_id: 9
+- annotation_data: ENABLE_ORA_ALL_FILE_URLS
+  annotation_token: '.. toggle_name:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 453
+  report_group_id: 10
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 454
+  report_group_id: 10
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 455
+  report_group_id: 10
+- annotation_data: A "work-around" feature toggle meant to help in cases where some
+    file uploads are not
+  annotation_token: '.. toggle_description:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 456
+  report_group_id: 10
+- annotation_data: ora
+  annotation_token: '.. toggle_category:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 459
+  report_group_id: 10
+- annotation_data:
+  - graceful_degradation
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 460
+  report_group_id: 10
+- annotation_data: '2020-03-03'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 461
+  report_group_id: 10
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 462
+  report_group_id: 10
+- annotation_data: https://openedx.atlassian.net/browse/EDUCATOR-4951
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 463
+  report_group_id: 10
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 464
+  report_group_id: 10
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 465
+  report_group_id: 10
+- annotation_data: ENABLE_ORA_USER_STATE_UPLOAD_DATA
+  annotation_token: '.. toggle_name:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 468
+  report_group_id: 11
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 469
+  report_group_id: 11
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 470
+  report_group_id: 11
+- annotation_data: A "work-around" feature toggle meant to help in cases where some
+    file uploads are not
+  annotation_token: '.. toggle_description:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 471
+  report_group_id: 11
+- annotation_data: ora
+  annotation_token: '.. toggle_category:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 473
+  report_group_id: 11
+- annotation_data:
+  - graceful_degradation
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 474
+  report_group_id: 11
+- annotation_data: '2020-03-03'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 475
+  report_group_id: 11
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 476
+  report_group_id: 11
+- annotation_data: https://openedx.atlassian.net/browse/EDUCATOR-4951
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 477
+  report_group_id: 11
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 478
+  report_group_id: 11
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 479
+  report_group_id: 11
+- annotation_data: ENABLE_ORA_USERNAMES_ON_DATA_EXPORT
+  annotation_token: '.. toggle_name:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 482
+  report_group_id: 12
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 483
+  report_group_id: 12
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 484
+  report_group_id: 12
+- annotation_data: Set to True to add deanonymized usernames to ORA data report.
+  annotation_token: '.. toggle_description:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 485
+  report_group_id: 12
+- annotation_data: ora
+  annotation_token: '.. toggle_category:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 486
+  report_group_id: 12
+- annotation_data:
+  - incremental_release
+  annotation_token: '.. toggle_use_cases:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 487
+  report_group_id: 12
+- annotation_data: '2020-06-11'
+  annotation_token: '.. toggle_creation_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 488
+  report_group_id: 12
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 489
+  report_group_id: 12
+- annotation_data: https://openedx.atlassian.net/browse/TNL-7273
+  annotation_token: '.. toggle_tickets:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 490
+  report_group_id: 12
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 491
+  report_group_id: 12
+- annotation_data: None
+  annotation_token: '.. toggle_warnings:'
+  filename: lms/envs/common.py
+  found_by: python
+  line_number: 492
+  report_group_id: 12
+openedx/core/djangoapps/user_api/accounts/toggles.py:
+- annotation_data: order_history.redirect_to_microfrontend
+  annotation_token: '.. toggle_name:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 9
+  report_group_id: 16
+- annotation_data:
+  - WaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 10
+  report_group_id: 16
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 11
+  report_group_id: 16
+- annotation_data: Supports staged rollout of a new micro-frontend-based implementation
+    of the order history page.
+  annotation_token: '.. toggle_description:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 12
+  report_group_id: 16
+- annotation_data: micro-frontend
+  annotation_token: '.. toggle_category:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 13
+  report_group_id: 16
+- annotation_data:
+  - incremental_release
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 14
+  report_group_id: 16
+- annotation_data: '2019-04-11'
+  annotation_token: '.. toggle_creation_date:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 15
+  report_group_id: 16
+- annotation_data: '2020-12-31'
+  annotation_token: '.. toggle_expiration_date:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 16
+  report_group_id: 16
+- annotation_data: Also set settings.ORDER_HISTORY_MICROFRONTEND_URL and site's ENABLE_ORDER_HISTORY_MICROFRONTEND.
+  annotation_token: '.. toggle_warnings:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 17
+  report_group_id: 16
+- annotation_data: DEPR-17
+  annotation_token: '.. toggle_tickets:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 18
+  report_group_id: 16
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 19
+  report_group_id: 16
+- annotation_data: account.redirect_to_microfrontend
+  annotation_token: '.. toggle_name:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 30
+  report_group_id: 17
+- annotation_data:
+  - WaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 31
+  report_group_id: 17
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 32
+  report_group_id: 17
+- annotation_data: Supports staged rollout of a new micro-frontend-based implementation
+    of the account page.
+  annotation_token: '.. toggle_description:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 33
+  report_group_id: 17
+- annotation_data: micro-frontend
+  annotation_token: '.. toggle_category:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 34
+  report_group_id: 17
+- annotation_data:
+  - incremental_release
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 35
+  report_group_id: 17
+- annotation_data: '2019-04-30'
+  annotation_token: '.. toggle_creation_date:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 36
+  report_group_id: 17
+- annotation_data: '2020-12-31'
+  annotation_token: '.. toggle_expiration_date:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 37
+  report_group_id: 17
+- annotation_data: Also set settings.ACCOUNT_MICROFRONTEND_URL and site's ENABLE_ACCOUNT_MICROFRONTEND.
+  annotation_token: '.. toggle_warnings:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 38
+  report_group_id: 17
+- annotation_data: DEPR-17
+  annotation_token: '.. toggle_tickets:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 39
+  report_group_id: 17
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: openedx/core/djangoapps/user_api/accounts/toggles.py
+  found_by: python
+  line_number: 40
+  report_group_id: 17
+openedx/core/djangoapps/user_authn/config/waffle.py:
+- annotation_data: user_authn.enable_login_using_thirdparty_auth_only
+  annotation_token: '.. toggle_name:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 11
+  report_group_id: 18
+- annotation_data:
+  - WaffleSwitch
+  annotation_token: '.. toggle_implementation:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 12
+  report_group_id: 18
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 13
+  report_group_id: 18
+- annotation_data: When enabled, users must be sign in using their allowed domain
+    SSO account.
+  annotation_token: '.. toggle_description:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 14
+  report_group_id: 18
+- annotation_data: authn
+  annotation_token: '.. toggle_category:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 15
+  report_group_id: 18
+- annotation_data:
+  - incremental_release
+  annotation_token: '.. toggle_use_cases:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 16
+  report_group_id: 18
+- annotation_data: '2019-11-20'
+  annotation_token: '.. toggle_creation_date:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 17
+  report_group_id: 18
+- annotation_data: '2020-01-31'
+  annotation_token: '.. toggle_expiration_date:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 18
+  report_group_id: 18
+- annotation_data: Requires THIRD_PARTY_AUTH_ONLY_DOMAIN to also be set.
+  annotation_token: '.. toggle_warnings:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 19
+  report_group_id: 18
+- annotation_data: ENT-2461
+  annotation_token: '.. toggle_tickets:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 20
+  report_group_id: 18
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: openedx/core/djangoapps/user_authn/config/waffle.py
+  found_by: python
+  line_number: 21
+  report_group_id: 18
+openedx/core/djangoapps/waffle_utils/__init__.py:
+- annotation_data: WAFFLE_FLAG_CUSTOM_METRICS
+  annotation_token: '.. toggle_name:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 360
+  report_group_id: 22
+- annotation_data:
+  - DjangoSetting
+  annotation_token: '.. toggle_implementation:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 361
+  report_group_id: 22
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 362
+  report_group_id: 22
+- annotation_data: A list of waffle flag to track with custom metrics having values
+    of (True, False, or Both).
+  annotation_token: '.. toggle_description:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 363
+  report_group_id: 22
+- annotation_data: monitoring
+  annotation_token: '.. toggle_category:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 364
+  report_group_id: 22
+- annotation_data:
+  - opt_in
+  annotation_token: '.. toggle_use_cases:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 365
+  report_group_id: 22
+- annotation_data: '2020-06-17'
+  annotation_token: '.. toggle_creation_date:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 366
+  report_group_id: 22
+- annotation_data: None
+  annotation_token: '.. toggle_expiration_date:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 367
+  report_group_id: 22
+- annotation_data: None
+  annotation_token: '.. toggle_tickets:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 368
+  report_group_id: 22
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 369
+  report_group_id: 22
+- annotation_data: Intent is for temporary research (1 day - several weeks) of a flag's
+    usage.
+  annotation_token: '.. toggle_warnings:'
+  filename: openedx/core/djangoapps/waffle_utils/__init__.py
+  found_by: python
+  line_number: 370
+  report_group_id: 22
+openedx/features/course_experience/__init__.py:
+- annotation_data: course_experience.show_reviews_tool
+  annotation_token: '.. toggle_name:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 28
+  report_group_id: 19
+- annotation_data:
+  - CourseWaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 29
+  report_group_id: 19
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 30
+  report_group_id: 19
+- annotation_data: Used with our integration with CourseTalk to display reviews for
+    a course.
+  annotation_token: '.. toggle_description:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 31
+  report_group_id: 19
+- annotation_data: course_experience
+  annotation_token: '.. toggle_category:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 32
+  report_group_id: 19
+- annotation_data:
+  - monitored_rollout
+  annotation_token: '.. toggle_use_cases:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 33
+  report_group_id: 19
+- annotation_data: '2017-06-19'
+  annotation_token: '.. toggle_creation_date:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 34
+  report_group_id: 19
+- annotation_data: ???
+  annotation_token: '.. toggle_expiration_date:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 35
+  report_group_id: 19
+- annotation_data: We are no longer integrating with CourseTalk, so this probably
+    should be deprecated and the code for reviews should be removed.
+  annotation_token: '.. toggle_warnings:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 36
+  report_group_id: 19
+- annotation_data: DEPR-48
+  annotation_token: '.. toggle_tickets:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 37
+  report_group_id: 19
+- annotation_data: unsupported
+  annotation_token: '.. toggle_status:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 38
+  report_group_id: 19
+- annotation_data: course_experience.enable_course_goals
+  annotation_token: '.. toggle_name:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 42
+  report_group_id: 20
+- annotation_data:
+  - CourseWaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 43
+  report_group_id: 20
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 44
+  report_group_id: 20
+- annotation_data: Used to determine whether or not to use course goals for the particular
+    course.
+  annotation_token: '.. toggle_description:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 45
+  report_group_id: 20
+- annotation_data: course_experience
+  annotation_token: '.. toggle_category:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 46
+  report_group_id: 20
+- annotation_data:
+  - opt_out
+  - monitored_rollout
+  annotation_token: '.. toggle_use_cases:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 47
+  report_group_id: 20
+- annotation_data: '2017-09-11'
+  annotation_token: '.. toggle_creation_date:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 48
+  report_group_id: 20
+- annotation_data: ???
+  annotation_token: '.. toggle_expiration_date:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 49
+  report_group_id: 20
+- annotation_data: N/A
+  annotation_token: '.. toggle_warnings:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 50
+  report_group_id: 20
+- annotation_data: N/A
+  annotation_token: '.. toggle_tickets:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 51
+  report_group_id: 20
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 52
+  report_group_id: 20
+- annotation_data: course_experience.latest_update
+  annotation_token: '.. toggle_name:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 62
+  report_group_id: 21
+- annotation_data:
+  - CourseWaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 63
+  report_group_id: 21
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 64
+  report_group_id: 21
+- annotation_data: Used to switch between 'welcome message' and 'latest update' on
+    the course home page.
+  annotation_token: '.. toggle_description:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 65
+  report_group_id: 21
+- annotation_data: course_experience
+  annotation_token: '.. toggle_category:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 66
+  report_group_id: 21
+- annotation_data:
+  - opt_out
+  annotation_token: '.. toggle_use_cases:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 67
+  report_group_id: 21
+- annotation_data: '2017-09-11'
+  annotation_token: '.. toggle_creation_date:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 68
+  report_group_id: 21
+- annotation_data: ???
+  annotation_token: '.. toggle_expiration_date:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 69
+  report_group_id: 21
+- annotation_data: This is meant to be configured using waffle_utils course override
+    only.  Either do not create the actual waffle flag, or be sure to unset the flag
+    even for Superusers.
+  annotation_token: '.. toggle_warnings:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 70
+  report_group_id: 21
+- annotation_data: N/A
+  annotation_token: '.. toggle_tickets:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 71
+  report_group_id: 21
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: openedx/features/course_experience/__init__.py
+  found_by: python
+  line_number: 72
+  report_group_id: 21
+openedx/features/course_experience/waffle.py:
+- annotation_data: course_experience.enable_about_sidebar_html
+  annotation_token: '.. toggle_name:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 12
+  report_group_id: 4
+- annotation_data:
+  - CourseWaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 13
+  report_group_id: 4
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 14
+  report_group_id: 4
+- annotation_data: Used to determine whether to show custom HTML in the sidebar on
+    the internal course about page.
+  annotation_token: '.. toggle_description:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 15
+  report_group_id: 4
+- annotation_data: course-experience
+  annotation_token: '.. toggle_category:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 16
+  report_group_id: 4
+- annotation_data:
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 17
+  report_group_id: 4
+- annotation_data: '2018-01-26'
+  annotation_token: '.. toggle_creation_date:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 18
+  report_group_id: 4
+- annotation_data: ???
+  annotation_token: '.. toggle_expiration_date:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 19
+  report_group_id: 4
+- annotation_data: N/A
+  annotation_token: '.. toggle_warnings:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 20
+  report_group_id: 4
+- annotation_data: N/A
+  annotation_token: '.. toggle_tickets:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 21
+  report_group_id: 4
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: openedx/features/course_experience/waffle.py
+  found_by: python
+  line_number: 22
+  report_group_id: 4
+openedx/features/learner_profile/toggles.py:
+- annotation_data: learner_profile.redirect_to_microfrontend
+  annotation_token: '.. toggle_name:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 14
+  report_group_id: 15
+- annotation_data:
+  - WaffleFlag
+  annotation_token: '.. toggle_implementation:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 15
+  report_group_id: 15
+- annotation_data: 'False'
+  annotation_token: '.. toggle_default:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 16
+  report_group_id: 15
+- annotation_data: Supports staged rollout of a new micro-frontend-based implementation
+    of the profile page.
+  annotation_token: '.. toggle_description:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 17
+  report_group_id: 15
+- annotation_data: micro-frontend
+  annotation_token: '.. toggle_category:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 18
+  report_group_id: 15
+- annotation_data:
+  - incremental_release
+  - open_edx
+  annotation_token: '.. toggle_use_cases:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 19
+  report_group_id: 15
+- annotation_data: '2019-02-19'
+  annotation_token: '.. toggle_creation_date:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 20
+  report_group_id: 15
+- annotation_data: '2020-12-31'
+  annotation_token: '.. toggle_expiration_date:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 21
+  report_group_id: 15
+- annotation_data: Also set settings.PROFILE_MICROFRONTEND_URL and site's ENABLE_PROFILE_MICROFRONTEND.
+  annotation_token: '.. toggle_warnings:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 22
+  report_group_id: 15
+- annotation_data: DEPR-17
+  annotation_token: '.. toggle_tickets:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 23
+  report_group_id: 15
+- annotation_data: supported
+  annotation_token: '.. toggle_status:'
+  filename: openedx/features/learner_profile/toggles.py
+  found_by: python
+  line_number: 24
+  report_group_id: 15
