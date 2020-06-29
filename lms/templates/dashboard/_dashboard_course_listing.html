@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url" expression_filter="h"/>
+<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
 
 <%!
 import six
@@ -274,6 +274,12 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                                 ${_('Unenroll')}
                               </a>
                         </li>
+                    % elif partner_managed_enrollment:
+                      <li class="actions-item" id="actions-item-enrolled-by-partner-${dashboard_index}" role="menuitem">
+                        <a class="action action-message action-unenroll-managed-enrollment">
+                          ${_('You are enrolled by your institution and you should reach out to your institution to drop this course.')}
+                        </a>
+                      </li>
                     % endif
                       <li class="actions-item" id="actions-item-email-settings-${dashboard_index}" role="menuitem">
                         % if show_email_settings:
