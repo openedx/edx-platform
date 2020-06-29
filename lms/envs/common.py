@@ -2596,7 +2596,7 @@ REST_FRAMEWORK = {
     'URL_FORMAT_OVERRIDE': None,
     'DEFAULT_THROTTLE_RATES': {
         'user': '60/minute',
-        'service_user': '120/minute',
+        'service_user': '800/minute',
         'registration_validation': '30/minute',
     },
 }
