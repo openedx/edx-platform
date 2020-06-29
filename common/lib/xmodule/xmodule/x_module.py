@@ -1,3 +1,4 @@
+import beeline
 import logging
 import os
 import sys
@@ -1871,6 +1872,7 @@ class CombinedSystem(object):
         self._module_system = module_system
         self._descriptor_system = descriptor_system
 
+    @beeline.traced(name="xmodule.CombinedSystem._get_student_block")
     def _get_student_block(self, block):
         """
         If block is an XModuleDescriptor that has been bound to a student, return
@@ -1883,6 +1885,7 @@ class CombinedSystem(object):
         else:
             return block
 
+    @beeline.traced(name="xmodule.CombinedSystem.render")
     def render(self, block, view_name, context=None):
         """
         Render a block by invoking its view.
@@ -1896,6 +1899,8 @@ class CombinedSystem(object):
         integrate it into a larger whole.
 
         """
+        beeline.add_context_field("block", block)
+        beeline.add_context_field("view_name", view_name)
         context = context or {}
         if view_name in PREVIEW_VIEWS:
             block = self._get_student_block(block)

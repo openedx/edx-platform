@@ -1124,6 +1124,7 @@ def hash_resource(resource):
         md5.update(repr(data))
     return md5.hexdigest()
 
+
 @beeline.traced(name="lms.courseware.module_render.xblock_view")
 def xblock_view(request, course_id, usage_id, view_name):
     """
