@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from third_party_auth.models import SAMLProviderConfig
 
+
 class SAMLProviderConfigTests(APITestCase):
     """
         API Tests for SAMLProviderConfig REST endpoints

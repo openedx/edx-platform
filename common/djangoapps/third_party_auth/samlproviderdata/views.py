@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from third_party_auth.models import SAMLProviderData
 from third_party_auth.samlproviderdata.serializers import SAMLProviderDataSerializer
 
+
 class SAMLProviderDataViewSet(viewsets.ModelViewSet):
     """
     A View to handle SAMLProviderData CRUD

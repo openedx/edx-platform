@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from third_party_auth.models import SAMLProviderConfig
 from third_party_auth.samlproviderconfig.serializers import SAMLProviderConfigSerializer
 
+
 class SAMLProviderConfigViewSet(viewsets.ModelViewSet):
     """
     A View to handle SAMLProviderConfig CRUD
@@ -16,4 +17,3 @@ class SAMLProviderConfigViewSet(viewsets.ModelViewSet):
     queryset = SAMLProviderConfig.objects.all()
     serializer_class = SAMLProviderConfigSerializer
     # permission_classes = [IsAdminUser]
-
