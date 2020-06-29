@@ -23,9 +23,9 @@
                 Object.keys(optionalAttrs).length > 0
             ) {
                 var allowedAttrs = ["courseId", "pageName"];
-                allowedAttrs.map(
-                    allowedAttr => eventAttrs[allowedAttr] = optionalAttrs[allowedAttr]
-                );
+                allowedAttrs.map(function(allowedAttr) {
+                    eventAttrs[allowedAttr] = optionalAttrs[allowedAttr];
+                });
             }
     
             window.analytics.track("edx.bi.ecommerce.upsell_links_clicked", eventAttrs);
