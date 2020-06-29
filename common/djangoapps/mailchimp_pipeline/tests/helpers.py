@@ -17,8 +17,7 @@ def create_organization(user):
     organization = OrganizationFactory(
         admin=user,
         alternate_admin_email=user.email,
-        label='test_org',
-        org_type='test_org_type'
+        label='test_org'
     )
     organization.save()
     return organization

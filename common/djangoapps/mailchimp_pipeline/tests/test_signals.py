@@ -152,4 +152,6 @@ class MailchimpPipelineSignalTestClass(TestCase):
         """
         organization = create_organization(self.user)
         org_label, org_type, work_area = get_org_data_for_mandrill(organization)
-        mocked_delay.assert_called_with(org_label, org_type, work_area, settings.MAILCHIMP_LEARNERS_LIST_ID)
+        mocked_delay.assert_called_with(
+            org_label, org_type, work_area, organization.id, settings.MAILCHIMP_LEARNERS_LIST_ID
+        )
