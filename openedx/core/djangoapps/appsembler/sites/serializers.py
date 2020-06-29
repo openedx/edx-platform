@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.db import transaction
 from rest_framework import serializers
 from organizations import api as organizations_api
 from organizations.models import Organization
@@ -139,7 +140,13 @@ class RegistrationSerializer(serializers.Serializer):
 
         # clone course
         if settings.FEATURES.get("APPSEMBLER_IMPORT_DEFAULT_COURSE_ON_SITE_CREATION", False):
-            import_course_on_site_creation_apply_async(organization)
+            def import_task_on_commit():
+                """
+                Run the import task after the commit to avoid Organization.DoesNotExist error on the Celery.
+                """
+                import_course_on_site_creation_apply_async(organization)
+            transaction.on_commit(import_task_on_commit)
+
         return {
             'site': site,
             'organization': organization,
