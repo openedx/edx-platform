@@ -8,7 +8,7 @@
     define([], function() {
         var trackUpsellClick = function(linkName, optionalAttrs) {
             var eventAttrs = {linkName: linkName};
-            var allowedAttrs = ['courseId', 'pageName'];
+            var allowedAttrs = ['linkType', 'pageName', 'linkCategory'];
 
             if (!window.analytics) {
                 return;
