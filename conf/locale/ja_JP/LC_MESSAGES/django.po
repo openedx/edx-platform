@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-21 20:42+0000\n"
+"POT-Creation-Date: 2020-06-28 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/)\n"
@@ -3224,6 +3224,17 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Proctortrack Exam Escalation Contact"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Required if 'proctortrack' is selected as your proctoring provider. Enter an"
+" email address to be contacted by the support team whenever there are "
+"escalations (e.g. appeals, delayed reviews, etc.)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
 msgstr "監督付き試験をやめるのを許可する"
 
@@ -4175,6 +4186,7 @@ msgid "External Discussion"
 msgstr "外部ディスカッション"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
 msgid "Home"
 msgstr "ホーム"
 
@@ -5922,6 +5934,23 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Annual Household Income"
 msgstr "年間の世帯収入"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your current financial situation. Why do you need assistance?"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your learning or professional goals. How will a Verified "
+"Certificate in this course help you achieve these goals?"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your plans for this course. What steps will you take to help "
+"you complete the course work and receive a certificate?"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 1250 and 2500 characters or so in your response."
@@ -10977,6 +11006,10 @@ msgstr ""
 msgid "Username created for VEM Integration, e.g. vem_service_user."
 msgstr ""
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Percentage of courses allowed to use VEM pipeline"
+msgstr ""
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr "強制オン"
@@ -11074,36 +11107,28 @@ msgstr ""
 msgid "Subscribe to calendar updates"
 msgstr ""
 
-#: openedx/features/calendar_sync/views/management.py
-#, python-brace-format
-msgid "Updates for Your {course} Schedule"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
-msgid "Update Your Calendar"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
-#, python-brace-format
-msgid ""
-"Your assignment due dates for {course} were recently adjusted. Update your "
-"calendarwith your new schedule to ensure that you stay on track!"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
+#: openedx/features/calendar_sync/utils.py
 msgid "Stay on Track"
 msgstr ""
 
-#: openedx/features/calendar_sync/views/management.py
-msgid "Mark Your Calendar"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
+#: openedx/features/calendar_sync/utils.py
 #, python-brace-format
 msgid ""
 "Sticking to a schedule is the best way to ensure that you successfully "
 "complete your self-paced course. This schedule of assignment due dates for "
 "{course} will help you stay on track!"
+msgstr ""
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid "Updates for Your {course} Schedule"
+msgstr ""
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid ""
+"Your assignment due dates for {course} were recently adjusted. Update your "
+"calendar with your new schedule to ensure that you stay on track!"
 msgstr ""
 
 #: openedx/features/content_type_gating/models.py
@@ -11303,6 +11328,23 @@ msgid ""
 "checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
+#: openedx/features/enterprise_support/admin/forms.py
+msgid "CSV File"
+msgstr ""
+
+#: openedx/features/enterprise_support/admin/forms.py
+msgid ""
+"CSV file should have 3 columns having names lms_user_id, course_id, "
+"opportunity_id"
+msgstr ""
+
+#: openedx/features/enterprise_support/admin/views.py
+#, python-brace-format
+msgid ""
+"Enrollment attributes were not updated for records at following line numbers"
+" in csv because no enrollment found for these records: {error_line_numbers}"
+msgstr ""
+
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_title} was not complete."
@@ -11314,6 +11356,18 @@ msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
 msgstr "データのシェアについて心配があるなら、{enterprise_customer_name}で管理者へお問い合わせください。"
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Enterprise Course Enrollments"
+msgstr ""
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Override Enrollment Attributes"
+msgstr ""
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Upload CSV to override enrollment attributes for learners"
+msgstr ""
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
@@ -13077,6 +13131,7 @@ msgid "Sequence"
 msgstr "順番"
 
 #: lms/templates/courseware/dates.html lms/templates/seq_module.html
+#: lms/templates/vert_module.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr ""
@@ -13461,6 +13516,11 @@ msgid ""
 msgstr ""
 "フォントサイズを大きくしたり小さくしたりする必要がある場合には、ブラウザ設定でフォントサイズを調整してください。Google "
 "Chromeでは、コントロールキーと＋または－を同時に押してください。"
+
+#: lms/templates/vert_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "{subsection_format} due {{date}}"
+msgstr "{subsection_format} 締切 {{date}}"
 
 #: lms/templates/video.html
 msgid "Loading video player"
@@ -15629,22 +15689,6 @@ msgstr "メール設定"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "関連プログラム"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can contact the account holder to request payment, or you can "
-"unenroll from this course"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can {contact_link_start}contact the account "
-"holder{contact_link_end} to request payment, or you can "
-"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
-msgstr ""
-"お支払いがなかったため、この講座へはアクセスができません。お支払いについての{contact_link_start}問い合わせ{contact_link_end}をするか、この講座を{unenroll_link_start}受講取消{unenroll_link_end}しましょう"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -18852,12 +18896,10 @@ msgstr "このページは空欄にしてあります。自由に記入してく
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
 "course from a country or region currently subject to U.S. economic and trade"
-" sanctions.Unfortunately, because {platform_name} is required to comply with"
-" export controls,we cannot allow you to access this course at this time."
+" sanctions. Unfortunately, because {platform_name} is required to comply "
+"with export controls, we cannot allow you to access this course at this "
+"time."
 msgstr ""
-"本システムは、あなたが現在米国の経済的制裁、貿易制裁の対象国または地域から{platform_name} "
-"講座へアクセスしようとしていることを検知しました。残念ながら、 {platform_name} "
-"は輸出規制を厳守しなければならないため、今回の本講座へのアクセスを許可することができません。"
 
 #: lms/templates/static_templates/faq.html
 #: themes/red-theme/lms/templates/footer.html
@@ -19221,10 +19263,6 @@ msgstr[0] ""
 msgid "Prerequisite: "
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "{subsection_format} due {{date}}"
-msgstr "{subsection_format} 締切 {{date}}"
-
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"
 msgstr ""
@@ -19394,6 +19432,14 @@ msgstr "Partner Portalで講座スタッフサポートにアクセスし、サ�
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "edX Partner Portal"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""
