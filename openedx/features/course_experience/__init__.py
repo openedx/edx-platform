@@ -85,14 +85,12 @@ class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
 DEFAULT_TRUE_WAFFLE_FLAG_NAMESPACE = DefaultTrueWaffleFlagNamespace(name='course_experience')
 
 # Waffle flag to enable the separate course outline page and full width content.
-# NOTE: This is no longer a real CourseWaffleFlag.
-# 1. It always has a default of True.
-# 2. It no longer checks course overrides
+# NOTE: The special namespace makes the default True and skips checking course overrides.
 # TODO: TNL-7061: Perform the actual clean-up required to remove this flag.
 COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(DEFAULT_TRUE_WAFFLE_FLAG_NAMESPACE, 'course_outline_page')
 
 # Waffle flag to enable a single unified "Course" tab.
-# NOTE: This is no longer a real flag. It is always True.
+# NOTE: The special namespace makes the default True and skips checking course overrides.
 # TODO: TNL-7061: Perform the actual clean-up required to remove this flag.
 UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(DEFAULT_TRUE_WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
 
