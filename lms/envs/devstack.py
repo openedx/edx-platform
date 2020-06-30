@@ -359,7 +359,8 @@ ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
-COURSE_CATALOG_API_URL = 'http://edx.devstack.discovery:18381/api/v1/'
+COURSE_CATALOG_URL_ROOT = 'http://edx.devstack.discovery:18381'
+COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
 
 # Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
 # LOGGING['handlers']['console']['level'] = 'DEBUG'
