@@ -176,7 +176,7 @@ lazy==1.4                 # via -r requirements/edx/testing.txt, acid-xblock, bo
 lepl==5.1.3               # via -r requirements/edx/testing.txt, rfc6266-parser
 libsass==0.10.0           # via -r requirements/edx/testing.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/testing.txt, ora2
-lti-consumer-xblock==1.4.2  # via -r requirements/edx/testing.txt
+lti-consumer-xblock==2.0.1.1  # via -r requirements/edx/testing.txt
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, capa, edxval, lti-consumer-xblock, ora2, pyquery, safe-lxml, xblock, xmlsec
 m2r==0.2.1                # via sphinxcontrib-openapi
 mailsnake==1.6.4          # via -r requirements/edx/testing.txt
@@ -197,7 +197,7 @@ mysqlclient==1.4.6        # via -r requirements/edx/testing.txt
 newrelic==5.14.1.144      # via -r requirements/edx/testing.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/testing.txt, chem
 nodeenv==1.4.0            # via -r requirements/edx/testing.txt
-numpy==1.18.5             # via -r requirements/edx/testing.txt, chem, openedx-calc, scipy
+numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/testing.txt
 ora2==2.8.6               # via -r requirements/edx/testing.txt
@@ -221,11 +221,11 @@ pycodestyle==2.6.0        # via -r requirements/edx/testing.txt, flake8
 pycontracts==1.8.12       # via -r requirements/edx/testing.txt, edx-user-state-client
 pycountry==19.8.18        # via -r requirements/edx/testing.txt
 pycparser==2.20           # via -r requirements/edx/testing.txt, cffi
-pycryptodome==3.9.8       # via -r requirements/edx/testing.txt, pdfminer.six
+pycryptodome==3.9.8       # via -r requirements/edx/testing.txt, lti-consumer-xblock, pdfminer.six
 pycryptodomex==3.9.8      # via -r requirements/edx/testing.txt, edx-proctoring, pyjwkest
 pyflakes==2.2.0           # via -r requirements/edx/testing.txt, flake8
 pygments==2.6.1           # via -r requirements/edx/testing.txt, diff-cover, sphinx
-pyjwkest==1.4.2           # via -r requirements/edx/testing.txt, edx-drf-extensions
+pyjwkest==1.4.2           # via -r requirements/edx/testing.txt, edx-drf-extensions, lti-consumer-xblock
 pyjwt==1.5.2              # via -r requirements/edx/testing.txt, drf-jwt, edx-rest-api-client, social-auth-core
 pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
 pylint-django==2.0.11     # via -r requirements/edx/testing.txt, edx-lint
@@ -271,7 +271,7 @@ ruamel.yaml==0.16.10      # via -r requirements/edx/testing.txt, drf-yasg
 rules==2.2                # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 s3transfer==0.1.13        # via -r requirements/edx/testing.txt, boto3
 sailthru-client==2.2.3    # via -r requirements/edx/testing.txt, edx-ace
-scipy==1.4.1              # via -r requirements/edx/testing.txt, chem, openedx-calc
+scipy==1.4.1              # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, chem, openedx-calc
 selenium==3.141.0         # via -r requirements/edx/testing.txt, bok-choy
 semantic-version==2.8.5   # via -r requirements/edx/testing.txt, edx-drf-extensions
 shapely==1.7.0            # via -r requirements/edx/testing.txt
@@ -304,7 +304,7 @@ testfixtures==6.14.1      # via -r requirements/edx/testing.txt, edx-enterprise
 text-unidecode==1.3       # via -r requirements/edx/testing.txt, faker, python-slugify
 toml==0.10.1              # via -r requirements/edx/testing.txt, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
-tox==3.16.0               # via -r requirements/edx/testing.txt, tox-battery
+tox==3.16.1               # via -r requirements/edx/testing.txt, tox-battery
 tqdm==4.47.0              # via -r requirements/edx/testing.txt, nltk
 transifex-client==0.13.10  # via -r requirements/edx/testing.txt
 typed-ast==1.4.1          # via -r requirements/edx/testing.txt, astroid
