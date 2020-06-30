@@ -145,7 +145,7 @@ requests-oauthlib                   # Simplifies use of OAuth via the requests l
 random2
 rules                               # Django extension for rules-based authorization checks
 simplejson
-sailthru-client==2.2.3              # For Sailthru integration
+sailthru-client                     # For Sailthru integration
 Shapely                             # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
 social-auth-app-django
