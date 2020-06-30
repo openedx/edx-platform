@@ -12,8 +12,8 @@ from xblock.exceptions import NoSuchDefinition, NoSuchUsage
 from xblock.fields import ScopeIds
 
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
-from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntime
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import parse_xblock_include, BundleFormatException
+from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntime
 from openedx.core.djangoapps.xblock.runtime.serializer import serialize_xblock
 from openedx.core.djangolib.blockstore_cache import (
     BundleCache,
@@ -30,7 +30,8 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
     A runtime designed to work with Blockstore, reading and writing
     XBlock field data directly from Blockstore.
     """
-    def parse_xml_file(self, fileobj, id_generator=None):
+
+    def parse_xml_file(self, fileobj):
         raise NotImplementedError("Use parse_olx_file() instead")
 
     def get_block(self, usage_id, for_parent=None):
@@ -69,7 +70,7 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
                 # plus some minor additional lines of code as needed.
                 block = block_class.parse_xml_new_runtime(xml_node, runtime=self, keys=keys)
             else:
-                block = block_class.parse_xml(xml_node, runtime=self, keys=keys, id_generator=None)
+                block = block_class.parse_xml(xml_node, runtime=self, keys=keys)
             # Update field data with parsed values. We can't call .save() because it will call save_block(), below.
             block.force_save_fields(block._get_fields_to_save())  # pylint: disable=protected-access
             self.system.authored_data_store.cache_fields(block)
@@ -80,7 +81,7 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
                 block._parent_block_id = for_parent.scope_ids.usage_id  # pylint: disable=protected-access
             return block
 
-    def add_node_as_child(self, block, node, id_generator=None):
+    def add_node_as_child(self, block, node):
         """
         This runtime API should normally be used via
         runtime.get_block() -> block.parse_xml() -> runtime.add_node_as_child

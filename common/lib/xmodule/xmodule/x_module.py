@@ -36,14 +36,14 @@ from xblock.fields import (
     UserScope
 )
 from xblock.runtime import IdGenerator, IdReader, Runtime
-
-from openedx.core.djangolib.markup import HTML
 from xmodule import block_metadata_utils
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import UndefinedContext
 from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.xmodule_django import add_webpack_to_fragment
+
+from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger(__name__)
 
@@ -310,7 +310,6 @@ def shim_xmodule_js(fragment, js_module_name):
     """
     # Delay this import so that it is only used (and django settings are parsed) when
     # they are required (rather than at startup)
-    import webpack_loader.utils
 
     if not fragment.js_init_fn:
         fragment.initialize_js('XBlockToXModuleShim')
@@ -1117,13 +1116,13 @@ class XModuleDescriptorToXBlockMixin(object):
 
     # ================================= XML PARSING ============================
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
+    def parse_xml(cls, node, runtime, keys):
         """
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
         # It'd be great to not reserialize and deserialize the xml
         xml = etree.tostring(node).decode('utf-8')
-        block = cls.from_xml(xml, runtime, id_generator)
+        block = cls.from_xml(xml, runtime)
         return block
 
     @classmethod
@@ -1135,10 +1134,10 @@ class XModuleDescriptorToXBlockMixin(object):
         try:
             return super(XModuleDescriptorToXBlockMixin, cls).parse_xml_new_runtime(node, runtime, keys)
         except AttributeError:
-            return super(XModuleDescriptorToXBlockMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
+            return super(XModuleDescriptorToXBlockMixin, cls).parse_xml(node, runtime, keys)
 
     @classmethod
-    def from_xml(cls, xml_data, system, id_generator):
+    def from_xml(cls, xml_data, system):
         """
         Creates an instance of this descriptor from the supplied xml_data.
         This may be overridden by subclasses.
@@ -1635,7 +1634,7 @@ class XMLParsingSystem(DescriptorSystem):
         super(XMLParsingSystem, self).__init__(**kwargs)
         self.process_xml = process_xml
 
-    def _usage_id_from_node(self, node, parent_id, id_generator=None):
+    def _usage_id_from_node(self, node, parent_id):
         """Create a new usage id from an XML dom node.
 
         Args:
@@ -1646,9 +1645,9 @@ class XMLParsingSystem(DescriptorSystem):
         Returns:
             UsageKey: the usage key for the new xblock
         """
-        return self.xblock_from_node(node, parent_id, id_generator).scope_ids.usage_id
+        return self.xblock_from_node(node, parent_id).scope_ids.usage_id
 
-    def xblock_from_node(self, node, parent_id, id_generator=None):
+    def xblock_from_node(self, node, parent_id):
         """
         Create an XBlock instance from XML data.
 
@@ -1663,7 +1662,7 @@ class XMLParsingSystem(DescriptorSystem):
             XBlock: The fully instantiated :class:`~xblock.core.XBlock`.
 
         """
-        id_generator = id_generator or self.id_generator
+        # id_generator = id_generator or self.id_generator
         # leave next line commented out - useful for low-level debugging
         # log.debug('[_usage_id_from_node] tag=%s, class=%s' % (node.tag, xblock_class))
 
@@ -1672,16 +1671,16 @@ class XMLParsingSystem(DescriptorSystem):
         node.attrib.pop('xblock-family', None)
 
         url_name = node.get('url_name')  # difference from XBlock.runtime
-        def_id = id_generator.create_definition(block_type, url_name)
-        usage_id = id_generator.create_usage(def_id)
+        def_id = self.id_generator.create_definition(block_type, url_name)
+        usage_id = self.id_generator.create_usage(def_id)
 
         keys = ScopeIds(None, block_type, def_id, usage_id)
         block_class = self.mixologist.mix(self.load_block_type(block_type))
 
-        aside_children = self.parse_asides(node, def_id, usage_id, id_generator)
+        aside_children = self.parse_asides(node, def_id, usage_id)
         asides_tags = [x.tag for x in aside_children]
 
-        block = block_class.parse_xml(node, self, keys, id_generator)
+        block = block_class.parse_xml(node, self, keys)
         self._convert_reference_fields_to_keys(block)  # difference from XBlock.runtime
         block.parent = parent_id
         block.save()
@@ -1693,7 +1692,7 @@ class XMLParsingSystem(DescriptorSystem):
 
         return block
 
-    def parse_asides(self, node, def_id, usage_id, id_generator):
+    def parse_asides(self, node, def_id, usage_id):
         """pull the asides out of the xml payload and instantiate them"""
         aside_children = []
         for child in node.iterchildren():
@@ -1705,7 +1704,7 @@ class XMLParsingSystem(DescriptorSystem):
                     aside_children.append(child)
         # now process them & remove them from the xml payload
         for child in aside_children:
-            self._aside_from_xml(child, def_id, usage_id, id_generator)
+            self._aside_from_xml(child, def_id, usage_id)
             node.remove(child)
         return aside_children
 

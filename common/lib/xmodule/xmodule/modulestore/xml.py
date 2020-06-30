@@ -1,6 +1,3 @@
-
-
-import codecs
 import glob
 import hashlib
 import io
@@ -25,7 +22,6 @@ from path import Path as path
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore
-
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str, make_error_tracker
 from xmodule.mako_module import MakoDescriptorSystem
@@ -33,7 +29,6 @@ from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, Modu
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import (
-    DEPRECATION_VSCOMPAT_EVENT,
     AsideKeyGenerator,
     OpaqueKeyReader,
     XMLParsingSystem,
@@ -248,7 +243,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
     # id_generator is ignored, because each ImportSystem is already local to
     # a course, and has it's own id_generator already in place
-    def add_node_as_child(self, block, node, id_generator):
+    def add_node_as_child(self, block, node):
         child_block = self.process_xml(etree.tostring(node))
         block.children.append(child_block.scope_ids.usage_id)
 
