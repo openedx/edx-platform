@@ -33,8 +33,7 @@ class override_waffle_flag(override_flag):
         def test_happy_mode_enabled():
             ...
     """
-    _NO_CACHED_VALUE = object()
-    _cached_value = _NO_CACHED_VALUE
+    _cached_value = None
 
     def __init__(self, flag, active):
         """
@@ -53,7 +52,7 @@ class override_waffle_flag(override_flag):
 
         # pylint: disable=protected-access
         # Store values that have been cached on the flag
-        self._cached_value = self.flag.waffle_namespace._cached_flags.get(self.name, self._NO_CACHED_VALUE)
+        self._cached_value = self.flag.waffle_namespace._cached_flags.get(self.name)
         self.flag.waffle_namespace._cached_flags[self.name] = self.active
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -62,7 +61,7 @@ class override_waffle_flag(override_flag):
         # pylint: disable=protected-access
         # Restore the cached values
         waffle_namespace = self.flag.waffle_namespace
-        waffle_namespace._cached_flags.pop(self.name, self._NO_CACHED_VALUE)
+        waffle_namespace._cached_flags.pop(self.name, None)
 
-        if self._cached_value != self._NO_CACHED_VALUE:
+        if self._cached_value is not None:
             waffle_namespace._cached_flags[self.name] = self._cached_value
