@@ -19,10 +19,9 @@ from six.moves.urllib.parse import urlunsplit
 def track(user_id, event_name, properties=None, context=None):
     """
     Wrapper for emitting Segment track event, including augmenting context information from middleware.
-    TEMPORARILY CHANGED AND TO OR in conditional below, because locally settings.LMS_SEGMENT_KEY is none
     """
 
-    if event_name is not None and hasattr(settings, 'LMS_SEGMENT_KEY') or settings.LMS_SEGMENT_KEY:
+    if event_name is not None and hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         properties = properties or {}
         segment_context = dict(context) if context else {}
         tracking_context = tracker.get_tracker().resolve_context()
@@ -60,12 +59,7 @@ def track(user_id, event_name, properties=None, context=None):
             if page is not None and 'url' not in segment_context['page']:
                 segment_context['page']['url'] = page
 
-        if event_name == 'edx.bi.ecommerce.upsell_links_clicked': 
-            category = properties.get('category')
-            link_name = _get_upsell_link_name(category, page)
-            segment_context['linkName'] = link_name
-            print("segment_context: ", segment_context)
-        # analytics.track(user_id, event_name, properties, segment_context)
+        analytics.track(user_id, event_name, properties, segment_context)
 
 
 def identify(user_id, properties, context=None):
@@ -75,9 +69,3 @@ def identify(user_id, properties, context=None):
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
         segment_context = dict(context) if context else {}
         analytics.identify(user_id, properties, segment_context)
-
-def _get_upsell_link_name(category, page):
-    link_name = "undefined"
-    if category == "welcome":
-        link_name = "in_course_welcome" if "courseware" in page else "course_home_welcome"
-    return(link_name)

@@ -13,7 +13,7 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
     % if show_course_sock:
     <div class="verification-sock"
         % if not DISPLAY_COURSE_SOCK_FLAG.is_enabled(course_id):
-
+        style="display: none"
         %endif
     >
         <button type="button" aria-expanded="false" class="btn btn-primary focusable action-toggle-verification-sock">
@@ -58,7 +58,7 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
                     </div>
                 % endif
                 <img class="mini-cert" alt="Example Certificate Image" src="${static.url('course_experience/images/verified-cert.png')}"/>
-                <a class="ecommerce_upgrade_link" href="${upgrade_url}">
+                <a href="${upgrade_url}">
                     <div class="btn btn-upgrade stuck-top focusable action-upgrade-certificate" data-creative="original_sock" data-position="sock">
                         ${Text(_('Upgrade ({course_price})')).format(course_price=HTML(course_price))}
                     </div>
@@ -68,16 +68,6 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
     </div>
     %endif
 </%block>
-
-<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
-var link = $("#ecommerce_upgrade_link");
-event_name = 'edx.bi.ecommerce.upsell_links_clicked'
-segment.track(user_id, event_name, {
-    'category': 'green_upgrade',
-    'properties': [text_type(user_id), text_type(course_id)]
-})
-link.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackEvent);
-</%static:require_module_async>
 
 <%static:webpack entry="CourseSock">
     new CourseSock({
