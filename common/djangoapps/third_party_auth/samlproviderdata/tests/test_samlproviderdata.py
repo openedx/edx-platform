@@ -29,7 +29,7 @@ class SAMLProviderDataTests(APITestCase):
         self.assertEqual(SAMLProviderData.objects.count(), 0)
 
     def test_create_one_providerdata_success(self):
-        # POST auth/saml/v0/providerconfig/ -d data
+        # POST auth/saml/v0/providerdata/ -d data
         url = reverse('samlproviderdata-list')
         fetched_at = '2009-01-10 00:12:12'
         data = {
@@ -45,10 +45,9 @@ class SAMLProviderDataTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(SAMLProviderData.objects.count(), 1)
         self.assertEqual(SAMLProviderData.objects.get().fetched_at.strftime('%Y-%m-%d %H:%M:%S'), fetched_at)
-        # d.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
     def test_create_one_providerdata_fail(self):
-        # POST auth/saml/v0/providerconfig/ -d data
+        # POST auth/saml/v0/providerdata/ -d data
         url = reverse('samlproviderdata-list')
         data = {
             'name': 'provider-1'
