@@ -2,8 +2,6 @@
 
 from django.conf.urls import include, url
 from rest_framework import routers
-from third_party_auth.samlproviderconfig.views import SAMLProviderConfigViewSet
-from third_party_auth.samlproviderdata.views import SAMLProviderDataViewSet
 
 from .views import (
     IdPRedirectView,
@@ -20,10 +18,6 @@ urlpatterns = [
     url(r'^auth/login/(?P<backend>lti)/$', lti_login_and_complete_view),
     url(r'^auth/idp_redirect/(?P<provider_slug>[\w-]+)', IdPRedirectView.as_view(), name="idp_redirect"),
     url(r'^auth/', include('social_django.urls', namespace='social')),
+    url(r'', include('third_party_auth.samlproviderconfig.urls')),
+    url(r'', include('third_party_auth.samlproviderdata.urls')) 
 ]
-
-# samlproviderconfig/samlproviderdata urls
-router = routers.DefaultRouter()
-router.register(r'auth/saml/v0/providerconfig', SAMLProviderConfigViewSet, basename="samlproviderconfig")
-router.register(r'auth/saml/v0/providerdata', SAMLProviderDataViewSet, basename="samlproviderdata")
-urlpatterns += router.urls
