@@ -32,13 +32,14 @@ class SAMLProviderConfigTests(APITestCase):
         data = {
             'entity_id': 'id',
             'metadata_source': 'http://test.url',
-            'name': 'name',
+            'name': 'name-of-config',
             'enabled': 'true',
             'slug': 'test-slug'
         }
         self.assertEqual(SAMLProviderConfig.objects.count(), 0)
         response = self.client.post(url, data, format='json')
-        print(response)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(SAMLProviderConfig.objects.count(), 1)
-        self.assertEqual(SAMLProviderConfig.objects.get().slug, 'test-slug')
+        providerconfig = SAMLProviderConfig.objects.get()
+        self.assertEqual(providerconfig.slug, 'test-slug')
+        self.assertEqual(providerconfig.name, 'name-of-config')

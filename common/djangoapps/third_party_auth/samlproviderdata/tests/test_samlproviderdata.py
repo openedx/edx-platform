@@ -33,7 +33,7 @@ class SAMLProviderDataTests(APITestCase):
         url = reverse('samlproviderdata-list')
         fetched_at = '2009-01-10 00:12:12'
         data = {
-            'entity_id':'http://saml.test.io',
+            'entity_id': 'http://saml.test.io',
             'sso_url': 'http://sso.saml.test.io',
             'fetched_at': fetched_at,
             'name': 'provider-1',
