@@ -1,4 +1,7 @@
-from django.conf.urls import include, url
+"""
+    url mappings for auth/saml/v0/providerdata/
+"""
+
 from rest_framework import routers
 
 from .views import SAMLProviderDataViewSet
