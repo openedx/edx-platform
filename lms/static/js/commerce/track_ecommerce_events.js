@@ -1,39 +1,33 @@
 /**
  *
- * A library of helper functions to track ecommerce related events. 
+ * A library of helper functions to track ecommerce related events.
  *
  */
-
 (function(define) {
     'use strict';
-
-    define([
-        'jquery'
-    ], function($) {
+    define([], function() {
         var trackUpsellClick = function(linkName, optionalAttrs) {
+            var eventAttrs = {linkName: linkName};
+            var allowedAttrs = ['courseId', 'pageName'];
+
             if (!window.analytics) {
                 return;
             }
-    
-            var eventAttrs = { "linkName": linkName };
 
             if (
                 typeof optionalAttrs !== 'undefined' &&
                 optionalAttrs !== null &&
                 Object.keys(optionalAttrs).length > 0
             ) {
-                var allowedAttrs = ["courseId", "pageName"];
-                allowedAttrs.map(function(allowedAttr) {
+                allowedAttrs.forEach(function(allowedAttr) {
                     eventAttrs[allowedAttr] = optionalAttrs[allowedAttr];
                 });
             }
-    
-            window.analytics.track("edx.bi.ecommerce.upsell_links_clicked", eventAttrs);
+
+            window.analytics.track('edx.bi.ecommerce.upsell_links_clicked', eventAttrs);
         };
-        
-        var TrackECommerceEvents = {
-            trackUpsellClick: trackUpsellClick,
-        };
+
+        var TrackECommerceEvents = {trackUpsellClick: trackUpsellClick};
 
         return TrackECommerceEvents;
     });
