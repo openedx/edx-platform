@@ -609,11 +609,7 @@ def get_courses(user, org=None, filter_=None):
         org=org,
         filter_=filter_,
     ).prefetch_related(
-        Prefetch(
-            'modes',
-            queryset=CourseMode.objects.exclude(mode_slug__in=CourseMode.CREDIT_MODES),
-            to_attr='selectable_modes',
-        ),
+        'modes',
     ).select_related(
         'image_set'
     )

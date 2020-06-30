@@ -10,9 +10,11 @@ from rest_framework.response import Response
 from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate, verified_upgrade_deadline_link
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.course_home_api.dates.v1.serializers import DatesTabSerializer
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
 from openedx.features.course_experience.utils import dates_banner_should_display
@@ -70,6 +72,14 @@ class DatesTabView(RetrieveAPIView):
         monitoring_utils.set_custom_metric('is_staff', request.user.is_staff)
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
+
+        _, request.user = setup_masquerade(
+            request,
+            course_key,
+            staff_access=has_access(request.user, 'staff', course_key),
+            reset_masquerade_data=True,
+        )
+
         blocks = get_course_date_blocks(course, request.user, request, include_access=True, include_past_dates=True)
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 

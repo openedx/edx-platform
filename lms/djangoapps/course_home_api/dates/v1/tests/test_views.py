@@ -66,3 +66,13 @@ class DatesTabTestViews(BaseCourseHomeTests):
         self.assertContains(response, 'missed_gated_content')
         self.assertContains(response, 'content_type_gating_enabled')
         self.assertContains(response, 'verified_upgrade_link')
+
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)
+    def test_masquerade(self):
+        self.upgrade_to_staff()
+        CourseEnrollment.enroll(self.user, self.course.id, 'audit')
+        self.assertTrue(self.client.get(self.url).data.get('learner_is_full_access'))
+
+        self.update_masquerade(role='student')
+        self.assertFalse(self.client.get(self.url).data.get('learner_is_full_access'))

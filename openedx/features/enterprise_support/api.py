@@ -474,12 +474,14 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         consent_needed = False
     else:
         client = ConsentApiClient(user=request.user)
+        current_enterprise_uuid = enterprise_customer_uuid_for_request(request)
         consent_needed = any(
-            Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
+            current_enterprise_uuid == learner['enterprise_customer']['uuid']
+            and Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
             and client.consent_required(
                 username=user.username,
                 course_id=course_id,
-                enterprise_customer_uuid=learner['enterprise_customer']['uuid'],
+                enterprise_customer_uuid=current_enterprise_uuid,
                 enrollment_exists=enrollment_exists,
             )
             for learner in enterprise_learner_details

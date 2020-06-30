@@ -176,10 +176,7 @@ class ChooseModeView(View):
                 user=request.user,
                 course_key=course_key
             ),
-            "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(
-                user=request.user,
-                course_key=course_key
-            ),
+            "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(request.user, course),
         }
         context.update(
             get_experiment_user_metadata_context(

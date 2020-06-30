@@ -2,7 +2,6 @@
 Base classes or util functions for use in Course Home API tests
 """
 
-
 import unittest
 
 from datetime import datetime
@@ -10,6 +9,7 @@ from django.conf import settings
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.tests.factories import UserFactory
@@ -19,7 +19,7 @@ from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class BaseCourseHomeTests(SharedModuleStoreTestCase):
+class BaseCourseHomeTests(SharedModuleStoreTestCase, MasqueradeMixin):
     """
     Base class for Course Home API tests.
 
@@ -66,3 +66,7 @@ class BaseCourseHomeTests(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.client.login(username=self.user.username, password='foo')
+
+    def upgrade_to_staff(self):
+        self.user.is_staff = True
+        self.user.save()

@@ -1,14 +1,13 @@
 """
 Script to process pytest warnings output by pytest-json-report plugin and output it as a html
 """
-from __future__ import absolute_import
-from __future__ import print_function
-import json
-import os
+
+import argparse
 import io
 import itertools
+import json
+import os
 import re
-import argparse
 from collections import Counter
 
 from write_to_html import (
@@ -36,11 +35,11 @@ def seperate_warnings_by_location(warnings_data):
 
     # first create regex for each n file location
     warnings_locations = {
-        ".*/python\d\.\d/site-packages/.*\.py": "python",  # noqa pylint: disable=W1401
-        ".*/edx-platform/lms/.*\.py": "lms",  # noqa pylint: disable=W1401
-        ".*/edx-platform/openedx/.*\.py": "openedx",  # noqa pylint: disable=W1401
-        ".*/edx-platform/cms/.*\.py": "cms",  # noqa pylint: disable=W1401
-        ".*/edx-platform/common/.*\.py": "common",  # noqa pylint: disable=W1401
+        r".*/python\d\.\d/site-packages/.*\.py": "python",  # noqa pylint: disable=W1401
+        r".*/edx-platform/lms/.*\.py": "lms",  # noqa pylint: disable=W1401
+        r".*/edx-platform/openedx/.*\.py": "openedx",  # noqa pylint: disable=W1401
+        r".*/edx-platform/cms/.*\.py": "cms",  # noqa pylint: disable=W1401
+        r".*/edx-platform/common/.*\.py": "common",  # noqa pylint: disable=W1401
     }
 
     # separate into locations flow:
@@ -93,7 +92,7 @@ def read_warning_data(dir_path):
     # TODO(jinder): currently this is hard-coded in, maybe create a constants file with info
     # THINK(jinder): but creating file for one constant seems overkill
     warnings_file_name_regex = (
-        "pytest_warnings_?\d*\.json"  # noqa pylint: disable=W1401
+        r"pytest_warnings_?\d*\.json"  # noqa pylint: disable=W1401
     )
 
     # iterate through files_in_dir and see if they match our know file name pattern

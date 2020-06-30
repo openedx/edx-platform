@@ -19,10 +19,6 @@ ddt<1.4.0
 # Stay on the latest LTS release of Django
 Django<2.3
 
-# 0.6.0 has a missing dependency declaration on ua-parser: https://github.com/jotes/django-cookies-samesite/issues/25
-# 0.6.1 throws on some requests from iOS app: https://github.com/jotes/django-cookies-samesite/issues/28
-django-cookies-samesite<0.6.0
-
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
@@ -43,6 +39,12 @@ drf-yasg<1.17.1
 
 # drf-jwt 1.15.0 contains a migration that breaks on MySQL: https://github.com/Styria-Digital/django-rest-framework-jwt/issues/40
 drf-jwt==1.14.0
+
+# Tests are failing with 3.2.2: https://build.testeng.edx.org/job/edx-platform-python-pipeline-pr/19138/
+edx-completion==3.2.1
+
+# 3.3.15 is failing with `AttributeError: 'Settings' object has no attribute 'COURSE_CATALOG_URL_ROOT'`
+edx-enterprise==3.3.13
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
@@ -108,3 +110,9 @@ zipp==1.0.0
 
 # Matplotlib 3.1 requires Python 3.6
 matplotlib<3.1
+
+# numpy 1.19 requires Python 3.6
+numpy<1.19
+
+# scipy 1.5 equires Python 3.6
+scipy<1.5

@@ -397,7 +397,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-21 20:42+0000\n"
+"POT-Creation-Date: 2020-06-28 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -3483,6 +3483,17 @@ msgid ""
 msgstr "输入要用于本课程运行的监考提供程序。 从以下选项中选择： {available_providers}"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Proctortrack Exam Escalation Contact"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Required if 'proctortrack' is selected as your proctoring provider. Enter an"
+" email address to be contacted by the support team whenever there are "
+"escalations (e.g. appeals, delayed reviews, etc.)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
 msgstr "允许退出监考考试"
 
@@ -4439,6 +4450,7 @@ msgid "External Discussion"
 msgstr "外部讨论"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
 msgid "Home"
 msgstr "主页"
 
@@ -6193,6 +6205,23 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Annual Household Income"
 msgstr "家庭年收入"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your current financial situation. Why do you need assistance?"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your learning or professional goals. How will a Verified "
+"Certificate in this course help you achieve these goals?"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your plans for this course. What steps will you take to help "
+"you complete the course work and receive a certificate?"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 1250 and 2500 characters or so in your response."
@@ -11306,6 +11335,10 @@ msgstr ""
 msgid "Username created for VEM Integration, e.g. vem_service_user."
 msgstr ""
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Percentage of courses allowed to use VEM pipeline"
+msgstr ""
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr "强制开启"
@@ -11403,36 +11436,28 @@ msgstr ""
 msgid "Subscribe to calendar updates"
 msgstr ""
 
-#: openedx/features/calendar_sync/views/management.py
-#, python-brace-format
-msgid "Updates for Your {course} Schedule"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
-msgid "Update Your Calendar"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
-#, python-brace-format
-msgid ""
-"Your assignment due dates for {course} were recently adjusted. Update your "
-"calendarwith your new schedule to ensure that you stay on track!"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
+#: openedx/features/calendar_sync/utils.py
 msgid "Stay on Track"
 msgstr ""
 
-#: openedx/features/calendar_sync/views/management.py
-msgid "Mark Your Calendar"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
+#: openedx/features/calendar_sync/utils.py
 #, python-brace-format
 msgid ""
 "Sticking to a schedule is the best way to ensure that you successfully "
 "complete your self-paced course. This schedule of assignment due dates for "
 "{course} will help you stay on track!"
+msgstr ""
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid "Updates for Your {course} Schedule"
+msgstr ""
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid ""
+"Your assignment due dates for {course} were recently adjusted. Update your "
+"calendar with your new schedule to ensure that you stay on track!"
 msgstr ""
 
 #: openedx/features/content_type_gating/models.py
@@ -11637,6 +11662,23 @@ msgid ""
 "checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
+#: openedx/features/enterprise_support/admin/forms.py
+msgid "CSV File"
+msgstr ""
+
+#: openedx/features/enterprise_support/admin/forms.py
+msgid ""
+"CSV file should have 3 columns having names lms_user_id, course_id, "
+"opportunity_id"
+msgstr ""
+
+#: openedx/features/enterprise_support/admin/views.py
+#, python-brace-format
+msgid ""
+"Enrollment attributes were not updated for records at following line numbers"
+" in csv because no enrollment found for these records: {error_line_numbers}"
+msgstr ""
+
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_title} was not complete."
@@ -11648,6 +11690,18 @@ msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
 msgstr "如果您对分享自己的数据有顾虑，请联系您在{enterprise_customer_name}的管理员。"
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Enterprise Course Enrollments"
+msgstr ""
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Override Enrollment Attributes"
+msgstr ""
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Upload CSV to override enrollment attributes for learners"
+msgstr ""
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
@@ -13410,6 +13464,7 @@ msgid "Sequence"
 msgstr "序列"
 
 #: lms/templates/courseware/dates.html lms/templates/seq_module.html
+#: lms/templates/vert_module.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr ""
@@ -13795,6 +13850,11 @@ msgid ""
 msgstr ""
 "如果您需要改变字体大小，请使用浏览器设置实现缩放。以Google "
 "Chrome浏览器为例，可以通过按键“Ctrl”和“+”，“Ctrl”和“-”来使用放大和缩小功能。"
+
+#: lms/templates/vert_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "{subsection_format} due {{date}}"
+msgstr "{subsection_format} 截止日期{{date}}"
 
 #: lms/templates/video.html
 msgid "Loading video player"
@@ -16000,23 +16060,6 @@ msgstr "电子邮件设置"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "相关课程"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can contact the account holder to request payment, or you can "
-"unenroll from this course"
-msgstr "您无法再访问此课程，因为尚未收到付款。您可以联系账号持有人以请求付款，或者您可以取消注册此课程。"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can {contact_link_start}contact the account "
-"holder{contact_link_end} to request payment, or you can "
-"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
-msgstr ""
-"您无法再访问此课程，因为尚未收到付款。您可以 "
-"{contact_link_start}联系账号持有人{contact_link_end}以请求付款，或者您可以{unenroll_link_start}取消注册{unenroll_link_end}此课程。"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -19211,10 +19254,10 @@ msgstr "这个页面是有意留空的。欢迎您添加自己的评论。"
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
 "course from a country or region currently subject to U.S. economic and trade"
-" sanctions.Unfortunately, because {platform_name} is required to comply with"
-" export controls,we cannot allow you to access this course at this time."
+" sanctions. Unfortunately, because {platform_name} is required to comply "
+"with export controls, we cannot allow you to access this course at this "
+"time."
 msgstr ""
-"我们的系统表明您所在的国家或地区正在受到美国经济贸易制裁，非常抱歉，{platform_name}必须接受出口管制，所以我们暂时无法允许您访问此{platform_name}课程。"
 
 #: lms/templates/static_templates/faq.html
 #: themes/red-theme/lms/templates/footer.html
@@ -19575,10 +19618,6 @@ msgstr[0] ""
 msgid "Prerequisite: "
 msgstr "先修条件："
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "{subsection_format} due {{date}}"
-msgstr "{subsection_format} 截止日期{{date}}"
-
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"
 msgstr "认证证书是什么？"
@@ -19748,6 +19787,14 @@ msgstr "在合作伙伴网站上访问“课程人员支持”来提交或查看
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "edX 合作伙伴网站"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""
