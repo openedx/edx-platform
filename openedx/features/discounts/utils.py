@@ -9,6 +9,8 @@ import six
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache
+from six import text_type
+from track import segment
 from web_fragments.fragment import Fragment
 
 from course_modes.models import format_course_price, get_course_prices
@@ -105,44 +107,46 @@ def generate_offer_html(user, course):
     Returns a openedx.core.djangolib.markup.HTML object, or None if the user
     should not be shown an offer message.
     """
-    if user and not user.is_anonymous and course:
-        now = datetime.now(tz=pytz.UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
-        saw_banner = ExperimentData.objects.filter(
-            user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course)
-        )
-        if not saw_banner:
-            ExperimentData.objects.create(
-                user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course), value=now
-            )
-        discount_expiration_date = get_discount_expiration_date(user, course)
-        if (discount_expiration_date and
-                can_receive_discount(user=user, course=course, discount_expiration_date=discount_expiration_date)):
+    # if user and not user.is_anonymous and course:
+    #     now = datetime.now(tz=pytz.UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
+    #     saw_banner = ExperimentData.objects.filter(
+    #         user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course)
+    #     )
+    #     if not saw_banner:
+    #         ExperimentData.objects.create(
+    #             user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course), value=now
+    #         )
+    discount_expiration_date = get_discount_expiration_date(user, course)
+    #     if (discount_expiration_date and
+    #             can_receive_discount(user=user, course=course, discount_expiration_date=discount_expiration_date)):
             # Translator: xgettext:no-python-format
-            offer_message = _(u'{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% '
-                              u'[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at checkout! '
-                              u'{a_open}Upgrade Now{a_close}{div_close}')
+    offer_message = _(u'{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% '
+                        u'[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at checkout! '
+                        u'{a_open}Upgrade Now{a_close}{div_close}')
 
-            message_html = HTML(offer_message).format(
-                a_open=HTML(u'<a href="{upgrade_link}">').format(
-                    upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
-                ),
-                a_close=HTML('</a>'),
-                b_open=HTML('<b>'),
-                code=Text('BIENVENIDOAEDX') if get_language() == 'es-419' else Text('EDXWELCOME'),
-                b_close=HTML('</b>'),
-                br=HTML('<br>'),
-                banner_open=HTML(
-                    '<div class="first-purchase-offer-banner" role="note">'
-                    '<span class="first-purchase-offer-banner-bold">'
-                ),
-                discount_expiration_date=discount_expiration_date.strftime(u'%B %d'),
-                percentage=discount_percentage(course),
-                span_close=HTML('</span>'),
-                div_close=HTML('</div>'),
-                strikeout_price=HTML(format_strikeout_price(user, course, check_for_discount=False)[0])
-            )
-            return message_html
-    return None
+    _track_upsell_click(user.id, course.id)
+
+    message_html = HTML(offer_message).format(
+            a_open=HTML(u'<a class="ecommerce_upgrade_link" href="{upgrade_link}">').format(
+                upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
+            ),
+            a_close=HTML('</a>'),
+            b_open=HTML('<b>'),
+            code=Text('BIENVENIDOAEDX') if get_language() == 'es-419' else Text('EDXWELCOME'),
+            b_close=HTML('</b>'),
+            br=HTML('<br>'),
+            banner_open=HTML(
+                '<div class="first-purchase-offer-banner" role="note">'
+                '<span class="first-purchase-offer-banner-bold">'
+            ),
+            discount_expiration_date=discount_expiration_date.strftime(u'%B %d'),
+            percentage=discount_percentage(course),
+            span_close=HTML('</span>'),
+            div_close=HTML('</div>'),
+            strikeout_price=HTML(format_strikeout_price(user, course, check_for_discount=False)[0])
+        )
+    return message_html
+    # return None
 
 
 def get_first_purchase_offer_banner_fragment(user, course):
@@ -179,3 +183,18 @@ def get_first_purchase_offer_banner_fragment_from_key(user, course_key):
     request_cache.set(cache_key, offer_html)
 
     return Fragment(offer_html)
+
+def _track_upsell_click(user_id, course_id):
+    """
+    Track a upsell click.
+    Arguments:
+        user_id (str): The ID of the logged in user.
+        course_id (CourseKey): Identifier for the course.
+    Returns:
+        None
+    """
+    event_name = 'edx.bi.ecommerce.upsell_links_clicked'
+    segment.track(user_id, event_name, {
+        'category': 'welcome',
+        'properties': [text_type(user_id), text_type(course_id)]
+    })

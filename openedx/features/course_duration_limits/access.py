@@ -177,7 +177,6 @@ def generate_course_expired_message(user, course):
                 formatted_date=upgrade_deadline.strftime("%Y-%m-%d"),
                 formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
             )
-
             return HTML(full_message).format(
                 a_open=HTML(u'<a href="{upgrade_link}">').format(
                     upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
