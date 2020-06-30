@@ -40,6 +40,9 @@ drf-yasg<1.17.1
 # drf-jwt 1.15.0 contains a migration that breaks on MySQL: https://github.com/Styria-Digital/django-rest-framework-jwt/issues/40
 drf-jwt==1.14.0
 
+# 3.3.15 is failing with `AttributeError: 'Settings' object has no attribute 'COURSE_CATALOG_URL_ROOT'`
+edx-enterprise==3.3.13
+
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
 
