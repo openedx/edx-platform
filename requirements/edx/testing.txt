@@ -60,10 +60,10 @@ defusedxml==0.6.0         # via -r requirements/edx/base.txt, djangorestframewor
 diff-cover==3.0.1         # via -r requirements/edx/coverage.txt
 distlib==0.3.1            # via virtualenv
 django-appconf==1.0.4     # via -r requirements/edx/base.txt, django-statici18n
-django-celery==3.3.1      # via -r requirements/edx/base.txt
+django-celery==3.3.1      # via -r requirements/edx/base.txt, edx-bulk-grades
 django-classy-tags==1.0.0  # via -r requirements/edx/base.txt, django-sekizai
 django-config-models==2.0.2  # via -r requirements/edx/base.txt, edx-enterprise
-django-cookies-samesite==0.5.1  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+django-cookies-samesite==0.6.4  # via -r requirements/edx/base.txt
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-enterprise
 django-crum==0.7.6        # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring, edx-rbac, super-csv
@@ -100,7 +100,7 @@ drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, -r requi
 edx-ace==0.1.15           # via -r requirements/edx/base.txt
 edx-analytics-data-api-client==0.16.1  # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.3.1  # via -r requirements/edx/base.txt
-edx-bulk-grades==0.6.8    # via -r requirements/edx/base.txt, staff-graded-xblock
+edx-bulk-grades==0.7.0    # via -r requirements/edx/base.txt, staff-graded-xblock
 edx-ccx-keys==1.1.0       # via -r requirements/edx/base.txt
 edx-celeryutils==0.5.0    # via -r requirements/edx/base.txt, super-csv
 edx-completion==3.2.1     # via -r requirements/edx/base.txt
@@ -202,7 +202,7 @@ paver==1.3.4              # via -r requirements/edx/base.txt
 pbr==5.4.5                # via -r requirements/edx/base.txt, stevedore
 pdfminer.six==20200517    # via -r requirements/edx/base.txt
 piexif==1.1.3             # via -r requirements/edx/base.txt
-pillow==7.1.2             # via -r requirements/edx/base.txt, edx-enterprise, edx-organizations
+pillow==7.2.0             # via -r requirements/edx/base.txt, edx-enterprise, edx-organizations
 pluggy==0.13.1            # via -r requirements/edx/coverage.txt, diff-cover, pytest, tox
 polib==1.1.0              # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-i18n-tools
 psutil==1.2.1             # via -r requirements/edx/base.txt, edx-django-utils
@@ -239,7 +239,7 @@ pytest==5.3.5             # via -c requirements/edx/../constraints.txt, -r requi
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/base.txt
 python-memcached==1.59    # via -r requirements/edx/base.txt
-python-slugify==4.0.0     # via -r requirements/edx/base.txt, code-annotations, transifex-client
+python-slugify==4.0.1     # via -r requirements/edx/base.txt, code-annotations, transifex-client
 python-swiftclient==3.10.0  # via -r requirements/edx/base.txt, ora2
 python3-openid==3.2.0 ; python_version >= "3"  # via -r requirements/edx/base.txt, social-auth-core
 python3-saml==1.9.0       # via -r requirements/edx/base.txt
@@ -266,7 +266,7 @@ semantic-version==2.8.5   # via -r requirements/edx/base.txt, edx-drf-extensions
 shapely==1.7.0            # via -r requirements/edx/base.txt
 simplejson==3.17.0        # via -r requirements/edx/base.txt, sailthru-client, super-csv, xblock-utils
 singledispatch==3.4.0.3   # via -r requirements/edx/testing.in
-six==1.15.0               # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, analytics-python, astroid, bleach, bok-choy, chem, crowdsourcehinter-xblock, cryptography, diff-cover, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, libsass, mando, mock, openedx-calc, packaging, pathlib2, paver, pycontracts, pyjwkest, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
+six==1.15.0               # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, analytics-python, astroid, bleach, bok-choy, chem, crowdsourcehinter-xblock, cryptography, diff-cover, django-classy-tags, django-countries, django-pyfs, django-sekizai, django-simple-history, django-statici18n, drf-yasg, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, libsass, mando, mock, openedx-calc, packaging, pathlib2, paver, pycontracts, pyjwkest, pytest-xdist, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/base.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 smmap==3.0.4              # via gitdb
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.txt
@@ -287,8 +287,9 @@ tox==3.16.1               # via -r requirements/edx/testing.in, tox-battery
 tqdm==4.47.0              # via -r requirements/edx/base.txt, nltk
 transifex-client==0.13.10  # via -r requirements/edx/testing.in
 typed-ast==1.4.1          # via astroid
+ua-parser==0.10.0         # via -r requirements/edx/base.txt, django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/base.txt, edx-enterprise
-unidiff==0.6.0            # via -r requirements/edx/testing.in, coverage-pytest-plugin
+unidiff==0.6.0            # via -r requirements/edx/testing.in
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.9           # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/base.txt

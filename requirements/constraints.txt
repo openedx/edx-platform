@@ -19,10 +19,6 @@ ddt<1.4.0
 # Stay on the latest LTS release of Django
 Django<2.3
 
-# 0.6.0 has a missing dependency declaration on ua-parser: https://github.com/jotes/django-cookies-samesite/issues/25
-# 0.6.1 throws on some requests from iOS app: https://github.com/jotes/django-cookies-samesite/issues/28
-django-cookies-samesite<0.6.0
-
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
