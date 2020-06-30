@@ -62,7 +62,7 @@ class override_waffle_flag(override_flag):
         # pylint: disable=protected-access
         # Restore the cached values
         waffle_namespace = self.flag.waffle_namespace
-        waffle_namespace._cached_flags.pop(self.name)
+        waffle_namespace._cached_flags.pop(self.name, self._NO_CACHED_VALUE)
 
         if self._cached_value != self._NO_CACHED_VALUE:
             waffle_namespace._cached_flags[self.name] = self._cached_value
