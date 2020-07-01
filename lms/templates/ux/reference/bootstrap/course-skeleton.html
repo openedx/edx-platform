@@ -79,17 +79,18 @@ from django.utils.translation import ugettext as _
 </%block>
 
 <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
-  var link = $("#welcome");
-  function trackEvent() {
+  var welcomeLink = $("#welcome");
+  var sockLink = $("#sock");
+
+  function trackWelcomeEvent() {
     TrackECommerceEvents.trackUpsellClick('in_course_welcome', {
       pageName: "in_course",
       linkType: "link",
       linkCategory: "welcome"
     });
   }
-  link.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackEvent);
+  welcomeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackWelcomeEvent);
 
-  var sockLink = $("#sock");
   function trackSockEvent() {
     TrackECommerceEvents.trackUpsellClick('in_course_sock', {
       pageName: "in_course",
