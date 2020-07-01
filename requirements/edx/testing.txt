@@ -108,7 +108,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.txt
 edx-django-utils==3.2.3   # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.3.13    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-enterprise==3.3.15    # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.5.0           # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
@@ -149,8 +149,8 @@ html5lib==1.1             # via -r requirements/edx/base.txt, ora2
 httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 icalendar==4.0.6          # via -r requirements/edx/base.txt
 idna==2.10                # via -r requirements/edx/base.txt, requests
-importlib-metadata==1.7.0  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, flake8, importlib-resources, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
-importlib-resources==2.0.1  # via virtualenv
+importlib-metadata==1.7.0  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, flake8, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
+importlib-resources==3.0.0  # via virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, jinja2-pluralize
 inflection==0.5.0         # via -r requirements/edx/base.txt, drf-yasg
 ipaddress==1.0.23         # via -r requirements/edx/base.txt

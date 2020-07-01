@@ -93,7 +93,7 @@ django-storages==1.8      # via -c requirements/edx/../constraints.txt, -r requi
 django-user-tasks==1.1.0  # via -r requirements/edx/testing.txt
 django-waffle==1.0.0      # via -r requirements/edx/testing.txt, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-proctoring
 django-webpack-loader==0.7.0  # via -r requirements/edx/testing.txt, edx-proctoring
-django==2.2.13            # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, code-annotations, django-appconf, django-celery, django-classy-tags, django-config-models, django-cors-headers, django-crum, django-debug-toolbar, django-fernet-fields, django-filter, django-method-override, django-model-utils, django-mptt, django-multi-email-field, django-mysql, django-oauth-toolkit, django-pyfs, django-ratelimit-backend, django-sekizai, django-splash, django-statici18n, django-storages, django-user-tasks, django-wiki, drf-jwt, drf-yasg, edx-ace, edx-api-doc-tools, edx-bulk-grades, edx-celeryutils, edx-completion, edx-django-release-util, edx-django-sites-extensions, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-organizations, edx-proctoring, edx-rbac, edx-search, edx-submissions, edx-when, edxval, enmerkar, enmerkar-underscore, event-tracking, help-tokens, jsonfield2, lti-consumer-xblock, ora2, rest-condition, super-csv, xss-utils
+django==2.2.14            # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, code-annotations, django-appconf, django-celery, django-classy-tags, django-config-models, django-cors-headers, django-crum, django-debug-toolbar, django-fernet-fields, django-filter, django-method-override, django-model-utils, django-mptt, django-multi-email-field, django-mysql, django-oauth-toolkit, django-pyfs, django-ratelimit-backend, django-sekizai, django-splash, django-statici18n, django-storages, django-user-tasks, django-wiki, drf-jwt, drf-yasg, edx-ace, edx-api-doc-tools, edx-bulk-grades, edx-celeryutils, edx-completion, edx-django-release-util, edx-django-sites-extensions, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-organizations, edx-proctoring, edx-rbac, edx-search, edx-submissions, edx-when, edxval, enmerkar, enmerkar-underscore, event-tracking, help-tokens, jsonfield2, lti-consumer-xblock, ora2, rest-condition, super-csv, xss-utils
 djangorestframework-xml==2.0.0  # via -r requirements/edx/testing.txt, edx-enterprise
 djangorestframework==3.9.4  # via -r requirements/edx/testing.txt, django-config-models, django-user-tasks, drf-jwt, drf-yasg, edx-api-doc-tools, edx-completion, edx-drf-extensions, edx-enterprise, edx-organizations, edx-proctoring, edx-submissions, ora2, rest-condition, super-csv
 docopt==0.6.2             # via -r requirements/edx/testing.txt, xmodule
@@ -111,7 +111,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/testing.txt
 edx-django-utils==3.2.3   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.3.13    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
+edx-enterprise==3.3.15    # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.5.0           # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
@@ -154,8 +154,8 @@ httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requi
 icalendar==4.0.6          # via -r requirements/edx/testing.txt
 idna==2.10                # via -r requirements/edx/testing.txt, requests
 imagesize==1.2.0          # via sphinx
-importlib-metadata==1.7.0  # via -r requirements/edx/testing.txt, flake8, importlib-resources, inflect, jsonschema, path, pluggy, pytest, pytest-randomly, tox, virtualenv
-importlib-resources==2.0.1  # via -r requirements/edx/testing.txt, virtualenv
+importlib-metadata==1.7.0  # via -r requirements/edx/testing.txt, flake8, inflect, jsonschema, path, pluggy, pytest, pytest-randomly, tox, virtualenv
+importlib-resources==3.0.0  # via -r requirements/edx/testing.txt, virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, jinja2-pluralize
 inflection==0.5.0         # via -r requirements/edx/testing.txt, drf-yasg
 ipaddress==1.0.23         # via -r requirements/edx/testing.txt

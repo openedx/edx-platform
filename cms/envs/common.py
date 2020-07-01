@@ -1950,7 +1950,8 @@ MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
 ############## Settings for the Discovery App ######################
 
-COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
+COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
+COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
 
 # which access.py permission name to check in order to determine if a course is visible in
 # the course catalog. We default this to the legacy permission 'see_exists'.
