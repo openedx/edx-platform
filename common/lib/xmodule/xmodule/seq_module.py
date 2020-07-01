@@ -775,17 +775,34 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
 
         return xblock_body
 
-    def set_discussion_status(self, is_enable_discussion):
-        ''' Enable or disable the disussion.
-        '''
-        for child in self.get_children():
-            child.set_discussion_status(is_enable_discussion)
+    def get_children_discussion_switches(self) -> dict:
+        """
+        Return dict{child:child.enable_dicussion}
+        """
+        return {
+            child: child.enable_discussion
+            for child in self.get_children()
+        }
 
-    def get_discussion_status(self):
-        for child in self.get_children():
-            if not child.get_discussion_status():
-                return False
-        return True
+    @property
+    def enable_discussion(self) -> dict:
+        return all(self.get_children_discussion_switches().values())
+
+    @enable_discussion.setter
+    def enable_discussion(self, value):
+        """
+        Enable or disable the discussion.
+        """
+        def get_course_node(node):
+            node = node.get_parent()
+            while node.xml_element_name() != "course":
+                node = node.get_parent()
+            return node
+        
+        # We shouldn't override what is set at course level
+        if get_course_node(self).enable_discussion:
+            for child in self.get_children():
+                child.enable_discussion = value
 
 
 class HighlightsFields(object):

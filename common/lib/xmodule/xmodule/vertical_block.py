@@ -32,23 +32,35 @@ _ = lambda text: text
 
 
 class VerticalFields(object):
-
-    discussions_enabled = Boolean(
-        display_name=_("Discussions Enabled"),
+    enable_discussion_flag = Boolean(
+        display_name=_("Enable Discussion"),
         help=_(
-            "This setting enable discussions for this course unit. A discussion UI will show up under this Unit."
+            "This setting enable discussions for this vertical block. If True, a discussion UI would show up under this vertical block."
         ),
         default=False,
         scope=Scope.settings,
     )
 
+    @property
+    def enable_discussion(self):
+        return self.enable_discussion_flag
+    
+    @enable_discussion.setter
+    def enable_discussion(self, value):
+        def get_course_node(node):
+            node = node.get_parent()
+            while node.xml_element_name() != "course":
+                node = node.get_parent()
+            return node
+
+        # We shouldn't override what is set at course level
+        if get_course_node(self).enable_discussion:
+            self.enable_discussion_flag = value
+
 
 @XBlock.needs('user', 'bookmarks')
 @XBlock.wants('completion')
-class VerticalBlock(
-    SequenceFields, XModuleFields, StudioEditableBlock,
-    XmlParserMixin, MakoTemplateBlockBase, XBlock, VerticalFields
-):
+class VerticalBlock(VerticalFields, SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
     """
@@ -236,9 +248,3 @@ class VerticalBlock(
         xblock_body["content_type"] = "Sequence"
 
         return xblock_body
-
-    def set_discussion_status(self, is_enable_discussion):
-        self.discussions_enabled = is_enable_discussion
-
-    def get_discussion_status(self):
-        return self.discussions_enabled

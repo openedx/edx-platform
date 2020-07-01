@@ -1023,8 +1023,8 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    discussions_enabled = Boolean(
-        display_name=_("Discussions Enabled"),
+    enable_discussion_flag = Boolean(
+        display_name=_("Enable Discussion"),
         help=_(
             "Enter true or false. If this value is False, you can not enable discussion for any "
             "section/subsection/unit."
@@ -1569,6 +1569,19 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         if not self.start:
             return False
         return datetime.now(utc) <= self.start
+    
+    @property
+    def enable_discussion(self):
+        return self.enable_discussion_flag
+    
+    @enable_discussion.setter
+    def enable_discussion(self, value):
+        # If we enable discussion at course level, it wouldn't cascade. But, if we disable it, it would.
+        if value is False:
+            for child in self.get_children():
+                child.enable_discussion = value            
+        
+        self.enable_discussion_flag = value
 
 
 class CourseSummary(object):
