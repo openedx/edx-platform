@@ -42,6 +42,12 @@ class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
 
         If the flag value is already cached in the request, it is returned.
         If the flag doesn't exist, always returns default of True.
+
+        Note: This is a similified version of the method it overrides, that
+        hard codes the default to True, and skips the call back used for
+        course overrides:
+        https://github.com/edx/edx-platform/blob/df9be8c678f8266e2e5710513c74deca14c4527c/openedx/core/djangoapps/waffle_utils/__init__.py#L229-L305
+
         """
         # Import is placed here to avoid model import at project startup.
         from waffle.models import Flag
