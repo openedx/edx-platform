@@ -229,7 +229,6 @@ class TeamMembershipTest(SharedModuleStoreTestCase):
             expected_count
         )
 
-
     @ddt.data(
         ('user1', COURSE_KEY1, TEAMSET_1_ID, True),
         ('user1', COURSE_KEY1, TEAMSET_2_ID, False),
