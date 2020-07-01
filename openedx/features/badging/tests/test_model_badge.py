@@ -17,7 +17,6 @@ class BadgeModelTestCases(TestCase):
         Trying to save a Badge object with all the right arguments.
         """
         badge = Badge(name="Sample Badge",
-                      description="This is a sample badge",
                       threshold=30,
                       type=CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX],
                       image="path/to/image",
@@ -43,3 +42,4 @@ class BadgeModelTestCases(TestCase):
         threshold_index_1 = result.index('"threshold":10')
         threshold_index_2 = result.index('"threshold":20')
         self.assertGreater(threshold_index_2, threshold_index_1)
+

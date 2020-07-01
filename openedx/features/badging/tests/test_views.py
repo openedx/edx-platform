@@ -2,12 +2,13 @@ import mock
 
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from django.test import RequestFactory
+from django.test import RequestFactory, TestCase
 from django.test.client import Client
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from openedx.core.djangolib.testing.philu_utils import configure_philu_theme, clear_philu_theme
 from student.tests.factories import CourseEnrollmentFactory
-from student.tests.factories import UserFactory
+from lms.djangoapps.onboarding.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -22,29 +23,27 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         self.course = CourseFactory(org="test", number="123", run="1")
         self.request_factory = RequestFactory()
         self.user = UserFactory()
+        self.client = Client()
 
-    def test_trophycase_with_various_course(self):
+
+    @classmethod
+    def setUpClass(cls):
+        super(BadgeViewsTestCases, cls).setUpClass()
+        configure_philu_theme()
+
+    @classmethod
+    def tearDownClass(cls):
+        clear_philu_theme()
+        super(BadgeViewsTestCases, cls).tearDownClass()
+
+    def test_trophycase(self):
         """
-        Create 2 courses and their course enrollments (1 active & 1 inactive), without badges.
-        Assert that response code is 200 and expected json has data for only active course enrollment
+        Assert that response code is 200
         :return: None
         """
-        request = self.request_factory.get(reverse('trophycase'), {'json': True})
-        request.user = self.user
-
-        # create two courses here, one is already created via setUp
-        course1 = CourseFactory(org="test1", number="123", run="1", display_name="course1")
-        course2 = CourseFactory(org="test2", number="123", run="1", display_name="course2")
-
-        # enroll in two course one of which is active other is inactive
-        CourseEnrollmentFactory(user=self.user, course_id=course1.id, is_active=True)
-        CourseEnrollmentFactory(user=self.user, course_id=course2.id, is_active=False)
-
-        response = badging_views.trophycase(request)
-
-        expected_json = """{"test1/123/1":{"display_name":"course1","badges":{"conversationalist":[]}}}"""
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(reverse('trophycase'), follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, expected_json)
 
     @mock.patch('openedx.features.badging.views.populate_trophycase')
     def test_trophycase_with_some_earned_badges(self, mock_populate_trophycase):
@@ -55,11 +54,9 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         :param mock_populate_trophycase: mock to assert it has been called with expected input
         :return: None
         """
-        request = self.request_factory.get(reverse('trophycase'), {'json': True})
-        request.user = self.user
-
+        self.client.login(username=self.user.username, password='test')
         badge1 = BadgeFactory()
-        badge2 = BadgeFactory()
+        badge2 = BadgeFactory(threshold=11)
 
         # Assign one badge to current user
         user_badge = UserBadgeFactory(user=self.user, badge=badge1)
@@ -69,8 +66,9 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         UserBadgeFactory(user=any_other_user, course_id=CourseKeyField.Empty, badge=badge2)
 
         mock_populate_trophycase.return_value = dict()
-        badging_views.trophycase(request)
-        mock_populate_trophycase.assert_called_once_with(request.user, mock.ANY, [user_badge])
+        response = self.client.get(reverse('trophycase'), follow=True, data= {'json': True})
+        self.assertEqual(response.status_code, 200)
+        mock_populate_trophycase.assert_called_once_with(self.user, mock.ANY, [user_badge])
 
     def test_my_badges_denies_anonymous(self):
         """
@@ -82,11 +80,16 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         response = Client().get(path=path)
         self.assertRedirects(response, '{}?next={}'.format(reverse('signin_user'), path))
 
+        path = reverse('trophycase')
+        response = Client().get(path=path)
+        self.assertRedirects(response, '{}?next={}'.format(reverse('signin_user'), path))
+
     def test_my_badges_invalid_course_id(self):
         """
         Test my badges with invalid course id. Assert that an error is raised
         :return: None
         """
+        self.client.login(username=self.user.username, password='test')
         course_id = 'test/course/123'
         path = reverse('my_badges', kwargs={'course_id': course_id})
 
@@ -103,21 +106,20 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         :param mock_get_course_badges: mock to assert it has been called with expected input
         :return: None
         """
+        self.client.login(username=self.user.username, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, is_active=True)
 
-        path = reverse('my_badges', kwargs={'course_id': self.course.id})
-        request = self.request_factory.get(path)
-        request.user = self.user
-
         mock_get_course_badges.return_value = dict()
-        badging_views.my_badges(request, self.course.id)
-        mock_get_course_badges.assert_called_once_with(request.user, self.course.id, list())
+        response = self.client.get(reverse('my_badges', kwargs={'course_id': self.course.id}))
+        self.assertEqual(response.status_code, 200)
+        mock_get_course_badges.assert_called_once_with(self.user, self.course.id, list())
 
     def test_my_badges_with_enrolled_but_inactive_course(self):
         """
         Test my badges with inactive course. Assert that an error is raised
         :return: None
         """
+        self.client.login(username=self.user.username, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, is_active=False)
 
         path = reverse('my_badges', kwargs={'course_id': self.course.id})
@@ -136,14 +138,11 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         :param mock_get_course_badges: mock to assert it has been called with expected input
         :return: None
         """
+        self.client.login(username=self.user.username, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, is_active=True)
 
-        path = reverse('my_badges', kwargs={'course_id': self.course.id})
-        request = self.request_factory.get(path)
-        request.user = self.user
-
         badge1 = BadgeFactory()
-        badge2 = BadgeFactory()
+        badge2 = BadgeFactory(threshold=11)
 
         # Assign one badge to current user
         user_badge = UserBadgeFactory(user=self.user, course_id=self.course.id, badge=badge1)
@@ -153,6 +152,7 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         UserBadgeFactory(user=any_other_user, course_id=self.course.id, badge=badge2)
 
         mock_get_course_badges.return_value = dict()
-        badging_views.my_badges(request, self.course.id)
-        mock_get_course_badges.assert_called_once_with(request.user, self.course.id, [user_badge])
+        response = self.client.get(reverse('my_badges', kwargs={'course_id': self.course.id}), follow=True)
+        self.assertEqual(response.status_code, 200)
+        mock_get_course_badges.assert_called_once_with(self.user, self.course.id, [user_badge])
 
