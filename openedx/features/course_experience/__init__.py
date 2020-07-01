@@ -85,8 +85,6 @@ class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
         Overrides is_flag_active if setting USE_DEFAULT_TRUE_NAMESPACE is True.
         """
         use_default_true_namespace = getattr(settings, _USE_DEFAULT_TRUE_NAMESPACE, False)
-        # TODO: REMOVE THIS HARDCODED SETTING
-        use_default_true_namespace = True
         set_custom_metric('temp_use_default_true_namespace', use_default_true_namespace)
         if use_default_true_namespace:
             return self._is_flag_active(flag_name)
