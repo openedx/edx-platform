@@ -57,7 +57,8 @@ class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
             username="testcert",
             email="cert@example.com",
             password="testuser",
-            course_id=self.course_id
+            course_id=self.course_id,
+            staff=True
         ).visit()
 
     def test_page_has_accomplishments_banner(self):
