@@ -47,8 +47,7 @@ class SmartReferralInvitationAPIViewTest(APITestCase):
 
     @mock.patch('openedx.features.smart_referral.api_views.task_send_referral_and_toolkit_emails.delay')
     @data('This is invalid json', None, '', [], {})
-    def test_send_initial_emails_and_save_record_invalid_request_json(self, invalid_json,
-                                                                                  mock_task_send_emails):
+    def test_send_initial_emails_and_save_record_invalid_request_json(self, invalid_json, mock_task_send_emails):
         """Submit smart referral invitation request with invalid json"""
 
         response = self.client.post(
@@ -121,11 +120,11 @@ class FilterContactsAPIViewTestCases(APITestCase):
         self.user = UserFactory()
 
     @file_data('data/test_data_contacts.json')
+    @mock.patch('openedx.features.smart_referral.api_views.filter_referred_contacts')
     @mock.patch('openedx.features.smart_referral.api_views.sort_contacts_by_org_and_user_domain')
     @mock.patch('openedx.features.smart_referral.api_views.get_platform_contacts_and_non_platform_contacts')
-    def test_filter_contacts_api(self, contacts_data,
-                                 mock_get_platform_contacts_and_non_platform_contacts,
-                                 mock_sort_contacts_by_org_and_user_domain):
+    def test_filter_contacts_api(self, contacts_data, mock_get_platform_contacts_and_non_platform_contacts,
+                                 mock_sort_contacts_by_org_and_user_domain, mock_filter_referred_contacts):
         """
         Testcase to test filter contacts api' request and response
         :param contacts_data: Json data that is read from json file provided in test annotation.
@@ -142,6 +141,7 @@ class FilterContactsAPIViewTestCases(APITestCase):
             platform_contacts, non_platform_contacts
         )
         mock_sort_contacts_by_org_and_user_domain.side_effect = [platform_contacts, non_platform_contacts]
+        mock_filter_referred_contacts.return_value = non_platform_contacts
 
         self.client.login(username=self.user.username, password='test')
         response = self.client.post(reverse('filter_user_contacts'),

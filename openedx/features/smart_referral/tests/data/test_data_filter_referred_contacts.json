@@ -1,0 +1,72 @@
+{
+  "contact_list": [
+    {
+      "all_contacts": [
+        {
+          "first_name": "T1 First Name",
+          "last_name": "T1 Last Name",
+          "contact_email": "testing1@test.com"
+        },
+        {
+          "first_name": "T2 First Name",
+          "last_name": "T2 Last Name",
+          "contact_email": "testing2@test.com"
+        },
+        {
+          "first_name": "T3 First Name",
+          "last_name": "T3 Last Name",
+          "contact_email": "testing3@test.com"
+        },
+        {
+          "first_name": "T4 First Name",
+          "last_name": "T4 Last Name",
+          "contact_email": "testing4@test.com"
+        },
+        {
+          "first_name": "T5 First Name",
+          "last_name": "T5 Last Name",
+          "contact_email": "testing5@test.com"
+        }
+      ],
+      "filter_contacts_referred_by_current_user": [
+        {
+          "first_name": "T2 First Name",
+          "last_name": "T2 Last Name",
+          "contact_email": "testing2@test.com"
+        },
+        {
+          "first_name": "T4 First Name",
+          "last_name": "T4 Last Name",
+          "contact_email": "testing4@test.com"
+        },
+        {
+          "first_name": "T5 First Name",
+          "last_name": "T5 Last Name",
+          "contact_email": "testing5@test.com"
+        }
+      ],
+      "filter_contacts_referred_twice": [
+        {
+          "first_name": "T1 First Name",
+          "last_name": "T1 Last Name",
+          "contact_email": "testing1@test.com"
+        },
+        {
+          "first_name": "T2 First Name",
+          "last_name": "T2 Last Name",
+          "contact_email": "testing2@test.com"
+        },
+        {
+          "first_name": "T3 First Name",
+          "last_name": "T3 Last Name",
+          "contact_email": "testing3@test.com"
+        },
+        {
+          "first_name": "T5 First Name",
+          "last_name": "T5 Last Name",
+          "contact_email": "testing5@test.com"
+        }
+      ]
+    }
+  ]
+}

@@ -3,6 +3,7 @@ from django.test import TestCase
 from lms.djangoapps.onboarding.tests.factories import OrganizationFactory, UserFactory
 
 from .constants import (
+    FILTER_CONTACTS_LIST_INDEX,
     SORTED_PLATFORM_CONTACT_LIST_KEY,
     SORTED_PLATFORM_CONTACT_LIST_INDEX,
     SORTED_NON_PLATFORM_CONTACT_LIST_KEY,
@@ -13,6 +14,7 @@ from .constants import (
     UNSORTED_CONTACT_LIST_INDEX,
 )
 from openedx.features.smart_referral import helpers as filter_contacts_helpers
+from openedx.features.smart_referral.tests.factories import SmartReferralFactory
 
 
 @ddt
@@ -113,3 +115,42 @@ class FilterContactsAPIViewTestHelpers(TestCase):
         user = UserFactory(email='testing.101@test.com')
         actual_result = filter_contacts_helpers.get_org_admin_email(user)
         self.assertIsNone(actual_result)
+
+    @file_data('data/test_data_filter_referred_contacts.json')
+    def test_filter_referred_contacts_already_referred_by_current_user(self, contacts):
+        """
+        Test filtering contacts which are already referred by current user.
+        """
+        current_user = UserFactory(email='current_user@test.com')
+        any_other_user = UserFactory(email='any_other_user@test.com')
+        # refer two different contacts by current user, it should be filtered
+        SmartReferralFactory(user=current_user, contact_email='testing1@test.com')
+        SmartReferralFactory(user=current_user, contact_email='testing3@test.com')
+        # refer a contact once by any other user, it should not be filtered
+        SmartReferralFactory(user=any_other_user, contact_email='testing1@test.com')
+
+        contact_list = contacts[FILTER_CONTACTS_LIST_INDEX]
+        filtered_contacts = filter_contacts_helpers.filter_referred_contacts(contact_list['all_contacts'], current_user)
+
+        self.assertEqual(filtered_contacts, contact_list['filter_contacts_referred_by_current_user'])
+
+    @file_data('data/test_data_filter_referred_contacts.json')
+    def test_filter_referred_contacts_already_referred_twice(self, contacts):
+        """
+        Test filtering contacts which are already referred by other users twice.
+        """
+        current_user = UserFactory(email='current_user@test.com')
+        any_other_user1 = UserFactory(email='any_other_user1@test.com')
+        any_other_user2 = UserFactory(email='any_other_user2@test.com')
+
+        # refer single contact by two users, it should be filtered
+        SmartReferralFactory(user=any_other_user1, contact_email='testing4@test.com')
+        SmartReferralFactory(user=any_other_user2, contact_email='testing4@test.com')
+
+        # refer a contact only once by other user, it should not be filtered
+        SmartReferralFactory(user=any_other_user2, contact_email='testing1@test.com')
+
+        contact_list = contacts[FILTER_CONTACTS_LIST_INDEX]
+        filtered_contacts = filter_contacts_helpers.filter_referred_contacts(contact_list['all_contacts'], current_user)
+
+        self.assertEqual(filtered_contacts, contact_list['filter_contacts_referred_twice'])

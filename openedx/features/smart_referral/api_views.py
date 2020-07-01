@@ -7,7 +7,11 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 
-from .helpers import sort_contacts_by_org_and_user_domain, get_platform_contacts_and_non_platform_contacts
+from .helpers import (
+    filter_referred_contacts,
+    sort_contacts_by_org_and_user_domain,
+    get_platform_contacts_and_non_platform_contacts
+)
 from .serializers import SmartReferralSerializer
 from .tasks import task_send_referral_and_toolkit_emails
 
@@ -33,7 +37,7 @@ class FilterContactsAPIView(APIView):
 
         response = {
             'platform_contacts': platform_contacts,
-            'non_platform_contacts': non_platform_contacts,
+            'non_platform_contacts': filter_referred_contacts(non_platform_contacts, user),
         }
         return JsonResponse(response, status=status.HTTP_200_OK)
 

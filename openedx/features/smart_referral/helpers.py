@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 
-from lms.djangoapps.onboarding.models import UserExtendedProfile, Organization
+from lms.djangoapps.onboarding.models import UserExtendedProfile
+
+from .models import SmartReferral
 
 CONTACT_EMAIL_KEY = 'contact_email'
 
@@ -57,3 +59,20 @@ def get_email_domain(email):
     Return email domain name e.g "google.com", "yahoo.com" and "outlook.com" etc by splitting email after "@".
     """
     return email.split('@')[1] if email else None
+
+
+def filter_referred_contacts(contacts, user):
+    """
+    Filter out contacts which are already been referred twice or which are referred by current user.
+    """
+    if not contacts:
+        return None
+
+    filtered_contacts = []
+    for contact in contacts:
+        queryset_referral = SmartReferral.objects.filter(contact_email=contact.get('contact_email'))
+        queryset_count = queryset_referral.count()
+        is_referred_before = queryset_count > 1 or (queryset_count == 1 and queryset_referral.first().user == user)
+        filtered_contacts.append(contact) if not is_referred_before else None
+
+    return filtered_contacts
