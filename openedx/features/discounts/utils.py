@@ -123,7 +123,7 @@ def generate_offer_html(user, course):
                               u'{a_open}Upgrade Now{a_close}{div_close}')
 
             message_html = HTML(offer_message).format(
-                a_open=HTML(u'<a href="{upgrade_link}">').format(
+                a_open=HTML(u'<a id="welcome" href="{upgrade_link}">').format(
                     upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
                 ),
                 a_close=HTML('</a>'),
