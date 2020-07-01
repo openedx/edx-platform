@@ -659,7 +659,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         name="Test team",
         course=None,
         description="Filler description",
-        topic_id="topic_0",
+        teamset_id="topic_0",
         **kwargs
     ):
         """Creates the payload for creating a team. kwargs can be used to specify additional fields."""
@@ -669,7 +669,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             'name': name,
             'course_id': str(course.id),
             'description': description,
-            'topic_id': topic_id,
+            'teamset_id': teamset_id,
         })
         return data
 
