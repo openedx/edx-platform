@@ -63,11 +63,15 @@ class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
                 if request:
                     value = flag_is_active(request, namespaced_flag_name)
                 else:
+                    set_custom_metric('warn_flag_no_request', True)
                     # Return the default value if not in a request context.
                     # Same as the original implementation
+                    self._set_waffle_flag_metric(namespaced_flag_name, value)
                     return True
 
             self._cached_flags[namespaced_flag_name] = value
+
+        self._set_waffle_flag_metric(namespaced_flag_name, value)
         return value
 
     def is_flag_active(self, flag_name, check_before_waffle_callback=None, flag_undefined_default=None):
