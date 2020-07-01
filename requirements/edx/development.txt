@@ -221,7 +221,7 @@ psutil==1.2.1             # via -r requirements/edx/testing.txt, edx-django-util
 py2neo==3.1.2             # via -r requirements/edx/testing.txt
 py==1.8.1                 # via -r requirements/edx/testing.txt, pytest, tox
 pycodestyle==2.6.0        # via -r requirements/edx/testing.txt, flake8
-pycontracts==1.8.14       # via -r requirements/edx/testing.txt, edx-user-state-client
+pycontracts==1.8.12       # via -r requirements/edx/testing.txt, edx-user-state-client
 pycountry==19.8.18        # via -r requirements/edx/testing.txt
 pycparser==2.20           # via -r requirements/edx/testing.txt, cffi
 pycryptodome==3.9.7       # via -r requirements/edx/testing.txt, pdfminer.six
