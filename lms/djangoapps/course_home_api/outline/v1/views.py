@@ -8,15 +8,17 @@ from rest_framework.response import Response
 
 from edx_django_utils import monitoring as monitoring_utils
 from django.urls import reverse
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
 
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
-from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
+from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
@@ -78,9 +80,16 @@ class OutlineTabView(RetrieveAPIView):
         monitoring_utils.set_custom_metric('user_id', request.user.id)
         monitoring_utils.set_custom_metric('is_staff', request.user.is_staff)
 
-        course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
-
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
+
+        _, request.user = setup_masquerade(
+            request,
+            course_key,
+            staff_access=has_access(request.user, 'staff', course_key),
+            reset_masquerade_data=True,
+        )
+
+        course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
         date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
 
         # User locale settings

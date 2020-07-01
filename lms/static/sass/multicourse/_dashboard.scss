@@ -263,6 +263,12 @@
               }
             }
 
+            .action-message {
+              min-width: ($baseline*20);
+              color: $gray-d1;
+              pointer-events: none;
+            }
+
             // UI: general actions dropdown layout
             .wrapper-action-more {
               display: inline-block;

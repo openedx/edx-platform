@@ -26,10 +26,11 @@ from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.tests.factories import StaffFactory
-from lms.urls import RESET_COURSE_DEADLINES_NAME
 from gating import api as lms_gating_api
+from lms.djangoapps.courseware.tests.factories import StaffFactory
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
+from lms.urls import RESET_COURSE_DEADLINES_NAME
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
@@ -55,7 +56,7 @@ GATING_NAMESPACE_QUALIFIER = '.gating'
 
 
 @ddt.ddt
-class TestCourseOutlinePage(SharedModuleStoreTestCase):
+class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     """
     Test the course outline view.
     """
@@ -241,8 +242,6 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         enrollment = CourseEnrollment.objects.get(course_id=course.id)
         enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=30)
         enrollment.schedule.save()
-        post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
-        course = self.courses[0]
 
         student_schedule = CourseEnrollment.objects.get(course_id=course.id, user=self.user).schedule
         student_schedule.start_date = timezone.now() - datetime.timedelta(days=30)
@@ -255,19 +254,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         )
 
         self.client.login(username=staff.username, password=TEST_PASSWORD)
-        masquerade_url = reverse(
-            'masquerade_update',
-            kwargs={
-                'course_key_string': six.text_type(course.id),
-            }
-        )
-        response = self.client.post(
-            masquerade_url,
-            json.dumps({"role": 'student', "group_id": None, "user_name": self.user.username}),
-            "application/json"
-        )
-
-        assert response.status_code == 200
+        self.update_masquerade(course=course, username=self.user.username)
 
         post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
@@ -292,19 +279,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         )
 
         self.client.login(username=staff.username, password=TEST_PASSWORD)
-        masquerade_url = reverse(
-            'masquerade_update',
-            kwargs={
-                'course_key_string': six.text_type(course.id),
-            }
-        )
-        response = self.client.post(
-            masquerade_url,
-            json.dumps({"role": 'student', "group_id": None, "user_name": None}),
-            "application/json"
-        )
-
-        assert response.status_code == 200
+        self.update_masquerade(course=course)
 
         post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
@@ -772,28 +747,10 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         self.assertEqual(DEFAULT_COMPLETION_TRACKING_START, view._completion_data_collection_start())
 
 
-class TestCourseOutlinePreview(SharedModuleStoreTestCase):
+class TestCourseOutlinePreview(SharedModuleStoreTestCase, MasqueradeMixin):
     """
     Unit tests for staff preview of the course outline.
     """
-    def update_masquerade(self, course, role, group_id=None, user_name=None):
-        """
-        Toggle masquerade state.
-        """
-        masquerade_url = reverse(
-            'masquerade_update',
-            kwargs={
-                'course_key_string': six.text_type(course.id),
-            }
-        )
-        response = self.client.post(
-            masquerade_url,
-            json.dumps({'role': role, 'group_id': group_id, 'user_name': user_name}),
-            'application/json'
-        )
-        self.assertEqual(response.status_code, 200)
-        return response
-
     def test_preview(self):
         """
         Verify the behavior of preview for the course outline.
@@ -830,7 +787,7 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         self.assertContains(response, 'Future Chapter')
 
         # Verify that staff masquerading as a learner see the future chapter.
-        self.update_masquerade(course, role='student')
+        self.update_masquerade(course=course, role='student')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Future Chapter')

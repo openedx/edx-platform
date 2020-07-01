@@ -371,14 +371,10 @@ class TeamMembershipImportManager(object):
         if(teamset_id, team_name) not in self.user_enrollment_by_team:
             self.user_enrollment_by_team[teamset_id, team_name] = set()
         self.user_enrollment_by_team[teamset_id, team_name].add(self.user_to_actual_enrollment_mode[user.id])
-        if self.is_FERPA_bubble_breached(teamset_id, team_name):
+        if self.is_FERPA_bubble_breached(teamset_id, team_name) or \
+                not self.is_enrollment_protection_for_existing_team_matches_user(user, team_name, teamset_id):
             error_message = \
                 'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(team_name)
-            self.add_error_and_check_if_max_exceeded(error_message)
-            return False
-        if not self.is_enrollment_protection_for_existing_team_matches_user(user, team_name, teamset_id):
-            error_message = \
-                'User {} does not have access to team {}.'.format(user.username, team_name)
             self.add_error_and_check_if_max_exceeded(error_message)
             return False
         return True

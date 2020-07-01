@@ -391,7 +391,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
     def _assert_generated_modes(self, response):
         """Dry method to generate course modes dict and test with response data."""
-        modes = CourseMode.modes_for_course(self.course.id, include_expired=True, exclude_credit=False)
+        modes = CourseMode.modes_for_course(self.course.id, include_expired=True, only_selectable=False)
         modes_data = []
         for mode in modes:
             expiry = mode.expiration_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') if mode.expiration_datetime else None

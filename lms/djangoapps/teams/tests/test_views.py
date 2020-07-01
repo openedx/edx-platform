@@ -3101,8 +3101,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        expected_message = 'User {} does not have access to team {}.'.format(
-            masters_a,
+        expected_message = 'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(
             team.name
         )
         self.assertEqual(response_text['errors'][0], expected_message)

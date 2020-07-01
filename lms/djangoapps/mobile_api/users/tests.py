@@ -290,7 +290,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
             self.enroll(course.id)
 
-        add_course_mode(course, upgrade_deadline_expired=False)
+        add_course_mode(course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(course)
 
     def _get_enrollment_data(self, api_version, expired):
         self.login()
