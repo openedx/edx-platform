@@ -69,7 +69,7 @@ django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requi
 django-crum==0.7.6        # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring, edx-rbac, super-csv
 django-fernet-fields==0.6  # via -r requirements/edx/base.txt, edx-enterprise, edxval
 django-filter==2.3.0      # via -r requirements/edx/base.txt, edx-enterprise
-django-ipware==2.1.0      # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
+django-ipware==3.0.0      # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via -r requirements/edx/base.txt, django-mptt
 django-method-override==1.0.4  # via -r requirements/edx/base.txt
 django-model-utils==4.0.0  # via -r requirements/edx/base.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
@@ -149,8 +149,8 @@ html5lib==1.1             # via -r requirements/edx/base.txt, ora2
 httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 icalendar==4.0.6          # via -r requirements/edx/base.txt
 idna==2.10                # via -r requirements/edx/base.txt, requests
-importlib-metadata==1.7.0  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, flake8, importlib-resources, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
-importlib-resources==2.0.1  # via virtualenv
+importlib-metadata==1.7.0  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, flake8, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
+importlib-resources==3.0.0  # via virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, jinja2-pluralize
 inflection==0.5.0         # via -r requirements/edx/base.txt, drf-yasg
 ipaddress==1.0.23         # via -r requirements/edx/base.txt
