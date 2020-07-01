@@ -1164,6 +1164,7 @@ class TopicDetailView(APIView):
         )
         return Response(serializer.data)
 
+
 class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
     """
         **Use Cases**
@@ -1182,12 +1183,12 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
             * username: Returns membership records only for the specified user.
               If the requesting user is not staff then only memberships for
-              teams associated with teamsets in which the requesting user is
+              teams associated with courses in which the requesting user is
               enrolled are returned.
 
             * team_id: Returns only membership records associated with the
-              specified team. The requesting user must be staff or a member of
-              the teamset associated with the team.
+              specified team. The requesting user must be staff or enrolled in
+              the course associated with the team.
 
             * teamset_id: Returns membership records only for the specified teamset.
               if teamset_id is specified, course_id must also be specified.
@@ -1463,7 +1464,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except AlreadyOnTeamInTeamset:
             return Response(
                 build_api_error(
-                    ugettext_noop(u"The user {username} is already a member of a team in this teamset."),
+                    ugettext_noop("The user {username} is already a member of a team in this teamset."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST
@@ -1471,7 +1472,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         except NotEnrolledInCourseForTeam:
             return Response(
                 build_api_error(
-                    ugettext_noop(u"The user {username} is not enrolled in the course associated with this team."),
+                    ugettext_noop("The user {username} is not enrolled in the course associated with this team."),
                     username=username
                 ),
                 status=status.HTTP_400_BAD_REQUEST
