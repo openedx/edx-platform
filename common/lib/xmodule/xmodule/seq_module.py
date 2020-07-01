@@ -785,7 +785,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
         }
 
     @property
-    def enable_discussion(self) -> dict:
+    def enable_discussion(self):
         return all(self.get_children_discussion_switches().values())
 
     @enable_discussion.setter
