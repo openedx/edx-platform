@@ -191,17 +191,20 @@ from openedx.features.course_experience.course_tools import HttpMethod
 </%static:webpack>
 
 <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
-  var link = $("#welcome");
-  function trackEvent() {
+  var welcomeLink = $("#welcome");
+  var sockLink = $("#sock");
+  var fbeLink = $("#FBE_banner");
+  var upgradeDateLink = $("#course_home_dates");
+
+  function trackWelcomeEvent() {
     TrackECommerceEvents.trackUpsellClick('course_home_welcome', {
       pageName: "course_home",
       linkType: "link",
       linkCategory: "welcome"
     });
   }
-  link.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackEvent);
+  welcomeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackWelcomeEvent);
 
-  var sockLink = $("#sock");
   function trackSockEvent() {
     TrackECommerceEvents.trackUpsellClick('course_home_sock', {
       pageName: "course_home",
@@ -210,4 +213,24 @@ from openedx.features.course_experience.course_tools import HttpMethod
     });
   }
   sockLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackSockEvent);
+
+  function trackFBEEvent() {
+    TrackECommerceEvents.trackUpsellClick('course_home_audit_access_expires', {
+      pageName: "course_home",
+      linkType: "link",
+      linkCategory: "FBE_banner"
+    });
+  }
+  fbeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackFBEEvent);
+
+  function trackUpgradeDateEvent() {
+    TrackECommerceEvents.trackUpsellClick('course_home_dates', {
+      pageName: "course_home",
+      linkType: "link",
+      linkCategory: "(none)"
+    });
+  }
+  upgradeDateLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackUpgradeDateEvent);
+  
+
 </%static:require_module_async>
