@@ -319,7 +319,7 @@ class CourseTeamMembership(models.Model):
         return queryset
 
     @classmethod
-    def user_in_team_for_teamset(cls, user, course_id, teamset_id):
+    def user_in_team_for_teamset(cls, user, course_id, topic_id):
         """
         Using the provided teamset_id, checks to see if a user is assigned to any team in the teamset.
 
@@ -332,7 +332,7 @@ class CourseTeamMembership(models.Model):
             True if the user is on a team in a teamset in the course already
             False if not
         """
-        return cls.objects.filter(user=user, team__course_id=course_id, team__topic_id=teamset_id).exists()
+        return cls.objects.filter(user=user, team__course_id=course_id, team__topic_id=topic_id).exists()
 
     @classmethod
     def update_last_activity(cls, user, discussion_topic_id):
