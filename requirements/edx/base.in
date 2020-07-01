@@ -125,7 +125,8 @@ pycryptodomex
 pygments                            # Used to support colors in paver command output
 pyjwkest
 # TODO Replace PyJWT usage with pyjwkest
-PyJWT==1.5.2
+# PyJWT 1.6.3 contains PyJWTError, which is required by Apple auth in social-auth-core
+PyJWT>=1.6.3
 pymongo                             # MongoDB driver
 pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil

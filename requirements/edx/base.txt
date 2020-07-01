@@ -59,7 +59,7 @@ django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requi
 django-crum==0.7.6        # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring, edx-rbac, super-csv
 django-fernet-fields==0.6  # via -r requirements/edx/base.in, edx-enterprise, edxval
 django-filter==2.3.0      # via -r requirements/edx/base.in, edx-enterprise
-django-ipware==2.1.0      # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
+django-ipware==2.1.0      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via django-mptt
 django-method-override==1.0.4  # via -r requirements/edx/base.in
 django-model-utils==4.0.0  # via -r requirements/edx/base.in, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
@@ -185,7 +185,7 @@ pycryptodome==3.9.8       # via lti-consumer-xblock, pdfminer.six
 pycryptodomex==3.9.8      # via -r requirements/edx/base.in, edx-proctoring, pyjwkest
 pygments==2.6.1           # via -r requirements/edx/base.in
 pyjwkest==1.4.2           # via -r requirements/edx/base.in, edx-drf-extensions, lti-consumer-xblock
-pyjwt==1.5.2              # via -r requirements/edx/base.in, drf-jwt, edx-rest-api-client, social-auth-core
+pyjwt==1.7.1              # via -r requirements/edx/base.in, drf-jwt, edx-rest-api-client, social-auth-core
 pymongo==3.10.1           # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/base.in
 pyparsing==2.4.7          # via chem, openedx-calc, packaging, pycontracts
