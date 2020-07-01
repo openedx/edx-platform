@@ -18,8 +18,6 @@ import attr
 
 from openedx.core.lib.api.permissions import IsStaff
 from .api import get_user_course_outline_details
-from .api.data import ScheduleData, UserCourseOutlineData
-
 
 User = get_user_model()
 log = logging.getLogger(__name__)
