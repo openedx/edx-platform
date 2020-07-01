@@ -75,4 +75,4 @@ def is_sso_request(request):
     :param request: request Object:
     :return: Bool
     """
-    return third_party_auth.is_enabled() and third_party_auth.pipeline.running(request) or 'provider' in request.POST
+    return third_party_auth.is_enabled() and third_party_auth.pipeline.running(request)

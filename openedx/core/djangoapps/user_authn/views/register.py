@@ -168,7 +168,7 @@ def create_account_with_params(request, params):
     is_third_party_auth_enabled = third_party_auth.is_enabled()
 
     is_sso = is_sso_request(request)
-    if is_sso:
+    if is_sso or third_party_auth_credentials_in_api:
         params["password"] = generate_password()
 
     if is_registration_api_v1(request) or is_sso:

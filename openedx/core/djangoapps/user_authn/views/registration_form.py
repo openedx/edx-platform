@@ -23,7 +23,7 @@ from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
-from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1, is_sso_request
+from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1, is_sso_request
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.models import (
@@ -431,7 +431,7 @@ class RegistrationFormFactory(object):
                         required=self._is_field_required(field_name)
                     )
         # remove confirm_email form v1 registration form
-        if is_api_v1(request) or is_sso_request(request):
+        if is_registration_api_v1(request) or is_sso_request(request):
             for index, field in enumerate(form_desc.fields):
                 if field['name'] == 'confirm_email':
                     del form_desc.fields[index]
@@ -439,7 +439,10 @@ class RegistrationFormFactory(object):
         return form_desc
 
     def _get_registration_submit_url(self, request):
-        return reverse("user_api_registration") if is_api_v1(request) else reverse("user_api_registration_v2")
+        if is_registration_api_v1(request):
+            return reverse("user_api_registration")
+        else:
+            return reverse("user_api_registration_v2")
 
     def _add_email_field(self, form_desc, required=True):
         """Add an email field to a form description.
