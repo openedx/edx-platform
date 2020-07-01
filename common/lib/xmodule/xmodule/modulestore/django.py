@@ -199,7 +199,6 @@ class SignalHandler(object):
             log.info('Sent %s signal to %s with kwargs %s. Response was: %s', signal_name, receiver, kwargs, response)
 
 
-@beeline.traced(name="xmodule.load_function")
 def load_function(path):
     """
     Load a function by name.
@@ -211,7 +210,6 @@ def load_function(path):
     Returns:
         The imported object 'function'.
     """
-    beeline.add_context_field("path", path)
     if ':' in path:
         module_path, _, method_path = path.rpartition(':')
         module = import_module(module_path)
@@ -314,7 +312,6 @@ def create_modulestore_instance(
 _MIXED_MODULESTORE = None
 
 
-@beeline.traced(name="xmodule.modulestore()")
 def modulestore():
     """
     Returns the Mixed modulestore

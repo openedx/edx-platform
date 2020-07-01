@@ -3,7 +3,6 @@ This module provides an abstraction for working with XModuleDescriptors
 that are stored in a database an accessible using their Location as an identifier
 """
 
-import beeline
 import logging
 import re
 import json
@@ -240,7 +239,6 @@ class BulkOperationsMixin(object):
         """
         pass
 
-    @beeline.traced(name="xmodule._begin_bulk_operation")
     def _begin_bulk_operation(self, course_key, ignore_case=False):
         """
         Begin a bulk operation on course_key.
@@ -263,7 +261,6 @@ class BulkOperationsMixin(object):
         """
         pass
 
-    @beeline.traced(name="xmodule._end_bulk_operation")
     def _end_bulk_operation(self, structure_key, emit_signals=True, ignore_case=False):
         """
         End the active bulk operation on structure_key (course or library key).
