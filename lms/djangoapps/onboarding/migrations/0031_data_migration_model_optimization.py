@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            ["BEGIN;"
+            ["BEGIN;",
 
              "UPDATE onboarding_userextendedprofile SET function_areas = CONCAT(function_areas, 'function_strategy_planning,') WHERE function_strategy_planning = 1;",
              "UPDATE onboarding_userextendedprofile SET function_areas = CONCAT(function_areas, 'function_leadership_governance,') WHERE function_leadership_governance = 1;",
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
              "UPDATE onboarding_userextendedprofile SET function_areas = CONCAT(function_areas, 'function_fundraising,') WHERE function_fundraising = 1;",
              "UPDATE onboarding_userextendedprofile SET function_areas = CONCAT(function_areas, 'function_marketing_communication,') WHERE function_marketing_communication = 1;",
              "UPDATE onboarding_userextendedprofile SET function_areas = CONCAT(function_areas, 'function_system_tools') WHERE function_system_tools = 1;",
-             "UPDATE onboarding_userextendedprofile SET function_areas = TRIM(TRAILING ',' FROM function_areas) WHERE function_areas <> '';"
+             "UPDATE onboarding_userextendedprofile SET function_areas = TRIM(TRAILING ',' FROM function_areas) WHERE function_areas <> '';",
 
              "UPDATE onboarding_userextendedprofile SET interests = CONCAT(interests, 'interest_strategy_planning,') WHERE interest_strategy_planning = 1;",
              "UPDATE onboarding_userextendedprofile SET interests = CONCAT(interests, 'interest_leadership_governance,') WHERE interest_leadership_governance = 1;",
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
              "UPDATE onboarding_userextendedprofile SET interests = CONCAT(interests, 'interest_human_resource,') WHERE interest_human_resource = 1;",
              "UPDATE onboarding_userextendedprofile SET interests = CONCAT(interests, 'interest_financial_management,') WHERE interest_financial_management = 1;",
              "UPDATE onboarding_userextendedprofile SET interests = CONCAT(interests, 'interest_fundraising,') WHERE interest_fundraising = 1;",
-             "UPDATE onboarding_userextendedprofile SET interests = CONCAT(interests, 'interest_marketing_communication,') WHERE interest_marketing_communication = 1;"
+             "UPDATE onboarding_userextendedprofile SET interests = CONCAT(interests, 'interest_marketing_communication,') WHERE interest_marketing_communication = 1;",
              "UPDATE onboarding_userextendedprofile SET interests = CONCAT(interests, 'interest_system_tools') WHERE interest_system_tools = 1;",
              "UPDATE onboarding_userextendedprofile SET interests = TRIM(TRAILING ',' FROM interests) WHERE interests <> '';",
 
