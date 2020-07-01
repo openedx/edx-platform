@@ -66,7 +66,7 @@ def compare_hear_about_philanthropyu(user_extended_profile):
     actual_value = hear_about_philanthropyu_list[0] if len(hear_about_philanthropyu_list) > 0 else ''
 
     if expected_value != actual_value:
-        log.info(ERROR_MSG_MISMATCH.format(field_name='HEAR_ABOUT_PHILANTHROPYU',
+        log.error(ERROR_MSG_MISMATCH.format(field_name='HEAR_ABOUT_PHILANTHROPYU',
                                            profile_id=user_extended_profile.id,
                                            user_id=user_extended_profile.user_id,
                                            expected_val=expected_value,
