@@ -88,4 +88,14 @@ from django.utils.translation import ugettext as _
     });
   }
   link.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackEvent);
+
+  var sockLink = $("#sock");
+  function trackSockEvent() {
+    TrackECommerceEvents.trackUpsellClick('in_course_sock', {
+      pageName: "in_course",
+      linkType: "button",
+      linkCategory: "sock"
+    });
+  }
+  sockLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackSockEvent);
 </%static:require_module_async>

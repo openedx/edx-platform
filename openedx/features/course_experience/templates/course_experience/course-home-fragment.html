@@ -200,4 +200,14 @@ from openedx.features.course_experience.course_tools import HttpMethod
     });
   }
   link.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackEvent);
+
+  var sockLink = $("#sock");
+  function trackSockEvent() {
+    TrackECommerceEvents.trackUpsellClick('course_home_sock', {
+      pageName: "course_home",
+      linkType: "button",
+      linkCategory: "sock"
+    });
+  }
+  sockLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackSockEvent);
 </%static:require_module_async>
