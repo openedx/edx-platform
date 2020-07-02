@@ -82,6 +82,7 @@ from django.utils.translation import ugettext as _
   var welcomeLink = $("#welcome");
   var sockLink = $("#sock");
   var fbeLink = $("#FBE_banner");
+  var accessDeniedUpsellLink = $("#accessDeniedUpsell");
 
   function trackWelcomeEvent() {
     TrackECommerceEvents.trackUpsellClick(welcomeLink, 'in_course_welcome', {
@@ -109,5 +110,15 @@ from django.utils.translation import ugettext as _
     });
   }
   fbeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackFBEEvent);
+
+  function trackAccessDeniedUpsellEvent() {
+    TrackECommerceEvents.trackUpsellClick(accessDeniedUpsellLink, 'in_course_upgrade', {
+      pageName: "in_course",
+      linkType: "link",
+      linkCategory: "none"
+    });
+  }
+  accessDeniedUpsellLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackAccessDeniedUpsellEvent);
+
 
 </%static:require_module_async>
