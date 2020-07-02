@@ -144,7 +144,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
                         <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png" alt="">
                         <div class="upgrade-container">
                             <p>
-                                <a class="btn-brand btn-upgrade"
+                                <a id="green_upgrade" class="btn-brand btn-upgrade"
                                    href="${upgrade_url}"
                                    data-creative="sidebarupsell"
                                    data-position="sidebar-message"
@@ -195,6 +195,8 @@ from openedx.features.course_experience.course_tools import HttpMethod
   var sockLink = $("#sock");
   var fbeLink = $("#FBE_banner");
   var upgradeDateLink = $("#course_home_dates");
+  var GreenUpgradeLink = $("#green_upgrade");
+  
 
   function trackWelcomeEvent() {
     TrackECommerceEvents.trackUpsellClick(welcomeLink, 'course_home_welcome', {
@@ -231,6 +233,15 @@ from openedx.features.course_experience.course_tools import HttpMethod
     });
   }
   upgradeDateLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackUpgradeDateEvent);
+  
+  function trackGreenUpgradeEvent() {
+    TrackECommerceEvents.trackUpsellClick(GreenUpgradeLink, 'course_home_green', {
+      pageName: "course_home",
+      linkType: "button",
+      linkCategory: "green_upgrade"
+    });
+  }
+  GreenUpgradeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackGreenUpgradeEvent);
   
 
 </%static:require_module_async>
