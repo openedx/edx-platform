@@ -43,3 +43,21 @@ class SAMLProviderConfigTests(APITestCase):
         providerconfig = SAMLProviderConfig.objects.get()
         self.assertEqual(providerconfig.slug, 'test-slug')
         self.assertEqual(providerconfig.name, 'name-of-config')
+
+    def test_update_one_config(self):
+        # PUT auth/saml/v0/providerconfig/{id}/ -d data
+        url = reverse('samlproviderconfig-list')
+        data = {
+            'entity_id': 'id',
+            'metadata_source': 'http://test.url',
+            'name': 'name-of-config',
+            'enabled': 'true',
+            'slug': 'test-slug'
+        }
+        self.assertEqual(SAMLProviderConfig.objects.count(), 0)
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(SAMLProviderConfig.objects.count(), 1)
+        providerconfig = SAMLProviderConfig.objects.get()
+        self.assertEqual(providerconfig.slug, 'test-slug')
+        self.assertEqual(providerconfig.name, 'name-of-config')
