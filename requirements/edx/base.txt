@@ -99,7 +99,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.in
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.in
 edx-django-utils==3.2.3   # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.3.15    # via -r requirements/edx/base.in
+edx-enterprise==3.3.16    # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.0  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
@@ -145,7 +145,7 @@ lazy==1.4                 # via -r requirements/edx/paver.txt, acid-xblock, lti-
 lepl==5.1.3               # via rfc6266-parser
 libsass==0.10.0           # via -r requirements/edx/paver.txt, ora2
 loremipsum==1.0.5         # via ora2
-lti-consumer-xblock==2.0.1.1  # via -r requirements/edx/base.in
+lti-consumer-xblock==2.0.2  # via -r requirements/edx/base.in
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/../edx-sandbox/shared.txt, capa, edxval, lti-consumer-xblock, ora2, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.in
 mako==1.1.3               # via -r requirements/edx/base.in, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
@@ -179,7 +179,7 @@ polib==1.1.0              # via edx-i18n-tools
 psutil==1.2.1             # via -r requirements/edx/paver.txt, edx-django-utils
 py2neo==3.1.2             # via -r requirements/edx/base.in
 pycontracts==1.8.12       # via -r requirements/edx/base.in, edx-user-state-client
-pycountry==19.8.18        # via -r requirements/edx/base.in
+pycountry==20.7.2         # via -r requirements/edx/base.in
 pycparser==2.20           # via -r requirements/edx/../edx-sandbox/shared.txt, cffi
 pycryptodome==3.9.8       # via lti-consumer-xblock, pdfminer.six
 pycryptodomex==3.9.8      # via -r requirements/edx/base.in, edx-proctoring, pyjwkest
