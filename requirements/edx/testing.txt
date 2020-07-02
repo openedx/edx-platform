@@ -185,7 +185,7 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 mongoengine==0.20.0       # via -r requirements/edx/base.txt
 more-itertools==8.4.0     # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, pytest, zipp
 mpmath==1.1.0             # via -r requirements/edx/base.txt, sympy
-mysqlclient==1.4.6        # via -r requirements/edx/base.txt
+mysqlclient==2.0.0        # via -r requirements/edx/base.txt
 newrelic==5.14.1.144      # via -r requirements/edx/base.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/base.txt, chem
 nodeenv==1.4.0            # via -r requirements/edx/base.txt
