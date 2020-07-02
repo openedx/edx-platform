@@ -1707,7 +1707,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         # Invalidate user certificate
         generated_certificate.invalidate()
-        response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+        response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
         self.assertEqual(response.cert_status, 'invalidated')
         self.assertEqual(response.title, 'Your certificate has been invalidated')
 
@@ -1720,7 +1720,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
         )
-        response = views._get_cert_data(
+        response = views.get_cert_data(
             self.user, self.course, CourseMode.HONOR, MagicMock(passed=True)
         )
 
@@ -1736,7 +1736,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_generating=True)):
-            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+            response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'generating')
         self.assertEqual(response.title, "We're working on it...")
@@ -1750,7 +1750,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status(is_unverified=True)):
-            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+            response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'unverified')
         self.assertEqual(response.title, "Certificate unavailable")
@@ -1764,7 +1764,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
         with patch('lms.djangoapps.certificates.api.certificate_downloadable_status',
                    return_value=self.mock_certificate_downloadable_status()):
-            response = views._get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
+            response = views.get_cert_data(self.user, self.course, CourseMode.HONOR, MagicMock(passed=True))
 
         self.assertEqual(response.cert_status, 'requesting')
         self.assertEqual(response.title, "Congratulations, you qualified for a certificate!")
