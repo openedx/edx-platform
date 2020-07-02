@@ -37,6 +37,9 @@
             certificates_url = ''
             if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
                 certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            exams_url = ''
+            if settings.FEATURES.get("EXAM_SETTINGS_HTML_VIEW"):
+                exams_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
             checklists_url = reverse('checklists_handler', kwargs={'course_key_string': six.text_type(course_key)})
 
       %>
@@ -100,6 +103,11 @@
                   <li class="nav-item nav-course-settings-group-configurations">
                     <a href="${reverse('group_configurations_list_handler', kwargs={'course_key_string': six.text_type(course_key)})}">${_("Group Configurations")}</a>
                   </li>
+                  % if exams_url:
+                  <li class="nav-item nav-course-settings-exams">
+                    <a href="${exams_url}">${_("Exam Settings")}</a>
+                  </li>
+                  % endif
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>
