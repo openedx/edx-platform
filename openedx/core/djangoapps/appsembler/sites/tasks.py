@@ -20,6 +20,7 @@ from student.roles import CourseAccessRole
 from opaque_keys.edx.keys import CourseKey
 
 from organizations.models import Organization
+from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -101,6 +102,7 @@ def import_course_on_site_creation(organization_id):
                 ModuleStoreEnum.UserID.system,
                 os.path.join(dir_name, extracted_course_folder),
                 source_dirs=[os.path.join(dir_name, extracted_course_folder, 'course')],
+                static_content_store=contentstore(),
                 target_id=course_target_id,
                 create_if_not_present=True,
             )
