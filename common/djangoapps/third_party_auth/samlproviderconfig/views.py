@@ -23,12 +23,3 @@ class SAMLProviderConfigViewSet(SAMLProviderMixin, viewsets.ModelViewSet):
     Usage:
         [HttpVerb] /auth/saml/v0/providerconfig/
     """
-
-    @action(methods=['put', detail=False])
-    def update_existing(self, request, *args, **kwargs):
-        provider_config = self.get_object()
-        partial = kwargs.pop('partial', False)
-        serializer = self.get_serializer(provider_config, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
