@@ -83,7 +83,7 @@ from django.utils.translation import ugettext as _
   var sockLink = $("#sock");
 
   function trackWelcomeEvent() {
-    TrackECommerceEvents.trackUpsellClick('in_course_welcome', {
+    TrackECommerceEvents.trackUpsellClick(welcomeLink, 'in_course_welcome', {
       pageName: "in_course",
       linkType: "link",
       linkCategory: "welcome"
@@ -92,7 +92,7 @@ from django.utils.translation import ugettext as _
   welcomeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackWelcomeEvent);
 
   function trackSockEvent() {
-    TrackECommerceEvents.trackUpsellClick('in_course_sock', {
+    TrackECommerceEvents.trackUpsellClick(sockLink, 'in_course_sock', {
       pageName: "in_course",
       linkType: "button",
       linkCategory: "sock"
