@@ -196,6 +196,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
   var fbeLink = $("#FBE_banner");
   var upgradeDateLink = $("#course_home_dates");
   var GreenUpgradeLink = $("#green_upgrade");
+  var PLSUpgradeLink = $("#PLS_button");
   
 
   function trackWelcomeEvent() {
@@ -243,5 +244,13 @@ from openedx.features.course_experience.course_tools import HttpMethod
   }
   GreenUpgradeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackGreenUpgradeEvent);
   
+  function trackPLSUpgradeEvent() {
+    TrackECommerceEvents.trackUpsellClick(PLSUpgradeLink, 'course_home_upgrade_shift_dates', {
+      pageName: "course_home",
+      linkType: "button",
+      linkCategory: "PLS_button"
+    });
+  }
+  PLSUpgradeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackPLSUpgradeEvent);
 
 </%static:require_module_async>
