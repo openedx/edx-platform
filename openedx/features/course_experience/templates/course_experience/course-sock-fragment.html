@@ -10,11 +10,9 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 %>
 
 <%block name="content">
-    % if show_course_sock:
+% if show_course_sock:
     <div class="verification-sock"
-        % if not DISPLAY_COURSE_SOCK_FLAG.is_enabled(course_id):
-        style="display: none"
-        %endif
+
     >
         <button type="button" aria-expanded="false" class="btn btn-primary focusable action-toggle-verification-sock">
             ${_('Learn About Verified Certificates')}
@@ -66,7 +64,7 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
             </div>
         </div>
     </div>
-    %endif
+% endif
 </%block>
 
 <%static:webpack entry="CourseSock">

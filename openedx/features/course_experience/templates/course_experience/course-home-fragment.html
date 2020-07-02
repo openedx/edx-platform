@@ -197,7 +197,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
   var upgradeDateLink = $("#course_home_dates");
 
   function trackWelcomeEvent() {
-    TrackECommerceEvents.trackUpsellClick('course_home_welcome', {
+    TrackECommerceEvents.trackUpsellClick(welcomeLink, 'course_home_welcome', {
       pageName: "course_home",
       linkType: "link",
       linkCategory: "welcome"
@@ -206,7 +206,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
   welcomeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackWelcomeEvent);
 
   function trackSockEvent() {
-    TrackECommerceEvents.trackUpsellClick('course_home_sock', {
+    TrackECommerceEvents.trackUpsellClick(sockLink, 'course_home_sock', {
       pageName: "course_home",
       linkType: "button",
       linkCategory: "sock"
@@ -215,7 +215,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
   sockLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackSockEvent);
 
   function trackFBEEvent() {
-    TrackECommerceEvents.trackUpsellClick('course_home_audit_access_expires', {
+    TrackECommerceEvents.trackUpsellClick(fbeLink, 'course_home_audit_access_expires', {
       pageName: "course_home",
       linkType: "link",
       linkCategory: "FBE_banner"
@@ -224,7 +224,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
   fbeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackFBEEvent);
 
   function trackUpgradeDateEvent() {
-    TrackECommerceEvents.trackUpsellClick('course_home_dates', {
+    TrackECommerceEvents.trackUpsellClick(upgradeDateLink, 'course_home_dates', {
       pageName: "course_home",
       linkType: "link",
       linkCategory: "(none)"
