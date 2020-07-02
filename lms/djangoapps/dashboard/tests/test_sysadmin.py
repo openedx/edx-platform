@@ -128,7 +128,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         try:
             mongoengine.connect(TEST_MONGODB_LOG['db'])
             CourseImportLog.objects.all().delete()
-        except mongoengine.connection.ConnectionError:
+        except mongoengine.connection.ConnectionFailure:
             pass
 
     def _setstaff_login(self):

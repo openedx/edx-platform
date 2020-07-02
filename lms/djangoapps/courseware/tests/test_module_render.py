@@ -997,6 +997,7 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 @ddt.ddt
 class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
+
     def setup_request_and_course(self, num_finds, num_sends):
         """
         Sets up the toy course in the modulestore and the request object.
@@ -1522,6 +1523,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
     Tests to verify that standard modifications to the output of XModule/XBlock
     student_view are taking place
     """
+
     def setUp(self):
         super(TestHtmlModifiers, self).setUp()
         self.course = CourseFactory.create()
@@ -1717,6 +1719,7 @@ class DetachedXBlock(XBlock):
     """
     XBlock marked with the 'detached' flag.
     """
+
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """
         A simple view that returns just enough to test.
@@ -2002,7 +2005,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         )
 
 
-@patch('track.views.tracker', autospec=True)
+@patch('track.views.eventtracker', autospec=True)
 class TestModuleTrackingContext(SharedModuleStoreTestCase):
     """
     Ensure correct tracking information is included in events emitted during XBlock callback handling.
@@ -2054,7 +2057,11 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             return {'content': 'test1', 'data_field': 'test2'}
 
         AsideTestType.get_event_context = get_event_context
-        context_info = self.handle_callback_and_get_context_info(mock_tracker, problem_display_name)
+
+        # for different operations, there are different number of context calls.
+        # We are sending this `call_idx` to get the mock call that we are interested in.
+        context_info = self.handle_callback_and_get_context_info(mock_tracker, problem_display_name, call_idx=4)
+
         self.assertIn('asides', context_info)
         self.assertIn('test_aside', context_info['asides'])
         self.assertIn('content', context_info['asides']['test_aside'])
@@ -2062,11 +2069,15 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         self.assertIn('data_field', context_info['asides']['test_aside'])
         self.assertEqual(context_info['asides']['test_aside']['data_field'], 'test2')
 
-    def handle_callback_and_get_context_info(self, mock_tracker, problem_display_name=None):
+    def handle_callback_and_get_context_info(self,
+                                             mock_tracker,
+                                             problem_display_name=None,
+                                             call_idx=0):
         """
         Creates a fake module, invokes the callback and extracts the 'context'
         metadata from the emitted problem_check event.
         """
+
         descriptor_kwargs = {
             'category': 'problem',
             'data': self.problem_xml
@@ -2075,28 +2086,35 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             descriptor_kwargs['display_name'] = problem_display_name
 
         descriptor = ItemFactory.create(**descriptor_kwargs)
+        with patch('lms.djangoapps.courseware.module_render.tracker') as mock_tracker_for_context:
+            render.handle_xblock_callback(
+                self.request,
+                text_type(self.course.id),
+                quote_slashes(text_type(descriptor.location)),
+                'xmodule_handler',
+                'problem_check',
+            )
 
-        render.handle_xblock_callback(
-            self.request,
-            text_type(self.course.id),
-            quote_slashes(text_type(descriptor.location)),
-            'xmodule_handler',
-            'problem_check',
-        )
+            self.assertEquals(len(mock_tracker.emit.mock_calls), 1)
+            mock_call = mock_tracker.emit.mock_calls[0]
+            event = mock_call[2]
 
-        self.assertEqual(len(mock_tracker.send.mock_calls), 1)
-        mock_call = mock_tracker.send.mock_calls[0]
-        event = mock_call[1][0]
+            self.assertEquals(event['name'], 'problem_check')
 
-        self.assertEqual(event['event_type'], 'problem_check')
-        return event['context']
+            # for different operations, there are different number of context calls.
+            # We are sending this `call_idx` to get the mock call that we are interested in.
+            context = mock_tracker_for_context.get_tracker.mock_calls[call_idx][1][1]
+
+            return context
 
     def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
         """
         Creates a fake module, invokes the callback and extracts the 'module'
         metadata from the emitted problem_check event.
         """
-        event = self.handle_callback_and_get_context_info(mock_tracker, problem_display_name)
+        event = self.handle_callback_and_get_context_info(
+            mock_tracker, problem_display_name, call_idx=1
+        )
         return event['module']
 
     def test_missing_display_name(self, mock_tracker):
@@ -2194,6 +2212,7 @@ class TestRebindModule(TestSubmittingProblems):
     Tests to verify the functionality of rebinding a module.
     Inherit from TestSubmittingProblems to get functionality that set up a course structure
     """
+
     def setUp(self):
         super(TestRebindModule, self).setUp()
         self.homework = self.add_graded_section_to_course('homework')
@@ -2552,6 +2571,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     """
     Tests that verify disabled XBlock types are not loaded.
     """
+
     def setUp(self):
         super(TestDisabledXBlockTypes, self).setUp()
         XBlockConfiguration(name='video', enabled=False).save()

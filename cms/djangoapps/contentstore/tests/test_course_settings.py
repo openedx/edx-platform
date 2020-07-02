@@ -619,7 +619,7 @@ class CourseGradingTest(CourseTestCase):
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                 }
             ) for policy_hash in {grading_policy_1, grading_policy_2, grading_policy_3}
-        ])
+        ], any_order=True)
 
     @mock.patch('track.event_transaction_utils.uuid4')
     @mock.patch('models.settings.course_grading.tracker')
@@ -880,6 +880,32 @@ class CourseMetadataEditingTest(CourseTestCase):
         """
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertNotIn('giturl', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'proctortrack': {}
+        },
+    )
+    def test_fetch_proctoring_escalation_email_present(self):
+        """
+        If 'proctortrack' is an available provider, show the escalation email setting
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertIn('proctoring_escalation_email', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'alternate_provider': {}
+        },
+    )
+    def test_fetch_proctoring_escalation_email_not_present(self):
+        """
+        If 'proctortrack' is not an available provider, don't show the escalation email setting
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertNotIn('proctoring_escalation_email', test_model)
 
     @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': False})
     def test_validate_update_filtered_off(self):
@@ -1353,6 +1379,101 @@ class CourseMetadataEditingTest(CourseTestCase):
             user=self.user
         )
         self.assertNotIn(field_name, test_model)
+
+    @ddt.data(True, False)
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {},
+            'proctortrack': {}
+        }
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_validate_update_requires_escalation_email_for_proctortrack(self, include_blank_email):
+        json_data = {
+            "proctoring_provider": {"value": 'proctortrack'},
+        }
+        if include_blank_email:
+            json_data["proctoring_escalation_email"] = {"value": ""}
+
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            json_data,
+            user=self.user
+        )
+        self.assertFalse(did_validate)
+        self.assertEqual(len(errors), 1)
+        self.assertIsNone(test_model)
+        self.assertEqual(
+            errors[0].get('message'),
+            'Provider \'proctortrack\' requires an exam escalation contact.'
+        )
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {},
+            'proctortrack': {}
+        }
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_validate_update_does_not_require_escalation_email_by_default(self):
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "proctoring_provider": {"value": "test_proctoring_provider"},
+            },
+            user=self.user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn('proctoring_provider', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'proctortrack',
+            'proctortrack': {}
+        }
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_validate_update_cannot_unset_escalation_email_when_proctortrack_is_provider(self):
+        course = CourseFactory.create()
+        CourseMetadata.update_from_dict({"proctoring_provider": 'proctortrack'}, course, self.user)
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            course,
+            {
+                "proctoring_escalation_email": {"value": ""},
+            },
+            user=self.user
+        )
+        self.assertFalse(did_validate)
+        self.assertEqual(len(errors), 1)
+        self.assertIsNone(test_model)
+        self.assertEqual(
+            errors[0].get('message'),
+            'Provider \'proctortrack\' requires an exam escalation contact.'
+        )
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'proctortrack',
+            'proctortrack': {}
+        }
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_validate_update_set_proctortrack_provider_with_valid_escalation_email(self):
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "proctoring_provider": {"value": "proctortrack"},
+                "proctoring_escalation_email": {"value": "foo@bar.com"},
+            },
+            user=self.user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn('proctoring_provider', test_model)
+        self.assertIn('proctoring_escalation_email', test_model)
 
     def test_create_zendesk_tickets_present_for_edx_staff(self):
         """

@@ -39,7 +39,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from six import StringIO, text_type
+from six import text_type
 from six.moves import map, range
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
@@ -1357,25 +1357,6 @@ def get_enrollment_report(request, course_id):
     course_key = CourseKey.from_string(course_id)
     report_type = _('detailed enrollment')
     task_api.submit_detailed_enrollment_features_csv(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-
-    return JsonResponse({"status": success_status})
-
-
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ENROLLMENT_REPORT)
-@require_finance_admin
-@common_exceptions_400
-def get_exec_summary_report(request, course_id):
-    """
-    get the executive summary report for the particular course.
-    """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('executive summary')
-    task_api.submit_executive_summary_report(request, course_key)
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
     return JsonResponse({"status": success_status})

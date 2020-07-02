@@ -2596,7 +2596,7 @@ REST_FRAMEWORK = {
     'URL_FORMAT_OVERRIDE': None,
     'DEFAULT_THROTTLE_RATES': {
         'user': '60/minute',
-        'service_user': '120/minute',
+        'service_user': '800/minute',
         'registration_validation': '30/minute',
     },
 }
@@ -3357,7 +3357,8 @@ ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
-COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
+COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
+COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'

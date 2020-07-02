@@ -2926,7 +2926,10 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file}, user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_text['errors'][0], 'Team {} is full.'.format(team1))
+        self.assertEqual(
+            response_text['errors'][0],
+            'New membership for team {} would exceed max size of {}.'.format(team1, 3)
+        )
 
     def test_deletion_via_upload_csv(self):
         # create a team membership that will be used further down
@@ -3098,8 +3101,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        expected_message = 'User {} does not have access to team {}.'.format(
-            masters_a,
+        expected_message = 'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(
             team.name
         )
         self.assertEqual(response_text['errors'][0], expected_message)

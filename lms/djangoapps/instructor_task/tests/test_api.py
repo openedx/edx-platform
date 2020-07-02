@@ -27,7 +27,6 @@ from lms.djangoapps.instructor_task.api import (
     submit_delete_entrance_exam_state_for_student,
     submit_delete_problem_state_for_all_students,
     submit_detailed_enrollment_features_csv,
-    submit_executive_summary_report,
     submit_export_ora2_data,
     submit_override_score,
     submit_rescore_entrance_exam_for_student,
@@ -255,12 +254,6 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
     def test_submit_enrollment_report_features_csv(self):
         api_call = lambda: submit_detailed_enrollment_features_csv(self.create_task_request(self.instructor),
                                                                    self.course.id)
-        self._test_resubmission(api_call)
-
-    def test_submit_executive_summary_report(self):
-        api_call = lambda: submit_executive_summary_report(
-            self.create_task_request(self.instructor), self.course.id
-        )
         self._test_resubmission(api_call)
 
     def test_submit_course_survey_report(self):

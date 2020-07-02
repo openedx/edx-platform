@@ -336,17 +336,16 @@ class CourseMode(models.Model):
     @classmethod
     @request_cached(CACHE_NAMESPACE)
     def modes_for_course(
-        cls, course_id=None, include_expired=False, only_selectable=True, course=None, exclude_credit=True
+        cls, course_id=None, include_expired=False, only_selectable=True, course=None,
     ):
         """
         Returns a list of the non-expired modes for a given course id
 
         If no modes have been set in the table, returns the default mode
 
-        Arguments:
+        Keyword Arguments:
             course_id (CourseKey): Search for course modes for this course.
 
-        Keyword Arguments:
             include_expired (bool): If True, expired course modes will be included
             in the returned JSON data. If False, these modes will be omitted.
 
@@ -370,10 +369,10 @@ class CourseMode(models.Model):
             course_id = course.id
             course = None
 
-        if course_id is not None:
-            found_course_modes = cls.objects.filter(course_id=course_id)
+        if course is not None:
+            found_course_modes = course.modes.all()
         else:
-            found_course_modes = course.modes
+            found_course_modes = cls.objects.filter(course_id=course_id)
 
         # Filter out expired course modes if include_expired is not set
         if not include_expired:
@@ -386,10 +385,7 @@ class CourseMode(models.Model):
         # we exclude them from the list if we're only looking for selectable modes
         # (e.g. on the track selection page or in the payment/verification flows).
         if only_selectable:
-            if course is not None and hasattr(course, 'selectable_modes'):
-                found_course_modes = course.selectable_modes
-            elif exclude_credit:
-                found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
+            found_course_modes = found_course_modes.exclude(mode_slug__in=cls.CREDIT_MODES)
 
         modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:

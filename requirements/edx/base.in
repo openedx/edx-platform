@@ -66,7 +66,7 @@ django-splash
 django-statici18n
 django-storages
 django-user-tasks
-django-waffle==0.18.0
+django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework==3.9.4
 edx-ace
@@ -108,7 +108,7 @@ lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
-mongoengine==0.10.0                 # Object-document mapper for MongoDB, used in the LMS dashboard
+mongoengine                         # Object-document mapper for MongoDB, used in the LMS dashboard
 mysqlclient                         # Driver for the default production relational database
 newrelic                            # New Relic agent for performance monitoring
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
@@ -125,7 +125,8 @@ pycryptodomex
 pygments                            # Used to support colors in paver command output
 pyjwkest
 # TODO Replace PyJWT usage with pyjwkest
-PyJWT==1.5.2
+# PyJWT 1.6.3 contains PyJWTError, which is required by Apple auth in social-auth-core
+PyJWT>=1.6.3
 pymongo                             # MongoDB driver
 pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil
@@ -145,7 +146,7 @@ requests-oauthlib                   # Simplifies use of OAuth via the requests l
 random2
 rules                               # Django extension for rules-based authorization checks
 simplejson
-sailthru-client==2.2.3              # For Sailthru integration
+sailthru-client                     # For Sailthru integration
 Shapely                             # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
 social-auth-app-django

@@ -318,7 +318,6 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
         'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': six.text_type(course_key)}),
         'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': six.text_type(course_key)}),
         'enrollment_report_url': reverse('get_enrollment_report', kwargs={'course_id': six.text_type(course_key)}),
-        'exec_summary_report_url': reverse('get_exec_summary_report', kwargs={'course_id': six.text_type(course_key)}),
         'list_financial_report_downloads_url': reverse(
             'list_financial_report_downloads',
             kwargs={'course_id': six.text_type(course_key)}
@@ -342,6 +341,10 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
 def _section_special_exams(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = six.text_type(course.id)
+    proctoring_provider = course.proctoring_provider
+    escalation_email = None
+    if proctoring_provider == 'proctortrack':
+        escalation_email = course.proctoring_escalation_email
     from edx_proctoring.api import is_backend_dashboard_available
 
     section_data = {
@@ -349,6 +352,7 @@ def _section_special_exams(course, access):
         'section_display_name': _('Special Exams'),
         'access': access,
         'course_id': course_key,
+        'escalation_email': escalation_email,
         'show_dashboard': is_backend_dashboard_available(course_key),
     }
     return section_data

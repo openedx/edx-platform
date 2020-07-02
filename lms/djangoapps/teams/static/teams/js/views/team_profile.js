@@ -70,7 +70,7 @@
                     );
                     this.discussionView = new TeamDiscussionView({
                         el: this.$('.discussion-module'),
-                        readOnly: !isMember
+                        readOnly: (!isMember && !isAdminOrStaff)
                     });
                     this.discussionView.render();
 

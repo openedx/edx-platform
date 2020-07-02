@@ -15,7 +15,6 @@ cffi==1.13.2
 git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
 cryptography==2.8
 cycler==0.10.0            # via matplotlib
-enum34==1.1.6
 ipaddress==1.0.23
 kiwisolver==1.1.0         # via matplotlib
 lxml==3.8.0

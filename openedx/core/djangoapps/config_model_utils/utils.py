@@ -4,7 +4,7 @@
 from student.models import FBEEnrollmentExclusion
 
 
-def is_in_holdback(user, enrollment):
+def is_in_holdback(enrollment):
     """
     Return true if given user is in holdback expermiment
     """

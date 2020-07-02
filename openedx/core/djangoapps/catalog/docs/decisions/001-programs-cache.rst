@@ -8,9 +8,12 @@ Accepted
 Decision
 =========
 1. Developers working on code involving programs (which is not limited Programs theme developers) should be directed to this ADR for context on the usage and limitations of the programs cache.
+
 2. Consumers of the programs cache should expect cache misses and either handle them gracefully when possible or explicitly fail (with logging).
-    a. Depending on the cache access pattern, it may be impossible to distinguish between a non-existent program and an existent program that is missing from the cache.
+
+   a. Depending on the cache access pattern, it may be impossible to distinguish between a non-existent program and an existent program that is missing from the cache.
 3. Introduce logging to the programs cache, especially in the case of cache misses or an empty cache. This will make debugging easier and make it more apparent when intervention (such as manually running cache_programs) is necessary.
+
 4. All edX.org developers should be given access to the Jenkins job that runs cache_programs.
 
 Context
@@ -45,12 +48,12 @@ Because the cache is held in volatile memory, any crash or restart of the memcac
 Recently, the edX.org memcached cluster was restarted due to an increased LMS load. Following the restart, the cache_programs was not run immediately. As a result, there may have been an impact on LMS functionality due to the empty cache.
 
 Developer & operator experience
-=================================
+-------------------------------
 
 Requiring the regularly-scheduled execution of a management command to make the LMS fully functional adds operational complexity to courses.edx.org, Open edX instances, Devstack, and Sandboxes.
 
 Knowledge & access
-==================
+------------------
 The requirements to populate the cache via the edx.org Jenkins job, the privileges required or the fact that the cache is not auto refreshed are not well known.
 
 Future Recommendations and Alternatives

@@ -11,6 +11,7 @@
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
 # ichs <ichsansp@outlook.com>, 2014
+# Imron ras <ombak147@gmail.com>, 2020
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Muhammad Herdiansyah <herdiansyah@openmailbox.org>, 2016
 # Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2015,2018
@@ -51,6 +52,7 @@
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
 # hafizhuddin amin, 2013
+# Imron ras <ombak147@gmail.com>, 2020
 # Mardiyanto Saahi, 2016
 # masrosid2 <masrosid@live.com>, 2014
 # masrosid2 <masrosid@live.com>, 2014
@@ -99,7 +101,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-18 18:51+0000\n"
+"POT-Creation-Date: 2020-06-28 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -3464,6 +3466,17 @@ msgstr ""
 "ini. PIlih dari opsi berikut: {available_providers}."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Proctortrack Exam Escalation Contact"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Required if 'proctortrack' is selected as your proctoring provider. Enter an"
+" email address to be contacted by the support team whenever there are "
+"escalations (e.g. appeals, delayed reviews, etc.)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Opting Out of Proctored Exams"
 msgstr "Ijinkan Tidak Mengikuti Ujian Tersupervisi"
 
@@ -4547,6 +4560,7 @@ msgid "External Discussion"
 msgstr "Diskusi Eksternal"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
 msgid "Home"
 msgstr "Beranda"
 
@@ -6031,6 +6045,11 @@ msgid "in {relative} - {absolute}"
 msgstr "di {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
+#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
+msgid "Enrollment Date"
+msgstr "Tanggal Pendaftaran"
+
+#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr "Awal Mulai Pelatihan"
 
@@ -6451,6 +6470,23 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 msgid "Annual Household Income"
 msgstr "Pemasukan Rumah Tangga Tahunan"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your current financial situation. Why do you need assistance?"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your learning or professional goals. How will a Verified "
+"Certificate in this course help you achieve these goals?"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Tell us about your plans for this course. What steps will you take to help "
+"you complete the course work and receive a certificate?"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 1250 and 2500 characters or so in your response."
@@ -7719,10 +7755,6 @@ msgstr "Judul"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Year of Birth"
 msgstr "Tahun Lahir"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Date"
-msgstr "Tanggal Pendaftaran"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Currently Enrolled"
@@ -11700,6 +11732,10 @@ msgstr ""
 msgid "Username created for VEM Integration, e.g. vem_service_user."
 msgstr ""
 
+#: openedx/core/djangoapps/video_pipeline/models.py
+msgid "Percentage of courses allowed to use VEM pipeline"
+msgstr ""
+
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr ""
@@ -11799,36 +11835,28 @@ msgstr ""
 msgid "Subscribe to calendar updates"
 msgstr ""
 
-#: openedx/features/calendar_sync/views/management.py
-#, python-brace-format
-msgid "Updates for Your {course} Schedule"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
-msgid "Update Your Calendar"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
-#, python-brace-format
-msgid ""
-"Your assignment due dates for {course} were recently adjusted. Update your "
-"calendarwith your new schedule to ensure that you stay on track!"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
+#: openedx/features/calendar_sync/utils.py
 msgid "Stay on Track"
 msgstr ""
 
-#: openedx/features/calendar_sync/views/management.py
-msgid "Mark Your Calendar"
-msgstr ""
-
-#: openedx/features/calendar_sync/views/management.py
+#: openedx/features/calendar_sync/utils.py
 #, python-brace-format
 msgid ""
 "Sticking to a schedule is the best way to ensure that you successfully "
 "complete your self-paced course. This schedule of assignment due dates for "
 "{course} will help you stay on track!"
+msgstr ""
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid "Updates for Your {course} Schedule"
+msgstr ""
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid ""
+"Your assignment due dates for {course} were recently adjusted. Update your "
+"calendar with your new schedule to ensure that you stay on track!"
 msgstr ""
 
 #: openedx/features/content_type_gating/models.py
@@ -12035,6 +12063,23 @@ msgid ""
 "checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
+#: openedx/features/enterprise_support/admin/forms.py
+msgid "CSV File"
+msgstr ""
+
+#: openedx/features/enterprise_support/admin/forms.py
+msgid ""
+"CSV file should have 3 columns having names lms_user_id, course_id, "
+"opportunity_id"
+msgstr ""
+
+#: openedx/features/enterprise_support/admin/views.py
+#, python-brace-format
+msgid ""
+"Enrollment attributes were not updated for records at following line numbers"
+" in csv because no enrollment found for these records: {error_line_numbers}"
+msgstr ""
+
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_title} was not complete."
@@ -12045,6 +12090,18 @@ msgstr "Pendaftaran ke {course_title} belum selesai."
 msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
+msgstr ""
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Enterprise Course Enrollments"
+msgstr ""
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Override Enrollment Attributes"
+msgstr ""
+
+#: openedx/features/enterprise_support/templates/enterprise_support/admin/enrollment_attributes_override.html
+msgid "Upload CSV to override enrollment attributes for learners"
 msgstr ""
 
 #: openedx/features/enterprise_support/utils.py
@@ -13840,6 +13897,7 @@ msgid "Sequence"
 msgstr "Urutan"
 
 #: lms/templates/courseware/dates.html lms/templates/seq_module.html
+#: lms/templates/vert_module.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr ""
@@ -14239,6 +14297,11 @@ msgstr ""
 "setelan browser Anda untuk mengubah skala naik atau turun. Pada Google "
 "Chrome, hal ini dilakukan dengan menekan ctrl-plus atau ctrl-minus pada "
 "waktu yang bersamaan."
+
+#: lms/templates/vert_module.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "{subsection_format} due {{date}}"
+msgstr "{subsection_format} berakhir {{date}}"
 
 #: lms/templates/video.html
 msgid "Loading video player"
@@ -16818,29 +16881,6 @@ msgstr "Setelan Email"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
 msgstr "Program terkait"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can contact the account holder to request payment, or you can "
-"unenroll from this course"
-msgstr ""
-"Anda tidak bisa mengakses kursus ini lagi karena pembayaran belum diterima. "
-"Anda dapat menghubungi pemegang rekening untuk meminta pembayaran, atau Anda"
-" dapat membatalkan pendaftaran dari pelatihan ini"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You can no longer access this course because payment has not yet been "
-"received. You can {contact_link_start}contact the account "
-"holder{contact_link_end} to request payment, or you can "
-"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
-msgstr ""
-"Anda tidak dapat lagi mengakses kursus ini karena bukti pembayaran belum "
-"diterima. Anda dapat mengontak {contact_link_start}Tim "
-"IndonesiaX{contact_link_end} untuk memproses pembayaran, atau Anda dapat "
-"{unenroll_link_start}membatalkan pendaftaran{unenroll_link_end} dari kursus "
-"ini."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -20386,14 +20426,10 @@ msgstr ""
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
 "course from a country or region currently subject to U.S. economic and trade"
-" sanctions.Unfortunately, because {platform_name} is required to comply with"
-" export controls,we cannot allow you to access this course at this time."
+" sanctions. Unfortunately, because {platform_name} is required to comply "
+"with export controls, we cannot allow you to access this course at this "
+"time."
 msgstr ""
-"Sistem kami menunjukkan bahwa Anda mencoba mengakses pelatihan "
-"{platform_name} ini dari suatu negara atau wilayah yang saat ini terkena "
-"sanksi ekonomi dan perdagangan AS. Sayangnya, karena {platform_name} "
-"diwajibkan untuk mematuhi kontrol ekspor, kami tidak mengizinkan Anda untuk "
-"mengakses pelatihan ini pada saat ini."
 
 #: lms/templates/static_templates/faq.html
 #: themes/red-theme/lms/templates/footer.html
@@ -20776,10 +20812,6 @@ msgstr[0] ""
 msgid "Prerequisite: "
 msgstr "Prasyarat:"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "{subsection_format} due {{date}}"
-msgstr "{subsection_format} berakhir {{date}}"
-
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"
 msgstr "Pelajari tentang Sertifikat Terverifikasi"
@@ -20961,6 +20993,14 @@ msgstr ""
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "Portal Mitra edX"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""
