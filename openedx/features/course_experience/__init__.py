@@ -1,9 +1,11 @@
 """
 Unified course experience settings and helper methods.
 """
-
-
+import crum
+from django.conf import settings
 from django.utils.translation import ugettext as _
+from edx_django_utils.monitoring import set_custom_metric
+from waffle import flag_is_active
 
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
@@ -12,11 +14,95 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, W
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 
+# .. toggle_name: USE_DEFAULT_TRUE_NAMESPACE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: When True, uses the new default_true namespace to help deprecate flag_undefined_default.
+# .. toggle_category: course_experience
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2020-06-30
+# .. toggle_expiration_date: 2020-07
+# .. toggle_warnings: n/a
+# .. toggle_tickets: n/a
+# .. toggle_status: supported
+_USE_DEFAULT_TRUE_NAMESPACE = 'USE_DEFAULT_TRUE_NAMESPACE'
+
+
+class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
+    """
+    This is a temporary class to help deprecate/remove ``flag_undefined_default``.
+
+    TODO: TNL-7061: Perform the actual clean-up required to remove these flags
+        and refactor/fix any tests that shouldn't be removed.
+
+    """
+    def _is_flag_active(self, flag_name):
+        """
+        Returns and caches whether the provided flag is active.
+
+        If the flag value is already cached in the request, it is returned.
+        If the flag doesn't exist, always returns default of True.
+
+        Note: This is a similified version of the method it overrides, that
+        hard codes the default to True, and skips the call back used for
+        course overrides:
+        https://github.com/edx/edx-platform/blob/df9be8c678f8266e2e5710513c74deca14c4527c/openedx/core/djangoapps/waffle_utils/__init__.py#L229-L305
+
+        """
+        # Import is placed here to avoid model import at project startup.
+        from waffle.models import Flag
+
+        # validate arguments
+        namespaced_flag_name = self._namespaced_name(flag_name)
+        value = self._cached_flags.get(namespaced_flag_name)
+        if value is None:
+
+            # determine if the flag is undefined in waffle
+            try:
+                Flag.objects.get(name=namespaced_flag_name)
+            except Flag.DoesNotExist:
+                # default to True if not defined
+                value = True
+
+            if value is None:
+                request = crum.get_current_request()
+                if request:
+                    value = flag_is_active(request, namespaced_flag_name)
+                else:
+                    set_custom_metric('warn_flag_no_request', True)
+                    # Return the default value if not in a request context.
+                    # Same as the original implementation
+                    self._set_waffle_flag_metric(namespaced_flag_name, value)
+                    return True
+
+            self._cached_flags[namespaced_flag_name] = value
+
+        self._set_waffle_flag_metric(namespaced_flag_name, value)
+        return value
+
+    def is_flag_active(self, flag_name, check_before_waffle_callback=None, flag_undefined_default=None):
+        """
+        Overrides is_flag_active if setting USE_DEFAULT_TRUE_NAMESPACE is True.
+        """
+        use_default_true_namespace = getattr(settings, _USE_DEFAULT_TRUE_NAMESPACE, False)
+        set_custom_metric('temp_use_default_true_namespace', use_default_true_namespace)
+        if use_default_true_namespace:
+            return self._is_flag_active(flag_name)
+        else:
+            return super().is_flag_active(flag_name, check_before_waffle_callback, flag_undefined_default=True)
+
+
+DEFAULT_TRUE_WAFFLE_FLAG_NAMESPACE = DefaultTrueWaffleFlagNamespace(name='course_experience')
+
 # Waffle flag to enable the separate course outline page and full width content.
-COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_outline_page', flag_undefined_default=True)
+# NOTE: The special namespace makes the default True and skips checking course overrides.
+# TODO: TNL-7061: Perform the actual clean-up required to remove this flag.
+COURSE_OUTLINE_PAGE_FLAG = CourseWaffleFlag(DEFAULT_TRUE_WAFFLE_FLAG_NAMESPACE, 'course_outline_page')
 
 # Waffle flag to enable a single unified "Course" tab.
-UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab', flag_undefined_default=True)
+# NOTE: The special namespace makes the default True and skips checking course overrides.
+# TODO: TNL-7061: Perform the actual clean-up required to remove this flag.
+UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(DEFAULT_TRUE_WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
 
 # Waffle flag to enable the sock on the footer of the home and courseware pages.
 DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock')

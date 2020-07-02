@@ -8,25 +8,25 @@ Usage:
 For Waffle Flags, first set up the namespace, and then create flags using the
 namespace.  For example::
 
-   WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
+   WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='my_namespace')
 
    # Use CourseWaffleFlag when you are in the context of a course.
-   UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_course_tab')
+   SOME_COURSE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_course_feature')
    # Use WaffleFlag when outside the context of a course.
-   HIDE_SEARCH_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'hide_search')
+   SOME_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_feature')
 
 You can check these flags in code using the following::
 
-    HIDE_SEARCH_FLAG.is_enabled()
-    UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key)
+    SOME_FLAG.is_enabled()
+    SOME_COURSE_FLAG.is_enabled(course_key)
 
 To test these WaffleFlags, see testutils.py.
 
 In the above examples, you will use Django Admin "waffle" section to configure
-for a flag named: course_experience.unified_course_tab
+for a flag named: my_namespace.some_course_feature
 
 You could also use the Django Admin "waffle_utils" section to configure a course
-override for this same flag (e.g. course_experience.unified_course_tab).
+override for this same flag (e.g. my_namespace.some_course_feature).
 
 For Waffle Switches, first set up the namespace, and then create the flag name.
 For example::
