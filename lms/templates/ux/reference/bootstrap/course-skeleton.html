@@ -81,6 +81,7 @@ from django.utils.translation import ugettext as _
 <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
   var welcomeLink = $("#welcome");
   var sockLink = $("#sock");
+  var fbeLink = $("#FBE_banner");
 
   function trackWelcomeEvent() {
     TrackECommerceEvents.trackUpsellClick(welcomeLink, 'in_course_welcome', {
@@ -99,4 +100,14 @@ from django.utils.translation import ugettext as _
     });
   }
   sockLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackSockEvent);
+
+  function trackFBEEvent() {
+    TrackECommerceEvents.trackUpsellClick(fbeLink, 'in_course_audit_access_expires', {
+      pageName: "in_course",
+      linkType: "link",
+      linkCategory: "FBE_banner"
+    });
+  }
+  fbeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackFBEEvent);
+
 </%static:require_module_async>
