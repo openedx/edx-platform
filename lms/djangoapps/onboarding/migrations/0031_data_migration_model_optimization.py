@@ -51,12 +51,12 @@ class Migration(migrations.Migration):
              "UPDATE onboarding_userextendedprofile SET goals = CONCAT(goals, 'goal_relation_with_other') WHERE goal_relation_with_other = 1;",
              "UPDATE onboarding_userextendedprofile SET goals = TRIM(TRAILING ',' FROM goals) WHERE goals <> '';",
 
-             '''UPDATE onboarding_userextendedprofile SET hear_about_philanthropyu =
+             """UPDATE onboarding_userextendedprofile SET hear_about_philanthropyu =
                 CASE
                     WHEN hear_about_philanthropy = 'Other'
                     THEN
                         CASE
-                            WHEN hear_about_philanthropy_other IS NOT NULL AND hear_about_philanthropy_other <> ''
+                            WHEN hear_about_philanthropy_other <> ''
                             THEN CONCAT('|', hear_about_philanthropy_other)
                             ELSE ''
                         END
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
                     END
                 END
                 WHERE hear_about_philanthropy IS NOT NULL;
-             ''',
+             """,
 
              "COMMIT;"]
         )
