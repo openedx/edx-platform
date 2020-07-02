@@ -101,7 +101,7 @@ from openedx.core.djangolib.markup import HTML, Text
   var PLSUpgradeLink = $("#PLS_button");
 
 function trackPLSUpgradeEvent() {
-    TrackECommerceEvents.trackUpsellClick(PLSUpgradeLink, 'dates_upgrade_shift_dates', {
+    TrackECommerceEvents.trackUpsellClick(PLSUpgradeLink, 'dates_upgrade', {
       pageName: "dates_tab",
       linkType: "button",
       linkCategory: "PLS_button"

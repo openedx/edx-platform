@@ -22,7 +22,7 @@
                 </div>
             <% } %>
             <% if (is_learner_eligible_for_one_click_purchase && (typeof is_mobile_only === 'undefined' || is_mobile_only === false)) { %>
-            <a href="<%- completeProgramURL %>" class="btn-brand btn cta-primary upgrade-button complete-program">
+            <a id="program_dash_program" href="<%- completeProgramURL %>" class="btn-brand btn cta-primary upgrade-button complete-program">
                 <%- gettext('Upgrade All Remaining Courses (')%>
                 <% if (discount_data.is_discounted) { %>
                     <span class='list-price'>
@@ -76,3 +76,29 @@
     </div>
 </article>
 <aside class="js-program-sidebar program-sidebar"></aside>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+var upgradeProgramLink = $("#program_dash_program");
+var upgradeCourseLink = $("#program_dash_course");
+
+
+function trackProgramUpgradeEvent() {
+  TrackECommerceEvents.trackUpsellClick(upgradeProgramLink, 'program_dash_program', {
+    pageName: "program_dashboard",
+    linkType: "button",
+    linkCategory: "green_upgrade"
+  });
+}
+upgradeProgramLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackProgramUpgradeEvent);
+
+
+function trackCourseUpgradeEvent() {
+  TrackECommerceEvents.trackUpsellClick(upgradeCourseLink, 'program_dash_course', {
+    pageName: "program_dashboard",
+    linkType: "button",
+    linkCategory: "green_upgrade"
+  });
+}
+upgradeCourseLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackCourseUpgradeEvent);
+
+</%static:require_module_async>
