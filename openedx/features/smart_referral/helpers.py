@@ -70,9 +70,9 @@ def filter_referred_contacts(contacts, user):
 
     filtered_contacts = []
     for contact in contacts:
-        queryset_referral = SmartReferral.objects.filter(contact_email=contact.get('contact_email'))
-        queryset_count = queryset_referral.count()
-        is_referred_before = queryset_count > 1 or (queryset_count == 1 and queryset_referral.first().user == user)
-        filtered_contacts.append(contact) if not is_referred_before else None
+        referrals = SmartReferral.objects.filter(contact_email=contact.get('contact_email'))
+        referral_count = referrals.count()
+        is_referable = referral_count == 0 or (referral_count == 1 and referrals.first().user != user)
+        filtered_contacts.append(contact) if is_referable else None
 
     return filtered_contacts
