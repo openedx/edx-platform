@@ -9,10 +9,13 @@ from django.urls import reverse
 from course_modes.models import CourseMode
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND
+from lms.djangoapps.verify_student.models import ManualVerification
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+
+CREDIT_SUPPORT_URL = 'https://support.edx.org/hc/en-us/sections/115004154688-Purchasing-Academic-Credit'
 
 
 @override_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
@@ -36,6 +39,13 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         for chapter in response.data['courseware_summary']:
             self.assertIsNotNone(chapter)
         self.assertIn('settings/grading/' + str(self.course.id), response.data['studio_url'])
+        self.assertEqual(response.data['credit_support_url'], CREDIT_SUPPORT_URL)
+        self.assertIsNotNone(response.data['verification_data'])
+        self.assertEqual(response.data['verification_data']['status'], 'none')
+        if enrollment_mode == CourseMode.VERIFIED:
+            ManualVerification.objects.create(user=self.user, status='approved')
+            response = self.client.get(self.url)
+            self.assertEqual(response.data['verification_data']['status'], 'approved')
 
     def test_get_authenticated_user_not_enrolled(self):
         response = self.client.get(self.url)

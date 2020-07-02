@@ -3,10 +3,13 @@
 Tests for the service classes in verify_student.
 """
 
+from datetime import datetime
 
 import ddt
 from django.conf import settings
 from mock import patch
+from freezegun import freeze_time
+from pytz import utc
 
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -66,47 +69,62 @@ class TestIDVerificationService(ModuleStoreTestCase):
             self.assertTrue(IDVerificationService.user_has_valid_or_pending(user), status)
 
     def test_user_status(self):
+        # each part of the test is in it's own 'frozen time' block because the status is dependent on recency of
+        # verifications and in order to control the recency, we just put everything inside of a frozen time
+
         # test for correct status when no error returned
         user = UserFactory.create()
-        status = IDVerificationService.user_status(user)
-        expected_status = {'status': 'none', 'error': '', 'should_display': True, 'verification_expiry': ''}
-        self.assertDictEqual(status, expected_status)
+        with freeze_time('2014-12-12'):
+            status = IDVerificationService.user_status(user)
+            expected_status = {'status': 'none', 'error': '', 'should_display': True, 'verification_expiry': '',
+                               'status_date': ''}
+            self.assertDictEqual(status, expected_status)
 
-        # test for when photo verification has been created
-        SoftwareSecurePhotoVerification.objects.create(user=user, status='approved')
-        status = IDVerificationService.user_status(user)
-        expected_status = {'status': 'approved', 'error': '', 'should_display': True, 'verification_expiry': ''}
-        self.assertDictEqual(status, expected_status)
+        with freeze_time('2015-01-02'):
+            # test for when photo verification has been created
+            SoftwareSecurePhotoVerification.objects.create(user=user, status='approved')
+            status = IDVerificationService.user_status(user)
+            expected_status = {'status': 'approved', 'error': '', 'should_display': True, 'verification_expiry': '',
+                               'status_date': datetime.now(utc)}
+            self.assertDictEqual(status, expected_status)
 
-        # create another photo verification for the same user, make sure the denial
-        # is handled properly
-        SoftwareSecurePhotoVerification.objects.create(
-            user=user, status='denied', error_msg='[{"photoIdReasons": ["Not provided"]}]'
-        )
-        status = IDVerificationService.user_status(user)
-        expected_status = {
-            'status': 'must_reverify', 'error': ['id_image_missing'], 'should_display': True, 'verification_expiry': ''
-        }
-        self.assertDictEqual(status, expected_status)
+        with freeze_time('2015-02-02'):
+            # create another photo verification for the same user, make sure the denial
+            # is handled properly
+            SoftwareSecurePhotoVerification.objects.create(
+                user=user, status='denied', error_msg='[{"photoIdReasons": ["Not provided"]}]'
+            )
+            status = IDVerificationService.user_status(user)
+            expected_status = {
+                'status': 'must_reverify', 'error': ['id_image_missing'], 'should_display': True, 'verification_expiry': '',
+                'status_date': '',
+            }
+            self.assertDictEqual(status, expected_status)
 
-        # test for when sso verification has been created
-        SSOVerification.objects.create(user=user, status='approved')
-        status = IDVerificationService.user_status(user)
-        expected_status = {'status': 'approved', 'error': '', 'should_display': False, 'verification_expiry': ''}
-        self.assertDictEqual(status, expected_status)
+        with freeze_time('2015-03-02'):
+            # test for when sso verification has been created
+            SSOVerification.objects.create(user=user, status='approved')
+            status = IDVerificationService.user_status(user)
+            expected_status = {'status': 'approved', 'error': '', 'should_display': False, 'verification_expiry': '',
+                               'status_date': datetime.now(utc)}
+            self.assertDictEqual(status, expected_status)
 
-        # create another sso verification for the same user, make sure the denial
-        # is handled properly
-        SSOVerification.objects.create(user=user, status='denied')
-        status = IDVerificationService.user_status(user)
-        expected_status = {'status': 'must_reverify', 'error': '', 'should_display': False, 'verification_expiry': ''}
-        self.assertDictEqual(status, expected_status)
+        with freeze_time('2015-04-02'):
+            # create another sso verification for the same user, make sure the denial
+            # is handled properly
+            SSOVerification.objects.create(user=user, status='denied')
+            status = IDVerificationService.user_status(user)
+            expected_status = {'status': 'must_reverify', 'error': '', 'should_display': False, 'verification_expiry': '',
+                               'status_date': ''}
+            self.assertDictEqual(status, expected_status)
 
-        # test for when manual verification has been created
-        ManualVerification.objects.create(user=user, status='approved')
-        status = IDVerificationService.user_status(user)
-        expected_status = {'status': 'approved', 'error': '', 'should_display': False, 'verification_expiry': ''}
-        self.assertDictEqual(status, expected_status)
+        with freeze_time('2015-05-02'):
+            # test for when manual verification has been created
+            ManualVerification.objects.create(user=user, status='approved')
+            status = IDVerificationService.user_status(user)
+            expected_status = {'status': 'approved', 'error': '', 'should_display': False, 'verification_expiry': '',
+                               'status_date': datetime.now(utc)}
+            self.assertDictEqual(status, expected_status)
 
     @ddt.unpack
     @ddt.data(
@@ -125,7 +143,6 @@ class TestIDVerificationService(ModuleStoreTestCase):
         with patch(
             'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
         ) as mock_verification:
-
             mock_verification.return_value = status
 
             status = IDVerificationService.verification_status_for_user(user, enrollment_mode)
