@@ -20,8 +20,12 @@ ERROR_MSG_MISMATCH = """
 """
 
 
+def get_selected_choices_keys(user_extended_profile, choices):
+    return list([k for k, _ in choices if getattr(user_extended_profile, k)])
+
+
 def compare_function_areas(user_extended_profile):
-    expected_value = list([k for k, _ in FUNCTIONS if getattr(user_extended_profile, k)])
+    expected_value = get_selected_choices_keys(user_extended_profile, FUNCTIONS)
     actual_value = list(user_extended_profile.function_areas)
 
     if expected_value != actual_value:
@@ -31,9 +35,13 @@ def compare_function_areas(user_extended_profile):
                                             expected_val=expected_value,
                                             actual_val=actual_value))
 
+        return False
+
+    return True
+
 
 def compare_interests(user_extended_profile):
-    expected_value = list([k for k, _ in INTERESTS if getattr(user_extended_profile, k)])
+    expected_value = get_selected_choices_keys(user_extended_profile, INTERESTS)
     actual_value = list(user_extended_profile.interests)
 
     if expected_value != actual_value:
@@ -43,9 +51,13 @@ def compare_interests(user_extended_profile):
                                             expected_val=expected_value,
                                             actual_val=actual_value))
 
+        return False
+
+    return True
+
 
 def compare_learners_related(user_extended_profile):
-    expected_value = list([k for k, _ in INTERESTED_LEARNERS if getattr(user_extended_profile, k)])
+    expected_value = get_selected_choices_keys(user_extended_profile, INTERESTED_LEARNERS)
     actual_value = list(user_extended_profile.learners_related)
 
     if expected_value != actual_value:
@@ -55,9 +67,13 @@ def compare_learners_related(user_extended_profile):
                                             expected_val=expected_value,
                                             actual_val=actual_value))
 
+        return False
+
+    return True
+
 
 def compare_goals(user_extended_profile):
-    expected_value = list([k for k, _ in GOALS if getattr(user_extended_profile, k)])
+    expected_value = get_selected_choices_keys(user_extended_profile, GOALS)
     actual_value = list(user_extended_profile.goals)
 
     if expected_value != actual_value:
@@ -67,19 +83,27 @@ def compare_goals(user_extended_profile):
                                             expected_val=expected_value,
                                             actual_val=actual_value))
 
+        return False
+
+    return True
+
 
 def compare_hear_about_philanthropyu(user_extended_profile):
     expected_value = get_expected_hear_about_philanthropyu(user_extended_profile)
 
     hear_about_philanthropyu_list = list(user_extended_profile.hear_about_philanthropyu)
-    actual_value = hear_about_philanthropyu_list[0] if len(hear_about_philanthropyu_list) > 0 else ''
+    actual_value = hear_about_philanthropyu_list[0] if hear_about_philanthropyu_list else ''
 
     if expected_value != actual_value:
         log.error(ERROR_MSG_MISMATCH.format(field_name='HEAR_ABOUT_PHILANTHROPYU',
-                                           profile_id=user_extended_profile.id,
-                                           user_id=user_extended_profile.user_id,
-                                           expected_val=expected_value,
-                                           actual_val=actual_value))
+                                            profile_id=user_extended_profile.id,
+                                            user_id=user_extended_profile.user_id,
+                                            expected_val=expected_value,
+                                            actual_val=actual_value))
+
+        return False
+
+    return True
 
 
 def get_expected_hear_about_philanthropyu(user_extended_profile):
@@ -106,9 +130,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         user_extended_profiles = UserExtendedProfile.objects.all()
+
+        all_profiles_count = len(user_extended_profiles)
+        processed_profiles_count = 0
+        failed_profiles = []
+
         for user_extended_profile in user_extended_profiles:
-            compare_function_areas(user_extended_profile)
-            compare_interests(user_extended_profile)
-            compare_learners_related(user_extended_profile)
-            compare_goals(user_extended_profile)
-            compare_hear_about_philanthropyu(user_extended_profile)
+            comparison_statuses = [compare_function_areas(user_extended_profile),
+                                   compare_interests(user_extended_profile),
+                                   compare_learners_related(user_extended_profile),
+                                   compare_goals(user_extended_profile),
+                                   compare_hear_about_philanthropyu(user_extended_profile)]
+
+            if not all(comparison_statuses):
+                failed_profiles.append(int(user_extended_profile.id))
+
+            processed_profiles_count += 1
+            log.info('{processed}/{all} profiles processed'.
+                     format(processed=processed_profiles_count, all=all_profiles_count))
+
+        if failed_profiles:
+            log.info('{failed}/{all} profiles failed'.format(failed=len(failed_profiles), all=all_profiles_count))
+            log.info('IDs of failed profiles:')
+            log.info(failed_profiles)
+        else:
+            log.info('Congratulations! Consistency check is complete and there are no failed profiles.')
