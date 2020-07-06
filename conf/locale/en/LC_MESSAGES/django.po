@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-22 14:40+0000\n"
-"PO-Revision-Date: 2020-04-22 14:40:52.621774\n"
+"POT-Creation-Date: 2020-06-22 06:00+0000\n"
+"PO-Revision-Date: 2020-06-22 06:00:33.440074\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10792,6 +10792,10 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid "You are not allowed to login on this site."
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
 msgstr ""
@@ -11195,6 +11199,45 @@ msgstr ""
 #: themes/st-normanx/cms/templates/widgets/footer.html
 #: themes/st-normanx/lms/templates/footer.html
 msgid "Powered by"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: cms/templates/index.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/courseware/courses.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
+msgid "Courses"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Coupons"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Enterprise Coupons"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Program Offers"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Enterprise Offers"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Journal Bundle Offers"
 msgstr ""
 
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
@@ -12377,24 +12420,6 @@ msgstr ""
 #: cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Run:"
-msgstr ""
-
-#: cms/templates/index.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/courseware/courses.html
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
-#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-normanx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
-msgid "Courses"
 msgstr ""
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
@@ -21100,7 +21125,7 @@ msgstr ""
 msgid "Organization"
 msgstr ""
 
-#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/course-create-rerun.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr ""
 

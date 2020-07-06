@@ -8,20 +8,28 @@
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013-2014
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
+# Abdelmageed <mido.a@hotmail.com>, 2014
 # Abdullatif El Ali <abdullatifalali@gmail.com>, 2014
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
+# Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
-# Alhamzah Alnufaili <inactive+Alhamzah97@transifex.com>, 2016
+# 11e20772453a5447f86b653d16e71bd3_f829fca <fc1a175da0e051e8f2220ae4e8c37e82_372655>, 2016
+# 11e20772453a5447f86b653d16e71bd3_f829fca <fc1a175da0e051e8f2220ae4e8c37e82_372655>, 2016
+# Ali Hasan <ahasan@qrf.org>, 2016
 # 6e68c7971a89e50e680ae9444d303c8f, 2016-2017
 # AR R1 <e2far1@hotmail.com>, 2016
 # ayshibly <ayshibly@gmail.com>, 2014
+# ayshibly <ayshibly@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
+# br1ng <ibnalawam@gmail.com>, 2014
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016-2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
+# faisal wazir <alwazir95business@gmail.com>, 2020
 # br1ng <ibnalawam@gmail.com>, 2014
+# Jad Freij <jkfreij@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
 # Khaled Jalajel <khaledjalajeldode@gmail.com>, 2015
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
@@ -36,12 +44,15 @@
 # Ned Batchelder <ned@edx.org>, 2015-2016
 # Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2015-2016
 # Sahbi BG <sahbi.g@gmail.com>, 2017
+# Sahbi BG <sahbi.g@gmail.com>, 2017
+# Saramami.mami <saramami.mami@yahoo.com>, 2014
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # Shadi Naif <shadinaif@gmail.com>, 2019
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016-2017
 # SiddigSami <siddigsami@live.com>, 2014-2015
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # Tariq Hamid <ou63@outlook.com>, 2015
+# wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Zakaria <zakaria.braksa@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -49,12 +60,14 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# 6e68c7971a89e50e680ae9444d303c8f, 2016
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013,2015
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
+# Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
 # 6e68c7971a89e50e680ae9444d303c8f, 2016
@@ -84,14 +97,18 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# 6e68c7971a89e50e680ae9444d303c8f, 2016
 # Abdallah Nassif <abdoosh00@gmail.com>, 2016
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # Ali Hasan <ahasan@qrf.org>, 2014,2016
 # Ahmad <reload_cobra2@yahoo.com>, 2015
 # ahmed hai <a7medpeace@gmail.com>, 2017
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
+# Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
-# Alhamzah Alnufaili <inactive+Alhamzah97@transifex.com>, 2016
+# 11e20772453a5447f86b653d16e71bd3_f829fca <fc1a175da0e051e8f2220ae4e8c37e82_372655>, 2016
+# 11e20772453a5447f86b653d16e71bd3_f829fca <fc1a175da0e051e8f2220ae4e8c37e82_372655>, 2016
+# Ali Hasan <ahasan@qrf.org>, 2014,2016
 # 6e68c7971a89e50e680ae9444d303c8f, 2016
 # mohammad hamdi <babrica@hotmail.com>, 2014
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2017
@@ -99,10 +116,12 @@
 # Emad Ahmad Alghamdi <eaalghamdi@kau.edu.sa>, 2015
 # Khaled Abdel wahab <engkhaledabdelwahab@gmail.com>, 2015
 # may <may@qordoba.com>, 2014-2015
+# mohammad hamdi <babrica@hotmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Ned Batchelder <ned@edx.org>, 2016
 # Omar Al-Ithawi <omar.al.dolaimy@gmail.com>, 2015-2016
+# Sahbi BG <sahbi.g@gmail.com>, 2017
 # Sahbi BG <sahbi.g@gmail.com>, 2017
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016-2017
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
@@ -113,13 +132,16 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# 6e68c7971a89e50e680ae9444d303c8f, 2016
 # Abdallah Nassif <abdoosh00@gmail.com>, 2014
 # Ali Hasan <ahasan@qrf.org>, 2016
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
+# Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015
 # Ahmed Jazzar <ahmed.mojaz@gmail.com>, 2015-2016
-# Alhamzah Alnufaili <inactive+Alhamzah97@transifex.com>, 2016
-# Alhamzah Alnufaili <inactive+Alhamzah97@transifex.com>, 2016
+# 11e20772453a5447f86b653d16e71bd3_f829fca <fc1a175da0e051e8f2220ae4e8c37e82_372655>, 2016
+# 11e20772453a5447f86b653d16e71bd3_f829fca <fc1a175da0e051e8f2220ae4e8c37e82_372655>, 2016
 # Ali Hasan <ahasan@qrf.org>, 2016
+# Anouar Benyaiche <anouar1_ben@hotmail.com>, 2020
 # 6e68c7971a89e50e680ae9444d303c8f, 2016
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2017
@@ -135,13 +157,14 @@
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016-2017
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # waeldaoud2014 <wael.daoud@hotmail.com>, 2017
+# waeldaoud2014 <wael.daoud@hotmail.com>, 2017
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-16 13:51+0000\n"
-"PO-Revision-Date: 2019-09-29 20:43+0000\n"
+"POT-Creation-Date: 2020-06-17 12:00+0000\n"
+"PO-Revision-Date: 2020-06-14 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "Language: ar\n"
@@ -149,7 +172,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -270,7 +293,7 @@ msgstr "اختر الملف"
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
 msgid "There was an error while importing the new library to our database."
-msgstr "حدث خطأ أثناء استيراد المكتبة الجديدة إلى قاعدة بياناتنا."
+msgstr "حدث خطأ أثناء استيراد المكتبة الجديدة إلى قاعدة بياناتنا.
 
 #: cms/static/js/features/import/factories/import.js
 #: common/static/bundles/Import.js
@@ -283,15 +306,19 @@ msgid "There was an error with the upload"
 msgstr "حدث خطأ في التحميل"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: cms/static/js/views/manage_users_and_roles.js
-#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
-#: common/static/bundles/StudentAccountDeletion.js
-#: common/static/bundles/StudentAccountDeletionInitializer.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Are you sure?"
-msgstr "هل أنت واثق؟"
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid ""
+"Courses are archived by default when they pass their end date. Are you sure "
+"you want to archive this course anyway?"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid ""
+"Are you sure you want to unarchive this course? End date for this course "
+"will be changed to 1 year from now. This course will still have to be "
+"published."
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: common/static/bundles/CourseOrLibraryListing.js
@@ -317,12 +344,12 @@ msgstr "استعراض"
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: common/static/bundles/CourseOrLibraryListing.js
 msgid "Archive"
-msgstr "أرشيف"
+msgstr ""
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: common/static/bundles/CourseOrLibraryListing.js
 msgid "Un-Archive"
-msgstr "غير مؤرشف"
+msgstr ""
 
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
@@ -439,6 +466,16 @@ msgstr "موافق"
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Unknown"
 msgstr "غير معروف "
+
+#: cms/static/js/views/manage_users_and_roles.js
+#: common/static/bundles/EdlyStudentAccountDeletionInitializer.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+#: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Are you sure?"
+msgstr "هل أنت واثق؟"
 
 #: cms/static/js/views/metadata.js common/static/bundles/commons.js
 #: lms/static/js/views/file_uploader.js
@@ -2181,6 +2218,10 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/bundles/commons.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "العنوان"
 
@@ -2708,23 +2749,6 @@ msgstr "لقد نجحت في تحديث هدفك."
 msgid "There was an error updating your goal."
 msgstr "حدث خطأ أثناء تحديث هدفك."
 
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid ""
-"Courses are archived by default when they pass their end date. Are you sure "
-"you want to archive this course anyway?"
-msgstr ""
-"تتم أرشفة الدورات التدريبية افتراضيًا عند اجتياز تاريخ انتهائها. هل أنت "
-"متأكد أنك تريد أرشفة هذه الدورة التدريبية على أي حال؟"
-
-#: common/static/bundles/CourseOrLibraryListing.js
-msgid ""
-"Are you sure you want to unarchive this course? End date for this course "
-"will be changed to 1 year from now. This course will still have to be "
-"published."
-msgstr ""
-"هل أنت متأكد أنك تريد إلغاء أرشفة هذه الدورة؟ سيتم تغيير تاريخ الانتهاء لهذه"
-" الدورة إلى سنة واحدة من الآن. لا يزال يتعين نشر هذه الدورة."
-
 #: common/static/bundles/CourseOutline.js
 #: openedx/features/course_experience/static/course_experience/js/CourseOutline.js
 #: lms/templates/ccx/schedule.underscore
@@ -2985,14 +3009,14 @@ msgstr ""
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change Session"
-msgstr ""
+msgstr "Change Session"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Select Session"
-msgstr ""
+msgstr "أختر جلسة"
 
 #: common/static/bundles/EntitlementFactory.js
 #: common/static/bundles/ProgramDetailsFactory.js
@@ -3119,12 +3143,12 @@ msgstr "مسجَّل"
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/errors_list.jsx
 msgid "Please fix the following errors:"
-msgstr ""
+msgstr "يرجى تعديل هذه الأخطاء."
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 msgid "Files that you upload must be smaller than 5MB in size."
-msgstr ""
+msgstr "الملفات التي سيتم تحميلها يجب أن لا يتجاوز حجمها 5 ميجا بايت."
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
@@ -3137,7 +3161,7 @@ msgstr ""
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Something went wrong. Please try again later."
-msgstr ""
+msgstr "جرى خطأ معين. حاول مجددا لاحقا."
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/file_upload.jsx
@@ -3192,7 +3216,7 @@ msgstr ""
 #: common/static/common/templates/discussion/thread.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Submit"
-msgstr "تقديم"
+msgstr "جرى التقديم"
 
 #: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
@@ -3348,6 +3372,12 @@ msgid "Bookmark this page"
 msgstr "إضافة الصفحة للمفضلة"
 
 #: common/static/bundles/commons.js
+msgid ""
+"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
+"<%= fileExtensions %> to upload."
+msgstr ""
+
+#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr "حقل مطلوب."
@@ -3367,6 +3397,10 @@ msgstr "يُرجى عدم إدخال أي مسافات أو أحرف خاصة ف
 #: common/static/common/js/components/views/paging_footer.js
 msgid "Pagination"
 msgstr "ترقيم الصفحات"
+
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Upload a new PDF to “<%= name %>”"
+msgstr ""
 
 #: common/static/common/js/components/views/paginated_view.js
 msgid ""
@@ -3394,6 +3428,7 @@ msgid "Your request could not be processed. Refresh the page and try again."
 msgstr "تعذر معالجة طلبك. قم بتحديث الصفحة وإعادة المحاولة."
 
 #: common/static/common/js/discussion/utils.js
+#: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
 msgstr "..."
 
@@ -3505,7 +3540,7 @@ msgstr "إظهار النقاش"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
-msgstr ""
+msgstr "لا يوجد أي منشور في هذا الموضوع"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
@@ -3602,6 +3637,8 @@ msgid "Your post will be discarded."
 msgstr "سوف يُحذَف منشورك."
 
 #: common/static/common/js/discussion/views/response_comment_show_view.js
+#: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/profile-thread.underscore
 msgid "anonymous"
 msgstr "مجهول"
 
@@ -4490,6 +4527,7 @@ msgid "HTML preview of post"
 msgstr "استعراض المنشور في HTML"
 
 #: lms/static/js/customwmd.js
+#: common/static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
 msgstr "سؤالك أو فكرتك (مطلوب)"
 
@@ -6593,6 +6631,7 @@ msgstr "هل أنت متأكّد من رغبتك في حذف {email} من فري
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "طاقم المساق"
 
@@ -6626,23 +6665,6 @@ msgstr "إظهار الإعدادات المهملة"
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr "لديك تغييرات غير محفّظة. هل تريد حقًّا أن تغادر الصفحة؟"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "Yes"
-msgstr "نعم"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid ""
-"Courses are archived by default when they pass their end date. Are you sure"
-"         you want to archive this course anyway?"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid ""
-"Are you sure you want to unarchive this course? End date for this course "
-"will be         changed to 1 year from now. This course will still have to "
-"be published."
-msgstr ""
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -6762,6 +6784,12 @@ msgstr "يجب تحديد فترة السماح بصيغة HH:MM."
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr "لم يمكن تحديد درجة النجاح عند أقلّ من %(minimum_grade_cutoff)s%."
+
+#: cms/static/js/models/uploads.js
+msgid ""
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
+msgstr ""
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -6924,6 +6952,10 @@ msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
 msgid "{selectedProvider} credentials saved"
+msgstr ""
+
+#: cms/static/js/views/edit_chapter.js
+msgid "Upload a new PDF to “<%- name %>”"
 msgstr ""
 
 #: cms/static/js/views/export.js
@@ -7250,16 +7282,12 @@ msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than <%=limit%> characters."
 msgstr ""
-"لا يمكن أن يزيد مجموع الأحرف في حقول المؤسسة ورقم المساق وفترة طرح المساق عن"
-" <%=limit%> حرفًا."
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
 "more than <%=limit%> characters."
 msgstr ""
-"لا يمكن أن يزيد مجموع الأحرف في حقلي المؤسسة ورمز المكتبة عن <%=limit%> "
-"حرفًا."
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
@@ -7505,63 +7533,63 @@ msgstr "البحث"
 
 #: common/static/common/templates/discussion/forum-action-answer.underscore
 msgid "Mark as Answer"
-msgstr ""
+msgstr "التحديد كإجابة"
 
 #: common/static/common/templates/discussion/forum-action-answer.underscore
 msgid "Unmark as Answer"
-msgstr ""
+msgstr "إلغاء التحديد كإجابة"
 
 #: common/static/common/templates/discussion/forum-action-close.underscore
 msgid "Open"
-msgstr ""
+msgstr "فتح"
 
 #: common/static/common/templates/discussion/forum-action-endorse.underscore
 msgid "Endorse"
-msgstr ""
+msgstr "تأييد"
 
 #: common/static/common/templates/discussion/forum-action-endorse.underscore
 msgid "Unendorse"
-msgstr ""
+msgstr "إلغاء التأييد"
 
 #: common/static/common/templates/discussion/forum-action-follow.underscore
 msgid "Follow"
-msgstr ""
+msgstr "متابعة"
 
 #: common/static/common/templates/discussion/forum-action-follow.underscore
 msgid "Unfollow"
-msgstr ""
+msgstr "إلغاء المتابعة"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
 msgid "Pin"
-msgstr ""
+msgstr "تثبيت"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
 msgid "Unpin"
-msgstr ""
+msgstr "إلغاء التثبيت"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
 msgid "Report abuse"
-msgstr ""
+msgstr "الإبلاغ عن إساءة "
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
 msgid "Report"
-msgstr ""
+msgstr "الإبلاغ"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
 msgid "Unreport"
-msgstr ""
+msgstr "إلغاء الإبلاغ"
 
 #: common/static/common/templates/discussion/forum-action-vote.underscore
 msgid "Vote for this post,"
-msgstr ""
+msgstr "صوّت لهذا المنشور"
 
 #: common/static/common/templates/discussion/nav-load-more-link.underscore
 msgid "Load more"
-msgstr ""
+msgstr "تحميل المزيد"
 
 #: common/static/common/templates/discussion/new-post-alert.underscore
 msgid "Error posting your message."
-msgstr ""
+msgstr "حدث خطأ في نشر رسالتك."
 
 #: common/static/common/templates/discussion/new-post-visibility.underscore
 #, python-format
@@ -7578,13 +7606,15 @@ msgstr "كل المنشورات"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Visible to"
-msgstr ""
+msgstr "مرئي من قبل"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid ""
 "Discussion admins, moderators, and TAs can make their posts visible to all "
 "students or specify a single group."
 msgstr ""
+"مدراء المناقشة والمنسقون ومجموعة مساعدي هيئة التدريس المجتمعية يستطيعون جعل "
+"منشوراتهم مرئيّة لجميع الطلّاب أو لمجموعة محددة."
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "All Groups"
@@ -7594,32 +7624,32 @@ msgstr "كل المواضيع"
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
+msgstr "أضف عنوان واضح ومفصل لتشجيع المشاركة. (مطلوب)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
-msgstr ""
+msgstr "تابِع هذا المنشور "
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "post anonymously"
-msgstr ""
+msgstr "انشُر من دون الكشف عن الهوية  "
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "post anonymously to classmates"
-msgstr ""
+msgstr "انشر أمام الزملاء من دون الكشف عن الهوية "
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 msgid "(Community TA)"
-msgstr ""
+msgstr "(مجموعة مساعدي هيئة التدريس المجتمعية)"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 msgid "(Staff)"
-msgstr ""
+msgstr "(الطاقم)"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
 msgid "This thread is closed."
-msgstr ""
+msgstr "أُغلِق هذا الموضوع. "
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 msgid "View discussion"
@@ -7627,7 +7657,7 @@ msgstr "إيجاد النقاشات"
 
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 msgid "Editing comment"
-msgstr ""
+msgstr "تعديل التعليق"
 
 #: common/static/common/templates/discussion/response-comment-edit.underscore
 msgid "Update comment"
@@ -7636,21 +7666,21 @@ msgstr "عدّل فريق."
 #: common/static/common/templates/discussion/response-comment-show.underscore
 #, python-format
 msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "منشور %(author)s بواسطة %(time_ago)s"
 
 #: common/static/common/templates/discussion/response-comment-show.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Reported"
-msgstr ""
+msgstr "مبلَّغ عنه"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Editing post"
-msgstr ""
+msgstr "تعديل المنشور "
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
-msgstr ""
+msgstr "تعديل المنشور أدناه."
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Update post"
@@ -7662,28 +7692,28 @@ msgstr "إيجاد النقاشات"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "answered question"
-msgstr ""
+msgstr "سؤال مُجاب عليه"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "unanswered question"
-msgstr ""
+msgstr "سؤال غير مُجاب عليه"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Pinned"
-msgstr ""
+msgstr "مُثَبَّت"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
-msgstr ""
+msgstr "جاري المتابعة"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
-msgstr ""
+msgstr "مساعد أستاذ لشؤون المتعلّمين"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
-msgstr ""
+msgstr "{unread_comments_count} جديد"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #, python-format
@@ -7691,39 +7721,41 @@ msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
 msgstr ""
+"%(comments_count)s %(span_sr_open)sتعليقات (%(unread_comments_count)s "
+"تعليقات غير مقروءة)%(span_close)s"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #, python-format
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
+msgstr "%(comments_count)s %(span_sr_open)sتعليقات %(span_close)s"
 
 #: common/static/common/templates/discussion/thread-response-edit.underscore
 msgid "Editing response"
-msgstr ""
+msgstr "تعديل الرد "
 
 #: common/static/common/templates/discussion/thread-response-edit.underscore
 msgid "Update response"
-msgstr ""
+msgstr "تحديث الرد "
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
+msgstr "موسومة كإجابة %(time_ago)s للمستخدم %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s"
-msgstr ""
+msgstr "موسومة كإجابة %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
+msgstr "مصادقة عليها %(time_ago)s من قِبل %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "endorsed %(time_ago)s"
-msgstr ""
+msgstr "مصادقة عليها %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 #, python-format
@@ -7738,17 +7770,17 @@ msgstr[5] ""
 
 #: common/static/common/templates/discussion/thread-response.underscore
 msgid "Add a comment"
-msgstr ""
+msgstr "إضافة تعليق "
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "مناقشة منشورة %(author)s بواسطة %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "سؤال منشور %(author)s بواسطة %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
@@ -7757,26 +7789,28 @@ msgstr "إغلاق"
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
-msgstr ""
+msgstr "متعلِّقٌ بِـ: %(courseware_title_linked)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "This post is visible only to %(group_name)s."
-msgstr ""
+msgstr "هذا المنشور مرئيٌّ فقط لـ %(group_name)s."
 
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "This post is visible to everyone."
-msgstr ""
+msgstr "هذا المنشور مرئيٌّ للجميع."
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Post type"
-msgstr ""
+msgstr "نوع المنشور"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
 msgstr ""
+"أسئلة التي تثير قضايا التي تحتاج إلى إجابات. مناقشات تبادل الأفكار وبدء "
+"المحادثات. (مطلوب)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"
@@ -7788,19 +7822,19 @@ msgstr "صفحة المناقشة الرئيسية"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a Response"
-msgstr ""
+msgstr "إضافة رد:"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a response:"
-msgstr ""
+msgstr "أضف رداً:"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "منطقة الموضوع"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
+msgstr "أضف ردك للموضوع ذو الصلة لمساعدة الآخرين في العثور عليه. (مطلوب)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -8175,8 +8209,6 @@ msgid ""
 "You still need to visit the %(display_name)s website to complete the credit "
 "process."
 msgstr ""
-"مازلت بحاجة لزيارة الموقع الإلكتروني %(display_name)s لإتمام العملية ذات "
-"الصلة بالمادّة "
 
 #: lms/templates/commerce/provider.underscore
 #, python-format
@@ -8184,20 +8216,16 @@ msgid ""
 "To finalize course credit, %(display_name)s requires %(platform_name)s "
 "learners to submit a credit request."
 msgstr ""
-"لاستكمال عملية الحصول على مادة دراسية بشكل نهائي، يُوجب %(display_name)s على"
-" متعلّمي %(platform_name)s التقدّم بطلب حصول على مادّة دراسية"
 
 #: lms/templates/commerce/provider.underscore
 msgid "Get Credit"
-msgstr "احصل على مادّة دراسية"
+msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #, python-format
 msgid ""
 "Thank you %(full_name)s! We have received your payment for %(course_name)s."
 msgstr ""
-"شكراً جزيلاً %(full_name)s! لقد استلمنا المبلغ الذي سددته لقاء مشاركتك في "
-"%(course_name)s."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -8255,9 +8283,8 @@ msgid ""
 "from your dashboard. You will receive periodic reminders from {platformName}"
 " to verify your identity."
 msgstr ""
-"إذا لن تقم بالتحقق من هويتك الآن، لا يزال بإمكانك استكشاف الدورة من خلال "
-"لوحة المعلومات الخاصة بك. سوف تتلقى رسائل تذكير دورية من {platformName} "
-"للتحقق من هويتك."
+"إذا لم تؤكّد هويّتك الآن، سيبقى بإمكانك استكشاف مساقك من خلال لوحة معلوماتك."
+" وستتلقّى رسائل تذكيرية دوريًّا من %(platformName)s لتأكيد هويّتك."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -8266,7 +8293,7 @@ msgstr "هل تريد تأكيد هويّتك لاحقًا؟"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Verify Now"
-msgstr "إجراء التحقّق الآن"
+msgstr ""
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
@@ -8389,8 +8416,6 @@ msgid ""
 "The following information is already a part of your {platform} profile. "
 "We\\'ve included it here for your application."
 msgstr ""
-"إن المعلومات التالية هي جزء من ملفّك الشخصي المستخدم في منصّة {platform}. "
-"وقد ضمنّاه هنا كجزء من طلبك."
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -8784,11 +8809,11 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Final Grade"
-msgstr ""
+msgstr "الدرجة"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "for {courseName}"
-msgstr ""
+msgstr "شهادة معتمدة لـ {courseName}"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
@@ -9012,7 +9037,7 @@ msgstr ""
 
 #: lms/templates/student_account/account_recovery.underscore
 msgid "Recover my account"
-msgstr ""
+msgstr "أنشئ حساباً جديداً اﻵن."
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -9246,8 +9271,8 @@ msgid ""
 "You need a driver's license, passport, or other government-issued ID that "
 "has your name and photo."
 msgstr ""
-"تحتاج إلى رخصة قيادة أو جواز سفر أو غيرها من المستندات الشخصية الصادرة عن "
-"الحكومة والتي تحمل اسمك وصورتك."
+"رخصة القيادة، أو جواز السفر، أو بطاقة شخصية صادرة عن الحكومة، بحيث تحمل أي "
+"واحدة من هذه الوثائق اسمك وصورتك"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -9274,7 +9299,9 @@ msgstr "أنّ وجهك داخل إطار الصورة بالكامل."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "The photo of your face matches the photo on your ID."
-msgstr "أن تطابق الصورة على بطاقتك الشخصية صورة وجهك. "
+msgstr ""
+"استخدم كاميرتك لالتقاط صورة لوجهك. ثمّ سنطابق هذه الصورة مع الصورة الموجودة "
+"على بطاقتك الشخصية."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
@@ -9345,16 +9372,16 @@ msgid ""
 "Use your webcam to take a photo of your ID. We will match this photo with "
 "the photo of your face and the name on your account."
 msgstr ""
-"يُرجى استخدام كاميرتك لالتقاط صورة لوجهك. ثمّ سنطابق هذه الصورة مع صورة وجهك"
-" والاسم الموجودين في حسابك.  "
+"استخدم كاميرتك لالتقاط صورة لوجهك. ثمّ سنطابق هذه الصورة مع الصورة الموجودة "
+"على بطاقتك الشخصية."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
 "You need an ID with your name and photo. A driver's license, passport, or "
 "other government-issued IDs are all acceptable."
 msgstr ""
-"تحتاج إلى بطاقة شخصية تحمل اسمك وصورتك. ويمكن تقديم رخصة القيادة، أو جواز "
-"السفر، أو بطاقة شخصية أخرى صادرة عن الحكومة، فجميع هذه الوثائق مقبولة.  "
+"رخصة القيادة، أو جواز السفر، أو بطاقة شخصية صادرة عن الحكومة، بحيث تحمل أي "
+"واحدة من هذه الوثائق اسمك وصورتك"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -9376,7 +9403,7 @@ msgstr ""
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Use the retake photo button if you are not pleased with your photo"
-msgstr "هل تتطابق صورتك مع الصورة التي تحملها بطاقتك الشخصية؟"
+msgstr ""
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -9626,9 +9653,6 @@ msgid ""
 "(usually within 1-2 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
-"لقد استلمنا معلوماتك ونتولّى حاليًا التحقّق من هويتك. ستصلك رسالة على لوحة "
-"معلوماتك عند اكتمال عملية التحقّق (عادةً خلال 1-2 أيام). ويمكنك في الوقت "
-"الراهن استخدام كافة محتويات المساق المُتاحة."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
@@ -9666,7 +9690,7 @@ msgstr "هل يظهر وجهك في صورتك بالكامل؟"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you match your ID photo?"
-msgstr "هل تتطابق صورتك مع الصورة التي تحملها بطاقتك الشخصية؟"
+msgstr "هل يظهر وجهك في صورتك بالكامل؟"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
@@ -10494,7 +10518,7 @@ msgstr "اضغط على إضافة إلى اللغة"
 
 #: cms/templates/js/course-video-transcript-provider-empty.underscore
 msgid "Automated Transcripts"
-msgstr ""
+msgstr "Automated Transcripts"
 
 #: cms/templates/js/course-video-transcript-provider-selected.underscore
 msgid "Transcript Provider"
@@ -11654,21 +11678,11 @@ msgstr "استخدم النص الحالي"
 #~ msgid "All chapters must have a name and asset"
 #~ msgstr "يجب أن يتوفّر اسم ومادّة لجميع الفصول."
 
-#~ msgid ""
-#~ "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-#~ "<%= fileExtensions %> to upload."
-#~ msgstr ""
-#~ "لا يمكن تحميل سوى الملفّات <%= fileTypes %>. لذا يُرجى اختيار ملف ينتهي بـ "
-#~ "<%= fileExtensions %> لتحميله. "
-
 #~ msgid "This unit has validation issues."
 #~ msgstr "هذه الوحدة لديها مشاكل التحقق من الصحة."
 
 #~ msgid "This component has validation issues."
 #~ msgstr "هناك إشكالات في المصادقة على هذا المكوِّن."
-
-#~ msgid "Upload a new PDF to “<%= name %>”"
-#~ msgstr "حمّل ملف PDF جديد إلى “<%= name %>”."
 
 #~ msgid "Please select a PDF file to upload."
 #~ msgstr "يُرجى اختيار ملف PDF لتحميله. "
@@ -11880,11 +11894,23 @@ msgstr "استخدم النص الحالي"
 #~ msgid "New {component_type}"
 #~ msgstr "{component_type} جديد"
 
-#~ msgid "No"
-#~ msgstr "لا شيء"
+#~ msgid "Billing/Payment Options"
+#~ msgstr "خيارات الدفع"
 
 #~ msgid "Certificates"
 #~ msgstr "الشهادات"
+
+#~ msgid "Deadlines"
+#~ msgstr "المواعيد النهائية"
+
+#~ msgid "Errors/Technical Issues"
+#~ msgstr "اخطاء او اشكاليات تقنية"
+
+#~ msgid "Financial Aid"
+#~ msgstr "المساعدة المادية"
+
+#~ msgid "Masters"
+#~ msgstr "ماجستير"
 
 #~ msgid "MicroMasters"
 #~ msgstr "MicroMasters"
