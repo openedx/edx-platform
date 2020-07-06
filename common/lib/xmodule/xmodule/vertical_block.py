@@ -32,7 +32,7 @@ _ = lambda text: text
 
 
 class VerticalFields(object):
-    enable_discussion_flag = Boolean(
+    discussion_enabled = Boolean(
         display_name=_("Enable Discussion"),
         help=_(
             "This setting enable discussions for this vertical block. If True, a discussion UI would show up under this vertical block."
@@ -40,22 +40,6 @@ class VerticalFields(object):
         default=False,
         scope=Scope.settings,
     )
-
-    @property
-    def enable_discussion(self):
-        return self.enable_discussion_flag
-    
-    @enable_discussion.setter
-    def enable_discussion(self, value):
-        def get_course_node(node):
-            node = node.get_parent()
-            while node.xml_element_name() != "course":
-                node = node.get_parent()
-            return node
-
-        # We shouldn't override what is set at course level
-        if get_course_node(self).enable_discussion:
-            self.enable_discussion_flag = value
 
 
 @XBlock.needs('user', 'bookmarks')
