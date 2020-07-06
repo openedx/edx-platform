@@ -27,11 +27,11 @@ would need to be added and/or moved into the cms application
 
 2. Import a course from git
 
-   <https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/git_import.py>_
+   https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/git_import.py
 
 3. Delete a course
 
-   <https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L383-L408>_
+   https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L383-L408
 
 
 These APIs can be removed entirely, as they are adequately covered by existing functionality:
@@ -43,7 +43,7 @@ These APIs can be removed entirely, as they are adequately covered by existing f
 
 2. Staffing and Enrollment (TBD)
 
-   <https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477>_
+   https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477
 
    This functionality may be redundant to features in the Insights application.
 
