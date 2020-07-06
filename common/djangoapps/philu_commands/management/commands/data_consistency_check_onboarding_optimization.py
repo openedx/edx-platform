@@ -136,11 +136,13 @@ class Command(BaseCommand):
         failed_profiles = []
 
         for user_extended_profile in user_extended_profiles:
-            comparison_statuses = [compare_function_areas(user_extended_profile),
-                                   compare_interests(user_extended_profile),
-                                   compare_learners_related(user_extended_profile),
-                                   compare_goals(user_extended_profile),
-                                   compare_hear_about_philanthropyu(user_extended_profile)]
+            comparison_statuses = [
+                compare_function_areas(user_extended_profile),
+                compare_interests(user_extended_profile),
+                compare_learners_related(user_extended_profile),
+                compare_goals(user_extended_profile),
+                compare_hear_about_philanthropyu(user_extended_profile)
+            ]
 
             if not all(comparison_statuses):
                 failed_profiles.append(int(user_extended_profile.id))
