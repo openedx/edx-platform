@@ -68,10 +68,15 @@ class SerializersTestBaseClass(ModuleStoreTestCase):
 class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
     """ Tests for the create team serializer."""
 
+    def _get_team_dict_data(self):
+        data = self.team.__dict__
+        data['course_id'] = data['course_id'].to_deprecated_string()
+        return data
+
     def test_case_create_team__with_empty_language_field(self):
         """ Test that correct error message is thrown when serializing team with empty language field"""
         self.team.country = VALID_COUNTRY
-        data = self.team.__dict__
+        data = self._get_team_dict_data()
         expected_result = {'language': REQUIRED_ERROR_MSG['LANGUAGE']}
         serialized_data = CustomCourseTeamCreationSerializer(data=data)
         serialized_data.is_valid()
@@ -81,7 +86,7 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         """ Test that correct error message is thrown when serializing team with invalid language value"""
         self.team.country = VALID_COUNTRY
         self.team.language = INVALID_LANGUAGE
-        data = self.team.__dict__
+        data = self._get_team_dict_data()
         expected_result = {'language': [INVALID_LANGUAGE_CODE.format(language_code=self.team.language)]}
         serialized_data = CustomCourseTeamCreationSerializer(data=data)
         serialized_data.is_valid()
@@ -90,7 +95,7 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
     def test_case_create_team_with_empty_country_field(self):
         """ Test that correct error message is thrown when serializing team with empty country field"""
         self.team.language = VALID_LANGUAGE
-        data = self.team.__dict__
+        data = self._get_team_dict_data()
         expected_result = {'country': REQUIRED_ERROR_MSG['COUNTRY']}
         serialized_data = CustomCourseTeamCreationSerializer(data=data)
         serialized_data.is_valid()
@@ -100,7 +105,7 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         """ Test that correct error message is thrown when serializing team with invalid country value"""
         self.team.country = INVALID_COUNTRY
         self.team.language = VALID_LANGUAGE
-        data = self.team.__dict__
+        data = self._get_team_dict_data()
         expected_result = {'country': [INVALID_COUNTRY_CODE.format(country_code=self.team.country)]}
         serialized_data = CustomCourseTeamCreationSerializer(data=data)
         serialized_data.is_valid()
@@ -110,7 +115,7 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         """ Test that correct error message is thrown when serializing team with both empty language field
         and empty country field
         """
-        data = self.team.__dict__
+        data = self._get_team_dict_data()
         expected_result = {'country': REQUIRED_ERROR_MSG['COUNTRY'], 'language': REQUIRED_ERROR_MSG['LANGUAGE']}
         serialized_data = CustomCourseTeamCreationSerializer(data=data)
         serialized_data.is_valid()
@@ -122,7 +127,7 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         """
         self.team.country = INVALID_COUNTRY
         self.team.language = INVALID_LANGUAGE
-        data = self.team.__dict__
+        data = self._get_team_dict_data()
         expected_result = {'country': [INVALID_COUNTRY_CODE.format(country_code=self.team.country)],
                            'language': [INVALID_LANGUAGE_CODE.format(language_code=self.team.language)]}
         serialized_data = CustomCourseTeamCreationSerializer(data=data)
@@ -133,7 +138,7 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         """ Test that no errors are returned when team has valid language and country values """
         self.team.country = VALID_COUNTRY
         self.team.language = VALID_LANGUAGE
-        data = self.team.__dict__
+        data = self._get_team_dict_data()
         expected_result = {}
         serialized_data = CustomCourseTeamCreationSerializer(data=data)
         serialized_data.is_valid()
@@ -143,7 +148,7 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         """ Test that after serializing team object language is represented correctly in unicode"""
         self.team.country = VALID_COUNTRY
         self.team.language = VALID_LANGUAGE
-        data = self.team.__dict__
+        data = self._get_team_dict_data()
         valid_result = unicode(self.team.language)
         serialized_data = CustomCourseTeamCreationSerializer(data=data)
         serialized_data.is_valid()
