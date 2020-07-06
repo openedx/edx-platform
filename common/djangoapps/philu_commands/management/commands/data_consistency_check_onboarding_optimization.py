@@ -131,11 +131,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         user_extended_profiles = UserExtendedProfile.objects.all()
 
-        all_profiles_count = len(user_extended_profiles)
-        processed_profiles_count = 0
+        total_profiles = len(user_extended_profiles)
         failed_profiles = []
 
-        for user_extended_profile in user_extended_profiles:
+        for profile_count, user_extended_profile in enumerate(user_extended_profiles, 1):
             comparison_statuses = [
                 compare_function_areas(user_extended_profile),
                 compare_interests(user_extended_profile),
@@ -147,12 +146,11 @@ class Command(BaseCommand):
             if not all(comparison_statuses):
                 failed_profiles.append(int(user_extended_profile.id))
 
-            processed_profiles_count += 1
-            log.info('{processed}/{all} profiles processed'.
-                     format(processed=processed_profiles_count, all=all_profiles_count))
+            log.info('{processed}/{total} profiles processed'.
+                     format(processed=profile_count, total=total_profiles))
 
         if failed_profiles:
-            log.info('{failed}/{all} profiles failed'.format(failed=len(failed_profiles), all=all_profiles_count))
+            log.info('{failed}/{total} profiles failed'.format(failed=len(failed_profiles), total=total_profiles))
             log.info('IDs of failed profiles:')
             log.info(failed_profiles)
         else:
