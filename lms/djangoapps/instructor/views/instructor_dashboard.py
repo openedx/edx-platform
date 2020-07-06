@@ -7,6 +7,7 @@ import datetime
 import logging
 import uuid
 from functools import reduce
+import time
 
 import pytz
 import six
@@ -32,6 +33,7 @@ from xblock.fields import ScopeIds
 from bulk_email.api import is_bulk_email_feature_enabled
 from course_modes.models import CourseMode, CourseModesArchive
 from edxmako.shortcuts import render_to_response
+from instructor.toggles import use_optimised_is_small_course
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -132,6 +134,7 @@ def instructor_dashboard_2(request, course_id):
     reports_enabled = configuration_helpers.get_value('SHOW_ECOMMERCE_REPORTS', False)
 
     sections = []
+    start_time = time.time()  # starts time before _section_student_admin (further calls is_small_course)
     if access['staff']:
         sections.extend([
             _section_course_info(course, access),
@@ -140,6 +143,8 @@ def instructor_dashboard_2(request, course_id):
             _section_discussions_management(course, access),
             _section_student_admin(course, access),
         ])
+    if course_id == 'course-v1:HarvardX+CS50+X':
+        log.info('Investigating log at %s : after _section_student_admin', time.time() - start_time)
     if access['data_researcher']:
         sections.append(_section_data_download(course, access))
 
@@ -195,7 +200,8 @@ def instructor_dashboard_2(request, course_id):
 
     if can_see_special_exams:
         sections.append(_section_special_exams(course, access))
-
+    if course_id == 'course-v1:HarvardX+CS50+X':
+        log.info('Investigating log at %s : section certificate', time.time() - start_time)
     # Certificates panel
     # This is used to generate example certificates
     # and enable self-generated certificates for a course.
@@ -214,7 +220,14 @@ def instructor_dashboard_2(request, course_id):
     if len(openassessment_blocks) > 0 and access['staff']:
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
-    disable_buttons = not _is_small_course(course_key)
+    if course_id == 'course-v1:HarvardX+CS50+X':
+        log.info('Investigating log at %s : before Disable Button (calling is_small_course)', time.time() - start_time)
+    if use_optimised_is_small_course():
+        disable_buttons = not CourseEnrollment.objects.is_small_course(course_key)
+    else:
+        disable_buttons = not _is_small_course(course_key)
+    if course_id == 'course-v1:HarvardX+CS50+X':
+        log.info('Investigating log at %s : after Disable Button (calling is_small_course)', time.time() - start_time)
 
     certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
     generate_certificate_exceptions_url = reverse(
@@ -235,6 +248,8 @@ def instructor_dashboard_2(request, course_id):
         kwargs={'course_id': six.text_type(course_key)}
     )
 
+    if course_id == 'course-v1:HarvardX+CS50+X':
+        log.info('Investigating log at %s : Before Context', time.time() - start_time)
     certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
 
     context = {
@@ -617,7 +632,10 @@ def _is_small_course(course_key):
 def _section_student_admin(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
-    is_small_course = _is_small_course(course_key)
+    if use_optimised_is_small_course():
+        is_small_course = CourseEnrollment.objects.is_small_course(course_key)
+    else:
+        is_small_course = _is_small_course(course_key)
 
     section_data = {
         'section_key': 'student_admin',
