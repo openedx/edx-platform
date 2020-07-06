@@ -23,28 +23,28 @@ would need to be added and/or moved into the cms application
 
 1. Create a cms user account
 
-  https://github.com/edx/edx-platform/blob/50dd1238408dc6785f022d8540961f96e0d6bb4f/lms/djangoapps/dashboard/sysadmin.py#L113-L151
+   https://github.com/edx/edx-platform/blob/50dd1238408dc6785f022d8540961f96e0d6bb4f/lms/djangoapps/dashboard/sysadmin.py#L113-L151
 
 2. Import a course from git
 
-  https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/git_import.py
+   <https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/git_import.py>_
 
 3. Delete a course
 
-  https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L383-L408
+   <https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L383-L408>_
 
 
 These APIs can be removed entirely, as they are adequately covered by existing functionality:
 
 1. Delete a cms user.
 
-  This functionality should be removed entirely. CMS user accounts should be retired using the existing `edX User
-  Retirement Feature<https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/>`_.
+   This functionality should be removed entirely. CMS user accounts should be retired using the existing `edX User
+   Retirement Feature <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/>`_.
 
 2. Staffing and Enrollment (TBD)
 
-  https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477
+   <https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477>_
 
-  This functionality may be redundant to features in the Insights application
+   This functionality may be redundant to features in the Insights application.
 
 
