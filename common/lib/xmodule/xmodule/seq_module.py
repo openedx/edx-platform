@@ -775,6 +775,39 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
 
         return xblock_body
 
+    def _get_children_discussion_toggle_status(self) -> list:
+        child_statuses = []
+        for child in self.get_children():
+            if hasattr(child, "discussion_enabled"):
+                # This if-case covers vertical block
+                child_statuses.append(child.discussion_enabled)
+            else:
+                # This else-case covers subsection block
+                child_statuses += child._get_children_discussion_toggle_status()
+        return child_statuses
+    
+    def set_discussion_toggle(self, value):
+        for child in self.get_children():
+            # Child of a section would be subsection
+            if hasattr(child, "set_discussion_toggle"):
+                child.set_discussion_toggle(value)
+            else:
+                # Child of a subsection would be a vertical
+                child.discussion_enabled = value
+
+    def get_discussion_toggle_status(self):
+        child_statuses = self._get_children_discussion_toggle_status()
+
+        if all(child_statuses):
+            # All child statuses are True
+            return "enabled"
+        elif not any(child_statuses):
+            # Not a single one of child is True
+            return "disabled"
+        else:
+            # Mixture of true and false
+            return "partially_enabled"
+
 
 class HighlightsFields(object):
     """Only Sections have summaries now, but we may expand that later."""

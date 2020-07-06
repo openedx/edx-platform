@@ -70,10 +70,10 @@ class DiscussionTest(unittest.TestCase):
         Tests that when a vertical is created then by default discussion is disabled.
         """
 
-        self.assertFalse(self.vertical_3_1_1.enable_discussion)
-        self.assertFalse(self.vertical_3_1_2.enable_discussion)
-        self.assertFalse(self.vertical_3_1_3.enable_discussion)
-        self.assertFalse(self.vertical_4_1_1.enable_discussion)
+        self.assertFalse(self.vertical_3_1_1.discussion_enabled)
+        self.assertFalse(self.vertical_3_1_2.discussion_enabled)
+        self.assertFalse(self.vertical_3_1_3.discussion_enabled)
+        self.assertFalse(self.vertical_4_1_1.discussion_enabled)
 
     def test_verticals_disable_get_sequence_return_disable(self):
         """
@@ -82,60 +82,62 @@ class DiscussionTest(unittest.TestCase):
         """
 
         # The following sequentials don't have any vertical
-        self.assertTrue(self.sequential_1_1.enable_discussion)
-        self.assertTrue(self.sequential_1_2.enable_discussion)
+        self.assertEqual(self.sequential_1_1.get_discussion_toggle_status(), "enabled")
+        self.assertEqual(self.sequential_1_2.get_discussion_toggle_status(), "enabled")
 
         # The following sequentials have verticals
-        self.assertFalse(self.sequential_3_1.enable_discussion)
-        self.assertFalse(self.sequential_4_1.enable_discussion)
+        self.assertEqual(self.sequential_3_1.get_discussion_toggle_status(), "disabled")
+        self.assertEqual(self.sequential_4_1.get_discussion_toggle_status(), "disabled")
 
     def test_verticals_disable_get_chapter_return_disable(self):
         """
         Tests that when all the sequentials of a chapter have discussions disable then chapter of those verticals
         also have discussion disable. If a chapter has no vertical then its enable by default.
         """
+        # Chapter 1 have no vertical so its sequentials would report discussion_toggle_status for its children
+        # as enabled so discussion toggle status for the Chapter itself would be enabled.
+        # and Chapter 2 don't have any sections so its discussion_toggle_status would also be enabled
+        self.assertEqual(self.chapter_1.get_discussion_toggle_status(), "enabled")
+        self.assertEqual(self.chapter_2.get_discussion_toggle_status(), "enabled")
 
-        self.assertTrue(self.chapter_1.enable_discussion)
-        self.assertTrue(self.chapter_2.enable_discussion)
-
-        self.assertFalse(self.chapter_3.enable_discussion)
-        self.assertFalse(self.chapter_4.enable_discussion)
+        self.assertEqual(self.chapter_3.get_discussion_toggle_status(), "disabled")
+        self.assertEqual(self.chapter_4.get_discussion_toggle_status(), "disabled")
 
     def test_not_all_verticals_enable_get_sequence_return_disable(self):
         """
         Tests that when not all the verticals part of a sequence have discussions enable then sequence of those
-        verticals have discussion disable.
+        verticals have discussion "partially_enabled".
         """
 
-        self.vertical_3_1_1.enable_discussion = True
-        self.vertical_3_1_2.enable_discussion = True
+        self.vertical_3_1_1.discussion_enabled = True
+        self.vertical_3_1_2.discussion_enabled = True
 
-        self.assertFalse(self.sequential_3_1.enable_discussion)
+        self.assertEqual(self.sequential_3_1.get_discussion_toggle_status(), "partially_enabled")
 
     def test_verticals_enable_get_sequence_and_chapter_return_enable(self):
         """
         Tests that when all the verticals part of a sequence have discussions enable then sequence of those verticals
-        have discussion enable then chapters are also enabled.
+        have discussion enable and then chapters are also enabled.
         """
 
-        self.vertical_3_1_1.enable_discussion = True
-        self.vertical_3_1_2.enable_discussion = True
-        self.vertical_3_1_3.enable_discussion = True
-        self.vertical_4_1_1.enable_discussion = True
+        self.vertical_3_1_1.discussion_enabled = True
+        self.vertical_3_1_2.discussion_enabled = True
+        self.vertical_3_1_3.discussion_enabled = True
+        self.vertical_4_1_1.discussion_enabled = True
 
-        self.assertTrue(self.sequential_3_1.enable_discussion)
-        self.assertTrue(self.sequential_4_1.enable_discussion)
+        self.assertEqual(self.sequential_3_1.get_discussion_toggle_status(), "enabled")
+        self.assertEqual(self.sequential_4_1.get_discussion_toggle_status(), "enabled")
 
         # Chapter 2 have no children (e.g no sequential so no vertical) so it is by default True
-        self.assertTrue(self.chapter_2.enable_discussion)
+        self.assertEqual(self.chapter_2.get_discussion_toggle_status(), "enabled")
 
-        # Chapter 3 and 4 have enable_discussion flag set to true as all their children have enable_discussion flag as True
-        self.assertTrue(self.chapter_3.enable_discussion)
-        self.assertTrue(self.chapter_4.enable_discussion)
+        # Chapter 3 and 4 have discussion_enabled flag set to true as all their children have discussion_enabled flag as True
+        self.assertEqual(self.chapter_3.get_discussion_toggle_status(), "enabled")
+        self.assertEqual(self.chapter_4.get_discussion_toggle_status(), "enabled")
 
-        # Chapter 1 have two sequentials whose enable_discussion flag is True as they don't have any verticals so this makes Chapter 1
-        # enable_discussion flag as True
-        self.assertTrue(self.chapter_1.enable_discussion)
+        # Chapter 1 have two sequentials whose discussion_enabled flag is True as they don't have any verticals so this makes Chapter 1
+        # discussion_enabled flag as True
+        self.assertEqual(self.chapter_1.get_discussion_toggle_status(), "enabled")
 
 
     def test_sequence_enable_get_verticals_enable(self):
@@ -144,12 +146,12 @@ class DiscussionTest(unittest.TestCase):
         enable.
         """
 
-        self.sequential_3_1.enable_discussion = True
+        self.sequential_3_1.set_discussion_toggle(True)
 
-        self.assertTrue(self.vertical_3_1_1.enable_discussion)
-        self.assertTrue(self.vertical_3_1_2.enable_discussion)
-        self.assertTrue(self.vertical_3_1_3.enable_discussion)
-        self.assertTrue(self.sequential_3_1.enable_discussion)
+        self.assertTrue(self.vertical_3_1_1.discussion_enabled)
+        self.assertTrue(self.vertical_3_1_2.discussion_enabled)
+        self.assertTrue(self.vertical_3_1_3.discussion_enabled)
+        self.assertEqual(self.sequential_3_1.get_discussion_toggle_status(), "enabled")
 
     def test_chapter_enable_get_verticals_and_sequence_enable(self):
         """
@@ -157,41 +159,42 @@ class DiscussionTest(unittest.TestCase):
         chapter is also enable.
         """
 
-        self.chapter_3.enable_discussion = True
+        self.chapter_3.set_discussion_toggle(True)
 
-        self.assertTrue(self.vertical_3_1_1.enable_discussion)
-        self.assertTrue(self.vertical_3_1_2.enable_discussion)
-        self.assertTrue(self.vertical_3_1_3.enable_discussion)
+        self.assertTrue(self.vertical_3_1_1.discussion_enabled)
+        self.assertTrue(self.vertical_3_1_2.discussion_enabled)
+        self.assertTrue(self.vertical_3_1_3.discussion_enabled)
 
     def test_course_level_discussion_disable_cannot_be_overriden(self):
         """
         Tests that when we disable the discussion toggle at course level then the enable_discussion toggle have
         no effect down the hierarchy
         """
-        self.course.enable_discussion = False
+        self.course.set_discussion_toggle(False)
 
-        self.chapter_3.enable_discussion = True
-        self.vertical_3_1_1.enable_discussion = True
-        self.vertical_3_1_2.enable_discussion = True
-        self.vertical_3_1_3.enable_discussion = True
+        self.chapter_3.set_discussion_toggle(True)
+        self.vertical_3_1_1.discussion_enabled = True
+        self.vertical_3_1_2.discussion_enabled = True
+        self.vertical_3_1_3.discussion_enabled = True
 
-        self.assertFalse(self.chapter_3.enable_discussion)
-        self.assertFalse(self.vertical_3_1_1.enable_discussion)
-        self.assertFalse(self.vertical_3_1_2.enable_discussion)
-        self.assertFalse(self.vertical_3_1_3.enable_discussion)
+        # The following blocks would be enabled as all the toggle methods just recursively
+        # set the children discussion_enabled boolean.
+        self.assertEqual(self.chapter_3.get_discussion_toggle_status(), "enabled")
+        self.assertTrue(self.vertical_3_1_1.discussion_enabled)
+        self.assertTrue(self.vertical_3_1_2.discussion_enabled)
+        self.assertTrue(self.vertical_3_1_3.discussion_enabled)
     
     def test_course_level_discussion_disable_already_enabled_discussion_in_children(self):
-        self.chapter_3.enable_discussion = True
+        self.chapter_3.set_discussion_toggle(True)
 
-        self.assertTrue(self.chapter_3.enable_discussion)
-        self.assertTrue(self.vertical_3_1_1.enable_discussion)
-        self.assertTrue(self.vertical_3_1_2.enable_discussion)
-        self.assertTrue(self.vertical_3_1_3.enable_discussion)
+        self.assertEqual(self.chapter_3.get_discussion_toggle_status(), "enabled")
+        self.assertTrue(self.vertical_3_1_1.discussion_enabled)
+        self.assertTrue(self.vertical_3_1_2.discussion_enabled)
+        self.assertTrue(self.vertical_3_1_3.discussion_enabled)
 
-        self.course.enable_discussion = False
+        self.course.set_discussion_toggle(False)
 
-        self.assertFalse(self.chapter_3.enable_discussion)
-        self.assertFalse(self.vertical_3_1_1.enable_discussion)
-        self.assertFalse(self.vertical_3_1_2.enable_discussion)
-        self.assertFalse(self.vertical_3_1_3.enable_discussion)
-    
+        self.assertEqual(self.chapter_3.get_discussion_toggle_status(), "disabled")
+        self.assertFalse(self.vertical_3_1_1.discussion_enabled)
+        self.assertFalse(self.vertical_3_1_2.discussion_enabled)
+        self.assertFalse(self.vertical_3_1_3.discussion_enabled)
