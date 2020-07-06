@@ -59,7 +59,6 @@ class ResponseNotification(BaseMessageType):
 @task(base=LoggedTask, routing_key=ROUTING_KEY)
 def send_ace_message(context):
     context['course_id'] = CourseKey.from_string(context['course_id'])
-
     if _should_send_message(context):
         context['site'] = Site.objects.get(id=context['site_id'])
         thread_author = User.objects.get(id=context['thread_author_id'])
@@ -101,7 +100,8 @@ def _track_notification_sent(message, context):
         segment.track(
             user_id=context['thread_author_id'],
             event_name='edx.bi.email.sent',
-            properties=properties
+            properties=properties,
+            send_to_track=True
         )
 
 

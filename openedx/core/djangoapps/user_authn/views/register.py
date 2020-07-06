@@ -336,15 +336,20 @@ def _track_user_registration(user, profile, params, third_party_provider):
             })
 
         segment.identify(*identity_args)
-        segment.track(
-            user.id,
-            "edx.bi.user.account.registered",
-            {
-                'category': 'conversion',
-                'label': params.get('course_id'),
-                'provider': third_party_provider.name if third_party_provider else None
-            },
-        )
+
+    # Moving this outside the if block. `LMS_SEGMENT_KEY` check will be handled
+    # inside the track method.
+    segment.track(
+        user.id,
+        "edx.bi.user.account.registered",
+        {
+            'category': 'conversion',
+            'label': params.get('course_id'),
+            'provider': third_party_provider.name if third_party_provider else None
+        },
+        user=user,
+        send_to_track=True
+    )
 
 
 def _skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider):

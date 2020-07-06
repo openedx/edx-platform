@@ -649,7 +649,6 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 @partial.partial
 def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs):
     """ Sends login info to Segment """
-
     event_name = None
     if auth_entry == AUTH_ENTRY_LOGIN:
         event_name = 'edx.bi.user.account.authenticated'
@@ -660,8 +659,9 @@ def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs)
         segment.track(kwargs['user'].id, event_name, {
             'category': "conversion",
             'label': None,
-            'provider': kwargs['backend'].name
-        })
+            'provider': kwargs['backend'].name,
+            'username': kwargs.get('username','')
+        }, send_to_track=True, user=kwargs['user'])
 
 
 @partial.partial

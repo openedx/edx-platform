@@ -529,7 +529,7 @@ class Order(models.Model):
                 'revenue': str(self.total_cost),
                 'currency': self.currency,
                 'products': [item.analytics_data() for item in orderitems]
-            })
+            }, send_to_track=True, user=user)
 
         except Exception:  # pylint: disable=broad-except
             # Capturing all exceptions thrown while tracking analytics events. We do not want

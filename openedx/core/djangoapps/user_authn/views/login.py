@@ -281,8 +281,12 @@ def _track_user_login(user, request):
         {
             'category': "conversion",
             'label': request.POST.get('course_id'),
-            'provider': None
+            'provider': None,
+            'email': request.POST.get('email'),
+            'username': user.username
         },
+        send_to_track=True,
+        user=user
     )
 
 
