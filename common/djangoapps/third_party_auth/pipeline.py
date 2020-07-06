@@ -649,6 +649,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 @partial.partial
 def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs):
     """ Sends login info to Segment """
+
     event_name = None
     if auth_entry == AUTH_ENTRY_LOGIN:
         event_name = 'edx.bi.user.account.authenticated'

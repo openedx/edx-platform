@@ -29,8 +29,8 @@ def track(user_id, event_name, properties=None, context=None, send_to_track=Fals
 
         if user and getattr(user, 'username', ''):
             context_override['username'] = user.username
-        else:
-            context_override['user_id'] = user_id
+
+        context_override['user_id'] = user_id
 
         with tracker.get_tracker().context('edx.course.segment', context_override):
             tracker.emit(name=event_name, data=properties)

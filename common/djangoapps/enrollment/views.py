@@ -656,6 +656,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         go through `add_enrollment()`, which allows creation of new and reactivation of old enrollments.
         """
         # Get the User, Course ID, and Mode from the request.
+
         username = request.data.get('user', request.user.username)
         course_id = request.data.get('course_details', {}).get('course_id')
 

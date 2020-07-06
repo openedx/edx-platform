@@ -59,6 +59,7 @@ class ResponseNotification(BaseMessageType):
 @task(base=LoggedTask, routing_key=ROUTING_KEY)
 def send_ace_message(context):
     context['course_id'] = CourseKey.from_string(context['course_id'])
+
     if _should_send_message(context):
         context['site'] = Site.objects.get(id=context['site_id'])
         thread_author = User.objects.get(id=context['thread_author_id'])

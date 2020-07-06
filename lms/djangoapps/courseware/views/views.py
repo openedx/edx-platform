@@ -1463,7 +1463,7 @@ def _track_successful_certificate_generation(user_id, course_id, user=None):
     segment.track(user_id, event_name, {
         'category': 'certificates',
         'label': text_type(course_id)
-    }, send_to_track=True , user=user)
+    }, send_to_track=True, user=user)
 
 
 @require_http_methods(["GET", "POST"])
