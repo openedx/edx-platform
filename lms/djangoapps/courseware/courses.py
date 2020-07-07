@@ -121,7 +121,6 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     return course_overview
 
 
-@beeline.traced(name="check_course_access")
 def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True):
     """
     Check that the user has the access to perform the specified action
