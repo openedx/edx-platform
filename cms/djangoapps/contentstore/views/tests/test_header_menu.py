@@ -59,7 +59,7 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
     @override_settings(FEATURES=FEATURES_WITH_EXAM_SETTINGS_DISABLED)
     def test_header_menu_without_exam_settings_enabled(self):
         """
-        Tests course header menu should not have `Exam Settings` menu item 
+        Tests course header menu should not have `Exam Settings` menu item
         if course does not have the Exam Settings view enabled.
         """
         outline_url = reverse_course_url('course_handler', self.course.id)
