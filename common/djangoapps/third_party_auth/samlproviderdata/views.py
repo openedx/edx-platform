@@ -4,7 +4,7 @@
 
 from rest_framework import viewsets
 
-from .models import SAMLProviderData
+from ..models import SAMLProviderData
 from .serializers import SAMLProviderDataSerializer
 
 

@@ -5,7 +5,7 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
-from .models import SAMLProviderConfig
+from ..models import SAMLProviderConfig
 from .serializers import SAMLProviderConfigSerializer
 
 
