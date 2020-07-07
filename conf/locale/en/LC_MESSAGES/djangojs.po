@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-22 05:59+0000\n"
-"PO-Revision-Date: 2020-06-22 06:00:34.543614\n"
+"POT-Creation-Date: 2020-07-06 12:05+0000\n"
+"PO-Revision-Date: 2020-07-06 12:06:18.218747\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -311,6 +311,12 @@ msgid "All chapters must have a name and asset"
 msgstr ""
 
 #: cms/static/js/models/uploads.js common/static/bundles/commons.js
+msgid ""
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
+msgstr ""
+
+#: cms/static/js/models/uploads.js common/static/bundles/commons.js
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
@@ -401,6 +407,11 @@ msgstr ""
 #: cms/templates/js/video/metadata-translations-item.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
 msgid "Remove"
+msgstr ""
+
+#: cms/static/js/views/edit_chapter.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Upload a new PDF to “<%- name %>”"
 msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
@@ -3022,9 +3033,7 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: themes/st-lutherx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
 #: themes/st-normanx/lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Delete My Account"
 msgstr ""
 
@@ -3554,12 +3563,6 @@ msgid "Bookmark this page"
 msgstr ""
 
 #: common/static/bundles/commons.js
-msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
-msgstr ""
-
-#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr ""
@@ -3578,10 +3581,6 @@ msgstr ""
 #: common/static/common/js/components/views/paginated_view.js
 #: common/static/common/js/components/views/paging_footer.js
 msgid "Pagination"
-msgstr ""
-
-#: common/static/bundles/js/factories/textbooks.js
-msgid "Upload a new PDF to “<%= name %>”"
 msgstr ""
 
 #: common/static/common/js/components/views/paginated_view.js
@@ -5837,8 +5836,6 @@ msgid "The country or region where you live."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
-#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Basic Account Information"
 msgstr ""
 
@@ -5906,8 +5903,6 @@ msgid "Default (Local Time Zone)"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
-#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Additional Information"
 msgstr ""
 
@@ -5945,8 +5940,6 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: themes/st-lutherx/lms/static/js/student_account/views/edly_account_settings_factory.js
-#: themes/st-normanx/lms/static/js/student_account/views/edly_account_settings_factory.js
 msgid "Social Media Links"
 msgstr ""
 
@@ -6645,12 +6638,6 @@ msgstr ""
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr ""
 
-#: cms/static/js/models/uploads.js
-msgid ""
-"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
-"<%- (fileExtensions) %> to upload."
-msgstr ""
-
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
 msgstr ""
@@ -6801,10 +6788,6 @@ msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
 msgid "{selectedProvider} credentials saved"
-msgstr ""
-
-#: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%- name %>”"
 msgstr ""
 
 #: cms/static/js/views/export.js
