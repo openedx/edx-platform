@@ -19,7 +19,7 @@ class override_waffle_flag(override_flag):
     It accepts two parameters, the flag itself and its intended state. Example
     usage::
 
-        with override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True):
+        with override_waffle_flag(SOME_COURSE_FLAG, active=True):
             ...
 
     If the flag already exists, its value will be changed inside the context
@@ -29,7 +29,7 @@ class override_waffle_flag(override_flag):
 
     It can also act as a decorator::
 
-        @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
+        @override_waffle_flag(SOME_COURSE_FLAG, active=True)
         def test_happy_mode_enabled():
             ...
     """

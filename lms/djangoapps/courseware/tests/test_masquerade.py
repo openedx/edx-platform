@@ -22,7 +22,7 @@ from lms.djangoapps.courseware.masquerade import (
     CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group,
 )
 from lms.djangoapps.courseware.tests.factories import StaffFactory
-from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -37,7 +37,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 
-class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, MasqueradeMixin):
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.
     """
@@ -205,24 +205,6 @@ class StaffMasqueradeTestCase(MasqueradeTestCase):
         """
         return StaffFactory(course_key=self.course.id)
 
-    def update_masquerade(self, role, group_id=None, user_name=None):
-        """
-        Toggle masquerade state.
-        """
-        masquerade_url = reverse(
-            'masquerade_update',
-            kwargs={
-                'course_key_string': six.text_type(self.course.id),
-            }
-        )
-        response = self.client.post(
-            masquerade_url,
-            json.dumps({"role": role, "group_id": group_id, "user_name": user_name}),
-            "application/json"
-        )
-        self.assertEqual(response.status_code, 200)
-        return response
-
 
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
@@ -334,7 +316,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
         # Masquerade as the student,enable the self paced configuration, and check we can see the info page.
         SelfPacedConfiguration(enable_course_home_improvements=True).save()
-        self.update_masquerade(role='student', user_name=self.student_user.username)
+        self.update_masquerade(role='student', username=self.student_user.username)
         response = self.get_course_info_page()
         self.assertContains(response, "OOGIE BLOOGIE")
 
@@ -363,7 +345,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertEqual(self.get_progress_detail(), u'0/2')
 
         # Masquerade as the student, and check we can see the student state.
-        self.update_masquerade(role='student', user_name=student.username)
+        self.update_masquerade(role='student', username=student.username)
         self.assertEqual(self.get_progress_detail(), u'2/2')
 
         # Temporarily override the student state.
@@ -402,7 +384,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
         # Set student language preference and set masquerade to view same page the student.
         set_user_preference(self.student_user, preference_key=LANGUAGE_KEY, preference_value='es-419')
-        self.update_masquerade(role='student', user_name=self.student_user.username)
+        self.update_masquerade(role='student', username=self.student_user.username)
 
         # Reload the page and check we have expected language preference in system and in cookies.
         self.get_courseware_page()
@@ -423,7 +405,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertIn("OOGIE BLOOGIE", content)
 
         # Masquerade as the student, and check we can see the info page.
-        self.update_masquerade(role='student', user_name=self.student_user.username)
+        self.update_masquerade(role='student', username=self.student_user.username)
         content = self.get_course_info_page().content.decode('utf-8')
         self.assertIn("OOGIE BLOOGIE", content)
 
@@ -446,7 +428,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.assertIn("1 of 2 possible points", staff_progress)
 
         # Should now see the student's scores
-        self.update_masquerade(role='student', user_name=self.student_user.username)
+        self.update_masquerade(role='student', username=self.student_user.username)
         masquerade_progress = self.get_progress_page().content.decode('utf-8')
         self.assertNotIn("1 of 2 possible points", masquerade_progress)
         self.assertIn("2 of 2 possible points", masquerade_progress)

@@ -107,7 +107,7 @@ def check_course_expired(user, course):
     if get_course_masquerade(user, course.id):
         return ACCESS_GRANTED
 
-    if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
+    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
         return ACCESS_GRANTED
 
     expiration_date = get_user_course_expiration_date(user, course)
@@ -127,7 +127,7 @@ def generate_course_expired_message(user, course):
     """
     Generate the message for the user course expiration date if it exists.
     """
-    if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
+    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
         return
 
     expiration_date = get_user_course_expiration_date(user, course)

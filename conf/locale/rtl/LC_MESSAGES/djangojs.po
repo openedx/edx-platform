@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-21 20:50+0000\n"
-"PO-Revision-Date: 2020-06-21 20:50:24.441486\n"
+"POT-Creation-Date: 2020-07-05 20:50+0000\n"
+"PO-Revision-Date: 2020-07-05 20:50:23.560748\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2960,6 +2960,12 @@ msgstr ""
 "{search_span_start}سثشقذا فثشوس{span_end} هر فاهس فخحهذ. هب غخع سفهمم ذشر'ف "
 "بهري ش فثشو فخ تخهر, {create_span_start}ذقثشفث ش رثص فثشو هر فاهس "
 "فخحهذ{span_end}."
+
+#: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
+msgid ""
+"An error occurred while looking up team membership. Try refreshing the page."
+msgstr ""
+"شر ثققخق خذذعققثي صاهمث مخخنهرل عح فثشو وثوزثقساهح. فقغ قثبقثساهرل فاث حشلث."
 
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
 msgid "All topics"

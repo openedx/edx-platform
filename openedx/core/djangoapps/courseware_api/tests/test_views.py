@@ -11,6 +11,7 @@ from django.conf import settings
 
 from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
 from lms.djangoapps.courseware.tabs import ExternalLinkCourseTab
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from student.models import CourseEnrollment, CourseEnrollmentCelebration
 from student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
 from xmodule.modulestore.django import modulestore
@@ -159,7 +160,7 @@ class ResumeApiTestViews(BaseCoursewareTests, CompletionWaffleTestMixin):
 
 
 @ddt.ddt
-class CelebrationApiTestViews(BaseCoursewareTests):
+class CelebrationApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     """
     Tests for the celebration API
     """
@@ -207,3 +208,20 @@ class CelebrationApiTestViews(BaseCoursewareTests):
         response = self.client.post('/api/courseware/celebration/course-v1:does+not+exist',
                                     {'first_section': True}, content_type='application/json')
         assert response.status_code == 404
+
+    def test_masquerade(self):
+        self.user.is_staff = True
+        self.user.save()
+
+        user = UserFactory()
+        CourseEnrollment.enroll(user, self.course.id, 'verified')
+
+        response = self.client.post(self.url, {'first_section': True}, content_type='application/json')
+        assert response.status_code == 201
+
+        self.update_masquerade(username=user.username)
+        response = self.client.post(self.url, {'first_section': False}, content_type='application/json')
+        assert response.status_code == 202
+
+        celebration = CourseEnrollmentCelebration.objects.first()
+        assert celebration.celebrate_first_section  # make sure it didn't change during masquerade attempt

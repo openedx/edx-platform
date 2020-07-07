@@ -1,0 +1,42 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+  <tr>
+    <td>
+      <h1>
+        {% trans "ID Verification Submitted" as tmsg %}{{ tmsg | force_escape }}
+      </h1>
+      <p style="color: rgba(0,0,0,.75);">
+        {% filter force_escape %}
+          {% blocktrans %}Hello {{ full_name }},{% endblocktrans %}
+        {% endfilter %}
+      </p>
+      <p style="color: rgba(0,0,0,.75);">
+        {% filter force_escape %}
+           {% blocktrans %}Thank you for submitting your photos for identity verification with {{ platform_name }}. {% endblocktrans %}
+        {% endfilter %}
+      </p>
+
+      <p style="color: rgba(0,0,0,.75);">
+        {% trans "We have received your photos and they will be reviewed within 5-7 days." as tmsg %}{{ tmsg | force_escape }}
+
+      {% filter force_escape %}
+        {% blocktrans %}You may check the status on your dashboard: {{ dashboard_link }} {% endblocktrans %}
+      {% endfilter %}
+      </p>
+
+      <p>
+        {% trans "Best regards," as tmsg %}{{ tmsg | force_escape }}
+        <br/>
+        {% filter force_escape %}
+        {% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
+        {% endfilter %}
+      </p>
+
+    </td>
+  </tr>
+</table>
+{% endblock %}

@@ -138,24 +138,20 @@ def node_prereqs_installation():
     npm_log_file = open(npm_log_file_path, 'wb')
     npm_command = 'npm install --verbose'.split()
 
-    cb_error_text = "Subprocess return code: 1"
-
-    # Error handling around a race condition that produces "cb() never called" error. This
-    # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
-    # npm to 3 or higher. TODO: clean this up when we do that.
-    try:
-        # The implementation of Paver's `sh` function returns before the forked
-        # actually returns. Using a Popen object so that we can ensure that
-        # the forked process has returned
+    # The implementation of Paver's `sh` function returns before the forked
+    # actually returns. Using a Popen object so that we can ensure that
+    # the forked process has returned
+    proc = subprocess.Popen(npm_command, stderr=npm_log_file)
+    retcode = proc.wait()
+    if retcode == 1:
+        # Error handling around a race condition that produces "cb() never called" error. This
+        # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
+        # npm to 3 or higher. TODO: clean this up when we do that.
+        print("npm install error detected. Retrying...")
         proc = subprocess.Popen(npm_command, stderr=npm_log_file)
-        proc.wait()
-    except BuildFailure as error:
-        if cb_error_text in str(error):
-            print("npm install error detected. Retrying...")
-            proc = subprocess.Popen(npm_command, stderr=npm_log_file)
-            proc.wait()
-        else:
-            raise
+        retcode = proc.wait()
+        if retcode == 1:
+            raise Exception("npm install failed: See {}".format(npm_log_file_path))
     print("Successfully installed NPM packages. Log found at {}".format(
         npm_log_file_path
     ))
@@ -197,6 +193,7 @@ PACKAGES_TO_UNINSTALL = [
     "django-storages",
     "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
     "edx-oauth2-provider",          # Because it moved from github to pypi
+    "enum34",                       # Because enum34 is not needed in python>3.4
     "i18n-tools",                   # Because now it's called edx-i18n-tools
     "moto",                         # Because we no longer use it and it conflicts with recent jsondiff versions
     "python-saml",                  # Because python3-saml shares the same directory name

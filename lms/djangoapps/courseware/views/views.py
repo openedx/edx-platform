@@ -27,6 +27,7 @@ from django.utils.http import urlquote_plus
 from django.utils.text import slugify
 from django.utils.translation import ugettext
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -1722,13 +1723,11 @@ def _get_fa_header(header):
                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)).split('\n')
 
 
-FA_INCOME_LABEL = _('Annual Household Income')
-FA_REASON_FOR_APPLYING_LABEL = 'Tell us about your current financial situation. Why do you need assistance?'
-FA_GOALS_LABEL = 'Tell us about your learning or professional goals. How will a Verified Certificate in ' \
-                 'this course help you achieve these goals?'
+FA_INCOME_LABEL = ugettext_noop('Annual Household Income')
+FA_REASON_FOR_APPLYING_LABEL = ugettext_noop('Tell us about your current financial situation. Why do you need assistance?')
+FA_GOALS_LABEL = ugettext_noop('Tell us about your learning or professional goals. How will a Verified Certificate in this course help you achieve these goals?')
 
-FA_EFFORT_LABEL = 'Tell us about your plans for this course. What steps will you take to help you complete ' \
-                  'the course work and receive a certificate?'
+FA_EFFORT_LABEL = ugettext_noop('Tell us about your plans for this course. What steps will you take to help you complete the course work and receive a certificate?')
 
 FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in your response.')
 
@@ -1791,7 +1790,7 @@ def financial_assistance_request(request):
             ('Username', username),
             ('Full Name', legal_name),
             ('Course ID', course_id),
-            ('Annual Household Income', income),
+            (FA_INCOME_LABEL, income),
             ('Country', country),
             ('Allowed for marketing purposes', 'Yes' if marketing_permission else 'No'),
             (FA_REASON_FOR_APPLYING_LABEL, '\n' + reason_for_applying + '\n\n'),
@@ -1852,7 +1851,7 @@ def financial_assistance_form(request):
             {
                 'name': 'income',
                 'type': 'select',
-                'label': FA_INCOME_LABEL,
+                'label': _(FA_INCOME_LABEL),
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1862,7 +1861,7 @@ def financial_assistance_form(request):
             {
                 'name': 'reason_for_applying',
                 'type': 'textarea',
-                'label': _(FA_REASON_FOR_APPLYING_LABEL),  # pylint: disable=translation-of-non-string
+                'label': _(FA_REASON_FOR_APPLYING_LABEL),
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1875,7 +1874,7 @@ def financial_assistance_form(request):
             {
                 'name': 'goals',
                 'type': 'textarea',
-                'label': _(FA_GOALS_LABEL),  # pylint: disable=translation-of-non-string
+                'label': _(FA_GOALS_LABEL),
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1888,7 +1887,7 @@ def financial_assistance_form(request):
             {
                 'name': 'effort',
                 'type': 'textarea',
-                'label': _(FA_EFFORT_LABEL),  # pylint: disable=translation-of-non-string
+                'label': _(FA_EFFORT_LABEL),
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,

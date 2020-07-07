@@ -778,7 +778,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.override_waffle_switch(True)
 
         course = CourseFactory.create(start=self.THREE_YEARS_AGO)
-        add_course_mode(course, upgrade_deadline_expired=False)
+        add_course_mode(course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(course)
         enrollment = CourseEnrollmentFactory.create(
             user=self.user,
             course_id=course.id

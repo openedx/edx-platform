@@ -1,7 +1,6 @@
 """
 Create or updates the SiteConfiguration for a site.
 """
-from __future__ import absolute_import, unicode_literals
 
 import codecs
 import json
@@ -9,7 +8,6 @@ import logging
 
 from django.contrib.sites.models import Site
 from django.core.management import BaseCommand
-
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 

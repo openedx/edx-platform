@@ -1031,7 +1031,6 @@ class CourseEnrollmentManager(models.Manager):
     def num_enrolled_in(self, course_id):
         """
         Returns the count of active enrollments in a course.
-
         'course_id' is the course_id to return enrollments
         """
 
@@ -1041,6 +1040,21 @@ class CourseEnrollmentManager(models.Manager):
         ).count()
 
         return enrollment_number
+
+    def is_small_course(self, course_id):
+        """
+        Returns false if the number of enrollments are one greater than 'max_enrollments' else true
+
+        'course_id' is the course_id to return enrollments
+        """
+        max_enrollments = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+
+        enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(
+            course_id=course_id,
+            is_active=1
+        )[:max_enrollments + 1].count()
+
+        return enrollment_number <= max_enrollments
 
     def num_enrolled_in_exclude_admins(self, course_id):
         """
