@@ -150,7 +150,7 @@ def create_account_with_params(request, params):
         not eamap.external_domain.startswith(settings.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
-    params['name'] = "{} {}".format(params.get('first_name'), params.get('last_name'))
+    params['name'] = '{} {}'.format(params.get('first_name').encode('utf-8'), params.get('last_name').encode('utf-8'))
     form = AccountCreationFormCustom(
         data=params,
         extended_profile_fields=None,
