@@ -103,6 +103,7 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
         title=course_context.learning_context.title,
         published_at=course_context.learning_context.published_at,
         published_version=course_context.learning_context.published_version,
+        days_early_for_beta=course_context.days_early_for_beta,
         sections=sections_data,
         self_paced=course_context.self_paced,
         course_visibility=CourseVisibility(course_context.course_visibility),
@@ -220,8 +221,14 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,
         **{
             name: getattr(trimmed_course_outline, name)
             for name in [
-                'course_key', 'title', 'published_at', 'published_version',
-                'sections', 'self_paced', 'course_visibility'
+                'course_key',
+                'title',
+                'published_at',
+                'published_version',
+                'sections',
+                'self_paced',
+                'course_visibility',
+                'days_early_for_beta',
             ]
         }
     )
@@ -270,6 +277,7 @@ def _update_course_context(course_outline: CourseOutlineData):
         learning_context=learning_context,
         defaults={
             'course_visibility': course_outline.course_visibility.value,
+            'days_early_for_beta': course_outline.days_early_for_beta,
             'self_paced': course_outline.self_paced,
         }
     )

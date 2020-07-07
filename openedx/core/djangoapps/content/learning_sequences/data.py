@@ -132,6 +132,10 @@ class CourseOutlineData:
     # course is modified.
     published_version = attr.ib(type=str)
 
+    # The time period (in days) before the official start of the course during which
+    # beta testers have access to the course.
+    days_early_for_beta = attr.ib(type=Optional[int])
+
     sections = attr.ib(type=List[CourseSectionData])
 
     # Defines if course self-paced or instructor-paced.
@@ -198,6 +202,17 @@ class CourseOutlineData:
                 if section.usage_key not in keys_to_remove
             ]
         )
+
+    @days_early_for_beta.validator
+    def validate_days_early_for_beta(self, attribute, value):
+        """
+        Ensure that days_early_for_beta isn't negative.
+        """
+        if value is not None and value < 0:
+            raise ValueError(
+                "Provided value {} for days_early_for_beta is invalid. The value must be positive or zero. "
+                "A positive value will shift back the starting date for Beta users by that many days.".format(value)
+            )
 
 
 @attr.s(frozen=True)
