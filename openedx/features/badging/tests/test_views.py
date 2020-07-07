@@ -1,19 +1,15 @@
 import mock
-
 from django.core.urlresolvers import reverse
-from django.http import Http404
-from django.test import RequestFactory, TestCase
 from django.test.client import Client
-
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from openedx.core.djangolib.testing.philu_utils import configure_philu_theme, clear_philu_theme
-from student.tests.factories import CourseEnrollmentFactory
 from lms.djangoapps.onboarding.tests.factories import UserFactory
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from openedx.core.djangolib.testing.philu_utils import (clear_philu_theme,
+                                                        configure_philu_theme)
+from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from .factories import BadgeFactory, UserBadgeFactory
-from .. import views as badging_views
 
 
 class BadgeViewsTestCases(ModuleStoreTestCase):
@@ -21,9 +17,9 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
     def setUp(self):
         super(BadgeViewsTestCases, self).setUp()
         self.course = CourseFactory(org="test", number="123", run="1")
-        self.request_factory = RequestFactory()
         self.user = UserFactory()
         self.client = Client()
+        self.client.login(username=self.user.username, password='test')
 
 
     @classmethod
@@ -41,7 +37,6 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         Assert that response code is 200
         :return: None
         """
-        self.client.login(username=self.user.username, password='test')
         response = self.client.get(reverse('trophycase'), follow=True)
         self.assertEqual(response.status_code, 200)
 
@@ -54,7 +49,6 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         :param mock_populate_trophycase: mock to assert it has been called with expected input
         :return: None
         """
-        self.client.login(username=self.user.username, password='test')
         badge1 = BadgeFactory()
         badge2 = BadgeFactory(threshold=11)
 
@@ -66,7 +60,7 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         UserBadgeFactory(user=any_other_user, course_id=CourseKeyField.Empty, badge=badge2)
 
         mock_populate_trophycase.return_value = dict()
-        response = self.client.get(reverse('trophycase'), follow=True, data= {'json': True})
+        response = self.client.get(reverse('trophycase'), data= {'json':True}, follow=True)
         self.assertEqual(response.status_code, 200)
         mock_populate_trophycase.assert_called_once_with(self.user, mock.ANY, [user_badge])
 
@@ -76,12 +70,20 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         to login page
         :return: None
         """
+        self.client.logout()
         path = reverse('my_badges', kwargs={'course_id': 'course/123/1'})
-        response = Client().get(path=path)
+        response = self.client.get(path=path)
         self.assertRedirects(response, '{}?next={}'.format(reverse('signin_user'), path))
 
+    def test_trophycase_denies_anonymous(self):
+        """
+        This method test API call without logged-in user. In this case user must be redirected
+        to login page
+        :return: None
+        """
+        self.client.logout()
         path = reverse('trophycase')
-        response = Client().get(path=path)
+        response = self.client.get(path=path)
         self.assertRedirects(response, '{}?next={}'.format(reverse('signin_user'), path))
 
     def test_my_badges_invalid_course_id(self):
@@ -89,15 +91,10 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         Test my badges with invalid course id. Assert that an error is raised
         :return: None
         """
-        self.client.login(username=self.user.username, password='test')
         course_id = 'test/course/123'
         path = reverse('my_badges', kwargs={'course_id': course_id})
-
-        request = self.request_factory.get(path)
-        request.user = self.user
-
-        with self.assertRaises(Http404):
-            badging_views.my_badges(request, course_id)
+        response = self.client.get(path, follow=True)
+        self.assertEqual(response.status_code, 404)
 
     @mock.patch('openedx.features.badging.views.get_course_badges')
     def test_my_badges_with_enrolled_and_active_course(self, mock_get_course_badges):
@@ -106,7 +103,6 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         :param mock_get_course_badges: mock to assert it has been called with expected input
         :return: None
         """
-        self.client.login(username=self.user.username, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, is_active=True)
 
         mock_get_course_badges.return_value = dict()
@@ -119,15 +115,11 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         Test my badges with inactive course. Assert that an error is raised
         :return: None
         """
-        self.client.login(username=self.user.username, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, is_active=False)
 
         path = reverse('my_badges', kwargs={'course_id': self.course.id})
-        request = self.request_factory.get(path)
-        request.user = self.user
-
-        with self.assertRaises(Http404):
-            badging_views.my_badges(request, self.course.id)
+        response = self.client.get(path, follow=True)
+        self.assertEqual(response.status_code, 404)
 
     @mock.patch('openedx.features.badging.views.get_course_badges')
     def test_my_badges_with_some_earned_badges(self, mock_get_course_badges):
@@ -138,7 +130,6 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         :param mock_get_course_badges: mock to assert it has been called with expected input
         :return: None
         """
-        self.client.login(username=self.user.username, password='test')
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, is_active=True)
 
         badge1 = BadgeFactory()
@@ -155,4 +146,3 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         response = self.client.get(reverse('my_badges', kwargs={'course_id': self.course.id}), follow=True)
         self.assertEqual(response.status_code, 200)
         mock_get_course_badges.assert_called_once_with(self.user, self.course.id, [user_badge])
-
