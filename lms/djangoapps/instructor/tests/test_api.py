@@ -119,12 +119,6 @@ REPORTS_DATA = (
         'extra_instructor_api_kwargs': {'csv': '/csv'}
     },
     {
-        'report_type': 'detailed enrollment',
-        'instructor_api_endpoint': 'get_enrollment_report',
-        'task_api_endpoint': 'lms.djangoapps.instructor_task.api.submit_detailed_enrollment_features_csv',
-        'extra_instructor_api_kwargs': {}
-    },
-    {
         'report_type': 'enrollment',
         'instructor_api_endpoint': 'get_students_who_may_enroll',
         'task_api_endpoint': 'lms.djangoapps.instructor_task.api.submit_calculate_may_enroll_csv',
@@ -155,7 +149,6 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'calculate_grades_csv',
     'change_due_date',
     'export_ora2_data',
-    'get_enrollment_report',
     'get_grading_config',
     'get_problem_responses',
     'get_proctored_exam_results',
@@ -431,7 +424,6 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('list_report_downloads', {}),
             ('calculate_grades_csv', {}),
             ('get_students_features', {}),
-            ('get_enrollment_report', {}),
             ('get_students_who_may_enroll', {}),
             ('get_proctored_exam_results', {}),
             ('get_problem_responses', {}),
