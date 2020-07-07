@@ -18,6 +18,7 @@ from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
+from freezegun import freeze_time
 from mock import patch
 from six.moves import range
 
@@ -351,7 +352,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout'])
         self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test'])
 
-    def test_login_ratelimited_success(self):
+    @override_settings(RATELIMIT_ENABLE=False)
+    def test_excessive_login_attempts_success(self):
         # Try (and fail) logging in with fewer attempts than the limit of 30
         # and verify that you can still successfully log in afterwards.
         for i in range(20):
@@ -362,7 +364,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _audit_log = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
 
-    def test_login_ratelimited(self):
+    @override_settings(RATELIMIT_ENABLE=False)
+    def test_excessive_login_attempts(self):
         # try logging in 30 times, the default limit in the number of failed
         # login attempts in one 5 minute period before the rate gets limited
         for i in range(30):
@@ -371,6 +374,26 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         # check to see if this response indicates that this was ratelimited
         response, _audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
+
+    def test_login_ratelimited(self):
+        """
+        Test that login endpoint is IP ratelimited and only allow 5 requests
+        per 5 minutes per IP.
+        """
+        for i in range(5):
+            password = u'test_password{0}'.format(i)
+            response, _audit_log = self._login_response(self.user_email, password)
+            self._assert_response(response, success=False)
+
+        response, _audit_log = self._login_response(self.user_email, self.password)
+        self.assertEqual(response.status_code, 403)
+
+        # now reset the time to 6 min from now in future and verify that it will
+        # allow another request from same IP and user can successfully login
+        reset_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=361)
+        with freeze_time(reset_time):
+            response, _audit_log = self._login_response(self.user_email, self.password)
+            self._assert_response(response, success=True)
 
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_login_refresh(self):

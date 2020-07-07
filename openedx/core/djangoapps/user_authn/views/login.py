@@ -24,6 +24,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 from edx_django_utils.monitoring import set_custom_metric
+from ratelimit.decorators import ratelimit
 from ratelimitbackend.exceptions import RateLimitException
 from rest_framework.views import APIView
 
@@ -382,6 +383,12 @@ def finish_auth(request):  # pylint: disable=unused-argument
 
 @ensure_csrf_cookie
 @require_http_methods(['POST'])
+@ratelimit(
+    key='openedx.core.djangoapps.util.ratelimit.real_ip',
+    rate=settings.LOGISTRATION_RATELIMIT_RATE,
+    method='POST',
+    block=True
+)
 def login_user(request):
     """
     AJAX request to log in the user.
