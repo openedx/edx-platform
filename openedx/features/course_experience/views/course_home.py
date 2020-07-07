@@ -84,6 +84,7 @@ class CourseHomeFragmentView(EdxFragmentView):
     """
     A fragment to render the home page for a course.
     """
+    _uses_pattern_library = False
 
     def _get_resume_course_info(self, request, course_id):
         """
@@ -258,7 +259,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'update_message_fragment': update_message_fragment,
             'course_sock_fragment': course_sock_fragment,
             'disable_courseware_js': True,
-            'uses_pattern_library': True,
+            'uses_bootstrap': True,
             'upgrade_price': upgrade_price,
             'upgrade_url': upgrade_url,
             'has_discount': has_discount,
