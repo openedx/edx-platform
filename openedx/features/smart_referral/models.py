@@ -10,7 +10,7 @@ class SmartReferral(TimeStampedModel):
     user = models.ForeignKey(User, related_name='smart_referrals', related_query_name='smart_referral',
                              on_delete=models.CASCADE)
     contact_email = models.EmailField(max_length=255)
-    is_contact_reg_completed = models.BooleanField(default=False, verbose_name='Is contact registration completed')
+    is_referral_step_complete = models.BooleanField(default=False, verbose_name='Is referral steps completed')
 
     class Meta(object):
         app_label = 'smart_referral'

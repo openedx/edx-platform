@@ -3,6 +3,8 @@ from django.conf import settings
 
 from common.lib.mandrill_client.client import MandrillClient
 
+from openedx.features.smart_referral.models import SmartReferral
+
 
 @task(routing_key=settings.HIGH_PRIORITY_QUEUE)
 def task_send_referral_and_toolkit_emails(contact_emails, user_email):
@@ -15,3 +17,14 @@ def task_send_referral_and_toolkit_emails(contact_emails, user_email):
         })
 
     mandrill_client.send_mail(MandrillClient.REFERRAL_SOCIAL_IMPACT_TOOLKIT, user_email, context={})
+
+
+@task(routing_key=settings.HIGH_PRIORITY_QUEUE)
+def task_send_referral_follow_up_email(contact_email_list):
+    """Send follow up referral email to contact email."""
+    for contact_email in contact_email_list:
+        response = MandrillClient().send_mail(MandrillClient.REFERRAL_FOLLOW_UP_EMAIL, contact_email, context={
+            'root_url': settings.LMS_ROOT_URL,
+        })
+        if response[0]['status'] == 'sent':
+            SmartReferral.objects.filter(contact_email=response[0]['email']).update(is_referral_step_complete=True)
