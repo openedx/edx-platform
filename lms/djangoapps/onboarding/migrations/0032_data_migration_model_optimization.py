@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('onboarding', '0030_add_new_fields_for_model_optimization'),
+        ('onboarding', '0031_add_new_fields_for_model_optimization'),
     ]
 
     operations = [

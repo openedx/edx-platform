@@ -14,6 +14,9 @@ class SmartReferral(TimeStampedModel):
 
     class Meta(object):
         app_label = 'smart_referral'
+        unique_together = (
+            ('contact_email', 'user')
+        )
 
     def __unicode__(self):
         return '{user} referred {contact}'.format(user=self.user.username, contact=self.contact_email)

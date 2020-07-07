@@ -19,7 +19,11 @@ from student.tests.factories import UserProfileFactory
 from student.models import CourseEnrollment
 
 from mailchimp_pipeline.tasks import update_org_details_at_mailchimp, update_enrollments_completions_at_mailchimp
-from mailchimp_pipeline.helpers import get_user_active_enrollements, get_enrollements_course_short_ids
+from mailchimp_pipeline.helpers import (
+    get_enrollements_course_short_ids,
+    get_org_data_for_mandrill,
+    get_user_active_enrollements
+)
 from mailchimp_pipeline.client import MailChimpException, Connection
 from mailchimp_pipeline.signals.handlers import (
     send_user_info_to_mailchimp,
@@ -230,8 +234,11 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
             Test if the update_org_details_at_mailchimp task is sending organization information
             perfectly to the MailChimp expected URL
         """
-        org_label, org_type, work_area = 'test_org', 'test_org_type', 'test_work_area'
-        result = update_org_details_at_mailchimp.delay(org_label, org_type, work_area, self.mailchimp_list_id)
+        organization = create_organization(self.user)
+        org_label, org_type, work_area = get_org_data_for_mandrill(organization)
+        result = update_org_details_at_mailchimp.delay(
+            org_label, org_type, work_area, organization.id, self.mailchimp_list_id
+        )
         assert result.successful() == True
         expected_url = generate_mailchimp_url(self.mail_chimp_root_url, self.user.email)
         expected_data = {
@@ -251,8 +258,13 @@ class MailchimpPipelineTaskTestClass(ModuleStoreTestCase):
         """
         self.mock_request.return_value.status_code = 404
         self.mock_request.return_value.raise_for_status.side_effect = requests.exceptions.HTTPError
-        org_label, org_type, work_area = 'test_org', 'test_org_type', 'test_work_area'
-        update_org_details_at_mailchimp.delay(org_label, org_type, work_area, self.mailchimp_list_id)
+
+        organization = create_organization(self.user)
+        org_label, org_type, work_area = get_org_data_for_mandrill(organization)
+        update_org_details_at_mailchimp.delay(
+            org_label, org_type, work_area, organization.id, self.mailchimp_list_id
+        )
+
         self.assertRaises(MailChimpException)
 
     @factory.django.mute_signals(post_save)

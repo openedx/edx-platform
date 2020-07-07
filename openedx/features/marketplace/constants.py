@@ -53,7 +53,7 @@ ORG_SECTOR_CHOICES = [
     (ORG_SECTOR_WORK_AND_ECONOMIC_GROWTH, _('Work & Economic Growth')),
     (ORG_SECTOR_HUMAN_RIGHTS, _('Human Rights')),
     (ORG_SECTOR_SOCIAL_JUSTICE, _('Social Justice')),
-    (ORG_SECTOR_ART_AND_CULTURE, _('Art & Culture'))
+    (ORG_SECTOR_ART_AND_CULTURE, _('Arts & Culture'))
 ]
 
 ORG_SECTOR_TEMPLATE_CHOICES = [ORG_SECTOR_CHOICES, _('Other')]
@@ -69,7 +69,7 @@ USER_SERVICES_PEOPLE_POWER = 'people-power'
 USER_SERVICES_CHOICES = (
     (USER_SERVICES_HEALTH_CARE_SUPPLIES, _('Healthcare Supplies')),
     (USER_SERVICES_PEOPLE_POWER, _('People Power')),
-    (USER_SERVICES_ONLINE_TRAINING, _('Online Training')),
+    (USER_SERVICES_ONLINE_TRAINING, _('Online Training Tools')),
     (USER_SERVICES_DELIVERY_SERVICES, _('Delivery Services')),
     (USER_SERVICES_MENTORSHIP, _('Mentorship')),
     (USER_SERVICES_FUNDING, _('Funding')),

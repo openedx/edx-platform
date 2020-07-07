@@ -53,3 +53,4 @@ class OrganizationFactory(DjangoModelFactory):
         django_get_or_create = ('label', )
 
     label = factory.Sequence(u'Organization{0}'.format)
+    org_type = factory.Faker('pystr', max_chars=10)

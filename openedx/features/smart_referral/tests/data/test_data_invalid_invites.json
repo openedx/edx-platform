@@ -1,0 +1,16 @@
+{
+  "empty_contacts": [
+    {
+      "first_name": "",
+      "last_name": "",
+      "contact_email": ""
+    }
+  ],
+  "null_contacts": [
+    {
+      "first_name": null,
+      "last_name": null,
+      "contact_email": null
+    }
+  ]
+}

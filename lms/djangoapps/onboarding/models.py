@@ -10,8 +10,6 @@ from django.utils.translation import ugettext_noop
 from model_utils.models import TimeStampedModel
 from multiselectfield import MultiSelectField
 from pytz import utc
-from simple_history import register
-from simple_history.models import HistoricalRecords
 
 import choices
 from constants import (
@@ -24,14 +22,8 @@ from constants import (
     TAKE_ME_THERE_VAL
 )
 from openedx.features.custom_fields.multiselect_with_other.db.fields import MultiSelectWithOtherField
-from student.models import UserProfile
 
 log = logging.getLogger("edx.onboarding")
-
-
-# register User and UserProfile models for django-simple-history module
-register(User, app=__package__, table_name='auth_historicaluser')
-register(UserProfile, table_name='auth_historicaluserprofile')
 
 
 class SchemaOrNoSchemaURLValidator(URLValidator):
@@ -229,8 +221,6 @@ class Organization(TimeStampedModel):
     # If organization has affiliation with some affiliated partners,
     # this flag will be True
     has_affiliated_partner = models.BooleanField(default=False)
-
-    history = HistoricalRecords()
 
     def users_count(self):
         """
@@ -502,8 +492,6 @@ class UserExtendedProfile(TimeStampedModel):
     is_organization_metrics_submitted = models.BooleanField(default=False)
     is_first_learner = models.BooleanField(default=False)
     is_alquity_user = models.BooleanField(default=False)
-
-    history = HistoricalRecords()
 
     # TODO: Populate this newly added field by performing ETL on existing fields hear_about_philanthropy and
     #  hear_about_philanthropy_other

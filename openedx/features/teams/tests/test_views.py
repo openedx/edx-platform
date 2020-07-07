@@ -7,7 +7,6 @@ from django.conf import settings
 from django.db.models import signals
 from django.core.urlresolvers import reverse
 from django.test.client import Client
-from django.test import modify_settings, override_settings
 from w3lib.url import add_or_replace_parameter
 
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
@@ -160,17 +159,17 @@ class BrowseTeamsTestCase(TeamsTestsBaseClass):
 
         client = Client()
         client.login(username=self.user.username, password=TEST_PASSWORD)
-        response = client.get(self.url, follow=True)
+        response = client.get(self.url, follow=False)
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.url, '404/')
 
     def test_404_case_user_not_enrolled_not_staff(self):
         """Test that 404 is returned if the user is neither enrolled in course nor a staff member."""
         client = Client()
         client.login(username=self.user.username, password=TEST_PASSWORD)
-        response = client.get(self.url, follow=True)
+        response = client.get(self.url, follow=False)
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.url, '404/')
 
     def test_case_user_is_not_enrolled_staff(self):
         """Test that valid data is rendered if user is not enrolled in a course but is a staff member."""

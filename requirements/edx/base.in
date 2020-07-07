@@ -57,6 +57,7 @@ django-require
 django-rest-swagger                 # API documentation
 django-sekizai
 django-ses==0.8.4
+django-simple-history
 django-splash
 django-statici18n==1.4.0
 django-storages==1.4.1
