@@ -312,7 +312,9 @@ def certificate_downloadable_status(student, course_key):
 
     if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
         response_data['is_downloadable'] = True
-        response_data['download_url'] = current_status['download_url'] or get_certificate_url(student.id, course_key)
+        response_data['download_url'] = current_status['download_url'] or get_certificate_url(
+            student.id, course_key, current_status['uuid']
+        )
         response_data['is_pdf_certificate'] = bool(current_status['download_url'])
         response_data['uuid'] = current_status['uuid']
 
@@ -472,13 +474,13 @@ def _course_from_key(course_key):
     return CourseOverview.get_from_id(_safe_course_key(course_key))
 
 
-def _certificate_html_url(user_id, course_id, uuid):
-    if uuid:
-        return reverse('certificates:render_cert_by_uuid', kwargs={'certificate_uuid': uuid})
-    elif user_id and course_id:
-        kwargs = {"user_id": str(user_id), "course_id": six.text_type(course_id)}
-        return reverse('certificates:html_view', kwargs=kwargs)
-    return ''
+def _certificate_html_url(uuid):
+    """
+    Returns uuid based certificate URL.
+    """
+    return reverse(
+        'certificates:render_cert_by_uuid', kwargs={'certificate_uuid': uuid}
+    ) if uuid else ''
 
 
 def _certificate_download_url(user_id, course_id, user_certificate=None):
@@ -515,7 +517,7 @@ def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificat
         return url
 
     if has_html_certificates_enabled(course):
-        url = _certificate_html_url(user_id, course_id, uuid)
+        url = _certificate_html_url(uuid)
     else:
         url = _certificate_download_url(user_id, course_id, user_certificate=user_certificate)
     return url
@@ -631,10 +633,11 @@ def emit_certificate_event(event_name, user, course_id, course=None, event_data=
         'org_id': course.org,
         'course_id': six.text_type(course_id)
     }
+
     data = {
         'user_id': user.id,
         'course_id': six.text_type(course_id),
-        'certificate_url': get_certificate_url(user.id, course_id)
+        'certificate_url': get_certificate_url(user.id, course_id, uuid=event_data['certificate_id'])
     }
     event_data = event_data or {}
     event_data.update(data)
