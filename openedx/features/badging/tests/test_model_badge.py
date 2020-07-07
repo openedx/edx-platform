@@ -42,4 +42,3 @@ class BadgeModelTestCases(TestCase):
         threshold_index_1 = result.index('"threshold":10')
         threshold_index_2 = result.index('"threshold":20')
         self.assertGreater(threshold_index_2, threshold_index_1)
-
