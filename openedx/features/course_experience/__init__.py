@@ -2,7 +2,6 @@
 Unified course experience settings and helper methods.
 """
 import crum
-from django.conf import settings
 from django.utils.translation import ugettext as _
 from edx_django_utils.monitoring import set_custom_metric
 from waffle import flag_is_active
@@ -14,19 +13,6 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, W
 # Namespace for course experience waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_experience')
 
-# .. toggle_name: USE_DEFAULT_TRUE_NAMESPACE
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When True, uses the new default_true namespace to help deprecate flag_undefined_default.
-# .. toggle_category: course_experience
-# .. toggle_use_cases: monitored_rollout
-# .. toggle_creation_date: 2020-06-30
-# .. toggle_expiration_date: 2020-07
-# .. toggle_warnings: n/a
-# .. toggle_tickets: n/a
-# .. toggle_status: supported
-_USE_DEFAULT_TRUE_NAMESPACE = 'USE_DEFAULT_TRUE_NAMESPACE'
-
 
 class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
     """
@@ -36,9 +22,9 @@ class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
         and refactor/fix any tests that shouldn't be removed.
 
     """
-    def _is_flag_active(self, flag_name):
+    def is_flag_active(self, flag_name, check_before_waffle_callback=None, flag_undefined_default=None):
         """
-        Returns and caches whether the provided flag is active.
+        Overrides is_flag_active, and returns and caches whether the provided flag is active.
 
         If the flag value is already cached in the request, it is returned.
         If the flag doesn't exist, always returns default of True.
@@ -79,17 +65,6 @@ class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
 
         self._set_waffle_flag_metric(namespaced_flag_name, value)
         return value
-
-    def is_flag_active(self, flag_name, check_before_waffle_callback=None, flag_undefined_default=None):
-        """
-        Overrides is_flag_active if setting USE_DEFAULT_TRUE_NAMESPACE is True.
-        """
-        use_default_true_namespace = getattr(settings, _USE_DEFAULT_TRUE_NAMESPACE, False)
-        set_custom_metric('temp_use_default_true_namespace', use_default_true_namespace)
-        if use_default_true_namespace:
-            return self._is_flag_active(flag_name)
-        else:
-            return super().is_flag_active(flag_name, check_before_waffle_callback, flag_undefined_default=True)
 
 
 DEFAULT_TRUE_WAFFLE_FLAG_NAMESPACE = DefaultTrueWaffleFlagNamespace(name='course_experience')
