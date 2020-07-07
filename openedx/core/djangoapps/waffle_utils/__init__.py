@@ -297,8 +297,8 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                         # the default value.
                         value = bool(flag_undefined_default)
                         self._set_waffle_flag_metric(namespaced_flag_name, value)
-                        no_request_default_match = flag_undefined_default == value
-                        set_custom_metric('temp_flag_no_request_default_match', no_request_default_match)
+                        no_request_default_match = is_flag_active_for_everyone == value
+                        set_custom_metric('temp_flag_no_request_default_match_2', no_request_default_match)
                         set_custom_metric('warn_flag_no_request_return_value', value)
                         return value
 
