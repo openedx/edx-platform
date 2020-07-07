@@ -7,7 +7,13 @@
 
                 initialize: function(options) {
                     this.getTopic = options.getTopic;
-                    TeamsView.prototype.initialize.call(this, options);
+                    TeamsView.prototype.initialize.call(
+                        this,
+                        _.extend(
+                            { showTeamset: true },
+                            options
+                        )
+                    );
                 },
 
                 render: function() {

@@ -1155,7 +1155,7 @@ def results_callback(request):
         )
 
         if use_new_templates_for_id_verification_emails():
-            context = {'user_id': user, 'expiry_date': expiry_date.strftime("%m/%d/%Y")}
+            context = {'user': user, 'expiry_date': expiry_date.strftime("%m/%d/%Y")}
             send_verification_approved_email(context=context)
         else:
             verification_status_email_vars['expiry_date'] = expiry_date.strftime("%m/%d/%Y")

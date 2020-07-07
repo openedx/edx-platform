@@ -69,7 +69,7 @@ django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requi
 django-crum==0.7.6        # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring, edx-rbac, super-csv
 django-fernet-fields==0.6  # via -r requirements/edx/base.txt, edx-enterprise, edxval
 django-filter==2.3.0      # via -r requirements/edx/base.txt, edx-enterprise
-django-ipware==2.1.0      # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
+django-ipware==2.1.0      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 django-js-asset==1.2.2    # via -r requirements/edx/base.txt, django-mptt
 django-method-override==1.0.4  # via -r requirements/edx/base.txt
 django-model-utils==4.0.0  # via -r requirements/edx/base.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
@@ -103,12 +103,12 @@ edx-api-doc-tools==1.3.1  # via -r requirements/edx/base.txt
 edx-bulk-grades==0.7.0    # via -r requirements/edx/base.txt, staff-graded-xblock
 edx-ccx-keys==1.1.0       # via -r requirements/edx/base.txt
 edx-celeryutils==0.5.1    # via -r requirements/edx/base.txt, super-csv
-edx-completion==3.2.1     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-completion==3.2.3     # via -r requirements/edx/base.txt
 edx-django-release-util==0.4.4  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.txt
 edx-django-utils==3.2.3   # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.0  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.3.13    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-enterprise==3.3.15    # via -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.5.0           # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
@@ -149,8 +149,8 @@ html5lib==1.1             # via -r requirements/edx/base.txt, ora2
 httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 icalendar==4.0.6          # via -r requirements/edx/base.txt
 idna==2.10                # via -r requirements/edx/base.txt, requests
-importlib-metadata==1.7.0  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, flake8, importlib-resources, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
-importlib-resources==2.0.1  # via virtualenv
+importlib-metadata==1.7.0  # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, flake8, inflect, path, pluggy, pytest, pytest-randomly, tox, virtualenv
+importlib-resources==3.0.0  # via virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, jinja2-pluralize
 inflection==0.5.0         # via -r requirements/edx/base.txt, drf-yasg
 ipaddress==1.0.23         # via -r requirements/edx/base.txt
@@ -185,7 +185,7 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 mongoengine==0.20.0       # via -r requirements/edx/base.txt
 more-itertools==8.4.0     # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, pytest, zipp
 mpmath==1.1.0             # via -r requirements/edx/base.txt, sympy
-mysqlclient==1.4.6        # via -r requirements/edx/base.txt
+mysqlclient==2.0.0        # via -r requirements/edx/base.txt
 newrelic==5.14.1.144      # via -r requirements/edx/base.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/base.txt, chem
 nodeenv==1.4.0            # via -r requirements/edx/base.txt
@@ -217,7 +217,7 @@ pycryptodomex==3.9.8      # via -r requirements/edx/base.txt, edx-proctoring, py
 pyflakes==2.2.0           # via flake8
 pygments==2.6.1           # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, diff-cover
 pyjwkest==1.4.2           # via -r requirements/edx/base.txt, edx-drf-extensions, lti-consumer-xblock
-pyjwt==1.5.2              # via -r requirements/edx/base.txt, drf-jwt, edx-rest-api-client, social-auth-core
+pyjwt==1.7.1              # via -r requirements/edx/base.txt, drf-jwt, edx-rest-api-client, social-auth-core
 pylint-celery==0.3        # via edx-lint
 pylint-django==2.0.11     # via edx-lint
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django

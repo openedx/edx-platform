@@ -2632,7 +2632,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=732 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=733 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3152,6 +3152,7 @@ CREATE TABLE `enterprise_enterprisecourseenrollment` (
   `enterprise_customer_user_id` int(11) NOT NULL,
   `marked_done` tinyint(1) NOT NULL,
   `source_id` int(11) DEFAULT NULL,
+  `saved_for_later` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_enterprisecou_enterprise_customer_user_71fe301a_uniq` (`enterprise_customer_user_id`,`course_id`),
   KEY `enterprise_enterpris_source_id_c347bfa6_fk_enterpris` (`source_id`),
@@ -3399,6 +3400,7 @@ CREATE TABLE `enterprise_historicalenterprisecourseenrollment` (
   `history_change_reason` varchar(100) DEFAULT NULL,
   `marked_done` tinyint(1) NOT NULL,
   `source_id` int(11) DEFAULT NULL,
+  `saved_for_later` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_a7d84786_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalenterprisecourseenrollment_id_452a4b04` (`id`),
