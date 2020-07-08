@@ -44,6 +44,9 @@ import importlib.util
 import os
 import sys
 from datetime import timedelta
+
+from corsheaders.defaults import default_headers as corsheaders_default_headers
+
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
@@ -718,6 +721,12 @@ MIDDLEWARE = [
 
     # This must be last so that it runs first in the process_response chain
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
+
+    # CORS and CSRF
+    'corsheaders.middleware.CorsMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
 
 EXTRA_MIDDLEWARE_CLASSES = []
@@ -1502,6 +1511,10 @@ INSTALLED_APPS = [
 
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
+
+    # CORS and cross-domain CSRF
+    'corsheaders',
+    'openedx.core.djangoapps.cors_csrf',
 ]
 
 

@@ -5,6 +5,7 @@ Specific overrides to the base prod settings to make development easier.
 
 import logging
 from os.path import abspath, dirname, join
+from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -188,6 +189,15 @@ IDA_LOGOUT_URI_LIST = [
     'http://localhost:18130/logout/',  # ecommerce
     'http://localhost:18150/logout/',  # credentials
 ]
+
+###################### CROSS-DOMAIN REQUESTS ######################
+FEATURES['ENABLE_CORS_HEADERS'] = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = ()
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+    'use-jwt-cookie',
+)
 
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
