@@ -34,7 +34,6 @@ from lms.djangoapps.instructor_task.tasks import (
     cohort_students,
     course_survey_report_csv,
     delete_problem_state,
-    enrollment_report_features_csv,
     export_ora2_data,
     generate_certificates,
     override_problem_score,
@@ -371,20 +370,6 @@ def submit_calculate_students_features_csv(request, course_key, features):
     task_type = 'profile_info_csv'
     task_class = calculate_students_features_csv
     task_input = features
-    task_key = ""
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
-def submit_detailed_enrollment_features_csv(request, course_key):
-    """
-    Submits a task to generate a CSV containing detailed enrollment info.
-
-    Raises AlreadyRunningError if said CSV is already being updated.
-    """
-    task_type = 'detailed_enrollment_report'
-    task_class = enrollment_report_features_csv
-    task_input = {}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
