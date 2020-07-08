@@ -188,7 +188,7 @@ def create_account_with_params_custom(request, params, partner):
         extended_profile_data[partner_constants.START_MONTH_YEAR_KEY] = datetime.now().strftime('%m/%Y')
 
         user_profile_data = deepcopy(partner_constants.PARTNER_USER_PROFILE_DEFAULT_DATA)
-        user_profile_data['name'] = '{} {}'.format(first_name, last_name)
+        user_profile_data['name'] = user.get_full_name()
         user_profile_data['country'] = params['country']
 
         try:
