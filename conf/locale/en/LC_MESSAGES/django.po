@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-22 14:40+0000\n"
-"PO-Revision-Date: 2020-04-22 14:40:52.621774\n"
+"POT-Creation-Date: 2020-07-06 12:06+0000\n"
+"PO-Revision-Date: 2020-07-06 12:06:17.476078\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -5135,7 +5135,9 @@ msgstr ""
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr ""
@@ -6601,6 +6603,8 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
 #: lms/djangoapps/shoppingcart/reports.py
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -7705,8 +7709,10 @@ msgid "Date: {date}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
 #: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Quantity"
@@ -7728,7 +7734,10 @@ msgstr ""
 msgid "Amount"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/pdf.py lms/templates/courseware/gradebook.html
+#: lms/djangoapps/shoppingcart/pdf.py
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#: lms/templates/courseware/gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/shoppingcart/billing_details.html
 #: lms/templates/shoppingcart/receipt.html
@@ -9448,7 +9457,9 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
@@ -9456,7 +9467,9 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
@@ -9467,7 +9480,9 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
@@ -9475,7 +9490,9 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
@@ -9483,7 +9500,9 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
@@ -9491,7 +9510,9 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
@@ -9499,7 +9520,9 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
@@ -9507,21 +9530,27 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_body.html
+#: themes/st-normanx/cms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/st-normanx/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr ""
@@ -10792,6 +10821,10 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid "You are not allowed to login on this site."
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/login_form.py
 msgid "Create Account"
 msgstr ""
@@ -11151,6 +11184,143 @@ msgid ""
 "glad to have you! Come see what everyone is learning."
 msgstr ""
 
+#: themes/st-lutherx/cms/templates/ace_common/edx_ace/common/base_head.html
+#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_head.html
+msgid "St. LutherX Email"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#, python-format
+msgid "Receipt for %(order_number)s"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Thank you for your order!"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#, python-format
+msgid ""
+"Your order is complete. You will receive a confirmation message and your "
+"enrollment code(s) at %(link_start)s%(email)s%(link_end)s. If you need a "
+"receipt, you can print this page."
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#, python-format
+msgid ""
+"Your order is complete. If you need a receipt, you can print this page. You "
+"will also receive a confirmation message with this information at "
+"%(link_start)s%(email)s%(link_end)s."
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Order Number:"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Payment Method:"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Order Date:"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Order Information"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
+msgid "Item Price"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Quantity:"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Description:"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Item Price:"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
+msgid "Subtotal"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Discount"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#, python-format
+msgid "%(voucher_discount_amount)s off"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#, python-format
+msgid "Discount of type %(type)s provided by %(enterprise_name)s"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#, python-format
+msgid "Discount of type %(type)s is provided."
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#, python-format
+msgid "Courtesy of %(enterprise_name)s."
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Get Your Course Credit"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+#, python-format
+msgid ""
+"To receive academic credit for this course, you must apply for credit at the"
+" organization that offers the credit. You can find a link to the "
+"organization’s website on your %(link_start)sdashboard%(link_end)s, next to "
+"the course name."
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Go to dashboard"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/checkout/receipt.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/checkout/receipt.html
+msgid "Find more courses"
+msgstr ""
+
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/footer.html
 #: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/footer.html
 msgid "organization logo placeholder"
@@ -11195,6 +11365,51 @@ msgstr ""
 #: themes/st-normanx/cms/templates/widgets/footer.html
 #: themes/st-normanx/lms/templates/footer.html
 msgid "Powered by"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
+#: cms/templates/index.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/courseware/courses.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/footer.html
+#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
+#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
+#: themes/st-normanx/lms/templates/footer.html
+#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
+#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
+msgid "Courses"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Coupons"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Enterprise Coupons"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Program Offers"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Enterprise Offers"
+msgstr ""
+
+#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_administration_menu.html
+#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/edx/partials/_administration_menu.html
+msgid "Journal Bundle Offers"
 msgstr ""
 
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/edx/partials/_base_navbar.html
@@ -11271,11 +11486,6 @@ msgstr ""
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 #: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
 msgid "summary"
-msgstr ""
-
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
-msgid "Subtotal"
 msgstr ""
 
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/client_side_checkout_basket.html
@@ -11427,11 +11637,6 @@ msgstr ""
 
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
-msgid "Item Price"
-msgstr ""
-
-#: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
-#: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #, python-format
 msgid ""
 "\n"
@@ -11532,10 +11737,6 @@ msgstr ""
 #: themes/st-lutherx/ecommerce/st-lutherx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 #: themes/st-normanx/ecommerce/st-normanx-ecommerce/templates/oscar/basket/partials/hosted_checkout_basket.html
 msgid "Please read our FAQs to view common questions about our certificates."
-msgstr ""
-
-#: themes/st-lutherx/lms/templates/ace_common/edx_ace/common/base_head.html
-msgid "St. LutherX Email"
 msgstr ""
 
 #: themes/st-lutherx/lms/templates/student/edx_ace/passwordreset/email/body.html
@@ -12379,24 +12580,6 @@ msgstr ""
 msgid "Course Run:"
 msgstr ""
 
-#: cms/templates/index.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/courseware/courses.html
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-#: themes/st-lutherx/lms/templates/footer.html
-#: themes/st-lutherx/lms/templates/header/navbar-authenticated.html
-#: themes/st-lutherx/lms/templates/header/navbar-not-authenticated.html
-#: themes/st-normanx/lms/templates/footer.html
-#: themes/st-normanx/lms/templates/header/navbar-authenticated.html
-#: themes/st-normanx/lms/templates/header/navbar-not-authenticated.html
-msgid "Courses"
-msgstr ""
-
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Sign In to {studio_name}"
 msgstr ""
@@ -12501,6 +12684,15 @@ msgstr ""
 #: themes/st-lutherx/cms/templates/widgets/header.html
 #: themes/st-normanx/cms/templates/widgets/header.html
 msgid "Video Uploads"
+msgstr ""
+
+#: cms/templates/emails/course_creator_granted.txt
+#: themes/st-lutherx/cms/templates/emails/course_creator_granted.txt
+#: themes/st-normanx/cms/templates/emails/course_creator_granted.txt
+msgid ""
+"Your request for course creation rights to {studio_name} have been granted. To create your first course, visit\n"
+"\n"
+"{url}"
 msgstr ""
 
 #: cms/templates/maintenance/_force_publish_course.html
@@ -21100,7 +21292,7 @@ msgstr ""
 msgid "Organization"
 msgstr ""
 
-#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/course-create-rerun.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr ""
 
@@ -23621,13 +23813,6 @@ msgstr ""
 msgid ""
 "Your request for course creation rights to {studio_name} have been denied. "
 "If you believe this was in error, please contact {email}"
-msgstr ""
-
-#: cms/templates/emails/course_creator_granted.txt
-msgid ""
-"Your request for course creation rights to {studio_name} have been granted. To create your first course, visit\n"
-"\n"
-"{url}"
 msgstr ""
 
 #: cms/templates/emails/course_creator_revoked.txt
