@@ -37,7 +37,7 @@ class CertificatePage(PageObject):
         """
         Construct a URL to the page
         """
-        return BASE_URL + "/" + self.url_path + "/user/" + self.user_id + "/course/" + self.course_id
+        return BASE_URL + "/" + self.url_path + "/course/" + self.course_id
 
     @property
     def accomplishment_banner(self):
