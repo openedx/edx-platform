@@ -11,15 +11,31 @@ To use, call "from track import segment", then call segment.track() or segment.i
 from urlparse import urlunsplit
 
 import analytics
+from crum import get_current_request
 from django.conf import settings
 from eventtracking import tracker
+from track import contexts
+from track.views import _get_request_value
 
 
-def track(user_id, event_name, properties=None, context=None):
+def track(user_id, event_name, properties=None, context=None, send_to_track=False, user=None):
     """Wrapper for emitting Segment track event, including augmenting context information from middleware."""
+    properties = properties or {}
+
+    if event_name is not None and send_to_track:
+        request = get_current_request()
+        page = _get_request_value(request, 'page') or getattr(request, 'path', '')
+        context_override = contexts.course_context_from_url(page)
+
+        if user and getattr(user, 'username', ''):
+            context_override['username'] = user.username
+
+        context_override['user_id'] = user_id
+
+        with tracker.get_tracker().context('edx.course.segment', context_override):
+            tracker.emit(name=event_name, data=properties)
 
     if event_name is not None and hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-        properties = properties or {}
         segment_context = dict(context) if context else {}
         tracking_context = tracker.get_tracker().resolve_context()
 

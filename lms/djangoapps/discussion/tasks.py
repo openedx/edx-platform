@@ -101,7 +101,8 @@ def _track_notification_sent(message, context):
         segment.track(
             user_id=context['thread_author_id'],
             event_name='edx.bi.email.sent',
-            properties=properties
+            properties=properties,
+            send_to_track=True
         )
 
 

@@ -1444,11 +1444,11 @@ def generate_user_cert(request, course_id):
         # with a management command.  From the user's perspective,
         # it will appear that the certificate task was submitted successfully.
         certs_api.generate_user_certificates(student, course.id, course=course, generation_mode='self')
-        _track_successful_certificate_generation(student.id, course.id)
+        _track_successful_certificate_generation(student.id, course.id, user=student)
         return HttpResponse()
 
 
-def _track_successful_certificate_generation(user_id, course_id):
+def _track_successful_certificate_generation(user_id, course_id, user=None):
     """
     Track a successful certificate generation event.
 
@@ -1463,7 +1463,7 @@ def _track_successful_certificate_generation(user_id, course_id):
     segment.track(user_id, event_name, {
         'category': 'certificates',
         'label': text_type(course_id)
-    })
+    }, send_to_track=True, user=user)
 
 
 @require_http_methods(["GET", "POST"])

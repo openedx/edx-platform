@@ -660,8 +660,9 @@ def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs)
         segment.track(kwargs['user'].id, event_name, {
             'category': "conversion",
             'label': None,
-            'provider': kwargs['backend'].name
-        })
+            'provider': kwargs['backend'].name,
+            'username': kwargs.get('username','')
+        }, send_to_track=True, user=kwargs['user'])
 
 
 @partial.partial

@@ -5,7 +5,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.db import connection
 from django.http import HttpResponse
 from pytz import UTC
@@ -677,11 +677,19 @@ def permalink(content):
     else:
         course_id = content['course_id']
     if content['type'] == 'thread':
-        return reverse('discussion.views.single_thread',
-                       args=[course_id, content['commentable_id'], content['id']])
+        try:
+            return reverse('discussion.views.single_thread',
+                            args=[course_id, content['commentable_id'], content['id']])
+        except NoReverseMatch:
+            return reverse('single_thread',
+                            args=[course_id, content['commentable_id'], content['id']])
     else:
-        return reverse('discussion.views.single_thread',
-                       args=[course_id, content['commentable_id'], content['thread_id']]) + '#' + content['id']
+        try:
+            return reverse('discussion.views.single_thread',
+                           args=[course_id, content['commentable_id'], content['thread_id']]) + '#' + content['id']
+        except NoReverseMatch:
+            return reverse('single_thread',
+                           args=[course_id, content['commentable_id'], content['thread_id']]) + '#' + content['id']
 
 
 def extend_content(content):

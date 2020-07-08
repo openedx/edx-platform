@@ -1096,7 +1096,7 @@ class SubmitPhotosView(View):
         Returns: None
 
         """
-        segment.track(user.id, event_name, parameters)
+        segment.track(user.id, event_name, parameters, user=user, send_to_track=True)
 
 
 @require_POST

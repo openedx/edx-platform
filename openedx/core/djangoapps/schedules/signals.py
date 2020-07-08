@@ -144,7 +144,9 @@ def _should_randomly_suppress_schedule_creation(
                 'experience_type': experience_type,
                 'upgrade_deadline': upgrade_deadline_str,
                 'content_availability_date': content_availability_date.isoformat(),
-            }
+            },
+            user=enrollment.user,
+            send_to_track=True
         )
         return True
 
