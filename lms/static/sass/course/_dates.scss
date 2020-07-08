@@ -151,6 +151,19 @@
     }
   }
 
+  .timeline-extra-info {
+    @include font-size(14);
+
+    display: flex;
+    flex: 100%;
+    line-height: 1.25;
+
+    &.not-released {
+      color: #d1d2d4;
+    }
+  }
+
+
   .pill {
     @include font-size(12);
 
