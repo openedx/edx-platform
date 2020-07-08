@@ -7,7 +7,7 @@ from common.lib.mandrill_client.client import MandrillClient
 from openedx.features.smart_referral.models import SmartReferral
 from openedx.features.smart_referral.tasks import (
     task_send_referral_and_toolkit_emails,
-    task_send_referral_follow_up_email
+    task_send_referral_follow_up_emails
 )
 
 from .factories import SmartReferralFactory
@@ -59,12 +59,14 @@ class SmartReferralTasksTest(TestCase):
                 'email': test_email2
             }
         ]
+
         mock_send_mail.side_effect = (status_first_referral, status_second_referral)
-        task_send_referral_follow_up_email(contact_emails)
+        task_send_referral_follow_up_emails(contact_emails)
 
         context = {
             'root_url': settings.LMS_ROOT_URL,
         }
+
         all_rerun_mock_calls = [
             mock.call(MandrillClient.REFERRAL_FOLLOW_UP_EMAIL, test_email1, context=context),
             mock.call(MandrillClient.REFERRAL_FOLLOW_UP_EMAIL, test_email2, context=context)
