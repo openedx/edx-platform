@@ -659,7 +659,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         name="Test team",
         course=None,
         description="Filler description",
-        teamset_id="topic_0",
+        topic_id="topic_0",
         **kwargs
     ):
         """Creates the payload for creating a team. kwargs can be used to specify additional fields."""
@@ -669,13 +669,13 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             'name': name,
             'course_id': str(course.id),
             'description': description,
-            'teamset_id': teamset_id,
+            'topic_id': topic_id,
         })
         return data
 
     def post_create_team(self, expected_status=200, data=None, **kwargs):
         """Posts data to the team creation endpoint. Verifies expected_status."""
-        return self.make_call(reverse('teams_list'), expected_status, 'post', data, **kwargs)
+        return self.make_call(reverse('teams_list'), expected_status, 'post', data, topic_id='topic_0', **kwargs)
 
     def get_team_detail(self, team_id, expected_status=200, data=None, **kwargs):
         """Gets detailed team information for team_id. Verifies expected_status."""
@@ -1080,7 +1080,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     @ddt.data(
         (None, 401),
         ('student_inactive', 401),
-        ('student_unenrolled', 403),
+        ('student_unenrolled', 400),
         ('student_enrolled_not_on_team', 200),
         ('staff', 200),
         ('course_staff', 200),
