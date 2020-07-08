@@ -48,7 +48,6 @@ experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 PROGRAM_INFO_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_programs',
-    flag_undefined_default=False
 )
 
 # .. toggle_name: experiments.add_dashboard_info
@@ -62,9 +61,7 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-118
 # .. toggle_status: supported
-DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace,
-                                 u'add_dashboard_info',
-                                 flag_undefined_default=False)
+DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace, u'add_dashboard_info')
 # TODO END: clean up as part of REVEM-199 (End)
 
 

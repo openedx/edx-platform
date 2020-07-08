@@ -61,7 +61,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         self.num_buckets = num_buckets
         self.experiment_id = experiment_id
         self.bucket_flags = [
-            CourseWaffleFlag(waffle_namespace, '{}.{}'.format(flag_name, bucket), flag_undefined_default=False)
+            CourseWaffleFlag(waffle_namespace, '{}.{}'.format(flag_name, bucket))
             for bucket in range(num_buckets)
         ]
 

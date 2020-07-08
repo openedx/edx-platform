@@ -45,7 +45,6 @@ from track import segment
 MOBILE_UPSELL_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'experiments'),
     flag_name=u'mobile_upsell_rev934',
-    flag_undefined_default=False
 )
 MOBILE_UPSELL_EXPERIMENT = 'mobile_upsell_experiment'
 
