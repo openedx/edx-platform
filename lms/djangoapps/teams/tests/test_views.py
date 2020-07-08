@@ -1080,7 +1080,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     @ddt.data(
         (None, 401),
         ('student_inactive', 401),
-        ('student_unenrolled', 400),
+        ('student_unenrolled', 403),
         ('student_enrolled_not_on_team', 200),
         ('staff', 200),
         ('course_staff', 200),

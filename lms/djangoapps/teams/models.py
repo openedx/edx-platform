@@ -326,7 +326,7 @@ class CourseTeamMembership(models.Model):
         Args:
             user: the user that we want to query on
             course_id: the course_id of the course we're interested in
-            teamset_id: the teamset_id (formaerly topic_id) of the course we are interested in
+            topic_id: the topic_id of the course we are interested in
 
         Returns:
             True if the user is on a team in a teamset in the course already
