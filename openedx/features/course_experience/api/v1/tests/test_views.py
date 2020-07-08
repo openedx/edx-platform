@@ -29,3 +29,8 @@ class ResetCourseDeadlinesViewTests(BaseCourseHomeTests):
             reverse('course-experience-reset-course-deadlines'), {'course_key': self.course.id, 'invalid': 'value'}
         )
         self.assertEqual(response.status_code, 400)
+
+    def test_post_unauthenticated_user(self):
+        self.client.logout()
+        response = self.client.post(reverse('course-experience-reset-course-deadlines'), {'course_key': self.course.id})
+        self.assertEqual(response.status_code, 401)
