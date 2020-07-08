@@ -25,7 +25,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 from six.moves import filter
@@ -97,8 +97,8 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundErr
 from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
-from .component import ADVANCED_COMPONENT_TYPES
-from .item import create_xblock_info
+from .component import ADVANCED_COMPONENT_TYPES, _get_item_in_course
+from .item import create_xblock_info, _update_with_callback, _save_xblock
 from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
@@ -106,7 +106,7 @@ log = logging.getLogger(__name__)
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_info_update_handler', 'course_search_index_handler',
-           'course_rerun_handler',
+           'course_rerun_handler', 'toggle_discussion_enabled',
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
@@ -304,6 +304,94 @@ def course_rerun_handler(request, course_key_string):
                 'course_creator_status': _get_course_creator_status(request.user),
                 'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
             })
+
+
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(("GET", "POST"))
+@expect_json
+def toggle_discussion_enabled(request, key_string=None):
+    # NOTE: Work in Progress.
+    course_key, usage_key = None, None
+
+    try:
+        usage_key = UsageKey.from_string(key_string)
+    except InvalidKeyError:  # Raise Http404 on invalid 'usage_key_string'
+        # It could be a course
+        try:
+            course_key = CourseKey.from_string(key_string)
+        except InvalidKeyError:
+            return JsonResponse({
+                "Message": "Not Found",
+                "key": key_string, 
+            })
+            raise Http404
+        
+    if course_key:
+        course = modulestore().get_course(course_key)
+        if not course:
+            return JsonResponse({
+                "Message": "Not Found",
+                "key": key_string, 
+            })
+            raise Http404
+        
+        discussion_enabled = course.get_discussion_toggle_status()
+        
+        if request.method == "GET":
+            return JsonResponse({'discussion_enabled': discussion_enabled})
+        elif request.method == "POST":
+            value = request.json.get("value", discussion_enabled)
+            course.set_discussion_toggle(value)
+            
+            # Persist update in children
+            for chapter in course.get_children():
+                modulestore().update_item(chapter, request.user.id)
+                for section in chapter.get_children():
+                    modulestore().update_item(section, request.user.id)
+                    for vertical in section.get_children():
+                        modulestore().update_item(vertical, request.user.id)
+
+            modulestore().update_item(course, request.user.id)
+
+            return JsonResponse({"user_message": _("Discussion toggle has been successfully updated.")}, status=200)
+
+    elif usage_key:
+        try:
+            course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
+            is_vertical = hasattr(xblock, "discussion_enabled")
+            is_sequential = hasattr(xblock, "get_discussion_toggle_status")
+            
+            if not is_vertical and not is_sequential:
+                return HttpResponseBadRequest()
+        except ItemNotFoundError:
+            return HttpResponseBadRequest()
+        else:
+            discussion_enabled = xblock.discussion_enabled if is_vertical else xblock.get_discussion_toggle_status()
+
+            if request.method == "GET":
+                return JsonResponse({
+                    'discussion_enabled': discussion_enabled,
+                    'message': str(xblock._get_children_discussion_toggle_status()),
+                })
+            elif request.method == "POST":
+                value = request.json.get("value", discussion_enabled)
+
+                if is_vertical:
+                    xblock.discussion_enabled = value
+                elif is_sequential:
+                    xblock.set_discussion_toggle(value)
+
+                    # Persist update in children
+                    for child in xblock.get_children():
+                        modulestore().update_item(child, request.user.id)
+                        for grand_child in child.get_children():  # This loop would cover the verticals
+                            modulestore().update_item(grand_child, request.user.id)
+
+                # Persist the current xblock itself
+                modulestore().update_item(xblock, request.user.id)
+
+                return JsonResponse({"user_message": _("Discussion toggle has been successfully updated.")}, status=200)
 
 
 @login_required

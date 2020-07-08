@@ -787,6 +787,8 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
         return child_statuses
     
     def set_discussion_toggle(self, value):
+        # NOTE: Make sure to use modulestore.update_item() after calling this
+        # method on every children.
         for child in self.get_children():
             # Child of a section would be subsection
             if hasattr(child, "set_discussion_toggle"):

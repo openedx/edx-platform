@@ -1580,7 +1580,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             for child in self.get_children()
         ]
         
-        if "partially_enabled" in child_statuses:
+        if "partially_enabled" in child_statuses or ("enabled" in child_statuses and "disabled" in child_statuses):
             return "partially_enabled"
         elif all([status == "enabled" for status in child_statuses]):
             return "enabled"
