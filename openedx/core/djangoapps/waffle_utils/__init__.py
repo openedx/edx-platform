@@ -290,17 +290,13 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                         value = flag_is_active(request, namespaced_flag_name)
                     else:
                         log.warning(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
-                        # Return the default value if not in a request context.
+                        # Return the Flag's Everyone value if not in a request context.
                         # Note: this skips the cache as the value might be different
                         # in a normal request context. This case seems to occur when
-                        # a page redirects to a 404. In this case, we'll just return
-                        # the default value.
-                        value = bool(flag_undefined_default)
-                        self._set_waffle_flag_metric(namespaced_flag_name, value)
-                        no_request_default_match = is_flag_active_for_everyone == value
-                        set_custom_metric('temp_flag_no_request_default_match_2', no_request_default_match)
-                        set_custom_metric('warn_flag_no_request_return_value', value)
-                        return value
+                        # a page redirects to a 404, or in Celery workers.
+                        self._set_waffle_flag_metric(namespaced_flag_name, is_flag_active_for_everyone)
+                        set_custom_metric('warn_flag_no_request_return_value', is_flag_active_for_everyone)
+                        return is_flag_active_for_everyone
 
                 self._cached_flags[namespaced_flag_name] = value
 
