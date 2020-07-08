@@ -1,7 +1,9 @@
 import unittest
 from uuid import uuid4
 from django.urls import reverse
+from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
+from django.utils.http import urlencode
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -29,10 +31,15 @@ class SAMLProviderConfigTests(APITestCase):
     """
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='testpwd')
-        self.enterprise_customer = EnterpriseCustomer.objects.create(uuid=ENTERPRISE_ID, name='test-ep', slug='test-ep')
+        self.site, _ = Site.objects.get_or_create(domain='example.com')
+        self.enterprise_customer = EnterpriseCustomer.objects.create(
+            uuid=ENTERPRISE_ID,
+            name='test-ep',
+            slug='test-ep',
+            site=self.site)
         self.samlproviderconfig = SAMLProviderConfig.objects.create(
-            entity_id=SINGLE_PROVIDER_CONFIG.entity_id,
-            metadata_source=SINGLE_PROVIDER_CONFIG.metadata_source
+            entity_id=SINGLE_PROVIDER_CONFIG['entity_id'],
+            metadata_source=SINGLE_PROVIDER_CONFIG['metadata_source']
         )
         self.enterprisecustomeridp = EnterpriseCustomerIdentityProvider.objects.create(
             provider_id=self.samlproviderconfig.id,
@@ -43,19 +50,21 @@ class SAMLProviderConfigTests(APITestCase):
 
     def test_get_one_config_by_enterprise_uuid_found(self):
         # GET auth/saml/v0/providerconfig/{id}
-        url = reverse('samlproviderconfig-detail', kwargs={'enterprise_customer_uuid', ENTERPRISE_ID})
+        urlbase = reverse('samlproviderconfig-list')
+        query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
+        url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(SAMLProviderConfig.objects.count(), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(SAMLProviderConfig.objects.count(), 1)
 
     def test_create_one_config(self):
         # POST auth/saml/v0/providerconfig/ -d data
         url = reverse('samlproviderconfig-list')
         data = SINGLE_PROVIDER_CONFIG
-        self.assertEqual(SAMLProviderConfig.objects.count(), 0)
+        orig_count = SAMLProviderConfig.objects.count()
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(SAMLProviderConfig.objects.count(), 1)
+        self.assertEqual(SAMLProviderConfig.objects.count(), orig_count + 1)
         providerconfig = SAMLProviderConfig.objects.get()
         self.assertEqual(providerconfig.slug, 'test-slug')
         self.assertEqual(providerconfig.name, 'name-of-config')
