@@ -8,12 +8,14 @@ define([
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         createMockTopicData, createMockTopicCollection, createMockTopic, createMockInstructorManagedTopic,
+        createMockPrivateTopic,
         createMockContext,
         testContext,
         testCourseID = 'course/1',
         testUser = 'testUser',
         testTopicID = 'test-topic-1',
         testInstructorManagedTopicID = 'test-instructor-managed-topic-1',
+        testPrivateTopicID = 'enigma',
         testTeamDiscussionID = '12345',
         teamEvents = _.clone(Backbone.Events),
         testCountries = [
@@ -277,6 +279,18 @@ define([
         ));
     };
 
+    createMockPrivateTopic = function(options) {
+        return new TopicModel(_.extend(
+            {
+                id: testPrivateTopicID,
+                name: 'Test Private Topic 1',
+                description: 'Test private topic description 1',
+                type: 'private_managed'
+            },
+            options
+        ));
+    };
+
     testContext = {
         courseID: testCourseID,
         topics: {
@@ -333,6 +347,7 @@ define([
         testCourseID: testCourseID,
         testUser: testUser,
         testTopicID: testTopicID,
+        testPrivateTopicID: testPrivateTopicID,
         testCountries: testCountries,
         testLanguages: testLanguages,
         testTeamDiscussionID: testTeamDiscussionID,
@@ -345,6 +360,7 @@ define([
         createMockContext: createMockContext,
         createMockTopic: createMockTopic,
         createMockInstructorManagedTopic: createMockInstructorManagedTopic,
+        createMockPrivateTopic: createMockPrivateTopic,
         createMockPostResponse: createMockPostResponse,
         createMockDiscussionResponse: createMockDiscussionResponse,
         createAnnotatedContentInfo: createAnnotatedContentInfo,
