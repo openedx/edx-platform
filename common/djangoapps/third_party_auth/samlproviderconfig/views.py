@@ -4,6 +4,8 @@
 
 from rest_framework import viewsets
 
+from edx_rbac.mixins import PermissionRequiredMixin
+
 from ..models import SAMLProviderConfig
 from .serializers import SAMLProviderConfigSerializer
 
@@ -11,14 +13,13 @@ from .serializers import SAMLProviderConfigSerializer
 class SAMLProviderMixin(object):
     queryset = SAMLProviderConfig.objects.all()
     serializer_class = SAMLProviderConfigSerializer
-    # TODO: Authorization work pending, right now open API
-    # permission_classes = [IsAdminUser]
 
 
-class SAMLProviderConfigViewSet(SAMLProviderMixin, viewsets.ModelViewSet):
+class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, viewsets.ModelViewSet):
     """
     A View to handle SAMLProviderConfig CRUD
 
     Usage:
         [HttpVerb] /auth/saml/v0/providerconfig/
     """
+    permission_required = 'enterprise.can_access_admin_dashboard'
