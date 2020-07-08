@@ -54,11 +54,20 @@ def get_competency_assessments_score(user, chapter_id):
     pre_assessment_score = post_assessment_score = 0
     attempted_pre_assessments = attempted_post_assessments = 0
 
-    COMPETENCY_ASSESSMENT_RECORD_QUERY_FORMAT = 'SELECT MAX(id) AS id, COUNT(assessment_type) AS assessments_count, ' \
-                                      'assessment_type, correctness FROM philu_courseware_competencyassessmentrecord' \
-                                      ' WHERE id IN (SELECT MAX(id) FROM philu_courseware_competencyassessmentrecord' \
-                                      ' WHERE chapter_id = "{chapter_id}" and user_id = {user_id} ' \
-                                      'GROUP BY problem_id) GROUP BY correctness, assessment_type'
+    COMPETENCY_ASSESSMENT_RECORD_QUERY_FORMAT = """
+        SELECT
+        MAX(id) AS id,
+        COUNT(assessment_type) AS assessments_count,
+        assessment_type,
+        correctness
+        FROM philu_courseware_competencyassessmentrecord
+        WHERE id IN (
+            SELECT
+            MAX(id) FROM philu_courseware_competencyassessmentrecord
+            WHERE chapter_id = "{chapter_id}" and user_id = {user_id}
+            GROUP BY problem_id, question_number
+        ) GROUP BY correctness, assessment_type
+    """
 
     assessments_record = CompetencyAssessmentRecord.objects.raw(
         COMPETENCY_ASSESSMENT_RECORD_QUERY_FORMAT.format(chapter_id=chapter_id, user_id=user.id))

@@ -8,6 +8,8 @@ from .models import CompetencyAssessmentRecord
 
 
 class CompetencyAssessmentRecordSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     def validate_problem_id(self, problem_id):
         """
         validate if problem_id is valid UsageKeyField or not

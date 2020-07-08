@@ -7,5 +7,5 @@ from .views import competency_assessments_score_view, record_and_fetch_competenc
 urlpatterns = [
     url(r'^api/courses/courseware/(?P<chapter_id>[^/]*)/competency_assessments_score/$',
         competency_assessments_score_view, name='competency_assessments_score'),
-    url(r'^api/record_and_fetch_competency_assessment/$', record_and_fetch_competency_assessment, name='record_and_fetch_competency_assessment')
+    url(r'^api/record_and_fetch_competency_assessment/(?P<chapter_id>[a-z0-9]+)/$', record_and_fetch_competency_assessment, name='record_and_fetch_competency_assessment')
 ]

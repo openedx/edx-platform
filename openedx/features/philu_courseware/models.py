@@ -20,13 +20,15 @@ class CompetencyAssessmentRecord(TimeStampedModel):
     choice_text = models.TextField()
     score = models.FloatField()
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
+    question_number = models.IntegerField(default=None, blank=True, null=True)
 
     def __unicode__(self):
-        return '{problem}, {username}, {assessment_type}, attempt({attempt})'.format(
+        return '{problem}, question({question_number}), {username}, {assessment_type}, attempt({attempt})'.format(
             problem=self.problem_id,
             username=self.user.username,
             assessment_type=self.assessment_type,
-            attempt=self.attempt
+            attempt=self.attempt,
+            question_number=self.question_number
         )
 
     class Meta:
