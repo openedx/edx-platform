@@ -18,7 +18,6 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         super(BadgeViewsTestCases, self).setUp()
         self.course = CourseFactory(org="test", number="123", run="1")
         self.user = UserFactory()
-        self.client = Client()
         self.client.login(username=self.user.username, password='test')
 
 
