@@ -118,7 +118,7 @@ from openedx.core.djangolib.markup import HTML, Text
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
           advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
           exams_url = ''
-          if settings.FEATURES.get('EXAM_SETTINGS_HTML_VIEW'):
+          if settings.FEATURES.get('ENABLE_EXAM_SETTINGS_HTML_VIEW'):
             exams_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
         %>
       <h3 class="title-3">${_("Other Course Settings")}</h3>
@@ -129,7 +129,7 @@ from openedx.core.djangolib.markup import HTML, Text
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
             % if exams_url:
-            <li class="nav-item"><a href="${exams_url}">${_("Exam Settings")}</a></li>
+              <li class="nav-item"><a href="${exams_url}">${_("Proctored Exam Settings")}</a></li>
             % endif
           </ul>
         </nav>
