@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "grading" %></%def>
 <%block name="title">${_("Grading Settings")}</%block>
@@ -28,7 +29,7 @@
 <%block name="requirejs">
     require(["js/factories/settings_graders"], function(SettingsGradersFactory) {
         SettingsGradersFactory(
-            _.extend(${dump_js_escaped_json(course_details, cls=CourseSettingsEncoder) | n},
+            _.extend(${dump_js_escaped_json(course_details, cls=CourseSettingsEncoder) | n, decode.utf8},
                 {is_credit_course: ${is_credit_course | n, dump_js_escaped_json}}),
             "${grading_url | n, js_escaped_string}"
         );
@@ -105,7 +106,7 @@
 
         <section class="group-settings grade-rules">
           <header>
-            <h2 class="title-2">${_("Grading Rules &amp; Policies")}</h2>
+            <h2 class="title-2">${_("Grading Rules & Policies")}</h2>
             <span class="tip">${_("Deadlines, requirements, and logistics around grading student work")}</span>
           </header>
 
@@ -155,18 +156,18 @@
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
           advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
           exams_url = ''
-          if settings.FEATURES.get('EXAM_SETTINGS_HTML_VIEW'):
+          if settings.FEATURES.get('ENABLE_EXAM_SETTINGS_HTML_VIEW'):
             exams_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
         %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related" aria-label="${_('Other Course Settings')}">
           <ul>
-            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details & Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
             % if exams_url:
-            <li class="nav-item"><a href="${exams_url}">${_("Exam Settings")}</a></li>
+              <li class="nav-item"><a href="${exams_url}">${_("Proctored Exam Settings")}</a></li>
             % endif
           </ul>
         </nav>
