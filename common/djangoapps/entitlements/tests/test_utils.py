@@ -102,18 +102,6 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
 
         assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
-    def test_course_run_not_fulfillable_enroll_period_ended(self):
-        course_overview = self.create_course(
-            start_from_now=-3,
-            end_from_now=2,
-            enrollment_start_from_now=-2,
-            enrollment_end_from_now=-1
-        )
-
-        entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
-
-        assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
-
     def test_course_run_not_fulfillable_enrollment_start_in_future(self):
         course_overview = self.create_course(
             start_from_now=-3,
@@ -140,7 +128,7 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
 
         assert is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
-    def test_course_run_fulfillable_enrollment_ended_upgrade_open(self):
+    def test_course_run_fulfillable_enrollment_ended_already_enrolled(self):
         course_overview = self.create_course(
             start_from_now=-3,
             end_from_now=2,
@@ -166,3 +154,15 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
 
         assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
+
+    def test_course_run_fulfillable_enrollment_ended_upgrade_open(self):
+        course_overview = self.create_course(
+            start_from_now=-3,
+            end_from_now=2,
+            enrollment_start_from_now=-2,
+            enrollment_end_from_now=-1,
+        )
+
+        entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+
+        assert is_course_run_entitlement_fulfillable(course_overview.id, entitlement)

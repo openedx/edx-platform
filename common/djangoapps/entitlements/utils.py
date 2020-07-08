@@ -48,13 +48,11 @@ def is_course_run_entitlement_fulfillable(
     run_end = course_overview.end
     is_running = run_start and (not run_end or (run_end and (run_end > compare_date)))
 
-    # Verify that the course run can currently be enrolled
+    # Verify that the course run can currently be enrolled, explicitly
+    # not checking for enrollment end date becasue course run is still
+    # fulfillable if enrollment has ended but VUD is in future
     enrollment_start = course_overview.enrollment_start
-    enrollment_end = course_overview.enrollment_end
-    can_enroll = (
-        (not enrollment_start or enrollment_start < compare_date)
-        and (not enrollment_end or enrollment_end > compare_date)
-    )
+    can_enroll = not enrollment_start or enrollment_start < compare_date
 
     # Is the user already enrolled in the Course Run
     is_enrolled = CourseEnrollment.is_enrolled(entitlement.user, course_run_key)

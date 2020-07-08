@@ -337,17 +337,20 @@ class EntitlementEnrollmentViewSet(viewsets.GenericViewSet):
         Returns a response object is there is an error or exception, None otherwise
         """
         try:
+            unexpired_paid_modes = [mode.slug for mode in CourseMode.paid_modes_for_course(course_run_key)]
+            can_upgrade = unexpired_paid_modes and entitlement.mode in unexpired_paid_modes
             enrollment = CourseEnrollment.enroll(
                 user=user,
                 course_key=course_run_key,
                 mode=entitlement.mode,
-                check_access=True
+                check_access=True,
+                can_upgrade=can_upgrade
             )
         except AlreadyEnrolledError:
             enrollment = CourseEnrollment.get_enrollment(user, course_run_key)
             if enrollment.mode == entitlement.mode:
                 entitlement.set_enrollment(enrollment)
-            elif enrollment.mode not in [mode.slug for mode in CourseMode.paid_modes_for_course(course_run_key)]:
+            elif enrollment.mode not in unexpired_paid_modes:
                 enrollment.update_enrollment(mode=entitlement.mode)
                 entitlement.set_enrollment(enrollment)
             # Else the User is already enrolled in another paid Mode and we should

@@ -1430,7 +1430,7 @@ class CourseEnrollment(models.Model):
                 )
 
     @classmethod
-    def enroll(cls, user, course_key, mode=None, check_access=False):
+    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -1453,6 +1453,11 @@ class CourseEnrollment(models.Model):
                 The default is set to False to avoid breaking legacy code or
                 code with non-standard flows (ex. beta tester invitations), but
                 for any standard enrollment flow you probably want this to be True.
+
+        `can_upgrade`: if course is upgradeable, alow learners to enroll even
+                if enrollment is closed. This is a special case for entitlements
+                while selecting a session. The default is set to False to avoid
+                breaking the orignal course enroll code.
 
         Exceptions that can be raised: NonExistentCourseError,
         EnrollmentClosedError, CourseFullError, AlreadyEnrolledError.  All these
@@ -1477,7 +1482,7 @@ class CourseEnrollment(models.Model):
                 raise NonExistentCourseError
 
         if check_access:
-            if cls.is_enrollment_closed(user, course):
+            if cls.is_enrollment_closed(user, course) and not can_upgrade:
                 log.warning(
                     u"User %s failed to enroll in course %s because enrollment is closed",
                     user.username,
