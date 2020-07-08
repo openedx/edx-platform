@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer
 from third_party_auth.samlutils.utils import set_jwt_cookie
-
 from third_party_auth.models import SAMLProviderConfig
 from third_party_auth.tests import testutil
 
@@ -29,19 +29,21 @@ class SAMLProviderConfigTests(APITestCase):
     """
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='testpwd')
+        self.enterprise_customer = EnterpriseCustomer.objects.create(uuid=ENTERPRISE_ID, name='test-ep', slug='test-ep')
+        self.samlproviderconfig = SAMLProviderConfig.objects.create(
+            entity_id=SINGLE_PROVIDER_CONFIG.entity_id,
+            metadata_source=SINGLE_PROVIDER_CONFIG.metadata_source
+        )
+        self.enterprisecustomeridp = EnterpriseCustomerIdentityProvider.objects.create(
+            provider_id=self.samlproviderconfig.id,
+            enterprise_customer_id=ENTERPRISE_ID
+        )
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_DASHBOARD_ROLE, str(ENTERPRISE_ID))])
         self.client.force_authenticate(user=self.user)
 
-    def test_get_all_configs(self):
-        # ^auth/saml/v0/providerconfig/
-        url = reverse('samlproviderconfig-list')
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(SAMLProviderConfig.objects.count(), 0)
-
-    def test_get_one_config_id_not_found(self):
+    def test_get_one_config_by_enterprise_uuid_found(self):
         # GET auth/saml/v0/providerconfig/{id}
-        url = reverse('samlproviderconfig-detail', args=[1])
+        url = reverse('samlproviderconfig-detail', kwargs={'enterprise_customer_uuid', ENTERPRISE_ID})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(SAMLProviderConfig.objects.count(), 0)
@@ -57,25 +59,3 @@ class SAMLProviderConfigTests(APITestCase):
         providerconfig = SAMLProviderConfig.objects.get()
         self.assertEqual(providerconfig.slug, 'test-slug')
         self.assertEqual(providerconfig.name, 'name-of-config')
-
-    '''def test_update_one_config(self):
-        # Patch auth/saml/v0/providerconfig/{id}/ -d data
-
-        # first create a config
-        url = reverse('samlproviderconfig-list')
-        data = SINGLE_PROVIDER_CONFIG
-        response = self.client.post(url, data, format='json')
-        providerconfig = SAMLProviderConfig.objects.get()
-        self.assertEqual(providerconfig.enabled, True)
-
-        # now test the patch works
-        url = reverse('samlproviderconfig-detail', args=[1])
-        data = {
-            'enabled': 'false',
-        }
-        response = self.client.patch(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(SAMLProviderConfig.objects.count(), 1)
-        providerconfig = SAMLProviderConfig.objects.get()
-        self.assertEqual(providerconfig.enabled, False)
-    '''
