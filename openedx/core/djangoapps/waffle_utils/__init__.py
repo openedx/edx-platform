@@ -271,11 +271,12 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
             # The callback needs to handle its own caching if it wants it.
             value = self._cached_flags.get(namespaced_flag_name)
             if value is None:
-
+                is_flag_active_for_everyone = False
                 if flag_undefined_default is not None:
                     # determine if the flag is undefined in waffle
                     try:
-                        Flag.objects.get(name=namespaced_flag_name)
+                        waffle_flag = Flag.objects.get(name=namespaced_flag_name)
+                        is_flag_active_for_everyone = (waffle_flag.everyone is True)
                     except Flag.DoesNotExist:
                         if flag_undefined_default:
                             # This metric will go away once this has been fully retired with ARCHBOM-132.
@@ -289,7 +290,6 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                         value = flag_is_active(request, namespaced_flag_name)
                     else:
                         log.warning(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
-                        set_custom_metric('warn_flag_no_request', True)
                         # Return the default value if not in a request context.
                         # Note: this skips the cache as the value might be different
                         # in a normal request context. This case seems to occur when
@@ -297,6 +297,9 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                         # the default value.
                         value = bool(flag_undefined_default)
                         self._set_waffle_flag_metric(namespaced_flag_name, value)
+                        no_request_default_match = is_flag_active_for_everyone == value
+                        set_custom_metric('temp_flag_no_request_default_match_2', no_request_default_match)
+                        set_custom_metric('warn_flag_no_request_return_value', value)
                         return value
 
                 self._cached_flags[namespaced_flag_name] = value
