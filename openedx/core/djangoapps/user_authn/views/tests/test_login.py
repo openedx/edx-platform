@@ -30,7 +30,8 @@ from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MA
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.views.login import (
     AllowedAuthUser,
-    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
+    ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
+    _check_user_auth_flow
 )
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -784,6 +785,28 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
                             success=success
                         )
                         self.assertFalse(mock_check_user_auth_flow.called)
+
+    def test_check_user_auth_flow_bad_email(self):
+        """Regression Exception was thrown on missing @ char in TPA."""
+        provider = 'Google'
+        provider_tpa_hint = 'saml-test'
+        username = 'batman'
+        invalid_email_user = self._create_user(username, username)
+        allowed_domain = 'edx.org'
+        default_site_configuration_values = {
+            'SITE_NAME': allowed_domain,
+            'THIRD_PARTY_AUTH_ONLY_DOMAIN': allowed_domain,
+            'THIRD_PARTY_AUTH_ONLY_PROVIDER': provider,
+            'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
+        }
+
+        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(True):
+            site = self.set_up_site(allowed_domain, default_site_configuration_values)
+
+            with self.assertLogs(level='WARN') as log:
+                _check_user_auth_flow(site, invalid_email_user)
+                assert len(log.output) == 1
+                assert "Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check." in log.output[0]
 
 
 @ddt.ddt
