@@ -17,7 +17,6 @@ class BadgeModelTestCases(TestCase):
         Trying to save a Badge object with all the right arguments.
         """
         badge = Badge(name="Sample Badge",
-                      description="This is a sample badge",
                       threshold=30,
                       type=CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX],
                       image="path/to/image",
