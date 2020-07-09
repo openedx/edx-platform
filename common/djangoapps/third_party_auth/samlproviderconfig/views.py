@@ -18,7 +18,6 @@ from third_party_auth.samlutils.utils import fetch_enterprise_customer_by_id
 class SAMLProviderMixin(object):
     authentication_classes = [JwtAuthentication, SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
-    # queryset = SAMLProviderConfig.objects.all()
     serializer_class = SAMLProviderConfigSerializer
 
 
