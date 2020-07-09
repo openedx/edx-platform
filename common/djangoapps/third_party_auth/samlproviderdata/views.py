@@ -2,17 +2,16 @@
     Viewset for auth/saml/v0/samlproviderdata
 """
 
-from rest_framework import viewsets, permissions
-from rest_framework.authentication import SessionAuthentication
-
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-
 from enterprise.models import EnterpriseCustomerIdentityProvider
+from rest_framework import permissions, viewsets
+from rest_framework.authentication import SessionAuthentication
 
-from ..models import SAMLProviderData, SAMLProviderConfig
-from .serializers import SAMLProviderDataSerializer
 from third_party_auth.samlutils.utils import fetch_enterprise_customer_by_id
+
+from ..models import SAMLProviderConfig, SAMLProviderData
+from .serializers import SAMLProviderDataSerializer
 
 
 class SAMLProviderDataMixin(object):
