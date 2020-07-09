@@ -26,10 +26,8 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
 
     Usage:
         [HttpVerb] /auth/saml/v0/providerconfig/?enterprise-id=uuid
-    """
 
-    """
-    This string refers to the rule name defined in edx-rbac
+    permission_required refers to the rule name defined in edx-rbac
     That rule will allow rbac to check if the EnterpriseCustomer
     returned by the get_permission_object method here, can be
     accessed by the user making this request (request.user)
