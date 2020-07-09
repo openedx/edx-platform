@@ -10,7 +10,7 @@ from rest_framework.test import APITestCase
 
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer
 from enterprise.constants import ENTERPRISE_ADMIN_ROLE
-from third_party_auth.samlutils.utils import set_jwt_cookie
+from third_party_auth.tests.samlutils import set_jwt_cookie
 from third_party_auth.models import SAMLProviderConfig
 from third_party_auth.tests import testutil
 

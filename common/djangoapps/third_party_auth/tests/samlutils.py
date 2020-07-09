@@ -1,5 +1,5 @@
 """
-    Utility functions for use in SAMLProviderConfig, SAMLProviderData code and tests
+Utility functions for use in SAMLProviderConfig, SAMLProviderData tests
 """
 
 from edx_rest_framework_extensions.auth.jwt.cookies import jwt_cookie_name

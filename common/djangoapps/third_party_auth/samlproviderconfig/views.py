@@ -8,7 +8,7 @@ from enterprise.models import EnterpriseCustomerIdentityProvider
 from rest_framework import permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
 
-from third_party_auth.samlutils.utils import fetch_enterprise_customer_by_id
+from third_party_auth.tests.samlutils import fetch_enterprise_customer_by_id
 
 from ..models import SAMLProviderConfig
 from .serializers import SAMLProviderConfigSerializer
