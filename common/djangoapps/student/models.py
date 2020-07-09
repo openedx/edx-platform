@@ -244,17 +244,59 @@ def is_username_retired(username):
         raise
 
 
-def is_email_retired(email):
+def generate_retired_email_address(email, organization):
     """
-    Checks to see if the given email has been previously retired
+    Suffix the email with an unusable suffix with organization short_name.
+
+    This fixes issues with the APPSEMBLER_MULTI_TENANT_EMAILS and is_email_retired.
+
+    The double dot (..) suffix was chosen because it would break the send_email() and avoid allowing
+    account hijacking.
+
+    e.g. the email "omar@example.org" in blue-academy organization would become --> "omar@example.org..blue-academy"
+    """
+    retired_email = '{email}..{organization}'.format(
+        email=email,
+        organization=organization.short_name,
+    )
+    return retired_email
+
+
+def is_email_retired(email, organization=None, check_within_organization=True):
+    """
+    Checks to see if the given email has been previously retired.
+
+    :param email: The email to check for.
+    :param organization: Allow providing a pre-fetched organization.
+    :param check_within_organization: Whether to check within the organization,
+                                      set to `False` to disable the checks for all Mutli-Tenant Emails retired
+                                      accounts.
     """
     locally_hashed_emails = user_util.get_all_retired_emails(
         email,
         settings.RETIRED_USER_SALTS,
         settings.RETIRED_EMAIL_FMT
     )
+    # Before adding Multi-Tenant Emails support for is_email_retired about a hundred emails were retired without
+    # the organization added to them as a suffix using `generate_retired_email_address`.
+    # This is a piece of Tech Debt that will need to be addressed so this function is simplified into a single
+    # mode i.e. either multi-tenant or single-tenant but not both.
+    # But for now we're leaving this as-is.
+    # See related issue: https://appsembler.atlassian.net/browse/RED-1185
+    filter_args = Q(email__in=list(locally_hashed_emails))
 
-    return User.objects.filter(email__in=list(locally_hashed_emails)).exists()
+    if check_within_organization and settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+        if not organization:
+            organization = get_current_organization()
+        retired_email = generate_retired_email_address(email, organization)
+        locally_hashed_retired_emails = user_util.get_all_retired_emails(
+            retired_email,
+            settings.RETIRED_USER_SALTS,
+            settings.RETIRED_EMAIL_FMT
+        )
+        filter_args = filter_args | Q(email__in=list(locally_hashed_retired_emails))
+
+    return User.objects.filter(filter_args).exists()
 
 
 def email_exists_or_retired(email, check_for_new_site=False):
@@ -273,7 +315,8 @@ def email_exists_or_retired(email, check_for_new_site=False):
             exists = current_org.userorganizationmapping_set.filter(user__email=email).exists()
     else:
         exists = User.objects.filter(email=email).exists()
-    return exists or is_email_retired(email)
+    check_within_organization = not check_for_new_site  # Allow existing learners to spin their new Tahoe trial
+    return exists or is_email_retired(email, check_within_organization=check_within_organization)
 
 
 def get_retired_username_by_username(username):

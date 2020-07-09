@@ -10,6 +10,7 @@ from functools import wraps
 
 import pytz
 from consent.models import DataSharingConsent
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, logout
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -33,6 +34,7 @@ from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
 from entitlements.models import CourseEntitlement
+from openedx.core.djangoapps.appsembler.sites.utils import get_single_user_organization
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequest
@@ -58,6 +60,7 @@ from student.models import (
     get_potentially_retired_user_by_username,
     get_retired_email_by_email,
     get_retired_username_by_username,
+    generate_retired_email_address,
     is_username_retired
 )
 from student.views.login import AuthFailedError, LoginFailures
@@ -409,6 +412,10 @@ class DeactivateLogoutView(APIView):
     -  Log the user out
     - Create a row in the retirement table for that user
     """
+
+    # Dictionary key name to store unsuffixed email within user.profile.meta
+    APPSEMBLER_RETIREMENT_EMAIL_META_KEY = 'APPSEMBLER_RETIREMENT_EMAIL'
+
     authentication_classes = (SessionAuthentication, JwtAuthentication, )
     permission_classes = (permissions.IsAuthenticated, )
 
@@ -426,6 +433,8 @@ class DeactivateLogoutView(APIView):
             if verify_user_password_response.status_code != status.HTTP_204_NO_CONTENT:
                 return verify_user_password_response
             with transaction.atomic():
+                if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+                    self._retire_user_email_for_multi_tenancy(request.user)
                 UserRetirementStatus.create_retirement(request.user)
                 # Unlink LMS social auth accounts
                 UserSocialAuth.objects.filter(user_id=request.user.id).delete()
@@ -468,6 +477,37 @@ class DeactivateLogoutView(APIView):
             )
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _retire_user_email_for_multi_tenancy(self, user):
+        """
+        Suffix the user email with the organization for account retirement.
+
+        This fixes email collision issues when the APPSEMBLER_MULTI_TENANT_EMAILS feature
+        is enabled.
+
+        See the related decision document: https://appsembler.atlassian.net/l/c/QBcq0Mhu
+        """
+        profile = user.profile
+        meta = profile.get_meta()
+
+        organization = get_single_user_organization(user)
+
+        # Store the original email in the case of Account Deletion cancellation is needed
+        # This value will be removed when the pipeline is executed, so it won't
+        # degrade GDPR-compliance.
+        meta[self.APPSEMBLER_RETIREMENT_EMAIL_META_KEY] = user.email
+        profile.set_meta(meta)
+        profile.save()
+
+        retired_email = generate_retired_email_address(user.email, organization)
+
+        log.info(
+            'Multi-Tenant Emails retirement for username (%s): Retiring email (%s) to (%s)',
+            user.username, user.email, retired_email,
+        )
+
+        user.email = retired_email
+        user.save()
 
     def _verify_user_password(self, request):
         """

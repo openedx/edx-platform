@@ -69,6 +69,7 @@ DISABLE_UNENROLL_CERT_STATES = [
     'generating',
     'downloadable',
 ]
+EMAIL_EXISTS_MSG_FMT = _("An account with the Email '{email}' already exists.")
 USERNAME_EXISTS_MSG_FMT = _("An account with the Public Username '{username}' already exists.")
 
 

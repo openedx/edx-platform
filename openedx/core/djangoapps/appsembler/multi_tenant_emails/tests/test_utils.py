@@ -3,7 +3,6 @@ Tests utils for multi-tenant emails.
 """
 
 import contextlib
-from mock import patch
 
 from django.conf import settings
 from unittest import skipUnless
