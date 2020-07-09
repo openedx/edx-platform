@@ -22,6 +22,7 @@ from student.helpers import (
   DISABLE_UNENROLL_CERT_STATES,
 )
 from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
+from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 %>
 
 <%
@@ -455,15 +456,17 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
     DateUtilFactory.transform(iterationKey=".localized-datetime");
 </%static:require_module_async>
 
+% if UPSELL_TRACKING_FLAG.is_enabled():
+    <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+      if (window.loadedECommerceEvents === undefined) {
+        window.loadedECommerceEvents = true;
 
-<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
-  var link = $("#ecommerce_upgrade_link");
-  function trackEvent() {
-    TrackECommerceEvents.trackUpsellClick('course_dashboard_green', {
-      pageName: "course_dashboard",
-      linkType: "button",
-      linkCategory: "green_upgrade"
-    });
-  }
-  link.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackEvent);
-</%static:require_module_async>
+        TrackECommerceEvents.trackUpsellClick($("#ecommerce_upgrade_link"), 'course_dashboard_green', {
+          pageName: "course_dashboard",
+          linkType: "button",
+          linkCategory: "green_upgrade"
+        });
+      }
+
+    </%static:require_module_async>
+%endif

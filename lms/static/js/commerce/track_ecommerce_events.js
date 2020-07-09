@@ -6,7 +6,7 @@
 (function(define) {
     'use strict';
     define([], function() {
-        var trackUpsellClick = function(linkElement, linkName, optionalAttrs) {
+        var trackUpsellClick = function(elt, linkName, optionalAttrs) {
             var eventAttrs = {linkName: linkName};
             var allowedAttrs = ['linkType', 'pageName', 'linkCategory'];
             if (!window.analytics) {
@@ -22,9 +22,8 @@
                     eventAttrs[allowedAttr] = optionalAttrs[allowedAttr];
                 });
             }
-
-            console.log('eventAttrs', eventAttrs);
-            console.log('allowedAttrs', allowedAttrs);
+            
+            window.analytics.trackLink(elt, 'edx.bi.ecommerce.upsell_links_clicked', eventAttrs);
         };
 
         var TrackECommerceEvents = {trackUpsellClick: trackUpsellClick};
