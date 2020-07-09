@@ -1,6 +1,7 @@
 """
 Courseware views functions
 """
+import beeline
 import json
 import logging
 import urllib
@@ -475,6 +476,7 @@ class CourseTabView(EdxFragmentView):
     """
     View that displays a course tab page.
     """
+    @beeline.traced(name="CourseTabView.get")
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(ensure_valid_course_key)
     @method_decorator(data_sharing_consent_required)
@@ -587,6 +589,7 @@ class CourseTabView(EdxFragmentView):
         """
         return tab.uses_bootstrap
 
+    @beeline.traced(name="CourseTabView.create_page_context")
     def create_page_context(self, request, course=None, tab=None, **kwargs):
         """
         Creates the context for the fragment's template.
@@ -624,6 +627,7 @@ class CourseTabView(EdxFragmentView):
         )
         return context
 
+    @beeline.traced(name="CourseTabView.render_to_fragment")
     def render_to_fragment(self, request, course=None, page_context=None, **kwargs):
         """
         Renders the course tab to a fragment.
@@ -631,6 +635,7 @@ class CourseTabView(EdxFragmentView):
         tab = page_context['tab']
         return tab.render_to_fragment(request, course, **kwargs)
 
+    @beeline.traced(name="CourseTabView.render_standalone_response")
     def render_standalone_response(self, request, fragment, course=None, tab=None, page_context=None, **kwargs):
         """
         Renders this course tab's fragment to HTML for a standalone page.
@@ -645,6 +650,7 @@ class CourseTabView(EdxFragmentView):
             return render_to_response('courseware/tab-view-v2.html', page_context)
 
 
+@beeline.traced(name="courseware.views.syllabus")
 @ensure_csrf_cookie
 @ensure_valid_course_key
 def syllabus(request, course_id):
@@ -913,6 +919,7 @@ def progress(request, course_id, student_id=None):
         return _progress(request, course_key, student_id)
 
 
+@beeline.traced(name="courseware.views._progress")
 def _progress(request, course_key, student_id):
     """
     Unwrapped version of "progress".

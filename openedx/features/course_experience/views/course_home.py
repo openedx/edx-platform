@@ -2,6 +2,7 @@
 Views for the course home page.
 """
 
+import beeline
 from django.urls import reverse
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
@@ -46,6 +47,7 @@ class CourseHomeView(CourseTabView):
     """
     The home page for a course.
     """
+    @beeline.traced(name="CourseHomeView.get")
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)

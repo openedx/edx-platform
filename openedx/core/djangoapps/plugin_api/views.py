@@ -2,6 +2,7 @@
 Views for building plugins.
 """
 
+import beeline
 import logging
 
 from django.conf import settings
@@ -115,6 +116,7 @@ class EdxFragmentView(FragmentView):
         """
         return None
 
+    @beeline.traced(name="EdxFragmentView.render_standalone_response")
     def render_standalone_response(self, request, fragment, **kwargs):
         """
         Renders a standalone page for the specified fragment.
