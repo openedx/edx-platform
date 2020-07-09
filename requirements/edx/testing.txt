@@ -7,7 +7,6 @@
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock  # via -r requirements/edx/base.txt
 -e common/lib/capa  # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail  # via -r requirements/edx/base.txt
--e git+https://github.com/jsocol/django-ratelimit.git@72edbe8949fbf6699848e5847645a1998f121d46#egg=ratelimit  # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/django-wiki.git@0.0.27#egg=django-wiki  # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/DoneXBlock.git@2.0.2#egg=done-xblock  # via -r requirements/edx/base.txt
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme  # via -r requirements/edx/base.txt
@@ -81,6 +80,7 @@ django-object-actions==2.0.0  # via -r requirements/edx/base.txt, edx-enterprise
 django-pipeline==1.7.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 django-pyfs==2.2          # via -r requirements/edx/base.txt
 django-ratelimit-backend==2.0  # via -r requirements/edx/base.txt
+django-ratelimit==3.0.0   # via -r requirements/edx/base.txt
 django-require==1.0.11    # via -r requirements/edx/base.txt
 django-sekizai==1.1.0     # via -r requirements/edx/base.txt, django-wiki
 django-ses==0.8.14        # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
