@@ -98,7 +98,7 @@ from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
 from .component import ADVANCED_COMPONENT_TYPES, _get_item_in_course
-from .item import create_xblock_info, _update_with_callback, _save_xblock
+from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED, get_library_creator_status
 
 log = logging.getLogger(__name__)
@@ -311,7 +311,7 @@ def _update_children_in_module_store(xblock, user):
         modulestore().update_item(child, user.id)
         for grand_child in child.get_children():
             _update_children_in_module_store(grand_child, user)
-    
+
     modulestore().update_item(xblock, user.id)
 
 
@@ -353,25 +353,24 @@ def toggle_discussion_enabled(request, key_string=None):
         elif request.method == "POST":
             value = request.json.get("value", discussion_enabled)
             course.set_discussion_toggle(value)
-            _update_children_in_module_store(course, request.user) # Persist update in children
+            _update_children_in_module_store(course, request.user)  # Persist update in children
 
     elif usage_key:
         try:
             course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
             is_vertical = hasattr(xblock, "discussion_enabled")
             is_sequential = hasattr(xblock, "get_discussion_toggle_status")
-            
+
             if not is_vertical and not is_sequential:
                 return HttpResponseBadRequest()
         except ItemNotFoundError:
             return HttpResponseBadRequest()
         else:
             discussion_enabled = xblock.discussion_enabled if is_vertical else xblock.get_discussion_toggle_status()
-            
 
             if request.method == "GET":
                 return JsonResponse({
-                'discussion_enabled': discussion_enabled,
+                    'discussion_enabled': discussion_enabled,
                 })
             elif request.method == "POST":
                 value = request.json.get("value", discussion_enabled)

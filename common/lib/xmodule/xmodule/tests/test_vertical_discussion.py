@@ -13,6 +13,7 @@ from .test_course_module import DummySystem as DummyImportSystem
 ORG = 'test_org'
 COURSE = 'test_course'
 
+
 class DiscussionTest(unittest.TestCase):
     """
     Discussion Tests
@@ -55,7 +56,7 @@ class DiscussionTest(unittest.TestCase):
             </chapter>
         </course>""".format(org=ORG, course=COURSE)
         return self.system.process_xml(course_xml)
-    
+
     def patch_self_with_course_elements(self, element_root, indexes=None):
         """
         It recursively adds chapters, section, verticals, blocks to self for easier access starting from element_root
@@ -139,7 +140,6 @@ class DiscussionTest(unittest.TestCase):
         # discussion_enabled flag as True
         self.assertEqual(self.chapter_1.get_discussion_toggle_status(), "enabled")
 
-
     def test_sequence_enable_get_verticals_enable(self):
         """
         Tests that when a sequence discussion is enable then discussion of all the verticals of that sequence is also
@@ -183,7 +183,7 @@ class DiscussionTest(unittest.TestCase):
         self.assertTrue(self.vertical_3_1_1.discussion_enabled)
         self.assertTrue(self.vertical_3_1_2.discussion_enabled)
         self.assertTrue(self.vertical_3_1_3.discussion_enabled)
-    
+
     def test_course_level_discussion_disable_already_enabled_discussion_in_children(self):
         self.chapter_3.set_discussion_toggle(True)
 

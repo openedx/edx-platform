@@ -7,6 +7,7 @@ from xmodule.modulestore.django import modulestore
 import json
 import mock
 
+
 class TestDiscussionEnabledAPI(CourseTestCase):
     def setUp(self):
         super(TestDiscussionEnabledAPI, self).setUp()
@@ -23,86 +24,81 @@ class TestDiscussionEnabledAPI(CourseTestCase):
             modulestore=self.store
         )
         self.chapter_1 = ItemFactory(
-            parent_location = self.course.location,
-            category = "chapter",
-            display_name = "Chapter 1",
+            parent_location=self.course.location,
+            category="chapter",
+            display_name="Chapter 1",
             modulestore=self.store
         )
         self.chapter_2 = ItemFactory(
-            parent_location = self.course.location,
-            category = "chapter",
-            display_name = "Chapter 2",
+            parent_location=self.course.location,
+            category="chapter",
+            display_name="Chapter 2",
             modulestore=self.store
         )
         self.chapter_3 = ItemFactory(
-            parent_location = self.course.location,
-            category = "chapter",
-            display_name = "Chapter 3",
+            parent_location=self.course.location,
+            category="chapter",
+            display_name="Chapter 3",
             modulestore=self.store
         )
         self.chapter_4 = ItemFactory(
-            parent_location = self.course.location,
-            category = "chapter",
-            display_name = "Chapter 4",
+            parent_location=self.course.location,
+            category="chapter",
+            display_name="Chapter 4",
             modulestore=self.store
         )
-        
+
         self.sequential_1_1 = ItemFactory(
-            parent_location = self.chapter_1.location,
-            category = "sequential",
-            display_name = "Sequential 1.1",
+            parent_location=self.chapter_1.location,
+            category="sequential",
+            display_name="Sequential 1.1",
             modulestore=self.store
         )
         self.sequential_1_2 = ItemFactory(
-            parent_location = self.chapter_1.location,
-            category = "sequential",
-            display_name = "Sequential 1.2",
+            parent_location=self.chapter_1.location,
+            category="sequential",
+            display_name="Sequential 1.2",
             modulestore=self.store
         )
-        
         self.sequential_3_1 = ItemFactory(
-            parent_location = self.chapter_3.location,
-            category = "sequential",
-            display_name = "Sequential 3.1",
+            parent_location=self.chapter_3.location,
+            category="sequential",
+            display_name="Sequential 3.1",
             modulestore=self.store
         )
-        
         self.sequential_4_1 = ItemFactory(
-            parent_location = self.chapter_4.location,
-            category = "sequential",
-            display_name = "Sequential 4.1",
+            parent_location=self.chapter_4.location,
+            category="sequential",
+            display_name="Sequential 4.1",
             modulestore=self.store
         )
-        
+
         self.vertical_3_1_1 = ItemFactory(
-            parent_location = self.sequential_3_1.location,
-            category = "vertical",
-            display_name = "Vertical 3.1.1",
+            parent_location=self.sequential_3_1.location,
+            category="vertical",
+            display_name="Vertical 3.1.1",
             modulestore=self.store
         )
-        
         self.vertical_3_1_2 = ItemFactory(
-            parent_location = self.sequential_3_1.location,
-            category = "vertical",
-            display_name = "Vertical 3.1.2",
+            parent_location=self.sequential_3_1.location,
+            category="vertical",
+            display_name="Vertical 3.1.2",
             modulestore=self.store
         )
-        
         self.vertical_3_1_3 = ItemFactory(
-            parent_location = self.sequential_3_1.location,
-            category = "vertical",
-            display_name = "Vertical 3.1.3",
+            parent_location=self.sequential_3_1.location,
+            category="vertical",
+            display_name="Vertical 3.1.3",
             modulestore=self.store
         )
-        
         self.vertical_4_1_1 = ItemFactory(
-            parent_location = self.sequential_4_1.location,
-            category = "vertical",
-            display_name = "Vertical 4.1.1",
+            parent_location=self.sequential_4_1.location,
+            category="vertical",
+            display_name="Vertical 4.1.1",
             modulestore=self.store
         )
         return self.course
-    
+
     def get_discussion_enabled_status(self, xblock, client=None):
         client = client if client is not None else self.client
         url = reverse_url("toggle_discussion_enabled", 'key_string', xblock.location)
@@ -123,7 +119,7 @@ class TestDiscussionEnabledAPI(CourseTestCase):
             content_type="application/json",
         )
         return resp
-    
+
     def test_verticals_disable_initially(self):
         """
         Tests that when a vertical is created then by default discussion is disabled.
@@ -202,7 +198,7 @@ class TestDiscussionEnabledAPI(CourseTestCase):
         enable.
         """
         self.set_discussion_enabled_status(self.sequential_3_1, True)
-        
+
         self.assertTrue(self.get_discussion_enabled_status(self.vertical_3_1_1))
         self.assertTrue(self.get_discussion_enabled_status(self.vertical_3_1_2))
         self.assertTrue(self.get_discussion_enabled_status(self.vertical_3_1_3))
@@ -219,7 +215,7 @@ class TestDiscussionEnabledAPI(CourseTestCase):
         self.assertTrue(self.get_discussion_enabled_status(self.vertical_3_1_1))
         self.assertTrue(self.get_discussion_enabled_status(self.vertical_3_1_2))
         self.assertTrue(self.get_discussion_enabled_status(self.vertical_3_1_3))
-        
+
         self.set_discussion_enabled_status(self.course, False)
 
         self.assertEqual(self.get_discussion_enabled_status(self.chapter_3), "disabled")

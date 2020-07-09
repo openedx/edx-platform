@@ -818,7 +818,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
                 # This else-case covers subsection block
                 child_statuses += child._get_children_discussion_toggle_status()
         return child_statuses
-    
+
     def set_discussion_toggle(self, value):
         # NOTE: Make sure to use modulestore.update_item() after calling this
         # method on every children.
