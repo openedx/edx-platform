@@ -151,7 +151,7 @@ def get_credential_certificates(user):
 
 
 def get_philu_certificate_social_context(course, certificate):
-    custom_settings = get_course_custom_settings(certificate.course_id)
+    custom_settings = get_course_custom_settings(course.id)
     meta_tags = custom_settings.get_course_meta_tags()
 
     tweet_text = TWITTER_TWEET_TEXT_FMT.format(
@@ -213,13 +213,13 @@ def get_pdfkit_html(image_base64):
     return PDFKIT_HTML_STRING.format(image_tag=PDFKIT_IMAGE_TAG.format(base64_img=image_base64))
 
 
-def override_update_certificate_context(request, context, course, user_certificate):
+def override_update_certificate_context(request, context, course, user_certificate, preview_mode=None):
     """
     This method adds custom context to the certificate
     :return: Updated context
     """
     border = request.GET.get('border', None)
-    if border and border == 'hide':
+    if (border and border == 'hide') or preview_mode:
         context['border_class'] = 'certificate-border-hide'
     else:
         context['border_class'] = ''
