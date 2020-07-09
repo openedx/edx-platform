@@ -32,7 +32,3 @@ def set_jwt_cookie(client, user, role_context_pairs=None):
     """
     jwt_token = _jwt_token_from_role_context_pairs(user, role_context_pairs or [])
     client.cookies[jwt_cookie_name()] = jwt_token
-
-
-def fetch_enterprise_customer_by_id(enterprise_uuid):
-    return EnterpriseCustomer.objects.get(uuid=enterprise_uuid)
