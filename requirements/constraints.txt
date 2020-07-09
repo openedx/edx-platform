@@ -13,15 +13,8 @@
 # (although it is advertised in the changelog as 3.1.26.)
 celery>=3.1.25,<4.0.0
 
-# Constrain until https://github.com/datadriventests/ddt/issues/83 is fixed.
-ddt<1.4.0
-
 # Stay on the latest LTS release of Django
 Django<2.3
-
-# 0.6.0 has a missing dependency declaration on ua-parser: https://github.com/jotes/django-cookies-samesite/issues/25
-# 0.6.1 throws on some requests from iOS app: https://github.com/jotes/django-cookies-samesite/issues/28
-django-cookies-samesite<0.6.0
 
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
@@ -29,8 +22,14 @@ django-cors-headers<3.0.0
 # It seems like django-countries > 5.5 may cause performance issues for us.
 django-countries==5.5
 
+# Removes deprecated get_ip function, which we still use (ARCHBOM-1329 for unpinning)
+django-ipware<3.0.0
+
 # 2.0.0 dropped support for Python 3.5
 django-pipeline<2.0.0
+
+# 1.0.0 currently causes an AttributeError that is under investigation: https://github.com/django-ses/django-ses/issues/186
+django-ses==0.8.14
 
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
@@ -40,6 +39,11 @@ drf-yasg<1.17.1
 
 # drf-jwt 1.15.0 contains a migration that breaks on MySQL: https://github.com/Styria-Digital/django-rest-framework-jwt/issues/40
 drf-jwt==1.14.0
+
+# The team that owns this package will manually bump this package rather than having it pulled in automatically.
+# This is to allow them to better control its deployment and to do it in a process that works better
+# for them.
+edx-enterprise==3.3.17
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
@@ -105,3 +109,9 @@ zipp==1.0.0
 
 # Matplotlib 3.1 requires Python 3.6
 matplotlib<3.1
+
+# numpy 1.19 requires Python 3.6
+numpy<1.19
+
+# scipy 1.5 equires Python 3.6
+scipy<1.5

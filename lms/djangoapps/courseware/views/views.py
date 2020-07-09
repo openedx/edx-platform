@@ -27,6 +27,7 @@ from django.utils.http import urlquote_plus
 from django.utils.text import slugify
 from django.utils.translation import ugettext
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_noop
 from django.views.decorators.cache import cache_control
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -308,7 +309,16 @@ def load_metadata_from_youtube(video_id, request):
         yt_timeout = settings.YOUTUBE.get('TEST_TIMEOUT', 1500) / 1000  # converting milli seconds to seconds
 
         headers = {}
-        http_referer = request.META.get('HTTP_REFERER')
+        http_referer = None
+
+        try:
+            # This raises an attribute error if called from the xblock yt_video_metadata handler, which passes
+            # a webob request instead of a django request.
+            http_referer = request.META.get('HTTP_REFERER')
+        except AttributeError:
+            # So here, let's assume it's a webob request and access the referer the webob way.
+            http_referer = request.referer
+
         if http_referer:
             headers['Referer'] = http_referer
 
@@ -1050,6 +1060,14 @@ def dates(request, course_id):
         )
         request.user = masquerade_user
 
+    user_is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
+    user_is_staff = has_access(request.user, 'staff', course_key)
+
+    # Render the full content to enrolled users, as well as to course and global staff.
+    # Unenrolled users who are not course or global staff are redirected to the Outline Tab.
+    if not user_is_enrolled and not user_is_staff:
+        raise CourseAccessRedirect(reverse('openedx.course_experience.course_home', args=[course_id]))
+
     course_date_blocks = get_course_date_blocks(course, request.user, request,
                                                 include_access=True, include_past_dates=True)
 
@@ -1713,13 +1731,11 @@ def _get_fa_header(header):
                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)).split('\n')
 
 
-FA_INCOME_LABEL = _('Annual Household Income')
-FA_REASON_FOR_APPLYING_LABEL = 'Tell us about your current financial situation. Why do you need assistance?'
-FA_GOALS_LABEL = 'Tell us about your learning or professional goals. How will a Verified Certificate in ' \
-                 'this course help you achieve these goals?'
+FA_INCOME_LABEL = ugettext_noop('Annual Household Income')
+FA_REASON_FOR_APPLYING_LABEL = ugettext_noop('Tell us about your current financial situation. Why do you need assistance?')
+FA_GOALS_LABEL = ugettext_noop('Tell us about your learning or professional goals. How will a Verified Certificate in this course help you achieve these goals?')
 
-FA_EFFORT_LABEL = 'Tell us about your plans for this course. What steps will you take to help you complete ' \
-                  'the course work and receive a certificate?'
+FA_EFFORT_LABEL = ugettext_noop('Tell us about your plans for this course. What steps will you take to help you complete the course work and receive a certificate?')
 
 FA_SHORT_ANSWER_INSTRUCTIONS = _('Use between 1250 and 2500 characters or so in your response.')
 
@@ -1782,7 +1798,7 @@ def financial_assistance_request(request):
             ('Username', username),
             ('Full Name', legal_name),
             ('Course ID', course_id),
-            ('Annual Household Income', income),
+            (FA_INCOME_LABEL, income),
             ('Country', country),
             ('Allowed for marketing purposes', 'Yes' if marketing_permission else 'No'),
             (FA_REASON_FOR_APPLYING_LABEL, '\n' + reason_for_applying + '\n\n'),
@@ -1843,7 +1859,7 @@ def financial_assistance_form(request):
             {
                 'name': 'income',
                 'type': 'select',
-                'label': FA_INCOME_LABEL,
+                'label': _(FA_INCOME_LABEL),
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1853,7 +1869,7 @@ def financial_assistance_form(request):
             {
                 'name': 'reason_for_applying',
                 'type': 'textarea',
-                'label': _(FA_REASON_FOR_APPLYING_LABEL),  # pylint: disable=translation-of-non-string
+                'label': _(FA_REASON_FOR_APPLYING_LABEL),
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1866,7 +1882,7 @@ def financial_assistance_form(request):
             {
                 'name': 'goals',
                 'type': 'textarea',
-                'label': _(FA_GOALS_LABEL),  # pylint: disable=translation-of-non-string
+                'label': _(FA_GOALS_LABEL),
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,
@@ -1879,7 +1895,7 @@ def financial_assistance_form(request):
             {
                 'name': 'effort',
                 'type': 'textarea',
-                'label': _(FA_EFFORT_LABEL),  # pylint: disable=translation-of-non-string
+                'label': _(FA_EFFORT_LABEL),
                 'placeholder': '',
                 'defaultValue': '',
                 'required': True,

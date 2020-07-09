@@ -2926,7 +2926,10 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file}, user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response_text['errors'][0], 'Team {} is full.'.format(team1))
+        self.assertEqual(
+            response_text['errors'][0],
+            'New membership for team {} would exceed max size of {}.'.format(team1, 3)
+        )
 
     def test_deletion_via_upload_csv(self):
         # create a team membership that will be used further down
@@ -3077,3 +3080,28 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             [user.username for user in team.users.all()],
             [user_name]
         )
+
+    def test_upload_assign_masters_learner_to_non_protected_team(self):
+        """
+        Scenario: Attempt to add a learner enrolled in masters track to an existing, non-org protected team.
+        Outcome: Must fail
+        """
+        masters_a = 'masters_a'
+        team = self.wind_team
+        self.create_and_enroll_student(username=masters_a, mode=CourseMode.MASTERS)
+        csv_content = 'user,mode,{}'.format(team.topic_id) + '\n'
+        csv_content += 'masters_a, masters,{}'.format(team.name)
+        csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
+        self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
+
+        response = self.make_call(
+            reverse('team_membership_bulk_management', args=[self.good_course_id]),
+            400, method='post',
+            data={'csv': csv_file},
+            user='staff'
+        )
+        response_text = json.loads(response.content.decode('utf-8'))
+        expected_message = 'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(
+            team.name
+        )
+        self.assertEqual(response_text['errors'][0], expected_message)

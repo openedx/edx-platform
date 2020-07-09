@@ -6,7 +6,9 @@ Tests for vertical module.
 
 
 from collections import namedtuple
+from datetime import datetime, timedelta
 import json
+import pytz
 import six
 
 import ddt
@@ -67,6 +69,11 @@ class StubCompletionService(object):
     def blocks_to_mark_complete_on_view(self, blocks):
         return {} if self._completion_value == 1.0 else blocks
 
+    def vertical_is_complete(self, item):
+        if item.scope_ids.block_type != 'vertical':
+            raise ValueError('The passed in xblock is not a vertical type!')
+        return self._completion_value
+
 
 class BaseVerticalBlockTest(XModuleXmlImportTest):
     """
@@ -120,18 +127,24 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
 
     @ddt.unpack
     @ddt.data(
-        {'context': None, 'view': STUDENT_VIEW},
-        {'context': {}, 'view': STUDENT_VIEW},
-        {'context': {}, 'view': PUBLIC_VIEW},
+        {'context': None, 'view': STUDENT_VIEW, 'completion_value': 0.0, 'days': 1},
+        {'context': {}, 'view': STUDENT_VIEW, 'completion_value': 0.0, 'days': 1},
+        {'context': {}, 'view': PUBLIC_VIEW, 'completion_value': 0.0, 'days': 1},
+        {'context': {'format': 'Quiz'}, 'view': STUDENT_VIEW, 'completion_value': 1.0, 'days': 1},  # completed
+        {'context': {'format': 'Exam'}, 'view': STUDENT_VIEW, 'completion_value': 0.0, 'days': 1},  # upcoming
+        {'context': {'format': 'Homework'}, 'view': STUDENT_VIEW, 'completion_value': 0.0, 'days': -1},  # past due
     )
-    def test_render_student_preview_view(self, context, view):
+    def test_render_student_preview_view(self, context, view, completion_value, days):
         """
         Test the rendering of the student and public view.
         """
         self.module_system._services['bookmarks'] = Mock()
+        now = datetime.now(pytz.UTC)
+        self.vertical.due = now + timedelta(days=days)
         if view == STUDENT_VIEW:
             self.module_system._services['user'] = StubUserService()
-            self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0.0)
+            self.module_system._services['completion'] = StubCompletionService(enabled=True,
+                                                                               completion_value=completion_value)
         elif view == PUBLIC_VIEW:
             self.module_system._services['user'] = StubUserService(is_anonymous=True)
 
@@ -140,10 +153,16 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         ).content
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)
+        self.assertIn("'due': datetime.datetime({year}, {month}, {day}".format(
+            year=self.vertical.due.year, month=self.vertical.due.month, day=self.vertical.due.day), html)
         if view == STUDENT_VIEW:
             self.assert_bookmark_info(self.assertIn, html)
         else:
             self.assert_bookmark_info(self.assertNotIn, html)
+        if context:
+            self.assertIn("'subsection_format': '{}'".format(context['format']), html)
+            self.assertIn("'completed': {}".format(completion_value), html)
+            self.assertIn("'past_due': {}".format(self.vertical.due < now), html)
 
     @ddt.unpack
     @ddt.data(
@@ -163,7 +182,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
                 completion_value=completion_value,
             )
             self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context)
-            if (mark_completed_enabled):
+            if mark_completed_enabled:
                 self.assertEqual(
                     mock_student_view.call_args[0][1]['wrap_xblock_data']['mark-completed-on-view-after-delay'], 9876
                 )

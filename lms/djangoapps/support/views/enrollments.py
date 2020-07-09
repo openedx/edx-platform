@@ -188,7 +188,7 @@ class EnrollmentSupportListView(GenericAPIView):
         course_modes = CourseMode.modes_for_course(
             course_key,
             include_expired=True,
-            exclude_credit=False
+            only_selectable=False,
         )
         return [
             ModeSerializer(mode).data

@@ -110,7 +110,6 @@ def generate_already_running_error_message(task_type):
         'profile_info_csv': _('enrolled learner profile'),
         'may_enroll_info_csv': _('enrollment'),
         'detailed_enrollment_report': _('detailed enrollment'),
-        'exec_summary_report': _('executive summary'),
         'course_survey_report': _('survey'),
         'proctored_exam_results_report': _('proctored exam results'),
         'export_ora2_data': _('ORA data'),

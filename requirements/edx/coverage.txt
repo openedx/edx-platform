@@ -4,9 +4,9 @@
 #
 #    make upgrade
 #
-coverage==5.1             # via -r requirements/edx/coverage.in
+coverage==5.2             # via -r requirements/edx/coverage.in
 diff-cover==3.0.1         # via -r requirements/edx/coverage.in
-importlib-metadata==1.6.1  # via inflect, pluggy
+importlib-metadata==1.7.0  # via inflect, pluggy
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.11.2            # via diff-cover, jinja2-pluralize

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-14 20:49+0000\n"
-"PO-Revision-Date: 2020-06-14 20:50:09.210426\n"
+"POT-Creation-Date: 2020-07-05 20:50+0000\n"
+"PO-Revision-Date: 2020-07-05 20:50:23.560748\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2961,6 +2961,12 @@ msgstr ""
 "بهري ش فثشو فخ تخهر, {create_span_start}ذقثشفث ش رثص فثشو هر فاهس "
 "فخحهذ{span_end}."
 
+#: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
+msgid ""
+"An error occurred while looking up team membership. Try refreshing the page."
+msgstr ""
+"شر ثققخق خذذعققثي صاهمث مخخنهرل عح فثشو وثوزثقساهح. فقغ قثبقثساهرل فاث حشلث."
+
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
 msgid "All topics"
 msgstr "شمم فخحهذس"
@@ -5552,6 +5558,10 @@ msgstr "غثس, شممخص ثيهفس فخ فاث شذفهدث ذثقفهبهذ�
 msgid "certificate"
 msgstr "ذثقفهبهذشفث"
 
+#: cms/static/js/certificates/views/certificate_preview.js
+msgid "Deactivating"
+msgstr "يثشذفهدشفهرل"
+
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
 msgstr "سثف عح غخعق ذثقفهبهذشفث"
@@ -5563,8 +5573,8 @@ msgid "You have not created any certificates yet."
 msgstr "غخع اشدث رخف ذقثشفثي شرغ ذثقفهبهذشفثس غثف."
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
-msgstr "يثمثفث \"<%= signatoryName %>\" بقخو فاث مهسف خب سهلرشفخقهثس?"
+msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
+msgstr "يثمثفث \"<%- signatoryName %>\" بقخو فاث مهسف خب سهلرشفخقهثس?"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js

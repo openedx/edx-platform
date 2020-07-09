@@ -13,7 +13,10 @@ define([
         });
 
         mockGetTopic = function(topicId) {
-            return $.Deferred().resolve(TeamSpecHelpers.createMockTopic({id: topicId}));
+            return $.Deferred().resolve(TeamSpecHelpers.createMockTopic({
+                id: topicId,
+                name: 'teamset-name-' + topicId,
+            }));
         };
 
         createMyTeamsView = function(myTeams) {
@@ -77,6 +80,12 @@ define([
                 }
             );
             AjaxHelpers.respondWithJson(requests, {});
+        });
+
+        it('sets showTeamsetOnTeamCards on child Teams view', function() {
+            var teams = TeamSpecHelpers.createMockTeams({results: []}),
+                myTeamsView = createMyTeamsView(teams);
+            TeamSpecHelpers.verifyCards(myTeamsView, [], true);
         });
     });
 });

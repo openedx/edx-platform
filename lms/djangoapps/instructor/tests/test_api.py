@@ -22,10 +22,9 @@ from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
-from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
-from edx_when.api import get_overrides_for_user
+from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from mock import Mock, NonCallableMock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
@@ -120,12 +119,6 @@ REPORTS_DATA = (
         'extra_instructor_api_kwargs': {'csv': '/csv'}
     },
     {
-        'report_type': 'detailed enrollment',
-        'instructor_api_endpoint': 'get_enrollment_report',
-        'task_api_endpoint': 'lms.djangoapps.instructor_task.api.submit_detailed_enrollment_features_csv',
-        'extra_instructor_api_kwargs': {}
-    },
-    {
         'report_type': 'enrollment',
         'instructor_api_endpoint': 'get_students_who_may_enroll',
         'task_api_endpoint': 'lms.djangoapps.instructor_task.api.submit_calculate_may_enroll_csv',
@@ -145,17 +138,6 @@ REPORTS_DATA = (
     }
 )
 
-# ddt data for test cases involving executive summary report
-EXECUTIVE_SUMMARY_DATA = (
-    {
-        'report_type': 'executive summary',
-        'task_type': 'exec_summary_report',
-        'instructor_api_endpoint': 'get_exec_summary_report',
-        'task_api_endpoint': 'lms.djangoapps.instructor_task.api.submit_executive_summary_report',
-        'extra_instructor_api_kwargs': {}
-    },
-)
-
 
 INSTRUCTOR_GET_ENDPOINTS = set([
     'get_anon_ids',
@@ -167,8 +149,6 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'calculate_grades_csv',
     'change_due_date',
     'export_ora2_data',
-    'get_enrollment_report',
-    'get_exec_summary_report',
     'get_grading_config',
     'get_problem_responses',
     'get_proctored_exam_results',
@@ -444,9 +424,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('list_report_downloads', {}),
             ('calculate_grades_csv', {}),
             ('get_students_features', {}),
-            ('get_enrollment_report', {}),
             ('get_students_who_may_enroll', {}),
-            ('get_exec_summary_report', {}),
             ('get_proctored_exam_results', {}),
             ('get_problem_responses', {}),
             ('export_ora2_data', {}),
@@ -2876,50 +2854,6 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 response = self.client.post(url, {})
                 self.assertContains(response, success_status)
 
-    @ddt.data(*EXECUTIVE_SUMMARY_DATA)
-    @ddt.unpack
-    def test_executive_summary_report_success(
-            self,
-            report_type,
-            task_type,
-            instructor_api_endpoint,
-            task_api_endpoint,
-            extra_instructor_api_kwargs
-    ):  # pylint: disable=unused-argument
-        kwargs = {'course_id': text_type(self.course.id)}
-        kwargs.update(extra_instructor_api_kwargs)
-        url = reverse(instructor_api_endpoint, kwargs=kwargs)
-
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        with patch(task_api_endpoint):
-            response = self.client.post(url, {})
-        success_status = u"The {report_type} report is being created." \
-                         " To view the status of the report, see Pending" \
-                         " Tasks below".format(report_type=report_type)
-        self.assertContains(response, success_status)
-
-    @ddt.data(*EXECUTIVE_SUMMARY_DATA)
-    @ddt.unpack
-    def test_executive_summary_report_already_running(
-            self,
-            report_type,
-            task_type,
-            instructor_api_endpoint,
-            task_api_endpoint,
-            extra_instructor_api_kwargs
-    ):
-        kwargs = {'course_id': text_type(self.course.id)}
-        kwargs.update(extra_instructor_api_kwargs)
-        url = reverse(instructor_api_endpoint, kwargs=kwargs)
-
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        already_running_status = generate_already_running_error_message(task_type)
-        with patch(task_api_endpoint) as mock:
-            mock.side_effect = AlreadyRunningError(already_running_status)
-            response = self.client.post(url, {})
-
-        self.assertContains(response, already_running_status, status_code=400)
-
     def test_get_ora2_responses_success(self):
         url = reverse('export_ora2_data', kwargs={'course_id': text_type(self.course.id)})
 
@@ -3901,9 +3835,16 @@ def get_extended_due(course, unit, user):
     for override in dates:
         if text_type(override['location']) == location:
             return override['actual_date']
-    print(unit.location)
-    print(dates)
     return None
+
+
+def get_date_for_block(course, unit, user):
+    """
+    Gets the due date for the given user on the given unit (overridden or original).
+    Returns `None` if there is no date set.
+    (Differs from edx-when's get_date_for_block only in that we skip the cache.
+    """
+    return get_dates_for_course(course.id, user=user, use_cached=False).get((unit.location, 'due'), None)
 
 
 class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -4041,6 +3982,28 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             self.due,
             get_extended_due(self.course, self.week1, self.user1)
         )
+
+    @RELATIVE_DATES_FLAG.override(True)
+    def test_reset_date_only_in_edx_when(self):
+        # Start with a unit that only has a date in edx-when
+        self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), None)
+        original_due = datetime.datetime(2010, 4, 1, tzinfo=UTC)
+        set_date_for_block(self.course.id, self.week3.location, 'due', original_due)
+        self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), original_due)
+
+        # set override, confirm it took
+        override = datetime.datetime(2010, 7, 1, tzinfo=UTC)
+        set_date_for_block(self.course.id, self.week3.location, 'due', override, user=self.user1)
+        self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), override)
+
+        # Now test that we noticed the edx-when date
+        url = reverse('reset_due_date', kwargs={'course_id': text_type(self.course.id)})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': text_type(self.week3.location),
+        })
+        self.assertContains(response, 'Successfully reset due date for student')
+        self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), original_due)
 
     def test_show_unit_extensions(self):
         self.test_change_due_date()

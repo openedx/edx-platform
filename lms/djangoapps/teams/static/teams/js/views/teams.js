@@ -24,6 +24,7 @@
                     router: options.router,
                     courseMaxTeamSize: this.context.courseMaxTeamSize,
                     srInfo: this.srInfo,
+                    showTeamset: options.showTeamset,
                     countries: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries),
                     languages: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages),
                     getTopic: function(topicId) { return view.getTopic(topicId); }

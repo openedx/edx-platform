@@ -6,6 +6,7 @@ This file contains utility functions which will responsible for sending emails.
 import logging
 import os
 import uuid
+import html
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
@@ -106,8 +107,7 @@ def send_credit_notifications(username, course_key):
                 cur_text = cur_file.read()
                 # use html parser to unescape html characters which are changed
                 # by the 'pynliner' while adding inline css to html content
-                html_parser = six.moves.html_parser.HTMLParser()
-                email_body_content = html_parser.unescape(with_inline_css(cur_text))
+                email_body_content = html.unescape(with_inline_css(cur_text))
                 # cache the email body content before rendering it since the
                 # email context will change for each user e.g., 'full_name'
                 cache.set('credit.email.css-email-body', email_body_content, settings.CREDIT_NOTIFICATION_CACHE_TIMEOUT)

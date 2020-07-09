@@ -148,8 +148,7 @@ class ContentTypeGatingPartitionScheme(object):
         """
         Returns the Group for the specified user.
         """
-        if not ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=course_key,
-                                                              user_partition=user_partition):
+        if not ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=course_key):
             return FULL_ACCESS
         else:
             return LIMITED_ACCESS

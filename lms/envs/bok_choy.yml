@@ -211,9 +211,8 @@ MODULESTORE:
         NAME: xml
         OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_module.HiddenDescriptor}
 # We need to test different scenarios, following setting effectively disbale rate limiting
-PASSWORD_RESET_EMAIL_RATE_LIMIT:
-  no_of_emails: 1
-  per_seconds: 1
+PASSWORD_RESET_IP_RATE: '1/s'
+PASSWORD_RESET_EMAIL_RATE: '1/s'
 PASSWORD_RESET_SUPPORT_LINK: https://support.example.com/password-reset-help.html
 REGISTRATION_EXTENSION_FORM: openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm
 REGISTRATION_EXTRA_FIELDS: {city: hidden, country: required, gender: optional, goals: optional,
@@ -237,7 +236,7 @@ TECH_SUPPORT_EMAIL: technical@example.com
 THIRD_PARTY_AUTH_BACKENDS: [social_core.backends.google.GoogleOAuth2, social_core.backends.linkedin.LinkedinOAuth2,
   social_core.backends.facebook.FacebookOAuth2, third_party_auth.dummy.DummyBackend,
   third_party_auth.saml.SAMLAuthBackend]
-THIRD_PARTY_AUTH: 
+THIRD_PARTY_AUTH:
   Google:
     SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test"
     SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test"

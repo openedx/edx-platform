@@ -502,6 +502,7 @@ def _has_group_access(descriptor, user, course_key):
     # If missing_groups is empty, the user is granted access.
     # If missing_groups is NOT empty, we generate an error based on one of the particular groups they are missing.
     missing_groups = []
+    block_key = descriptor.scope_ids.usage_id
     for partition, groups in partition_groups:
         user_group = partition.scheme.get_group_for_user(
             course_key,
@@ -509,17 +510,25 @@ def _has_group_access(descriptor, user, course_key):
             partition,
         )
         if user_group not in groups:
-            missing_groups.append((partition, user_group, groups))
+            missing_groups.append((
+                partition,
+                user_group,
+                groups,
+                partition.access_denied_message(block_key, user, user_group, groups),
+                partition.access_denied_fragment(descriptor, user, user_group, groups),
+            ))
 
     if missing_groups:
-        partition, user_group, allowed_groups = missing_groups[0]
-        block_key = descriptor.scope_ids.usage_id
+        # Prefer groups with explanatory messages
+        # False < True, so the default order and `is None` results in groups with messages coming first
+        ordered_groups = sorted(missing_groups, key=lambda details: (details[3] is None, details[4] is None))
+        partition, user_group, allowed_groups, message, fragment = ordered_groups[0]
         return IncorrectPartitionGroupError(
             partition=partition,
             user_group=user_group,
             allowed_groups=allowed_groups,
-            user_message=partition.access_denied_message(block_key, user, user_group, allowed_groups),
-            user_fragment=partition.access_denied_fragment(descriptor, user, user_group, allowed_groups),
+            user_message=message,
+            user_fragment=fragment,
         )
 
     # all checks passed.

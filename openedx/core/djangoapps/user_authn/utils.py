@@ -58,3 +58,12 @@ def generate_password(length=12, chars=string.ascii_letters + string.digits):
     password += choice(string.ascii_letters)
     password += ''.join([choice(chars) for _i in range(length - 2)])
     return password
+
+
+def is_registration_api_v1(request):
+    """
+    Checks if registration api is v1
+    :param request:
+    :return: Bool
+    """
+    return 'v1' in request.get_full_path() and 'register' not in request.get_full_path()

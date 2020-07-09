@@ -4,18 +4,24 @@ Tests courseware views.py
 """
 
 
+import html
 import itertools
 import json
 import unittest
 from datetime import datetime, timedelta
-from pytz import utc
 from uuid import uuid4
 
-import crum
-import ddt
 import six
+from markupsafe import escape
+from mock import MagicMock, PropertyMock, call, create_autospec, patch
+from pytz import UTC, utc
+from six import text_type
+from six.moves import range
+from six.moves.urllib.parse import quote, urlencode
+
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
+import ddt
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponseBadRequest
@@ -24,32 +30,17 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse, reverse_lazy
 from freezegun import freeze_time
-from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import MagicMock, PropertyMock, call, create_autospec, patch
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from pytz import UTC
-from six import text_type
-from six.moves import range
-from six.moves.html_parser import HTMLParser
-from six.moves.urllib.parse import quote, urlencode
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
-
 import lms.djangoapps.courseware.views.views as views
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
-from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
-from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, RequestFactoryNoCsrf, StudentModuleFactory
-from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
-from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
-from lms.djangoapps.courseware.url_helpers import get_redirect_url
-from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -59,17 +50,23 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
+from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
+from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
+from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, RequestFactoryNoCsrf, StudentModuleFactory
+from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
+from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
-    REDIRECT_TO_COURSEWARE_MICROFRONTEND,
+    REDIRECT_TO_COURSEWARE_MICROFRONTEND
 )
-from lms.djangoapps.courseware.url_helpers import get_microfrontend_url
+from lms.djangoapps.courseware.url_helpers import get_microfrontend_url, get_redirect_url
+from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
-from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -100,7 +97,6 @@ from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_P
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
@@ -272,8 +268,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 167),
-        (ModuleStoreEnum.Type.split, 4, 165),
+        (ModuleStoreEnum.Type.mongo, 10, 170),
+        (ModuleStoreEnum.Type.split, 4, 166),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -694,7 +690,7 @@ class ViewsTestCase(BaseViewsTestCase):
             'location': six.text_type(usage_key),
         })
         response = self.client.get(url)
-        response_content = HTMLParser().unescape(response.content.decode('utf-8'))
+        response_content = html.unescape(response.content.decode('utf-8'))
 
         # We have update the state 4 times: twice to change content, and twice
         # to set the scores. We'll check that the identifying content from each is
@@ -1438,8 +1434,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 54),
-        (False, 53),
+        (True, 52),
+        (False, 51),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1452,8 +1448,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 62, 40),
-        (True, 53, 35)
+        (False, 60, 41),
+        (True, 51, 36)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1632,7 +1628,8 @@ class ProgressPageTests(ProgressPageBaseTests):
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
-        add_course_mode(self.course, upgrade_deadline_expired=False)
+        add_course_mode(self.course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(self.course)
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
 
         response = self._get_progress_page()
@@ -2811,7 +2808,8 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         """
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
-        add_course_mode(self.course, upgrade_deadline_expired=False)
+        add_course_mode(self.course, mode_slug=CourseMode.AUDIT)
+        add_course_mode(self.course)
         response = self.client.get(
             reverse(
                 'courseware_section',

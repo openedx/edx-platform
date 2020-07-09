@@ -8,20 +8,17 @@ Many of these GETs may become PUTs in the future.
 
 
 import csv
-import decimal
 import json
 import logging
 import random
 import re
 import string
-import time
 
 import six
 import unicodecsv
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied, ValidationError
-from django.core.mail.message import EmailMessage
 from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
@@ -35,13 +32,14 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from six import StringIO, text_type
+from six import text_type
 from six.moves import map, range
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
@@ -51,7 +49,6 @@ import instructor_analytics.distributions
 from bulk_email.api import is_bulk_email_feature_enabled
 from bulk_email.models import CourseEmail
 from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_string
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateInvalidation,
@@ -93,7 +90,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
@@ -1059,37 +1056,6 @@ def get_grading_config(request, course_id):
     return JsonResponse(response_payload)
 
 
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-def get_sale_records(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
-    """
-    return the summary of all sales records for a particular course
-    """
-    course_id = CourseKey.from_string(course_id)
-    query_features = [
-        'company_name', 'company_contact_name', 'company_contact_email', 'total_codes', 'total_used_codes',
-        'total_amount', 'created', 'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by',
-        'internal_reference', 'invoice_number', 'codes', 'course_id'
-    ]
-
-    sale_data = instructor_analytics.basic.sale_record_features(course_id, query_features)
-
-    if not csv:
-        for item in sale_data:
-            item['created_by'] = item['created_by'].username
-
-        response_payload = {
-            'course_id': text_type(course_id),
-            'sale': sale_data,
-            'queried_features': query_features
-        }
-        return JsonResponse(response_payload)
-    else:
-        header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("e-commerce_sale_invoice_records.csv", header, datarows)
-
-
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -1344,44 +1310,6 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
         except (FileValidationException, ValueError) as e:
             raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'failed-validation')
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ENROLLMENT_REPORT)
-@require_finance_admin
-@common_exceptions_400
-def get_enrollment_report(request, course_id):
-    """
-    get the enrollment report for the particular course.
-    """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('detailed enrollment')
-    task_api.submit_detailed_enrollment_features_csv(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-
-    return JsonResponse({"status": success_status})
-
-
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ENROLLMENT_REPORT)
-@require_finance_admin
-@common_exceptions_400
-def get_exec_summary_report(request, course_id):
-    """
-    get the executive summary report for the particular course.
-    """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('executive summary')
-    task_api.submit_executive_summary_report(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-
-    return JsonResponse({"status": success_status})
 
 
 @transaction.non_atomic_requests
@@ -2408,14 +2336,16 @@ def reset_due_date(request, course_id):
     unit = find_unit(course, request.POST.get('url'))
     reason = strip_tags(request.POST.get('reason', ''))
 
+    original_due_date = get_date_for_block(course_id, unit.location)
+
     set_due_date_extension(course, unit, student, None, request.user, reason=reason)
-    if not getattr(unit, "due", None):
+    if not original_due_date:
         # It's possible the normal due date was deleted after an extension was granted:
         return JsonResponse(
             _("Successfully removed invalid due date extension (unit has no due date).")
         )
 
-    original_due_date_str = unit.due.strftime(u'%Y-%m-%d %H:%M')
+    original_due_date_str = original_due_date.strftime(u'%Y-%m-%d %H:%M')
     return JsonResponse(_(
         u'Successfully reset due date for student {0} for {1} '
         u'to {2}').format(student.profile.name, _display_unit(unit),

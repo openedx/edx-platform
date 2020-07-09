@@ -79,15 +79,11 @@ def fail_on_eslint(*args, **kwargs):
             return
 
 
-def fail_on_npm_install(*args, **kwargs):  # pylint: disable=unused-argument
+def fail_on_npm_install():
     """
-    For our tests, we need the call for diff-quality running pycodestyle reports to fail, since that is what
-    is going to fail when we pass in a percentage ("p") requirement.
+    Used to simulate an error when executing "npm install"
     """
-    if ["npm", "install", "--verbose"] == args[0]:
-        raise BuildFailure('Subprocess return code: 1')
-    else:
-        return
+    return 1
 
 
 def unexpected_fail_on_npm_install(*args, **kwargs):  # pylint: disable=unused-argument

@@ -34,8 +34,6 @@ from lms.djangoapps.instructor_task.tasks import (
     cohort_students,
     course_survey_report_csv,
     delete_problem_state,
-    enrollment_report_features_csv,
-    exec_summary_report_csv,
     export_ora2_data,
     generate_certificates,
     override_problem_score,
@@ -377,20 +375,6 @@ def submit_calculate_students_features_csv(request, course_key, features):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_detailed_enrollment_features_csv(request, course_key):
-    """
-    Submits a task to generate a CSV containing detailed enrollment info.
-
-    Raises AlreadyRunningError if said CSV is already being updated.
-    """
-    task_type = 'detailed_enrollment_report'
-    task_class = enrollment_report_features_csv
-    task_input = {}
-    task_key = ""
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
 def submit_calculate_may_enroll_csv(request, course_key, features):
     """
     Submits a task to generate a CSV file containing information about
@@ -401,20 +385,6 @@ def submit_calculate_may_enroll_csv(request, course_key, features):
     task_type = 'may_enroll_info_csv'
     task_class = calculate_may_enroll_csv
     task_input = {'features': features}
-    task_key = ""
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
-def submit_executive_summary_report(request, course_key):
-    """
-    Submits a task to generate a HTML File containing the executive summary report.
-
-    Raises AlreadyRunningError if HTML File is already being updated.
-    """
-    task_type = 'exec_summary_report'
-    task_class = exec_summary_report_csv
-    task_input = {}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

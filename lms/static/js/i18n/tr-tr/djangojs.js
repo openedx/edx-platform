@@ -595,7 +595,6 @@
     "Default (Local Time Zone)": "Varsay\u0131lan (Yerel Zaman Dilimi)",
     "Default Timed Transcript": "Varsay\u0131lan Zamanlar\u0131 \u0130\u015faretlenmi\u015f Altyaz\u0131",
     "Delete": "Sil",
-    "Delete \"<%= signatoryName %>\" from the list of signatories?": "\u0130mza sahipleri listesinden \"<%= signatoryName %>\" sil?",
     "Delete File Confirmation": "Dosya Onay\u0131n\u0131 Kald\u0131r",
     "Delete My Account": "Hesab\u0131m\u0131 Sil",
     "Delete Page Confirmation": "Sayfa Onay\u0131n\u0131 Kald\u0131r",

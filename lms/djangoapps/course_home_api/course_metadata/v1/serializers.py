@@ -36,3 +36,4 @@ class CourseHomeMetadataSerializer(serializers.Serializer):
     tabs = CourseTabSerializer(many=True)
     title = serializers.CharField()
     is_self_paced = serializers.BooleanField()
+    is_enrolled = serializers.BooleanField()

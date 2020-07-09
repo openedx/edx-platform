@@ -25,21 +25,3 @@ HIDE_ACCESS_DENIALS_FLAG = WaffleFlag(
     flag_name=u'hide_access_denials',
     flag_undefined_default=False
 )
-
-# Waffle course override to rewrite video URLs for videos that have encodings available.
-# .. toggle_name: course_blocks_api.enable_video_url_rewrite
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Controlled rollout for video URL re-write utility to serve videos from edX CDN.
-# .. toggle_category: course api
-# .. toggle_use_cases: monitored_rollout
-# .. toggle_creation_date: 2019-09-24
-# .. toggle_expiration_date: ??
-# .. toggle_warnings: None
-# .. toggle_tickets: PROD-62
-# .. toggle_status: supported
-ENABLE_VIDEO_URL_REWRITE = CourseWaffleFlag(
-    waffle_namespace=COURSE_BLOCKS_API_NAMESPACE,
-    flag_name="enable_video_url_rewrite",
-    flag_undefined_default=True
-)

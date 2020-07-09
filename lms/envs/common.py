@@ -531,10 +531,6 @@ SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
 # Maximum of 6 retries before giving up.
 SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
 
-PASSWORD_RESET_EMAIL_RATE_LIMIT = {
-    'no_of_emails': 1,
-    'per_seconds': 60
-}
 RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
 # Deadline message configurations
 COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
@@ -2596,7 +2592,7 @@ REST_FRAMEWORK = {
     'URL_FORMAT_OVERRIDE': None,
     'DEFAULT_THROTTLE_RATES': {
         'user': '60/minute',
-        'service_user': '120/minute',
+        'service_user': '800/minute',
         'registration_validation': '30/minute',
     },
 }
@@ -3357,7 +3353,8 @@ ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
-COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
+COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
+COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
@@ -3774,7 +3771,11 @@ RATELIMIT_ENABLE = True
 RATELIMIT_RATE = '120/m'
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
-LOGISTRATION_RATELIMIT_RATE = '500/5m'
+LOGISTRATION_RATELIMIT_RATE = '100/5m'
+
+##### PASSWORD RESET RATE LIMIT SETTINGS #####
+PASSWORD_RESET_IP_RATE = '1/m'
+PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 ############### Settings for Retirement #####################
 RETIRED_USERNAME_PREFIX = 'retired__user_'
