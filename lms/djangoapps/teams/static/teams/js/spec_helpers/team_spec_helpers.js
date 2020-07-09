@@ -280,7 +280,7 @@ define([
     };
 
     createMockPrivateTopic = function(options) {
-        return new TopicModel(_.extend(
+        return _.extend(
             {
                 id: testPrivateTopicID,
                 name: 'Test Private Topic 1',
@@ -288,7 +288,7 @@ define([
                 type: 'private_managed'
             },
             options
-        ));
+        );
     };
 
     testContext = {

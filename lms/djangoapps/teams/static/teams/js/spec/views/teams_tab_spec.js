@@ -388,38 +388,11 @@ define([
             it('does not show a search box in private team-sets for non-privileged users', function() {
                 teamsTabView = createTeamsTabView({
                     topics: {
-                        count: 1,
-                        num_pages: 1,
-                        current_page: 1,
-                        start: 0,
-                        results: {
-                            id: TeamSpecHelpers.testPrivateTopicID,
-                            name: 'Test Private Topic 1',
-                            description: 'Test private topic description 1',
-                            type: 'private_managed',
-                            team_count: 0
-                        }
+                        results: TeamSpecHelpers.createMockPrivateTopic()
                     },
-                    hasOpenTopic: false,
-                    hasManagedTopic: true,
                     userInfo: TeamSpecHelpers.createMockUserInfo({
                         privileged: false,
-                        staff: false,
-                        team_memberships_data: {
-                            user: {username: TeamSpecHelpers.testUser},
-                            team: [
-                                {
-                                    name: 'team',
-                                    id: 'id',
-                                    language: 'en',
-                                    country: ['US'],
-                                    membership: [],
-                                    last_activity_at: '',
-                                    topic_id: 'topic_id',
-                                    url: 'api/team/v0/teams/id'
-                                }
-                            ]
-                        }
+                        staff: false
                     })
                 });
 
@@ -438,38 +411,11 @@ define([
             it('shows a search box in private team-sets for privileged users', function() {
                 teamsTabView = createTeamsTabView({
                     topics: {
-                        count: 1,
-                        num_pages: 1,
-                        current_page: 1,
-                        start: 0,
-                        results: {
-                            id: TeamSpecHelpers.testPrivateTopicID,
-                            name: 'Test Private Topic 1',
-                            description: 'Test private topic description 1',
-                            type: 'private_managed',
-                            team_count: 0
-                        }
+                        results: TeamSpecHelpers.createMockPrivateTopic()
                     },
-                    hasOpenTopic: false,
-                    hasManagedTopic: true,
                     userInfo: TeamSpecHelpers.createMockUserInfo({
                         privileged: true,
-                        staff: true,
-                        team_memberships_data: {
-                            user: {username: TeamSpecHelpers.testUser},
-                            team: [
-                                {
-                                    name: 'team',
-                                    id: 'id',
-                                    language: 'en',
-                                    country: ['US'],
-                                    membership: [],
-                                    last_activity_at: '',
-                                    topic_id: 'topic_id',
-                                    url: 'api/team/v0/teams/id'
-                                }
-                            ]
-                        }
+                        staff: true
                     })
                 });
 
