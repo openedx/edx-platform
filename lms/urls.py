@@ -120,6 +120,9 @@ urlpatterns = [
     url(r'^api/entitlements/', include(('entitlements.rest_api.urls', 'common.djangoapps.entitlements'),
                                        namespace='entitlements_api')),
 
+    # Demographics API RESTful endpoints
+    url(r'^api/demographics/', include('openedx.core.djangoapps.demographics.rest_api.urls')),
+
     # Courseware search endpoints
     url(r'^search/', include('search.urls')),
 

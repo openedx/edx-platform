@@ -88,6 +88,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.schedules.apps.SchedulesConfig',
     'openedx.core.djangoapps.theming.apps.ThemingConfig',
     'openedx.core.djangoapps.external_user_ids',
+    'openedx.core.djangoapps.demographics',
 
     'experiments',
     'openedx.features.content_type_gating',
