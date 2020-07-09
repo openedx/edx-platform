@@ -306,12 +306,20 @@ def course_rerun_handler(request, course_key_string):
             })
 
 
+def _update_children_in_module_store(xblock, user):
+    for child in xblock.get_children():
+        modulestore().update_item(child, user.id)
+        for grand_child in child.get_children():
+            _update_children_in_module_store(grand_child, user)
+    
+    modulestore().update_item(xblock, user.id)
+
+
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST"))
 @expect_json
 def toggle_discussion_enabled(request, key_string=None):
-    # NOTE: Work in Progress.
     course_key, usage_key = None, None
 
     try:
@@ -321,40 +329,31 @@ def toggle_discussion_enabled(request, key_string=None):
         try:
             course_key = CourseKey.from_string(key_string)
         except InvalidKeyError:
-            return JsonResponse({
-                "Message": "Not Found",
-                "key": key_string, 
-            })
             raise Http404
-        
+
     if course_key:
+        # You may think that it should only be necessary for the POST request handlers
+        # but we are using _get_item_in_course() to get the xblock in case the key_string
+        # represents a non-course block and it (_get_item_in_course()) requires that the user
+        # have the course author access.
+        if not has_course_author_access(request.user, course_key):
+            raise PermissionDenied()
+
         course = modulestore().get_course(course_key)
+
         if not course:
-            return JsonResponse({
-                "Message": "Not Found",
-                "key": key_string, 
-            })
             raise Http404
-        
+
         discussion_enabled = course.get_discussion_toggle_status()
-        
+
         if request.method == "GET":
-            return JsonResponse({'discussion_enabled': discussion_enabled})
+            return JsonResponse({
+                'discussion_enabled': discussion_enabled,
+            })
         elif request.method == "POST":
             value = request.json.get("value", discussion_enabled)
             course.set_discussion_toggle(value)
-            
-            # Persist update in children
-            for chapter in course.get_children():
-                modulestore().update_item(chapter, request.user.id)
-                for section in chapter.get_children():
-                    modulestore().update_item(section, request.user.id)
-                    for vertical in section.get_children():
-                        modulestore().update_item(vertical, request.user.id)
-
-            modulestore().update_item(course, request.user.id)
-
-            return JsonResponse({"user_message": _("Discussion toggle has been successfully updated.")}, status=200)
+            _update_children_in_module_store(course, request.user) # Persist update in children
 
     elif usage_key:
         try:
@@ -368,11 +367,11 @@ def toggle_discussion_enabled(request, key_string=None):
             return HttpResponseBadRequest()
         else:
             discussion_enabled = xblock.discussion_enabled if is_vertical else xblock.get_discussion_toggle_status()
+            
 
             if request.method == "GET":
                 return JsonResponse({
-                    'discussion_enabled': discussion_enabled,
-                    'message': str(xblock._get_children_discussion_toggle_status()),
+                'discussion_enabled': discussion_enabled,
                 })
             elif request.method == "POST":
                 value = request.json.get("value", discussion_enabled)
@@ -382,16 +381,9 @@ def toggle_discussion_enabled(request, key_string=None):
                 elif is_sequential:
                     xblock.set_discussion_toggle(value)
 
-                    # Persist update in children
-                    for child in xblock.get_children():
-                        modulestore().update_item(child, request.user.id)
-                        for grand_child in child.get_children():  # This loop would cover the verticals
-                            modulestore().update_item(grand_child, request.user.id)
+                _update_children_in_module_store(xblock, request.user)
 
-                # Persist the current xblock itself
-                modulestore().update_item(xblock, request.user.id)
-
-                return JsonResponse({"user_message": _("Discussion toggle has been successfully updated.")}, status=200)
+    return JsonResponse({"user_message": _("Discussion toggle has been successfully updated.")})
 
 
 @login_required
