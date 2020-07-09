@@ -32,38 +32,53 @@ ENTERPRISE_ID = str(uuid4())
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class SAMLProviderConfigTests(APITestCase):
     """
-        API Tests for SAMLProviderConfig REST endpoints
+    API Tests for SAMLProviderConfig REST endpoints
+    The skip annotation above exists because we currently cannot run this test in
+    the cms mode in CI builds, where the third_party_auth application is not loaded
     """
-    def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpwd')
-        self.site, _ = Site.objects.get_or_create(domain='example.com')
-        self.enterprise_customer = EnterpriseCustomer.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        super(SAMLProviderConfigTests, cls).setUpTestData()
+        cls.user = User.objects.create_user(username='testuser', password='testpwd')
+        cls.site, _ = Site.objects.get_or_create(domain='example.com')
+        cls.enterprise_customer = EnterpriseCustomer.objects.create(
             uuid=ENTERPRISE_ID,
             name='test-ep',
             slug='test-ep',
-            site=self.site)
-        self.samlproviderconfig, _ = SAMLProviderConfig.objects.get_or_create(
+            site=cls.site)
+        cls.samlproviderconfig, _ = SAMLProviderConfig.objects.get_or_create(
             entity_id=SINGLE_PROVIDER_CONFIG['entity_id'],
             metadata_source=SINGLE_PROVIDER_CONFIG['metadata_source']
         )
-        self.enterprisecustomeridp, _ = EnterpriseCustomerIdentityProvider.objects.get_or_create(
-            provider_id=self.samlproviderconfig.id,
+        cls.enterprisecustomeridp, _ = EnterpriseCustomerIdentityProvider.objects.get_or_create(
+            provider_id=cls.samlproviderconfig.id,
             enterprise_customer_id=ENTERPRISE_ID
         )
+
+    def setUp(self):
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, ENTERPRISE_ID)])
         self.client.force_authenticate(user=self.user)
 
     def test_get_one_config_by_enterprise_uuid_found(self):
-        # GET auth/saml/v0/providerconfig/?enterprise_customer_uuid=id=id
+        """
+        GET auth/saml/v0/providerconfig/?enterprise_customer_uuid=id=id
+        """
         urlbase = reverse('samlproviderconfig-list')
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        print(response.data)
+        results = response.data['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['entity_id'], SINGLE_PROVIDER_CONFIG['entity_id'])
+        self.assertEqual(results[0]['metadata_source'], SINGLE_PROVIDER_CONFIG['metadata_source'])
         self.assertEqual(SAMLProviderConfig.objects.count(), 1)
 
     def test_create_one_config(self):
-        # POST auth/saml/v0/providerconfig/?enterprise_customer_uuid=id -d data
+        """
+        POST auth/saml/v0/providerconfig/?enterprise_customer_uuid=id -d data
+        """
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
         url = '{}?{}'.format(reverse('samlproviderconfig-list'), urlencode(query_kwargs))
         data = SINGLE_PROVIDER_CONFIG_2

@@ -27,8 +27,9 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
     Usage:
         [HttpVerb] /auth/saml/v0/providerconfig/?enterprise-id=uuid
 
-    permission_required refers to the rule name defined in edx-rbac
-    That rule will allow rbac to check if the EnterpriseCustomer
+    permission_required refers to the Django permission name defined
+    in enterprise.rules.
+    The associated rule will allow edx-rbac to check if the EnterpriseCustomer
     returned by the get_permission_object method here, can be
     accessed by the user making this request (request.user)
     Access is only allowed if the user has the system role

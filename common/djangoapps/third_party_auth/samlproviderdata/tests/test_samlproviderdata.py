@@ -46,30 +46,32 @@ class SAMLProviderDataTests(APITestCase):
     """
         API Tests for SAMLProviderConfig REST endpoints
     """
-
-    def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpwd')
-        self.site, _ = Site.objects.get_or_create(domain='example.com')
-        self.enterprise_customer = EnterpriseCustomer.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        super(SAMLProviderDataTests, cls).setUpTestData()
+        cls.user = User.objects.create_user(username='testuser', password='testpwd')
+        cls.site, _ = Site.objects.get_or_create(domain='example.com')
+        cls.enterprise_customer = EnterpriseCustomer.objects.create(
             uuid=ENTERPRISE_ID,
             name='test-ep',
             slug='test-ep',
-            site=self.site)
-        self.samlproviderconfig, _ = SAMLProviderConfig.objects.get_or_create(
+            site=cls.site)
+        cls.samlproviderconfig, _ = SAMLProviderConfig.objects.get_or_create(
             entity_id=SINGLE_PROVIDER_CONFIG['entity_id'],
             metadata_source=SINGLE_PROVIDER_CONFIG['metadata_source']
         )
         # the entity_id here must match that of the samlproviderconfig
-        self.samlproviderdata, _ = SAMLProviderData.objects.get_or_create(
+        cls.samlproviderdata, _ = SAMLProviderData.objects.get_or_create(
             entity_id=SINGLE_DATA_CONFIG['entity_id'],
             sso_url=SINGLE_DATA_CONFIG['sso_url'],
             fetched_at=SINGLE_DATA_CONFIG['fetched_at']
         )
-        self.enterprisecustomeridp, _ = EnterpriseCustomerIdentityProvider.objects.get_or_create(
-            provider_id=self.samlproviderconfig.id,
+        cls.enterprisecustomeridp, _ = EnterpriseCustomerIdentityProvider.objects.get_or_create(
+            provider_id=cls.samlproviderconfig.id,
             enterprise_customer_id=ENTERPRISE_ID
         )
 
+    def setUp(self):
         # a cookie with roles: [{enterprise_admin_role: ent_id}] will be
         # needed to rbac to authorize access for this view
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, ENTERPRISE_ID)])

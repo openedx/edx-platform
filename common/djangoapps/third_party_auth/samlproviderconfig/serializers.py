@@ -1,5 +1,5 @@
 """
-    Serializer for SAMLProviderConfig
+Serializer for SAMLProviderConfig
 """
 
 from rest_framework import serializers
