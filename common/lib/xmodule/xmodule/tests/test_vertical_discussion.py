@@ -31,6 +31,9 @@ class DiscussionTest(unittest.TestCase):
         self.patch_self_with_course_elements(self.course)
 
     def get_dummy_course(self):
+        """
+        Create and return a dummy course
+        """
         # TODO: Add a vertical with some children in it e.g HTML Block, ORA Block, DnD Block etc.
         # It won't work if there is a child block in it.
         course_xml = """

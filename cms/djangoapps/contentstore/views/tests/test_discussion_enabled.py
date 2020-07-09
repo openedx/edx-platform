@@ -1,3 +1,6 @@
+"""
+Test API functionality responsible for set/get of discussion_enabled flag for course and other xblocks
+"""
 import json
 
 from contentstore.tests.utils import CourseTestCase
@@ -6,12 +9,18 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestDiscussionEnabledAPI(CourseTestCase):
+    """
+    Test API functionality responsible for set/get of discussion_enabled flag for course and other xblocks
+    """
     def setUp(self):
         super(TestDiscussionEnabledAPI, self).setUp()
         self.course = self.get_dummy_course()
         self.course.save()
 
     def get_dummy_course(self):
+        """
+        Create and return a dummy course
+        """
         ORG, NUMBER, NAME, RUN = "ABKUni", "CS101", "Introduction to CS", "2020_T2"
         self.course = CourseFactory(
             org=ORG,
@@ -97,6 +106,9 @@ class TestDiscussionEnabledAPI(CourseTestCase):
         return self.course
 
     def get_discussion_enabled_status(self, xblock, client=None):
+        """
+        Issue a GET request to fetch value of param:xblock's discussion_enabled flag
+        """
         client = client if client is not None else self.client
         url = reverse_url("toggle_discussion_enabled", 'key_string', xblock.location)
         resp = client.get(url, HTTP_ACCEPT="application/json")
@@ -105,6 +117,9 @@ class TestDiscussionEnabledAPI(CourseTestCase):
         return discussion_enabled
 
     def set_discussion_enabled_status(self, xblock, value, client=None):
+        """
+        Issue a POST request to update value of param:xblock's discussion_enabled flag
+        """
         client = client if client is not None else self.client
         xblock_location = xblock.id if xblock.category == "course" else xblock.location
 

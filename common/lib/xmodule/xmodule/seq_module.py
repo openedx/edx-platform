@@ -808,7 +808,10 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
 
         return xblock_body
 
-    def _get_children_discussion_toggle_status(self) -> list:
+    def get_children_discussion_toggle_status(self) -> list:
+        """
+        Return a list containing value of discussion_enabled flag of children of current sequential
+        """
         child_statuses = []
         for child in self.get_children():
             if hasattr(child, "discussion_enabled"):
@@ -816,12 +819,16 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
                 child_statuses.append(child.discussion_enabled)
             else:
                 # This else-case covers subsection block
-                child_statuses += child._get_children_discussion_toggle_status()
+                child_statuses += child.get_children_discussion_toggle_status()
         return child_statuses
 
     def set_discussion_toggle(self, value):
-        # NOTE: Make sure to use modulestore.update_item() after calling this
-        # method on every children.
+        """
+        Recursively set all children's discussion_enabled flag to param:value
+
+        NOTE: Make sure to use modulestore.update_item() after calling this method on every children.
+        """
+
         for child in self.get_children():
             # Child of a section would be subsection
             if hasattr(child, "set_discussion_toggle"):
@@ -831,7 +838,14 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
                 child.discussion_enabled = value
 
     def get_discussion_toggle_status(self):
-        child_statuses = self._get_children_discussion_toggle_status()
+        """
+        Return a single value representing summary of discussion_enabled flag for children
+        Possible Return Values:
+            * enabled
+            * disabled
+            * partially_enabled
+        """
+        child_statuses = self.get_children_discussion_toggle_status()
 
         if all(child_statuses):
             # All child statuses are True

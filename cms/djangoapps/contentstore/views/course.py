@@ -307,6 +307,9 @@ def course_rerun_handler(request, course_key_string):
 
 
 def _update_children_in_module_store(xblock, user):
+    """
+    Recursively update all children of given xblock in modulestore
+    """
     for child in xblock.get_children():
         modulestore().update_item(child, user.id)
         for grand_child in child.get_children():
@@ -320,6 +323,19 @@ def _update_children_in_module_store(xblock, user):
 @require_http_methods(("GET", "POST"))
 @expect_json
 def toggle_discussion_enabled(request, key_string=None):
+    """
+    A view to get/set discussion_enabled flag and to use related methods
+
+    GET:
+        json: Return discussion_enabled flag value.
+    POST:
+        json: Return a message indicating that the discussion_enabled flag is updated.
+
+    It can throw the following errors:
+    * 404 Page Not Found Error: If the provided key_string does not represent existing block or course.
+    * 403 Forbidden Error: If the logged in user does not have course authoring access for course
+        represented by key_string
+    """
     course_key, usage_key = None, None
 
     try:
