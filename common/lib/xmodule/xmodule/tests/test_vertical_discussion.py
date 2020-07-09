@@ -34,7 +34,7 @@ class DiscussionTest(unittest.TestCase):
         # TODO: Add a vertical with some children in it e.g HTML Block, ORA Block, DnD Block etc.
         # It won't work if there is a child block in it.
         course_xml = """
-        <course course="{course}" org="{org}" not_a_pointer="true" 
+        <course course="{course}" org="{org}" not_a_pointer="true"
         static_asset_path="xml_test_course" url_name="0" name="101">
             <chapter not_a_pointer="true" url_name="1">
                 <sequential not_a_pointer="true" url_name="5"/>

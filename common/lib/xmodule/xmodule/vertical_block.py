@@ -49,7 +49,7 @@ class VerticalFields(object):
 @XBlock.wants('completion')
 class VerticalBlock(
     VerticalFields, SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock
-    ):
+):
     """
     Layout XBlock for rendering subblocks vertically.
     """
