@@ -4,10 +4,10 @@
 
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from enterprise.models import EnterpriseCustomerIdentityProvider
 from rest_framework import permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
 
+from enterprise.models import EnterpriseCustomerIdentityProvider
 from openedx.features.enterprise_support.utils import fetch_enterprise_customer_by_id
 
 from ..models import SAMLProviderConfig, SAMLProviderData
