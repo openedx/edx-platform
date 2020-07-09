@@ -30,6 +30,8 @@ Consequences
 
 * We will need to implement one of the alternate solutions for each flag currently using ``flag_undefined_default=True``, and then finally remove the deprecated ``flag_undefined_default`` argument.
 
+UPDATE: This work has been completed and ``flag_undefined_default`` has been removed.
+
 Rejected Alternatives
 =====================
 

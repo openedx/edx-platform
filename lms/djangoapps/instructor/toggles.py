@@ -22,7 +22,6 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='instructor')
 OPTIMISED_IS_SMALL_COURSE = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='optimised_is_small_course',
-    flag_undefined_default=False
 )
 
 

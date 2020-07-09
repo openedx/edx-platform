@@ -27,11 +27,9 @@ def waffle_flags():
         ENABLE_DEVSTACK_VIDEO_UPLOADS: WaffleFlag(
             waffle_namespace=namespace,
             flag_name=ENABLE_DEVSTACK_VIDEO_UPLOADS,
-            flag_undefined_default=False
         ),
         ENABLE_VEM_PIPELINE: CourseWaffleFlag(
             waffle_namespace=namespace,
             flag_name=ENABLE_VEM_PIPELINE,
-            flag_undefined_default=False
         )
     }

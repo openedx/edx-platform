@@ -23,5 +23,4 @@ COURSE_BLOCKS_API_NAMESPACE = WaffleFlagNamespace(name=u'course_blocks_api')
 HIDE_ACCESS_DENIALS_FLAG = WaffleFlag(
     waffle_namespace=COURSE_BLOCKS_API_NAMESPACE,
     flag_name=u'hide_access_denials',
-    flag_undefined_default=False
 )

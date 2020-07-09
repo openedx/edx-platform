@@ -94,19 +94,13 @@ class TestCourseWaffleFlag(TestCase):
 
     @override_settings(WAFFLE_FLAG_CUSTOM_METRICS=[NAMESPACED_FLAG_NAME])
     @patch('openedx.core.djangoapps.waffle_utils.set_custom_metric')
-    @ddt.data(
-        {'flag_undefined_default': None, 'result': False},
-        {'flag_undefined_default': False, 'result': False},
-        {'flag_undefined_default': True, 'result': True},
-    )
-    def test_undefined_waffle_flag(self, data, mock_set_custom_metric):
+    def test_undefined_waffle_flag(self, mock_set_custom_metric):
         """
-        Test flag with various defaults provided for undefined waffle flags.
+        Test flag with undefined waffle flag.
         """
         test_course_flag = CourseWaffleFlag(
             self.TEST_NAMESPACE,
             self.FLAG_NAME,
-            flag_undefined_default=data['flag_undefined_default']
         )
 
         with patch(
@@ -119,8 +113,8 @@ class TestCourseWaffleFlag(TestCase):
                 return_value=WaffleFlagCourseOverrideModel.ALL_CHOICES.unset
             ):
                 # check twice to test that the result is properly cached
-                self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), data['result'])
-                self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), data['result'])
+                self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), False)
+                self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), False)
                 # result is cached, so override check should happen once
                 WaffleFlagCourseOverrideModel.override_value.assert_called_once_with(
                     self.NAMESPACED_FLAG_NAME,
@@ -129,26 +123,31 @@ class TestCourseWaffleFlag(TestCase):
 
         self._assert_waffle_flag_metric(
             mock_set_custom_metric,
-            expected_flag_value=str(data['result']),
-            flag_undefined_default=data['flag_undefined_default'],
+            expected_flag_value=str(False),
         )
 
-    @ddt.data(
-        {'flag_undefined_default': None, 'result': False},
-        {'flag_undefined_default': False, 'result': False},
-        {'flag_undefined_default': True, 'result': True},
-    )
-    def test_without_request(self, data):
+    def test_without_request_and_undefined_waffle(self):
         """
-        Test the flag behavior when outside a request context.
+        Test the flag behavior when outside a request context and waffle data undefined.
         """
         crum.set_current_request(None)
         test_course_flag = CourseWaffleFlag(
             self.TEST_NAMESPACE,
             self.FLAG_NAME,
-            flag_undefined_default=data['flag_undefined_default']
         )
-        self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), data['result'])
+        self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), False)
+
+    def test_without_request_and_everyone_active_waffle(self):
+        """
+        Test the flag behavior when outside a request context and waffle active for everyone.
+        """
+        crum.set_current_request(None)
+        test_course_flag = CourseWaffleFlag(
+            self.TEST_NAMESPACE,
+            self.FLAG_NAME,
+        )
+        with override_flag(self.NAMESPACED_FLAG_NAME, active=True):
+            self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), True)
 
     @ddt.data(
         {'expected_count': 0, 'waffle_flag_metric_setting': None},
@@ -169,13 +168,12 @@ class TestCourseWaffleFlag(TestCase):
 
         self.assertEqual(mock_set_custom_metric.call_count, data['expected_count'])
 
-    def _assert_waffle_flag_metric(self, mock_set_custom_metric, expected_flag_value=None, flag_undefined_default=None):
+    def _assert_waffle_flag_metric(self, mock_set_custom_metric, expected_flag_value=None):
         if expected_flag_value:
             expected_flag_name = 'flag_{}'.format(self.NAMESPACED_FLAG_NAME)
             expected_calls = [call(expected_flag_name, expected_flag_value)]
             mock_set_custom_metric.assert_has_calls(expected_calls)
-            expected_call_count = 2 if flag_undefined_default else 1
-            self.assertEqual(mock_set_custom_metric.call_count, expected_call_count)
+            self.assertEqual(mock_set_custom_metric.call_count, 1)
         else:
             self.assertEqual(mock_set_custom_metric.call_count, 0)
 
