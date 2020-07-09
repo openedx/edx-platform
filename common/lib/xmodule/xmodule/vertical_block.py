@@ -37,7 +37,8 @@ class VerticalFields(object):
     discussion_enabled = Boolean(
         display_name=_("Enable Discussion"),
         help=_(
-            "This setting enable discussions for this vertical block. If True, a discussion UI would show up under this vertical block."
+            "This setting enable discussions for this vertical block. "
+            "If True, a discussion UI would show up under this vertical block."
         ),
         default=False,
         scope=Scope.settings,
@@ -46,7 +47,9 @@ class VerticalFields(object):
 
 @XBlock.needs('user', 'bookmarks')
 @XBlock.wants('completion')
-class VerticalBlock(VerticalFields, SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
+class VerticalBlock(
+    VerticalFields, SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock
+    ):
     """
     Layout XBlock for rendering subblocks vertically.
     """

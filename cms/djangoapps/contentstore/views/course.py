@@ -357,7 +357,7 @@ def toggle_discussion_enabled(request, key_string=None):
 
     elif usage_key:
         try:
-            course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
+            course, xblock, _, _ = _get_item_in_course(request, usage_key)
             is_vertical = hasattr(xblock, "discussion_enabled")
             is_sequential = hasattr(xblock, "get_discussion_toggle_status")
 

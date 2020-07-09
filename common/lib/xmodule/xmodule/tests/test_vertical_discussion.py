@@ -5,10 +5,7 @@ Tests discussion functions used in sequence and vertical xmodules.
 
 import unittest
 
-from xmodule.tests.xml import InMemorySystem
-from django.test import TestCase
 from .test_course_module import DummySystem as DummyImportSystem
-
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -34,9 +31,11 @@ class DiscussionTest(unittest.TestCase):
         self.patch_self_with_course_elements(self.course)
 
     def get_dummy_course(self):
-        # TODO: Add a vertical with some children in it e.g HTML Block, ORA Block, DnD Block etc. It won't work if there is a child block in it.
+        # TODO: Add a vertical with some children in it e.g HTML Block, ORA Block, DnD Block etc.
+        # It won't work if there is a child block in it.
         course_xml = """
-        <course course="{course}" org="{org}" not_a_pointer="true" static_asset_path="xml_test_course" url_name="0" name="101">
+        <course course="{course}" org="{org}" not_a_pointer="true" 
+        static_asset_path="xml_test_course" url_name="0" name="101">
             <chapter not_a_pointer="true" url_name="1">
                 <sequential not_a_pointer="true" url_name="5"/>
                 <sequential not_a_pointer="true" url_name="6"/>
@@ -132,12 +131,13 @@ class DiscussionTest(unittest.TestCase):
         # Chapter 2 have no children (e.g no sequential so no vertical) so it is by default True
         self.assertEqual(self.chapter_2.get_discussion_toggle_status(), "enabled")
 
-        # Chapter 3 and 4 have discussion_enabled flag set to true as all their children have discussion_enabled flag as True
+        # Chapter 3 and 4 have discussion_enabled flag set to true as all their children
+        # have discussion_enabled flag as True
         self.assertEqual(self.chapter_3.get_discussion_toggle_status(), "enabled")
         self.assertEqual(self.chapter_4.get_discussion_toggle_status(), "enabled")
 
-        # Chapter 1 have two sequentials whose discussion_enabled flag is True as they don't have any verticals so this makes Chapter 1
-        # discussion_enabled flag as True
+        # Chapter 1 have two sequentials whose discussion_enabled flag is True as they
+        # don't have any verticals so this makes Chapter 1 discussion_enabled flag as True
         self.assertEqual(self.chapter_1.get_discussion_toggle_status(), "enabled")
 
     def test_sequence_enable_get_verticals_enable(self):

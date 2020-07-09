@@ -1,11 +1,8 @@
-from contentstore.tests.utils import CourseTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
-from common.lib.xmodule.xmodule.tests.test_course_module import DummySystem
-from common.lib.xmodule.xmodule.course_module import CourseDescriptor
-from contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url, reverse_url
-from xmodule.modulestore.django import modulestore
 import json
-import mock
+
+from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import reverse_url
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestDiscussionEnabledAPI(CourseTestCase):
@@ -184,12 +181,13 @@ class TestDiscussionEnabledAPI(CourseTestCase):
         # Chapter 2 have no children (e.g no sequential so no vertical) so it is by default True
         self.assertEqual(self.get_discussion_enabled_status(self.chapter_2), "enabled")
 
-        # Chapter 3 and 4 have discussion_enabled flag set to true as all their children have discussion_enabled flag as True
+        # Chapter 3 and 4 have discussion_enabled flag set to true as all their children
+        # have discussion_enabled flag as True
         self.assertEqual(self.get_discussion_enabled_status(self.chapter_3), "enabled")
         self.assertEqual(self.get_discussion_enabled_status(self.chapter_4), "enabled")
 
-        # Chapter 1 have two sequentials whose discussion_enabled flag is True as they don't have any verticals so this makes Chapter 1
-        # discussion_enabled flag as True
+        # Chapter 1 have two sequentials whose discussion_enabled flag is True as they
+        # don't have any verticals so this makes Chapter 1 discussion_enabled flag as True
         self.assertEqual(self.get_discussion_enabled_status(self.chapter_1), "enabled")
 
     def test_sequence_enable_get_verticals_enable(self):
@@ -224,7 +222,7 @@ class TestDiscussionEnabledAPI(CourseTestCase):
         self.assertFalse(self.get_discussion_enabled_status(self.vertical_3_1_3))
 
     def test_non_course_author_cannot_get_or_set_discussion_flag(self):
-        client, non_staff_user = self.create_non_staff_authed_user_client()
+        client, _ = self.create_non_staff_authed_user_client()
         with self.assertRaises(json.JSONDecodeError):
             self.get_discussion_enabled_status(self.course, client=client)
 
