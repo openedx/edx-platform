@@ -5,7 +5,7 @@ components.
 Installation
 ------------
 
-Installing and running an Open edX instance is not simple.  We strongly
+Installing and running an Open edX instance is simple.  We strongly
 recommend that you use a service provider to run the software for you.  They
 have free trials that make it easy to get started:
 https://openedx.org/get-started/
