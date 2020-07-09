@@ -3098,8 +3098,36 @@ class DatesTabTestCase(ModuleStoreTestCase):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2017, 1, 1))
 
     def _get_response(self, course):
-        """ Returns the HTML for the progress page """
+        """ Returns the HTML for the dates page """
         return self.client.get(reverse('dates', args=[six.text_type(course.id)]))
+
+    def test_tab_redirects_if_not_logged_in(self):
+        self.client.logout()
+        response = self._get_response(self.course)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login?next=/courses/', response.url)
+
+    def test_tab_redirects_if_not_enrolled_and_not_staff(self):
+        response = self._get_response(self.course)
+        self.assertEqual(response.status_code, 302)
+        # Beginning of redirect URL
+        self.assertIn('/courses/', response.url)
+        # End of redirect URL
+        self.assertIn('/course/', response.url)
+
+        # Now check staff users can see
+        self.user.is_staff = True
+        self.user.save()
+        response = self._get_response(self.course)
+        self.assertEqual(response.status_code, 200)
+
+        # Enrolled users can also see
+        self.client.logout()
+        enrolled_user = UserFactory()
+        CourseEnrollmentFactory(course_id=self.course.id, user=enrolled_user, mode=CourseMode.VERIFIED)
+        self.client.login(username=enrolled_user.username, password=TEST_PASSWORD)
+        response = self._get_response(self.course)
+        self.assertEqual(response.status_code, 200)
 
     @RELATIVE_DATES_FLAG.override(active=True)
     @patch('edx_django_utils.monitoring.set_custom_metric')
