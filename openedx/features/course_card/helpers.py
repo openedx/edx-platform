@@ -3,6 +3,7 @@ from logging import getLogger
 
 import pytz
 from crum import get_current_request
+from opaque_keys.edx.keys import CourseKey
 
 from course_action_state.models import CourseRerunState
 from custom_settings.models import CustomSettings
@@ -39,6 +40,9 @@ def get_related_card_id(course_id):
     :param course_id:
     :return:
     """
+    if isinstance(course_id, basestring):
+        course_id = CourseKey.from_string(course_id)
+
     course_rerun = CourseRerunState.objects.filter(course_key=course_id).first()
     if course_rerun:
         return course_rerun.source_course_key
@@ -101,18 +105,26 @@ def get_course_cards_list():
     return courses_list
 
 
-def is_course_in_programs(course_id):
+def is_course_in_programs(parent_course_key):
     """
-    Helper function to check if course is part of program
-    @param course_id: course key
-    @return: true if course is part of program otherwise false
+    Helper function to check if course is part of program.
+
+    Parent course(course card) of each rerun is same so we
+    just compare with parent of first rerun and check if course
+    is part of the program.
+
+    @param parent_course_key: parent course key
+    @return: True if parent of first course reruns from discovery matches
+             with parent course key
     """
     programs = get_programs(get_current_request().site)
 
     for program in programs:
-        for program_course in program['courses']:
-            if program_course['course_runs']:
-                for course_rerun in program_course['course_runs']:
-                    if course_rerun['key'] == str(course_id):
-                        return True
+        for program_course in program.get('courses', []):
+            course_runs = program_course.get('course_runs')
+            if course_runs:
+                first_rerun = course_runs[0]
+                rerun_parent_course_key = get_related_card_id(first_rerun.get('key'))
+                if rerun_parent_course_key == parent_course_key:
+                    return True
     return False
