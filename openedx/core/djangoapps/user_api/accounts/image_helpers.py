@@ -53,7 +53,12 @@ def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXT
         url = storage.url(
             _get_profile_image_filename(name, size, file_extension=file_extension)
         )
-        return '{}?v={}'.format(url, version) if version is not None else url
+        # Return the URL, with the "v" parameter added as its query
+        # string with "?v=". If the original URL already includes a
+        # query string (such as signed S3 URLs), append to the query
+        # string with "&v=" instead.
+        separator = '&' if '?' in url else '?'
+        return '{}{}v={}'.format(url, separator, version) if version is not None else url
 
     return {size_display_name: _make_url(size) for size_display_name, size in settings.PROFILE_IMAGE_SIZES_MAP.items()}
 
