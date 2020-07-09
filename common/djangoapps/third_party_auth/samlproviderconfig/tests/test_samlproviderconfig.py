@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer
+from enterprise.constants import ENTERPRISE_ADMIN_ROLE
 from third_party_auth.samlutils.utils import set_jwt_cookie
 from third_party_auth.models import SAMLProviderConfig
 from third_party_auth.tests import testutil
@@ -20,7 +21,6 @@ SINGLE_PROVIDER_CONFIG = {
     'slug': 'test-slug'
 }
 
-ENTERPRISE_ADMIN_DASHBOARD_ROLE = 'enterprise.can_access_admin_dashboard'
 ENTERPRISE_ID = uuid4()
 
 
@@ -45,26 +45,14 @@ class SAMLProviderConfigTests(APITestCase):
             provider_id=self.samlproviderconfig.id,
             enterprise_customer_id=ENTERPRISE_ID
         )
-        set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_DASHBOARD_ROLE, str(ENTERPRISE_ID))])
+        set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, str(ENTERPRISE_ID))])
         self.client.force_authenticate(user=self.user)
 
     def test_get_one_config_by_enterprise_uuid_found(self):
         # GET auth/saml/v0/providerconfig/{id}
         urlbase = reverse('samlproviderconfig-list')
-        query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
+        query_kwargs = {'enterprise_customer_uuid': str(ENTERPRISE_ID)}
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(SAMLProviderConfig.objects.count(), 1)
-
-    def test_create_one_config(self):
-        # POST auth/saml/v0/providerconfig/ -d data
-        url = reverse('samlproviderconfig-list')
-        data = SINGLE_PROVIDER_CONFIG
-        orig_count = SAMLProviderConfig.objects.count()
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(SAMLProviderConfig.objects.count(), orig_count + 1)
-        providerconfig = SAMLProviderConfig.objects.get()
-        self.assertEqual(providerconfig.slug, 'test-slug')
-        self.assertEqual(providerconfig.name, 'name-of-config')
