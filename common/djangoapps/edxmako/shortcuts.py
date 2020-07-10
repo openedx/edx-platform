@@ -24,6 +24,7 @@ from six.moves.urllib.parse import urljoin
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
+from edx_django_utils.monitoring import set_custom_metric
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from xmodule.util.xmodule_django import get_current_request_hostname
@@ -87,13 +88,15 @@ def marketing_link(name):
         # don't try to reverse disabled marketing links
         if link_map[name] is not None:
             host_name = get_current_request_hostname()
-            if all([host_name and 'edge' in host_name, 'http' in link_map[name]]):
+            if link_map[name].startswith('http'):
                 return link_map[name]
             else:
                 try:
                     return reverse(link_map[name])
                 except NoReverseMatch:
-                    raise Http404
+                    log.debug(u"Cannot find corresponding link for name: %s", name)
+                    set_custom_metric('unresolved_marketing_link', name)
+                    return '#'
     else:
         log.debug(u"Cannot find corresponding link for name: %s", name)
         return '#'
