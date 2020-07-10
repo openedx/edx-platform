@@ -103,6 +103,20 @@ def _filter_entrance_exam_grader(graders):
     return graders
 
 
+def set_discussion_toggle(value, xblock, user):
+    """
+    Recursively update all children of given xblock in modulestore
+    """
+    for child in xblock.get_children():
+        if child.category in ["chapter", "sequential"]:
+            set_discussion_toggle(value, child, user)
+        else:
+            child.discussion_enabled = value
+            modulestore().update_item(child, user.id)
+
+    modulestore().update_item(xblock, user.id)
+
+
 @require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
 @login_required
 @expect_json
@@ -155,7 +169,8 @@ def xblock_handler(request, usage_key_string):
                 :display_name: name for new xblock, optional
                 :boilerplate: template name for populating fields, optional and only used
                      if duplicate_source_locator is not present
-              The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
+              The locator (unicode representati                set_discussion_toggle()
+on of a UsageKey) for the created xblock (minus children) is returned.
     """
     if usage_key_string:
         usage_key = usage_key_with_run(usage_key_string)
@@ -187,9 +202,14 @@ def xblock_handler(request, usage_key_string):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
+            discussion_enabled = (request.json.get('fields') or {}).get('discussion_enabled')
+            xblock = _get_xblock(usage_key, request.user)
+            if discussion_enabled is not None and usage_key.category in ["sequential", "chapter"]:
+                set_discussion_toggle(discussion_enabled, xblock, request.user)
+
             return _save_xblock(
                 request.user,
-                _get_xblock(usage_key, request.user),
+                xblock,
                 data=request.json.get('data'),
                 children_strings=request.json.get('children'),
                 metadata=request.json.get('metadata'),
@@ -1209,11 +1229,13 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         if xblock.category == 'sequential':
             xblock_info.update({
                 'hide_after_due': xblock.hide_after_due,
+                'discussion_enabled': xblock.get_discussion_toggle_status()
             })
         elif xblock.category in ('chapter', 'course'):
             if xblock.category == 'chapter':
                 xblock_info.update({
                     'highlights': xblock.highlights,
+                    'discussion_enabled': xblock.get_discussion_toggle_status()
                 })
             elif xblock.category == 'course':
                 xblock_info.update({

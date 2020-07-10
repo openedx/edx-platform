@@ -822,21 +822,6 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
                 child_statuses += child.get_children_discussion_toggle_status()
         return child_statuses
 
-    def set_discussion_toggle(self, value):
-        """
-        Recursively set all children's discussion_enabled flag to param:value
-
-        NOTE: Make sure to use modulestore.update_item() after calling this method on every children.
-        """
-
-        for child in self.get_children():
-            # Child of a section would be subsection
-            if hasattr(child, "set_discussion_toggle"):
-                child.set_discussion_toggle(value)
-            else:
-                # Child of a subsection would be a vertical
-                child.discussion_enabled = value
-
     def get_discussion_toggle_status(self):
         """
         Return a single value representing summary of discussion_enabled flag for children

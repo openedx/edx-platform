@@ -320,14 +320,12 @@ def _update_children_in_module_store(xblock, user):
 
 @login_required
 @ensure_csrf_cookie
-@require_http_methods(("GET", "POST"))
+@require_http_methods(["POST"])
 @expect_json
 def toggle_discussion_enabled(request, key_string=None):
     """
     A view to get/set discussion_enabled flag and to use related methods
 
-    GET:
-        json: Return discussion_enabled flag value.
     POST:
         json: Return a message indicating that the discussion_enabled flag is updated.
 
@@ -336,67 +334,39 @@ def toggle_discussion_enabled(request, key_string=None):
     * 403 Forbidden Error: If the logged in user does not have course authoring access for course
         represented by key_string
     """
-    course_key, usage_key = None, None
+    if not has_course_author_access(request.user, course_key):
+        raise PermissionDenied()
+
+    try:
+        value = request.json["value"]
+    except KeyError:
+        raise HttpResponseBadRequest("value missing from data")
 
     try:
         usage_key = UsageKey.from_string(key_string)
-    except InvalidKeyError:  # Raise Http404 on invalid 'usage_key_string'
-        # It could be a course
-        try:
-            course_key = CourseKey.from_string(key_string)
-        except InvalidKeyError:
-            raise Http404
+        course_key = usage_key.course_key
+    except InvalidKeyError:
+        raise Http404
 
-    if course_key:
-        # You may think that it should only be necessary for the POST request handlers
-        # but we are using _get_item_in_course() to get the xblock in case the key_string
-        # represents a non-course block and it (_get_item_in_course()) requires that the user
-        # have the course author access.
-        if not has_course_author_access(request.user, course_key):
-            raise PermissionDenied()
+    is_course = usage_key.category == "course"
+    is_sequential = usage_key.category in ["chapter", "sequential"]
 
-        course = modulestore().get_course(course_key)
-
+    if is_course:
+        # A course is also an xblock
+        xblock = modulestore().get_course(course_key)
         if not course:
             raise Http404
 
-        discussion_enabled = course.get_discussion_toggle_status()
-
-        if request.method == "GET":
-            return JsonResponse({
-                'discussion_enabled': discussion_enabled,
-            })
-        elif request.method == "POST":
-            value = request.json.get("value", discussion_enabled)
-            course.set_discussion_toggle(value)
-            _update_children_in_module_store(course, request.user)  # Persist update in children
-
-    elif usage_key:
+    elif is_sequential:
         try:
             course, xblock, _, _ = _get_item_in_course(request, usage_key)
-            is_vertical = hasattr(xblock, "discussion_enabled")
-            is_sequential = hasattr(xblock, "get_discussion_toggle_status")
-
-            if not is_vertical and not is_sequential:
-                return HttpResponseBadRequest()
         except ItemNotFoundError:
             return HttpResponseBadRequest()
-        else:
-            discussion_enabled = xblock.discussion_enabled if is_vertical else xblock.get_discussion_toggle_status()
+    else:
+        return HttpResponseBadRequest()
 
-            if request.method == "GET":
-                return JsonResponse({
-                    'discussion_enabled': discussion_enabled,
-                })
-            elif request.method == "POST":
-                value = request.json.get("value", discussion_enabled)
-
-                if is_vertical:
-                    xblock.discussion_enabled = value
-                elif is_sequential:
-                    xblock.set_discussion_toggle(value)
-
-                _update_children_in_module_store(xblock, request.user)
+    xblock.set_discussion_toggle(value)
+    _update_children_in_module_store(xblock, request.user)  # Persist update in children
 
     return JsonResponse({"user_message": "Discussion toggle has been successfully updated."})
 
