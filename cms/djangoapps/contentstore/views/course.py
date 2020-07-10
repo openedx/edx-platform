@@ -398,7 +398,7 @@ def toggle_discussion_enabled(request, key_string=None):
 
                 _update_children_in_module_store(xblock, request.user)
 
-    return JsonResponse({"user_message": _("Discussion toggle has been successfully updated.")})
+    return JsonResponse({"user_message": "Discussion toggle has been successfully updated."})
 
 
 @login_required
