@@ -189,3 +189,18 @@ from openedx.features.course_experience.course_tools import HttpMethod
 <%static:webpack entry="Enrollment">
     new CourseEnrollment('.enroll-btn', '${course_key | n, js_escaped_string}');
 </%static:webpack>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+
+  var sockLink = $("#sock");
+
+  function trackSockEvent() {
+    TrackECommerceEvents.trackUpsellClick(sockLink, 'course_home_sock', {
+      pageName: "course_home",
+      linkType: "button",
+      linkCategory: "sock"
+    });
+  }
+  sockLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackSockEvent);
+
+</%static:require_module_async>
