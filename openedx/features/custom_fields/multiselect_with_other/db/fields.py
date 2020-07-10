@@ -1,5 +1,6 @@
 from django.core import exceptions, checks
 from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.text import capfirst
 from multiselectfield import MultiSelectField
 from multiselectfield.db.fields import MSFList
@@ -9,6 +10,7 @@ from openedx.features.custom_fields.multiselect_with_other.forms.fields import M
 from openedx.features.custom_fields.multiselect_with_other.helpers import add_other_field_in_choices
 
 
+@python_2_unicode_compatible
 class OtherMultiSelectFieldList(MSFList):
     def __str__(self):
         selected_choice_list = [self.choices.get(int(i)) if i.isdigit() else (self.choices.get(i) or i) for i in self]

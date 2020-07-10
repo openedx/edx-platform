@@ -4,14 +4,13 @@ import operator
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View, generic
+from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django_countries import countries
 
-from edxmako.shortcuts import render_to_response
 from openedx.features.marketplace.decorators import has_affiliated_user
 from openedx.features.marketplace.forms import MarketplaceRequestForm
 from openedx.features.user_leads.helpers import save_user_utm
@@ -166,10 +165,8 @@ class MarketplaceCreateRequestView(generic.CreateView, LoginRequiredMixin):
         return initial
 
 
-class MarketplaceRequestDetailView(View):
+class MarketplaceRequestDetailView(DetailView):
+    model = MarketplaceRequest
+    context_object_name = 'marketplace_request'
+    template_engine = 'mako'
     template_name = 'features/marketplace/marketplace_details.html'
-
-    def get(self, request, *args, **kwargs):
-        marketplace_request = get_object_or_404(MarketplaceRequest, pk=kwargs['pk'])
-        context = {'marketplace_request': marketplace_request}
-        return render_to_response(self.template_name, context)
