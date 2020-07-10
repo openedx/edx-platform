@@ -318,7 +318,11 @@ from openedx.core.djangolib.js_utils import (
         <li class="archived-courses-tab"><a>${_("Archived Courses")}</a></li>
         % endif
         % if libraries_enabled:
+        % if redirect_to_library_authoring_mfe:
+        <li><a href="${library_authoring_mfe_url}">${_("Libraries")}</a></li>
+        %else:
         <li class="libraries-tab"><a>${_("Libraries")}</a></li>
+        % endif
         % endif
       </ul>
       % endif

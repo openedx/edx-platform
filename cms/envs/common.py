@@ -405,6 +405,19 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     # .. toggle_status: supported
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
+
+    # .. toggle_name: ENABLE_LIBRARY_AUTHORING_MICROFRONTEND
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable the Library Authoring MFE
+    # .. toggle_category: micro-frontend
+    # .. toggle_use_cases: incremental_release
+    # .. toggle_creation_date: 2020-06-20
+    # .. toggle_expiration_date: 2020-12-31
+    # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
+    # .. toggle_status: supported
+    # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
+    'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
 }
 
 ENABLE_JASMINE = False
@@ -415,6 +428,7 @@ IDA_LOGOUT_URI_LIST = []
 
 ############################# MICROFRONTENDS ###################################
 COURSE_AUTHORING_MICROFRONTEND_URL = None
+LIBRARY_AUTHORING_MICROFRONTEND_URL = None
 
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
