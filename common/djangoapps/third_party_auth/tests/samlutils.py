@@ -7,7 +7,6 @@ from edx_rest_framework_extensions.auth.jwt.tests.utils import (
     generate_jwt_token,
     generate_unversioned_payload,
 )
-from enterprise.models import EnterpriseCustomer
 
 
 def _jwt_token_from_role_context_pairs(user, role_context_pairs):
