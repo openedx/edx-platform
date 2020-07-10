@@ -51,7 +51,7 @@ define([
                 context: options.context || TeamSpecHelpers.testContext,
                 model: teamModel,
                 topic: isInstructorManagedTopic ?
-                    TeamSpecHelpers.createMockInstructorManagedTopic() :
+                    TeamSpecHelpers.createMockTopic({type: 'public_managed'}) :
                     TeamSpecHelpers.createMockTopic(),
                 setFocusToHeaderFunc: function() {
                     $('.teams-content').focus();
