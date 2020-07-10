@@ -39,6 +39,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from six import text_type
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
 from contentstore.views.assets import delete_asset
 from contentstore.views.exception import AssetNotFoundException
@@ -416,6 +417,15 @@ def certificates_list_handler(request, course_key_string):
 
             is_active, certificates = CertificateManager.is_activated(course)
 
+            course_authoring_microfrontend_url = ''
+
+            if settings.FEATURES.get('ENABLE_EXAM_SETTINGS_HTML_VIEW'):
+                course_authoring_microfrontend_url = configuration_helpers.get_value_for_org(
+                    course.location.org,
+                    'COURSE_AUTHORING_MICROFRONTEND_URL',
+                    settings.COURSE_AUTHORING_MICROFRONTEND_URL
+                )
+
             return render_to_response('certificates.html', {
                 'context_course': course,
                 'certificate_url': certificate_url,
@@ -427,7 +437,8 @@ def certificates_list_handler(request, course_key_string):
                 'certificate_web_view_url': certificate_web_view_url,
                 'is_active': is_active,
                 'is_global_staff': GlobalStaff().has_user(request.user),
-                'certificate_activation_handler_url': activation_handler_url
+                'certificate_activation_handler_url': activation_handler_url,
+                'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             # Retrieve the list of certificates for the specified course
