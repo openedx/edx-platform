@@ -388,18 +388,13 @@ define([
             it('does not show a search box in private team-sets for non-privileged users', function() {
                 teamsTabView = createTeamsTabView({
                     topics: {
-                        results: TeamSpecHelpers.createMockPrivateTopic()
-                    },
-                    userInfo: TeamSpecHelpers.createMockUserInfo({
-                        privileged: false,
-                        staff: false
-                    })
+                        results: TeamSpecHelpers.createMockTopic({type: 'private_managed'})
+                    }
                 });
 
-                teamsTabView.browseTopic(TeamSpecHelpers.testPrivateTopicID);
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
 
                 verifyTeamsRequest({
-                    topic_id: TeamSpecHelpers.testPrivateTopicID,
                     order_by: 'last_activity_at',
                     text_search: ''
                 });
@@ -411,7 +406,7 @@ define([
             it('shows a search box in private team-sets for privileged users', function() {
                 teamsTabView = createTeamsTabView({
                     topics: {
-                        results: TeamSpecHelpers.createMockPrivateTopic()
+                        results: TeamSpecHelpers.createMockTopic({type: 'private_managed'})
                     },
                     userInfo: TeamSpecHelpers.createMockUserInfo({
                         privileged: true,
@@ -419,10 +414,9 @@ define([
                     })
                 });
 
-                teamsTabView.browseTopic(TeamSpecHelpers.testPrivateTopicID);
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
 
                 verifyTeamsRequest({
-                    topic_id: TeamSpecHelpers.testPrivateTopicID,
                     order_by: 'last_activity_at',
                     text_search: ''
                 });
