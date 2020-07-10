@@ -22,6 +22,7 @@ from path import Path as path
 
 from xmodule.capa_module import ProblemBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.word_cloud_module import WordCloudBlock
 from xmodule.x_module import XModuleDescriptor, HTMLSnippet
 
 LOG = logging.getLogger(__name__)
@@ -69,6 +70,7 @@ XBLOCK_CLASSES = [
     ProblemBlock,
     StaticTabBlock,
     VideoBlock,
+    WordCloudBlock,
 ]
 
 

@@ -255,7 +255,7 @@ class TestWordCloud(BaseTestXmodule):
         """
         fragment = self.runtime.render(self.item_descriptor, STUDENT_VIEW)
         expected_context = {
-            'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url,
+            'ajax_url': self.item_descriptor.ajax_url,
             'display_name': self.item_descriptor.display_name,
             'instructions': self.item_descriptor.instructions,
             'element_class': self.item_descriptor.location.block_type,

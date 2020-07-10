@@ -39,7 +39,7 @@ from xmodule.randomize_module import RandomizeDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.tests import get_test_descriptor_system, get_test_system
 from xmodule.vertical_block import VerticalBlock
-from xmodule.word_cloud_module import WordCloudDescriptor
+from xmodule.word_cloud_module import WordCloudBlock
 from xmodule.wrapper_module import WrapperBlock
 from xmodule.x_module import (
     PUBLIC_VIEW,
@@ -58,7 +58,7 @@ LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
     HtmlBlock: [{}],
     PollDescriptor: [{'display_name': 'Poll Display Name'}],
-    WordCloudDescriptor: [{}],
+    WordCloudBlock: [{}],
 }
 
 
@@ -295,7 +295,8 @@ class XBlockWrapperTestMixin(object):
         # pylint: disable=no-member
         descriptor.runtime.id_reader.get_definition_id = Mock(return_value='a')
         descriptor.runtime.modulestore = modulestore
-        descriptor._xmodule.graded = 'False'
+        if hasattr(descriptor, '_xmodule'):
+            descriptor._xmodule.graded = 'False'
         self.check_property(descriptor)
 
     # Test that when an xmodule is generated from descriptor_cls
