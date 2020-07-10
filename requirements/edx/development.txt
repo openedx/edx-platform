@@ -127,12 +127,12 @@ edx-sphinx-theme==1.5.0   # via -r requirements/edx/development.in
 edx-submissions==3.1.11   # via -r requirements/edx/testing.txt, ora2
 edx-tincan-py35==0.0.5    # via -r requirements/edx/testing.txt, edx-enterprise
 edx-user-state-client==1.2.0  # via -r requirements/edx/testing.txt
-edx-when==1.2.9           # via -r requirements/edx/testing.txt, edx-proctoring
+edx-when==1.2.8           # via -r requirements/edx/testing.txt, edx-proctoring
 edxval==1.3.8             # via -r requirements/edx/testing.txt
 elasticsearch==1.9.0      # via -r requirements/edx/testing.txt, edx-search
 enmerkar-underscore==1.0.0  # via -r requirements/edx/testing.txt
 enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-underscore
-event-tracking==0.3.3     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
+event-tracking==0.3.2     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 faker==4.1.1              # via -r requirements/edx/testing.txt, factory-boy
@@ -244,7 +244,7 @@ pytest-forked==1.2.0      # via -r requirements/edx/testing.txt, pytest-xdist
 pytest-json-report==1.2.1  # via -r requirements/edx/testing.txt
 pytest-metadata==1.8.0    # via -r requirements/edx/testing.txt, pytest-json-report
 pytest-randomly==3.4.0    # via -r requirements/edx/testing.txt
-pytest-xdist==1.33.0      # via -r requirements/edx/testing.txt
+pytest-xdist==1.32.0      # via -r requirements/edx/testing.txt
 pytest==5.3.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/testing.txt
@@ -306,7 +306,7 @@ toml==0.10.1              # via -r requirements/edx/testing.txt, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
 tox==3.16.1               # via -r requirements/edx/testing.txt, tox-battery
 tqdm==4.47.0              # via -r requirements/edx/testing.txt, nltk
-transifex-client==0.13.11  # via -r requirements/edx/testing.txt
+transifex-client==0.13.10  # via -r requirements/edx/testing.txt
 typed-ast==1.4.1          # via -r requirements/edx/testing.txt, astroid
 ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
