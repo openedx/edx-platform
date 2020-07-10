@@ -109,7 +109,10 @@ def _is_library_component_limit_reached(usage_key):
     """
     store = modulestore()
     parent = store.get_item(usage_key)
-    total_children = len(parent.get_children())
+    if not parent.has_children:
+        # Limit cannot be applied on such items
+        return False
+    total_children = len(parent.children)
     return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
 
 
