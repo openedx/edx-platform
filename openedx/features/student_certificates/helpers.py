@@ -213,16 +213,19 @@ def get_pdfkit_html(image_base64):
     return PDFKIT_HTML_STRING.format(image_tag=PDFKIT_IMAGE_TAG.format(base64_img=image_base64))
 
 
+def _should_hide_border(border, preview_mode):
+    """Return true if certificate border is not required or preview mode is enabled"""
+    return border == 'hide' or preview_mode
+
+
 def override_update_certificate_context(request, context, course, user_certificate, preview_mode=None):
     """
     This method adds custom context to the certificate
     :return: Updated context
     """
     border = request.GET.get('border', None)
-    if (border and border == 'hide') or preview_mode:
-        context['border_class'] = 'certificate-border-hide'
-    else:
-        context['border_class'] = ''
+
+    context['border_class'] = 'certificate-border-hide' if _should_hide_border(border, preview_mode) else ''
 
     context['download_pdf'] = reverse('download_certificate_pdf',
                                       kwargs={'certificate_uuid': user_certificate.verify_uuid})
