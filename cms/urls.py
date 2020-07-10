@@ -110,12 +110,6 @@ urlpatterns = [
         name='course_notifications_handler'),
     url(r'^course_rerun/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.course_rerun_handler,
         name='course_rerun_handler'),
-    url(r'^toggle_discussion_enabled/{}?$'\
-        .format(settings.COURSE_KEY_PATTERN.replace("course_key_string", "key_string")),
-        contentstore.views.toggle_discussion_enabled, name='toggle_discussion_enabled'),
-    url(r'^toggle_discussion_enabled/{}?$'\
-        .format(settings.USAGE_KEY_PATTERN.replace("usage_key_string", "key_string")),
-        contentstore.views.toggle_discussion_enabled, name='toggle_discussion_enabled'),
     url(r'^container/{}$'.format(settings.USAGE_KEY_PATTERN), contentstore.views.container_handler,
         name='container_handler'),
     url(r'^orphan/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.orphan_handler,

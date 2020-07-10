@@ -25,7 +25,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
 from six.moves import filter
@@ -97,7 +97,7 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundErr
 from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
-from .component import ADVANCED_COMPONENT_TYPES, _get_item_in_course
+from .component import ADVANCED_COMPONENT_TYPES
 from .item import create_xblock_info
 from .library import LIBRARIES_ENABLED, get_library_creator_status
 
@@ -106,7 +106,7 @@ log = logging.getLogger(__name__)
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_info_update_handler', 'course_search_index_handler',
-           'course_rerun_handler', 'toggle_discussion_enabled',
+           'course_rerun_handler',
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
@@ -304,71 +304,6 @@ def course_rerun_handler(request, course_key_string):
                 'course_creator_status': _get_course_creator_status(request.user),
                 'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
             })
-
-
-def _update_children_in_module_store(xblock, user):
-    """
-    Recursively update all children of given xblock in modulestore
-    """
-    for child in xblock.get_children():
-        modulestore().update_item(child, user.id)
-        for grand_child in child.get_children():
-            _update_children_in_module_store(grand_child, user)
-
-    modulestore().update_item(xblock, user.id)
-
-
-@login_required
-@ensure_csrf_cookie
-@require_http_methods(["POST"])
-@expect_json
-def toggle_discussion_enabled(request, key_string=None):
-    """
-    A view to get/set discussion_enabled flag and to use related methods
-
-    POST:
-        json: Return a message indicating that the discussion_enabled flag is updated.
-
-    It can throw the following errors:
-    * 404 Page Not Found Error: If the provided key_string does not represent existing block or course.
-    * 403 Forbidden Error: If the logged in user does not have course authoring access for course
-        represented by key_string
-    """
-    if not has_course_author_access(request.user, course_key):
-        raise PermissionDenied()
-
-    try:
-        value = request.json["value"]
-    except KeyError:
-        raise HttpResponseBadRequest("value missing from data")
-
-    try:
-        usage_key = UsageKey.from_string(key_string)
-        course_key = usage_key.course_key
-    except InvalidKeyError:
-        raise Http404
-
-    is_course = usage_key.category == "course"
-    is_sequential = usage_key.category in ["chapter", "sequential"]
-
-    if is_course:
-        # A course is also an xblock
-        xblock = modulestore().get_course(course_key)
-        if not course:
-            raise Http404
-
-    elif is_sequential:
-        try:
-            course, xblock, _, _ = _get_item_in_course(request, usage_key)
-        except ItemNotFoundError:
-            return HttpResponseBadRequest()
-    else:
-        return HttpResponseBadRequest()
-
-    xblock.set_discussion_toggle(value)
-    _update_children_in_module_store(xblock, request.user)  # Persist update in children
-
-    return JsonResponse({"user_message": "Discussion toggle has been successfully updated."})
 
 
 @login_required

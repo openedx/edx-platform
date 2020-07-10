@@ -1593,11 +1593,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             return False
         return datetime.now(utc) <= self.start
 
-    def set_discussion_toggle(self, value):
-        # Child of a course would be sections/chapters
-        for child in self.get_children():
-            child.set_discussion_toggle(value)
-
     def get_discussion_toggle_status(self):
         child_statuses = [
             child.get_discussion_toggle_status()
