@@ -30,18 +30,15 @@ def waffle_flags():
 ENABLE_PROCTORING_PROVIDER_OVERRIDES = CourseWaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name=u'enable_proctoring_provider_overrides',
-    flag_undefined_default=False
 )
 
 # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.
 ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name=u'enable_checklists_quality',
-    flag_undefined_default=True
 )
 
 SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name=u'show_review_rules',
-    flag_undefined_default=False
 )

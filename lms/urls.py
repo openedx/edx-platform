@@ -26,6 +26,7 @@ from lms.djangoapps.courseware.views import views as courseware_views
 from lms.djangoapps.courseware.views.index import CoursewareIndex
 from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from lms.djangoapps.discussion import views as discussion_views
+from lms.djangoapps.discussion.config.settings import is_forum_daily_digest_enabled
 from lms.djangoapps.discussion.notification_prefs import views as notification_prefs_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
@@ -701,7 +702,7 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         ),
     ]
 
-if settings.FEATURES.get('ENABLE_FORUM_DAILY_DIGEST'):
+if is_forum_daily_digest_enabled():
     urlpatterns += notification_prefs_urls
 
 urlpatterns += [

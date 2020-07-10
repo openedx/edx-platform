@@ -22,6 +22,7 @@ from student.helpers import (
   DISABLE_UNENROLL_CERT_STATES,
 )
 from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
+from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 %>
 
 <%
@@ -411,7 +412,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
               </p>
               <div class="action-upgrade-container">
                 % if use_ecommerce_payment_flow and course_mode_info['verified_sku']:
-                  <a class="action action-upgrade" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
+                  <a id="ecommerce_upgrade_link" class="action action-upgrade" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
                 % else:
                   <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': six.text_type(course_overview.id)})}" data-course-id="${course_overview.id}" data-user="${user.username}">
                 % endif
@@ -454,3 +455,18 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform(iterationKey=".localized-datetime");
 </%static:require_module_async>
+
+% if UPSELL_TRACKING_FLAG.is_enabled():
+    <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+      if (window.loadedECommerceEvents === undefined) {
+        window.loadedECommerceEvents = true;
+
+        TrackECommerceEvents.trackUpsellClick($("#ecommerce_upgrade_link"), 'course_dashboard_green', {
+          pageName: "course_dashboard",
+          linkType: "button",
+          linkCategory: "green_upgrade"
+        });
+      }
+
+    </%static:require_module_async>
+%endif

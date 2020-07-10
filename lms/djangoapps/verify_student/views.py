@@ -1032,31 +1032,12 @@ class SubmitPhotosView(View):
         Send an email confirming that the user submitted photos
         for initial verification.
         """
-        if use_new_templates_for_id_verification_emails():
-            lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
-            new_template_context = {
-                'user': user,
-                'dashboard_link': '{}{}'.format(lms_root_url, reverse('dashboard'))
-            }
-            return send_verification_confirmation_email(new_template_context)
-
+        lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
         context = {
-            'full_name': user.profile.name,
-            'platform_name': configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
+            'user': user,
+            'dashboard_link': '{}{}'.format(lms_root_url, reverse('dashboard'))
         }
-
-        subject = _("{platform_name} ID Verification Photos Received").format(platform_name=context['platform_name'])
-        message = render_to_string('emails/photo_submission_confirmation.txt', context)
-        from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-        to_address = user.email
-
-        try:
-            send_mail(subject, message, from_address, [to_address], fail_silently=False)
-        except:  # pylint: disable=bare-except
-            # We catch all exceptions and log them.
-            # It would be much, much worse to roll back the transaction due to an uncaught
-            # exception than to skip sending the notification email.
-            log.exception(u"Could not send notification email for initial verification for user %s", user.id)
+        return send_verification_confirmation_email(context)
 
     def _fire_event(self, user, event_name, parameters):
         """
@@ -1150,26 +1131,9 @@ def results_callback(request):
         log.debug(u'Approving verification for {}'.format(receipt_id))
         attempt.approve()
 
-        expiry_date = datetime.date.today() + datetime.timedelta(
-            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        )
-
-        if use_new_templates_for_id_verification_emails():
-            context = {'user': user, 'expiry_date': expiry_date.strftime("%m/%d/%Y")}
-            send_verification_approved_email(context=context)
-        else:
-            verification_status_email_vars['expiry_date'] = expiry_date.strftime("%m/%d/%Y")
-            verification_status_email_vars['full_name'] = user.profile.name
-            subject = _(u"Your {platform_name} ID Verification Approved").format(
-                platform_name=settings.PLATFORM_NAME
-            )
-            context = {
-                'subject': subject,
-                'template': 'emails/passed_verification_email.txt',
-                'email': user.email,
-                'email_vars': verification_status_email_vars
-            }
-            send_verification_status_email.delay(context)
+        expiry_date = datetime.date.today() + datetime.timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        email_context = {'user': user, 'expiry_date': expiry_date.strftime("%m/%d/%Y")}
+        send_verification_approved_email(context=email_context)
 
     elif result == "FAIL":
         log.debug(u"Denying verification for %s", receipt_id)

@@ -326,7 +326,15 @@ def _check_user_auth_flow(site, user):
     """
     if user and ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.is_enabled():
         allowed_domain = site.configuration.get_value('THIRD_PARTY_AUTH_ONLY_DOMAIN', '').lower()
-        user_domain = user.email.split('@')[1].strip().lower()
+        email_parts = user.email.split('@')
+        if len(email_parts) != 2:
+            # User has a nonstandard email so we record their id.
+            # we don't record their e-mail in case there is sensitive info accidentally
+            # in there.
+            set_custom_metric('login_tpa_domain_shortcircuit_user_id', user.id)
+            log.warn("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)
+            return
+        user_domain = email_parts[1].strip().lower()
 
         # If user belongs to allowed domain and not whitelisted then user must login through allowed domain SSO
         if user_domain == allowed_domain and not AllowedAuthUser.objects.filter(site=site, email=user.email).exists():

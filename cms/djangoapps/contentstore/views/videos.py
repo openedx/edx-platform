@@ -81,7 +81,6 @@ WAFFLE_STUDIO_FLAG_NAMESPACE = WaffleFlagNamespace(name=u'studio')
 ENABLE_VIDEO_UPLOAD_PAGINATION = CourseWaffleFlag(
     waffle_namespace=WAFFLE_STUDIO_FLAG_NAMESPACE,
     flag_name=u'enable_video_upload_pagination',
-    flag_undefined_default=False
 )
 # Default expiration, in seconds, of one-time URLs used for uploading videos.
 KEY_EXPIRATION_IN_SECONDS = 86400
