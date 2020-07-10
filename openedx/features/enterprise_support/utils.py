@@ -343,5 +343,6 @@ def get_provider_login_url(request, provider_id, redirect_url=None):
     )
     return provider_login_url
 
+
 def fetch_enterprise_customer_by_id(enterprise_uuid):
     return EnterpriseCustomer.objects.get(uuid=enterprise_uuid)
