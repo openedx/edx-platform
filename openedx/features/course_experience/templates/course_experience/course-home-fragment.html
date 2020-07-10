@@ -189,3 +189,17 @@ from openedx.features.course_experience.course_tools import HttpMethod
 <%static:webpack entry="Enrollment">
     new CourseEnrollment('.enroll-btn', '${course_key | n, js_escaped_string}');
 </%static:webpack>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+  var fbeLink = $("#FBE_banner");
+
+  function trackFBEEvent() {
+    TrackECommerceEvents.trackUpsellClick(fbeLink, 'course_home_audit_access_expires', {
+      pageName: "course_home",
+      linkType: "link",
+      linkCategory: "FBE_banner"
+    });
+  }
+  fbeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackFBEEvent);
+
+</%static:require_module_async> 
