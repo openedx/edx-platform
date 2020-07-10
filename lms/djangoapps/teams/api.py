@@ -381,7 +381,7 @@ def anonymous_user_ids_for_team(user, team):
         ))
 
     return sorted([
-        anonymous_id_for_user(user=team_member, course_id=team.course_id, save=False)
+        anonymous_id_for_user(user=team_member, course_id=team.course_id, save=True)
         for team_member in team.users.all()
     ])
 
