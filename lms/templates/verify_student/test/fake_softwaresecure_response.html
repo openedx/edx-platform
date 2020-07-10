@@ -65,10 +65,10 @@ $(document).ready(function() {
             data: JSON.stringify(data),
             contentType: "application/json;",
             success: function () {
-               $('#success-info').html('status updated.');
+               $('#success-info').text('status updated.');
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                $('#errors-info').html(jqXHR.responseText);
+                $('#errors-info').text(jqXHR.responseText);
             }
         });
     }
