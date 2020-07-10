@@ -15,6 +15,7 @@ from celery.utils.log import get_task_logger
 
 from django.conf import settings
 
+from student.models import CourseEnrollment
 from student.roles import CourseAccessRole
 
 from opaque_keys.edx.keys import CourseKey
@@ -129,4 +130,17 @@ def import_course_on_site_creation(organization_id):
             # it's possible there was an error even before the course module was created
             pass
 
+        return u'exception: ' + unicode(exc)
+
+    try:
+        # enroll the user in the course
+        # we use a separate try/except because we want to keep the course even
+        # if the user cannot be enrolled, because it will find the course anyway
+        CourseEnrollment.enroll(
+            organization.users.first(),
+            course_target_id,
+            'honor'
+        )
+    except Exception as exc:
+        logging.exception(u'Error enrolling the user in default course')
         return u'exception: ' + unicode(exc)
