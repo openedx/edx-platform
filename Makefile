@@ -79,6 +79,7 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 REQ_FILES = \
 	requirements/edx/pip-tools \
 	requirements/edx/coverage \
+	requirements/edx/doc \
 	requirements/edx/paver \
 	requirements/edx-sandbox/shared \
 	requirements/edx-sandbox/py35 \

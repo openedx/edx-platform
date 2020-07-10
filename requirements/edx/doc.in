@@ -1,0 +1,6 @@
+# Requirements for documentation validation
+-c ../constraints.txt
+
+code-annotations          # provides annotations for certain documentation
+edx_sphinx_theme          # edX theme for Sphinx output
+Sphinx                    # Documentation builder
