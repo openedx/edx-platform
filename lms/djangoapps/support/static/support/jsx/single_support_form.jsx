@@ -135,10 +135,6 @@ class RenderForm extends React.Component {
           value: formData.course,
         }],
         tags: this.props.context.tags,
-        requester: {
-          email: this.userInformation.email,
-          name: this.userInformation.username,
-        },
       };
     request.open('POST', url, true);
     request.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
