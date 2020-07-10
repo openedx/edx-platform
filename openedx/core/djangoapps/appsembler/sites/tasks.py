@@ -21,6 +21,7 @@ from student.roles import CourseAccessRole
 from opaque_keys.edx.keys import CourseKey
 
 from organizations.models import Organization
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -141,6 +142,8 @@ def import_course_on_site_creation(organization_id):
             course_target_id,
             'honor'
         )
+        # Regenerate course overview to properly display it in the home page.
+        CourseOverview.update_select_courses([course_target_id], force_update=force_update=True)
     except Exception as exc:
         logging.exception(u'Error enrolling the user in default course')
         return u'exception: ' + unicode(exc)
