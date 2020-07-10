@@ -57,6 +57,9 @@ httpretty<1.0
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
 
+# 5.0.0 dropped support for Python 3.5
+isort<5.0.0
+
 # 0.15.0 dropped support for Python 3.5
 joblib<0.15.0
 
