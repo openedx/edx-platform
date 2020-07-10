@@ -52,7 +52,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
         </div>
         % if not is_mobile_app:
             <div class="upgrade-button">
-                <a href="${verified_upgrade_link}">
+                <a id="PLS_button" href="${verified_upgrade_link}">
                     <button type="button">
                         ${_('Upgrade to shift due dates')}
                     </button>
@@ -76,7 +76,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
         </div>
         % if not is_mobile_app:
             <div class="upgrade-button">
-                <a href="${verified_upgrade_link}">
+                <a id="PLS_button" href="${verified_upgrade_link}">
                     <button type="button">
                         ${_('Upgrade now')}
                     </button>
