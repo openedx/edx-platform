@@ -22,7 +22,6 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='verify_student')
 USE_NEW_EMAIL_TEMPLATES = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='use_new_email_templates',
-    flag_undefined_default=False
 )
 
 

@@ -21,7 +21,7 @@ from student.models import CourseEnrollment
 from util.query import use_read_replica_if_available
 
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -127,6 +127,9 @@ class Command(BaseCommand):
 
         success = True
         for verification in sspv:
+            user = verification.user
+            if self.user_has_valid_verification(user):
+                continue
             if not verification.expiry_email_date or verification.expiry_email_date <= date_resend_days_ago:
                 batch_verifications.append(verification)
 
@@ -141,6 +144,30 @@ class Command(BaseCommand):
 
         if not success:
             raise CommandError('One or more email attempts failed. Search for "Could not send" above.')
+
+    def user_has_valid_verification(self, user):
+        """
+        Check if the user has a valid sso or manual verification
+        """
+        return self.has_valid_sso_verification(user) or self.has_valid_manual_verification(user)
+
+    def has_valid_sso_verification(self, user):
+        """
+        Checks if the user has a valid sso verification
+        """
+        sso_verifications = SSOVerification.objects.filter(user=user, status='approved')
+        for sso_verification in sso_verifications:
+            if sso_verification.expiration_datetime > now():
+                return True
+
+    def has_valid_manual_verification(self, user):
+        """
+        Checks if the user has a valid manual verification
+        """
+        manual_verifications = ManualVerification.objects.filter(user=user, status='approved')
+        for manual_verification in manual_verifications:
+            if manual_verification.expiration_datetime > now():
+                return True
 
     def send_verification_expiry_email(self, batch_verifications, email_config):
         """

@@ -412,6 +412,9 @@ ENABLE_JASMINE = False
 # IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
 
+############################# MICROFRONTENDS ###################################
+COURSE_AUTHORING_MICROFRONTEND_URL = None
+
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
@@ -1950,7 +1953,8 @@ MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
 ############## Settings for the Discovery App ######################
 
-COURSE_CATALOG_API_URL = 'http://localhost:8008/api/v1'
+COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
+COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
 
 # which access.py permission name to check in order to determine if a course is visible in
 # the course catalog. We default this to the legacy permission 'see_exists'.
@@ -2252,4 +2256,8 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 DISABLE_DEPRECATED_SIGNUP_URL = False
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
-LOGISTRATION_RATELIMIT_RATE = '500/5m'
+LOGISTRATION_RATELIMIT_RATE = '100/5m'
+
+##### PASSWORD RESET RATE LIMIT SETTINGS #####
+PASSWORD_RESET_IP_RATE = '1/m'
+PASSWORD_RESET_EMAIL_RATE = '2/h'

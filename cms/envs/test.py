@@ -135,6 +135,8 @@ LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 
+COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe/"
+
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
     # functioning cache -- it relies on caching to load its settings in places.
@@ -298,3 +300,6 @@ SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
 DEFAULT_MOBILE_AVAILABLE = True
 
 PROCTORING_SETTINGS = {}
+
+##### LOGISTRATION RATE LIMIT SETTINGS #####
+LOGISTRATION_RATELIMIT_RATE = '5/5m'

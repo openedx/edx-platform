@@ -17,9 +17,9 @@ import logging
 
 import six
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.template import engines
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 from six.moves.urllib.parse import urljoin
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -90,7 +90,10 @@ def marketing_link(name):
             if all([host_name and 'edge' in host_name, 'http' in link_map[name]]):
                 return link_map[name]
             else:
-                return reverse(link_map[name])
+                try:
+                    return reverse(link_map[name])
+                except NoReverseMatch:
+                    raise Http404
     else:
         log.debug(u"Cannot find corresponding link for name: %s", name)
         return '#'

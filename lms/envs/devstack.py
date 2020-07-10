@@ -323,7 +323,12 @@ FEATURES.update({
     'AUTOMATIC_AUTH_FOR_TESTING': True,
     'ENABLE_DISCUSSION_SERVICE': True,
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
-    'ENABLE_ENTERPRISE_INTEGRATION': False,
+
+    # Enable enterprise integration by default.
+    # See https://github.com/edx/edx-enterprise/blob/master/docs/development.rst for
+    # more background on edx-enterprise.
+    # Toggle this off if you don't want anything to do with enterprise in devstack.
+    'ENABLE_ENTERPRISE_INTEGRATION': True,
 })
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
@@ -362,15 +367,15 @@ CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 COURSE_CATALOG_URL_ROOT = 'http://edx.devstack.discovery:18381'
 COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
 
-# Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
-# LOGGING['handlers']['console']['level'] = 'DEBUG'
-# LOGGING['loggers']['django.db.backends'] = {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False}
-
 SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", SYSTEM_WIDE_ROLE_CLASSES)
-SYSTEM_WIDE_ROLE_CLASSES.extend(['system_wide_roles.SystemWideRoleAssignment'])
+SYSTEM_WIDE_ROLE_CLASSES.append(
+    'system_wide_roles.SystemWideRoleAssignment',
+)
 
-if FEATURES['ENABLE_ENTERPRISE_INTEGRATION']:
-    SYSTEM_WIDE_ROLE_CLASSES.extend(['enterprise.SystemWideEnterpriseUserRoleAssignment'])
+if FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION'):
+    SYSTEM_WIDE_ROLE_CLASSES.append(
+        'enterprise.SystemWideEnterpriseUserRoleAssignment',
+    )
 
 # List of enterprise customer uuids to exclude from transition to use of enterprise-catalog
 ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG = ()
@@ -398,3 +403,7 @@ if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
 # ]
 # TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
 # derive_settings(__name__)
+
+# Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
+# LOGGING['handlers']['console']['level'] = 'DEBUG'
+# LOGGING['loggers']['django.db.backends'] = {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False}

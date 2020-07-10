@@ -64,9 +64,10 @@ class BlockCompletionTransformer(BlockStructureTransformer):
         children = block_structure.get_children(block_key)
         non_discussion_children = (child_key for child_key in children
                                    if block_structure.get_xblock_field(child_key, 'category') != 'discussion')
-        child_complete = (block_structure.get_xblock_field(child_key, self.COMPLETE)
-                          for child_key in non_discussion_children)
-        if children and all(child_complete):
+        all_children_complete = all(block_structure.get_xblock_field(child_key, self.COMPLETE)
+                                    for child_key in non_discussion_children)
+
+        if children and all_children_complete:
             block_structure.override_xblock_field(block_key, self.COMPLETE, True)
 
         if any(block_structure.get_xblock_field(child_key, self.RESUME_BLOCK) for child_key in children):

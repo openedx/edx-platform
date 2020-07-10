@@ -109,7 +109,6 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'registration'),
     flag_name=u'enable_failure_logging',
-    flag_undefined_default=False
 )
 
 

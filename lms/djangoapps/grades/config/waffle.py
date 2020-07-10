@@ -38,25 +38,21 @@ def waffle_flags():
         REJECTED_EXAM_OVERRIDES_GRADE: CourseWaffleFlag(
             namespace,
             REJECTED_EXAM_OVERRIDES_GRADE,
-            flag_undefined_default=True,
         ),
         # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.
         ENFORCE_FREEZE_GRADE_AFTER_COURSE_END: CourseWaffleFlag(
             namespace,
             ENFORCE_FREEZE_GRADE_AFTER_COURSE_END,
-            flag_undefined_default=True,
         ),
         # Have this course override flag so we can selectively turn off the gradebook for courses.
         # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.
         WRITABLE_GRADEBOOK: CourseWaffleFlag(
             namespace,
             WRITABLE_GRADEBOOK,
-            flag_undefined_default=True,
         ),
         BULK_MANAGEMENT: CourseWaffleFlag(
             namespace,
             BULK_MANAGEMENT,
-            flag_undefined_default=False,
         ),
     }
 
