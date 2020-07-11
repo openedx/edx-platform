@@ -412,6 +412,9 @@ ENABLE_JASMINE = False
 # IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
 
+############################# MICROFRONTENDS ###################################
+COURSE_AUTHORING_MICROFRONTEND_URL = None
+
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py

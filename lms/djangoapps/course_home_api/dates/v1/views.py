@@ -36,6 +36,8 @@ class DatesTabView(RetrieveAPIView):
         Body consists of the following fields:
 
         course_date_blocks: List of serialized DateSummary objects. Each serialization has the following fields:
+            complete: (bool) Meant to only be used by assignments. Indicates completeness for an
+                assignment.
             date: (datetime) The date time corresponding for the event
             date_type: (str) The type of date (ex. course-start-date, assignment-due-date, etc.)
             description: (str) The description for the date event

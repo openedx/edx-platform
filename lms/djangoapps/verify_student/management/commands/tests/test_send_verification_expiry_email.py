@@ -17,7 +17,7 @@ from student.tests.factories import UserFactory
 from testfixtures import LogCapture
 
 from common.test.utils import MockS3BotoMixin
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
 
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.send_verification_expiry_email'
@@ -44,6 +44,17 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         attempt.mark_ready()
         attempt.submit()
         return attempt
+
+    def create_expired_software_secure_photo_verification(self):
+        """
+        Helper method that creates an expired ssp verification
+        """
+        user = UserFactory.create()
+        verification = self.create_and_submit(user)
+        verification.status = 'approved'
+        verification.expiry_date = now() - timedelta(days=self.days)
+        verification.save()
+        return verification
 
     def test_expiry_date_range(self):
         """
@@ -123,6 +134,30 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(user_id=verification.user_id)
         self.assertEqual(attempt.expiry_email_date.date(), expected_date.date())
         self.assertEqual(len(mail.outbox), 1)
+
+    def test_verification_expiry_email_not_sent_valid_ssov(self):
+        """
+        Test that user has an expired software secure verification but a valid sso verification
+        so an email is not sent to the user
+        """
+        expired_ssp_verification = self.create_expired_software_secure_photo_verification()
+
+        SSOVerification.objects.create(user=expired_ssp_verification.user, status='approved')
+
+        call_command('send_verification_expiry_email')
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_verification_expiry_email_not_sent_valid_manual_verification(self):
+        """
+        Test that user has an expired software secure verification but a valid manual verification
+        so an email is not sent to the user
+        """
+        expired_ssp_verification = self.create_expired_software_secure_photo_verification()
+
+        ManualVerification.objects.create(user=expired_ssp_verification.user, status='approved')
+
+        call_command('send_verification_expiry_email')
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_email_already_sent(self):
         """

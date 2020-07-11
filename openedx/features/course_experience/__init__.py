@@ -22,7 +22,7 @@ class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
         and refactor/fix any tests that shouldn't be removed.
 
     """
-    def is_flag_active(self, flag_name, check_before_waffle_callback=None, flag_undefined_default=None):
+    def is_flag_active(self, flag_name, check_before_waffle_callback=None):
         """
         Overrides is_flag_active, and returns and caches whether the provided flag is active.
 
