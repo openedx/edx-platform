@@ -814,11 +814,9 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
         """
         child_statuses = []
         for child in self.get_children():
-            if hasattr(child, "discussion_enabled"):
-                # This if-case covers vertical block
+            if child.category == "vertical":
                 child_statuses.append(child.discussion_enabled)
-            else:
-                # This else-case covers subsection block
+            elif child.category == "sequential":
                 child_statuses += child.get_children_discussion_toggle_status()
         return child_statuses
 
