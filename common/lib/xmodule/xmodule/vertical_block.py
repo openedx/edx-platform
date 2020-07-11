@@ -37,8 +37,7 @@ class VerticalFields(object):
     discussion_enabled = Boolean(
         display_name=_("Enable Discussion"),
         help=_(
-            "This setting enable discussions for this vertical block. "
-            "If True, a discussion UI would show up under this vertical block."
+            "This setting enables discussion for this Unit. If enabled, a discussion UI would show up under this Unit."
         ),
         default=False,
         scope=Scope.settings,

@@ -1049,8 +1049,7 @@ class CourseFields(object):
     discussion_enabled = Boolean(
         display_name=_("Enable Discussion"),
         help=_(
-            "Enter true or false. If this value is False, you can not enable discussion for any "
-            "section/subsection/unit."
+            "Enter true or false."
         ),
         default=True,
         scope=Scope.settings,

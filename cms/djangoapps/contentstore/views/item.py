@@ -169,8 +169,7 @@ def xblock_handler(request, usage_key_string):
                 :display_name: name for new xblock, optional
                 :boilerplate: template name for populating fields, optional and only used
                      if duplicate_source_locator is not present
-              The locator (unicode representati                set_discussion_toggle()
-on of a UsageKey) for the created xblock (minus children) is returned.
+              The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
     if usage_key_string:
         usage_key = usage_key_with_run(usage_key_string)
@@ -202,9 +201,9 @@ on of a UsageKey) for the created xblock (minus children) is returned.
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            discussion_enabled = (request.json.get('fields') or {}).get('discussion_enabled')
+            discussion_enabled = request.json.get('fields', {}).get('discussion_enabled')
             xblock = _get_xblock(usage_key, request.user)
-            if discussion_enabled is not None and usage_key.category in ["sequential", "chapter"]:
+            if isinstance(discussion_enabled, bool) and usage_key.category in ["sequential", "chapter"]:
                 set_discussion_toggle(discussion_enabled, xblock, request.user)
 
             return _save_xblock(
@@ -1240,6 +1239,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             elif xblock.category == 'course':
                 xblock_info.update({
                     'highlights_enabled_for_messaging': course.highlights_enabled_for_messaging,
+                    'discussion_enabled': xblock.get_discussion_toggle_status()
                 })
             xblock_info.update({
                 'highlights_enabled': highlights_setting.is_enabled(),
