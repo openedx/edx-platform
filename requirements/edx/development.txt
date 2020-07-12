@@ -170,7 +170,7 @@ kombu==4.6.11             # via -r requirements/edx/testing.txt, celery
 laboratory==1.0.2         # via -r requirements/edx/testing.txt
 lazy-object-proxy==1.4.3  # via -r requirements/edx/testing.txt, astroid
 lazy==1.4                 # via -r requirements/edx/testing.txt, acid-xblock, bok-choy, lti-consumer-xblock, ora2
-libsass==0.10.0           # via -r requirements/edx/testing.txt, ora2
+libsass==0.20.1           # via -r requirements/edx/testing.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/testing.txt, ora2
 lti-consumer-xblock==2.3  # via -r requirements/edx/testing.txt
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, capa, edxval, lti-consumer-xblock, ora2, pyquery, safe-lxml, xblock, xmlsec
