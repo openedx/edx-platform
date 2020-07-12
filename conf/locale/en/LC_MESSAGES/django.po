@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-05 20:50+0000\n"
-"PO-Revision-Date: 2020-07-05 20:50:24.140977\n"
+"POT-Creation-Date: 2020-07-12 20:50+0000\n"
+"PO-Revision-Date: 2020-07-12 20:50:33.766057\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -5394,7 +5394,6 @@ msgid "in {relative} - {absolute}"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Date"
 msgstr ""
 
@@ -6153,51 +6152,6 @@ msgid ""
 "sailthru."
 msgstr ""
 
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "{platform_name} Staff"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Course Staff"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: openedx/core/djangoapps/django_comment_common/models.py
-msgid "Student"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: lms/templates/preview_menu.html
-msgid "Staff"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Used Registration Code"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Credit Card - Individual"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "manually enrolled by username: {username}"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Manually Enrolled"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Data Integrity Error"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr ""
-
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
@@ -6307,13 +6261,11 @@ msgid "enrolled learner profile"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/ccx/enrollment.html lms/templates/staff_problem_info.html
@@ -6338,7 +6290,6 @@ msgid "Email"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Language"
 msgstr ""
 
@@ -6354,7 +6305,6 @@ msgstr ""
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6362,18 +6312,15 @@ msgid "Gender"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Level of Education"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Goals"
 msgstr ""
 
@@ -6406,7 +6353,6 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -6416,7 +6362,6 @@ msgid "City"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6434,11 +6379,6 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'username' column, an 'email' column, or both."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/api_helper.py
-msgid "detailed enrollment"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6675,10 +6615,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "E-Commerce"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Special Exams"
 msgstr ""
 
@@ -6802,7 +6738,6 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -6830,6 +6765,10 @@ msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Error occured. Please try again later."
+msgstr ""
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "detailed enrollment"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -6912,12 +6851,6 @@ msgstr ""
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-msgid "generating_enrollment_report"
-msgstr ""
-
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
 msgid "certificates generated"
 msgstr ""
 
@@ -6927,82 +6860,6 @@ msgstr ""
 #. {attempted} so far"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "First Name"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "Last Name"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/shoppingcart/receipt.html
-msgid "Company Name"
-msgstr ""
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Title
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
-#: wiki/templates/wiki/dir.html
-msgid "Title"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Year of Birth"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Currently Enrolled"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Source"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Manual (Un)Enrollment Reason"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Role"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "List Price"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Payment Amount"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Coupon Codes Used"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Registration Code Used"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Payment Status"
-msgstr ""
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Transaction Reference Number"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
@@ -8191,16 +8048,6 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "{platform_name} ID Verification Photos Received"
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "Your {platform_name} ID Verification Approved"
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
@@ -9750,6 +9597,10 @@ msgstr ""
 msgid "Community TA"
 msgstr ""
 
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Student"
+msgstr ""
+
 #: openedx/core/djangoapps/embargo/forms.py
 #: openedx/core/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
@@ -10289,6 +10140,20 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr ""
 
 #. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "First Name"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Last Name"
+msgstr ""
+
+#. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
@@ -10301,6 +10166,15 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Company"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Title
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
+#: wiki/templates/wiki/dir.html
+msgid "Title"
 msgstr ""
 
 #. Translators: This label appears above a field on the registration form
@@ -12832,6 +12706,11 @@ msgstr ""
 
 #: lms/templates/preview_menu.html
 msgid "View this course as:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/preview_menu.html
+msgid "Staff"
 msgstr ""
 
 #: lms/templates/preview_menu.html
@@ -18069,6 +17948,10 @@ msgid "Billed To Details"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
+msgid "Company Name"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
 msgid "N/A"
 msgstr ""
 
@@ -19092,6 +18975,10 @@ msgid "Highest Level of Education Completed"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-form.html
+msgid "Year of Birth"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 
@@ -19326,7 +19213,7 @@ msgid "Learn more about certificates"
 msgstr ""
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Details & Schedule"
 msgstr ""
 
@@ -19347,6 +19234,12 @@ msgstr ""
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Advanced Settings"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Proctored Exam Settings"
 msgstr ""
 
 #: cms/templates/checklists.html cms/templates/widgets/header.html
@@ -21753,7 +21646,7 @@ msgid "Must be greater than or equal to the course passing grade"
 msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Grading Rules &amp; Policies"
+msgid "Grading Rules & Policies"
 msgstr ""
 
 #: cms/templates/settings_graders.html
@@ -21802,10 +21695,6 @@ msgid ""
 "You can also create assignment types, such as homework, labs, quizzes, and "
 "exams, and specify how much of a student's grade each assignment type is "
 "worth."
-msgstr ""
-
-#: cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
