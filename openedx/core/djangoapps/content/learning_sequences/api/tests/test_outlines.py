@@ -30,7 +30,8 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
     def setUpTestData(cls):
         cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Learn+Roundtrip")
         normal_visibility = VisibilityData(
-            hide_from_toc=False, visible_to_staff_only=False
+            hide_from_toc=False,
+            visible_to_staff_only=False
         )
         cls.course_outline = CourseOutlineData(
             course_key=cls.course_key,
@@ -122,7 +123,8 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
         # Seed with data
         cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
         normal_visibility = VisibilityData(
-            hide_from_toc=False, visible_to_staff_only=False
+            hide_from_toc=False,
+            visible_to_staff_only=False
         )
         cls.simple_outline = CourseOutlineData(
             course_key=cls.course_key,
@@ -185,6 +187,15 @@ class ScheduleTestCase(CacheIsolationTestCase):
         cls.seq_same_key = cls.course_key.make_usage_key('sequential', 'seq_same')
         cls.seq_after_key = cls.course_key.make_usage_key('sequential', 'seq_after')
         cls.seq_inherit_key = cls.course_key.make_usage_key('sequential', 'seq_inherit')
+        cls.seq_due_key = cls.course_key.make_usage_key('sequential', 'seq_due')
+
+        cls.all_seq_keys = [
+            cls.seq_before_key,
+            cls.seq_same_key,
+            cls.seq_after_key,
+            cls.seq_inherit_key,
+            cls.seq_due_key,
+        ]
 
         # Set scheduling information into edx-when for a single Section with
         # sequences starting at various times.
@@ -219,9 +230,20 @@ class ScheduleTestCase(CacheIsolationTestCase):
                     cls.seq_inherit_key,
                     {'start': None}
                 ),
+                # Sequence should inherit start information from Section, but has a due date set.
+                (
+                    cls.seq_due_key,
+                    {
+                        'start': None,
+                        'due': datetime(2020, 5, 20, tzinfo=timezone.utc)
+                    }
+                ),
             ]
         )
-        visibility = VisibilityData(hide_from_toc=False, visible_to_staff_only=False)
+        visibility = VisibilityData(
+            hide_from_toc=False,
+            visible_to_staff_only=False
+        )
         cls.outline = CourseOutlineData(
             course_key=cls.course_key,
             title="User Outline Test Course!",
@@ -234,16 +256,29 @@ class ScheduleTestCase(CacheIsolationTestCase):
                     visibility=visibility,
                     sequences=[
                         CourseLearningSequenceData(
-                            usage_key=cls.seq_before_key, title='Before', visibility=visibility
+                            usage_key=cls.seq_before_key,
+                            title='Before',
+                            visibility=visibility
                         ),
                         CourseLearningSequenceData(
-                            usage_key=cls.seq_same_key, title='Same', visibility=visibility
+                            usage_key=cls.seq_same_key,
+                            title='Same', visibility=visibility
                         ),
                         CourseLearningSequenceData(
-                            usage_key=cls.seq_after_key, title='After', visibility=visibility
+                            usage_key=cls.seq_after_key,
+                            title='After',
+                            visibility=visibility
                         ),
                         CourseLearningSequenceData(
-                            usage_key=cls.seq_inherit_key, title='Inherit', visibility=visibility
+                            usage_key=cls.seq_inherit_key,
+                            title='Inherit',
+                            visibility=visibility
+                        ),
+                        CourseLearningSequenceData(
+                            usage_key=cls.seq_due_key,
+                            title='Due',
+                            visibility=visibility,
+                            inaccessible_after_due=True
                         ),
                     ]
                 )
@@ -256,25 +291,32 @@ class ScheduleTestCase(CacheIsolationTestCase):
         student_details = get_user_course_outline_details(self.course_key, self.student, at_time)
         return staff_details, student_details
 
+    def get_sequence_keys(self, exclude=None):
+        if exclude is None:
+            exclude = []
+        if not isinstance(exclude, list):
+            raise TypeError("`exclude` must be a list of keys to be excluded")
+        return [key for key in self.all_seq_keys if key not in exclude]
+
     def test_before_course_starts(self):
         staff_details, student_details = self.get_details(
             datetime(2020, 5, 9, tzinfo=timezone.utc)
         )
         # Staff can always access all sequences
-        assert len(staff_details.outline.accessible_sequences) == 4
+        assert len(staff_details.outline.accessible_sequences) == 5
         # Student can access nothing
         assert len(student_details.outline.accessible_sequences) == 0
 
         # Everyone can see everything
-        assert len(staff_details.outline.sequences) == 4
-        assert len(student_details.outline.sequences) == 4
+        assert len(staff_details.outline.sequences) == 5
+        assert len(student_details.outline.sequences) == 5
 
     def test_before_section_starts(self):
         staff_details, student_details = self.get_details(
             datetime(2020, 5, 14, tzinfo=timezone.utc)
         )
         # Staff can always access all sequences
-        assert len(staff_details.outline.accessible_sequences) == 4
+        assert len(staff_details.outline.accessible_sequences) == 5
 
         # Student can access nothing -- even though one of the sequences is set
         # to start on 2020-05-14, it's not available because the section hasn't
@@ -289,14 +331,44 @@ class ScheduleTestCase(CacheIsolationTestCase):
             datetime(2020, 5, 15, tzinfo=timezone.utc)
         )
         # Staff can always access all sequences
-        assert len(staff_details.outline.accessible_sequences) == 4
+        assert len(staff_details.outline.accessible_sequences) == 5
 
         # Student can access all sequences except the one that starts after this
         # datetime (self.seq_after_key)
-        assert len(student_details.outline.accessible_sequences) == 3
-        assert self.seq_before_key in student_details.outline.accessible_sequences
-        assert self.seq_same_key in student_details.outline.accessible_sequences
-        assert self.seq_inherit_key in student_details.outline.accessible_sequences
+        assert len(student_details.outline.accessible_sequences) == 4
+        assert self.seq_after_key not in student_details.outline.accessible_sequences
+        for key in self.get_sequence_keys(exclude=[self.seq_after_key]):
+            assert key in student_details.outline.accessible_sequences
+
+    def test_is_due_and_before_due(self):
+        staff_details, student_details = self.get_details(
+            datetime(2020, 5, 16, tzinfo=timezone.utc)
+        )
+        # Staff can always access all sequences
+        assert len(staff_details.outline.accessible_sequences) == 5
+
+        # Student can access all sequences including the one that is due in
+        # the future (self.seq_due_key)
+        assert len(student_details.outline.accessible_sequences) == 5
+        assert self.seq_due_key in student_details.outline.accessible_sequences
+
+        seq_due_sched_item_data = student_details.schedule.sequences[self.seq_due_key]
+        assert seq_due_sched_item_data.due == datetime(2020, 5, 20, tzinfo=timezone.utc)
+
+    def test_is_due_and_after_due(self):
+        staff_details, student_details = self.get_details(
+            datetime(2020, 5, 21, tzinfo=timezone.utc)
+        )
+        # Staff can always access all sequences
+        assert len(staff_details.outline.accessible_sequences) == 5
+
+        # Student can access all sequences except the one that is due before this
+        # datetime (self.seq_due_key)
+        assert len(student_details.outline.accessible_sequences) == 4
+        assert self.seq_due_key not in student_details.outline.accessible_sequences
+        assert self.seq_due_key in student_details.outline.sequences
+        for key in self.get_sequence_keys(exclude=[self.seq_due_key]):
+            assert key in student_details.outline.accessible_sequences
 
 
 class VisbilityTestCase(CacheIsolationTestCase):
@@ -322,12 +394,22 @@ class VisbilityTestCase(CacheIsolationTestCase):
 
         cls.staff_in_normal_key = cls.course_key.make_usage_key('sequential', 'staff_in_normal')
         cls.hide_in_normal_key = cls.course_key.make_usage_key('sequential', 'hide_in_normal')
+        cls.due_in_normal_key = cls.course_key.make_usage_key('sequential', 'due_in_normal')
         cls.normal_in_normal_key = cls.course_key.make_usage_key('sequential', 'normal_in_normal')
         cls.normal_in_staff_key = cls.course_key.make_usage_key('sequential', 'normal_in_staff')
 
-        v_normal = VisibilityData(hide_from_toc=False, visible_to_staff_only=False)
-        v_hide_from_toc = VisibilityData(hide_from_toc=True, visible_to_staff_only=False)
-        v_staff_only = VisibilityData(hide_from_toc=False, visible_to_staff_only=True)
+        v_normal = VisibilityData(
+            hide_from_toc=False,
+            visible_to_staff_only=False
+        )
+        v_hide_from_toc = VisibilityData(
+            hide_from_toc=True,
+            visible_to_staff_only=False
+        )
+        v_staff_only = VisibilityData(
+            hide_from_toc=False,
+            visible_to_staff_only=True
+        )
 
         cls.outline = CourseOutlineData(
             course_key=cls.course_key,
