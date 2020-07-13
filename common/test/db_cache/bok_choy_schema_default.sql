@@ -2632,7 +2632,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=735 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=738 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3186,6 +3186,7 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `contact_email` varchar(254) DEFAULT NULL,
   `enable_portal_subscription_management_screen` tinyint(1) NOT NULL,
   `enable_slug_login` tinyint(1) NOT NULL,
+  `enable_portal_saml_configuration_screen` tinyint(1) NOT NULL,
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `enterprise_enterprisecustomer_slug_80411f46_uniq` (`slug`),
   KEY `enterprise_enterprisecustomer_site_id_947ed084_fk_django_site_id` (`site_id`),
@@ -3440,6 +3441,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `contact_email` varchar(254) DEFAULT NULL,
   `enable_portal_subscription_management_screen` tinyint(1) NOT NULL,
   `enable_slug_login` tinyint(1) NOT NULL,
+  `enable_portal_saml_configuration_screen` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_bbd9b0d6_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomer_uuid_75c3528e` (`uuid`),
@@ -4161,6 +4163,7 @@ CREATE TABLE `learning_sequences_coursesectionsequence` (
   `learning_context_id` bigint(20) NOT NULL,
   `section_id` bigint(20) NOT NULL,
   `sequence_id` bigint(20) NOT NULL,
+  `inaccessible_after_due` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `learning_sequences_cours_learning_context_id_orde_ad7604bd_uniq` (`learning_context_id`,`ordering`),
   KEY `learning_sequences_c_section_id_646c2074_fk_learning_` (`section_id`),
