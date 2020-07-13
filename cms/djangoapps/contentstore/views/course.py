@@ -43,6 +43,7 @@ from contentstore.tasks import rerun_course as rerun_course_task
 from contentstore.utils import (
     add_instructor,
     get_lms_link_for_item,
+    get_proctored_exam_settings_url,
     initialize_permissions,
     remove_all_instructors,
     reverse_course_url,
@@ -608,21 +609,6 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
     return data
 
 
-def _get_proctored_exam_settings_url(course_module):
-    """
-    Gets course authoring microfrontend URL for links to proctored exam settings page
-    """
-    course_authoring_microfrontend_url = ''
-
-    if settings.FEATURES.get('ENABLE_EXAM_SETTINGS_HTML_VIEW'):
-        course_authoring_microfrontend_url = configuration_helpers.get_value_for_org(
-            course_module.location.org,
-            'COURSE_AUTHORING_MICROFRONTEND_URL',
-            settings.COURSE_AUTHORING_MICROFRONTEND_URL
-        )
-    return course_authoring_microfrontend_url
-
-
 @login_required
 @ensure_csrf_cookie
 def course_index(request, course_key):
@@ -668,7 +654,7 @@ def course_index(request, course_key):
             settings.FEATURES.get('FRONTEND_APP_PUBLISHER_URL', False)
         )
 
-        course_authoring_microfrontend_url = _get_proctored_exam_settings_url(course_module)
+        course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
 
         return render_to_response('course_outline.html', {
             'language_code': request.LANGUAGE_CODE,
@@ -1100,7 +1086,7 @@ def settings_handler(request, course_key_string):
             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
                                 verified_mode.expiration_datetime.isoformat())
 
-            course_authoring_microfrontend_url = _get_proctored_exam_settings_url(course_module)
+            course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
 
             settings_context = {
                 'context_course': course_module,
@@ -1240,7 +1226,7 @@ def grading_handler(request, course_key_string, grader_index=None):
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             course_details = CourseGradingModel.fetch(course_key)
 
-            course_authoring_microfrontend_url = _get_proctored_exam_settings_url(course_module)
+            course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
 
             return render_to_response('settings_graders.html', {
                 'context_course': course_module,
@@ -1346,7 +1332,7 @@ def advanced_settings_handler(request, course_key_string):
                 settings.FEATURES.get('ENABLE_PUBLISHER', False)
             )
 
-            course_authoring_microfrontend_url = _get_proctored_exam_settings_url(course_module)
+            course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
 
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
@@ -1698,7 +1684,7 @@ def group_configurations_list_handler(request, course_key_string):
             if not has_content_groups:
                 displayable_partitions.append(GroupConfiguration.get_or_create_content_group(store, course))
 
-            course_authoring_microfrontend_url = _get_proctored_exam_settings_url(course)
+            course_authoring_microfrontend_url = get_proctored_exam_settings_url(course)
 
             return render_to_response('group_configurations.html', {
                 'context_course': course,
