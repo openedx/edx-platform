@@ -21,7 +21,10 @@ class TestCourseOutlineData(TestCase):
         test as needed.
         """
         super().setUpClass()
-        normal_visibility = VisibilityData(hide_from_toc=False, visible_to_staff_only=False)
+        normal_visibility = VisibilityData(
+            hide_from_toc=False,
+            visible_to_staff_only=False
+        )
         cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Learning+TestRun")
         cls.course_outline = CourseOutlineData(
             course_key=cls.course_key,
@@ -110,7 +113,10 @@ def generate_sections(course_key, num_sequences):
 
     All sections and sequences have normal visibility.
     """
-    normal_visibility = VisibilityData(hide_from_toc=False, visible_to_staff_only=False)
+    normal_visibility = VisibilityData(
+        hide_from_toc=False,
+        visible_to_staff_only=False
+    )
     sections = []
     for sec_num, seq_count in enumerate(num_sequences, 1):
         sections.append(

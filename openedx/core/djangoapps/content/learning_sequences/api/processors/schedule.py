@@ -75,6 +75,13 @@ class ScheduleOutlineProcessor(OutlineProcessor):
                     seq_start = self.keys_to_schedule_fields[seq.usage_key].get('start')
                     if seq_start and self.at_time < seq_start:
                         inaccessible.add(seq.usage_key)
+                        continue
+
+                    seq_due = self.keys_to_schedule_fields[seq.usage_key].get('due')
+                    if seq.inaccessible_after_due:
+                        if seq_due and self.at_time > seq_due:
+                            inaccessible.add(seq.usage_key)
+                            continue
 
         return inaccessible
 

@@ -76,6 +76,8 @@ class CourseLearningSequenceData:
     title = attr.ib(type=str)
     visibility = attr.ib(type=VisibilityData)
 
+    inaccessible_after_due = attr.ib(type=bool, default=True)
+
 
 @attr.s(frozen=True)
 class CourseSectionData:
