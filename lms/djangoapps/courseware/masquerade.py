@@ -103,7 +103,7 @@ class MasqueradeView(View):
                 'course_key': course_key_string,
                 'group_id': course.group_id,
                 'role': course.role,
-                'user_name': course.user_name or ' ',
+                'user_name': course.user_name or None,
                 'user_partition_id': course.user_partition_id,
             },
             'available': [
