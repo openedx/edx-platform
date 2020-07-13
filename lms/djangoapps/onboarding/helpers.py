@@ -7804,11 +7804,6 @@ def get_country_iso(c_name):
     return _iso
 
 
-def get_sorted_choices_from_dict(_dict):
-    sorted_dict = sorted(_dict.items(), key=lambda x: x[1])
-    return ((field_name, label) for field_name, label in sorted_dict)
-
-
 def reorder_registration_form_fields(fields):
     required_order = {
         'first_name': 0,
@@ -7834,10 +7829,6 @@ def reorder_registration_form_fields(fields):
 
     required_order = sorted(fields, key=lambda k: k['order'])
     return required_order
-
-
-def get_actual_field_names(fields):
-    return [f.split("=")[1] for f in fields]
 
 
 def admin_not_assigned_or_me(user, organization):

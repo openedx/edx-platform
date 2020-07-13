@@ -15,30 +15,42 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect
-from django.http import JsonResponse
-from django.shortcuts import redirect, get_object_or_404
-from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _, ugettext_noop
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_noop
 from django.views.decorators.csrf import csrf_exempt
-from edxmako.shortcuts import render_to_response
-from nodebb.helpers import update_nodebb_for_user_status
 
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.onboarding import forms
 from lms.djangoapps.onboarding.decorators import can_save_org_data, can_save_org_details
-from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, \
+from lms.djangoapps.onboarding.email_utils import (
+    send_admin_activation_email,
+    send_admin_update_confirmation_email,
     send_admin_update_email
-from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner, \
-    get_close_matching_orgs_with_suggestions, get_alquity_community_url, serialize_partner_networks, \
-    affiliated_unattended_surveys
+)
+from lms.djangoapps.onboarding.helpers import (
+    COUNTRIES,
+    LANGUAGES,
+    affiliated_unattended_surveys,
+    calculate_age_years,
+    get_alquity_community_url,
+    get_close_matching_orgs_with_suggestions,
+    serialize_partner_networks
+)
 from lms.djangoapps.onboarding.models import (
+    Currency,
     Organization,
-    Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
-from lms.djangoapps.onboarding.models import UserExtendedProfile
+    OrganizationAdminHashKeys,
+    OrganizationMetric,
+    PartnerNetwork,
+    UserExtendedProfile
+)
 from lms.djangoapps.onboarding.serializers import PartnerNetworkSerializer
 from lms.djangoapps.onboarding.signals import save_interests
 from lms.djangoapps.philu_overrides.helpers import save_user_partner_network_consent
-from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_joined_communities
+from lms.djangoapps.student_dashboard.views import get_joined_communities, get_recommended_xmodule_courses
+from nodebb.helpers import update_nodebb_for_user_status
 
 log = logging.getLogger("edx.onboarding")
 
@@ -79,7 +91,6 @@ def user_info(request):
         'level_of_education': userprofile.level_of_education,
         'hours_per_week': user_extended_profile.hours_per_week if user_extended_profile.hours_per_week else '',
         'is_emp_location_different': True if user_extended_profile.country_of_employment else False,
-        "function_areas": user_extended_profile.get_user_selected_functions(_type="fields"),
         'organization_name': user_extended_profile.organization.label if user_extended_profile.organization else "",
         'is_poc': "1" if user_extended_profile.is_organization_admin else "0",
         'is_currently_employed': request.POST.get('is_currently_employed'),
@@ -161,20 +172,11 @@ def interests(request):
     if request.path == reverse('update_interests'):
         template = 'myaccount/interests.html'
 
-    initial = {
-        "interests": user_extended_profile.get_user_selected_interests(_type="fields"),
-        "interested_learners": user_extended_profile.get_user_selected_interested_learners(_type="fields"),
-        "personal_goals": user_extended_profile.get_user_selected_personal_goal(_type="fields"),
-        "hear_about_philanthropy": user_extended_profile.get_user_hear_about_philanthropy(_type="fields"),
-        "hear_about_philanthropy_other": user_extended_profile.hear_about_philanthropy_other if user_extended_profile
-            .hear_about_philanthropy_other else ''
-    }
-
     if request.method == 'POST':
-        form = forms.InterestsForm(request.POST, initial=initial)
+        form = forms.InterestsModelForm(request.POST, instance=user_extended_profile)
 
         is_action_update = user_extended_profile.is_interests_data_submitted
-        form.save(request, user_extended_profile)
+        form.save(request)
         save_interests.send(sender=UserExtendedProfile, instance=user_extended_profile)
 
         are_forms_complete = not (bool(user_extended_profile.unattended_surveys(_type='list')))
@@ -183,7 +185,7 @@ def interests(request):
             update_nodebb_for_user_status(request.user.username)
 
     else:
-        form = forms.InterestsForm(initial=initial)
+        form = forms.InterestsModelForm(instance=user_extended_profile)
     context = {'form': form, 'are_forms_complete': are_forms_complete}
 
     user = request.user

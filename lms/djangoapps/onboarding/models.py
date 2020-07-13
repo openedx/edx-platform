@@ -1,17 +1,27 @@
 import logging
+import re
 import uuid
 from datetime import datetime
 
-import re
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, URLValidator
 from django.db import models
 from django.utils.translation import ugettext_noop
 from model_utils.models import TimeStampedModel
+from multiselectfield import MultiSelectField
 from pytz import utc
 
-from constants import ORG_PARTNERSHIP_END_DATE_PLACEHOLDER, REMIND_ME_LATER_KEY, REMIND_ME_LATER_VAL, \
-    TAKE_ME_THERE_KEY, TAKE_ME_THERE_VAL, NOT_INTERESTED_KEY, NOT_INTERESTED_VAL
+import choices
+from constants import (
+    NOT_INTERESTED_KEY,
+    NOT_INTERESTED_VAL,
+    ORG_PARTNERSHIP_END_DATE_PLACEHOLDER,
+    REMIND_ME_LATER_KEY,
+    REMIND_ME_LATER_VAL,
+    TAKE_ME_THERE_KEY,
+    TAKE_ME_THERE_VAL
+)
+from openedx.features.custom_fields.multiselect_with_other.db.fields import MultiSelectWithOtherField
 
 log = logging.getLogger("edx.onboarding")
 
@@ -483,143 +493,45 @@ class UserExtendedProfile(TimeStampedModel):
     is_first_learner = models.BooleanField(default=False)
     is_alquity_user = models.BooleanField(default=False)
 
+    # TODO: Populate this newly added field by performing ETL on existing fields hear_about_philanthropy and
+    #  hear_about_philanthropy_other
+    hear_about_philanthropyu = MultiSelectWithOtherField(choices=choices.HEAR_ABOUT_PHILANTHROPY,
+                                                         other_max_length=255,
+                                                         max_choices=1,
+                                                         blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing functions related fields
+    function_areas = MultiSelectField(choices=choices.FUNCTIONS, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing interests related fields
+    interests = MultiSelectField(choices=choices.INTERESTS, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing learners related fields
+    learners_related = MultiSelectField(choices=choices.INTERESTED_LEARNERS, blank=True)
+    # TODO: Populate this newly added field by performing ETL on all existing goals related fields
+    goals = MultiSelectField(choices=choices.GOALS, blank=True)
+
     def __str__(self):
         return str(self.user)
 
-    def get_user_selected_functions(self, _type="labels"):
+    def get_user_selected_functions(self, _type='labels'):
         """
         :return: Users selected function areas
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-        if _type == "labels":
-            return [label for field_name, label in self.FUNCTIONS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        elif _type == "field_name":
-            return [field_name.split('=')[1] for field_name, label in self.FUNCTIONS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        else:
-            return [field_name for field_name, label in self.FUNCTIONS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
+        if _type == 'labels':
+            return map(choices.FUNCTIONS_DICT.get, self.function_areas)
 
-    def get_user_selected_interests(self, _type="labels"):
+        return list(self.function_areas)
+
+    def get_user_selected_interests(self, _type='labels'):
         """
         :return: Users selected interest
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-        if _type == "labels":
-            return [label for field_name, label in self.INTERESTS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        elif _type == "field_name":
-            return [field_name.split('=')[1] for field_name, label in self.INTERESTS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        else:
-            return [field_name for field_name, label in self.INTERESTS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
+        if _type == 'labels':
+            return map(choices.INTERESTS_DICT.get, self.interests)
 
-    def get_user_selected_interested_learners(self, _type="labels"):
-        """
-        :return: Users selected interested learners
-        :param _type: labels / fields
-        :return: list of labels / names of fields
-        """
-
-        if _type == "labels":
-            return [label for field_name, label in self.INTERESTED_LEARNERS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        else:
-            return [field_name for field_name, label in self.INTERESTED_LEARNERS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-
-    def get_user_selected_personal_goal(self, _type="labels"):
-        """
-        :return: Users selected personal goals
-        :param _type: labels / fields
-        :return: list of labels / names of fields
-        """
-
-        if _type == "labels":
-            return [label for field_name, label in self.GOALS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-        else:
-            return [field_name for field_name, label in self.GOALS_LABELS.items() if
-                    getattr(self, field_name.split("=")[1]) == 1]
-
-    def get_user_hear_about_philanthropy(self, _type="labels"):
-        """
-        :return: Users selected here about philanthropy university
-        :param _type: labels / fields
-        :return: list of labels / names of fields
-        """
-        if _type == "labels":
-            _field_label_data = [label for field_name, label in self.GOALS_LABELS.items() if
-                                 getattr(self, 'hear_about_philanthropy') ==
-                                 self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(field_name)]
-        else:
-            _field_label_data = [field_name for field_name, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items() if
-                                 getattr(self, 'hear_about_philanthropy') ==
-                                 self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(field_name)]
-        return _field_label_data if not _field_label_data else _field_label_data[0]
-
-    def save_user_hear_about_philanthropy_result(self, selected_values, _other_field):
-        _updated_value_about_philanthropy = None
-        _updated_value_about_philanthropy_other = None
-
-        for function_area_field, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items():
-            _function_area_field = function_area_field.split("=")[1]
-            if _function_area_field in selected_values:
-                _updated_value_about_philanthropy = self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(function_area_field)
-            if _function_area_field == 'hear_about_other' and _other_field:
-                _updated_value_about_philanthropy_other = _other_field[0]
-
-        self.__setattr__('hear_about_philanthropy', _updated_value_about_philanthropy)
-        self.__setattr__('hear_about_philanthropy_other', _updated_value_about_philanthropy_other)
-
-    def save_user_function_areas(self, selected_values):
-        """
-        Save users selected function areas
-        :param selected_values: selected values list
-        """
-
-        for function_area_field, label in self.FUNCTIONS_LABELS.items():
-            function_area_field = function_area_field.split("=")[1]
-            if function_area_field in selected_values:
-                _updated_value = 1
-            else:
-                _updated_value = 0
-
-            self.__setattr__(function_area_field, _updated_value)
-
-    def save_user_interests(self, selected_values):
-        """
-        Save users selected interests
-        :param selected_values: selected values list
-        """
-
-        for interest_field, label in self.INTERESTS_LABELS.items():
-            interest_field = interest_field.split("=")[1]
-            if interest_field in selected_values:
-                _updated_value = 1
-            else:
-                _updated_value = 0
-
-            self.__setattr__(interest_field, _updated_value)
-
-    def save_user_interested_learners(self, selected_values):
-        """
-        Save users selected interested learners
-        :param selected_values: selected values list
-        """
-
-        for interested_learner_field, label in self.INTERESTED_LEARNERS_LABELS.items():
-            interested_learner_field = interested_learner_field.split("=")[1]
-            if interested_learner_field in selected_values:
-                _updated_value = 1
-            else:
-                _updated_value = 0
-
-            self.__setattr__(interested_learner_field, _updated_value)
+        return list(self.interests)
 
     def is_organization_data_filled(self):
         """
@@ -633,21 +545,6 @@ class UserExtendedProfile(TimeStampedModel):
         :return: Status for registration fourth step completion
         """
         return self.is_organization_metrics_submitted
-
-    def save_user_personal_goals(self, selected_values):
-        """
-        Save data for users personal goals
-        :param selected_values: list of selected goals
-        """
-
-        for goal_field, label in self.GOALS_LABELS.items():
-            goal_field = goal_field.split("=")[1]
-            if goal_field in selected_values:
-                _updated_value = 1
-            else:
-                _updated_value = 0
-
-            self.__setattr__(goal_field, _updated_value)
 
     def get_normal_user_attend_surveys(self):
         """
@@ -728,8 +625,8 @@ class UserExtendedProfile(TimeStampedModel):
 
     def admin_has_pending_admin_suggestion_request(self):
         pending_suggestion_request = OrganizationAdminHashKeys.objects.filter(organization=self.organization,
-                                                                               suggested_by=self.user,
-                                                                               is_hash_consumed=False).first()
+                                                                              suggested_by=self.user,
+                                                                              is_hash_consumed=False).first()
         return bool(self.is_organization_admin and pending_suggestion_request)
 
     @property
@@ -772,7 +669,7 @@ class OrganizationMetric(TimeStampedModel):
     org = models.ForeignKey(Organization, related_name="organization_metrics")
     user = models.ForeignKey(User, related_name="organization_metrics")
     submission_date = models.DateTimeField(auto_now_add=True)
-    actual_data= models.NullBooleanField(choices=ACTUAL_DATA_CHOICES, blank=True, null=True)
+    actual_data = models.NullBooleanField(choices=ACTUAL_DATA_CHOICES, blank=True, null=True)
     effective_date = models.DateField(blank=True, null=True)
     total_clients = models.PositiveIntegerField(blank=True, null=True)
     total_employees = models.PositiveIntegerField(blank=True, null=True)

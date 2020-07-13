@@ -2,8 +2,15 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectFormField
 
-from openedx.features.custom_fields.multiselect_with_other.helpers import add_other_field_in_choices, get_other_values
-from openedx.features.custom_fields.multiselect_with_other.forms.widgets import CheckboxSelectMultipleWithOther, RadioSelectWithOther
+from openedx.features.custom_fields.multiselect_with_other.forms.widgets import (
+    CheckboxSelectMultipleWithOther,
+    RadioSelectWithOther
+)
+from openedx.features.custom_fields.multiselect_with_other.helpers import (
+    add_other_field_in_choices,
+    filter_other_field_checkbox_value,
+    get_other_values
+)
 
 
 class MultiSelectWithOtherFormField(MultiSelectFormField):
@@ -45,6 +52,14 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
                         code='invalid_length',
                         params={'value': val},
                     )
+
+    def to_python(self, value):
+        """
+        Returns a list of strings
+        """
+        return filter_other_field_checkbox_value(
+            super(MultiSelectWithOtherFormField, self).to_python(value)
+        )
 
     def clean(self, value):
         value = [val for val in value if val not in self.empty_values]
