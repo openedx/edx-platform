@@ -99,10 +99,7 @@
   }
 
   .no-access {
-    // This is too low-contrast for a11y purposes. But since it only applies to pieces of the page that are
-    // inaccessible to users, and we have a banner explaining the parts that are inaccessible at the top,
-    // we're OK from an accessibility point of view.
-    color: #d1d2d4;
+    color: #767676;
   }
 
   .timeline-date-content {
@@ -115,8 +112,12 @@
     align-items: center;
 
     &.not-released {
-      color: #767676;
+      color: #b1a3a3;
     }
+  }
+
+  .timeline-date {
+    color: #2d323e;
   }
 
   .timeline-title {
@@ -134,7 +135,7 @@
     }
 
     &.not-released {
-      color: #d1d2d4;
+      color: #767676;
     }
   }
 
@@ -149,6 +150,10 @@
       color: #2d323e;
       text-decoration: underline;
     }
+
+    &.not-released {
+        color: #767676;
+      }
   }
 
   .timeline-extra-info {
@@ -158,8 +163,13 @@
     flex: 100%;
     line-height: 1.25;
 
+    a {
+      color: #2d323e;
+      text-decoration: underline;
+    }
+
     &.not-released {
-      color: #d1d2d4;
+      color: #767676;
     }
   }
 
