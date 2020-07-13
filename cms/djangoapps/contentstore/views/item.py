@@ -112,9 +112,7 @@ def set_discussion_toggle(value, xblock, user):
             set_discussion_toggle(value, child, user)
         else:
             child.discussion_enabled = value
-            modulestore().update_item(child, user.id)
-
-    modulestore().update_item(xblock, user.id)
+            _save_xblock(user, child)
 
 
 @require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
@@ -201,14 +199,9 @@ def xblock_handler(request, usage_key_string):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            discussion_enabled = request.json.get('fields', {}).get('discussion_enabled')
-            xblock = _get_xblock(usage_key, request.user)
-            if isinstance(discussion_enabled, bool) and usage_key.category in ["sequential", "chapter"]:
-                set_discussion_toggle(discussion_enabled, xblock, request.user)
-
             return _save_xblock(
                 request.user,
-                xblock,
+                _get_xblock(usage_key, request.user),
                 data=request.json.get('data'),
                 children_strings=request.json.get('children'),
                 metadata=request.json.get('metadata'),
@@ -549,6 +542,10 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
         if fields:
             for field_name in fields:
                 setattr(xblock, field_name, fields[field_name])
+
+            discussion_enabled = fields.get('discussion_enabled')
+            if isinstance(discussion_enabled, bool) and xblock.location.category in ["sequential", "chapter"]:
+                set_discussion_toggle(discussion_enabled, xblock, user)
 
         if children_strings is not None:
             children = []

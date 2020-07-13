@@ -808,17 +808,15 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
 
         return xblock_body
 
-    def get_children_discussion_toggle_status(self) -> list:
+    def _get_children_discussion_toggle_status(self):
         """
-        Return a list containing value of discussion_enabled flag of children of current sequential
+        Yield values of children's discussion_enabled flag
         """
-        child_statuses = []
         for child in self.get_children():
-            if child.category == "vertical":
-                child_statuses.append(child.discussion_enabled)
-            elif child.category == "sequential":
-                child_statuses += child.get_children_discussion_toggle_status()
-        return child_statuses
+            if hasattr(child, '_get_children_discussion_toggle_status'):
+                yield from child._get_children_discussion_toggle_status()
+            if hasattr(child, 'discussion_enabled'):
+                yield child.discussion_enabled
 
     def get_discussion_toggle_status(self):
         """
@@ -828,17 +826,15 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
             * disabled
             * partially_enabled
         """
-        child_statuses = self.get_children_discussion_toggle_status()
+        child_statuses = list(self._get_children_discussion_toggle_status())
+        child_count = len(child_statuses)
+        enabled = sum(child_statuses)
 
-        if all(child_statuses):
-            # All child statuses are True
-            return "enabled"
-        elif not any(child_statuses):
-            # Not a single one of child is True
+        if enabled == 0:
             return "disabled"
-        else:
-            # Mixture of true and false
-            return "partially_enabled"
+        if enabled == child_count:
+            return "enabled"
+        return "partially_enabled"
 
 
 class HighlightsFields(object):

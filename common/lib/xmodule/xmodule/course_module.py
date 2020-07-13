@@ -1592,19 +1592,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             return False
         return datetime.now(utc) <= self.start
 
-    def get_discussion_toggle_status(self):
-        child_statuses = [
-            child.get_discussion_toggle_status()
-            for child in self.get_children()
-        ]
-
-        if "partially_enabled" in child_statuses or ("enabled" in child_statuses and "disabled" in child_statuses):
-            return "partially_enabled"
-        elif all([status == "enabled" for status in child_statuses]):
-            return "enabled"
-        else:
-            return "disabled"
-
 
 class CourseSummary(object):
     """

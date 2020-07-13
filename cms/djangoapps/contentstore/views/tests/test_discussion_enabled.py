@@ -166,21 +166,21 @@ class TestDiscussionEnabledAPI(CourseTestCase):
         self.assertEqual(self.get_discussion_enabled_status(self.chapter_4), "disabled")
         self.assertEqual(self.get_discussion_enabled_status(self.sequential_4_1), "disabled")
 
-    def test_discussion_enabled_status_is_enabled_for_empty_sequentials(self):
+    def test_discussion_enabled_status_is_disabled_for_empty_sequentials(self):
         """
-        If a sequential does not have any vertical or then its discussion_enabled status is enabled by default.
-        If a chapter's sequentials are empty than its's discussion_enabled status is enabled.
+        If a sequential does not have any vertical or then its discussion_enabled status is disabled by default.
+        If a chapter's sequentials are empty than its's discussion_enabled status is disabled.
         """
 
         # Chapter 1 have no vertical so its sequentials would report discussion_toggle_status for its children
-        # as enabled so discussion toggle status for the Chapter itself would be enabled.
-        # and Chapter 2 don't have any sections so its discussion_toggle_status would also be enabled
-        self.assertEqual(self.get_discussion_enabled_status(self.chapter_1), "enabled")
-        self.assertEqual(self.get_discussion_enabled_status(self.chapter_2), "enabled")
+        # as disabled so discussion toggle status for the Chapter itself would be disabled.
+        # and Chapter 2 don't have any sections so its discussion_toggle_status would also be disabled
+        self.assertEqual(self.get_discussion_enabled_status(self.chapter_1), "disabled")
+        self.assertEqual(self.get_discussion_enabled_status(self.chapter_2), "disabled")
 
         # The following sequentials do not have any vertical
-        self.assertEqual(self.get_discussion_enabled_status(self.sequential_1_1), "enabled")
-        self.assertEqual(self.get_discussion_enabled_status(self.sequential_1_2), "enabled")
+        self.assertEqual(self.get_discussion_enabled_status(self.sequential_1_1), "disabled")
+        self.assertEqual(self.get_discussion_enabled_status(self.sequential_1_2), "disabled")
 
     def test_setting_few_vertical_discussion_status_true_make_sequential_partially_enabled(self):
         """
@@ -260,7 +260,7 @@ class TestDiscussionEnabledAPI(CourseTestCase):
         """
         Test that setting all blocks discussion_enabled flag cascade up to the root block i.e course
         """
-        self.assertEqual(self._get_discussion_enabled_status(self.course_usage_key), "partially_enabled")
+        self.assertEqual(self._get_discussion_enabled_status(self.course_usage_key), "disabled")
 
         self.set_discussion_enabled_status(self.sequential_4_1, True)
         self.set_discussion_enabled_status(self.sequential_3_1, True)
@@ -272,6 +272,4 @@ class TestDiscussionEnabledAPI(CourseTestCase):
         self.set_discussion_enabled_status(self.chapter_3, False)
         self.set_discussion_enabled_status(self.chapter_4, False)
 
-        # The following is partially enabled because chapter_1 and chapter_2 do not have any verticals which carry
-        # discussion_enabled boolean values
-        self.assertEqual(self._get_discussion_enabled_status(self.course_usage_key), "partially_enabled")
+        self.assertEqual(self._get_discussion_enabled_status(self.course_usage_key), "disabled")
