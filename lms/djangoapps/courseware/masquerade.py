@@ -69,6 +69,23 @@ class CourseMasquerade(object):
         """
         self.__init__(**state)
 
+    def get_active_group_name(self, available):
+        """
+        Lookup the active group name, from available options
+
+        Returns: the corresponding group name, if exists,
+            else, return None
+        """
+        if not (self.group_id and self.user_partition_id):
+            return None
+        for group in available:
+            if (
+                self.group_id == group.get('group_id') and
+                self.user_partition_id == group.get('user_partition_id')
+            ):
+                return group.get('name')
+        return None
+
 
 @method_decorator(login_required, name='dispatch')
 class MasqueradeView(View):
@@ -128,6 +145,7 @@ class MasqueradeView(View):
                     }
                     for group in partition.groups
                 ])
+        data['active']['group_name'] = course.get_active_group_name(data['available'])
         return JsonResponse(data)
 
     @method_decorator(expect_json)
