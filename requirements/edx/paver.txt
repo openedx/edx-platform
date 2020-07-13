@@ -6,7 +6,7 @@
 #
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
-edx-opaque-keys==2.1.0    # via -r requirements/edx/paver.in
+edx-opaque-keys==2.1.1    # via -r requirements/edx/paver.in
 idna==2.10                # via requests
 importlib-metadata==1.7.0  # via path
 lazy==1.4                 # via -r requirements/edx/paver.in
