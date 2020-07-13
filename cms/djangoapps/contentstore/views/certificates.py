@@ -39,7 +39,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from six import text_type
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from contentstore.utils import (
     get_lms_link_for_certificate_web_view,
     reverse_course_url,
