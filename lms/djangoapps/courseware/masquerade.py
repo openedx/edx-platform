@@ -158,7 +158,7 @@ class MasqueradeView(View):
                 return JsonResponse({
                     'success': False,
                     'error': _(
-                        u'There is no user with the username or email address u"{user_identifier}" '
+                        u'There is no user with the username or email address "{user_identifier}" '
                         'enrolled in this course.'
                     ).format(
                         user_identifier=user_name,
