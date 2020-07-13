@@ -3,6 +3,7 @@
 <%!
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from lms.djangoapps.verify_student.services import IDVerificationService
 %>
 
 %if verification_display:
@@ -13,7 +14,7 @@ from django.utils.translation import ugettext as _
             %if verification_expiry:
                 <p class="status-note"><span><b>${_("Warning")}: </b></span><i>${_("Your photo verification expires on {verification_expiry}. Please be aware photo verification can take up to three days once initiated and you will not be able to earn a certificate or take a proctored exam until approved.").format(verification_expiry=verification_expiry)}</i></p>
                 <div class="btn-reverify">
-                    <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
+                    <a href="${IDVerificationService.get_verify_location('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
                 </div>
             %endif
         </li>
@@ -39,7 +40,7 @@ from django.utils.translation import ugettext as _
             %endif
             </p>
         <div class="btn-reverify">
-            <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
+            <a href="${IDVerificationService.get_verify_location('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
         </div>
         </li>
     %elif verification_status == 'expired':
@@ -48,7 +49,7 @@ from django.utils.translation import ugettext as _
             <p class="status-note">${_("Your verification has expired. To receive a verified certificate, you must submit a new photo of yourself and your government-issued photo ID before the verification deadline for your course.")}</p>
             <p class="status-note"><span><b>${_("Warning")}: </b></span><i>${_(" Please be aware photo verification can take up to three days once initiated and you will not be able to earn a certificate or take a proctored exam until approved.")}</i></p>
             <div class="btn-reverify">
-                <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
+                <a href="${IDVerificationService.get_verify_location('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
             </div>
         </li>
     %endif
