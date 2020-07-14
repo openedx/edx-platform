@@ -841,6 +841,7 @@ CREATE TABLE `calendar_sync_historicalusercalendarsyncconfig` (
   `history_type` varchar(1) NOT NULL,
   `history_user_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
+  `ics_sequence` int(11) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `calendar_sync_histor_history_user_id_e696e2d5_fk_auth_user` (`history_user_id`),
   KEY `calendar_sync_historicalusercalendarsyncconfig_id_2b36f9ae` (`id`),
@@ -857,6 +858,7 @@ CREATE TABLE `calendar_sync_usercalendarsyncconfig` (
   `course_key` varchar(255) NOT NULL,
   `enabled` tinyint(1) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `ics_sequence` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `calendar_sync_usercalend_user_id_course_key_57c343ab_uniq` (`user_id`,`course_key`),
   KEY `calendar_sync_usercalendarsyncconfig_course_key_86657ca7` (`course_key`),
@@ -2632,7 +2634,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=735 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=737 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4161,6 +4163,7 @@ CREATE TABLE `learning_sequences_coursesectionsequence` (
   `learning_context_id` bigint(20) NOT NULL,
   `section_id` bigint(20) NOT NULL,
   `sequence_id` bigint(20) NOT NULL,
+  `inaccessible_after_due` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `learning_sequences_cours_learning_context_id_orde_ad7604bd_uniq` (`learning_context_id`,`ordering`),
   KEY `learning_sequences_c_section_id_646c2074_fk_learning_` (`section_id`),
