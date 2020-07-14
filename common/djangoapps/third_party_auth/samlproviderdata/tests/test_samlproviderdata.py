@@ -79,9 +79,9 @@ class SAMLProviderDataTests(APITestCase):
 
     def test_get_one_provider_data_success(self):
         # GET auth/saml/v0/providerdata/?enterprise_customer_uuid=id
-        urlbase = reverse('saml_provider_data-list')
+        url_base = reverse('saml_provider_data-list')
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
-        url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
+        url = '{}?{}'.format(url_base, urlencode(query_kwargs))
 
         response = self.client.get(url, format='json')
 
@@ -127,7 +127,6 @@ class SAMLProviderDataTests(APITestCase):
     def test_delete_one_provider_data(self):
         # DELETE auth/saml/v0/providerdata/ -d data
         url = reverse('saml_provider_data-detail', kwargs={'pk': self.samlproviderdata.id})
-        # url = '{}/{}/'.format(url, self.samlproviderdata.id)
         data = {}
         data['enterprise_customer_uuid'] = ENTERPRISE_ID
         orig_count = SAMLProviderData.objects.count()
