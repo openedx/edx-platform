@@ -197,7 +197,6 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip('migration is purposely out of sync with models atm.')
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
