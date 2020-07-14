@@ -29,6 +29,7 @@ def user_exists(details):
 
     return False
 
+
 def validate_uuid4_string(uuid_string):
     """
     Returns True if valid uuid4 string, or False

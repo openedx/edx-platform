@@ -47,8 +47,10 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         """
         if self.requested_enterprise_uuid is None:
             raise Http404('Required enterprise_customer_uuid is missing')
-        enterprise_customer_idp = get_object_or_404(EnterpriseCustomerIdentityProvider,
-            enterprise_customer__uuid=self.requested_enterprise_uuid)
+        enterprise_customer_idp = get_object_or_404(
+            EnterpriseCustomerIdentityProvider,
+            enterprise_customer__uuid=self.requested_enterprise_uuid
+        )
         return SAMLProviderConfig.objects.filter(pk=enterprise_customer_idp.provider_id)
 
     @property
@@ -59,14 +61,13 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         if self.request.method == "POST":
             uuid_str = self.request.POST.get('enterprise_customer_uuid')
             if uuid_str is None:
-              raise Http404('Required enterprise_customer_uuid is missing')
+                raise Http404('Required enterprise_customer_uuid is missing')
             return uuid_str
         else:
             uuid_str = self.request.query_params.get('enterprise_customer_uuid')
             if validate_uuid4_string(uuid_str) is False:
                 raise ParseError('Invalid UUID enterprise_customer_id')
             return uuid_str
-
 
     def get_permission_object(self):
         """

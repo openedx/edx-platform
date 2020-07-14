@@ -42,8 +42,10 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
         """
         if self.requested_enterprise_uuid is None:
             raise Http404('Required enterprise_customer_uuid is missing')
-        enterprise_customer_idp = get_object_or_404(EnterpriseCustomerIdentityProvider,
-            enterprise_customer__uuid=self.requested_enterprise_uuid)
+        enterprise_customer_idp = get_object_or_404(
+            EnterpriseCustomerIdentityProvider,
+            enterprise_customer__uuid=self.requested_enterprise_uuid
+        )
         saml_provider = SAMLProviderConfig.objects.get(pk=enterprise_customer_idp.provider_id)
         return SAMLProviderData.objects.filter(entity_id=saml_provider.entity_id)
 
@@ -55,7 +57,7 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
         if self.request.method in ('POST', 'PATCH', 'DELETE'):
             uuid_str = self.request.POST.get('enterprise_customer_uuid')
             if uuid_str is None:
-              raise Http404('Required enterprise_customer_uuid is missing')
+                raise Http404('Required enterprise_customer_uuid is missing')
             return uuid_str
         else:
             uuid_str = self.request.query_params.get('enterprise_customer_uuid')
