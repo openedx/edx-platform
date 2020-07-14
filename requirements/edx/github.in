@@ -58,6 +58,10 @@
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 
+# This is a temporary fork until https://github.com/brutasse/django-ratelimit-backend/pull/50 is merged
+# back into the upstream code.
+git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-ratelimit-backend==2.0.1a5
+
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@ffec49bb09785fb688afc5d24714d4e43ae8449f#egg=codejail==3.0.1
 -e git+https://github.com/edx/acid-block.git@758855a67d2f12bd74db4d5e7a0862d6e65f079c#egg=acid-xblock
