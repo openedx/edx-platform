@@ -808,15 +808,15 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
 
         return xblock_body
 
-    def _get_children_discussion_toggle_status(self):
+    def get_children_discussion_toggle_status(self):
         """
         Yield values of children's discussion_enabled flag
         """
         for child in self.get_children():
-            if hasattr(child, '_get_children_discussion_toggle_status'):
-                yield from child._get_children_discussion_toggle_status()
             if hasattr(child, 'discussion_enabled'):
                 yield child.discussion_enabled
+            elif hasattr(child, 'get_children_discussion_toggle_status'):
+                yield from child.get_children_discussion_toggle_status()
 
     def get_discussion_toggle_status(self):
         """
@@ -826,7 +826,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
             * disabled
             * partially_enabled
         """
-        child_statuses = list(self._get_children_discussion_toggle_status())
+        child_statuses = list(self.get_children_discussion_toggle_status())
         child_count = len(child_statuses)
         enabled = sum(child_statuses)
 
