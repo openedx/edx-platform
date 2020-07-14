@@ -7,10 +7,12 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from enterprise.models import EnterpriseCustomerIdentityProvider
 from rest_framework import permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ParseError
+
+from enterprise.models import EnterpriseCustomerIdentityProvider
+from third_party_auth.utils import validate_uuid4_string
 
 from ..models import SAMLProviderConfig
 from .serializers import SAMLProviderConfigSerializer
@@ -62,10 +64,8 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
             return uuid_str
         else:
             uuid_str = self.request.query_params.get('enterprise_customer_uuid')
-            try:
-                UUID(uuid_str, version=4)
-            except ValueError:
-                raise ParseError('Invalid UUID for enterprise_customer_uuid')
+            if validate_uuid4_string(uuid_str) is False:
+                raise ParseError('Invalid UUID enterprise_customer_id')
             return uuid_str
 
 

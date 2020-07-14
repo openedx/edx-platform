@@ -6,9 +6,12 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from enterprise.models import EnterpriseCustomerIdentityProvider
 from rest_framework import permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.exceptions import ParseError
+
+from enterprise.models import EnterpriseCustomerIdentityProvider
+from third_party_auth.utils import validate_uuid4_string
 
 from ..models import SAMLProviderConfig, SAMLProviderData
 from .serializers import SAMLProviderDataSerializer
@@ -55,7 +58,10 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
               raise Http404('Required enterprise_customer_uuid is missing')
             return uuid_str
         else:
-            return self.request.query_params.get('enterprise_customer_uuid')
+            uuid_str = self.request.query_params.get('enterprise_customer_uuid')
+            if validate_uuid4_string(uuid_str) is False:
+                raise ParseError('Invalid UUID enterprise_customer_id')
+            return uuid_str
 
     def get_permission_object(self):
         """
