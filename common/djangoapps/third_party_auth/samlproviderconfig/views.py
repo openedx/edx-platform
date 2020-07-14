@@ -27,7 +27,10 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
     A View to handle SAMLProviderConfig CRUD
 
     Usage:
-        [HttpVerb] /auth/saml/v0/provider_config/?enterprise-id=uuid
+        GET /auth/saml/v0/provider_config/?enterprise-id=uuid
+        POST /auth/saml/v0/provider_config/ -d postData (must contain 'enterprise_customer_uuid')
+        DELETE /auth/saml/v0/provider_config/:pk -d postData (must contain 'enterprise_customer_uuid')
+        PATCH /auth/saml/v0/provider_config/:pk -d postData (must contain 'enterprise_customer_uuid')
 
     permission_required refers to the Django permission name defined
     in enterprise.rules.
