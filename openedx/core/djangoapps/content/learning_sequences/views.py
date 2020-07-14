@@ -112,6 +112,7 @@ class CourseOutlineView(APIView):
                 "id": str(sequence.usage_key),
                 "title": sequence.title,
                 "accessible": sequence.usage_key in accessible_sequences,
+                "inaccessible_after_due": sequence.inaccessible_after_due,
                 **schedule_item_dict,
             }
 

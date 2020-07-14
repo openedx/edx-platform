@@ -2559,6 +2559,9 @@ INSTALLED_APPS = [
     # Management of external user ids
     'openedx.core.djangoapps.external_user_ids',
 
+    # Provides api for Demographics support
+    'openedx.core.djangoapps.demographics',
+
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
@@ -3931,3 +3934,6 @@ GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
 
 ##################### SUPPORT URL ############################
 SUPPORT_HOW_TO_UNENROLL_LINK = ''
+
+######################## Setting for content libraries ########################
+MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
