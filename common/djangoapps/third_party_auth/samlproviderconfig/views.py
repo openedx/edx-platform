@@ -1,26 +1,18 @@
 """
 Viewset for auth/saml/v0/samlproviderconfig
 """
-from logging import getLogger
 
-from django.http import Http404, HttpResponseNotFound
+from django.http import Http404
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, viewsets
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.decorators import detail_route, list_route
-
 from edx_rbac.mixins import PermissionRequiredMixin
-from edx_rbac.decorators import permission_required
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from enterprise.models import EnterpriseCustomerIdentityProvider
-
-from openedx.features.enterprise_support.utils import fetch_enterprise_customer_by_id
+from rest_framework import permissions, viewsets
+from rest_framework.authentication import SessionAuthentication
 
 from ..models import SAMLProviderConfig
 from .serializers import SAMLProviderConfigSerializer
 
-
-LOGGER = getLogger(__name__)
 
 class SAMLProviderMixin(object):
     authentication_classes = [JwtAuthentication, SessionAuthentication]

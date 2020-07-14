@@ -6,6 +6,6 @@ from rest_framework import routers
 
 from .views import SAMLProviderDataViewSet
 
-samlproviderdata_router = routers.DefaultRouter()
-samlproviderdata_router.register(r'providerdata', SAMLProviderDataViewSet, basename="samlproviderdata")
-urlpatterns = samlproviderdata_router.urls
+saml_provider_data_router = routers.DefaultRouter()
+saml_provider_data_router.register(r'provider_data', SAMLProviderDataViewSet, basename="saml_provider_data")
+urlpatterns = saml_provider_data_router.urls

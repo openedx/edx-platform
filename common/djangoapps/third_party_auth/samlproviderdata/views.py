@@ -2,13 +2,13 @@
     Viewset for auth/saml/v0/samlproviderdata
 """
 
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from enterprise.models import EnterpriseCustomerIdentityProvider
 from rest_framework import permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
-
-from openedx.features.enterprise_support.utils import fetch_enterprise_customer_by_id
 
 from ..models import SAMLProviderConfig, SAMLProviderData
 from .serializers import SAMLProviderDataSerializer
@@ -37,18 +37,28 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
         So we make that association in code via samlproviderdata > samlproviderconfig ( via entity_id )
         then, we fetch enterprisecustomer via samlproviderconfig > enterprisecustomer ( via association table )
         """
-        enterprise_customer_idp = EnterpriseCustomerIdentityProvider.objects.get(
-            enterprise_customer__uuid=self.requested_enterprise_uuid
-        )
+        if self.requested_enterprise_uuid is None:
+            raise Http404('Required enterprise_customer_uuid is missing')
+        enterprise_customer_idp = get_object_or_404(EnterpriseCustomerIdentityProvider,
+            enterprise_customer__uuid=self.requested_enterprise_uuid)
         saml_provider = SAMLProviderConfig.objects.get(pk=enterprise_customer_idp.provider_id)
         return SAMLProviderData.objects.filter(entity_id=saml_provider.entity_id)
 
     @property
     def requested_enterprise_uuid(self):
-        return self.request.query_params.get('enterprise_customer_uuid')
+        """
+        The enterprise customer uuid from request params or post body
+        """
+        if self.request.method == "POST":
+            uuid_str = self.request.POST.get('enterprise_customer_uuid')
+            if uuid_str is None:
+              raise Http404('Required enterprise_customer_uuid is missing')
+            return uuid_str
+        else:
+            return self.request.query_params.get('enterprise_customer_uuid')
 
     def get_permission_object(self):
         """
         Retrive an EnterpriseCustomer to do auth against
         """
-        return fetch_enterprise_customer_by_id(self.requested_enterprise_uuid)
+        return self.requested_enterprise_uuid

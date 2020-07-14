@@ -77,23 +77,27 @@ class SAMLProviderDataTests(APITestCase):
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, ENTERPRISE_ID)])
         self.client.force_authenticate(user=self.user)
 
-    def test_get_one_providedata_success(self):
+    def test_get_one_provider_data_success(self):
         # GET auth/saml/v0/providerdata/?enterprise_customer_uuid=id
-        urlbase = reverse('samlproviderdata-list')
+        urlbase = reverse('saml_provider_data-list')
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
+
         response = self.client.get(url, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data['results']
+        self.assertEqual(len(results), 1)
 
     def test_create_one_providerdata_success(self):
-        # POST auth/saml/v0/providerdata/?enterprise_customer_uuid -d data
-        urlbase = reverse('samlproviderdata-list')
-        query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
-        url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
-        fetched_at = '2009-01-10 00:12:12'
-        data = SINGLE_DATA_CONFIG_2
+        # POST auth/saml/v0/providerdata/ -d data
+        url = reverse('saml_provider_data-list')
+        data = copy.copy(SINGLE_DATA_CONFIG_2)
+        data['enterprise_customer_uuid'] = ENTERPRISE_ID
         orig_count = SAMLProviderData.objects.count()
-        response = self.client.post(url, data, format='json')
+
+        response = self.client.post(url, data)
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(SAMLProviderData.objects.count(), orig_count + 1)
         self.assertEqual(
