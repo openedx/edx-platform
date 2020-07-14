@@ -33,7 +33,7 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
     A View to handle SAMLProviderConfig CRUD
 
     Usage:
-        [HttpVerb] /auth/saml/v0/providerconfig/?enterprise-id=uuid
+        [HttpVerb] /auth/saml/v0/provider_config/?enterprise-id=uuid
 
     permission_required refers to the Django permission name defined
     in enterprise.rules.
@@ -47,7 +47,8 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
 
     def get_queryset(self):
         """
-        Find and return the matching providerid for the given enterprise uuid
+        Find and return the matching providerconfig for the given enterprise uuid
+        if an association exists in EnterpriseCustomerIdentityProvider model
         """
         if self.requested_enterprise_uuid is None:
             raise Http404('Required enterprise_customer_uuid is missing')

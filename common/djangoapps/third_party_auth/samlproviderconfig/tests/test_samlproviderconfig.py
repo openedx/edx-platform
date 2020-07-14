@@ -65,9 +65,9 @@ class SAMLProviderConfigTests(APITestCase):
 
     def test_get_one_config_by_enterprise_uuid_found(self):
         """
-        GET auth/saml/v0/providerconfig/?enterprise_customer_uuid=id=id
+        GET auth/saml/v0/provider_config/?enterprise_customer_uuid=id=id
         """
-        urlbase = reverse('samlproviderconfig-list')
+        urlbase = reverse('saml_provider_config-list')
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
 
@@ -82,9 +82,9 @@ class SAMLProviderConfigTests(APITestCase):
 
     def test_get_one_config_by_enterprise_uuid_not_found(self):
         """
-        GET auth/saml/v0/providerconfig/?enterprise_customer_uuid=id=id
+        GET auth/saml/v0/provider_config/?enterprise_customer_uuid=id=id
         """
-        urlbase = reverse('samlproviderconfig-list')
+        urlbase = reverse('saml_provider_config-list')
         query_kwargs = {'enterprise_customer_uuid': 'abc-notfound'}
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
         orig_count = SAMLProviderConfig.objects.count()
@@ -96,9 +96,9 @@ class SAMLProviderConfigTests(APITestCase):
 
     def test_create_one_config(self):
         """
-        POST auth/saml/v0/providerconfig/ -d data
+        POST auth/saml/v0/provider_config/ -d data
         """
-        url = reverse('samlproviderconfig-list')
+        url = reverse('saml_provider_config-list')
         data = copy.copy(SINGLE_PROVIDER_CONFIG_2)
         data['enterprise_customer_uuid'] = ENTERPRISE_ID
         orig_count = SAMLProviderConfig.objects.count()
