@@ -31,7 +31,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
                     <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
                     <input type="hidden" name="reset_deadlines_redirect_url_base" value="${reset_deadlines_redirect_url_base}">
                     <input type="hidden" name="reset_deadlines_redirect_url_id_dict" value="${reset_deadlines_redirect_url_id_dict}">
-                    <button class="btn reset-deadlines-button">${_("Shift due dates")}</button>
+                    <button id="PLS_button" class="btn reset-deadlines-button">${_("Shift due dates")}</button>
                 </form>
             </div>
         % endif

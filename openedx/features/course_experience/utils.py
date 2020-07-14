@@ -267,46 +267,47 @@ def dates_banner_should_display(course_key, user):
             missed_deadlines is True if the user has missed any graded content deadlines
             missed_gated_content is True if the first content that the user missed was gated content
     """
-    if not RELATIVE_DATES_FLAG.is_enabled(course_key):
-        return False, False
+    return True, False
+    # if not RELATIVE_DATES_FLAG.is_enabled(course_key):
+    #     return False, False
 
-    course_overview = CourseOverview.objects.get(id=str(course_key))
-    course_end_date = getattr(course_overview, 'end_date', None)
-    is_self_paced = getattr(course_overview, 'self_paced', False)
+    # course_overview = CourseOverview.objects.get(id=str(course_key))
+    # course_end_date = getattr(course_overview, 'end_date', None)
+    # is_self_paced = getattr(course_overview, 'self_paced', False)
 
-    # Only display the banner for self-paced courses
-    if not is_self_paced:
-        return False, False
+    # # Only display the banner for self-paced courses
+    # if not is_self_paced:
+    #     return False, False
 
-    # Only display the banner for enrolled users
-    if not CourseEnrollment.is_enrolled(user, course_key):
-        return False, False
+    # # Only display the banner for enrolled users
+    # if not CourseEnrollment.is_enrolled(user, course_key):
+    #     return False, False
 
-    # Don't display the banner for course staff
-    is_course_staff = bool(
-        user and course_overview and has_access(user, 'staff', course_overview, course_overview.id)
-    )
-    if is_course_staff:
-        return False, False
+    # # Don't display the banner for course staff
+    # is_course_staff = bool(
+    #     user and course_overview and has_access(user, 'staff', course_overview, course_overview.id)
+    # )
+    # if is_course_staff:
+    #     return False, False
 
-    # Don't display the banner if the course has ended
-    if course_end_date and course_end_date < timezone.now():
-        return False, False
+    # # Don't display the banner if the course has ended
+    # if course_end_date and course_end_date < timezone.now():
+    #     return False, False
 
-    store = modulestore()
-    course_usage_key = store.make_course_usage_key(course_key)
-    block_data = get_course_blocks(user, course_usage_key, include_completion=True)
-    for section_key in block_data.get_children(course_usage_key):
-        for subsection_key in block_data.get_children(section_key):
-            subsection_due_date = block_data.get_xblock_field(subsection_key, 'due', None)
-            if subsection_due_date and (
-                not block_data.get_xblock_field(subsection_key, 'complete', False)
-                and block_data.get_xblock_field(subsection_key, 'graded', False)
-                and subsection_due_date < timezone.now()
-            ):
-                # Display the banner if the due date for an incomplete graded subsection
-                # has passed
-                return True, block_data.get_xblock_field(subsection_key, 'contains_gated_content', False)
+    # store = modulestore()
+    # course_usage_key = store.make_course_usage_key(course_key)
+    # block_data = get_course_blocks(user, course_usage_key, include_completion=True)
+    # for section_key in block_data.get_children(course_usage_key):
+    #     for subsection_key in block_data.get_children(section_key):
+    #         subsection_due_date = block_data.get_xblock_field(subsection_key, 'due', None)
+    #         if subsection_due_date and (
+    #             not block_data.get_xblock_field(subsection_key, 'complete', False)
+    #             and block_data.get_xblock_field(subsection_key, 'graded', False)
+    #             and subsection_due_date < timezone.now()
+    #         ):
+    #             # Display the banner if the due date for an incomplete graded subsection
+    #             # has passed
+    #             return True, block_data.get_xblock_field(subsection_key, 'contains_gated_content', False)
 
-    # Don't display the banner if there were no missed deadlines
-    return False, False
+    # # Don't display the banner if there were no missed deadlines
+    # return False, False
