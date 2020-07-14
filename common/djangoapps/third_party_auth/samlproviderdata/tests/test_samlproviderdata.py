@@ -27,16 +27,16 @@ SINGLE_PROVIDER_CONFIG = {
 
 # entity_id here matches that of the providerconfig, intentionally
 # that allows this data entity to be found
-SINGLE_DATA_CONFIG = {
+SINGLE_PROVIDER_DATA = {
     'entity_id': 'http://entity-id-1',
     'sso_url': 'http://test.url',
     'public_key': 'a-key0Aid98',
     'fetched_at': datetime.now(pytz.UTC).replace(microsecond=0)
 }
 
-SINGLE_DATA_CONFIG_2 = copy.copy(SINGLE_DATA_CONFIG)
-SINGLE_DATA_CONFIG_2['entity_id'] = 'http://entity-id-2'
-SINGLE_DATA_CONFIG_2['sso_url'] = 'http://test2.url'
+SINGLE_PROVIDER_DATA_2 = copy.copy(SINGLE_PROVIDER_DATA)
+SINGLE_PROVIDER_DATA_2['entity_id'] = 'http://entity-id-2'
+SINGLE_PROVIDER_DATA_2['sso_url'] = 'http://test2.url'
 
 ENTERPRISE_ID = str(uuid4())
 
@@ -62,9 +62,9 @@ class SAMLProviderDataTests(APITestCase):
         )
         # the entity_id here must match that of the saml_provider_config
         cls.saml_provider_data, _ = SAMLProviderData.objects.get_or_create(
-            entity_id=SINGLE_DATA_CONFIG['entity_id'],
-            sso_url=SINGLE_DATA_CONFIG['sso_url'],
-            fetched_at=SINGLE_DATA_CONFIG['fetched_at']
+            entity_id=SINGLE_PROVIDER_DATA['entity_id'],
+            sso_url=SINGLE_PROVIDER_DATA['sso_url'],
+            fetched_at=SINGLE_PROVIDER_DATA['fetched_at']
         )
         cls.enterprise_customer_idp, _ = EnterpriseCustomerIdentityProvider.objects.get_or_create(
             provider_id=cls.saml_provider_config.id,
@@ -88,12 +88,12 @@ class SAMLProviderDataTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data['results']
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]['sso_url'], SINGLE_DATA_CONFIG['sso_url'])
+        self.assertEqual(results[0]['sso_url'], SINGLE_PROVIDER_DATA['sso_url'])
 
     def test_create_one_provider_data_success(self):
         # POST auth/saml/v0/providerdata/ -d data
         url = reverse('saml_provider_data-list')
-        data = copy.copy(SINGLE_DATA_CONFIG_2)
+        data = copy.copy(SINGLE_PROVIDER_DATA_2)
         data['enterprise_customer_uuid'] = ENTERPRISE_ID
         orig_count = SAMLProviderData.objects.count()
 
@@ -102,9 +102,22 @@ class SAMLProviderDataTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(SAMLProviderData.objects.count(), orig_count + 1)
         self.assertEqual(
-            SAMLProviderData.objects.get(entity_id=SINGLE_DATA_CONFIG_2['entity_id']).sso_url,
-            SINGLE_DATA_CONFIG_2['sso_url']
+            SAMLProviderData.objects.get(entity_id=SINGLE_PROVIDER_DATA_2['entity_id']).sso_url,
+            SINGLE_PROVIDER_DATA_2['sso_url']
         )
+
+    def test_create_one_data_with_absent_enterprise_uuid(self):
+        """
+        POST auth/saml/v0/provider_data/ -d data
+        """
+        url = reverse('saml_provider_data-list')
+        data = copy.copy(SINGLE_PROVIDER_DATA_2)
+        orig_count = SAMLProviderData.objects.count()
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(SAMLProviderData.objects.count(), orig_count)
 
     def test_patch_one_provider_data(self):
         # PATCH auth/saml/v0/providerdata/ -d data
@@ -123,8 +136,8 @@ class SAMLProviderDataTests(APITestCase):
         # ensure only the sso_url was updated
         fetched_provider_data = SAMLProviderData.objects.get(pk=self.saml_provider_data.id)
         self.assertEqual(fetched_provider_data.sso_url, 'http://new.url')
-        self.assertEqual(fetched_provider_data.fetched_at, SINGLE_DATA_CONFIG['fetched_at'])
-        self.assertEqual(fetched_provider_data.entity_id, SINGLE_DATA_CONFIG['entity_id'])
+        self.assertEqual(fetched_provider_data.fetched_at, SINGLE_PROVIDER_DATA['fetched_at'])
+        self.assertEqual(fetched_provider_data.entity_id, SINGLE_PROVIDER_DATA['entity_id'])
 
     def test_delete_one_provider_data(self):
         # DELETE auth/saml/v0/providerdata/ -d data
