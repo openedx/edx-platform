@@ -205,3 +205,31 @@ def set_global_course_creator_status(request, user, set_global_creator):
         GlobalCourseCreatorRole(edx_org).add_users(user)
     else:
         GlobalCourseCreatorRole(edx_org).remove_users(user)
+
+
+def user_belongs_to_edly_organization(request, user):
+    """
+    Check if user belongs to the requested URL site.
+
+    Arguments:
+        request: HTTP request object,
+        user (object): User object.
+
+    Returns:
+        bool: Returns True if User belongs to Edly Organization Otherwise False.
+    """
+
+    current_site = request.site
+    try:
+        edly_sub_org = EdlySubOrganization.objects.get(
+            Q(lms_site=current_site) |
+            Q(studio_site=current_site) |
+            Q(preview_site=current_site)
+        )
+    except EdlySubOrganization.DoesNotExist:
+        return False
+
+    if edly_sub_org.slug in user.edly_profile.get_linked_edly_sub_organizations:
+        return True
+
+    return False

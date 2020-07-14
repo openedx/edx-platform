@@ -25,6 +25,7 @@ from openedx.features.edly.utils import (
     set_global_course_creator_status,
     update_course_creator_status,
     user_has_edly_organization_access,
+    user_belongs_to_edly_organization,
 )
 from student import auth
 from student.roles import (
@@ -136,6 +137,23 @@ class UtilsTests(TestCase):
 
         user_has_access = user_has_edly_organization_access(self.request)
         assert user_has_access is False
+
+    def test_user_linked_with_edly_organization(self):
+        """
+        Test user is linked with a valid site.
+        """
+        edly_sub_organization = EdlySubOrganizationFactory(lms_site=self.request.site)
+        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization)
+
+        assert user_belongs_to_edly_organization(self.request, self.user) is True
+
+    def test_user_not_linked_with_edly_organization(self):
+        """
+        Test user is not linked with a valid site.
+        """
+        self._create_edly_sub_organization()
+
+        assert user_belongs_to_edly_organization(self.request, self.user) is False
 
     def test_get_edly_sub_org_from_cookie(self):
         """
