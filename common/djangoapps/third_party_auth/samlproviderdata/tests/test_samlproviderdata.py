@@ -88,8 +88,9 @@ class SAMLProviderDataTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data['results']
         self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['sso_url'], SINGLE_DATA_CONFIG['sso_url'])
 
-    def test_create_one_providerdata_success(self):
+    def test_create_one_provider_data_success(self):
         # POST auth/saml/v0/providerdata/ -d data
         url = reverse('saml_provider_data-list')
         data = copy.copy(SINGLE_DATA_CONFIG_2)
@@ -104,3 +105,38 @@ class SAMLProviderDataTests(APITestCase):
             SAMLProviderData.objects.get(entity_id=SINGLE_DATA_CONFIG_2['entity_id']).sso_url,
             SINGLE_DATA_CONFIG_2['sso_url']
         )
+
+    def test_patch_one_provider_data(self):
+        # PATCH auth/saml/v0/providerdata/ -d data
+        url = reverse('saml_provider_data-detail', kwargs={'pk': self.samlproviderdata.id})
+        data = {
+            'sso_url': 'http://new.url'
+        }
+        data['enterprise_customer_uuid'] = ENTERPRISE_ID
+        orig_count = SAMLProviderData.objects.count()
+
+        response = self.client.patch(url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(SAMLProviderData.objects.count(), orig_count)
+
+        # ensure only the sso_url was updated
+        fetched_provider_data = SAMLProviderData.objects.get(pk=self.samlproviderdata.id)
+        self.assertEqual(fetched_provider_data.sso_url, 'http://new.url')
+
+    def test_delete_one_provider_data(self):
+        # DELETE auth/saml/v0/providerdata/ -d data
+        url = reverse('saml_provider_data-detail', kwargs={'pk': self.samlproviderdata.id})
+        # url = '{}/{}/'.format(url, self.samlproviderdata.id)
+        data = {}
+        data['enterprise_customer_uuid'] = ENTERPRISE_ID
+        orig_count = SAMLProviderData.objects.count()
+
+        response = self.client.delete(url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(SAMLProviderData.objects.count(), orig_count - 1)
+
+        # ensure only the sso_url was updated
+        query_set_count = SAMLProviderData.objects.filter(pk=self.samlproviderdata.id).count()
+        self.assertEqual(query_set_count, 0)

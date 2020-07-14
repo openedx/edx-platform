@@ -49,7 +49,7 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
         """
         The enterprise customer uuid from request params or post body
         """
-        if self.request.method == "POST":
+        if self.request.method in ('POST', 'PATCH', 'DELETE'):
             uuid_str = self.request.POST.get('enterprise_customer_uuid')
             if uuid_str is None:
               raise Http404('Required enterprise_customer_uuid is missing')
