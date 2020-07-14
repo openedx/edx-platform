@@ -123,6 +123,8 @@ class SAMLProviderDataTests(APITestCase):
         # ensure only the sso_url was updated
         fetched_provider_data = SAMLProviderData.objects.get(pk=self.saml_provider_data.id)
         self.assertEqual(fetched_provider_data.sso_url, 'http://new.url')
+        self.assertEqual(fetched_provider_data.fetched_at, SINGLE_DATA_CONFIG['fetched_at'])
+        self.assertEqual(fetched_provider_data.entity_id, SINGLE_DATA_CONFIG['entity_id'])
 
     def test_delete_one_provider_data(self):
         # DELETE auth/saml/v0/providerdata/ -d data
