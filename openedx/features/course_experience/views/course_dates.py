@@ -10,8 +10,10 @@ from django.utils.translation import get_language_bidi
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from student.models import CourseEnrollment
 
 
 class CourseDatesFragmentView(EdxFragmentView):
@@ -27,10 +29,16 @@ class CourseDatesFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         course_date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
+        # We will use this boolean to gate if we show a link to the dates tab. This same logic
+        # dictates if we show the tab at all.
+        user_enrolled = (request.user and request.user.is_authenticated and
+                         (bool(CourseEnrollment.is_enrolled(request.user, course.id) or
+                               has_access(request.user, 'staff', course, course.id))))
 
         context = {
             'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime'],
             'dates_tab_link': reverse('dates', args=[course.id]),
+            'user_enrolled': user_enrolled,
         }
         html = render_to_string(self.template_name, context)
         dates_fragment = Fragment(html)

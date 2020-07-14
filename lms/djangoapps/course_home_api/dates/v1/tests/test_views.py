@@ -48,7 +48,7 @@ class DatesTabTestViews(BaseCourseHomeTests):
     def test_get_unauthenticated_user(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     @COURSE_HOME_MICROFRONTEND.override(active=True)
     @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)

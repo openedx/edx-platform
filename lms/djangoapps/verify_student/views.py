@@ -36,7 +36,6 @@ from lms.djangoapps.commerce.utils import EcommerceService, is_account_activatio
 from lms.djangoapps.verify_student.emails import send_verification_approved_email, send_verification_confirmation_email
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 from lms.djangoapps.verify_student.utils import can_verify_now
@@ -53,6 +52,9 @@ from util.db import outer_atomic
 from util.json_request import JsonResponse
 from verify_student.toggles import use_new_templates_for_id_verification_emails
 from xmodule.modulestore.django import modulestore
+
+from .services import IDVerificationService
+from .toggles import redirect_to_idv_microfrontend
 
 log = logging.getLogger(__name__)
 
@@ -510,7 +512,10 @@ class PayAndVerifyView(View):
             if is_enrolled:
                 if already_paid:
                     # If the student has paid, but not verified, redirect to the verification flow.
-                    url = reverse('verify_student_verify_now', kwargs=course_kwargs)
+                    url = IDVerificationService.get_verify_location(
+                        'verify_student_verify_now',
+                        six.text_type(course_key)
+                    )
             else:
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
 
@@ -1139,7 +1144,7 @@ def results_callback(request):
         log.debug(u"Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
         status = "denied"
-        reverify_url = '{}{}'.format(settings.LMS_ROOT_URL, reverse("verify_student_reverify"))
+        reverify_url = IDVerificationService.email_reverify_url()
         verification_status_email_vars['reasons'] = reason
         verification_status_email_vars['reverify_url'] = reverify_url
         verification_status_email_vars['faq_url'] = settings.ID_VERIFICATION_SUPPORT_LINK
@@ -1229,6 +1234,8 @@ class ReverifyView(View):
         verification_status = IDVerificationService.user_status(request.user)
         expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
         if can_verify_now(verification_status, expiration_datetime):
+            if redirect_to_idv_microfrontend():
+                return redirect('{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL))
             context = {
                 "user_full_name": request.user.profile.name,
                 "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),

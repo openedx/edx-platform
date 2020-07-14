@@ -15,6 +15,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from student.models import User
 
 from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from .toggles import redirect_to_idv_microfrontend
 from .utils import earliest_allowed_verification_date, most_recent_verification
 
 log = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ class XBlockVerificationService(object):
         """
         Returns the URL for a user to verify themselves.
         """
-        return reverse('verify_student_reverify')
+        return IDVerificationService.get_verify_location('verify_student_reverify')
 
 
 class IDVerificationService(object):
@@ -240,3 +241,38 @@ class IDVerificationService(object):
             return 'Not ID Verified'
         else:
             return 'ID Verified'
+
+    @classmethod
+    def get_verify_location(cls, url_name, course_id=None):
+        """
+        url_name is one of:
+            'verify_student_verify_now'
+            'verify_student_reverify'
+
+        Returns a string:
+            If waffle flag is active, returns URL for IDV microfrontend.
+            Else, returns URL for corresponding view.
+        """
+        location = ''
+        if redirect_to_idv_microfrontend():
+            location = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
+            if course_id:
+                location = location + '?{}'.format(str(course_id))
+        else:
+            if course_id:
+                location = reverse(url_name, args=[str(course_id)])
+            else:
+                location = reverse(url_name)
+        return location
+
+    @classmethod
+    def email_reverify_url(cls):
+        """
+        Return a URL string for reverification emails:
+            If waffle flag is active, returns URL for IDV microfrontend.
+            Else, returns URL for reverify view.
+        """
+        if redirect_to_idv_microfrontend():
+            return '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
+        else:
+            return '{}{}'.format(settings.LMS_ROOT_URL, reverse('verify_student_reverify'))
