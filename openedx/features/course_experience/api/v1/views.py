@@ -1,9 +1,13 @@
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import APIException, ParseError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
 class UnableToResetDeadlines(APIException):
@@ -12,8 +16,11 @@ class UnableToResetDeadlines(APIException):
     default_code = 'unable_to_reset_deadlines'
 
 
-@permission_classes((IsAuthenticated,))
 @api_view(['POST'])
+@authentication_classes((
+    JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser,
+))
+@permission_classes((IsAuthenticated,))
 def reset_course_deadlines(request):
     course_key = request.data.get('course_key', None)
 
