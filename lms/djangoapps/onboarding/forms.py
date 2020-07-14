@@ -469,6 +469,15 @@ class InterestsModelForm(BaseOnboardingModelForm):
             )
         }
 
+    def save(self, request, commit=True):
+        user_extended_profile = super(InterestsModelForm, self).save(commit=False)
+        user_extended_profile.is_interests_data_submitted = True
+
+        if commit:
+            user_extended_profile.save()
+
+        return user_extended_profile
+
 
 class OrganizationInfoForm(BaseOnboardingModelForm):
     """
