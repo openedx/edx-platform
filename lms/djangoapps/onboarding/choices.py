@@ -42,7 +42,7 @@ HEAR_ABOUT_PHILANTHROPY = (
     ('hear_about_philanthropy_partner', 'A Philanthropy University Partner (Global Giving, +Acumen or another)'),
     ('hear_about_colleague_same_organization', 'A Colleague From My Organization'),
     ('hear_about_friend_new_organization', 'A Friend Or Colleague (Not From My Organization)'),
-    ('hear_about_interest_search', 'An Internet Search'),
+    ('hear_about_internet_search', 'An Internet Search'),
     ('hear_about_linkedIn_advertisement', 'A LinkedIn Advertisement'),
     ('hear_about_facebook_advertisement', 'A Facebook Advertisement'),
     ('hear_about_twitter_not_colleague', 'Twitter (Not From A Colleague)')

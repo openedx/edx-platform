@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userextendedprofile',
             name='hear_about_philanthropyu',
-            field=openedx.features.custom_fields.multiselect_with_other.db.fields.MultiSelectWithOtherField(blank=True, choices=[(b'hear_about_philanthropy_partner', b'A Philanthropy University Partner (Global Giving, +Acumen or another)'), (b'hear_about_colleague_same_organization', b'A Colleague From My Organization'), (b'hear_about_friend_new_organization', b'A Friend Or Colleague (Not From My Organization)'), (b'hear_about_interest_search', b'An Internet Search'), (b'hear_about_linkedIn_advertisement', b'A LinkedIn Advertisement'), (b'hear_about_facebook_advertisement', b'A Facebook Advertisement'), (b'hear_about_twitter_not_colleague', b'Twitter (Not From A Colleague)'), (b'other', b'Other')], max_length=488),
+            field=openedx.features.custom_fields.multiselect_with_other.db.fields.MultiSelectWithOtherField(blank=True, choices=[(b'hear_about_philanthropy_partner', b'A Philanthropy University Partner (Global Giving, +Acumen or another)'), (b'hear_about_colleague_same_organization', b'A Colleague From My Organization'), (b'hear_about_friend_new_organization', b'A Friend Or Colleague (Not From My Organization)'), (b'hear_about_internet_search', b'An Internet Search'), (b'hear_about_linkedIn_advertisement', b'A LinkedIn Advertisement'), (b'hear_about_facebook_advertisement', b'A Facebook Advertisement'), (b'hear_about_twitter_not_colleague', b'Twitter (Not From A Colleague)'), (b'other', b'Other')], max_length=488),
         ),
         migrations.AddField(
             model_name='userextendedprofile',
