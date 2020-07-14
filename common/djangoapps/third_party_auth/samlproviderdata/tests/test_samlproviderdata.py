@@ -56,18 +56,18 @@ class SAMLProviderDataTests(APITestCase):
             name='test-ep',
             slug='test-ep',
             site=cls.site)
-        cls.samlproviderconfig, _ = SAMLProviderConfig.objects.get_or_create(
+        cls.saml_provider_config, _ = SAMLProviderConfig.objects.get_or_create(
             entity_id=SINGLE_PROVIDER_CONFIG['entity_id'],
             metadata_source=SINGLE_PROVIDER_CONFIG['metadata_source']
         )
-        # the entity_id here must match that of the samlproviderconfig
+        # the entity_id here must match that of the saml_provider_config
         cls.saml_provider_data, _ = SAMLProviderData.objects.get_or_create(
             entity_id=SINGLE_DATA_CONFIG['entity_id'],
             sso_url=SINGLE_DATA_CONFIG['sso_url'],
             fetched_at=SINGLE_DATA_CONFIG['fetched_at']
         )
-        cls.enterprisecustomeridp, _ = EnterpriseCustomerIdentityProvider.objects.get_or_create(
-            provider_id=cls.samlproviderconfig.id,
+        cls.enterprise_customer_idp, _ = EnterpriseCustomerIdentityProvider.objects.get_or_create(
+            provider_id=cls.saml_provider_config.id,
             enterprise_customer_id=ENTERPRISE_ID
         )
 
