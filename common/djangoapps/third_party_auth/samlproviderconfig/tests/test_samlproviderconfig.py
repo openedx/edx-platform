@@ -107,5 +107,5 @@ class SAMLProviderConfigTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(SAMLProviderConfig.objects.count(), orig_count + 1)
-        providerconfig = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_2['slug'])
-        self.assertEqual(providerconfig.name, 'name-of-config-2')
+        provider_config = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_2['slug'])
+        self.assertEqual(provider_config.name, 'name-of-config-2')
