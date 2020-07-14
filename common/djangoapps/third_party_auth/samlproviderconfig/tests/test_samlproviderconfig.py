@@ -1,3 +1,7 @@
+"""
+Tests for SAMLProviderConfig endpoints
+"""
+
 import unittest
 import copy
 from uuid import uuid4
@@ -66,24 +70,41 @@ class SAMLProviderConfigTests(APITestCase):
         urlbase = reverse('samlproviderconfig-list')
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
+
         response = self.client.get(url, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print(response.data)
         results = response.data['results']
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['entity_id'], SINGLE_PROVIDER_CONFIG['entity_id'])
         self.assertEqual(results[0]['metadata_source'], SINGLE_PROVIDER_CONFIG['metadata_source'])
         self.assertEqual(SAMLProviderConfig.objects.count(), 1)
 
+    def test_get_one_config_by_enterprise_uuid_not_found(self):
+        """
+        GET auth/saml/v0/providerconfig/?enterprise_customer_uuid=id=id
+        """
+        urlbase = reverse('samlproviderconfig-list')
+        query_kwargs = {'enterprise_customer_uuid': 'abc-notfound'}
+        url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
+        orig_count = SAMLProviderConfig.objects.count()
+
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)
+
     def test_create_one_config(self):
         """
-        POST auth/saml/v0/providerconfig/?enterprise_customer_uuid=id -d data
+        POST auth/saml/v0/providerconfig/ -d data
         """
-        query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
-        url = '{}?{}'.format(reverse('samlproviderconfig-list'), urlencode(query_kwargs))
-        data = SINGLE_PROVIDER_CONFIG_2
+        url = reverse('samlproviderconfig-list')
+        data = copy.copy(SINGLE_PROVIDER_CONFIG_2)
+        data['enterprise_customer_uuid'] = ENTERPRISE_ID
         orig_count = SAMLProviderConfig.objects.count()
-        response = self.client.post(url, data, format='json')
+
+        response = self.client.post(url, data)
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(SAMLProviderConfig.objects.count(), orig_count + 1)
         providerconfig = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_2['slug'])
