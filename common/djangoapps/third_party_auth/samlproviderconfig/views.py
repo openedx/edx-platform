@@ -1,6 +1,7 @@
 """
 Viewset for auth/saml/v0/samlproviderconfig
 """
+from uuid import UUID
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -9,6 +10,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from enterprise.models import EnterpriseCustomerIdentityProvider
 from rest_framework import permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
+from rest_framework.exceptions import ParseError
 
 from ..models import SAMLProviderConfig
 from .serializers import SAMLProviderConfigSerializer
@@ -59,7 +61,13 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
               raise Http404('Required enterprise_customer_uuid is missing')
             return uuid_str
         else:
-            return self.request.query_params.get('enterprise_customer_uuid')
+            uuid_str = self.request.query_params.get('enterprise_customer_uuid')
+            try:
+                UUID(uuid_str, version=4)
+            except ValueError:
+                raise ParseError('Invalid UUID for enterprise_customer_uuid')
+            return uuid_str
+
 
     def get_permission_object(self):
         """

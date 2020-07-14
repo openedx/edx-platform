@@ -80,6 +80,18 @@ class SAMLProviderConfigTests(APITestCase):
         self.assertEqual(results[0]['metadata_source'], SINGLE_PROVIDER_CONFIG['metadata_source'])
         self.assertEqual(SAMLProviderConfig.objects.count(), 1)
 
+    def test_get_one_config_by_enterprise_uuid_invalid_uuid(self):
+        """
+        GET auth/saml/v0/provider_config/?enterprise_customer_uuid=invalidUUID
+        """
+        urlbase = reverse('saml_provider_config-list')
+        query_kwargs = {'enterprise_customer_uuid': 'invalid_uuid'}
+        url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
+
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_get_one_config_by_enterprise_uuid_not_found(self):
         """
         GET auth/saml/v0/provider_config/?enterprise_customer_uuid=id=id
@@ -91,7 +103,7 @@ class SAMLProviderConfigTests(APITestCase):
 
         response = self.client.get(url, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)
 
     def test_create_one_config(self):
