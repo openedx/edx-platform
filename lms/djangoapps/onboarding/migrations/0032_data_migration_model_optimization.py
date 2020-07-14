@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
                         THEN 'hear_about_friend_new_organization,|'
 
                         WHEN hear_about_philanthropy = 'An Internet Search'
-                        THEN 'hear_about_interest_search,|'
+                        THEN 'hear_about_internet_search,|'
 
                         WHEN hear_about_philanthropy = 'A LinkedIn Advertisement'
                         THEN 'hear_about_linkedIn_advertisement,|'
