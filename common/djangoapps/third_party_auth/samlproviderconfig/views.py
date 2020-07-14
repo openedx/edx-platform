@@ -70,7 +70,7 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
 
     def get_permission_object(self):
         """
-        Retrive an EnterpriseCustomer uuid to do auth against
+        Retrieve an EnterpriseCustomer uuid to do auth against
         Right now this is the same as from the request object
         meaning that only users belonging to the same enterprise
         can access these endpoints, we have to sort out the operator role use case

@@ -66,6 +66,6 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
 
     def get_permission_object(self):
         """
-        Retrive an EnterpriseCustomer to do auth against
+        Retrieve an EnterpriseCustomer to do auth against
         """
         return self.requested_enterprise_uuid
