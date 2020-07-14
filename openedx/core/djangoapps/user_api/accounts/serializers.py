@@ -475,10 +475,12 @@ class UserRetirementPartnerReportSerializer(serializers.Serializer):
     Perform serialization for the UserRetirementPartnerReportingStatus model
     """
     user_id = serializers.IntegerField()
+    student_id = serializers.CharField(required=False)
     original_username = serializers.CharField()
     original_email = serializers.EmailField()
     original_name = serializers.CharField()
     orgs = serializers.ListField(child=serializers.CharField())
+    orgs_config = serializers.ListField(required=False)
     created = serializers.DateTimeField()
 
     # Required overrides of abstract base class methods, but we don't use them

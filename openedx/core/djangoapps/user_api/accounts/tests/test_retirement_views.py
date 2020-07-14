@@ -46,6 +46,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirement,
     CreditRequirementStatus
 )
+from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
@@ -287,7 +288,7 @@ class TestPartnerReportingCleanup(ModuleStoreTestCase):
 
     def create_partner_reporting_statuses(self, is_being_processed=True, num=2):
         """
-        Creates and returnes the given number of test users and UserRetirementPartnerReportingStatuses
+        Creates and returns the given number of test users and UserRetirementPartnerReportingStatuses
         with the given is_being_processed value.
         """
         statuses = []
@@ -482,6 +483,17 @@ class TestPartnerReportingList(ModuleStoreTestCase):
     """
     Tests the partner reporting list endpoint
     """
+    EXPECTED_MB_ORGS_CONFIG = [
+        {
+            AccountRetirementPartnerReportView.ORGS_CONFIG_ORG_KEY: 'mb_coaching',
+            AccountRetirementPartnerReportView.ORGS_CONFIG_FIELD_HEADINGS_KEY: [
+                AccountRetirementPartnerReportView.STUDENT_ID_KEY,
+                AccountRetirementPartnerReportView.ORIGINAL_EMAIL_KEY,
+                AccountRetirementPartnerReportView.ORIGINAL_NAME_KEY,
+                AccountRetirementPartnerReportView.DELETION_COMPLETED_KEY
+            ]
+        }
+    ]
 
     def setUp(self):
         super(TestPartnerReportingList, self).setUp()
@@ -493,6 +505,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         self.url = reverse('accounts_retirement_partner_report')
         self.maxDiff = None
         self.test_created_datetime = datetime.datetime(2018, 1, 1, tzinfo=pytz.UTC)
+        ExternalIdType.objects.get_or_create(name=ExternalIdType.MICROBACHELORS_COACHING)
 
     def get_user_dict(self, user, enrollments):
         """
@@ -517,9 +530,10 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         their processing state to "is_being_processed".
 
         Returns a list of user dicts representing what we would expect back from the
-        endpoint for the given user / enrollment.
+        endpoint for the given user / enrollment, and a list of the users themselves.
         """
         user_dicts = []
+        users = []
         courses = self.courses if courses is None else courses
 
         for _ in range(num):
@@ -540,8 +554,9 @@ class TestPartnerReportingList(ModuleStoreTestCase):
             user_dicts.append(
                 self.get_user_dict(user, enrollments)
             )
+            users.append(user)
 
-        return user_dicts
+        return user_dicts, users
 
     def assert_status_and_user_list(self, expected_users, expected_status=status.HTTP_200_OK):
         """
@@ -561,9 +576,19 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         # These sub-lists will fail assertCountEqual if they're out of order
         for expected_user in expected_users:
             expected_user['orgs'].sort()
+            if AccountRetirementPartnerReportView.ORGS_CONFIG_KEY in expected_user:
+                orgs_config = expected_user[AccountRetirementPartnerReportView.ORGS_CONFIG_KEY]
+                orgs_config.sort()
+                for config in orgs_config:
+                    config[AccountRetirementPartnerReportView.ORGS_CONFIG_FIELD_HEADINGS_KEY].sort()
 
         for returned_user in returned_users:
             returned_user['orgs'].sort()
+            if AccountRetirementPartnerReportView.ORGS_CONFIG_KEY in returned_user:
+                orgs_config = returned_user[AccountRetirementPartnerReportView.ORGS_CONFIG_KEY]
+                orgs_config.sort()
+                for config in orgs_config:
+                    config[AccountRetirementPartnerReportView.ORGS_CONFIG_FIELD_HEADINGS_KEY].sort()
 
         self.assertCountEqual(returned_users, expected_users)
 
@@ -571,21 +596,72 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         """
         Basic test to make sure that users in two different orgs are returned.
         """
-        users = self.create_partner_reporting_statuses()
-        users += self.create_partner_reporting_statuses(courses=(self.course_awesome_org,))
+        user_dicts, users = self.create_partner_reporting_statuses()
+        additional_dicts, additional_users = self.create_partner_reporting_statuses(courses=(self.course_awesome_org,))
+        user_dicts += additional_dicts
 
-        self.assert_status_and_user_list(users)
+        self.assert_status_and_user_list(user_dicts)
 
     def test_success_multiple_statuses(self):
         """
         Checks that only users in the correct is_being_processed state (False) are returned.
         """
-        users = self.create_partner_reporting_statuses()
+        user_dicts, users = self.create_partner_reporting_statuses()
 
         # These should not come back
         self.create_partner_reporting_statuses(courses=(self.course_awesome_org,), is_being_processed=True)
 
-        self.assert_status_and_user_list(users)
+        self.assert_status_and_user_list(user_dicts)
+
+    def test_success_mb_coaching(self):
+        """
+        Check that MicroBachelors users who have consented to coaching have the proper info
+        included for the partner report.
+        """
+        path = 'openedx.core.djangoapps.user_api.accounts.views.has_ever_consented_to_coaching'
+        with mock.patch(path, return_value=True) as mock_has_ever_consented:
+            user_dicts, users = self.create_partner_reporting_statuses(num=1)
+            external_id, created = ExternalId.add_new_user_id(
+                user=users[0],
+                type_name=ExternalIdType.MICROBACHELORS_COACHING
+            )
+
+            expected_user = user_dicts[0]
+            expected_users = [expected_user]
+            expected_user[AccountRetirementPartnerReportView.STUDENT_ID_KEY] = str(external_id.external_user_id)
+            expected_user[
+                AccountRetirementPartnerReportView.ORGS_CONFIG_KEY] = TestPartnerReportingList.EXPECTED_MB_ORGS_CONFIG
+
+            self.assert_status_and_user_list(expected_users)
+            mock_has_ever_consented.assert_called_once()
+
+    def test_success_mb_coaching_no_external_id(self):
+        """
+        Check that MicroBachelors users who have consented to coaching, but who do not have an external id, have the
+        proper info included for the partner report.
+        """
+        path = 'openedx.core.djangoapps.user_api.accounts.views.has_ever_consented_to_coaching'
+        with mock.patch(path, return_value=True) as mock_has_ever_consented:
+            user_dicts, users = self.create_partner_reporting_statuses(num=1)
+
+            self.assert_status_and_user_list(user_dicts)
+            mock_has_ever_consented.assert_called_once()
+
+    def test_success_mb_coaching_no_consent(self):
+        """
+        Check that MicroBachelors users who have not consented to coaching have the proper info
+        included for the partner report.
+        """
+        path = 'openedx.core.djangoapps.user_api.accounts.views.has_ever_consented_to_coaching'
+        with mock.patch(path, return_value=False) as mock_has_ever_consented:
+            user_dicts, users = self.create_partner_reporting_statuses(num=1)
+            ExternalId.add_new_user_id(
+                user=users[0],
+                type_name=ExternalIdType.MICROBACHELORS_COACHING
+            )
+
+            self.assert_status_and_user_list(user_dicts)
+            mock_has_ever_consented.assert_called_once()
 
     def test_no_users(self):
         """
@@ -606,10 +682,10 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         Checks that users are progressed to "is_being_processed" True upon being returned
         from this call.
         """
-        users = self.create_partner_reporting_statuses()
+        user_dicts, users = self.create_partner_reporting_statuses()
 
         # First time through we should get the users
-        self.assert_status_and_user_list(users)
+        self.assert_status_and_user_list(user_dicts)
 
         # Second time they should be updated to is_being_processed=True
         self.assert_status_and_user_list([])
@@ -1105,7 +1181,7 @@ class TestAccountRetirementUpdate(RetirementTestCase):
         data = {'new_state': 'LOCKING_ACCOUNT', 'response': 'this should succeed'}
         self.update_and_assert_status(data)
 
-        # Refresh the retirment object and confirm the messages and state are correct
+        # Refresh the retirement object and confirm the messages and state are correct
         retirement = UserRetirementStatus.objects.get(id=self.retirement.id)
         self.assertEqual(retirement.current_state, RetirementState.objects.get(state_name='LOCKING_ACCOUNT'))
         self.assertEqual(retirement.last_state, RetirementState.objects.get(state_name='PENDING'))
@@ -1127,7 +1203,7 @@ class TestAccountRetirementUpdate(RetirementTestCase):
         for update_data in fake_retire_process:
             self.update_and_assert_status(update_data)
 
-        # Refresh the retirment object and confirm the messages and state are correct
+        # Refresh the retirement object and confirm the messages and state are correct
         retirement = UserRetirementStatus.objects.get(id=self.retirement.id)
         self.assertEqual(retirement.current_state, RetirementState.objects.get(state_name='COMPLETE'))
         self.assertEqual(retirement.last_state, RetirementState.objects.get(state_name='CREDENTIALS_COMPLETE'))

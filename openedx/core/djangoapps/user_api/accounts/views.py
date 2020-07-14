@@ -44,6 +44,7 @@ from openedx.core.djangoapps.ace_common.template_context import get_base_templat
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequirementStatus
+from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
@@ -81,6 +82,11 @@ from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
 from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
+
+try:
+    from coaching.api import has_ever_consented_to_coaching
+except ImportError:
+    has_ever_consented_to_coaching = None
 
 log = logging.getLogger(__name__)
 
@@ -530,6 +536,14 @@ class AccountRetirementPartnerReportView(ViewSet):
     Provides API endpoints for managing partner reporting of retired
     users.
     """
+    DELETION_COMPLETED_KEY = 'deletion_completed'
+    ORGS_CONFIG_KEY = 'orgs_config'
+    ORGS_CONFIG_ORG_KEY = 'org'
+    ORGS_CONFIG_FIELD_HEADINGS_KEY = 'field_headings'
+    ORIGINAL_EMAIL_KEY = 'original_email'
+    ORIGINAL_NAME_KEY = 'original_name'
+    STUDENT_ID_KEY = 'student_id'
+
     authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
     parser_classes = (JSONParser,)
@@ -544,7 +558,7 @@ class AccountRetirementPartnerReportView(ViewSet):
         for enrollment in user.courseenrollment_set.all():
             org = enrollment.course_id.org
 
-            # Org can concievably be blank or this bogus default value
+            # Org can conceivably be blank or this bogus default value
             if org and org != 'outdated_entry':
                 orgs.add(org)
         try:
@@ -569,23 +583,71 @@ class AccountRetirementPartnerReportView(ViewSet):
             is_being_processed=False
         ).order_by('id')
 
-        retirements = [
-            {
-                'user_id': retirement.user.pk,
-                'original_username': retirement.original_username,
-                'original_email': retirement.original_email,
-                'original_name': retirement.original_name,
-                'orgs': self._get_orgs_for_user(retirement.user),
-                'created': retirement.created,
-            }
-            for retirement in retirement_statuses
-        ]
+        retirements = []
+        for retirement_status in retirement_statuses:
+            retirements.append(self._get_retirement_for_partner_report(retirement_status))
 
         serializer = UserRetirementPartnerReportSerializer(retirements, many=True)
 
         retirement_statuses.update(is_being_processed=True)
 
         return Response(serializer.data)
+
+    def _get_retirement_for_partner_report(self, retirement_status):
+        """
+        Get the retirement for this retirement_status. The retirement info will be included in the partner report.
+        """
+        retirement = {
+            'user_id': retirement_status.user.pk,
+            'original_username': retirement_status.original_username,
+            AccountRetirementPartnerReportView.ORIGINAL_EMAIL_KEY: retirement_status.original_email,
+            AccountRetirementPartnerReportView.ORIGINAL_NAME_KEY: retirement_status.original_name,
+            'orgs': self._get_orgs_for_user(retirement_status.user),
+            'created': retirement_status.created,
+        }
+
+        # Some orgs have a custom list of headings and content for the partner report. Add this, if applicable.
+        self._add_orgs_config_for_user(retirement, retirement_status.user)
+
+        return retirement
+
+    def _add_orgs_config_for_user(self, retirement, user):
+        """
+        Check to see if the user's info was sent to any partners (orgs) that have a a custom list of headings and
+        content for the partner report. If so, add this.
+        """
+        # See if the MicroBachelors coaching provider needs to be notified of this user's retirement
+        if has_ever_consented_to_coaching is not None and has_ever_consented_to_coaching(user):
+            # See if the user has a MicroBachelors external id. If not, they were never sent to the
+            # coaching provider.
+            external_ids = ExternalId.objects.filter(
+                user=user,
+                external_id_type__name=ExternalIdType.MICROBACHELORS_COACHING
+            )
+            if external_ids.exists():
+                # User has an external id. Add the additional info.
+                external_id = str(external_ids[0].external_user_id)
+                self._add_coaching_orgs_config(retirement, external_id)
+
+    def _add_coaching_orgs_config(self, retirement, external_id):
+        """
+        Add the orgs configuration for MicroBachelors coaching
+        """
+        # Add the custom field headings
+        retirement[AccountRetirementPartnerReportView.ORGS_CONFIG_KEY] = [
+            {
+                AccountRetirementPartnerReportView.ORGS_CONFIG_ORG_KEY: 'mb_coaching',
+                AccountRetirementPartnerReportView.ORGS_CONFIG_FIELD_HEADINGS_KEY: [
+                    AccountRetirementPartnerReportView.STUDENT_ID_KEY,
+                    AccountRetirementPartnerReportView.ORIGINAL_EMAIL_KEY,
+                    AccountRetirementPartnerReportView.ORIGINAL_NAME_KEY,
+                    AccountRetirementPartnerReportView.DELETION_COMPLETED_KEY
+                ]
+            }
+        ]
+
+        # Add the custom field value
+        retirement[AccountRetirementPartnerReportView.STUDENT_ID_KEY] = external_id
 
     @request_requires_username
     def retirement_partner_status_create(self, request):
@@ -707,7 +769,7 @@ class AccountRetirementStatusView(ViewSet):
             )
             serializer = UserRetirementStatusSerializer(retirements, many=True)
             return Response(serializer.data)
-        # This should only occur on the int() converstion of cool_off_days at this point
+        # This should only occur on the int() conversion of cool_off_days at this point
         except ValueError:
             return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
@@ -1056,7 +1118,7 @@ class UsernameReplacementView(APIView):
     updates usernames across all services. DO NOT run this alone or users will
     not match across the system and things will be broken.
 
-    API will recieve a list of current usernames and their requested new
+    API will receive a list of current usernames and their requested new
     username. If their new username is taken, it will randomly assign a new username.
 
     This API will be called first, before calling the APIs in other services as this
@@ -1166,7 +1228,7 @@ class UsernameReplacementView(APIView):
         """
         Generates a unique username.
         If the desired username is available, that will be returned.
-        Otherwise it will generate unique suffixs to the desired username until it is an available username.
+        Otherwise it will generate unique suffixes to the desired username until it is an available username.
         """
         new_username = desired_username
         # Keep checking usernames in case desired_username + random suffix is already taken
