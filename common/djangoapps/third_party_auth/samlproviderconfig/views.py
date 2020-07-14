@@ -27,6 +27,9 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
     A View to handle SAMLProviderConfig CRUD
 
     Usage:
+        NOTE: Only the GET request requires a request parameter, otherwise pass the uuid as part
+        of the post body
+
         GET /auth/saml/v0/provider_config/?enterprise-id=uuid
         POST /auth/saml/v0/provider_config/ -d postData (must contain 'enterprise_customer_uuid')
         DELETE /auth/saml/v0/provider_config/:pk -d postData (must contain 'enterprise_customer_uuid')

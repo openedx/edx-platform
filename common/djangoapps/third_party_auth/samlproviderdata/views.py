@@ -28,7 +28,9 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
     Uses the edx-rbac mixin PermissionRequiredMixin to apply enterprise authorization
 
     Usage:
-        Usage:
+        NOTE: Only the GET request requires a request parameter, otherwise pass the uuid as part
+        of the post body
+
         GET /auth/saml/v0/provider_data/?enterprise-id=uuid
         POST /auth/saml/v0/provider_data/ -d postData (must contain 'enterprise_customer_uuid')
         DELETE /auth/saml/v0/provider_data/:pk -d postData (must contain 'enterprise_customer_uuid')
