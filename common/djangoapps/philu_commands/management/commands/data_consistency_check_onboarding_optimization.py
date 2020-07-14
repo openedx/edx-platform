@@ -1,3 +1,4 @@
+import traceback
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
@@ -19,6 +20,11 @@ ERROR_MSG_MISMATCH = """
     Actual Value: {actual_val}
 """
 
+EXCEPTION_MSG = """
+    An exception occurred for Profile ID: {profile_id}, User ID: {user_id}.
+    Stack trace:
+    {stack_trace}
+"""
 
 def get_selected_choices_keys(user_extended_profile, choices):
     return list([k for k, _ in choices if getattr(user_extended_profile, k)])
@@ -135,13 +141,20 @@ class Command(BaseCommand):
         failed_profiles = []
 
         for profile_count, user_extended_profile in enumerate(user_extended_profiles, 1):
-            comparison_statuses = [
-                compare_function_areas(user_extended_profile),
-                compare_interests(user_extended_profile),
-                compare_learners_related(user_extended_profile),
-                compare_goals(user_extended_profile),
-                compare_hear_about_philanthropyu(user_extended_profile)
-            ]
+            comparison_statuses = [False]
+
+            try:
+                comparison_statuses = [
+                    compare_function_areas(user_extended_profile),
+                    compare_interests(user_extended_profile),
+                    compare_learners_related(user_extended_profile),
+                    compare_goals(user_extended_profile),
+                    compare_hear_about_philanthropyu(user_extended_profile)
+                ]
+            except Exception:
+                log.error(EXCEPTION_MSG.format(profile_id=user_extended_profile.id,
+                                               user_id=user_extended_profile.user_id,
+                                               stack_trace=traceback.format_exc()))
 
             if not all(comparison_statuses):
                 failed_profiles.append(int(user_extended_profile.id))
