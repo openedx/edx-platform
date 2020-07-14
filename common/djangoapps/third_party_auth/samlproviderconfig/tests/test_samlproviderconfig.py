@@ -121,3 +121,16 @@ class SAMLProviderConfigTests(APITestCase):
         self.assertEqual(SAMLProviderConfig.objects.count(), orig_count + 1)
         provider_config = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_2['slug'])
         self.assertEqual(provider_config.name, 'name-of-config-2')
+
+    def test_create_one_config_with_absent_enterprise_uuid(self):
+        """
+        POST auth/saml/v0/provider_config/ -d data
+        """
+        url = reverse('saml_provider_config-list')
+        data = copy.copy(SINGLE_PROVIDER_CONFIG_2)
+        orig_count = SAMLProviderConfig.objects.count()
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)

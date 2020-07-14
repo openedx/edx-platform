@@ -2,7 +2,6 @@
 Viewset for auth/saml/v0/samlproviderconfig
 """
 
-from django.http import Http404
 from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -46,7 +45,7 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         if an association exists in EnterpriseCustomerIdentityProvider model
         """
         if self.requested_enterprise_uuid is None:
-            raise Http404('Required enterprise_customer_uuid is missing')
+            raise ParseError('Required enterprise_customer_uuid is missing')
         enterprise_customer_idp = get_object_or_404(
             EnterpriseCustomerIdentityProvider,
             enterprise_customer__uuid=self.requested_enterprise_uuid
@@ -61,7 +60,7 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         if self.request.method == "POST":
             uuid_str = self.request.POST.get('enterprise_customer_uuid')
             if uuid_str is None:
-                raise Http404('Required enterprise_customer_uuid is missing')
+                raise ParseError('Required enterprise_customer_uuid is missing')
             return uuid_str
         else:
             uuid_str = self.request.query_params.get('enterprise_customer_uuid')
