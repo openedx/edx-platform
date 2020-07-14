@@ -61,7 +61,7 @@ class SAMLProviderDataTests(APITestCase):
             metadata_source=SINGLE_PROVIDER_CONFIG['metadata_source']
         )
         # the entity_id here must match that of the samlproviderconfig
-        cls.samlproviderdata, _ = SAMLProviderData.objects.get_or_create(
+        cls.saml_provider_data, _ = SAMLProviderData.objects.get_or_create(
             entity_id=SINGLE_DATA_CONFIG['entity_id'],
             sso_url=SINGLE_DATA_CONFIG['sso_url'],
             fetched_at=SINGLE_DATA_CONFIG['fetched_at']
@@ -108,7 +108,7 @@ class SAMLProviderDataTests(APITestCase):
 
     def test_patch_one_provider_data(self):
         # PATCH auth/saml/v0/providerdata/ -d data
-        url = reverse('saml_provider_data-detail', kwargs={'pk': self.samlproviderdata.id})
+        url = reverse('saml_provider_data-detail', kwargs={'pk': self.saml_provider_data.id})
         data = {
             'sso_url': 'http://new.url'
         }
@@ -121,12 +121,12 @@ class SAMLProviderDataTests(APITestCase):
         self.assertEqual(SAMLProviderData.objects.count(), orig_count)
 
         # ensure only the sso_url was updated
-        fetched_provider_data = SAMLProviderData.objects.get(pk=self.samlproviderdata.id)
+        fetched_provider_data = SAMLProviderData.objects.get(pk=self.saml_provider_data.id)
         self.assertEqual(fetched_provider_data.sso_url, 'http://new.url')
 
     def test_delete_one_provider_data(self):
         # DELETE auth/saml/v0/providerdata/ -d data
-        url = reverse('saml_provider_data-detail', kwargs={'pk': self.samlproviderdata.id})
+        url = reverse('saml_provider_data-detail', kwargs={'pk': self.saml_provider_data.id})
         data = {}
         data['enterprise_customer_uuid'] = ENTERPRISE_ID
         orig_count = SAMLProviderData.objects.count()
@@ -137,5 +137,5 @@ class SAMLProviderDataTests(APITestCase):
         self.assertEqual(SAMLProviderData.objects.count(), orig_count - 1)
 
         # ensure only the sso_url was updated
-        query_set_count = SAMLProviderData.objects.filter(pk=self.samlproviderdata.id).count()
+        query_set_count = SAMLProviderData.objects.filter(pk=self.saml_provider_data.id).count()
         self.assertEqual(query_set_count, 0)
