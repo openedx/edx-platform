@@ -661,7 +661,7 @@ def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs)
             'category': "conversion",
             'label': None,
             'provider': kwargs['backend'].name,
-            'username': kwargs.get('username','')
+            'username': kwargs.get('username', '')
         }, send_to_track=True, user=kwargs['user'])
 
 
