@@ -3,7 +3,6 @@ Functions for accessing and displaying courses within the
 courseware.
 """
 
-
 import logging
 from collections import defaultdict, namedtuple
 from datetime import datetime
@@ -12,7 +11,6 @@ import pytz
 import six
 from crum import get_current_request
 from django.conf import settings
-from django.db.models import Prefetch
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -25,7 +23,6 @@ from six import text_type
 from openedx.core.lib.cache_utils import request_cached
 
 import branding
-from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     AuthenticationRequiredAccessError,
@@ -60,6 +57,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.course_experience.utils import is_block_structure_complete_for_assignments
 from static_replace import replace_static_urls
 from survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from util.date_utils import strftime_localized
@@ -550,7 +548,7 @@ def get_course_assignments(course_key, user, include_access=False):
             if assignment_released:
                 url = reverse('jump_to', args=[course_key, subsection_key])
 
-            complete = block_data.get_xblock_field(subsection_key, 'complete', False)
+            complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
             past_due = not complete and due < now
             assignments.append(_Assignment(
                 subsection_key, title, url, due, contains_gated_content, complete, past_due, assignment_type
