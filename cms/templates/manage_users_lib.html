@@ -1,3 +1,5 @@
+<%page expression_filter="h"/>
+
 <%inherit file="base.html" />
 <%!
 from django.utils.translation import ugettext as _
@@ -110,7 +112,7 @@ from openedx.core.djangolib.js_utils import (
 <%block name="requirejs">
   require(["js/factories/manage_users_lib"], function(ManageLibraryUsersFactory) {
       ManageLibraryUsersFactory(
-        "${context_library.display_name_with_default | h}",
+        "${context_library.display_name_with_default | n, js_escaped_string}",
         ${users | n, dump_js_escaped_json},
         "${reverse('course_team_handler', kwargs={'course_key_string': library_key, 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
         ${request.user.id | n, dump_js_escaped_json},
