@@ -332,10 +332,9 @@ class DatesTab(EnrolledTab):
     @classmethod
     def is_enabled(cls, course, user=None):
         """Returns true if this tab is enabled."""
-        # if not super().is_enabled(course, user=user):
-        #     return False
-        # return RELATIVE_DATES_FLAG.is_enabled(course.id)
-        return True
+        if not super().is_enabled(course, user=user):
+            return False
+        return RELATIVE_DATES_FLAG.is_enabled(course.id)
 
 
 def get_course_tab_list(user, course):

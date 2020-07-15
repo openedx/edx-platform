@@ -10,7 +10,6 @@
             var eventAttrs = {linkName: linkName};
             var allowedAttrs = ['linkType', 'pageName', 'linkCategory'];
 
-            console.log("TESTTESTTEST")
             if (!window.analytics) {
                 return;
             }
@@ -24,9 +23,7 @@
                     eventAttrs[allowedAttr] = optionalAttrs[allowedAttr];
                 });
             }
-
-            console.log('eventAttrs', eventAttrs);
-            console.log('allowedAttrs', allowedAttrs);
+            window.analytics.trackLink(elt, 'edx.bi.ecommerce.upsell_links_clicked', eventAttrs);
         };
 
         var TrackECommerceEvents = {trackUpsellClick: trackUpsellClick};
