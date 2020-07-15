@@ -82,11 +82,6 @@ from openedx.core.djangolib.markup import HTML, Text
                                     <div class="timeline-description ${access_class} ${not_released}">
                                         ${block.description}
                                     </div>
-                                    % if block.extra_info:
-                                        <div class="timeline-extra-info ${access_class} ${not_released}">
-                                            ${block.extra_info}
-                                        </div>
-                                    % endif
                                 % endif
                             </div>
                         </div>
