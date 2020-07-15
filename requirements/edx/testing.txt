@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
--e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock  # via -r requirements/edx/base.txt
+-e git+https://github.com/edx/acid-block.git@758855a67d2f12bd74db4d5e7a0862d6e65f079c#egg=acid-xblock  # via -r requirements/edx/base.txt
 -e common/lib/capa  # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/codejail.git@ffec49bb09785fb688afc5d24714d4e43ae8449f#egg=codejail==3.0.1  # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/django-wiki.git@0.0.27#egg=django-wiki  # via -r requirements/edx/base.txt
