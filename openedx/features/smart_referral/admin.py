@@ -11,8 +11,8 @@ class SmartReferralAdmin(admin.ModelAdmin):
     Django admin customizations for SmartReferral model.
     """
 
-    list_display = ('user', 'contact_email', 'is_contact_reg_completed')
-    search_fields = ('user__username', 'contact_email', 'is_contact_reg_completed')
+    list_display = ('user', 'contact_email')
+    search_fields = ('user__username', 'contact_email')
     raw_id_fields = ('user', )
 
 

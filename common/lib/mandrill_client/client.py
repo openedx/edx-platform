@@ -34,6 +34,7 @@ class MandrillClient(object):
     DOWNLOAD_CERTIFICATE = 'download-certificate'
     USER_BADGE_EMAIL_TEMPLATE = 'user-badge-email'
     REFERRAL_INITIAL_EMAIL = 'referral-email'
+    REFERRAL_FOLLOW_UP_EMAIL = 'referred-learner-follow-up'
     REFERRAL_SOCIAL_IMPACT_TOOLKIT = 'social-impact-toolkit'
 
     def __init__(self):
