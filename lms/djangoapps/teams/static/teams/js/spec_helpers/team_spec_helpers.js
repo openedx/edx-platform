@@ -7,13 +7,12 @@ define([
 ], function(Backbone, _, TeamCollection, TopicCollection, TopicModel) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
-        createMockTopicData, createMockTopicCollection, createMockTopic, createMockInstructorManagedTopic,
+        createMockTopicData, createMockTopicCollection, createMockTopic,
         createMockContext,
         testContext,
         testCourseID = 'course/1',
         testUser = 'testUser',
         testTopicID = 'test-topic-1',
-        testInstructorManagedTopicID = 'test-instructor-managed-topic-1',
         testTeamDiscussionID = '12345',
         teamEvents = _.clone(Backbone.Events),
         testCountries = [
@@ -283,18 +282,6 @@ define([
         ));
     };
 
-    createMockInstructorManagedTopic = function(options) {
-        return new TopicModel(_.extend(
-            {
-                id: testInstructorManagedTopicID,
-                name: 'Test Instructor Managed Topic 1',
-                description: 'Test instructor managed topic description 1',
-                type: 'public_managed'
-            },
-            options
-        ));
-    };
-
     testContext = {
         courseID: testCourseID,
         topics: {
@@ -362,7 +349,6 @@ define([
         createMockUserInfo: createMockUserInfo,
         createMockContext: createMockContext,
         createMockTopic: createMockTopic,
-        createMockInstructorManagedTopic: createMockInstructorManagedTopic,
         createMockPostResponse: createMockPostResponse,
         createMockDiscussionResponse: createMockDiscussionResponse,
         createAnnotatedContentInfo: createAnnotatedContentInfo,
