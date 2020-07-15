@@ -21,7 +21,6 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpRespo
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
@@ -111,12 +110,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from openedx.features.course_experience import (
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    RELATIVE_DATES_FLAG,
-    UNIFIED_COURSE_TAB_FLAG,
-    course_home_url_name
-)
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
@@ -735,9 +729,6 @@ class CourseTabView(EdxFragmentView):
         """
         Creates the context for the fragment's template.
         """
-        from lms.urls import RESET_COURSE_DEADLINES_NAME
-        from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
-
         can_masquerade = request.user.has_perm(MASQUERADE_AS_STUDENT, course)
         supports_preview_menu = tab.get('supports_preview_menu', False)
         uses_bootstrap = self.uses_bootstrap(request, course, tab=tab)
@@ -1031,6 +1022,7 @@ def program_marketing(request, program_uuid):
     return render_to_response('courseware/program_marketing.html', context)
 
 
+@login_required
 @ensure_csrf_cookie
 @ensure_valid_course_key
 def dates(request, course_id):
@@ -1061,7 +1053,7 @@ def dates(request, course_id):
         request.user = masquerade_user
 
     user_is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
-    user_is_staff = has_access(request.user, 'staff', course_key)
+    user_is_staff = bool(has_access(request.user, 'staff', course_key))
 
     # Render the full content to enrolled users, as well as to course and global staff.
     # Unenrolled users who are not course or global staff are redirected to the Outline Tab.

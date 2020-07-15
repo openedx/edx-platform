@@ -663,18 +663,33 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     )
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_dates_tab_link_render(self, url_name):
-        with freeze_time('2015-01-02'):
-            course = create_course_run()
-            user = create_user()
+        """ The dates tab link should only show for enrolled or staff users """
+        course = create_course_run()
+        html_elements = [
+            'class="dates-tab-link"',
+            'View all course dates</a>',
+        ]
+        url = reverse(url_name, args=(course.id,))
+
+        def assert_html_elements(assert_function, user):
             self.client.login(username=user.username, password=TEST_PASSWORD)
-            url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
-            html_elements = [
-                'class="dates-tab-link"',
-                'View all course dates</a>',
-            ]
             for html in html_elements:
-                self.assertContains(response, html)
+                assert_function(response, html)
+            self.client.logout()
+
+        with freeze_time('2015-01-02'):
+            unenrolled_user = create_user()
+            assert_html_elements(self.assertNotContains, unenrolled_user)
+
+            staff_user = create_user()
+            staff_user.is_staff = True
+            staff_user.save()
+            assert_html_elements(self.assertContains, staff_user)
+
+            enrolled_user = create_user()
+            CourseEnrollmentFactory(course_id=course.id, user=enrolled_user, mode=CourseMode.VERIFIED)
+            assert_html_elements(self.assertContains, enrolled_user)
 
 
 @ddt.ddt

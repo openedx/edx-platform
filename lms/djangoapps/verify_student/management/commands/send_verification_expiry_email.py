@@ -22,6 +22,7 @@ from util.query import use_read_replica_if_available
 
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -190,7 +191,7 @@ class Command(BaseCommand):
         message_context = get_base_template_context(site)
         message_context.update({
             'platform_name': settings.PLATFORM_NAME,
-            'lms_verification_link': '{}{}'.format(settings.LMS_ROOT_URL, reverse("verify_student_reverify")),
+            'lms_verification_link': IDVerificationService.email_reverify_url(),
             'help_center_link': settings.ID_VERIFICATION_SUPPORT_LINK
         })
 

@@ -164,7 +164,6 @@ class TabTestCase(SharedModuleStoreTestCase):
         if for_authenticated_users_only:
             user = self.create_mock_user(is_staff=False, is_enrolled=False)
             self.assertEqual(expected_value, self.is_tab_enabled(tab, self.course, user))
-            assert False
         if not for_staff_only and not for_authenticated_users_only and not for_enrolled_users_only:
             user = AnonymousUser()
             self.assertEqual(expected_value, self.is_tab_enabled(tab, self.course, user))
@@ -903,9 +902,29 @@ class DiscussionLinkTestCase(TabTestCase):
 
 
 class DatesTabTestCase(TabListTestCase):
-    """Test cases for making sure no persisted dates tab is surfaced"""
+    """Test cases for dates tab"""
 
-    def test_singular_dates_tab(self):
+    @patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG')
+    @patch('student.models.CourseEnrollment.is_enrolled')
+    def test_dates_tab_disabled_if_unenrolled(self, is_enrolled, mock_flag):
+        mock_flag.is_enabled().return_value = True
+        tab = DatesTab({'type': DatesTab.type, 'name': 'dates'})
+
+        is_enrolled.return_value = False
+        unenrolled_user = self.create_mock_user(is_staff=False, is_enrolled=False)
+        self.assertFalse(self.is_tab_enabled(tab, self.course, unenrolled_user))
+
+        staff_user = self.create_mock_user(is_staff=True, is_enrolled=False)
+        self.assertTrue(self.is_tab_enabled(tab, self.course, staff_user))
+
+        is_enrolled.return_value = True
+        enrolled_user = self.create_mock_user(is_staff=False, is_enrolled=True)
+        self.assertTrue(self.is_tab_enabled(tab, self.course, enrolled_user))
+
+    @patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG')
+    def test_singular_dates_tab(self, mock_flag):
+        """Test cases for making sure no persisted dates tab is surfaced"""
+        mock_flag.is_enabled().return_value = True
         user = self.create_mock_user()
         self.course.tabs = self.all_valid_tab_list
         self.course.save()
@@ -918,11 +937,9 @@ class DatesTabTestCase(TabListTestCase):
         self.assertTrue(has_dates_tab)
 
         # Verify that there is only 1 'dates' tab in the returned result from get_course_tab_list()
-        with patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG') as mock_flag:
-            mock_flag.is_enabled().return_value = True
-            tabs = get_course_tab_list(user, self.course)
-            num_dates_tabs = 0
-            for tab in tabs:
-                if tab.type == 'dates':
-                    num_dates_tabs += 1
-            self.assertEqual(num_dates_tabs, 1)
+        tabs = get_course_tab_list(user, self.course)
+        num_dates_tabs = 0
+        for tab in tabs:
+            if tab.type == 'dates':
+                num_dates_tabs += 1
+        self.assertEqual(num_dates_tabs, 1)

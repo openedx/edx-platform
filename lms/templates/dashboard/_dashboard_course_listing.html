@@ -3,12 +3,14 @@
 <%!
 import six
 
+from django.conf import settings
 from django.utils.http import urlencode, urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.urls import reverse
 from course_modes.models import CourseMode
 from course_modes.helpers import enrollment_mode_display
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import course_home_url_name
@@ -26,7 +28,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 %>
 
 <%
-  reverify_link = reverse('verify_student_reverify')
+  reverify_link = IDVerificationService.get_verify_location('verify_student_reverify')
   cert_name_short = course_overview.cert_name_short
   if cert_name_short == "":
     cert_name_short = settings.CERT_NAME_SHORT
@@ -364,7 +366,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 % endif
               </div>
               <div class="verification-cta">
-                <a href="${reverse('verify_student_verify_now', kwargs={'course_id': six.text_type(course_overview.id)})}" class="btn" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
+                <a href="${IDVerificationService.get_verify_location('verify_student_verify_now', course_overview.id)}" class="btn" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
               </div>
             % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
               <h4 class="message-title">${_('You have submitted your verification information.')}</h4>
@@ -382,7 +384,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
               ## Translators: start_link and end_link will be replaced with HTML tags;
               ## please do not translate these.
               <p class="message-copy">${Text(_('Your current verification will expire in {days} days. {start_link}Re-verify your identity now{end_link} using a webcam and a government-issued photo ID.')).format(
-                  start_link=HTML('<a href="{href}">').format(href=reverse('verify_student_reverify')),
+                  start_link=HTML('<a href="{href}">').format(href=IDVerificationService.get_verify_location('verify_student_reverify')),
                   end_link=HTML('</a>'),
                   days=settings.VERIFY_STUDENT.get("EXPIRING_SOON_WINDOW")
                 )}
@@ -412,7 +414,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
               </p>
               <div class="action-upgrade-container">
                 % if use_ecommerce_payment_flow and course_mode_info['verified_sku']:
-                  <a id="ecommerce_upgrade_link" class="action action-upgrade" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
+                  <a class="action action-upgrade track_course_dashboard_green_button" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
                 % else:
                   <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': six.text_type(course_overview.id)})}" data-course-id="${course_overview.id}" data-user="${user.username}">
                 % endif
@@ -461,7 +463,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
       if (window.loadedECommerceEvents === undefined) {
         window.loadedECommerceEvents = true;
 
-        TrackECommerceEvents.trackUpsellClick($("#ecommerce_upgrade_link"), 'course_dashboard_green', {
+        TrackECommerceEvents.trackUpsellClick($(".track_course_dashboard_green_button"), 'course_dashboard_green', {
           pageName: "course_dashboard",
           linkType: "button",
           linkCategory: "green_upgrade"

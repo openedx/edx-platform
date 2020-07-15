@@ -3,7 +3,6 @@ Functions for accessing and displaying courses within the
 courseware.
 """
 
-
 import logging
 from collections import defaultdict, namedtuple
 from datetime import datetime
@@ -12,7 +11,6 @@ import pytz
 import six
 from crum import get_current_request
 from django.conf import settings
-from django.db.models import Prefetch
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -25,7 +23,6 @@ from six import text_type
 from openedx.core.lib.cache_utils import request_cached
 
 import branding
-from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     AuthenticationRequiredAccessError,
@@ -60,6 +57,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.course_experience.utils import is_block_structure_complete_for_assignments
 from static_replace import replace_static_urls
 from survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from util.date_utils import strftime_localized
@@ -501,14 +499,14 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
     if num_return is None in date increasing order.
     """
     date_blocks = []
-    for assignment in get_course_assignments(course.id, user, request, include_access=include_access):
+    for assignment in get_course_assignments(course.id, user, include_access=include_access):
         date_block = CourseAssignmentDate(course, user)
         date_block.date = assignment.date
         date_block.contains_gated_content = assignment.contains_gated_content
         date_block.complete = assignment.complete
         date_block.assignment_type = assignment.assignment_type
         date_block.past_due = assignment.past_due
-        date_block.link = assignment.url
+        date_block.link = request.build_absolute_uri(assignment.url) if assignment.url else ''
         date_block.set_title(assignment.title, link=assignment.url)
         date_blocks.append(date_block)
     date_blocks = sorted((b for b in date_blocks if b.is_enabled or include_past_dates), key=date_block_key_fn)
@@ -518,7 +516,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
 
 
 @request_cached()
-def get_course_assignments(course_key, user, request, include_access=False):
+def get_course_assignments(course_key, user, include_access=False):
     """
     Returns a list of assignment (at the subsection/sequential level) due dates for the given course.
 
@@ -544,14 +542,13 @@ def get_course_assignments(course_key, user, request, include_access=False):
 
             assignment_type = block_data.get_xblock_field(subsection_key, 'format', None)
 
-            url = ''
+            url = None
             start = block_data.get_xblock_field(subsection_key, 'start')
             assignment_released = not start or start < now
             if assignment_released:
                 url = reverse('jump_to', args=[course_key, subsection_key])
-                url = request and request.build_absolute_uri(url)
 
-            complete = block_data.get_xblock_field(subsection_key, 'complete', False)
+            complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
             past_due = not complete and due < now
             assignments.append(_Assignment(
                 subsection_key, title, url, due, contains_gated_content, complete, past_due, assignment_type

@@ -17,7 +17,7 @@ is_global_staff = is_user_active & rules.is_staff
 # Does the user have at least read permission for the specified library?
 has_explicit_read_permission_for_library = (
     ManyRelation(
-        'contentlibrarypermission',
+        'permission_grants',
         (Attribute('user', lambda user: user) | Relation('group', in_current_groups))
     )
     # We don't check 'access_level' here because all access levels grant read permission
@@ -25,7 +25,7 @@ has_explicit_read_permission_for_library = (
 # Does the user have at least author permission for the specified library?
 has_explicit_author_permission_for_library = (
     ManyRelation(
-        'contentlibrarypermission',
+        'permission_grants',
         (Attribute('user', lambda user: user) | Relation('group', in_current_groups)) & (
             Attribute('access_level', ContentLibraryPermission.AUTHOR_LEVEL) |
             Attribute('access_level', ContentLibraryPermission.ADMIN_LEVEL)
@@ -35,7 +35,7 @@ has_explicit_author_permission_for_library = (
 # Does the user have admin permission for the specified library?
 has_explicit_admin_permission_for_library = (
     ManyRelation(
-        'contentlibrarypermission',
+        'permission_grants',
         (Attribute('user', lambda user: user) | Relation('group', in_current_groups)) &
         Attribute('access_level', ContentLibraryPermission.ADMIN_LEVEL)
     )

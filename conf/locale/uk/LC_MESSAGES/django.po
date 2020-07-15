@@ -122,7 +122,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-05 20:42+0000\n"
+"POT-Creation-Date: 2020-07-12 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -6148,7 +6148,6 @@ msgid "in {relative} - {absolute}"
 msgstr "в {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Date"
 msgstr "Дата запису на курс"
 
@@ -6973,51 +6972,6 @@ msgstr ""
 "Кількість секунд для затримки / перерва очікування для отримання значень "
 "cookie з sailthru."
 
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "{platform_name} Staff"
-msgstr "Адміністратори {platform_name}"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Course Staff"
-msgstr "Персонал курсу"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: openedx/core/djangoapps/django_comment_common/models.py
-msgid "Student"
-msgstr "Студент"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: lms/templates/preview_menu.html
-msgid "Staff"
-msgstr "Персонал"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Used Registration Code"
-msgstr "Використаний реєстраційний код"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Credit Card - Individual"
-msgstr "Кредитна картка - фізична особа"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "manually enrolled by username: {username}"
-msgstr "вручну зарахований користувачем: {username}"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Manually Enrolled"
-msgstr "Записаний вручну"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Data Integrity Error"
-msgstr "Помилка цілісності даних"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr "TBD"
-
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
@@ -7143,13 +7097,11 @@ msgid "enrolled learner profile"
 msgstr "зареєстровано профіль учня"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
 msgstr "ID користувача"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/ccx/enrollment.html lms/templates/staff_problem_info.html
@@ -7174,7 +7126,6 @@ msgid "Email"
 msgstr "Електронна пошта"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Language"
 msgstr "Мова"
 
@@ -7189,24 +7140,20 @@ msgstr "Рік Народження"
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Gender"
 msgstr "Стать"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Level of Education"
 msgstr "Рівень освіти"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Ваше місто або населений пункт"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Goals"
 msgstr "Цілі"
 
@@ -7238,14 +7185,12 @@ msgstr "Команда"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "City"
 msgstr "Місто"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Country"
 msgstr "Країна"
 
@@ -7262,11 +7207,6 @@ msgstr "Файл повинен містити стовпець «cohort», що
 msgid "The file must contain a 'username' column, an 'email' column, or both."
 msgstr ""
 "Файл повинен містити стовпець «username», стовпець «email», або обидва."
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/api_helper.py
-msgid "detailed enrollment"
-msgstr "деталі запису"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -7538,10 +7478,6 @@ msgstr ""
 " курс з аналізу даних {link_end}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "E-Commerce"
-msgstr "Електронна комерція"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Special Exams"
 msgstr "Контрольні випробування"
 
@@ -7672,7 +7608,6 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7701,6 +7636,10 @@ msgstr "Запитана задача вже виконується"
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Error occured. Please try again later."
 msgstr "Помилка. Будь ласка, спробуйте пізніше."
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "detailed enrollment"
+msgstr "деталі запису"
 
 #: lms/djangoapps/instructor_task/api_helper.py
 #, python-brace-format
@@ -7785,12 +7724,6 @@ msgstr "завдання оцінені"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-msgid "generating_enrollment_report"
-msgstr "генерація_звіту_про запис"
-
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
 msgid "certificates generated"
 msgstr "створено сертифікатів"
 
@@ -7801,80 +7734,6 @@ msgstr "створено сертифікатів"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
 msgstr "розподілено по групах"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "First Name"
-msgstr "Ім'я"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "Last Name"
-msgstr "Прізвище"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Company Name"
-msgstr "Ім'я компанії"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Title
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
-#: wiki/templates/wiki/dir.html
-msgid "Title"
-msgstr "Назва"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Year of Birth"
-msgstr "Рік Народження"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Currently Enrolled"
-msgstr "Зараз записаний"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Source"
-msgstr "Спосіб запису"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Manual (Un)Enrollment Reason"
-msgstr "Причина для ручного відрахування (зарахування)"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Role"
-msgstr "Роль"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "List Price"
-msgstr "Заявлена ціна"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Payment Amount"
-msgstr "Сумa платежу"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Coupon Codes Used"
-msgstr "Використаний код купона"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Registration Code Used"
-msgstr "Використаний реєстраційний код"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Payment Status"
-msgstr "Статус платежу"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Transaction Reference Number"
-msgstr "Ідентифікаційний номер операції"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No status information available"
@@ -9183,16 +9042,6 @@ msgstr ""
 #: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
 msgstr "Дані зображення не дійсні ."
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "{platform_name} ID Verification Photos Received"
-msgstr "{platform_name} Отримано ID Перевірки Отримано фото"
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "Your {platform_name} ID Verification Approved"
-msgstr "Ваш {platform_name} ID Перевірки схвалено"
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
@@ -10835,6 +10684,10 @@ msgstr "Модератор груп"
 msgid "Community TA"
 msgstr "Спільнота асистентів"
 
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Student"
+msgstr "Студент"
+
 #: openedx/core/djangoapps/embargo/forms.py
 #: openedx/core/djangoapps/verified_track_content/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
@@ -11425,6 +11278,20 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr "Поле '{field_name}' не може бути відредаговано."
 
 #. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "First Name"
+msgstr "Ім'я"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Last Name"
+msgstr "Прізвище"
+
+#. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
@@ -11438,6 +11305,15 @@ msgstr "Штат/регіон/область"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Company"
 msgstr "Компанія"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Title
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
+#: wiki/templates/wiki/dir.html
+msgid "Title"
+msgstr "Назва"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Job Title
@@ -14094,6 +13970,11 @@ msgstr ""
 #: lms/templates/preview_menu.html
 msgid "View this course as:"
 msgstr "Переглянути цей курс як:"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/preview_menu.html
+msgid "Staff"
+msgstr "Персонал"
 
 #: lms/templates/preview_menu.html
 msgid "Learner"
@@ -19404,6 +19285,10 @@ msgid "Billed To Details"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
+msgid "Company Name"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
 msgid "N/A"
 msgstr ""
 
@@ -20429,6 +20314,10 @@ msgid "Highest Level of Education Completed"
 msgstr ""
 
 #: themes/stanford-style/lms/templates/register-form.html
+msgid "Year of Birth"
+msgstr ""
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 
@@ -20670,7 +20559,7 @@ msgid "Learn more about certificates"
 msgstr "Дізнайтеся більше про сертифікати"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Details & Schedule"
 msgstr ""
 
@@ -20692,6 +20581,12 @@ msgstr "Команда курсу"
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Advanced Settings"
 msgstr "Розширені налаштування"
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Proctored Exam Settings"
+msgstr ""
 
 #: cms/templates/checklists.html cms/templates/widgets/header.html
 msgid "Checklists"
@@ -23251,8 +23146,8 @@ msgid "Must be greater than or equal to the course passing grade"
 msgstr ""
 
 #: cms/templates/settings_graders.html
-msgid "Grading Rules &amp; Policies"
-msgstr "Політика та правила оцінювання"
+msgid "Grading Rules & Policies"
+msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Deadlines, requirements, and logistics around grading student work"
@@ -23310,10 +23205,6 @@ msgstr ""
 "Ви також можете створювати власні типи завдань, наприклад, домашні завдання,"
 " лабораторні роботи, вікторини та іспити, а також визначати, як оцінювати "
 "кожний тип завдання, виконаний студентом."
-
-#: cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"

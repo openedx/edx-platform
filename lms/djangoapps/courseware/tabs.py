@@ -13,7 +13,6 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, UNIFIED_COURSE_TAB_FLAG, default_course_url_name
 from student.models import CourseEnrollment
@@ -205,7 +204,7 @@ class LinkTab(CourseTab):
     """
     link_value = ''
 
-    def __init__(self, tab_dict=None, name=None, link=None):
+    def __init__(self, tab_dict=None, link=None):
         self.link_value = tab_dict['link'] if tab_dict else link
 
         def link_value_func(_course, _reverse_func):

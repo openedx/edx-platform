@@ -675,6 +675,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
     def post_create_team(self, expected_status=200, data=None, **kwargs):
         """Posts data to the team creation endpoint. Verifies expected_status."""
+        #return self.make_call(reverse('teams_list'), expected_status, 'post', data, topic_id='topic_0', **kwargs)
         return self.make_call(reverse('teams_list'), expected_status, 'post', data, **kwargs)
 
     def get_team_detail(self, team_id, expected_status=200, data=None, **kwargs):

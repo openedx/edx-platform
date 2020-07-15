@@ -39,10 +39,12 @@ from uuid import UUID
 import logging
 
 import attr
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError
+from django.utils.translation import ugettext as _
 from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryLocatorV2, LibraryUsageLocatorV2
@@ -93,6 +95,10 @@ class LibraryAlreadyExists(KeyError):
 
 class LibraryBlockAlreadyExists(KeyError):
     """ An XBlock with that ID already exists in the library """
+
+
+class BlockLimitReachedError(Exception):
+    """ Maximum number of allowed XBlocks in the library reached """
 
 
 class InvalidNameError(ValueError):
@@ -513,6 +519,13 @@ def create_library_block(library_key, block_type, definition_id):
     """
     assert isinstance(library_key, LibraryLocatorV2)
     ref = ContentLibrary.objects.get_by_key(library_key)
+    lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
+    # Total number of blocks should not exceed the maximum allowed
+    total_blocks = len(lib_bundle.get_top_level_usages())
+    if total_blocks + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
+        raise BlockLimitReachedError(
+            _(u"Library cannot have more than {} XBlocks").format(settings.MAX_BLOCKS_PER_CONTENT_LIBRARY)
+        )
     # Make sure the proposed ID will be valid:
     validate_unicode_slug(definition_id)
     # Ensure the XBlock type is valid and installed:

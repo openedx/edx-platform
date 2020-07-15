@@ -103,6 +103,19 @@ def _filter_entrance_exam_grader(graders):
     return graders
 
 
+def _is_library_component_limit_reached(usage_key):
+    """
+    Verify if the library has reached the maximum number of components allowed in it
+    """
+    store = modulestore()
+    parent = store.get_item(usage_key)
+    if not parent.has_children:
+        # Limit cannot be applied on such items
+        return False
+    total_children = len(parent.children)
+    return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
+
+
 @require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
 @login_required
 @expect_json
@@ -214,6 +227,18 @@ def xblock_handler(request, usage_key_string):
                     not has_studio_read_access(request.user, source_course)
             ):
                 raise PermissionDenied()
+
+            # Libraries have a maximum component limit enforced on them
+            if (isinstance(parent_usage_key, LibraryUsageLocator) and
+                    _is_library_component_limit_reached(parent_usage_key)):
+                return JsonResponse(
+                    {
+                        'error': _(u'Libraries cannot have more than {limit} components').format(
+                            limit=settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
+                        )
+                    },
+                    status=400
+                )
 
             dest_usage_key = _duplicate_item(
                 parent_usage_key,
@@ -689,6 +714,16 @@ def _create_item(request):
         if category not in ['html', 'problem', 'video']:
             return HttpResponseBadRequest(
                 u"Category '%s' not supported for Libraries" % category, content_type='text/plain'
+            )
+
+        if _is_library_component_limit_reached(usage_key):
+            return JsonResponse(
+                {
+                    'error': _(u'Libraries cannot have more than {limit} components').format(
+                        limit=settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
+                    )
+                },
+                status=400
             )
 
     created_block = create_xblock(

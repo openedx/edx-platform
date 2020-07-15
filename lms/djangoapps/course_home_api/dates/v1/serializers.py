@@ -41,8 +41,5 @@ class DatesTabSerializer(DatesBannerSerializerMixin, serializers.Serializer):
     Serializer for the Dates Tab
     """
     course_date_blocks = DateSummarySerializer(many=True)
-    missed_deadlines = serializers.BooleanField()
-    missed_gated_content = serializers.BooleanField()
     learner_is_full_access = serializers.BooleanField()
     user_timezone = serializers.CharField()
-    verified_upgrade_link = serializers.URLField()
