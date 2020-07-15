@@ -590,7 +590,7 @@ def render_html_view(request, user_id, course_id):
         _update_context_with_user_info(context, user, user_certificate)
 
         # Append PhilU related context
-        override_update_certificate_context(request, context, course, user_certificate)
+        override_update_certificate_context(request, context, course, user_certificate, preview_mode)
 
         # Append/Override the existing view context values with certificate specific values
         _update_certificate_context(context, course, user_certificate, platform_name)
