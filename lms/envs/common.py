@@ -1499,7 +1499,7 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
 
     # Generate code ownership metrics. Keep this immediately after RequestCacheMiddleware.
-    'lms.djangoapps.monitoring.middleware.CodeOwnerMetricMiddleware',
+    'edx_django_utils.monitoring.code_owner.middleware.CodeOwnerMetricMiddleware',
 
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMetricsMiddleware',
@@ -2560,9 +2560,6 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
-
-    # Monitoring utilities for LMS
-    'lms.djangoapps.monitoring.apps.MonitoringConfig',
 
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
