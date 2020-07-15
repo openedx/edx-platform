@@ -54,6 +54,7 @@ COURSE_VISIBILITY_PRIVATE = 'private'
 COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
 COURSE_VISIBILITY_PUBLIC = 'public'
 
+EXAM_SETTINGS_HTML_VIEW_ENABLED = settings.FEATURES.get('ENABLE_EXAM_SETTINGS_HTML_VIEW', False)
 
 class StringOrDate(Date):
     def from_json(self, value):
@@ -908,7 +909,8 @@ class CourseFields(object):
             "This setting only applies if proctored exams are enabled for the course."
         ),
         default=True,
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     create_zendesk_tickets = Boolean(
