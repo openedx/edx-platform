@@ -568,13 +568,17 @@ def get_course_assignments(course_key, user, include_access=False):
                     if not (graded and has_score and (weight is None or weight > 0)):
                         continue
 
-                    valid_assessments = [{
+                    all_assessments = [{
                         'name': 'submission',
                         'due': block_data.get_xblock_field(descendent, 'submission_due'),
                         'start': block_data.get_xblock_field(descendent, 'submission_start'),
                         'required': True
-                    }] + block_data.get_xblock_field(descendent, 'valid_assessments')
-                    gated = include_access and block_data.get_xblock_field(descendent, 'gated', False)
+                    }]
+                    valid_assessments = block_data.get_xblock_field(descendent, 'valid_assessments')
+
+                    if valid_assessments:
+                        all_assessments.extend(valid_assessments)
+
                     assignment_type = block_data.get_xblock_field(descendent, 'format', None)
                     complete = is_block_structure_complete_for_assignments(block_data, descendent)
 
@@ -601,7 +605,6 @@ def get_course_assignments(course_key, user, include_access=False):
                         assignment_released = not start or start < now
                         if assignment_released:
                             url = reverse('jump_to', args=[course_key, descendent])
-                            url = request and request.build_absolute_uri(url)
 
                         past_due = not complete and due and due < now
                         assignments.append(_Assignment(
