@@ -133,7 +133,9 @@ def get_course_outline_block_tree(request, course_id):
         'discussion',
         'drag-and-drop-v2',
         'poll',
-        'word_cloud'
+        'word_cloud',
+        'lti',
+        'lti_consumer',
     ]
     all_blocks = get_blocks(
         request,
