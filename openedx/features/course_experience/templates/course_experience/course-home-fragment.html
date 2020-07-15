@@ -218,7 +218,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
     TrackECommerceEvents.trackUpsellClick(courseToolsUpgradeLink, 'course_home_course_tools', {
       pageName: "course_home",
       linkType: "link",
-      linkCategory: "none"
+      linkCategory: "(none)"
     });
   }
   courseToolsUpgradeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackCourseToolsEvent);
