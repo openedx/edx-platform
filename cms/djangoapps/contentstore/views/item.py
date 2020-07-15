@@ -107,12 +107,22 @@ def set_discussion_toggle(value, xblock, user):
     """
     Recursively update all children of given xblock in modulestore
     """
-    for child in xblock.get_children():
-        if child.category in ["chapter", "sequential"]:
-            set_discussion_toggle(value, child, user)
-        else:
-            child.discussion_enabled = value
-            _save_xblock(user, child)
+    is_block_with_discussion_enabled = (
+        xblock.location.block_type in ["vertical", "sequential", "chapter", "course"]
+    )
+    if not all([isinstance(value, bool), is_block_with_discussion_enabled]):
+        return
+
+    if hasattr(xblock, "discussion_enabled"):
+        xblock.discussion_enabled = value
+        _update_with_callback(xblock, user)
+    else:
+        for child in xblock.get_children():
+            if child.category in ["chapter", "sequential"]:
+                set_discussion_toggle(value, child, user)
+            elif hasattr(child, "discussion_enabled"):
+                child.discussion_enabled = value
+                _update_with_callback(child, user)
 
 
 def _is_library_component_limit_reached(usage_key):
@@ -565,12 +575,11 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             data = old_content['data'] if 'data' in old_content else None
 
         if fields:
+            discussion_enabled = fields.pop('discussion_enabled', None)
+            set_discussion_toggle(discussion_enabled, xblock, user)
+
             for field_name in fields:
                 setattr(xblock, field_name, fields[field_name])
-
-            discussion_enabled = fields.get('discussion_enabled')
-            if isinstance(discussion_enabled, bool) and xblock.location.category in ["sequential", "chapter"]:
-                set_discussion_toggle(discussion_enabled, xblock, user)
 
         if children_strings is not None:
             children = []
