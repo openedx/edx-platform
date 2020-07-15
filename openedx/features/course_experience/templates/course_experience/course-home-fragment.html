@@ -194,6 +194,8 @@ from openedx.features.course_experience.course_tools import HttpMethod
 
   var upgradeDateLink = $("#course_home_dates");
   var GreenUpgradeLink = $("#green_upgrade");
+  <!-- var courseToolsUpgradeLink = $(".course-tool-link"); -->
+  var courseToolsUpgradeLink = $(document.querySelectorAll("[data-analytics-id='edx.tool.verified_upgrade']"));
 
   function trackUpgradeDateEvent() {
     TrackECommerceEvents.trackUpsellClick(upgradeDateLink, 'course_home_dates', {
@@ -212,5 +214,14 @@ from openedx.features.course_experience.course_tools import HttpMethod
     });
   }
   GreenUpgradeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackGreenUpgradeEvent);
+
+  function trackCourseToolsEvent() {
+    TrackECommerceEvents.trackUpsellClick(courseToolsUpgradeLink, 'course_home_course_tools', {
+      pageName: "course_home",
+      linkType: "link",
+      linkCategory: "none"
+    });
+  }
+  courseToolsUpgradeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackCourseToolsEvent);
 
 </%static:require_module_async> 
