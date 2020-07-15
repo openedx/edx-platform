@@ -1,15 +1,16 @@
 (function(define) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'js/views/fields',
+        'gettext', 'jquery', 'underscore', 'backbone',
+        'edx-ui-toolkit/js/utils/html-utils', 'js/views/fields',
         'text!templates/fields/field_image.underscore',
         'backbone-super', 'jquery.fileupload'
-    ], function(gettext, $, _, Backbone, FieldViews, field_image_template) {
+    ], function(gettext, $, _, Backbone, HtmlUtils, FieldViews, FieldImageTemplate) {
         var ImageFieldView = FieldViews.FieldView.extend({
 
             fieldType: 'image',
 
-            fieldTemplate: field_image_template,
+            fieldTemplate: FieldImageTemplate,
             uploadButtonSelector: '.upload-button-input',
 
             titleAdd: gettext('Upload an image'),
@@ -44,7 +45,7 @@
             },
 
             render: function() {
-                this.$el.html(this.template({
+                var attributes = {
                     id: this.options.valueAttribute,
                     inputName: (this.options.inputName || 'file'),
                     imageUrl: _.result(this, 'imageUrl'),
@@ -54,7 +55,8 @@
                     removeButtonIcon: _.result(this, 'iconRemove'),
                     removeButtonTitle: _.result(this, 'removeButtonTitle'),
                     screenReaderTitle: _.result(this, 'screenReaderTitle')
-                }));
+                };
+                this.$el.html(HtmlUtils.HTML(this.template(attributes)).toString());
                 this.delegateEvents();
                 this.updateButtonsVisibility();
                 this.watchForPageUnload();
@@ -184,14 +186,14 @@
 
             showUploadInProgressMessage: function() {
                 this.$('.u-field-upload-button').addClass('in-progress');
-                this.$('.upload-button-icon').html(this.iconProgress);
-                this.$('.upload-button-title').html(this.titleUploading);
+                HtmlUtils.setHtml(this.$('.upload-button-icon'), HtmlUtils.HTML(this.iconProgress));
+                HtmlUtils.setHtml(this.$('.upload-button-title'), HtmlUtils.HTML(this.titleUploading));
             },
 
             showRemovalInProgressMessage: function() {
                 this.$('.u-field-remove-button').css('opacity', 1);
-                this.$('.remove-button-icon').html(this.iconProgress);
-                this.$('.remove-button-title').html(this.titleRemoving);
+                HtmlUtils.setHtml(this.$('.remove-button-icon'), HtmlUtils.HTML(this.iconProgress));
+                HtmlUtils.setHtml(this.$('.remove-button-title'), HtmlUtils.HTML(this.titleRemoving));
             },
 
             setCurrentStatus: function(status) {
