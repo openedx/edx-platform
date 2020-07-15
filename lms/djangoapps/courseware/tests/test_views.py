@@ -3146,7 +3146,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
                 format='Homework',
             )
             vertical = ItemFactory.create(category='vertical', parent_location=subsection.location)
-            ItemFactory.create(category='problem', parent_location=vertical.location)
+            ItemFactory.create(category='problem', parent_location=vertical.location, has_score=True)
 
         with patch('lms.djangoapps.courseware.views.views.get_enrollment') as mock_get_enrollment:
             mock_get_enrollment.return_value = {

@@ -313,7 +313,7 @@ define([
                 AjaxHelpers.expectNoRequests(requests);
             };
 
-            beforeEach(function() {
+            var setUpTopicTab = function() {
                 teamsTabView = createTeamsTabView();
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
                 verifyTeamsRequest({
@@ -322,15 +322,17 @@ define([
                 });
                 AjaxHelpers.respondWithJson(requests, {});
                 AjaxHelpers.respondWithJson(requests, { count: 0 });
-            });
+            };
 
             it('can search teams', function() {
+                setUpTopicTab();
                 performSearch();
                 expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
                 expect(teamsTabView.$('.page-description').text()).toBe('Showing results for "foo"');
             });
 
             it('can clear a search', function() {
+                setUpTopicTab();
                 // Perform a search
                 performSearch();
 
@@ -348,6 +350,7 @@ define([
             });
 
             it('can navigate back to all teams from a search', function() {
+                setUpTopicTab();
                 // Perform a search
                 performSearch();
 
@@ -365,6 +368,7 @@ define([
             });
 
             it('does not switch to showing results when the search returns an error', function() {
+                setUpTopicTab();
                 // Perform a search but respond with a 500
                 teamsTabView.$('.search-field').val('foo');
                 teamsTabView.$('.action-search').click();
@@ -374,6 +378,51 @@ define([
                 expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
                 expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
                 expect(teamsTabView.$('.search-field').val(), 'foo');
+            });
+
+            it('shows a search box in non-private team-sets', function() {
+                setUpTopicTab();
+                expect(teamsTabView.$('.search-field')).toExist();
+            });
+
+            it('does not show a search box in private team-sets for non-privileged users', function() {
+                teamsTabView = createTeamsTabView({
+                    topics: {
+                        results: TeamSpecHelpers.createMockTopic({type: 'private_managed'})
+                    }
+                });
+
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
+
+                verifyTeamsRequest({
+                    order_by: 'last_activity_at',
+                    text_search: ''
+                });
+                AjaxHelpers.respondWithJson(requests, {});
+
+                expect(teamsTabView.$('.search-field')).not.toExist();
+            });
+
+            it('shows a search box in private team-sets for privileged users', function() {
+                teamsTabView = createTeamsTabView({
+                    topics: {
+                        results: TeamSpecHelpers.createMockTopic({type: 'private_managed'})
+                    },
+                    userInfo: TeamSpecHelpers.createMockUserInfo({
+                        privileged: true,
+                        staff: true
+                    })
+                });
+
+                teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
+
+                verifyTeamsRequest({
+                    order_by: 'last_activity_at',
+                    text_search: ''
+                });
+                AjaxHelpers.respondWithJson(requests, {});
+
+                expect(teamsTabView.$('.search-field')).toExist();
             });
         });
     });

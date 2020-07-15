@@ -2,7 +2,7 @@
 Utility functions for third_party_auth
 """
 
-
+from uuid import UUID
 from django.contrib.auth.models import User
 
 
@@ -28,3 +28,14 @@ def user_exists(details):
         return User.objects.filter(**user_queryset_filter).exists()
 
     return False
+
+
+def validate_uuid4_string(uuid_string):
+    """
+    Returns True if valid uuid4 string, or False
+    """
+    try:
+        UUID(uuid_string, version=4)
+    except ValueError:
+        return False
+    return True

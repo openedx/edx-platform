@@ -60,6 +60,9 @@ class StubCompletionService(object):
         """
         return {candidate: self._completion_value for candidate in candidates}
 
+    def get_completable_children(self, node):
+        return node.get_children()
+
     def get_complete_on_view_delay_ms(self):
         """
         Return the completion-by-viewing delay in milliseconds.
@@ -72,15 +75,15 @@ class StubCompletionService(object):
     def vertical_is_complete(self, item):
         if item.scope_ids.block_type != 'vertical':
             raise ValueError('The passed in xblock is not a vertical type!')
-        return self._completion_value
+        return self._completion_value == 1 if self._enabled else None
 
 
 class BaseVerticalBlockTest(XModuleXmlImportTest):
     """
     Tests for the BaseVerticalBlock.
     """
-    test_html_1 = 'Test HTML 1'
-    test_html_2 = 'Test HTML 2'
+    test_html = 'Test HTML'
+    test_problem = 'Test Problem'
 
     def setUp(self):
         super(BaseVerticalBlockTest, self).setUp()
@@ -90,8 +93,8 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
         vertical = xml.VerticalFactory.build(parent=sequence)
 
         self.course = self.process_xml(course)
-        xml.HtmlFactory(parent=vertical, url_name='test-html-1', text=self.test_html_1)
-        xml.HtmlFactory(parent=vertical, url_name='test-html-2', text=self.test_html_2)
+        xml.HtmlFactory(parent=vertical, url_name='test-html', text=self.test_html)
+        xml.ProblemFactory(parent=vertical, url_name='test-problem', text=self.test_problem)
 
         self.course = self.process_xml(course)
         course_seq = self.course.get_children()[0]
@@ -103,8 +106,10 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
         self.vertical = course_seq.get_children()[0]
         self.vertical.xmodule_runtime = self.module_system
 
-        self.html1block = self.vertical.get_children()[0]
-        self.html2block = self.vertical.get_children()[1]
+        self.html_block = self.vertical.get_children()[0]
+        self.problem_block = self.vertical.get_children()[1]
+        self.problem_block.has_score = True
+        self.problem_block.graded = True
 
         self.username = "bilbo"
         self.default_context = {"bookmarked": False, "username": self.username}
@@ -151,8 +156,11 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         html = self.module_system.render(
             self.vertical, view, self.default_context if context is None else context
         ).content
-        self.assertIn(self.test_html_1, html)
-        self.assertIn(self.test_html_2, html)
+        self.assertIn(self.test_html, html)
+        if view == STUDENT_VIEW:
+            self.assertIn(self.test_problem, html)
+        else:
+            self.assertNotIn(self.test_problem, html)
         self.assertIn("'due': datetime.datetime({year}, {month}, {day}".format(
             year=self.vertical.due.year, month=self.vertical.due.month, day=self.vertical.due.day), html)
         if view == STUDENT_VIEW:
@@ -161,8 +169,29 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             self.assert_bookmark_info(self.assertNotIn, html)
         if context:
             self.assertIn("'subsection_format': '{}'".format(context['format']), html)
-            self.assertIn("'completed': {}".format(completion_value), html)
+            self.assertIn("'completed': {}".format(completion_value == 1), html)
             self.assertIn("'past_due': {}".format(self.vertical.due < now), html)
+
+    @ddt.data(True, False)
+    def test_render_problem_without_score(self, has_score):
+        """
+        Test the rendering of the student and public view.
+        """
+        self.module_system._services['bookmarks'] = Mock()
+        self.module_system._services['user'] = StubUserService()
+        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0)
+
+        now = datetime.now(pytz.UTC)
+        self.vertical.due = now + timedelta(days=-1)
+        self.problem_block.has_score = has_score
+
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
+        if has_score:
+            self.assertIn("'completed': False", html)
+            self.assertIn("'past_due': True", html)
+        else:
+            self.assertIn("'completed': None", html)
+            self.assertIn("'past_due': False", html)
 
     @ddt.unpack
     @ddt.data(
@@ -176,7 +205,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test that mark-completed-on-view-after-delay is only set for relevant child Xblocks.
         """
-        with patch.object(self.html1block, 'render') as mock_student_view:
+        with patch.object(self.html_block, 'render') as mock_student_view:
             self.module_system._services['completion'] = StubCompletionService(
                 enabled=completion_enabled,
                 completion_value=completion_value,
@@ -198,8 +227,8 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             'is_unit_page': True
         }
         html = self.module_system.render(self.vertical, AUTHOR_VIEW, context).content
-        self.assertNotIn(self.test_html_1, html)
-        self.assertNotIn(self.test_html_2, html)
+        self.assertNotIn(self.test_html, html)
+        self.assertNotIn(self.test_problem, html)
 
         # Vertical should render reorderable children on the container page
         reorderable_items = set()
@@ -208,5 +237,5 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             'reorderable_items': reorderable_items,
         }
         html = self.module_system.render(self.vertical, AUTHOR_VIEW, context).content
-        self.assertIn(self.test_html_1, html)
-        self.assertIn(self.test_html_2, html)
+        self.assertIn(self.test_html, html)
+        self.assertIn(self.test_problem, html)

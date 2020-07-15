@@ -10,7 +10,7 @@ from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
-from enterprise.models import EnterpriseCustomerUser
+from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomer
 from social_django.models import UserSocialAuth
 
 import third_party_auth
@@ -342,3 +342,7 @@ def get_provider_login_url(request, provider_id, redirect_url=None):
         redirect_url=redirect_url if redirect_url else get_next_url_for_login_page(request)
     )
     return provider_login_url
+
+
+def fetch_enterprise_customer_by_id(enterprise_uuid):
+    return EnterpriseCustomer.objects.get(uuid=enterprise_uuid)

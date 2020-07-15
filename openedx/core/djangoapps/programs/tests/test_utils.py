@@ -20,12 +20,13 @@ from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     CourseRunFactory,
@@ -42,13 +43,17 @@ from openedx.core.djangoapps.programs.utils import (
     ProgramMarketingDataExtender,
     ProgramProgressMeter,
     get_certificates,
-    get_logged_in_program_certificate_url
+    get_logged_in_program_certificate_url,
+    is_user_enrolled_in_program_type
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
 from util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+)
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
@@ -1551,3 +1556,61 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
             data['skus'],
             [course['course_runs'][0]['seats'][0]['sku'] for course in self.program['courses']]
         )
+
+
+@skip_unless_lms
+@mock.patch('openedx.core.djangoapps.programs.utils.get_programs_by_type')
+class TestProgramEnrollment(SharedModuleStoreTestCase):
+    """
+    Tests to test program enrollment utility methods for program data from the program cache.
+
+    Requests to the data in the Program cache are mocked out.
+    """
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    MICROBACHELORS = 'microbachelors'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.store = modulestore()
+        cls.user = UserFactory()
+        cls.program = ProgramFactory(type=cls.MICROBACHELORS)
+        cls.catalog_course_run = cls.program['courses'][0]['course_runs'][0]
+        cls.course_key = CourseKey.from_string(cls.catalog_course_run['key'])
+        cls.course_run = ModuleStoreCourseFactory.create(
+            org=cls.course_key.org,
+            number=cls.course_key.course,
+            run=cls.course_key.run,
+            modulestore=cls.store,
+        )
+        CourseModeFactory.create(course_id=cls.course_run.id, mode_slug=CourseMode.VERIFIED)
+
+    def test_user_not_in_program(self, mock_get_programs_by_type):
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertFalse(is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS))
+
+    def test_user_enrolled_in_mb_program(self, mock_get_programs_by_type):
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.VERIFIED)
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS))
+
+    def test_user_enrolled_unpaid_in_program(self, mock_get_programs_by_type):
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.AUDIT)
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS))
+
+    def test_user_enrolled_unpaid_in_program_paid_only_request(self, mock_get_programs_by_type):
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.AUDIT)
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertFalse(
+            is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS, paid_modes=True)
+        )
+
+    def test_user_with_entitlement_no_enrollment(self, mock_get_programs_by_type):
+        CourseEntitlementFactory.create(
+            user=self.user,
+            mode=CourseMode.VERIFIED,
+            course_uuid=self.program['courses'][0]['uuid']
+        )
+        mock_get_programs_by_type.return_value = [self.program]
+        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS))

@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
-from lms.djangoapps.courseware.date_summary import TodaysDate, verified_upgrade_deadline_link
+from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.course_home_api.dates.v1.serializers import DatesTabSerializer
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
@@ -91,7 +91,6 @@ class DatesTabView(RetrieveAPIView):
         )
 
         blocks = get_course_date_blocks(course, request.user, request, include_access=True, include_past_dates=True)
-        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(
             user=request.user,
@@ -105,11 +104,8 @@ class DatesTabView(RetrieveAPIView):
         data = {
             'has_ended': course.has_ended(),
             'course_date_blocks': [block for block in blocks if not isinstance(block, TodaysDate)],
-            'missed_deadlines': missed_deadlines,
-            'missed_gated_content': missed_gated_content,
             'learner_is_full_access': learner_is_full_access,
             'user_timezone': user_timezone,
-            'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
         }
         context = self.get_serializer_context()
         context['learner_is_full_access'] = learner_is_full_access
