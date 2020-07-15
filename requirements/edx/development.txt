@@ -124,7 +124,6 @@ edx-rest-api-client==5.2.1  # via -r requirements/edx/testing.txt, edx-enterpris
 edx-search==1.4.1         # via -r requirements/edx/testing.txt
 edx-sga==0.11.0           # via -r requirements/edx/testing.txt
 edx-sphinx-theme==1.5.0   # via -r requirements/edx/development.in
-edx-submissions==3.1.11   # via -r requirements/edx/testing.txt, ora2
 edx-tincan-py35==0.0.9    # via -r requirements/edx/testing.txt, edx-enterprise
 edx-user-state-client==1.2.0  # via -r requirements/edx/testing.txt
 edx-when==1.2.9           # via -r requirements/edx/testing.txt, edx-proctoring
@@ -333,3 +332,4 @@ zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requi
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+git+https://github.com/edx/edx-submissions@bb2655eac65e625a71ece50fb28e0d1ab1ca249a#egg=edx-submissions==3.1.12  # via -r requirements/edx/base.txt
