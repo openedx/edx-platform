@@ -20,29 +20,27 @@ def _cache_key_for_site_host(site_host):
     return 'site:host:%s' % (site_host,)
 
 
-@beeline.traced(name="patched_get_site_by_id")
 def patched_get_site_by_id(self, site_id):
-    beeline.add_context_field("site_id", site_id)
+    beeline.add_trace_field("site_id", site_id)
     key = _cache_key_for_site_id(site_id)
     site = cache.get(key)
     if site is None:
-        beeline.add_context_field("get_site_by_id_cache_hit", False)
+        beeline.add_trace_field("get_site_by_id_cache_hit", False)
         site = self.get(pk=site_id)
         SITE_CACHE[site_id] = site
     else:
-        beeline.add_context_field("get_site_by_id_cache_hit", True)
+        beeline.add_trace_field("get_site_by_id_cache_hit", True)
     cache.add(key, site)
     return site
 
 
-@beeline.traced(name="patched_get_site_by_request")
 def patched_get_site_by_request(self, request):
 
     host = request.get_host()
     key = _cache_key_for_site_host(host)
     site = cache.get(key)
     if site is None:
-        beeline.add_context_field("get_site_by_request_cache_hit", False)
+        beeline.add_trace_field("get_site_by_request_cache_hit", False)
         try:
             # First attempt to look up the site by host with or without port.
             site = self.get(domain__iexact=host)
@@ -54,7 +52,7 @@ def patched_get_site_by_request(self, request):
             site = self.get(domain__iexact=domain)
         SITE_CACHE[host] = site
     else:
-        beeline.add_context_field("get_site_by_request_cache_hit", True)
+        beeline.add_trace_field("get_site_by_request_cache_hit", True)
     cache.add(key, site)
     return site
 
