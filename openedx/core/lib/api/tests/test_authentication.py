@@ -3,7 +3,6 @@ Tests for OAuth2.  This module is copied from django-rest-framework-oauth
 (tests/test_authentication.py) and updated to use our subclass of BearerAuthentication.
 """
 
-
 import itertools
 import json
 import unittest
@@ -60,7 +59,6 @@ urlpatterns = [
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
 class OAuth2AllowInActiveUsersTests(TestCase):
-
     OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'
 
     def setUp(self):
@@ -230,3 +228,47 @@ class BearerAuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disab
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
         self.user.save()
+
+
+class OAuthDenyDisabledUsers(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
+    """
+     To test OAuth on disabled user.
+    """
+    OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
+
+    def setUp(self):
+        super().setUp()
+        # User is active but has have disabled status
+        self.user.is_active = True
+        self.user.set_unusable_password()
+        self.user.save()
+
+    def test_get_form_passing_auth_with_dot(self):
+        """
+         Asserts response with disabled user with DOT App
+        """
+        response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_post_form_passing_auth(self):
+        """
+         Asserts response with disabled user with DOT App
+        """
+        response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_form_without_oauth_app(self):
+        """
+         Asserts response with disabled user and without DOT APP
+        """
+        dot_models.Application.objects.filter(user_id=self.user.id).delete()
+        response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_post_form_without_oauth_app(self):
+        """
+         Asserts response with disabled user and without DOT APP
+        """
+        dot_models.Application.objects.filter(user_id=self.user.id).delete()
+        response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
