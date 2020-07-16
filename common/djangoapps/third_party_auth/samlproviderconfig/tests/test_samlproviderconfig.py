@@ -52,11 +52,8 @@ class SAMLProviderConfigTests(APITestCase):
             site=cls.site)
         cls.samlproviderconfig, _ = SAMLProviderConfig.objects.get_or_create(
             entity_id=SINGLE_PROVIDER_CONFIG['entity_id'],
-            metadata_source=SINGLE_PROVIDER_CONFIG['metadata_source']
-        )
-        cls.enterprisecustomeridp, _ = EnterpriseCustomerIdentityProvider.objects.get_or_create(
-            provider_id=cls.samlproviderconfig.id,
-            enterprise_customer_id=ENTERPRISE_ID
+            metadata_source=SINGLE_PROVIDER_CONFIG['metadata_source'],
+            slug=SINGLE_PROVIDER_CONFIG['slug']
         )
 
     def setUp(self):
@@ -67,6 +64,12 @@ class SAMLProviderConfigTests(APITestCase):
         """
         GET auth/saml/v0/provider_config/?enterprise_customer_uuid=id=id
         """
+
+        # for GET to work, we need an association present
+        EnterpriseCustomerIdentityProvider.objects.get_or_create(
+            provider_id=self.samlproviderconfig.slug,
+            enterprise_customer_id=ENTERPRISE_ID
+        )
         urlbase = reverse('saml_provider_config-list')
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
@@ -121,6 +124,9 @@ class SAMLProviderConfigTests(APITestCase):
         self.assertEqual(SAMLProviderConfig.objects.count(), orig_count + 1)
         provider_config = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_2['slug'])
         self.assertEqual(provider_config.name, 'name-of-config-2')
+
+        # check association has also been created
+        EnterpriseCustomerIdentityProvider.objects.get(provider_id=provider_config.slug)
 
     def test_create_one_config_with_absent_enterprise_uuid(self):
         """
