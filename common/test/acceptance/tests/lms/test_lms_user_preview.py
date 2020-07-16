@@ -9,7 +9,6 @@ from textwrap import dedent
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_partition_json
 from openedx.core.lib.tests import attr
@@ -52,54 +51,6 @@ class StaffViewTest(UniqueCourseTest):
         staff_page = StaffCoursewarePage(self.browser, self.course_id)
         self.assertEqual(staff_page.staff_view_mode, 'Staff')
         return staff_page
-
-
-@attr(shard=20)
-class CourseWithoutContentGroupsTest(StaffViewTest):
-    """
-    Setup for tests that have no content restricted to specific content groups.
-    """
-
-    def populate_course_fixture(self, course_fixture):
-        """
-        Populates test course with chapter, sequential, and 2 problems.
-        """
-        problem_data = dedent("""
-            <problem markdown="Simple Problem" max_attempts="" weight="">
-              <p>Choose Yes.</p>
-              <choiceresponse>
-                <checkboxgroup>
-                  <choice correct="true">Yes</choice>
-                </checkboxgroup>
-              </choiceresponse>
-            </problem>
-        """)
-
-        course_fixture.add_children(
-            XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
-                    XBlockFixtureDesc('problem', 'Test Problem 1', data=problem_data),
-                    XBlockFixtureDesc('problem', 'Test Problem 2', data=problem_data)
-                )
-            )
-        )
-
-
-@attr(shard=20)
-class StaffViewToggleTest(CourseWithoutContentGroupsTest):
-    """
-    Tests for the staff view toggle button.
-    """
-    def test_instructor_tab_visibility(self):
-        """
-        Test that the instructor tab is hidden when viewing as a student.
-        """
-
-        course_page = self._goto_staff_page()
-        self.assertTrue(course_page.has_tab('Instructor'))
-        course_page.set_staff_view_mode('Learner')
-        self.assertEqual(course_page.staff_view_mode, 'Learner')
-        self.assertFalse(course_page.has_tab('Instructor'))
 
 
 @attr(shard=20)
@@ -183,91 +134,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
             )
         )
 
-    def test_staff_sees_all_problems(self):
-        """
-        Scenario: Staff see all problems
-        Given I have a course with a cohort user partition
-        And problems that are associated with specific groups in the user partition
-        When I view the courseware in the LMS with staff access
-        Then I see all the problems, regardless of their group_access property
-        """
-        course_page = self._goto_staff_page()
-        verify_expected_problem_visibility(
-            self,
-            course_page,
-            [self.alpha_text, self.beta_text, self.audit_text, self.everyone_text]
-        )
-
-    def test_student_not_in_content_group(self):
-        """
-        Scenario: When previewing as a learner, only content visible to all is shown
-        Given I have a course with a cohort user partition
-        And problems that are associated with specific groups in the user partition
-        When I view the courseware in the LMS with staff access
-        And I change to previewing as a Learner
-        Then I see only problems visible to all users
-        """
-        course_page = self._goto_staff_page()
-        course_page.set_staff_view_mode('Learner')
-        verify_expected_problem_visibility(self, course_page, [self.everyone_text])
-
-    def test_as_student_in_alpha(self):
-        """
-        Scenario: When previewing as a learner in group alpha, only content visible to alpha is shown
-        Given I have a course with a cohort user partition
-        And problems that are associated with specific groups in the user partition
-        When I view the courseware in the LMS with staff access
-        And I change to previewing as a Learner in group alpha
-        Then I see only problems visible to group alpha
-        """
-        course_page = self._goto_staff_page()
-        course_page.set_staff_view_mode('Learner in alpha')
-        verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.everyone_text])
-
-    def test_as_student_in_beta(self):
-        """
-        Scenario: When previewing as a learner in group beta, only content visible to beta is shown
-        Given I have a course with a cohort user partition
-        And problems that are associated with specific groups in the user partition
-        When I view the courseware in the LMS with staff access
-        And I change to previewing as a Learner in group beta
-        Then I see only problems visible to group beta
-        """
-        course_page = self._goto_staff_page()
-        course_page.set_staff_view_mode('Learner in beta')
-        verify_expected_problem_visibility(self, course_page, [self.beta_text, self.everyone_text])
-
-    def test_as_student_in_audit(self):
-        """
-        Scenario: When previewing as a learner in the audit enrollment track, only content visible to audit is shown
-        Given I have a course with an enrollment_track user partition
-        And problems that are associated with specific groups in the user partition
-        When I view the courseware in the LMS with staff access
-        And I change to previewing as a Learner in audit enrollment track
-        Then I see only problems visible to audit enrollment track
-        """
-        course_page = self._goto_staff_page()
-        course_page.set_staff_view_mode('Learner in Audit')
-        verify_expected_problem_visibility(self, course_page, [self.audit_text, self.everyone_text])
-
-    def create_cohorts_and_assign_students(self, student_a_username, student_b_username):
-        """
-        Adds 2 manual cohorts, linked to content groups, to the course.
-        Each cohort is assigned one learner.
-        """
-        instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
-        instructor_dashboard_page.visit()
-        cohort_management_page = instructor_dashboard_page.select_cohort_management()
-        cohort_management_page.is_cohorted = True
-
-        def add_cohort_with_student(cohort_name, content_group, student):
-            """ Create cohort and assign learner to it. """
-            cohort_management_page.add_cohort(cohort_name, content_group=content_group)
-            cohort_management_page.add_students_to_selected_cohort([student])
-        add_cohort_with_student("Cohort Alpha", "alpha", student_a_username)
-        add_cohort_with_student("Cohort Beta", "beta", student_b_username)
-        cohort_management_page.wait_for_ajax()
-
     @attr('a11y')
     def test_course_page(self):
         """
@@ -286,14 +152,3 @@ class CourseWithContentGroupsTest(StaffViewTest):
             ]
         })
         course_page.a11y_audit.check_for_accessibility_errors()
-
-
-def verify_expected_problem_visibility(test, courseware_page, expected_problems):
-    """
-    Helper method that checks that the expected problems are visible on the current page.
-    """
-    courseware_page.wait_for(
-        lambda: courseware_page.num_xblock_components == len(expected_problems), "Expected number of problems visible"
-    )
-    for index, expected_problem in enumerate(expected_problems):
-        test.assertIn(expected_problem, courseware_page.xblock_components[index].text)
