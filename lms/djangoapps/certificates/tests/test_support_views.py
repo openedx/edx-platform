@@ -7,6 +7,8 @@ import json
 
 import ddt
 import six
+from mock import patch
+from uuid import uuid4
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -85,6 +87,7 @@ class CertificateSupportTestCase(ModuleStoreTestCase):
             status=self.CERT_STATUS,
             mode=self.CERT_MODE,
             download_url=self.CERT_DOWNLOAD_URL,
+            verify_uuid=uuid4().hex
         )
 
         # Login as support staff
@@ -226,8 +229,8 @@ class CertificateSearchTests(CertificateSupportTestCase):
         self.assertEqual(
             retrieved_cert["download_url"],
             reverse(
-                'certificates:html_view',
-                kwargs={"user_id": self.student.id, "course_id": self.course.id}
+                'certificates:render_cert_by_uuid',
+                kwargs={"certificate_uuid": self.cert.verify_uuid}
             )
         )
         self.assertTrue(retrieved_cert["regenerate"])
