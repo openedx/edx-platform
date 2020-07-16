@@ -410,6 +410,9 @@ FEATURES = {
 
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
+
+    # Figures flags
+    'FIGURES_IS_MULTISITE': True,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
