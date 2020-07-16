@@ -107,10 +107,7 @@ def set_discussion_toggle(value, xblock, user):
     """
     Recursively update all children of given xblock in modulestore
     """
-    is_block_with_discussion_enabled = (
-        xblock.location.block_type in ["vertical", "sequential", "chapter", "course"]
-    )
-    if not isinstance(value, bool) or not is_block_with_discussion_enabled:
+    if xblock.category not in ["vertical", "sequential", "chapter", "course"]:
         return
 
     if hasattr(xblock, "discussion_enabled"):
