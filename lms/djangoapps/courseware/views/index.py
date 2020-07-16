@@ -74,7 +74,6 @@ from ..permissions import MASQUERADE_AS_STUDENT
 from ..toggles import (
     COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
     REDIRECT_TO_COURSEWARE_MICROFRONTEND,
-    should_redirect_to_courseware_microfrontend,
 )
 from ..url_helpers import get_microfrontend_url
 
@@ -186,16 +185,20 @@ class CoursewareIndex(View):
         Redirect to the new courseware micro frontend,
         unless this is a time limited exam.
         """
-        # learners should redirect, if the waffle flag is set
-        if should_redirect_to_courseware_microfrontend(self.course_key):
-            # but exams should not redirect to the mfe until they're supported
-            if getattr(self.section, 'is_time_limited', False):
-                return
-
-            # and staff will not redirect, either
-            if self.is_staff:
-                return
-
+        # DENY: feature disabled globally
+        if not settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND'):
+            return
+        # DENY: staff access
+        if self.is_staff:
+            return
+        # DENY: Old Mongo courses, until removed from platform
+        if self.course_key.deprecated:
+            return
+        # DENY: Timed Exams, until supported
+        if getattr(self.section, 'is_time_limited', False):
+            return
+        # ALLOW: when flag set for course
+        if REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(self.course_key):
             raise Redirect(self.microfrontend_url)
 
     @property
