@@ -95,3 +95,14 @@ from openedx.core.djangolib.markup import HTML, Text
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform(iterationKey=".localized_datetime");
 </%static:require_module_async>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+  var PLSUpgradeLink = $(".PLS_button");
+
+    TrackECommerceEvents.trackUpsellClick(PLSUpgradeLink, 'dates_upgrade', {
+      pageName: "dates_tab",
+      linkType: "button",
+      linkCategory: "PLS_button"
+    });
+
+  </%static:require_module_async>
