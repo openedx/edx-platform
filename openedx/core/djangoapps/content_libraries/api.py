@@ -220,15 +220,18 @@ class AccessLevel:
     NO_ACCESS = None
 
 
-def get_libraries_for_user(user):
+def get_libraries_for_user(user, org=None):
     """
     Return content libraries that the user has permission to view.
     """
-    qs = ContentLibrary.objects.all()
+    if org:
+        qs = ContentLibrary.objects.filter(org__short_name=org)
+    else:
+        qs = ContentLibrary.objects.all()
     return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
 
 
-def get_metadata_from_index(queryset):
+def get_metadata_from_index(queryset, text_search=None):
     """
     Take a list of ContentLibrary objects and return metadata stored in
     ContentLibraryIndex.
@@ -237,14 +240,22 @@ def get_metadata_from_index(queryset):
     if ContentLibraryIndexer.indexing_is_enabled():
         try:
             library_keys = [lib.library_key for lib in queryset]
-            metadata = ContentLibraryIndexer.get_libraries(library_keys)
+            metadata = ContentLibraryIndexer.get_libraries(library_keys, text_search=text_search)
         except (LibraryNotIndexedException, KeyError, ElasticConnectionError) as e:
             log.exception(e)
 
     # If ContentLibraryIndex is not available, we query blockstore for a limited set of metadata
     if metadata is None:
         uuids = [lib.bundle_uuid for lib in queryset]
-        bundles = get_bundles(uuids)
+        bundles = get_bundles(uuids=uuids, text_search=text_search)
+
+        if text_search:
+            # Bundle APIs can't apply text_search on a bundle's org, so including those results here
+            queryset_org_search = queryset.filter(org__short_name__icontains=text_search)
+            if len(queryset_org_search):
+                uuids_org_search = [lib.bundle_uuid for lib in queryset_org_search]
+                bundles += get_bundles(uuids=uuids_org_search)
+
         bundle_dict = {
             bundle.uuid: {
                 'uuid': bundle.uuid,
@@ -254,7 +265,12 @@ def get_metadata_from_index(queryset):
             }
             for bundle in bundles
         }
-        metadata = [bundle_dict[uuid] for uuid in uuids]
+        metadata = [
+            bundle_dict[uuid]
+            if uuid in bundle_dict
+            else None
+            for uuid in uuids
+        ]
 
     libraries = [
         ContentLibraryMetadata(
@@ -271,6 +287,7 @@ def get_metadata_from_index(queryset):
             has_unpublished_deletes=metadata[i].get('has_unpublished_deletes'),
         )
         for i, lib in enumerate(queryset)
+        if metadata[i] is not None
     ]
     return libraries
 

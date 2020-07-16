@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.test.utils import override_settings
 from mock import patch
+from organizations.models import Organization
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from openedx.core.djangoapps.content_libraries.api import BlockLimitReachedError
@@ -126,6 +127,33 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             result = self._list_libraries({'pagination': 'true', 'page': '2'})
             self.assertEqual(len(result['results']), 1)
             self.assertEqual(result['next'], None)
+
+    @ddt.data(True, False)
+    def test_library_filters(self, is_indexing_enabled):
+        """
+        Test the filters in the list libraries API
+        """
+        features = settings.FEATURES
+        features['ENABLE_CONTENT_LIBRARY_INDEX'] = is_indexing_enabled
+        with override_settings(FEATURES=features):
+            self._create_library(slug="test-lib1", title="Foo", description="Bar")
+            self._create_library(slug="test-lib2", title="Library-Title-2", description="Bar2")
+            self._create_library(slug="l3", title="Library-Title-3", description="Description")
+
+            Organization.objects.get_or_create(
+                short_name="org-test",
+                defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
+            )
+            self._create_library(slug="l4", title="Library-Title-4", description="Library-Description", org='org-test')
+            self._create_library(slug="l5", title="Library-Title-5", description="Library-Description", org='org-test')
+
+            self.assertEqual(len(self._list_libraries()), 5)
+            self.assertEqual(len(self._list_libraries({'org': 'org-test'})), 2)
+            self.assertEqual(len(self._list_libraries({'text_search': 'test-lib'})), 2)
+            self.assertEqual(len(self._list_libraries({'text_search': 'library-title'})), 4)
+            self.assertEqual(len(self._list_libraries({'text_search': 'bar'})), 2)
+            self.assertEqual(len(self._list_libraries({'text_search': 'org-tes'})), 2)
+            self.assertEqual(len(self._list_libraries({'org': 'org-test', 'text_search': 'library-title-4'})), 1)
 
     # General Content Library XBlock tests:
 

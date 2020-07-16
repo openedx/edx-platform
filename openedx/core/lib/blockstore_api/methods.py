@@ -3,6 +3,7 @@ API Client methods for working with Blockstore bundles and drafts
 """
 
 import base64
+from urllib.parse import urlencode
 from uuid import UUID
 
 import dateutil.parser
@@ -144,13 +145,16 @@ def delete_collection(collection_uuid):
     api_request('delete', api_url('collections', str(collection_uuid)))
 
 
-def get_bundles(uuids=None):
+def get_bundles(uuids=None, text_search=None):
     """
     Get the details of all bundles
     """
-    if uuids is None:
-        uuids = []
-    version_url = api_url('bundles') + '?uuid=' + ','.join(map(str, uuids))
+    query_params = {}
+    if uuids:
+        query_params['uuid'] = ','.join(map(str, uuids))
+    if text_search:
+        query_params['text_search'] = text_search
+    version_url = api_url('bundles') + '?' + urlencode(query_params)
     response = api_request('get', version_url)
     # build bundle from response, convert map object to list and return
     return [_bundle_from_response(item) for item in response]

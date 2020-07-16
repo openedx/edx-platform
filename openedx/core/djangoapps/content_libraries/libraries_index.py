@@ -5,6 +5,7 @@ import logging
 from django.conf import settings
 from django.dispatch import receiver
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
+from search.elastic import ElasticSearchEngine, _translate_hits, _process_field_filters, RESERVED_CHARACTERS
 from search.search_engine_base import SearchEngine
 
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME
@@ -75,18 +76,25 @@ class ContentLibraryIndexer:
                 "last_published": last_published_str,
                 "has_unpublished_changes": has_unpublished_changes,
                 "has_unpublished_deletes": has_unpublished_deletes,
+                # only 'content' field is analyzed by elastisearch, and allows text-search
+                "content": {
+                    "id": str(library_key),
+                    "title": bundle_metadata.title,
+                    "description": bundle_metadata.description,
+                },
             }
             library_dicts.append(library_dict)
 
         return searcher.index(cls.LIBRARY_DOCUMENT_TYPE, library_dicts)
 
     @classmethod
-    def get_libraries(cls, library_keys):
+    def get_libraries(cls, library_keys, text_search=None):
         """
         Retrieve a list of libraries from the index
         """
         searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
         library_keys_str = [str(key) for key in library_keys]
+
         response = searcher.search(
             doc_type=cls.LIBRARY_DOCUMENT_TYPE,
             field_dictionary={
@@ -95,6 +103,25 @@ class ContentLibraryIndexer:
             },
             size=MAX_SIZE,
         )
+        if len(response["results"]) != len(library_keys_str):
+            missing = set(library_keys_str) - set([result["data"]["id"] for result in response["results"]])
+            raise LibraryNotIndexedException("Keys not found in index: {}".format(missing))
+
+        if text_search:
+            # Elastic is hit twice if text_search is valid
+            # Once above to identify unindexed libraries, and now to filter with text_search
+            if isinstance(searcher, ElasticSearchEngine):
+                response = _translate_hits(searcher._es.search(
+                    doc_type=cls.LIBRARY_DOCUMENT_TYPE,
+                    index=searcher.index_name,
+                    body=build_elastic_query(library_keys_str, text_search),
+                ))
+            else:
+                response = searcher.search(
+                    doc_type=cls.LIBRARY_DOCUMENT_TYPE,
+                    field_dictionary={"id": library_keys_str},
+                    query_string=text_search
+                )
 
         # Search results may not retain the original order of keys - we use this
         # dict to construct a list in the original order of library_keys
@@ -102,11 +129,11 @@ class ContentLibraryIndexer:
             result["data"]["id"]: result["data"]
             for result in response["results"]
         }
-        if len(response_dict) != len(library_keys_str):
-            missing = set(library_keys_str) - set(response_dict.keys())
-            raise LibraryNotIndexedException("Keys not found in index: {}".format(missing))
+
         return [
             response_dict[key]
+            if key in response_dict
+            else None
             for key in library_keys_str
         ]
 
@@ -163,3 +190,46 @@ def remove_library_index(sender, library_key, **kwargs):  # pylint: disable=unus
             ContentLibraryIndexer.remove_libraries([library_key])
         except ElasticConnectionError as e:
             log.exception(e)
+
+
+def build_elastic_query(library_keys_str, text_search):
+    """
+    Build and return an elastic query for doing text search on a library
+    """
+    # Remove reserved characters (and ") from the text to prevent unexpected errors.
+    text_search_normalised = text_search.translate(text_search.maketrans('', '', RESERVED_CHARACTERS + '"'))
+    # Wrap with asterix to enable partial matches
+    text_search_normalised = "*{}*".format(text_search_normalised)
+    return {
+        'query': {
+            'filtered': {
+                'query': {
+                    'bool': {
+                        'should': [
+                            {
+                                'query_string': {
+                                    'query': text_search_normalised,
+                                    "fields": ["content.*"],
+                                    "minimum_should_match": "100%",
+                                },
+                            },
+                            # Add a special wildcard search for id, as it contains a ":" character which is filtered out
+                            # in query_string
+                            {
+                                'wildcard': {
+                                    'id': {
+                                        'value': '*{}*'.format(text_search),
+                                    }
+                                },
+                            },
+                        ],
+                    },
+                },
+                'filter': {
+                    'terms': {
+                        'id': library_keys_str
+                    }
+                }
+            },
+        },
+    }
