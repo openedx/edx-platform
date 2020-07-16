@@ -101,7 +101,6 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         except EnterpriseCustomer.DoesNotExist:
             raise ValidationError('Enterprise customer not found at uuid: {}'.format(customer_uuid))
 
-        print(serializer.data)
         association_obj = EnterpriseCustomerIdentityProvider(
             enterprise_customer=enterprise_customer,
             provider_id=serializer.data['slug']
