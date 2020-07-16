@@ -187,6 +187,17 @@ class AccessTokenExchangeForm(forms.Form):
             user = backend.do_auth(access_token, allow_inactive_user=True)
         except (HTTPError, AuthException):
             pass
+        # check if user is disabled
+        if isinstance(user, User) and not user.has_usable_password():
+            self.request.social_strategy.clean_partial_pipeline(access_token)
+            raise OAuthValidationError(
+                {
+                    "error": "account_disabled",
+                    "error_description": 'user account is disabled',
+                    "error_code": 403
+                }
+            )
+
         if user and isinstance(user, User):
             self.cleaned_data["user"] = user
         else:
