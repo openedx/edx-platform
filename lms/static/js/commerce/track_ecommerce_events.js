@@ -23,7 +23,7 @@
                     eventAttrs[allowedAttr] = optionalAttrs[allowedAttr];
                 });
             }
-            
+
             window.analytics.trackLink(elt, 'edx.bi.ecommerce.upsell_links_clicked', eventAttrs);
         };
 
