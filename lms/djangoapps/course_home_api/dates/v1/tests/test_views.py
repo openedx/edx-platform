@@ -19,10 +19,9 @@ class DatesTabTestViews(BaseCourseHomeTests):
     """
     Tests for the Dates Tab API
     """
-    @classmethod
-    def setUpClass(cls):
-        BaseCourseHomeTests.setUpClass()
-        cls.url = reverse('course-home-dates-tab', args=[cls.course.id])
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('course-home-dates-tab', args=[self.course.id])
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2017, 1, 1))
 
     @COURSE_HOME_MICROFRONTEND.override(active=True)
@@ -70,7 +69,7 @@ class DatesTabTestViews(BaseCourseHomeTests):
     @COURSE_HOME_MICROFRONTEND.override(active=True)
     @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)
     def test_masquerade(self):
-        self.upgrade_to_staff()
+        self.switch_to_staff()
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         self.assertTrue(self.client.get(self.url).data.get('learner_is_full_access'))
 

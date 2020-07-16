@@ -58,6 +58,7 @@ class OutlineTabSerializer(serializers.Serializer):
     """
     Serializer for the Outline Tab
     """
-    course_tools = CourseToolSerializer(many=True)
     course_blocks = CourseBlockSerializer()
+    course_tools = CourseToolSerializer(many=True)
     dates_widget = DatesWidgetSerializer()
+    handouts_html = serializers.CharField()

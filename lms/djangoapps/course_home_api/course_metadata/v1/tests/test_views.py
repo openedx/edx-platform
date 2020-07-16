@@ -18,10 +18,9 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
     """
     Tests for the Course Home Course Metadata API
     """
-    @classmethod
-    def setUpClass(cls):
-        BaseCourseHomeTests.setUpClass()
-        cls.url = reverse('course-home-course-metadata', args=[cls.course.id])
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('course-home-course-metadata', args=[self.course.id])
 
     def test_get_authenticated_user(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
