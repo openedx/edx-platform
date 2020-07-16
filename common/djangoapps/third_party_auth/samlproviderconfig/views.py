@@ -103,8 +103,8 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
 
         print(serializer.data)
         association_obj = EnterpriseCustomerIdentityProvider(
-            enterprise_customer = enterprise_customer,
-            provider_id = serializer.data['slug']
+            enterprise_customer=enterprise_customer,
+            provider_id=serializer.data['slug']
         )
         association_obj.save()
 
