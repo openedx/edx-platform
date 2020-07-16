@@ -69,7 +69,7 @@ django-oauth-toolkit==1.3.2  # via -r requirements/edx/base.in
 django-object-actions==2.0.0  # via edx-enterprise
 django-pipeline==1.7.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 django-pyfs==2.2          # via -r requirements/edx/base.in
-git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a2#egg=django-ratelimit-backend==2.0.1  # via -r requirements/edx/github.in
+git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a4#egg=django-ratelimit-backend==2.0.1  # via -r requirements/edx/github.in
 django-ratelimit==3.0.0   # via -r requirements/edx/base.in
 django-require==1.0.11    # via -r requirements/edx/base.in
 django-sekizai==1.1.0     # via -r requirements/edx/base.in, django-wiki
