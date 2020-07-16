@@ -7,13 +7,12 @@ define([
 ], function(Backbone, _, TeamCollection, TopicCollection, TopicModel) {
     'use strict';
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
-        createMockTopicData, createMockTopicCollection, createMockTopic, createMockInstructorManagedTopic,
+        createMockTopicData, createMockTopicCollection, createMockTopic,
         createMockContext,
         testContext,
         testCourseID = 'course/1',
         testUser = 'testUser',
         testTopicID = 'test-topic-1',
-        testInstructorManagedTopicID = 'test-instructor-managed-topic-1',
         testTeamDiscussionID = '12345',
         teamEvents = _.clone(Backbone.Events),
         testCountries = [
@@ -113,13 +112,31 @@ define([
         );
     };
 
-    var verifyCards = function(view, teams) {
+
+    /**
+     * Verify that the given view shows cards for each of the teams included.
+     * If showTeamset is included (true or false), the test will also verify that the teamset
+     * label/penannt is or is not included in the card accordingly.
+     *
+     * @param {JQ Element} view - jquery DOM element for the card container
+     * @param {TeamModel[]} teams - list of teams to verify.
+     * @param {[bool]} showTeamset - should show teamset string? (if not included, do not check
+     *     the teamset string at all)
+     */
+    var verifyCards = function(view, teams, showTeamset) {
         var teamCards = view.$('.team-card');
         _.each(teams, function(team, index) {
             var currentCard = teamCards.eq(index);
+            var teamsetString = 'teamset-name-' + team.topic_id;
             expect(currentCard.text()).toMatch(team.name);
             expect(currentCard.text()).toMatch(_.object(testLanguages)[team.language]);
             expect(currentCard.text()).toMatch(_.object(testCountries)[team.country]);
+            if (showTeamset === false) {
+                expect(currentCard.text()).not.toMatch(teamsetString);
+            }
+            if (showTeamset === true) {
+                expect(currentCard.text()).toMatch(teamsetString);
+            }
         });
     };
 
@@ -265,18 +282,6 @@ define([
         ));
     };
 
-    createMockInstructorManagedTopic = function(options) {
-        return new TopicModel(_.extend(
-            {
-                id: testInstructorManagedTopicID,
-                name: 'Test Instructor Managed Topic 1',
-                description: 'Test instructor managed topic description 1',
-                type: 'public_managed'
-            },
-            options
-        ));
-    };
-
     testContext = {
         courseID: testCourseID,
         topics: {
@@ -344,7 +349,6 @@ define([
         createMockUserInfo: createMockUserInfo,
         createMockContext: createMockContext,
         createMockTopic: createMockTopic,
-        createMockInstructorManagedTopic: createMockInstructorManagedTopic,
         createMockPostResponse: createMockPostResponse,
         createMockDiscussionResponse: createMockDiscussionResponse,
         createAnnotatedContentInfo: createAnnotatedContentInfo,

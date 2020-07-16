@@ -655,10 +655,13 @@ class VerificationDeadlineDate(DateSummary):
         """Maps verification state to a tuple of link text and location."""
         return {
             'verification-deadline-passed': (_('Learn More'), ''),
-            'verification-deadline-retry': (_('Retry Verification'), reverse('verify_student_reverify')),
+            'verification-deadline-retry': (
+                _('Retry Verification'),
+                IDVerificationService.get_verify_location('verify_student_reverify'),
+            ),
             'verification-deadline-upcoming': (
                 _('Verify My Identity'),
-                reverse('verify_student_verify_now', args=(self.course_id,))
+                IDVerificationService.get_verify_location('verify_student_verify_now', self.course_id),
             )
         }
 

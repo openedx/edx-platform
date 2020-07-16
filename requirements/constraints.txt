@@ -22,6 +22,9 @@ django-cors-headers<3.0.0
 # It seems like django-countries > 5.5 may cause performance issues for us.
 django-countries==5.5
 
+# Removes deprecated get_ip function, which we still use (ARCHBOM-1329 for unpinning)
+django-ipware<3.0.0
+
 # 2.0.0 dropped support for Python 3.5
 django-pipeline<2.0.0
 
@@ -37,8 +40,10 @@ drf-yasg<1.17.1
 # drf-jwt 1.15.0 contains a migration that breaks on MySQL: https://github.com/Styria-Digital/django-rest-framework-jwt/issues/40
 drf-jwt==1.14.0
 
-# Tests are failing with 3.2.2: https://build.testeng.edx.org/job/edx-platform-python-pipeline-pr/19138/
-edx-completion==3.2.1
+# The team that owns this package will manually bump this package rather than having it pulled in automatically.
+# This is to allow them to better control its deployment and to do it in a process that works better
+# for them.
+edx-enterprise==3.3.23
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
@@ -51,6 +56,9 @@ httpretty<1.0
 
 # 4.0.0 dropped support for Python 3.5
 inflect<4.0.0
+
+# 5.0.0 dropped support for Python 3.5
+isort<5.0.0
 
 # 0.15.0 dropped support for Python 3.5
 joblib<0.15.0

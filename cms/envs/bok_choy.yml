@@ -112,6 +112,9 @@ MODULESTORE:
       - ENGINE: xmodule.modulestore.xml.XMLModuleStore
         NAME: xml
         OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_module.HiddenDescriptor}
+# We need to test different scenarios, following setting effectively disbale rate limiting
+PASSWORD_RESET_IP_RATE: '1/s'
+PASSWORD_RESET_EMAIL_RATE: '1/s'
 SECRET_KEY: ''
 SERVER_EMAIL: devops@example.com
 SESSION_COOKIE_DOMAIN: null

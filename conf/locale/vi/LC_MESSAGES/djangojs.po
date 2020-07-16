@@ -25,6 +25,7 @@
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014-2015
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2013-2015
 # Nhan Nguyen <constfang@yahoo.com>, 2015
+# Nhung Tran <nhungtth@hachium.com>, 2020
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
 # Thắng Trần <tmt111295@gmail.com>, 2019
 # Theodora. Tôn Nữ Quý Thiện <thien.tonnu1001@gmail.com>, 2015
@@ -56,6 +57,7 @@
 # Nguyen Nhat Quang <technicalmanager@gmail.com>, 2016
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2014
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
+# Tri Le <trilm@hihexa.com>, 2020
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015
 # truong tran <tranminhtruong88@yahoo.com.vn>, 2017
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
@@ -68,6 +70,7 @@
 # Tan Phat Trang <phattt2901@gmail.com>, 2019
 # Hoà Lê Thanh <hoa.lethanh@gmail.com>, 2019
 # Thắng Trần <tmt111295@gmail.com>, 2019
+# Tri Le <trilm@hihexa.com>, 2020
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
@@ -84,6 +87,7 @@
 # Nguyen Nhat Quang <technicalmanager@gmail.com>, 2016
 # Thi Thanh Nga Do <thanhnga.ftu2@gmail.com>, 2015
 # Theodora. Tôn Nữ Quý Thiện <thien.tonnu1001@gmail.com>, 2015
+# Tri Le <trilm@hihexa.com>, 2020
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
@@ -106,9 +110,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-28 20:42+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-07-12 20:42+0000\n"
+"PO-Revision-Date: 2020-07-09 13:49+0000\n"
+"Last-Translator: Tri Le <trilm@hihexa.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"

@@ -25,7 +25,12 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.video_module import VideoBlock
-from xmodule.video_module.transcripts_utils import Transcript, edxval_api, subs_filename
+from xmodule.video_module.transcripts_utils import (
+    Transcript,
+    edxval_api,
+    get_transcript,
+    subs_filename,
+)
 from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
@@ -521,9 +526,8 @@ class TestTranscriptDownloadDispatch(TestVideo):
         request = Request.blank('/download')
         response = self.item.transcript(request=request, dispatch='download')
         self.assertEqual(response.status, '404 Not Found')
-        transcripts = self.item.get_transcripts_info()
         with self.assertRaises(NotFoundError):
-            self.item.get_transcript(transcripts)
+            get_transcript(self.item)
 
     @patch(
         'xmodule.video_module.transcripts_utils.get_transcript_for_video',
@@ -537,7 +541,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
         self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename="en_塞.srt"')
 
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_video_transcript_data')
-    @patch('xmodule.video_module.VideoBlock.get_transcript', Mock(side_effect=NotFoundError))
+    @patch('xmodule.video_module.get_transcript', Mock(side_effect=NotFoundError))
     def test_download_fallback_transcript(self, mock_get_video_transcript_data):
         """
         Verify val transcript is returned as a fallback if it is not found in the content store.
@@ -1196,8 +1200,7 @@ class TestGetTranscript(TestVideo):
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
 
-        transcripts = self.item.get_transcripts_info()
-        text, filename, mime_type = self.item.get_transcript(transcripts)
+        text, filename, mime_type = get_transcript(self.item)
 
         expected_text = textwrap.dedent("""\
             0
@@ -1211,7 +1214,7 @@ class TestGetTranscript(TestVideo):
             """)
 
         self.assertEqual(text, expected_text)
-        self.assertEqual(filename[:-4], self.item.sub)
+        self.assertEqual(filename[:-4], 'en_' + self.item.sub)
         self.assertEqual(mime_type, 'application/x-subrip; charset=utf-8')
 
     def test_good_txt_transcript(self):
@@ -1234,27 +1237,27 @@ class TestGetTranscript(TestVideo):
 
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.sub = _get_subs_id(good_sjson.name)
-        transcripts = self.item.get_transcripts_info()
-        text, filename, mime_type = self.item.get_transcript(transcripts, transcript_format="txt")
+        text, filename, mime_type = get_transcript(self.item, output_format=Transcript.TXT)
         expected_text = textwrap.dedent("""\
             Hi, welcome to Edx.
             Let's start with what is on your screen right now.""")
 
         self.assertEqual(text, expected_text)
-        self.assertEqual(filename, self.item.sub + '.txt')
+        self.assertEqual(filename, 'en_' + self.item.sub + '.txt')
         self.assertEqual(mime_type, 'text/plain; charset=utf-8')
 
     def test_en_with_empty_sub(self):
 
-        transcripts = {"transcripts": {}, "sub": ""}
+        self.item.sub = ""
+        self.item.transcripts = None
         # no self.sub, self.youttube_1_0 exist, but no file in assets
         with self.assertRaises(NotFoundError):
-            self.item.get_transcript(transcripts)
+            get_transcript(self.item)
 
         # no self.sub and no self.youtube_1_0, no non-en transcritps
         self.item.youtube_id_1_0 = None
-        with self.assertRaises(ValueError):
-            self.item.get_transcript(transcripts)
+        with self.assertRaises(NotFoundError):
+            get_transcript(self.item)
 
         # no self.sub but youtube_1_0 exists with file in assets
         good_sjson = _create_file(content=textwrap.dedent("""\
@@ -1276,7 +1279,7 @@ class TestGetTranscript(TestVideo):
         _upload_sjson_file(good_sjson, self.item.location)
         self.item.youtube_id_1_0 = _get_subs_id(good_sjson.name)
 
-        text, filename, mime_type = self.item.get_transcript(transcripts)
+        text, filename, mime_type = get_transcript(self.item)
         expected_text = textwrap.dedent("""\
             0
             00:00:00,270 --> 00:00:02,720
@@ -1289,7 +1292,7 @@ class TestGetTranscript(TestVideo):
             """)
 
         self.assertEqual(text, expected_text)
-        self.assertEqual(filename, self.item.youtube_id_1_0 + '.srt')
+        self.assertEqual(filename, 'en_' + self.item.youtube_id_1_0 + '.srt')
         self.assertEqual(mime_type, 'application/x-subrip; charset=utf-8')
 
     def test_non_en_with_non_ascii_filename(self):
@@ -1298,14 +1301,14 @@ class TestGetTranscript(TestVideo):
         _upload_file(self.srt_file, self.item_descriptor.location, u"塞.srt")
 
         transcripts = self.item.get_transcripts_info()
-        text, filename, mime_type = self.item.get_transcript(transcripts)
+        text, filename, mime_type = get_transcript(self.item)
         expected_text = textwrap.dedent(u"""
         0
         00:00:00,12 --> 00:00:00,100
         Привіт, edX вітає вас.
         """)
         self.assertEqual(text, expected_text)
-        self.assertEqual(filename, u"塞.srt")
+        self.assertEqual(filename, u"zh_塞.srt")
         self.assertEqual(mime_type, 'application/x-subrip; charset=utf-8')
 
     def test_value_error(self):
@@ -1316,7 +1319,7 @@ class TestGetTranscript(TestVideo):
 
         transcripts = self.item.get_transcripts_info()
         with self.assertRaises(ValueError):
-            self.item.get_transcript(transcripts)
+            get_transcript(self.item)
 
     def test_key_error(self):
         good_sjson = _create_file(content="""
@@ -1337,4 +1340,4 @@ class TestGetTranscript(TestVideo):
 
         transcripts = self.item.get_transcripts_info()
         with self.assertRaises(KeyError):
-            self.item.get_transcript(transcripts)
+            get_transcript(self.item)

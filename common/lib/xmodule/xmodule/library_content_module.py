@@ -19,6 +19,7 @@ from six import text_type
 from six.moves import zip
 from web_fragments.fragment import Fragment
 from webob import Response
+from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Integer, List, Scope, String
 
@@ -65,6 +66,7 @@ class LibraryContentFields(object):
     Separated out for now because they need to be added to the module and the
     descriptor.
     """
+    completion_mode = XBlockCompletionMode.AGGREGATOR
     # Please note the display_name of each field below is used in
     # common/test/acceptance/pages/studio/library.py:StudioLibraryContentXBlockEditModal
     # to locate input elements - keep synchronized

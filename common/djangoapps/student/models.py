@@ -1028,19 +1028,20 @@ class CourseEnrollmentManager(models.Manager):
     Custom manager for CourseEnrollment with Table-level filter methods.
     """
 
-    def num_enrolled_in(self, course_id):
+    def is_small_course(self, course_id):
         """
-        Returns the count of active enrollments in a course.
+        Returns false if the number of enrollments are one greater than 'max_enrollments' else true
 
         'course_id' is the course_id to return enrollments
         """
+        max_enrollments = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
 
         enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(
             course_id=course_id,
             is_active=1
-        ).count()
+        )[:max_enrollments + 1].count()
 
-        return enrollment_number
+        return enrollment_number <= max_enrollments
 
     def num_enrolled_in_exclude_admins(self, course_id):
         """

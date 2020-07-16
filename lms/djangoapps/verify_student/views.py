@@ -36,7 +36,6 @@ from lms.djangoapps.commerce.utils import EcommerceService, is_account_activatio
 from lms.djangoapps.verify_student.emails import send_verification_approved_email, send_verification_confirmation_email
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 from lms.djangoapps.verify_student.utils import can_verify_now
@@ -53,6 +52,9 @@ from util.db import outer_atomic
 from util.json_request import JsonResponse
 from verify_student.toggles import use_new_templates_for_id_verification_emails
 from xmodule.modulestore.django import modulestore
+
+from .services import IDVerificationService
+from .toggles import redirect_to_idv_microfrontend
 
 log = logging.getLogger(__name__)
 
@@ -510,7 +512,10 @@ class PayAndVerifyView(View):
             if is_enrolled:
                 if already_paid:
                     # If the student has paid, but not verified, redirect to the verification flow.
-                    url = reverse('verify_student_verify_now', kwargs=course_kwargs)
+                    url = IDVerificationService.get_verify_location(
+                        'verify_student_verify_now',
+                        six.text_type(course_key)
+                    )
             else:
                 url = reverse('verify_student_start_flow', kwargs=course_kwargs)
 
@@ -1032,31 +1037,12 @@ class SubmitPhotosView(View):
         Send an email confirming that the user submitted photos
         for initial verification.
         """
-        if use_new_templates_for_id_verification_emails():
-            lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
-            new_template_context = {
-                'user': user,
-                'dashboard_link': '{}{}'.format(lms_root_url, reverse('dashboard'))
-            }
-            return send_verification_confirmation_email(new_template_context)
-
+        lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
         context = {
-            'full_name': user.profile.name,
-            'platform_name': configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
+            'user': user,
+            'dashboard_link': '{}{}'.format(lms_root_url, reverse('dashboard'))
         }
-
-        subject = _("{platform_name} ID Verification Photos Received").format(platform_name=context['platform_name'])
-        message = render_to_string('emails/photo_submission_confirmation.txt', context)
-        from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-        to_address = user.email
-
-        try:
-            send_mail(subject, message, from_address, [to_address], fail_silently=False)
-        except:  # pylint: disable=bare-except
-            # We catch all exceptions and log them.
-            # It would be much, much worse to roll back the transaction due to an uncaught
-            # exception than to skip sending the notification email.
-            log.exception(u"Could not send notification email for initial verification for user %s", user.id)
+        return send_verification_confirmation_email(context)
 
     def _fire_event(self, user, event_name, parameters):
         """
@@ -1150,32 +1136,15 @@ def results_callback(request):
         log.debug(u'Approving verification for {}'.format(receipt_id))
         attempt.approve()
 
-        expiry_date = datetime.date.today() + datetime.timedelta(
-            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        )
-
-        if use_new_templates_for_id_verification_emails():
-            context = {'user_id': user, 'expiry_date': expiry_date.strftime("%m/%d/%Y")}
-            send_verification_approved_email(context=context)
-        else:
-            verification_status_email_vars['expiry_date'] = expiry_date.strftime("%m/%d/%Y")
-            verification_status_email_vars['full_name'] = user.profile.name
-            subject = _(u"Your {platform_name} ID Verification Approved").format(
-                platform_name=settings.PLATFORM_NAME
-            )
-            context = {
-                'subject': subject,
-                'template': 'emails/passed_verification_email.txt',
-                'email': user.email,
-                'email_vars': verification_status_email_vars
-            }
-            send_verification_status_email.delay(context)
+        expiry_date = datetime.date.today() + datetime.timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+        email_context = {'user': user, 'expiry_date': expiry_date.strftime("%m/%d/%Y")}
+        send_verification_approved_email(context=email_context)
 
     elif result == "FAIL":
         log.debug(u"Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
         status = "denied"
-        reverify_url = '{}{}'.format(settings.LMS_ROOT_URL, reverse("verify_student_reverify"))
+        reverify_url = IDVerificationService.email_reverify_url()
         verification_status_email_vars['reasons'] = reason
         verification_status_email_vars['reverify_url'] = reverify_url
         verification_status_email_vars['faq_url'] = settings.ID_VERIFICATION_SUPPORT_LINK
@@ -1265,6 +1234,8 @@ class ReverifyView(View):
         verification_status = IDVerificationService.user_status(request.user)
         expiration_datetime = IDVerificationService.get_expiration_datetime(request.user, ['approved'])
         if can_verify_now(verification_status, expiration_datetime):
+            if redirect_to_idv_microfrontend():
+                return redirect('{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL))
             context = {
                 "user_full_name": request.user.profile.name,
                 "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),

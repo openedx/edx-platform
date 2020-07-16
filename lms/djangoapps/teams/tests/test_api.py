@@ -14,7 +14,7 @@ from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.lib.teams_config import TeamsConfig, TeamsetType
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, AnonymousUserId
 from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -190,6 +190,7 @@ class PythonAPITests(SharedModuleStoreTestCase):
         A learner should be able to get the anonymous user IDs of their team members
         """
         team_anonymous_user_ids = teams_api.anonymous_user_ids_for_team(self.user1, self.team1)
+        self.assertTrue(AnonymousUserId.objects.get(user=self.user1, course_id=self.team1.course_id))
         self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
 
     def test_anonymous_user_ids_for_team_not_on_team(self):

@@ -29,6 +29,7 @@ def update_from_modulestore(course_key):
                 CourseLearningSequenceData(
                     usage_key=sequence.location,
                     title=sequence.display_name,
+                    inaccessible_after_due=sequence.hide_after_due,
                     visibility=VisibilityData(
                         hide_from_toc=sequence.hide_from_toc,
                         visible_to_staff_only=sequence.visible_to_staff_only

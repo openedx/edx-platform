@@ -56,6 +56,7 @@ _ = translation.ugettext
 
 
 INVALID_CERTIFICATE_TEMPLATE_PATH = 'certificates/invalid.html'
+UNSUPPORTED_CERTIFICATE_URL_TEMPLATE_PATH = 'certificates/url_unsupported.html'
 
 
 def get_certificate_description(mode, certificate_type, platform_name):
@@ -458,6 +459,13 @@ def render_cert_by_uuid(request, certificate_uuid):
         raise Http404
 
 
+def render_unsupported_url_view(request, user_id, course_id):
+    platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
+    configuration = CertificateHtmlViewConfiguration.get_config()
+    return _render_invalid_certificate(request, course_id, platform_name, configuration,
+                                       cert_path=UNSUPPORTED_CERTIFICATE_URL_TEMPLATE_PATH)
+
+
 @handle_500(
     template_path="certificates/server-error.html",
     test_func=lambda request: request.GET.get('preview', None)
@@ -654,7 +662,8 @@ def _get_custom_template_and_language(course_id, course_mode, course_language):
         return (None, None)
 
 
-def _render_invalid_certificate(request, course_id, platform_name, configuration):
+def _render_invalid_certificate(request, course_id, platform_name, configuration,
+                                cert_path=INVALID_CERTIFICATE_TEMPLATE_PATH):
     """
     Renders the invalid certificate view with default header and footer.
     """
@@ -663,7 +672,7 @@ def _render_invalid_certificate(request, course_id, platform_name, configuration
     # Add certificate header/footer data to current context
     context.update(get_certificate_header_context(is_secure=request.is_secure()))
     context.update(get_certificate_footer_context())
-    return render_to_response(INVALID_CERTIFICATE_TEMPLATE_PATH, context)
+    return render_to_response(cert_path, context)
 
 
 def _render_valid_certificate(request, context, custom_template=None):

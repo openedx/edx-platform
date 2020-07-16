@@ -38,7 +38,7 @@ define([
             topicTeamsView = new TopicTeamsView({
                 el: '.teams-container',
                 model: isInstructorManagedTopic ?
-                    TeamSpecHelpers.createMockInstructorManagedTopic() : TeamSpecHelpers.createMockTopic(),
+                    TeamSpecHelpers.createMockTopic({type: 'public_managed'}) : TeamSpecHelpers.createMockTopic(),
                 collection: options.teams || TeamSpecHelpers.createMockTeams({results: []}),
                 context: _.extend({}, TeamSpecHelpers.testContext, options)
             });

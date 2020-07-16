@@ -1,6 +1,7 @@
 """
 Calendar syncing Course dates with a User.
 """
+default_app_config = 'openedx.features.calendar_sync.apps.UserCalendarSyncConfig'
 
 
 def get_calendar_event_id(user, block_key, date_type, hostname):

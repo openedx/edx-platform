@@ -8,6 +8,7 @@ from uuid import UUID
 from django.contrib.auth.models import Group
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
+from openedx.core.djangoapps.content_libraries.api import BlockLimitReachedError
 from student.tests.factories import UserFactory
 
 
@@ -443,3 +444,18 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         self.assertEqual(links_created[1]["version"], 1)
         self.assertEqual(links_created[1]["latest_version"], 2)
         self.assertEqual(links_created[1]["opaque_key"], bank_lib_id)
+
+    def test_library_blocks_limit(self):
+        """
+        Test that libraries don't allow more than specified blocks
+        """
+        with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=1):
+            lib = self._create_library(slug="test_lib_limits", title="Limits Test Library", description="Testing XBlocks limits in a library")
+            lib_id = lib["id"]
+            block_data = self._add_block_to_library(lib_id, "unit", "unit1")
+            # Second block should throw error
+            with self.assertRaises(BlockLimitReachedError):
+                self._add_block_to_library(lib_id, "problem", "problem1")
+            # Also check that limit applies to child blocks too
+            with self.assertRaises(BlockLimitReachedError):
+                self._add_block_to_library(lib_id, "html", "html1", parent_block=block_data["id"])

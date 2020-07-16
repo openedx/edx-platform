@@ -53,7 +53,6 @@ from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackC
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
-from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.roles import (
     CourseFinanceAdminRole, CourseInstructorRole,
@@ -177,10 +176,6 @@ def instructor_dashboard_2(request, course_id):
     if is_bulk_email_feature_enabled(course_key) and (access['staff'] or access['instructor']):
         sections.append(_section_send_email(course, access))
 
-    # Gate access to Ecommerce tab
-    if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
-        sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label, reports_enabled))
-
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
 
@@ -195,7 +190,6 @@ def instructor_dashboard_2(request, course_id):
 
     if can_see_special_exams:
         sections.append(_section_special_exams(course, access))
-
     # Certificates panel
     # This is used to generate example certificates
     # and enable self-generated certificates for a course.
@@ -214,7 +208,7 @@ def instructor_dashboard_2(request, course_id):
     if len(openassessment_blocks) > 0 and access['staff']:
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
-    disable_buttons = not _is_small_course(course_key)
+    disable_buttons = not CourseEnrollment.objects.is_small_course(course_key)
 
     certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
     generate_certificate_exceptions_url = reverse(
@@ -264,79 +258,6 @@ def instructor_dashboard_2(request, course_id):
 
 ## section_key will be used as a css attribute, javascript tie-in, and template import filename.
 ## section_display_name will be used to generate link titles in the nav bar.
-
-
-def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enabled):
-    """ Provide data for the corresponding dashboard section """
-    course_key = course.id
-    coupons = Coupon.objects.filter(course_id=course_key).order_by('-is_active')
-    course_price = paid_mode.min_price
-
-    total_amount = None
-    if access['finance_admin']:
-        single_purchase_total = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key)
-        bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(course_key)
-        total_amount = single_purchase_total + bulk_purchase_total
-
-    section_data = {
-        'section_key': 'e-commerce',
-        'section_display_name': _('E-Commerce'),
-        'access': access,
-        'course_id': six.text_type(course_key),
-        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-        'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': six.text_type(course_key)}),
-        'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': six.text_type(course_key)}),
-        'get_user_invoice_preference_url': reverse(
-            'get_user_invoice_preference',
-            kwargs={'course_id': six.text_type(course_key)}
-        ),
-        'sale_validation_url': reverse('sale_validation', kwargs={'course_id': six.text_type(course_key)}),
-        'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': six.text_type(course_key)}),
-        'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': six.text_type(course_key)}),
-        'get_sale_records_url': reverse('get_sale_records', kwargs={'course_id': six.text_type(course_key)}),
-        'get_sale_order_records_url': reverse(
-            'get_sale_order_records',
-            kwargs={'course_id': six.text_type(course_key)}
-        ),
-        'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': six.text_type(course_key)}),
-        'get_registration_code_csv_url': reverse(
-            'get_registration_codes',
-            kwargs={'course_id': six.text_type(course_key)}
-        ),
-        'generate_registration_code_csv_url': reverse(
-            'generate_registration_codes',
-            kwargs={'course_id': six.text_type(course_key)}
-        ),
-        'active_registration_code_csv_url': reverse(
-            'active_registration_codes',
-            kwargs={'course_id': six.text_type(course_key)}
-        ),
-        'spent_registration_code_csv_url': reverse(
-            'spent_registration_codes',
-            kwargs={'course_id': six.text_type(course_key)}
-        ),
-        'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': six.text_type(course_key)}),
-        'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': six.text_type(course_key)}),
-        'enrollment_report_url': reverse('get_enrollment_report', kwargs={'course_id': six.text_type(course_key)}),
-        'list_financial_report_downloads_url': reverse(
-            'list_financial_report_downloads',
-            kwargs={'course_id': six.text_type(course_key)}
-        ),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': six.text_type(course_key)}),
-        'look_up_registration_code': reverse(
-            'look_up_registration_code',
-            kwargs={'course_id': six.text_type(course_key)}
-        ),
-        'coupons': coupons,
-        'sales_admin': access['sales_admin'],
-        'coupons_enabled': coupons_enabled,
-        'reports_enabled': reports_enabled,
-        'course_price': course_price,
-        'total_amount': total_amount,
-        'is_ecommerce_course': is_ecommerce_course(course_key)
-    }
-    return section_data
-
 
 def _section_special_exams(course, access):
     """ Provide data for the corresponding dashboard section """
@@ -604,20 +525,10 @@ def _section_discussions_management(course, access):
     return section_data
 
 
-def _is_small_course(course_key):
-    """ Compares against MAX_ENROLLMENT_INSTR_BUTTONS to determine if course enrollment is considered small. """
-    is_small_course = False
-    enrollment_count = CourseEnrollment.objects.num_enrolled_in(course_key)
-    max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    if max_enrollment_for_buttons is not None:
-        is_small_course = enrollment_count <= max_enrollment_for_buttons
-    return is_small_course
-
-
 def _section_student_admin(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
-    is_small_course = _is_small_course(course_key)
+    is_small_course = CourseEnrollment.objects.is_small_course(course_key)
 
     section_data = {
         'section_key': 'student_admin',

@@ -33,8 +33,6 @@ from lms.djangoapps.instructor_analytics.basic import (
     get_response_state,
     list_may_enroll,
     list_problem_responses,
-    sale_order_record_features,
-    sale_record_features
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed

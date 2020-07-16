@@ -1056,37 +1056,6 @@ def get_grading_config(request, course_id):
     return JsonResponse(response_payload)
 
 
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-def get_sale_records(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
-    """
-    return the summary of all sales records for a particular course
-    """
-    course_id = CourseKey.from_string(course_id)
-    query_features = [
-        'company_name', 'company_contact_name', 'company_contact_email', 'total_codes', 'total_used_codes',
-        'total_amount', 'created', 'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by',
-        'internal_reference', 'invoice_number', 'codes', 'course_id'
-    ]
-
-    sale_data = instructor_analytics.basic.sale_record_features(course_id, query_features)
-
-    if not csv:
-        for item in sale_data:
-            item['created_by'] = item['created_by'].username
-
-        response_payload = {
-            'course_id': text_type(course_id),
-            'sale': sale_data,
-            'queried_features': query_features
-        }
-        return JsonResponse(response_payload)
-    else:
-        header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("e-commerce_sale_invoice_records.csv", header, datarows)
-
-
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -1341,25 +1310,6 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
         except (FileValidationException, ValueError) as e:
             raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'failed-validation')
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ENROLLMENT_REPORT)
-@require_finance_admin
-@common_exceptions_400
-def get_enrollment_report(request, course_id):
-    """
-    get the enrollment report for the particular course.
-    """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('detailed enrollment')
-    task_api.submit_detailed_enrollment_features_csv(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
-
-    return JsonResponse({"status": success_status})
 
 
 @transaction.non_atomic_requests
