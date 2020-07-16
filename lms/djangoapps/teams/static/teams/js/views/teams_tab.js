@@ -387,11 +387,12 @@
                             collection: collection,
                             showSortControls: options.showSortControls
                         }),
-                        searchFieldView = new SearchFieldView({
-                            type: 'teams',
-                            label: gettext('Search teams'),
-                            collection: collection
-                        }),
+                        searchFieldView = this.shouldShowSearch(topic) ?
+                            new SearchFieldView({
+                                type: 'teams',
+                                label: gettext('Search teams'),
+                                collection: collection
+                            }) : null,
                         viewWithHeader = this.createViewWithHeader({
                             subject: topic,
                             mainView: teamsView,
@@ -502,6 +503,13 @@
 
                 shouldSeeBrowseTab: function() {
                     return this.context.hasOpenTopic || this.context.hasPublicManagedTopic;
+                },
+
+                shouldShowSearch: function(topic) {
+                    if (topic && topic.get('type') === 'private_managed') {
+                        return this.context.userInfo.privileged || this.context.userInfo.staff;
+                    }
+                    return true;
                 },
 
                 getTeamsTabViewDescription: function() {

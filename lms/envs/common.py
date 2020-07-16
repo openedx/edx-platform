@@ -100,11 +100,6 @@ FEATURES = {
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
-    # settings for forums/discussions to on/off daily digest feature. Set this to True if you want to
-    # enable the UI for the users to subscribe and unsubscribe for daily digest. This setting is the
-    # part of deprecation of daily digest in production.
-    'ENABLE_FORUM_DAILY_DIGEST': True,
-
     # Set this to True if you want the discussion digest emails enabled automatically for new users.
     # This will be set on all new account registrations.
     # It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled, since
@@ -2571,6 +2566,8 @@ INSTALLED_APPS = [
 
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
+
+    'ratelimitbackend',
 ]
 
 ######################### CSRF #########################################
