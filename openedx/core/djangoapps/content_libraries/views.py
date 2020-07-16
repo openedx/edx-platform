@@ -97,16 +97,35 @@ class LibraryRootView(APIView):
                 int,
                 description="Page size of the result. Defaults to 50",
             ),
+            apidocs.query_parameter(
+                'org',
+                str,
+                description="The organization short-name used to filter libraries",
+            ),
+            apidocs.query_parameter(
+                'text_search',
+                str,
+                description="The string used to filter libraries by searching in title, id, org, or description",
+            ),
         ],
     )
     def get(self, request):
         """
         Return a list of all content libraries that the user has permission to view.
         """
+        org = request.query_params.get('org', None)
+        text_search = request.query_params.get('text_search', None)
+
         paginator = LibraryRootPagination()
-        queryset = api.get_libraries_for_user(request.user)
-        paginated_qs = paginator.paginate_queryset(queryset, request)
-        result = api.get_metadata_from_index(paginated_qs)
+        queryset = api.get_libraries_for_user(request.user, org=org)
+        if text_search:
+            result = api.get_metadata_from_index(queryset, text_search=text_search)
+            result = paginator.paginate_queryset(result, request)
+        else:
+            # We can paginate queryset early and prevent fetching unneeded metadata
+            paginated_qs = paginator.paginate_queryset(queryset, request)
+            result = api.get_metadata_from_index(paginated_qs)
+
         serializer = ContentLibraryMetadataSerializer(result, many=True)
         # Verify `pagination` param to maintain compatibility with older
         # non pagination-aware clients

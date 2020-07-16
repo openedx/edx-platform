@@ -63,7 +63,7 @@ class ContentLibraryIndexerIndexer(ContentLibrariesRestApiTest):
             with self.assertRaises(LibraryNotIndexedException):
                 ContentLibraryIndexer.get_libraries([library_key])
 
-            call_command("reindex_content_library", all=True, quiet=True)
+            call_command("reindex_content_library", all=True, force=True)
 
             ContentLibraryIndexer.get_libraries([library_key])
 

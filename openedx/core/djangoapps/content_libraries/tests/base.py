@@ -124,10 +124,12 @@ class ContentLibrariesRestApiTest(APITestCase):
         yield
         self.client = old_client  # pylint: disable=attribute-defined-outside-init
 
-    def _create_library(self, slug, title, description="", expect_response=200):
+    def _create_library(self, slug, title, description="", org=None, expect_response=200):
         """ Create a library """
+        if org is None:
+            org = self.organization.short_name
         return self._api('post', URL_LIB_CREATE, {
-            "org": self.organization.short_name,
+            "org": org,
             "slug": slug,
             "title": title,
             "description": description,
