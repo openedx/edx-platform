@@ -475,6 +475,13 @@ class CourseFields(object):
         ),
         scope=Scope.settings
     )
+    canvas_course_id = Integer(
+        display_name=_("Canvas Course Id"),
+        help=_(
+            "The id for the corresponding course on Canvas"
+        ),
+        scope=Scope.settings
+    )
     enable_ccx = Boolean(
         # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
         # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for

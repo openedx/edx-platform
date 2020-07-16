@@ -1,0 +1,15 @@
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<section>
+
+    <p>
+        <input type="button" name="add-enrollments-using-canvas" value="Add and remove students to match canvas enrollments" data-endpoint="${ section_data['add_enrollments_using_canvas_url'] }" />
+    </p>
+  <hr>
+
+  <div id="errors" class="errors"></div>
+  <div id="results"></div>
+</section>

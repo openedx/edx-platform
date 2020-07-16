@@ -6,4 +6,4 @@ def plugin_settings(settings):
     settings.REMOTE_GRADEBOOK = {}
     settings.REMOTE_GRADEBOOK_USER = None
     settings.REMOTE_GRADEBOOK_PASSWORD = None
-    settings.FEATURES['ENABLE_INSTRUCTOR_REMOTE_GRADEBOOK_CONTROLS'] = False
+    settings.FEATURES['ENABLE_INSTRUCTOR_REMOTE_GRADEBOOK_CONTROLS'] = True
