@@ -113,7 +113,6 @@ edx-sga==0.11.0           # via -r requirements/edx/base.in
 edx-tincan-py35==0.0.9    # via edx-enterprise
 edx-user-state-client==1.2.0  # via -r requirements/edx/base.in
 edx-when==1.2.9           # via -r requirements/edx/base.in, edx-proctoring
-edxval==1.3.8             # via -r requirements/edx/base.in
 elasticsearch==1.9.0      # via edx-search
 enmerkar-underscore==1.0.0  # via -r requirements/edx/base.in
 enmerkar==0.7.1           # via enmerkar-underscore
@@ -252,4 +251,5 @@ zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requi
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
-git+https://github.com/edx/edx-submissions@bb2655eac65e625a71ece50fb28e0d1ab1ca249a#egg=edx-submissions==3.1.12  # via -r requirements/edx/base.txt
+git+https://github.com/edx/edx-submissions@bf967815812a74ccc82bc87d140e352e4850911e#egg=edx-submissions==3.1.12  # via -r requirements/edx/base.txt
+git+https://github.com/edx/edx-val@3bb7bba030e055a807d7d233055809a9926d2030#egg=edx-val==1.3.9  # via -r requirements/edx/base.txt
