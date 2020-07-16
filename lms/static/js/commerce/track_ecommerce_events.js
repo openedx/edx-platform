@@ -9,7 +9,6 @@
         var trackUpsellClick = function(elt, linkName, optionalAttrs) {
             var eventAttrs = {linkName: linkName};
             var allowedAttrs = ['linkType', 'pageName', 'linkCategory'];
-
             if (!window.analytics) {
                 return;
             }

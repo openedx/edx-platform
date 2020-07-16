@@ -192,15 +192,12 @@ from openedx.features.course_experience.course_tools import HttpMethod
 
 <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
 
-  var PLSUpgradeLink = $("#PLS_button");
+  var PLSUpgradeLink = $(".PLS_button");
 
-  function trackPLSUpgradeEvent() {
     TrackECommerceEvents.trackUpsellClick(PLSUpgradeLink, 'course_home_upgrade_shift_dates', {
       pageName: "course_home",
       linkType: "button",
       linkCategory: "PLS_button"
     });
-  }
-  PLSUpgradeLink.unbind('click.ecommerce_link').bind('click.ecommerce_link', trackPLSUpgradeEvent);
 
 </%static:require_module_async> 
