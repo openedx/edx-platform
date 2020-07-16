@@ -110,7 +110,7 @@ def set_discussion_toggle(value, xblock, user):
     is_block_with_discussion_enabled = (
         xblock.location.block_type in ["vertical", "sequential", "chapter", "course"]
     )
-    if not all([isinstance(value, bool), is_block_with_discussion_enabled]):
+    if not isinstance(value, bool) or not is_block_with_discussion_enabled:
         return
 
     if hasattr(xblock, "discussion_enabled"):
@@ -118,11 +118,7 @@ def set_discussion_toggle(value, xblock, user):
         _update_with_callback(xblock, user)
     else:
         for child in xblock.get_children():
-            if child.category in ["chapter", "sequential"]:
-                set_discussion_toggle(value, child, user)
-            elif hasattr(child, "discussion_enabled"):
-                child.discussion_enabled = value
-                _update_with_callback(child, user)
+            set_discussion_toggle(value, child, user)
 
 
 def _is_library_component_limit_reached(usage_key):
