@@ -354,3 +354,10 @@ def get_user_roles(username):
         user._roles = RoleCache(user)
     role_cache = user._roles
     return role_cache._roles
+
+
+def serialize_enrollments(enrollments):
+    """
+    Take CourseEnrollment objects and return them in a serialized list.
+    """
+    return CourseEnrollmentSerializer(enrollments, many=True).data
