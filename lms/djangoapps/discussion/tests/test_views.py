@@ -455,13 +455,14 @@ class AllowOneLessInt(int):
     """
 
     def __init__(self, value):
-        self.value = value
+        super().__init__()
+        self.values = (value, value - 1) 
 
     def __eq__(self, other):
-        return other == self.value or other == self.value - 1
+        return other in self.values
 
     def __repr__(self):
-        return "{} or {}".format(self.value, self.value - 1)
+        return "{} or {}".format(*self.values)
 
 
 @ddt.ddt
