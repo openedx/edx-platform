@@ -27,6 +27,7 @@ from openedx.core.djangolib.markup import HTML, Text
 <%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
 var upgradeLink = $("#track_sel_upgrade");
 
+function trackUpgradeEvent() {
   TrackECommerceEvents.trackUpsellClick(upgradeLink, 'track_selection', {
     pageName: "track_selection",
     linkType: "button",
