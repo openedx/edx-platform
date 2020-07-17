@@ -456,7 +456,7 @@ class AllowOneLessInt(int):
 
     def __init__(self, value):
         super().__init__()
-        self.values = (value, value - 1) 
+        self.values = (value, value - 1)
 
     def __eq__(self, other):
         return other in self.values
