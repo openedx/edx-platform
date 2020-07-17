@@ -18,6 +18,7 @@ from mock import patch
 from pytz import UTC
 from search.search_engine_base import SearchEngine
 from six.moves import range
+from xblock.core import XBlock
 
 from contentstore.courseware_index import (
     CourseAboutSearchIndexer,
@@ -53,6 +54,10 @@ from xmodule.modulestore.tests.utils import (
 from xmodule.partitions.partitions import UserPartition
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
+
+
+class NonIndexableXBlock(XBlock):
+    """XBlock for testing indexibility"""
 
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
@@ -348,6 +353,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 3)
 
+    @XBlock.register_temp_plugin(NonIndexableXBlock)
     def _test_not_indexable(self, store):
         """ test not indexable items """
         # Publish the vertical to start with
@@ -359,7 +365,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         # Add a non-indexable item
         ItemFactory.create(
             parent_location=self.vertical.location,
-            category="openassessment",
+            category="nonindexablexblock",
             display_name="Some other content",
             publish_item=False,
             modulestore=store,
@@ -897,6 +903,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 1)
 
+    @XBlock.register_temp_plugin(NonIndexableXBlock)
     def _test_not_indexable(self, store):
         """ test not indexable items """
         self.reindex_library(store)
@@ -906,7 +913,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         # Add a non-indexable item
         ItemFactory.create(
             parent_location=self.library.location,
-            category="openassessment",
+            category="nonindexablexblock",
             display_name="Assessment",
             publish_item=False,
             modulestore=store,
