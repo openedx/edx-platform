@@ -20,7 +20,7 @@ from course_modes.models import CourseMode
 from edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.courses import check_course_access
+from lms.djangoapps.courseware.courses import check_course_access, get_course_by_id
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
@@ -99,6 +99,11 @@ class CoursewareMeta:
     def can_show_upgrade_sock(self):
         can_show = can_show_verified_upgrade(self.effective_user, self.enrollment_object)
         return can_show
+
+    @property
+    def license(self):
+        course = get_course_by_id(self.course_key)
+        return course.license
 
     @property
     def can_load_courseware(self):
