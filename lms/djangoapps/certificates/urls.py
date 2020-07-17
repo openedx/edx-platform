@@ -13,8 +13,8 @@ urlpatterns = [
     # Certificates HTML view end point to render web certs by user and course
     url(
         r'^user/(?P<user_id>[^/]*)/course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
-        views.render_html_view,
-        name='html_view'
+        views.render_unsupported_url_view,
+        name='unsupported_url_view'
     ),
 
     # Certificates HTML view end point to render web certs by certificate_uuid
