@@ -40,12 +40,6 @@ class CourseSearchView(CourseTabView):
         home_fragment_view = CourseSearchFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 
-    def uses_bootstrap(self, request, course, tab):
-        """
-        Always render this tab with bootstrap
-        """
-        return True
-
 
 class CourseSearchFragmentView(EdxFragmentView):
     """
