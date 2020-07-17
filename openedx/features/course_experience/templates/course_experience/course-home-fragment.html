@@ -194,6 +194,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
 
   var personalizedLearnerSchedulesLink = $(".personalized_learner_schedules_button");
   var fbeLink = $("#FBE_banner");
+  var welcomeLink = $("#welcome");
 
     TrackECommerceEvents.trackUpsellClick(personalizedLearnerSchedulesLink, 'course_home_upgrade_shift_dates', {
       pageName: "course_home",
@@ -201,11 +202,16 @@ from openedx.features.course_experience.course_tools import HttpMethod
       linkCategory: "personalized_learner_schedules"
     });
 
-  TrackECommerceEvents.trackUpsellClick(fbeLink, 'course_home_audit_access_expires', {
+    TrackECommerceEvents.trackUpsellClick(fbeLink, 'course_home_audit_access_expires', {
       pageName: "course_home",
       linkType: "link",
       linkCategory: "FBE_banner"
-  });
+    });
 
+    TrackECommerceEvents.trackUpsellClick(welcomeLink, 'course_home_welcome', {
+      pageName: "course_home",
+      linkType: "link",
+      linkCategory: "welcome"
+    });
 
 </%static:require_module_async>
