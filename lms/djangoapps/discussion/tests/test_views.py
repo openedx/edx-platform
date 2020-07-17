@@ -447,6 +447,23 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             )
 
 
+class AllowOneLessInt(int):
+    """
+    A workaround for the fact that assertNumQueries doesn't let you
+    specify a range or any tolerance. An 'int' that is 'equal to' its value,
+    but also its value -  1
+    """
+
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+        return other == self.value or other == self.value - 1
+
+    def __repr__(self):
+        return "{} or {}".format(self.value, self.value - 1)
+
+
 @ddt.ddt
 @patch('requests.request', autospec=True)
 class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
@@ -525,7 +542,9 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # Test uncached first, then cached now that the cache is warm.
         cached_calls = [
             [num_uncached_mongo_calls, num_uncached_sql_queries],
-            [num_cached_mongo_calls, num_cached_sql_queries],
+            # Sometimes there will be one fewer sql call than expected, because sometimes the call to
+            # CourseMode.modes_for_course gets cached and doesn't hit the DB. EDUCATOR-5167
+            [num_cached_mongo_calls, AllowOneLessInt(num_cached_sql_queries)],
         ]
         for expected_mongo_calls, expected_sql_queries in cached_calls:
             with self.assertNumQueries(expected_sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
