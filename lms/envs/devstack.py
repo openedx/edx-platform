@@ -360,6 +360,8 @@ MKTG_URLS = {
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
 }
 
+ENTERPRISE_LEARNER_PORTAL_BASE_URL = 'http://localhost:8734'
+
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
