@@ -12,7 +12,7 @@
             return Backbone.View.extend({
 
                 errorMessage: gettext('An error occurred. Try again.'),
-                alreadyTeamsetMemberMessage: gettext('You already belong to another team in this team set.'),
+                alreadyTeamsetMemberMessage: gettext('You already belong to another team in this team-set.'),
                 teamFullMessage: gettext('This team is full.'),
                 notJoinInstructorManagedTeam: gettext('Cannot join instructor managed team'),
 
