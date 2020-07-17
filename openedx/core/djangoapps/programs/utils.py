@@ -901,7 +901,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                     self.instructors.append(instructor)
 
 
-def is_user_enrolled_in_program_type(user, program_type, paid_modes=False):
+def is_user_enrolled_in_program_type(user, program_type, paid_modes=False, enrollments=None, entitlements=None):
     """
     This method will Look at the learners Enrollments and Entitlements to determine
     if a learner is enrolled in a Program of the given type.
@@ -931,12 +931,12 @@ def is_user_enrolled_in_program_type(user, program_type, paid_modes=False):
 
     # Check Entitlements first, because there will be less Course Entitlements than
     # Course Run Enrollments.
-    student_entitlements = get_active_entitlement_list_for_user(user)
+    student_entitlements = entitlements if entitlements is not None else get_active_entitlement_list_for_user(user)
     for entitlement in student_entitlements:
         if str(entitlement.course_uuid) in course_uuids:
             return True
 
-    student_enrollments = get_enrollments(user.username)
+    student_enrollments = enrollments if enrollments is not None else get_enrollments(user.username)
     for enrollment in student_enrollments:
         course_run_id = enrollment['course_details']['course_id']
         if paid_modes:
