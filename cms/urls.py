@@ -300,3 +300,8 @@ if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
 
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.CMS))
+
+# Contentstore
+urlpatterns += [
+    url(r'^api/contentstore/', include('cms.djangoapps.contentstore.rest_api.urls'))
+]
