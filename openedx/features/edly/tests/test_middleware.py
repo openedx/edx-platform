@@ -50,10 +50,9 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
                 settings.EDLY_USER_INFO_COOKIE_NAME: cookies._get_edly_user_info_cookie_string(self.request)
             }
         )
-
         response = self.client.get('/', follow=True)
         assert response.status_code == 200
-    
+
     @override_settings(FRONTEND_LOGOUT_URL=None)
     def test_user_without_edly_organization_access_and_without_frontend_logout_url(self):
         """
@@ -94,7 +93,6 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
 
         with LogCapture(LOGGER_NAME) as logger:
             response = self.client.get('/', follow=True)
-            
             logout_url = getattr(settings, 'FRONTEND_LOGOUT_URL', None)
             assert logout_url == '/logout'
 
@@ -122,6 +120,17 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
         Test logged in super user has access to all sites.
         """
         edly_user = EdlyUserFactory(is_superuser=True)
+        client = Client()
+        client.login(username=edly_user.username, password='test')
+
+        response = client.get('/', follow=True)
+        assert response.status_code == 200
+
+    def test_staff_has_all_sites_access(self):
+        """
+        Test logged in staff user has access to all sites.
+        """
+        edly_user = EdlyUserFactory(is_staff=True)
         client = Client()
         client.login(username=edly_user.username, password='test')
 
