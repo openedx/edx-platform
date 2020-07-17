@@ -89,18 +89,18 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         Process POST /auth/saml/v0/provider_config/ {postData}
         """
 
-        # Create the samlproviderconfig model first
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-
-        # Associate the enterprise customer with the provider
         customer_uuid = self.requested_enterprise_uuid
         try:
             enterprise_customer = EnterpriseCustomer.objects.get(pk=customer_uuid)
         except EnterpriseCustomer.DoesNotExist:
             raise ValidationError('Enterprise customer not found at uuid: {}'.format(customer_uuid))
 
+        # Create the samlproviderconfig model first
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # Associate the enterprise customer with the provider
         association_obj = EnterpriseCustomerIdentityProvider(
             enterprise_customer=enterprise_customer,
             provider_id=serializer.data['slug']

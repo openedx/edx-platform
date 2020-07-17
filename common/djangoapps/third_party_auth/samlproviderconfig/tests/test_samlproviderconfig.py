@@ -31,6 +31,7 @@ SINGLE_PROVIDER_CONFIG_2['name'] = 'name-of-config-2'
 SINGLE_PROVIDER_CONFIG_2['slug'] = 'test-slug-2'
 
 ENTERPRISE_ID = str(uuid4())
+ENTERPRISE_ID_NON_EXISTENT = str(uuid4())
 
 
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
@@ -97,16 +98,16 @@ class SAMLProviderConfigTests(APITestCase):
 
     def test_get_one_config_by_enterprise_uuid_not_found(self):
         """
-        GET auth/saml/v0/provider_config/?enterprise_customer_uuid=id=id
+        GET auth/saml/v0/provider_config/?enterprise_customer_uuid=valid-but-nonexistent-uuid
         """
         urlbase = reverse('saml_provider_config-list')
-        query_kwargs = {'enterprise_customer_uuid': 'abc-notfound'}
+        query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID_NON_EXISTENT}
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
         orig_count = SAMLProviderConfig.objects.count()
 
         response = self.client.get(url, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)
 
     def test_create_one_config(self):
@@ -126,7 +127,34 @@ class SAMLProviderConfigTests(APITestCase):
         self.assertEqual(provider_config.name, 'name-of-config-2')
 
         # check association has also been created
-        EnterpriseCustomerIdentityProvider.objects.get(provider_id=provider_config.slug)
+        self.assertTrue(
+            EnterpriseCustomerIdentityProvider.objects.filter(
+                provider_id=provider_config.slug
+            ).exists(),
+            'Cannot find EnterpriseCustomer-->SAMLProviderConfig association'
+        )
+
+    def test_create_one_config_fail_non_existent_enterprise_uuid(self):
+        """
+        POST auth/saml/v0/provider_config/ -d data
+        """
+        url = reverse('saml_provider_config-list')
+        data = copy.copy(SINGLE_PROVIDER_CONFIG_2)
+        data['enterprise_customer_uuid'] = ENTERPRISE_ID_NON_EXISTENT
+        orig_count = SAMLProviderConfig.objects.count()
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)
+
+        # check association has NOT been created
+        self.assertFalse(
+            EnterpriseCustomerIdentityProvider.objects.filter(
+                provider_id=SINGLE_PROVIDER_CONFIG_2['slug']
+            ).exists(),
+            'Did not expect to find EnterpriseCustomer-->SAMLProviderConfig association'
+        )
 
     def test_create_one_config_with_absent_enterprise_uuid(self):
         """
