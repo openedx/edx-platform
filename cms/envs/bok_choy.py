@@ -143,6 +143,7 @@ YOUTUBE['TEXT_API']['url'] = "{0}:{1}/test_transcripts_youtube/".format(YOUTUBE_
 
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
+FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 
 FEATURES['ORGANIZATIONS_APP'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"

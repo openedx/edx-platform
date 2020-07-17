@@ -254,8 +254,11 @@ FEATURES = {
     # Enable the courseware search functionality
     'ENABLE_COURSEWARE_INDEX': False,
 
-    # Enable content libraries search functionality
+    # Enable content libraries (modulestore) search functionality
     'ENABLE_LIBRARY_INDEX': False,
+
+    # Enable content libraries (blockstore) indexing
+    'ENABLE_CONTENT_LIBRARY_INDEX': False,
 
     # Enable course reruns, which will always use the split modulestore
     'ALLOW_COURSE_RERUNS': True,
