@@ -4,6 +4,7 @@ Tests for Blockstore-based Content Libraries
 """
 from contextlib import contextmanager
 from io import BytesIO
+from urllib.parse import urlencode
 import unittest
 
 from django.conf import settings
@@ -18,6 +19,7 @@ from openedx.core.lib import blockstore_api
 # backwards-incompatible changes like changed URLs.
 URL_PREFIX = '/api/libraries/v2/'
 URL_LIB_CREATE = URL_PREFIX
+URL_LIB_LIST = URL_PREFIX + '?{query_params}'
 URL_LIB_DETAIL = URL_PREFIX + '{lib_key}/'  # Get data about a library, update or delete library
 URL_LIB_BLOCK_TYPES = URL_LIB_DETAIL + 'block_types/'  # Get the list of XBlock types that can be added to this library
 URL_LIB_LINKS = URL_LIB_DETAIL + 'links/'  # Get the list of links in this library, or add a new one
@@ -131,6 +133,12 @@ class ContentLibrariesRestApiTest(APITestCase):
             "description": description,
             "collection_uuid": str(self.collection.uuid),
         }, expect_response)
+
+    def _list_libraries(self, query_params_dict=None, expect_response=200):
+        """ List libraries """
+        if query_params_dict is None:
+            query_params_dict = {}
+        return self._api('get', URL_LIB_LIST.format(query_params=urlencode(query_params_dict)), None, expect_response)
 
     def _get_library(self, lib_key, expect_response=200):
         """ Get a library """

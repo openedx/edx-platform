@@ -36,6 +36,7 @@ for these in most other learning contexts then those methods could be promoted
 to the core XBlock API and made generic.
 """
 from uuid import UUID
+from datetime import datetime
 import logging
 
 import attr
@@ -45,6 +46,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError
 from django.utils.translation import ugettext as _
+from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryLocatorV2, LibraryUsageLocatorV2
@@ -56,6 +58,7 @@ from xblock.exceptions import XBlockNotFoundError
 from openedx.core.djangoapps.content_libraries import permissions
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
+from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryNotIndexedException
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary, ContentLibraryPermission
 from openedx.core.djangoapps.content_libraries.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -90,6 +93,12 @@ log = logging.getLogger(__name__)
 ContentLibraryNotFound = ContentLibrary.DoesNotExist
 
 
+class ServerError(APIException):
+    """ A 500 server error """
+    status_code = 500
+    default_detail = "Error occurred in the server. Please contact support with details of this error"
+
+
 class ContentLibraryBlockNotFound(XBlockNotFoundError):
     """ XBlock not found in the content library """
 
@@ -121,7 +130,9 @@ class ContentLibraryMetadata:
     bundle_uuid = attr.ib(type=UUID)
     title = attr.ib("")
     description = attr.ib("")
+    num_blocks = attr.ib(0)
     version = attr.ib(0)
+    last_published = attr.ib(default=None, type=datetime)
     has_unpublished_changes = attr.ib(False)
     # has_unpublished_deletes will be true when the draft version of the library's bundle
     # contains deletes of any XBlocks that were in the most recently published version
@@ -214,16 +225,44 @@ class AccessLevel:
     NO_ACCESS = None
 
 
-def list_libraries_for_user(user):
+def get_libraries_for_user(user):
     """
-    Lists up to 50 content libraries that the user has permission to view.
-
-    This method makes at least one HTTP call per library so should only be used
-    for development until we have something more efficient.
+    Return content libraries that the user has permission to view.
     """
     qs = ContentLibrary.objects.all()
-    filtered_qs = permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
-    return [get_library(ref.library_key) for ref in filtered_qs[:50]]
+    return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
+
+
+def get_metadata_from_index(queryset):
+    """
+    Take a list of ContentLibrary objects and return metadata stored in
+    ContentLibraryIndex.
+    """
+    if not ContentLibraryIndexer.indexing_is_enabled():
+        raise NotImplementedError("Library indexing needs to be enabled for this API to work")
+    library_keys = [lib.library_key for lib in queryset]
+    try:
+        metadata = ContentLibraryIndexer.get_libraries(library_keys)
+        libraries = [
+            ContentLibraryMetadata(
+                key=key,
+                bundle_uuid=metadata[i]['uuid'],
+                title=metadata[i]['title'],
+                description=metadata[i]['description'],
+                num_blocks=metadata[i]['num_blocks'],
+                version=metadata[i]['version'],
+                last_published=metadata[i]['last_published'],
+                allow_public_learning=queryset[i].allow_public_learning,
+                allow_public_read=queryset[i].allow_public_read,
+                has_unpublished_changes=metadata[i]['has_unpublished_changes'],
+                has_unpublished_deletes=metadata[i]['has_unpublished_deletes'],
+            )
+            for i, key in enumerate(library_keys)
+        ]
+        return libraries
+    except (LibraryNotIndexedException, KeyError) as e:
+        log.exception(e)
+        raise ServerError("Libraries have missing or invalid indexes, and need to be updated.")
 
 
 def require_permission_for_library_key(library_key, user, permission):
@@ -253,13 +292,17 @@ def get_library(library_key):
     ref = ContentLibrary.objects.get_by_key(library_key)
     bundle_metadata = get_bundle(ref.bundle_uuid)
     lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
+    num_blocks = len(lib_bundle.get_top_level_usages())
+    last_published = lib_bundle.get_last_published_time()
     (has_unpublished_changes, has_unpublished_deletes) = lib_bundle.has_changes()
     return ContentLibraryMetadata(
         key=library_key,
         bundle_uuid=ref.bundle_uuid,
         title=bundle_metadata.title,
         description=bundle_metadata.description,
+        num_blocks=num_blocks,
         version=bundle_metadata.latest_version,
+        last_published=last_published,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
         has_unpublished_changes=has_unpublished_changes,
@@ -313,7 +356,9 @@ def create_library(collection_uuid, org, slug, title, description, allow_public_
         bundle_uuid=bundle.uuid,
         title=title,
         description=description,
+        num_blocks=0,
         version=0,
+        last_published=None,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
     )
