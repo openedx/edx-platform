@@ -248,14 +248,23 @@ def delete_draft(draft_uuid):
     api_request('delete', api_url('drafts', str(draft_uuid)))
 
 
+def get_bundle_version(bundle_uuid, version_number):
+    """
+    Get the details of the specified bundle version
+    """
+    if version_number == 0:
+        return None
+    version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
+    return api_request('get', version_url)
+
+
 def get_bundle_version_files(bundle_uuid, version_number):
     """
     Get a list of the files in the specified bundle version
     """
     if version_number == 0:
         return []
-    version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
-    version_info = api_request('get', version_url)
+    version_info = get_bundle_version(bundle_uuid, version_number)
     return [BundleFile(path=path, **file_metadata) for path, file_metadata in version_info["snapshot"]["files"].items()]
 
 
@@ -265,8 +274,7 @@ def get_bundle_version_links(bundle_uuid, version_number):
     """
     if version_number == 0:
         return {}
-    version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
-    version_info = api_request('get', version_url)
+    version_info = get_bundle_version(bundle_uuid, version_number)
     return {
         name: LinkDetails(
             name=name,

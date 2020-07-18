@@ -41,8 +41,9 @@ class ContentLibraryIndexerIndexer(ContentLibrariesRestApiTest):
             self.assertEqual(response['title'], result['title'])
             self.assertEqual(response['description'], result['description'])
             self.assertEqual(response['uuid'], result['bundle_uuid'])
-            self.assertEqual(response['version'], result['version'])
             self.assertEqual(response['num_blocks'], 0)
+            self.assertEqual(response['version'], result['version'])
+            self.assertEqual(response['last_published'], None)
             self.assertEqual(response['has_unpublished_changes'], False)
             self.assertEqual(response['has_unpublished_deletes'], False)
 
@@ -75,8 +76,9 @@ class ContentLibraryIndexerIndexer(ContentLibrariesRestApiTest):
         self.assertEqual(response['title'], "New Title")
         self.assertEqual(response['description'], "New Title")
         self.assertEqual(response['uuid'], lib['bundle_uuid'])
-        self.assertEqual(response['version'], lib['version'])
         self.assertEqual(response['num_blocks'], 0)
+        self.assertEqual(response['version'], lib['version'])
+        self.assertEqual(response['last_published'], None)
         self.assertEqual(response['has_unpublished_changes'], False)
         self.assertEqual(response['has_unpublished_deletes'], False)
 
@@ -92,10 +94,12 @@ class ContentLibraryIndexerIndexer(ContentLibrariesRestApiTest):
             """
             Commit library changes, and verify that there are no uncommited changes anymore
             """
+            last_published = ContentLibraryIndexer.get_libraries([library_key])[0]['last_published']
             self._commit_library_changes(str(library_key))
             response = ContentLibraryIndexer.get_libraries([library_key])[0]
             self.assertEqual(response['has_unpublished_changes'], False)
             self.assertEqual(response['has_unpublished_deletes'], False)
+            self.assertGreaterEqual(response['last_published'], last_published)
             return response
 
         def verify_uncommitted_libraries(library_key, has_unpublished_changes, has_unpublished_deletes):
@@ -113,6 +117,7 @@ class ContentLibraryIndexerIndexer(ContentLibrariesRestApiTest):
         # Verify uncommitted new blocks
         block = self._add_block_to_library(lib['id'], "problem", "problem1")
         response = verify_uncommitted_libraries(library_key, True, False)
+        self.assertEqual(response['last_published'], None)
         self.assertEqual(response['num_blocks'], 1)
         # Verify committed new blocks
         self._commit_library_changes(lib['id'])

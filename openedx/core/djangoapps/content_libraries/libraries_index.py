@@ -51,7 +51,11 @@ class ContentLibraryIndexer:
         for library_key in library_keys:
             ref = ContentLibrary.objects.get_by_key(library_key)
             lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
-            usages = lib_bundle.get_top_level_usages()
+            num_blocks = len(lib_bundle.get_top_level_usages())
+            last_published = lib_bundle.get_last_published_time()
+            last_published_str = None
+            if last_published:
+                last_published_str = last_published.strftime('%Y-%m-%dT%H:%M:%SZ')
             (has_unpublished_changes, has_unpublished_deletes) = lib_bundle.has_changes()
 
             bundle_metadata = get_bundle(ref.bundle_uuid)
@@ -61,8 +65,9 @@ class ContentLibraryIndexer:
                 "uuid": str(bundle_metadata.uuid),
                 "title": bundle_metadata.title,
                 "description": bundle_metadata.description,
+                "num_blocks": num_blocks,
                 "version": bundle_metadata.latest_version,
-                "num_blocks": len(usages),
+                "last_published": last_published_str,
                 "has_unpublished_changes": has_unpublished_changes,
                 "has_unpublished_deletes": has_unpublished_deletes,
             }
