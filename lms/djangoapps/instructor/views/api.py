@@ -2055,6 +2055,28 @@ def export_ora2_data(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.CAN_RESEARCH)
 @common_exceptions_400
+def export_ora2_submission_files(request, course_id):
+    """
+    Pushes a Celery task which will download and compress all submission
+    files (texts, attachments) into a zip archive.
+    """
+    course_key = CourseKey.from_string(course_id)
+
+    task_api.submit_export_ora2_submission_files(request, course_key)
+
+    return JsonResponse({
+        "status": _(
+            "Attachments archive is being created."
+        )
+    })
+
+
+@transaction.non_atomic_requests
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_course_permission(permissions.CAN_RESEARCH)
+@common_exceptions_400
 def calculate_grades_csv(request, course_id):
     """
     AlreadyRunningError is raised if the course's grades are already being updated.

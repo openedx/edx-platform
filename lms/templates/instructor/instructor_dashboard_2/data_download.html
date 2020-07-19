@@ -94,6 +94,11 @@ from openedx.core.djangolib.markup import HTML, Text
       <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/>
       <input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate ORA Data Report")}" data-endpoint="${ section_data['export_ora2_data_url'] }"/>
     </p>
+
+    <p>${_("Click to generate a ZIP file that contains all submission texts and attachments.")}</p>
+
+    <p><input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate Submission Files Archive")}" data-endpoint="${ section_data['export_ora2_submission_files_url'] }"/></p>
+
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
