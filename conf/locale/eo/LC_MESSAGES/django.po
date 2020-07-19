@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-12 20:50+0000\n"
-"PO-Revision-Date: 2020-07-12 20:50:33.766057\n"
+"POT-Creation-Date: 2020-07-19 20:50+0000\n"
+"PO-Revision-Date: 2020-07-19 20:50:09.722616\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -10288,9 +10288,9 @@ msgstr ""
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
-msgid "The user {username} is already a member of a team in this course."
+msgid "The user {username} is already a member of a team in this teamset."
 msgstr ""
-"Thé üsér {username} ïs älréädý ä mémßér öf ä téäm ïn thïs çöürsé. Ⱡ'σяєм "
+"Thé üsér {username} ïs älréädý ä mémßér öf ä téäm ïn thïs téämsét. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/teams/views.py
@@ -12026,6 +12026,12 @@ msgstr ""
 #: openedx/core/djangoapps/content/learning_sequences/apps.py
 msgid "Learning Sequences"
 msgstr "Léärnïng Séqüénçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: openedx/core/djangoapps/content_libraries/api.py
+msgid "Library cannot have more than {} XBlocks"
+msgstr ""
+"Lïßrärý çännöt hävé möré thän {} XBlöçks Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
@@ -13979,45 +13985,55 @@ msgid "Subscribe to calendar updates"
 msgstr "Süßsçrïßé tö çäléndär üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: openedx/features/calendar_sync/utils.py
-msgid "Stay on Track"
-msgstr "Stäý ön Träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+#, python-brace-format
+msgid "Sync {course} to your calendar"
+msgstr "Sýnç {course} tö ýöür çäléndär Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: openedx/features/calendar_sync/utils.py
 #, python-brace-format
 msgid ""
 "Sticking to a schedule is the best way to ensure that you successfully "
-"complete your self-paced course. This schedule of assignment due dates for "
-"{course} will help you stay on track!"
+"complete your self-paced course. This schedule for {course} will help you "
+"stay on track!"
 msgstr ""
 "Stïçkïng tö ä sçhédülé ïs thé ßést wäý tö énsüré thät ýöü süççéssfüllý "
-"çömplété ýöür sélf-päçéd çöürsé. Thïs sçhédülé öf ässïgnmént düé dätés för "
-"{course} wïll hélp ýöü stäý ön träçk! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"çömplété ýöür sélf-päçéd çöürsé. Thïs sçhédülé för {course} wïll hélp ýöü "
+"stäý ön träçk! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
+
+#: openedx/features/calendar_sync/utils.py
+msgid ""
+"Once you sync your course schedule to your calendar, any updates to the "
+"course from your instructor will be automatically reflected. You can remove "
+"the course from your calendar at any time."
+msgstr ""
+"Önçé ýöü sýnç ýöür çöürsé sçhédülé tö ýöür çäléndär, äný üpdätés tö thé "
+"çöürsé fröm ýöür ïnstrüçtör wïll ßé äütömätïçällý réfléçtéd. Ýöü çän rémövé "
+"thé çöürsé fröm ýöür çäléndär ät äný tïmé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
 "∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
 "υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
-" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη #"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρ#"
 
 #: openedx/features/calendar_sync/utils.py
 #, python-brace-format
-msgid "Updates for Your {course} Schedule"
+msgid "{course} dates have been updated on your calendar"
 msgstr ""
-"Ûpdätés för Ýöür {course} Sçhédülé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+"{course} dätés hävé ßéén üpdätéd ön ýöür çäléndär Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя #"
 
 #: openedx/features/calendar_sync/utils.py
-#, python-brace-format
 msgid ""
-"Your assignment due dates for {course} were recently adjusted. Update your "
-"calendar with your new schedule to ensure that you stay on track!"
+"You have successfully shifted your course schedule and your calendar is up "
+"to date."
 msgstr ""
-"Ýöür ässïgnmént düé dätés för {course} wéré réçéntlý ädjüstéd. Ûpdäté ýöür "
-"çäléndär wïth ýöür néw sçhédülé tö énsüré thät ýöü stäý ön träçk! Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
+"Ýöü hävé süççéssfüllý shïftéd ýöür çöürsé sçhédülé änd ýöür çäléndär ïs üp "
+"tö däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -14828,6 +14844,13 @@ msgid "File upload corrupted. Please try again"
 msgstr ""
 "Fïlé üplöäd çörrüptéd. Pléäsé trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
+"Lïßrärïés çännöt hävé möré thän {limit} çömpönénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -20930,6 +20953,11 @@ msgstr "Dïsçövér Néw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: lms/templates/navigation/navbar-authenticated.html
 msgid "Sysadmin"
 msgstr "Sýsädmïn Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/header/navbar-logo-header.html
+#: lms/templates/header/user_dropdown.html
+msgid "{name} Dashboard"
+msgstr "{name} Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
