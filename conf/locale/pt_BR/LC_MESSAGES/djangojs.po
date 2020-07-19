@@ -197,7 +197,7 @@
 # Renato Monteiro da Silva <renato_city@yahoo.com.br>, 2019
 # Sergio Silva <sergiohrs@gmail.com>, 2016
 # sgtmarciosilva <sgtmarciosilva@ibest.com.br>, 2015
-# Thiago Perrotta <tbperrotta@gmail.com>, 2016
+# 188a025320a00cf3a2eaedaf6504fd97_e837d7a <1f603a6e11897c650fffcb77c265c444_491793>, 2016
 # e05a6f0c527312287ac027cf3d3a35f5_685166c <0e3f187c36e42a887ffaef9a9e407417_190443>, 2014
 # Victor Hochgreb <victorfeec@gmail.com>, 2015
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
@@ -242,7 +242,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-12 20:42+0000\n"
+"POT-Creation-Date: 2020-07-19 20:42+0000\n"
 "PO-Revision-Date: 2020-06-14 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"

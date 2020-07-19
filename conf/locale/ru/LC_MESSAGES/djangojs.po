@@ -26,6 +26,7 @@
 # Евгений Козлов <eudjin@gmail.com>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Iaroslav V <yivasilev@fa.ru>, 2018
+# Irina Fedulova <istartlin@gmail.com>, 2020
 # Katerina <rosemaily@gmail.com>, 2014
 # Katerina <rosemaily@gmail.com>, 2014
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2018
@@ -85,6 +86,7 @@
 # Evgeniya <eugenia000@gmail.com>, 2013
 # Elena Freundorfer <e_freundorfer@gmx.de>, 2014
 # Evgeniya <eugenia000@gmail.com>, 2013
+# Irina Fedulova <istartlin@gmail.com>, 2020
 # Ivan Morozov <xmorozov@gmail.com>, 2019
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2017
 # Madina Kanlybaeva <madika.kanlybaeva@mail.ru>, 2016
@@ -130,6 +132,7 @@
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # SpaceOyster, 2016
+# Irina Fedulova <istartlin@gmail.com>, 2020
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2018
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
@@ -160,6 +163,7 @@
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # Eric Fischer <efischer@edx.org>, 2016
 # Iaroslav <danwill@ukr.net>, 2015
+# Irina Fedulova <istartlin@gmail.com>, 2020
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2017
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # mcha121 <mcha-12-1@bk.ru>, 2014
@@ -179,9 +183,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-12 20:42+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-07-19 20:42+0000\n"
+"PO-Revision-Date: 2020-07-14 21:10+0000\n"
+"Last-Translator: Irina Fedulova <istartlin@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"

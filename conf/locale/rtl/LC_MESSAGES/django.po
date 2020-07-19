@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-12 20:50+0000\n"
-"PO-Revision-Date: 2020-07-12 20:50:33.766057\n"
+"POT-Creation-Date: 2020-07-19 20:50+0000\n"
+"PO-Revision-Date: 2020-07-19 20:50:09.722616\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8866,8 +8866,8 @@ msgstr "غخع ذشر'ف تخهر شر هرسفقعذفخق وشرشلثي فث�
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
-msgid "The user {username} is already a member of a team in this course."
-msgstr "فاث عسثق {username} هس شمقثشيغ ش وثوزثق خب ش فثشو هر فاهس ذخعقسث."
+msgid "The user {username} is already a member of a team in this teamset."
+msgstr "فاث عسثق {username} هس شمقثشيغ ش وثوزثق خب ش فثشو هر فاهس فثشوسثف."
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
@@ -10417,6 +10417,10 @@ msgstr "ذخربهلعقشفهخر وشغ رخف زث سحثذهبهثي شف و
 #: openedx/core/djangoapps/content/learning_sequences/apps.py
 msgid "Learning Sequences"
 msgstr "مثشقرهرل سثضعثرذثس"
+
+#: openedx/core/djangoapps/content_libraries/api.py
+msgid "Library cannot have more than {} XBlocks"
+msgstr "مهزقشقغ ذشررخف اشدث وخقث فاشر {} طزمخذنس"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
@@ -12065,33 +12069,43 @@ msgid "Subscribe to calendar updates"
 msgstr "سعزسذقهزث فخ ذشمثريشق عحيشفثس"
 
 #: openedx/features/calendar_sync/utils.py
-msgid "Stay on Track"
-msgstr "سفشغ خر فقشذن"
+#, python-brace-format
+msgid "Sync {course} to your calendar"
+msgstr "سغرذ {course} فخ غخعق ذشمثريشق"
 
 #: openedx/features/calendar_sync/utils.py
 #, python-brace-format
 msgid ""
 "Sticking to a schedule is the best way to ensure that you successfully "
-"complete your self-paced course. This schedule of assignment due dates for "
-"{course} will help you stay on track!"
+"complete your self-paced course. This schedule for {course} will help you "
+"stay on track!"
 msgstr ""
 "سفهذنهرل فخ ش سذاثيعمث هس فاث زثسف صشغ فخ ثرسعقث فاشف غخع سعذذثسسبعممغ "
-"ذخوحمثفث غخعق سثمب-حشذثي ذخعقسث. فاهس سذاثيعمث خب شسسهلروثرف يعث يشفثس بخق "
-"{course} صهمم اثمح غخع سفشغ خر فقشذن!"
+"ذخوحمثفث غخعق سثمب-حشذثي ذخعقسث. فاهس سذاثيعمث بخق {course} صهمم اثمح غخع "
+"سفشغ خر فقشذن!"
 
 #: openedx/features/calendar_sync/utils.py
-#, python-brace-format
-msgid "Updates for Your {course} Schedule"
-msgstr "عحيشفثس بخق غخعق {course} سذاثيعمث"
-
-#: openedx/features/calendar_sync/utils.py
-#, python-brace-format
 msgid ""
-"Your assignment due dates for {course} were recently adjusted. Update your "
-"calendar with your new schedule to ensure that you stay on track!"
+"Once you sync your course schedule to your calendar, any updates to the "
+"course from your instructor will be automatically reflected. You can remove "
+"the course from your calendar at any time."
 msgstr ""
-"غخعق شسسهلروثرف يعث يشفثس بخق {course} صثقث قثذثرفمغ شيتعسفثي. عحيشفث غخعق "
-"ذشمثريشق صهفا غخعق رثص سذاثيعمث فخ ثرسعقث فاشف غخع سفشغ خر فقشذن!"
+"خرذث غخع سغرذ غخعق ذخعقسث سذاثيعمث فخ غخعق ذشمثريشق, شرغ عحيشفثس فخ فاث "
+"ذخعقسث بقخو غخعق هرسفقعذفخق صهمم زث شعفخوشفهذشممغ قثبمثذفثي. غخع ذشر قثوخدث "
+"فاث ذخعقسث بقخو غخعق ذشمثريشق شف شرغ فهوث."
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid "{course} dates have been updated on your calendar"
+msgstr "{course} يشفثس اشدث زثثر عحيشفثي خر غخعق ذشمثريشق"
+
+#: openedx/features/calendar_sync/utils.py
+msgid ""
+"You have successfully shifted your course schedule and your calendar is up "
+"to date."
+msgstr ""
+"غخع اشدث سعذذثسسبعممغ ساهبفثي غخعق ذخعقسث سذاثيعمث شري غخعق ذشمثريشق هس عح "
+"فخ يشفث."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -12794,6 +12808,11 @@ msgstr "سعزسثذفهخر"
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
 msgstr "بهمث عحمخشي ذخققعحفثي. حمثشسث فقغ شلشهر"
+
+#: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr "مهزقشقهثس ذشررخف اشدث وخقث فاشر {limit} ذخوحخرثرفس"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -18237,6 +18256,11 @@ msgstr "يهسذخدثق رثص"
 #: lms/templates/navigation/navbar-authenticated.html
 msgid "Sysadmin"
 msgstr "سغسشيوهر"
+
+#: lms/templates/header/navbar-logo-header.html
+#: lms/templates/header/user_dropdown.html
+msgid "{name} Dashboard"
+msgstr "{name} يشسازخشقي"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
