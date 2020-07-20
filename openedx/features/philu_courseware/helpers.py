@@ -2,8 +2,16 @@ from logging import getLogger
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from rest_framework.exceptions import APIException
+from rest_framework import serializers
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+from courseware.models import StudentModule
+from lms.djangoapps.instructor import enrollment
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.django.models import CourseKey, UsageKey
+from submissions.api import SubmissionError
 from xmodule.modulestore.django import modulestore
 from .models import CompetencyAssessmentRecord
 from . import constants
@@ -116,3 +124,33 @@ def is_post_assessment(section):
 
 def get_section_format(section):
     return section.format.lower() if section and section.format else ''
+
+
+def validate_problem_id(problem_id):
+    """
+    validate if problem_id is valid UsageKeyField or not
+    """
+    if not problem_id:
+        raise serializers.ValidationError(_('Problem id is required'))
+    try:
+        return UsageKey.from_string(problem_id)
+    except InvalidKeyError:
+        raise serializers.ValidationError(constants.INVALID_PROBLEM_ID_MSG)
+
+
+def revert_user_attempts_from_edx(course_id, user, problem_usage_key):
+    course_id = CourseKey.from_string(course_id)
+    module_state_key = problem_usage_key.map_into_course(course_id)
+    try:
+        enrollment.reset_student_attempts(
+            course_id,
+            user,
+            module_state_key,
+            requesting_user=user,
+            delete_module=True
+        )
+    except StudentModule.DoesNotExist:
+        raise serializers.ValidationError(_('Module does not exist.'))
+    except SubmissionError:
+        # Trust the submissions API to log the error
+        raise APIException(_('An error occurred while deleting the score.'))

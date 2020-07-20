@@ -1,9 +1,6 @@
 from rest_framework import serializers
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.django.models import UsageKey
-
-from .constants import INVALID_PROBLEM_ID_MSG
+from .helpers import validate_problem_id
 from .models import CompetencyAssessmentRecord
 
 
@@ -14,10 +11,7 @@ class CompetencyAssessmentRecordSerializer(serializers.ModelSerializer):
         """
         validate if problem_id is valid UsageKeyField or not
         """
-        try:
-            return UsageKey.from_string(problem_id)
-        except InvalidKeyError:
-            raise serializers.ValidationError(INVALID_PROBLEM_ID_MSG)
+        return validate_problem_id(problem_id)
 
     class Meta:
         model = CompetencyAssessmentRecord
