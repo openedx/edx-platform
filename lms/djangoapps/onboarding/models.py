@@ -384,57 +384,6 @@ class UserExtendedProfile(TimeStampedModel):
 
     SURVEYS_LIST = ["user_info", "interests", "organization", "org_detail_survey"]
 
-    FUNCTIONS_LABELS = {
-        "0=function_strategy_planning": "Strategy and planning",
-        "1=function_leadership_governance": "Leadership and governance",
-        "2=function_program_design": "Program design and development",
-        "3=function_measurement_eval": "Measurement, evaluation, and learning",
-        "4=function_stakeholder_engagement": "External relations and partnerships",
-        "5=function_human_resource": "Human resource management",
-        "6=function_financial_management": "Financial management",
-        "7=function_fundraising": "Fundraising and resource mobilization",
-        "8=function_marketing_communication": "Marketing, communications, and PR",
-        "9=function_system_tools": "Systems, tools, and processes",
-    }
-
-    INTERESTS_LABELS = {
-        "0=interest_strategy_planning": "Strategy and planning",
-        "1=interest_leadership_governance": "Leadership and governance",
-        "2=interest_program_design": "Program design and development",
-        "3=interest_measurement_eval": "Measurement, evaluation, and learning",
-        "4=interest_stakeholder_engagement": "External relations and partnerships",
-        "5=interest_human_resource": "Human resource management",
-        "6=interest_financial_management": "Financial management",
-        "7=interest_fundraising": "Fundraising and resource mobilization",
-        "8=interest_marketing_communication": "Marketing, communications, and PR",
-        "9=interest_system_tools": "Systems, tools, and processes",
-    }
-
-    INTERESTED_LEARNERS_LABELS = {
-        "0=learners_same_region": "Learners from my region or country",
-        "1=learners_similar_oe_interest": "Learners interested in same areas of organization effectiveness",
-        "2=learners_similar_org": "Learners working for similar organizations",
-        "3=learners_diff_who_are_different": "Learners who are different from me"
-    }
-
-    GOALS_LABELS = {
-        "0=goal_contribute_to_org": "Help improve my organization",
-        "1=goal_gain_new_skill": "Develop new skills",
-        "2=goal_improve_job_prospect": "Get a job",
-        "3=goal_relation_with_other": "Build relationships with other nonprofit leaders"
-    }
-
-    HEAR_ABOUT_PHILANTHROPY_LABELS = {
-        "0=hear_about_philanthropy_partner": "A Philanthropy University Partner (Global Giving, +Acumen or another)",
-        "1=hear_about_colleague_same_organization": "A Colleague From My Organization",
-        "2=hear_about_friend_new_organization": "A Friend Or Colleague (Not From My Organization)",
-        "3=hear_about_interest_search": "An Internet Search",
-        "4=hear_about_linkedIn_advertisement": "A LinkedIn Advertisement",
-        "5=hear_about_facebook_advertisement": "A Facebook Advertisement",
-        "6=hear_about_twitter_not_colleague": "Twitter (Not From A Colleague)",
-        "7=hear_about_other": "Other"
-    }
-
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='extended_profile')
     organization = models.ForeignKey(Organization, related_name='extended_profile', blank=True, null=True,
                                      on_delete=models.SET_NULL)
@@ -446,66 +395,19 @@ class UserExtendedProfile(TimeStampedModel):
     role_in_org = models.CharField(max_length=10, null=True)
     hours_per_week = models.PositiveIntegerField("Typical Number of Hours Worked per Week*", default=0,
                                                  validators=[MaxValueValidator(168)], null=True)
-    hear_about_philanthropy = models.CharField(max_length=255, null=True, blank=True)
-    hear_about_philanthropy_other = models.CharField(max_length=255, default=None, null=True)
-
-    # User functions related fields
-    function_strategy_planning = models.SmallIntegerField(FUNCTIONS_LABELS["0=function_strategy_planning"], default=0)
-    function_leadership_governance = models.SmallIntegerField(FUNCTIONS_LABELS["1=function_leadership_governance"], default=0)
-    function_program_design = models.SmallIntegerField(FUNCTIONS_LABELS["2=function_program_design"], default=0)
-    function_measurement_eval = models.SmallIntegerField(FUNCTIONS_LABELS["3=function_measurement_eval"], default=0)
-    function_stakeholder_engagement = models.SmallIntegerField(FUNCTIONS_LABELS["4=function_stakeholder_engagement"], default=0)
-    function_human_resource = models.SmallIntegerField(FUNCTIONS_LABELS["5=function_human_resource"], default=0)
-    function_financial_management = models.SmallIntegerField(FUNCTIONS_LABELS["6=function_financial_management"], default=0)
-    function_fundraising = models.SmallIntegerField(FUNCTIONS_LABELS["7=function_fundraising"], default=0)
-    function_marketing_communication = models.SmallIntegerField(FUNCTIONS_LABELS["8=function_marketing_communication"], default=0)
-    function_system_tools = models.SmallIntegerField(FUNCTIONS_LABELS["9=function_system_tools"], default=0)
-
-    # User interests related fields
-    interest_strategy_planning = models.SmallIntegerField(INTERESTS_LABELS["0=interest_strategy_planning"], default=0)
-    interest_leadership_governance = models.SmallIntegerField(INTERESTS_LABELS["1=interest_leadership_governance"], default=0)
-    interest_program_design = models.SmallIntegerField(INTERESTS_LABELS["2=interest_program_design"], default=0)
-    interest_measurement_eval = models.SmallIntegerField(INTERESTS_LABELS["3=interest_measurement_eval"], default=0)
-    interest_stakeholder_engagement = models.SmallIntegerField(INTERESTS_LABELS["4=interest_stakeholder_engagement"], default=0)
-    interest_human_resource = models.SmallIntegerField(INTERESTS_LABELS["5=interest_human_resource"], default=0)
-    interest_financial_management = models.SmallIntegerField(INTERESTS_LABELS["6=interest_financial_management"], default=0)
-    interest_fundraising = models.SmallIntegerField(INTERESTS_LABELS["7=interest_fundraising"], default=0)
-    interest_marketing_communication = models.SmallIntegerField(INTERESTS_LABELS["8=interest_marketing_communication"], default=0)
-    interest_system_tools = models.SmallIntegerField(INTERESTS_LABELS["9=interest_system_tools"], default=0)
-
-    # Learners related field
-    learners_same_region = models.SmallIntegerField(INTERESTED_LEARNERS_LABELS["0=learners_same_region"],
-                                                    default=0)
-    learners_similar_oe_interest = models.SmallIntegerField(INTERESTED_LEARNERS_LABELS["1=learners_similar_oe_interest"],
-                                                            default=0)
-    learners_similar_org = models.SmallIntegerField(INTERESTED_LEARNERS_LABELS["2=learners_similar_org"], default=0)
-    learners_diff_who_are_different = models.SmallIntegerField(
-        INTERESTED_LEARNERS_LABELS["3=learners_diff_who_are_different"], default=0)
-
-    # User goals related fields
-    goal_contribute_to_org = models.SmallIntegerField(GOALS_LABELS["0=goal_contribute_to_org"], default=0)
-    goal_gain_new_skill = models.SmallIntegerField(GOALS_LABELS["1=goal_gain_new_skill"], default=0)
-    goal_improve_job_prospect = models.SmallIntegerField(GOALS_LABELS["2=goal_improve_job_prospect"], default=0)
-    goal_relation_with_other = models.SmallIntegerField(GOALS_LABELS["3=goal_relation_with_other"], default=0)
 
     is_interests_data_submitted = models.BooleanField(default=False)
     is_organization_metrics_submitted = models.BooleanField(default=False)
     is_first_learner = models.BooleanField(default=False)
     is_alquity_user = models.BooleanField(default=False)
 
-    # TODO: Populate this newly added field by performing ETL on existing fields hear_about_philanthropy and
-    #  hear_about_philanthropy_other
     hear_about_philanthropyu = MultiSelectWithOtherField(choices=choices.HEAR_ABOUT_PHILANTHROPY,
                                                          other_max_length=255,
                                                          max_choices=1,
                                                          blank=True)
-    # TODO: Populate this newly added field by performing ETL on all existing functions related fields
     function_areas = MultiSelectField(choices=choices.FUNCTIONS, blank=True)
-    # TODO: Populate this newly added field by performing ETL on all existing interests related fields
     interests = MultiSelectField(choices=choices.INTERESTS, blank=True)
-    # TODO: Populate this newly added field by performing ETL on all existing learners related fields
     learners_related = MultiSelectField(choices=choices.INTERESTED_LEARNERS, blank=True)
-    # TODO: Populate this newly added field by performing ETL on all existing goals related fields
     goals = MultiSelectField(choices=choices.GOALS, blank=True)
 
     def __str__(self):
