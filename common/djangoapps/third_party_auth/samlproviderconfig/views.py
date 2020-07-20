@@ -5,11 +5,12 @@ Viewset for auth/saml/v0/samlproviderconfig
 from django.shortcuts import get_object_or_404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, status
+from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.exceptions import ParseError
+from rest_framework.exceptions import ParseError, ValidationError
 
-from enterprise.models import EnterpriseCustomerIdentityProvider
+from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer
 from third_party_auth.utils import validate_uuid4_string
 
 from ..models import SAMLProviderConfig
@@ -56,7 +57,7 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
             EnterpriseCustomerIdentityProvider,
             enterprise_customer__uuid=self.requested_enterprise_uuid
         )
-        return SAMLProviderConfig.objects.filter(pk=enterprise_customer_idp.provider_id)
+        return SAMLProviderConfig.objects.filter(slug=enterprise_customer_idp.provider_id)
 
     @property
     def requested_enterprise_uuid(self):
@@ -82,3 +83,29 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         can access these endpoints, we have to sort out the operator role use case
         """
         return self.requested_enterprise_uuid
+
+    def create(self, request, *args, **kwargs):
+        """
+        Process POST /auth/saml/v0/provider_config/ {postData}
+        """
+
+        customer_uuid = self.requested_enterprise_uuid
+        try:
+            enterprise_customer = EnterpriseCustomer.objects.get(pk=customer_uuid)
+        except EnterpriseCustomer.DoesNotExist:
+            raise ValidationError('Enterprise customer not found at uuid: {}'.format(customer_uuid))
+
+        # Create the samlproviderconfig model first
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # Associate the enterprise customer with the provider
+        association_obj = EnterpriseCustomerIdentityProvider(
+            enterprise_customer=enterprise_customer,
+            provider_id=serializer.data['slug']
+        )
+        association_obj.save()
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
