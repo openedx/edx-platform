@@ -663,7 +663,12 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 iteminfo['href'] = context.get('item_url', '').format(usage_key=usage_id)
             if is_user_authenticated:
                 if item.location.block_type == 'vertical' and completion_service:
-                    iteminfo['complete'] = completion_service.vertical_is_complete(item)
+                    try:
+                        is_complete = completion_service.vertical_is_complete(item)
+                    except AttributeError as error:
+                        log.exception('Unable to determine vertical completion status')
+                        is_complete = False
+                    iteminfo['complete'] = is_complete
 
             contents.append(iteminfo)
 
