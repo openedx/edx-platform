@@ -96,7 +96,7 @@ class MultiSelectWithOtherField(MultiSelectField):
                 choices_before_and_after_delimiter = value.split(self.other_delimiter)
                 selected_choices = [choice for choice in choices_before_and_after_delimiter[0].split(',')
                                     if choice.strip()]
-                if len(choices_before_and_after_delimiter) > 1:
+                if len(choices_before_and_after_delimiter) > 1 and choices_before_and_after_delimiter[1].strip():
                     selected_choices.append(choices_before_and_after_delimiter[1])
                 return OtherMultiSelectFieldList(choices, selected_choices)
             elif isinstance(value, (set, dict)):
