@@ -105,7 +105,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
     other_key_factory = partial(DjangoKeyValueStore.Key, Scope.user_state, 2, location('usage_id'))  # user_id=2, not 1
     existing_field_name = "a_field"
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = '__all__'
 
     def setUp(self):
         super(TestStudentModuleStorage, self).setUp()
@@ -230,7 +230,7 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
 
 class TestMissingStudentModule(TestCase):
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = '__all__'
 
     def setUp(self):
         super(TestMissingStudentModule, self).setUp()

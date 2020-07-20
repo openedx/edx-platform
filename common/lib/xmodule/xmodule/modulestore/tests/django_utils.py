@@ -16,11 +16,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
 from six.moves import range
-
-from lms.djangoapps.courseware.tests.factories import StaffFactory
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData
-from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
-from openedx.core.lib.tempdir import mkdtemp_clean
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.contentstore.django import _CONTENTSTORE
@@ -28,6 +23,11 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.tests.factories import StaffFactory
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
+from openedx.core.lib.tempdir import mkdtemp_clean
 
 
 class CourseUserType(Enum):
@@ -486,7 +486,7 @@ class ModuleStoreTestCase(
     CREATE_USER = True
 
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = '__all__'
 
     @classmethod
     def setUpClass(cls):

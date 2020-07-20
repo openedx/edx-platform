@@ -57,7 +57,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     """
     __test__ = False
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = '__all__'
 
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None
