@@ -4,9 +4,8 @@ from django.conf.urls import url
 from .views import (
     competency_assessments_score_view,
     record_and_fetch_competency_assessment,
-    revert_user_post_assessment_attempts,
+    revert_user_post_assessment_attempts
 )
-
 
 urlpatterns = [
     url(r'^api/courses/courseware/(?P<chapter_id>[^/]*)/competency_assessments_score/$',

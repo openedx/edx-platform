@@ -3,17 +3,15 @@ Views to add features in courseware.
 """
 
 from django.utils.translation import ugettext as _
-
 from rest_framework import status
 from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.serializers import ValidationError
 
-from openedx.core.lib.api.view_utils import view_auth_classes
-
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from openedx.core.lib.api.view_utils import view_auth_classes
 
 from .constants import COMP_ASSESS_RECORD_SUCCESS_MSG
 from .helpers import get_competency_assessments_score, revert_user_attempts_from_edx, validate_problem_id

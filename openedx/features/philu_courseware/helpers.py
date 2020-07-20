@@ -3,18 +3,18 @@ from logging import getLogger
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from rest_framework.exceptions import APIException
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.django.models import CourseKey, UsageKey
 from rest_framework import serializers
-
+from rest_framework.exceptions import APIException
+from submissions.api import SubmissionError
 
 from courseware.models import StudentModule
 from lms.djangoapps.instructor import enrollment
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.django.models import CourseKey, UsageKey
-from submissions.api import SubmissionError
 from xmodule.modulestore.django import modulestore
-from .models import CompetencyAssessmentRecord
+
 from . import constants
+from .models import CompetencyAssessmentRecord
 
 log = getLogger(__name__)
 
