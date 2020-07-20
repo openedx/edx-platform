@@ -93,8 +93,11 @@ class MultiSelectWithOtherField(MultiSelectField):
             if isinstance(value, list):
                 return value
             elif isinstance(value, string_type):
-                choices_str = value.replace(self.other_delimiter, '')
-                selected_choices = [choice for choice in choices_str.split(',') if choice.strip()]
+                choices_before_and_after_delimiter = value.split(self.other_delimiter)
+                selected_choices = [choice for choice in choices_before_and_after_delimiter[0].split(',')
+                                    if choice.strip()]
+                if len(choices_before_and_after_delimiter) > 1:
+                    selected_choices.append(choices_before_and_after_delimiter[1])
                 return OtherMultiSelectFieldList(choices, selected_choices)
             elif isinstance(value, (set, dict)):
                 return MSFList(choices, list(value))
