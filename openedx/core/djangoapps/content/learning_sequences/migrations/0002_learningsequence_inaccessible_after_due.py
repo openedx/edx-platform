@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='coursesectionsequence',
+            model_name='learningsequence',
             name='inaccessible_after_due',
             field=models.BooleanField(default=False),
         ),

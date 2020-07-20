@@ -75,7 +75,7 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
         sequence_data = CourseLearningSequenceData(
             usage_key=sequence_model.usage_key,
             title=sequence_model.title,
-            inaccessible_after_due=sec_seq_model.inaccessible_after_due,
+            inaccessible_after_due=sequence_model.inaccessible_after_due,
             visibility=VisibilityData(
                 hide_from_toc=sec_seq_model.hide_from_toc,
                 visible_to_staff_only=sec_seq_model.visible_to_staff_only,
@@ -287,7 +287,10 @@ def _update_sequences(course_outline: CourseOutlineData, learning_context: Learn
             LearningSequence.objects.update_or_create(
                 learning_context=learning_context,
                 usage_key=sequence_data.usage_key,
-                defaults={'title': sequence_data.title}
+                defaults={
+                    'title': sequence_data.title,
+                    'inaccessible_after_due': sequence_data.inaccessible_after_due,
+                }
             )
     LearningSequence.objects \
         .filter(learning_context=learning_context) \
@@ -316,7 +319,6 @@ def _update_course_section_sequences(course_outline: CourseOutlineData, learning
                 sequence=sequence_models[sequence_data.usage_key],
                 defaults={
                     'ordering': ordering,
-                    'inaccessible_after_due': sequence_data.inaccessible_after_due,
                     'hide_from_toc': sequence_data.visibility.hide_from_toc,
                     'visible_to_staff_only': sequence_data.visibility.visible_to_staff_only,
                 },

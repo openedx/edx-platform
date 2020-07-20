@@ -89,6 +89,9 @@ class LearningSequence(TimeStampedModel):
     # 270 long, meaning we wouldn't be able to make it indexed anyway in InnoDB.
     title = models.CharField(max_length=1000)
 
+    # Make the sequence inaccessible from the outline after the due date has passed
+    inaccessible_after_due = models.BooleanField(null=False, default=False)
+
     # Separate field for when this Sequence's content was last changed?
     class Meta:
         unique_together = [
@@ -167,9 +170,6 @@ class CourseSectionSequence(CourseContentVisibilityMixin, TimeStampedModel):
     )
     section = models.ForeignKey(CourseSection, on_delete=models.CASCADE)
     sequence = models.ForeignKey(LearningSequence, on_delete=models.CASCADE)
-
-    # Make the sequence inaccessible from the outline after the due date has passed
-    inaccessible_after_due = models.BooleanField(null=False, default=False)
 
     # Ordering, starts with 0, but global for the course. So if you had 200
     # sequences across 20 sections, the numbering here would be 0-199.
