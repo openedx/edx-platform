@@ -41,11 +41,10 @@ class ContentTypeGateTransformer(BlockStructureTransformer):
         inside of it is content gated. `contains_gated_content` can then be used to indicate something
         in the blocks subtree is gated.
         """
-        if block_structure.get_xblock_field(block_key, 'contains_gated_content'):
-            return
-        block_structure.override_xblock_field(block_key, 'contains_gated_content', True)
-
         for parent_block_key in block_structure.get_parents(block_key):
+            if block_structure.get_xblock_field(parent_block_key, 'contains_gated_content'):
+                continue
+            block_structure.override_xblock_field(parent_block_key, 'contains_gated_content', True)
             self._set_contains_gated_content_on_parents(block_structure, parent_block_key)
 
     def transform(self, usage_info, block_structure):
