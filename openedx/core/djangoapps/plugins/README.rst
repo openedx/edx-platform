@@ -205,10 +205,13 @@ class::
                 # Configure Plugin Slots for each Project Type, as needed.
                 ProjectType.LMS: {
 
-                    # Key is the slot in the current Project Type that the app wants to inject
-                    # content into and the value is the function within the app that will return
-                    # rendered content. The function will be passed minimal context relevant to it.
-                    u'head-extra': u'my_app.slots_api.get_slot_content'
+                    # Specify the namespace in which the slot is to be applied
+                    u"namespace" : {
+                        # Key is the slot in the current Project Type that the app wants to inject
+                        # content into and the value is the function within the app that will return
+                        # rendered content. The function will be passed minimal context relevant to it.
+                        u'head-extra': u'my_app.slots_api.get_slot_content'
+                   }
                 }
             }
         }
@@ -252,7 +255,9 @@ OR use string constants when they cannot import from djangoapps.plugins::
 
             u'view_slots_config': {
                 u'lms.djangoapp': {
-                     u'head-extra': u'my_app.slots_api.get_head_extra_content'
+                     u'namespace': {
+                        u'head-extra': u'my_app.slots_api.get_head_extra_content'
+                     }
                 }
             }
         }

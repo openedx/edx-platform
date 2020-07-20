@@ -28,10 +28,15 @@ support this, we have decided:
   pluggable contexts.
 * The callable function should return direct HTML content as text that can be
   rendered on page.
-* Each view can whitelist what context data should be made available to all
-  plugins by adding it to the context itself in a list called `context_whitelist`.
-  This will need to be maintained across releases so should be kept to a bare
-  minimum.
+* Each view can provide an list of what context data should be made available to
+  all plugins by adding it to the context itself in a list called
+  `context_allow_list`. This will need to be maintained across releases so
+  should be kept to a bare minimum.
+* A plugin will need to specify the namespace in which that slot should be active.
+  Different views can be under different namespaces, such as:
+  - 'course_home'
+  - 'learner_dashboard'
+  - 'instructor_dashboard'
 * All templates/pages will support three slots:
    + ``head-extra``: This slot exists near the end of the header tag for each page
      and can be used to add scripts, metadata, stylesheets or other header content.
@@ -66,7 +71,9 @@ Inside of the AppConfig of your new plugin app, add a "slots_config" item like b
         plugin_app = {
             "slots_config": {
                 "lms.djangoapp":  {
-                    "body-initial": "my_app.slots_api.get_body_initial_content"
+                    "view_namespace": {
+                        "body-initial": "my_app.slots_api.get_body_initial_content"
+                    }
                 }
             }
         }
@@ -90,9 +97,12 @@ In the core (LMS / Studio)
 The view you wish to add slots to should have the following pieces enabled:
 
 * A constant defined inside the apps for the slot name.
-* The view can add an entry called `context_whitelist` to its context. This
+* Decorate the view with `@view_namespace("namespace")` to make it work with
+  slots in that namespace. (This  should be the very first decorator on that
+  view function).
+* The view can add an entry called `context_allow_list` to its context. This
   should either be equal to '*', or be a list of context entries that are
-  whitelisted to be passed to plugin slots. If omitted, only the current request
+  allowed to be passed to plugin slots. If omitted, only the current request
   and url are passed through.
 * The template can include a line like the following to declare a new slot.
 

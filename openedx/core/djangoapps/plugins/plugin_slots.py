@@ -11,10 +11,10 @@ from .plugin_contexts import get_plugins_view_context
 
 log = getLogger(__name__)
 
-COMMON_WHITELIST = ['request', 'current_url']
+COMMON_ALLOW_LIST = ['request', 'current_url']
 
 
-def get_content_for_slot(project_type: str, slot_namespace: str, slot_name: str, raw_context: Dict[str]) -> str:
+def get_content_for_slot(project_type: str, slot_namespace: str, slot_name: str, raw_context: Dict) -> str:
     """
     Returns a list of additional content for a view slot. Will check if any plugin apps
     have that view in their view_context_config, and if so will call their
@@ -28,17 +28,17 @@ def get_content_for_slot(project_type: str, slot_namespace: str, slot_name: str,
     aggregate_slot_content = u""
     slot_functions = _get_cached_slot_functions_for_view(project_type, slot_namespace, slot_name)
 
-    # Each view can pass the whitelisted part of the context, in the context itself.
-    context_whitelist = raw_context.get('context_whitelist', [])
-    if context_whitelist == '*':
-        whitelisted_context = raw_context
+    # Each view can pass the approved part of the context, in the context itself.
+    context_allow_list = raw_context.get('context_allow_list', [])
+    if context_allow_list == '*':
+        allowed_context = raw_context
     else:
-        # The request object is whitelisted by default, and always available.
-        context_whitelist.extend(COMMON_WHITELIST)
+        # The request object is allowed by default, and always available.
+        context_allow_list.extend(COMMON_ALLOW_LIST)
 
-        whitelisted_context = {
+        allowed_context = {
             key: raw_context.get(key)
-            for key in context_whitelist
+            for key in context_allow_list
         }
 
     for (slot_function, plugin_name) in slot_functions:
@@ -49,7 +49,7 @@ def get_content_for_slot(project_type: str, slot_namespace: str, slot_name: str,
                 plugin_name,
                 raw_context,
             )
-            context.update(whitelisted_context)
+            context.update(allowed_context)
             plugin_slot_content = slot_function(context)
             aggregate_slot_content += plugin_slot_content
 

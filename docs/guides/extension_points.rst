@@ -105,6 +105,7 @@ Here are the different integration points that python plugins can use:
      - A "Django app plugin" is a self-contained Django `Application`_ that can define models (MySQL tables), new REST APIs, signal listeners, asynchronous tasks, and more. Even some parts of the core platform are implemented as Django app plugins, for better separation of concerns (``announcements``, ``credentials``, ``grades``, etc.) Read the `Django app plugin documentation`_ to learn more.
 
        Plugins can also inject custom data into django template contexts, to affect standard pages delivered by the core platform. See `Plugin Contexts`_ to learn more.
+       Plugins can also inject content into specific extendable areas (such as the header, footer or body) in django templates, to affect standard pages delivered by the core platform. See `Plugin Slots`_ to learn more.
    * - Course tab (``openedx.course_tab``)
      - Hold, Stable
      - A course tab plugin adds a new tab shown to learners within a course. ``courseware``, ``course_info``, and ``discussion`` are examples of built-in tab plugins. Read the `course tabs documentation`_ to learn more.
@@ -134,6 +135,7 @@ Here are the different integration points that python plugins can use:
 .. _Application: https://docs.djangoproject.com/en/3.0/ref/applications/
 .. _Django app plugin documentation: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
 .. _Plugin Contexts: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/docs/decisions/0003-plugin-contexts.rst
+.. _Plugin Slots: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/docs/decisions/0004-plugin-slots.rst
 .. _course tabs documentation: https://openedx.atlassian.net/wiki/spaces/AC/pages/30965919/Adding+a+new+course+tab
 .. |course_tools.py| replace:: ``course_tools.py``
 .. _course_tools.py: https://github.com/edx/edx-platform/blob/master/openedx/features/course_experience/course_tools.py
