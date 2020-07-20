@@ -11,20 +11,20 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
+from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
-
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
-from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
-from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-
-from lms.djangoapps.course_blocks.api import get_course_blocks
-import lms.djangoapps.course_blocks.api as course_blocks_api
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from student.models import CourseEnrollment
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 
 
@@ -58,6 +58,7 @@ class OutlineTabView(RetrieveAPIView):
                     xBlock on the web LMS.
                 children: (list) If the block has child blocks, a list of IDs of
                     the child blocks.
+        handouts_html: (str) Raw HTML for the handouts section of the course info
 
     **Returns**
 
@@ -89,6 +90,15 @@ class OutlineTabView(RetrieveAPIView):
             reset_masquerade_data=True,
         )
 
+        enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
+        allow_anonymous = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
+        allow_public = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC
+        is_enrolled = enrollment and enrollment.is_active
+        is_staff = has_access(request.user, 'staff', course_key)
+
+        show_handouts = is_enrolled or is_staff or allow_public
+        handouts_html = get_course_info_section(request, request.user, course, 'handouts') if show_handouts else ''
+
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
         date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
 
@@ -101,7 +111,7 @@ class OutlineTabView(RetrieveAPIView):
             dates_tab_link = get_microfrontend_url(course_key=course.id, view_name='dates')
 
         transformers = BlockStructureTransformers()
-        transformers += course_blocks_api.get_course_block_access_transformers(request.user)
+        transformers += get_course_block_access_transformers(request.user)
         transformers += [
             BlocksAPITransformer(None, None, depth=3),
         ]
@@ -115,9 +125,10 @@ class OutlineTabView(RetrieveAPIView):
         }
 
         data = {
-            'course_tools': course_tools,
             'course_blocks': course_blocks,
+            'course_tools': course_tools,
             'dates_widget': dates_widget,
+            'handouts_html': handouts_html,
         }
         context = self.get_serializer_context()
         context['course_key'] = course_key
