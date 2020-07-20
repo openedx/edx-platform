@@ -93,6 +93,25 @@ class ProctoredExamSettingsView(APIView):
         serializer = ProctoredExamConfigurationSerializer(data)
 
         return Response(serializer.data)
+        
+    def post(self, request, course_id):
+        with modulestore().bulk_operations(course_key):
+            course_module = self._get_and_validate_course(course_id)
+
+            # validate data formats and update the course module.
+            is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
+                course_module,
+                request.json,
+                user=request.user,
+            )
+
+            if is_valid:
+                modulestore().update_item(course_module, self.request.user.id)
+                return Response(updated_data)
+            else:
+                # error
+
+
 
     def _get_and_validate_course(self, course_id):
         course_key = CourseKey.from_string(course_id)
