@@ -1551,7 +1551,7 @@ class NumericalResponse(LoncapaResponse):
                 id=xml.get('id')
             )
             if tolerance_xml:  # If it isn't an empty list...
-                self.tolerance = contextualize_text(tolerance_xml[0], context)
+                self.tolerance = contextualize_text(tolerance_xml[0].strip(), context)
 
     def get_staff_ans(self, answer):
         """
@@ -3057,7 +3057,7 @@ class FormulaResponse(LoncapaResponse):
             id=xml.get('id')
         )
         if tolerance_xml:  # If it isn't an empty list...
-            self.tolerance = contextualize_text(tolerance_xml[0], context)
+            self.tolerance = contextualize_text(tolerance_xml[0].strip(), context)
 
         types = xml.get('type')
         if types is None:
