@@ -54,15 +54,19 @@ from openedx.core.djangoapps.django_comment_common.utils import ThreadContext, s
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import EventTestMixin, UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 log = logging.getLogger(__name__)
 
@@ -441,6 +445,112 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
                 'This is a private discussion. You do not have permissions to view this discussion',
                 html
             )
+
+
+class AllowOneLessInt(int):
+    """
+    A workaround for the fact that assertNumQueries doesn't let you
+    specify a range or any tolerance. An 'int' that is 'equal to' its value,
+    but also its value -  1
+    """
+
+    def __init__(self, value):
+        super().__init__()
+        self.values = (value, value - 1)
+
+    def __eq__(self, other):
+        return other in self.values
+
+    def __repr__(self):
+        return "{} or {}".format(*self.values)
+
+
+@ddt.ddt
+@patch('requests.request', autospec=True)
+class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
+    """
+    Ensures the number of modulestore queries and number of sql queries are
+    independent of the number of responses retrieved for a given discussion thread.
+    """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+
+    @ddt.data(
+        # Old mongo with cache. There is an additional SQL query for old mongo
+        # because the first time that disabled_xblocks is queried is in call_single_thread,
+        # vs. the creation of the course (CourseFactory.create). The creation of the
+        # course is outside the context manager that is verifying the number of queries,
+        # and with split mongo, that method ends up querying disabled_xblocks (which is then
+        # cached and hence not queried as part of call_single_thread).
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 21, 7),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 21, 7),
+        # split mongo: 3 queries, regardless of thread response size.
+        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 21, 8),
+        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 21, 8),
+
+        # Enabling Enterprise integration should have no effect on the number of mongo queries made.
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 21, 7),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 21, 7),
+        # split mongo: 3 queries, regardless of thread response size.
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 21, 8),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 21, 8),
+    )
+    @ddt.unpack
+    def test_number_of_mongo_queries(
+            self,
+            default_store,
+            enterprise_enabled,
+            num_thread_responses,
+            num_uncached_mongo_calls,
+            num_cached_mongo_calls,
+            num_uncached_sql_queries,
+            num_cached_sql_queries,
+            mock_request
+    ):
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        with modulestore().default_store(default_store):
+            course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
+
+        student = UserFactory.create()
+        CourseEnrollmentFactory.create(user=student, course_id=course.id)
+
+        test_thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(
+            course=course, text="dummy content", thread_id=test_thread_id, num_thread_responses=num_thread_responses
+        )
+        request = RequestFactory().get(
+            "dummy_url",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = student
+
+        def call_single_thread():
+            """
+            Call single_thread and assert that it returns what we expect.
+            """
+            with patch.dict("django.conf.settings.FEATURES", dict(ENABLE_ENTERPRISE_INTEGRATION=enterprise_enabled)):
+                response = views.single_thread(
+                    request,
+                    text_type(course.id),
+                    "dummy_discussion_id",
+                    test_thread_id
+                )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                len(json.loads(response.content.decode('utf-8'))["content"]["children"]),
+                num_thread_responses
+            )
+
+        # Test uncached first, then cached now that the cache is warm.
+        cached_calls = [
+            [num_uncached_mongo_calls, num_uncached_sql_queries],
+            # Sometimes there will be one fewer sql call than expected, because sometimes the call to
+            # CourseMode.modes_for_course gets cached and doesn't hit the DB. EDUCATOR-5167
+            [num_cached_mongo_calls, AllowOneLessInt(num_cached_sql_queries)],
+        ]
+        for expected_mongo_calls, expected_sql_queries in cached_calls:
+            with self.assertNumQueries(expected_sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+                with check_mongo_calls(expected_mongo_calls):
+                    call_single_thread()
 
 
 @patch('requests.request', autospec=True)
