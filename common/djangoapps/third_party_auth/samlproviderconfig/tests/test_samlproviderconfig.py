@@ -100,6 +100,12 @@ class SAMLProviderConfigTests(APITestCase):
         """
         GET auth/saml/v0/provider_config/?enterprise_customer_uuid=valid-but-nonexistent-uuid
         """
+
+        # the user must actually be authorized for this enterprise
+        # since we are testing auth passes but association to samlproviderconfig is not found
+        set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, ENTERPRISE_ID_NON_EXISTENT)])
+        self.client.force_authenticate(user=self.user)
+
         urlbase = reverse('saml_provider_config-list')
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID_NON_EXISTENT}
         url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
@@ -107,7 +113,7 @@ class SAMLProviderConfigTests(APITestCase):
 
         response = self.client.get(url, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)
 
     def test_create_one_config(self):
