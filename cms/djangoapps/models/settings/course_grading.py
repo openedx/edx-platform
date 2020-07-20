@@ -12,7 +12,7 @@ from eventtracking import tracker
 from contentstore.signals.signals import GRADING_POLICY_CHANGED
 from track.event_transaction_utils import create_new_event_transaction_id
 from xmodule.modulestore.django import modulestore
-from .waffle import material_recompute_only
+from models.settings.waffle import material_recompute_only
 
 GRADING_POLICY_CHANGED_EVENT_TYPE = 'edx.grades.grading_policy_changed'
 
@@ -67,36 +67,11 @@ class CourseGradingModel(object):
         Decode the json into CourseGradingModel and save any changes. Returns the modified model.
         Probably not the usual path for updates as it's too coarse grained.
         """
-
-        if material_recompute_only(course_key):
-            return CourseGradingModel.update_from_json_selective(course_key, jsondict, user)
-        else:
-            descriptor = modulestore().get_course(course_key)
-
-            graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
-            descriptor.raw_grader = graders_parsed
-            descriptor.grade_cutoffs = jsondict['grade_cutoffs']
-
-            modulestore().update_item(descriptor, user.id)
-
-            CourseGradingModel.update_grace_period_from_json(course_key, jsondict['grace_period'], user)
-
-            CourseGradingModel.update_minimum_grade_credit_from_json(course_key, jsondict['minimum_grade_credit'], user)
-            _grading_event_and_signal(course_key, user.id)
-
-            return CourseGradingModel.fetch(course_key)
-
-    @staticmethod
-    def update_from_json_selective(course_key, jsondict, user):
-        """
-        New version that doesn't fire change events when only name or short name are changed.
-        Decode the json into CourseGradingModel and save any changes. Returns the modified model.
-        Probably not the usual path for updates as it's too coarse grained.
-        """
         descriptor = modulestore().get_course(course_key)
 
         graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
         fire_signal = CourseGradingModel.must_fire_grading_event_and_signal(
+            course_key,
             graders_parsed,
             descriptor,
             jsondict
@@ -115,7 +90,36 @@ class CourseGradingModel(object):
         return CourseGradingModel.fetch(course_key)
 
     @staticmethod
-    def must_fire_grading_event_and_signal(proposed_grader_settings, course_from_module_store, jsondict):
+    def update_from_json_selective(course_key, jsondict, user):
+        """
+        New version that doesn't fire change events when only name or short name are changed.
+        Decode the json into CourseGradingModel and save any changes. Returns the modified model.
+        Probably not the usual path for updates as it's too coarse grained.
+        """
+        descriptor = modulestore().get_course(course_key)
+
+        graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
+        fire_signal = CourseGradingModel.must_fire_grading_event_and_signal(
+            course_key,
+            graders_parsed,
+            descriptor,
+            jsondict
+        )
+        descriptor.raw_grader = graders_parsed
+        descriptor.grade_cutoffs = jsondict['grade_cutoffs']
+
+        modulestore().update_item(descriptor, user.id)
+
+        CourseGradingModel.update_grace_period_from_json(course_key, jsondict['grace_period'], user)
+
+        CourseGradingModel.update_minimum_grade_credit_from_json(course_key, jsondict['minimum_grade_credit'], user)
+        if fire_signal:
+            _grading_event_and_signal(course_key, user.id)
+
+        return CourseGradingModel.fetch(course_key)
+
+    @staticmethod
+    def must_fire_grading_event_and_signal(course_key, proposed_grader_settings, course_from_modulestore, jsondict):
         """
         Detects if substantive enough changes were made to the proposed grader settings to warrant the firing of
         _grading_event_and_sngal
@@ -123,16 +127,39 @@ class CourseGradingModel(object):
             drop_count, weight, min_count
             An assignment type was added or removed
         """
-        if course_from_module_store.grade_cutoffs != jsondict['grade_cutoffs'] or \
-                len(proposed_grader_settings) != len(course_from_module_store.raw_grader):
+        if course_from_modulestore.grade_cutoffs != jsondict['grade_cutoffs'] or \
+                len(proposed_grader_settings) != len(course_from_modulestore.raw_grader):
             return True
 
         # because grading policy lists remain in the same order, we can do a single loop
-        for i in range(len(course_from_module_store.raw_grader)):
-            if course_from_module_store.raw_grader[i]['drop_count'] != proposed_grader_settings[i]['drop_count'] or \
-                    course_from_module_store.raw_grader[i]['weight'] != proposed_grader_settings[i]['weight'] or \
-                    course_from_module_store.raw_grader[i]['min_count'] != proposed_grader_settings[i]['min_count']:
+        for i in range(len(course_from_modulestore.raw_grader)):
+            if CourseGradingModel.must_fire_grading_event_and_signal_single_grader(
+                course_key,
+                proposed_grader_settings[i],
+                course_from_modulestore.raw_grader[i]
+            ):
                 return True
+        return False
+
+    @staticmethod
+    def must_fire_grading_event_and_signal_single_grader(
+        course_key,
+        proposed_grader_settings,
+        existing_grader_settings
+    ):
+        """
+        Detects changes in an individual grader vs an entire grading policy
+         Detects if substantive enough changes were made to the proposed grader settings to warrant the firing of
+        _grading_event_and_sngal
+        Substantive changes mean the following values were changed:
+            drop_count, weight, min_count
+        """
+        if not material_recompute_only(course_key):
+            return True
+        if existing_grader_settings['drop_count'] != proposed_grader_settings['drop_count'] or \
+                existing_grader_settings['weight'] != proposed_grader_settings['weight'] or \
+                existing_grader_settings['min_count'] != proposed_grader_settings['min_count']:
+            return True
         return False
 
     @staticmethod
@@ -147,13 +174,20 @@ class CourseGradingModel(object):
         index = int(grader.get('id', len(descriptor.raw_grader)))
         grader = CourseGradingModel.parse_grader(grader)
 
+        fire_signal = True
         if index < len(descriptor.raw_grader):
+            fire_signal = CourseGradingModel.must_fire_grading_event_and_signal_single_grader(
+                course_key,
+                grader,
+                descriptor.raw_grader[index]
+            )
             descriptor.raw_grader[index] = grader
         else:
             descriptor.raw_grader.append(grader)
 
         modulestore().update_item(descriptor, user.id)
-        _grading_event_and_signal(course_key, user.id)
+        if fire_signal:
+            _grading_event_and_signal(course_key, user.id)
 
         return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
 
