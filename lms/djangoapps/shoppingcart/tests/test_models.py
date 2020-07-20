@@ -286,9 +286,10 @@ class OrderTest(ModuleStoreTestCase):
                         'price': '40.00',
                         'id': 1,
                         'quantity': 1
-                    }
-                ]
+                    },
+                ],
             },
+            send_to_track=True, user=self.user
         )
 
     def test_purchase_item_failure(self):
@@ -889,6 +890,7 @@ class CertificateItemTest(ModuleStoreTestCase):
                     }
                 ]
             },
+            send_to_track=True, user=self.user
         )
 
     def test_existing_enrollment(self):

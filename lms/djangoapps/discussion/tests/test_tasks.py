@@ -329,4 +329,5 @@ class TaskTestCase(ModuleStoreTestCase):
                     user_id=context['thread_author_id'],
                     event_name='edx.bi.email.sent',
                     properties=test_props,
+                    send_to_track=True
                 )

@@ -2170,6 +2170,7 @@ class GenerateUserCertTests(ModuleStoreTestCase):
                     'category': 'certificates',
                     'label': unicode(self.course.id)
                 },
+                send_to_track=True, user=self.student
             )
             mock_tracker.reset_mock()
 
