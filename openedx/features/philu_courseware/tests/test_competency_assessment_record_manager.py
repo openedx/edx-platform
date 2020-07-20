@@ -1,8 +1,9 @@
 from django.test import TestCase
-
 from opaque_keys.edx.keys import UsageKey
+
 from openedx.features.philu_courseware.models import CompetencyAssessmentRecord
 from student.tests.factories import UserFactory
+
 from .factories import CompetencyAssessmentRecordFactory
 
 
