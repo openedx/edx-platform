@@ -131,14 +131,19 @@ def validate_problem_id(problem_id):
     validate if problem_id is valid UsageKeyField or not
     """
     if not problem_id:
-        raise serializers.ValidationError(_('Problem id is required'))
+        raise serializers.ValidationError({'problem_id': _('Problem id is required')})
     try:
         return UsageKey.from_string(problem_id)
     except InvalidKeyError:
-        raise serializers.ValidationError(constants.INVALID_PROBLEM_ID_MSG)
+        raise serializers.ValidationError({'problem_id': constants.INVALID_PROBLEM_ID_MSG})
 
 
 def revert_user_attempts_from_edx(course_id, user, problem_usage_key):
+    """
+    :param course_id: str course id of user
+    :param user: Django User
+    :param problem_usage_key: UsageKey problem id
+    """
     course_id = CourseKey.from_string(course_id)
     module_state_key = problem_usage_key.map_into_course(course_id)
     try:
