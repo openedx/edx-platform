@@ -104,4 +104,6 @@ class ProctoringExamSettingsGetTests(SharedModuleStoreTestCase, APITestCase):
         url = self.get_url(course_id)
         response = self.client.get(url)
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert response.data == 'Course with course_id {} does not exist.'.format(course_id)
+        assert response.data == {
+            'detail': 'Course with course_id {} does not exist.'.format(course_id)
+        }

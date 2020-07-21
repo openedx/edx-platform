@@ -3,6 +3,7 @@
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -157,9 +158,8 @@ class ProctoredExamSettingsView(APIView):
         course_module = get_course_and_check_access(course_key, user)
 
         if not course_module:
-            return Response(
-                'Course with course_id {} does not exist.'.format(course_id),
-                status=status.HTTP_404_NOT_FOUND
+            raise NotFound(
+                'Course with course_id {} does not exist.'.format(course_id)
             )
 
         return course_module
