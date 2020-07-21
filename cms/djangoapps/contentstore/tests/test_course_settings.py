@@ -26,6 +26,7 @@ from course_modes.models import CourseMode
 from models.settings.course_grading import GRADING_POLICY_CHANGED_EVENT_TYPE, CourseGradingModel, hash_grading_policy
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
+from models.settings.waffle import MATERIAL_RECOMPUTE_ONLY_FLAG
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -518,9 +519,9 @@ class CourseGradingTest(CourseTestCase):
         uuid.return_value = "mockUUID"
         self.course = CourseFactory.create(default_store=store)
         test_grader = CourseGradingModel.fetch(self.course.id)
+        # there should be no event raised after this call, since nothing got modified
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Noop update")
-        grading_policy_1 = self._grading_policy_hash_for_course()
         test_grader.graders[0]['weight'] = test_grader.graders[0].get('weight') * 2
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Weight[0] * 2")
@@ -548,10 +549,8 @@ class CourseGradingTest(CourseTestCase):
         # one for each of the calls to update_from_json()
         send_signal.assert_has_calls([
             # pylint: disable=line-too-long
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
             mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
             mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_3),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_4),
             mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_4),
             # pylint: enable=line-too-long
         ])
@@ -569,9 +568,85 @@ class CourseGradingTest(CourseTestCase):
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (
-                grading_policy_1, grading_policy_2, grading_policy_3, grading_policy_4, grading_policy_4
+                grading_policy_2, grading_policy_3, grading_policy_4
             )
         ])
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_must_fire_grading_event_and_signal_multiple_type(self, store):
+        """
+        Verifies that 'must_fire_grading_event_and_signal' ignores (returns False) if we modify
+        short_label and or name
+        use test_must_fire_grading_event_and_signal_multiple_type_2_split to run this test only
+        """
+        self.course = CourseFactory.create(default_store=store)
+        # .raw_grader approximates what our UI sends down. It uses decimal representation of percent
+        # without it, the  weights would be percentages
+        raw_grader_list = modulestore().get_course(self.course.id).raw_grader
+        course_grading_model = CourseGradingModel.fetch(self.course.id)
+        raw_grader_list[0]['type'] += '_foo'
+        raw_grader_list[0]['short_label'] += '_foo'
+        raw_grader_list[2]['type'] += '_foo'
+        raw_grader_list[3]['type'] += '_foo'
+
+        result = CourseGradingModel.must_fire_grading_event_and_signal(
+            self.course.id,
+            raw_grader_list,
+            modulestore().get_course(self.course.id),
+            course_grading_model.__dict__
+        )
+        self.assertTrue(result)
+
+    @override_waffle_flag(MATERIAL_RECOMPUTE_ONLY_FLAG, True)
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_must_fire_grading_event_and_signal_multiple_type_waffle_on(self, store):
+        """
+        Verifies that 'must_fire_grading_event_and_signal' ignores (returns False) if we modify
+        short_label and or name
+        use test_must_fire_grading_event_and_signal_multiple_type_2_split to run this test only
+        """
+        self.course = CourseFactory.create(default_store=store)
+        # .raw_grader approximates what our UI sends down. It uses decimal representation of percent
+        # without it, the  weights would be percentages
+        raw_grader_list = modulestore().get_course(self.course.id).raw_grader
+        course_grading_model = CourseGradingModel.fetch(self.course.id)
+        raw_grader_list[0]['type'] += '_foo'
+        raw_grader_list[0]['short_label'] += '_foo'
+        raw_grader_list[2]['type'] += '_foo'
+        raw_grader_list[3]['type'] += '_foo'
+
+        result = CourseGradingModel.must_fire_grading_event_and_signal(
+            self.course.id,
+            raw_grader_list,
+            modulestore().get_course(self.course.id),
+            course_grading_model.__dict__
+        )
+        self.assertFalse(result)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_must_fire_grading_event_and_signal_return_true(self, store):
+        """
+        Verifies that 'must_fire_grading_event_and_signal' ignores (returns False) if we modify
+        short_label and or name
+        use _2_split suffix to run this test only
+        """
+        self.course = CourseFactory.create(default_store=store)
+        # .raw_grader approximates what our UI sends down. It uses decimal representation of percent
+        # without it, the  weights would be percentages
+        raw_grader_list = modulestore().get_course(self.course.id).raw_grader
+        course_grading_model = CourseGradingModel.fetch(self.course.id)
+        raw_grader_list[0]['weight'] *= 2
+        raw_grader_list[0]['short_label'] += '_foo'
+        raw_grader_list[2]['type'] += '_foo'
+        raw_grader_list[3]['type'] += '_foo'
+
+        result = CourseGradingModel.must_fire_grading_event_and_signal(
+            self.course.id,
+            raw_grader_list,
+            modulestore().get_course(self.course.id),
+            course_grading_model.__dict__
+        )
+        self.assertTrue(result)
 
     @mock.patch('track.event_transaction_utils.uuid4')
     @mock.patch('models.settings.course_grading.tracker')
@@ -583,7 +658,6 @@ class CourseGradingTest(CourseTestCase):
             self.course.id, test_grader.graders[1], self.user
         )
         self.assertDictEqual(test_grader.graders[1], altered_grader, "Noop update")
-        grading_policy_1 = self._grading_policy_hash_for_course()
 
         test_grader.graders[1]['min_count'] = test_grader.graders[1].get('min_count') + 2
         altered_grader = CourseGradingModel.update_grader_from_json(
@@ -600,7 +674,6 @@ class CourseGradingTest(CourseTestCase):
         # one for each of the calls to update_grader_from_json()
         send_signal.assert_has_calls([
             # pylint: disable=line-too-long
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
             mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
             mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_3),
             # pylint: enable=line-too-long
@@ -617,7 +690,7 @@ class CourseGradingTest(CourseTestCase):
                     'event_transaction_id': 'mockUUID',
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                 }
-            ) for policy_hash in {grading_policy_1, grading_policy_2, grading_policy_3}
+            ) for policy_hash in {grading_policy_2, grading_policy_3}
         ], any_order=True)
 
     @mock.patch('track.event_transaction_utils.uuid4')
