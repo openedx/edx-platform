@@ -36,7 +36,6 @@ from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.tabs import InvalidTabsException
 
 from .utils import AjaxEnabledTestClient, CourseTestCase
 
@@ -1386,7 +1385,8 @@ class CourseMetadataEditingTest(CourseTestCase):
             'DEFAULT': 'test_proctoring_provider',
             'test_proctoring_provider': {},
             'proctortrack': {}
-        }
+        },
+        FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True},
     )
     @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_requires_escalation_email_for_proctortrack(self, include_blank_email):
@@ -1433,7 +1433,8 @@ class CourseMetadataEditingTest(CourseTestCase):
         PROCTORING_BACKENDS={
             'DEFAULT': 'proctortrack',
             'proctortrack': {}
-        }
+        },
+        FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True},
     )
     @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_cannot_unset_escalation_email_when_proctortrack_is_provider(self):
@@ -1468,6 +1469,31 @@ class CourseMetadataEditingTest(CourseTestCase):
                 "proctoring_provider": {"value": "proctortrack"},
                 "proctoring_escalation_email": {"value": "foo@bar.com"},
             },
+            user=self.user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn('proctoring_provider', test_model)
+        self.assertIn('proctoring_escalation_email', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'proctortrack': {}
+        }
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_validate_update_escalation_email_not_requirement_disabled(self):
+        """
+        Tests the escalation email is not required if 'ENABLED_EXAM_SETTINGS_HTML_VIEW'
+        setting is not set to True
+        """
+        json_data = {
+            "proctoring_provider": {"value": 'proctortrack'},
+        }
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            json_data,
             user=self.user
         )
         self.assertTrue(did_validate)
