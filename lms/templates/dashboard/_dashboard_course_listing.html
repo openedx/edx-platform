@@ -416,7 +416,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 % if use_ecommerce_payment_flow and course_mode_info['verified_sku']:
                   <a class="action action-upgrade track_course_dashboard_green_button" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
                 % else:
-                  <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': six.text_type(course_overview.id)})}" data-course-id="${course_overview.id}" data-user="${user.username}">
+                  <a class="action action-upgrade track_course_dashboard_green_button" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': six.text_type(course_overview.id)})}" data-course-id="${course_overview.id}" data-user="${user.username}">
                 % endif
                     <span class="action-upgrade-icon" aria-hidden="true"></span>
                   <span class="wrapper-copy">
