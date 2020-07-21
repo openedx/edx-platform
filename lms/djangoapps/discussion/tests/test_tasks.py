@@ -238,9 +238,9 @@ class TaskTestCase(ModuleStoreTestCase):
             self.assertTrue(self.mock_permalink in rendered_email.body_html)
             self.assertTrue(message.context['site'].domain in rendered_email.body_html)
 
-    def run_should_not_send_email_test(self, thread, comment_dict):
+    def run_should_send_email_test(self, thread, comment_dict):
         """
-        assert email is not sent
+        assert email is sent
         """
         self.mock_request.side_effect = make_mock_responder(
             subscribed_thread_ids=[self.discussion_id],
@@ -251,27 +251,26 @@ class TaskTestCase(ModuleStoreTestCase):
         comment = cc.Comment.find(id=comment_dict['id']).retrieve()
         comment_created.send(sender=None, user=user, post=comment)
 
-        actual_result = _should_send_message({
+        send_message_status = _should_send_message({
             'thread_author_id': self.thread_author.id,
             'course_id': self.course.id,
             'comment_id': comment_dict['id'],
             'thread_id': thread['id'],
         })
-        self.assertEqual(actual_result, False)
-        self.assertFalse(self.mock_ace_send.called)
+        self.assertEqual(send_message_status, True)
 
-    def test_subcomment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.thread, self.subcomment)
+    def test_subcomment_should_send_email(self):
+        self.run_should_send_email_test(self.thread, self.subcomment)
 
-    def test_second_comment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.thread, self.comment2)
+    def test_second_comment_should_send_email(self):
+        self.run_should_send_email_test(self.thread, self.comment2)
 
-    def test_thread_without_children_should_not_send_email(self):
+    def test_thread_without_children_should_send_email(self):
         """
-        test that email notification will not be sent for the thread
+        test that email notification will be sent for the thread
         that doesn't have attribute 'children'
         """
-        self.run_should_not_send_email_test(self.thread2, self.comment)
+        self.run_should_send_email_test(self.thread2, self.comment)
 
     @ddt.data((
         {
