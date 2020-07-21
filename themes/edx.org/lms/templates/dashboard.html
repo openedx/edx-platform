@@ -44,6 +44,7 @@ from student.models import CourseEnrollment
 
 <%block name="js_extra">
   <script src="${static.url('js/commerce/credit.js')}"></script>
+  <script src="${static.url('js/demographics-collection.js')}"></script>
   <%static:js group='dashboard'/>
   <script type="text/javascript">
     $(document).ready(function() {
@@ -157,7 +158,7 @@ from student.models import CourseEnrollment
       </a>
       <a href="${account_mfe_url}#demographics-information">
         <div
-          class="d-flex justify-content-left align-items-center flex-column flex-lg-row py-1 px-4 mb-2 mb-lg-4">
+          class="sub-banner d-flex justify-content-left align-items-center flex-column flex-lg-row py-1 px-4 mb-2 mb-lg-4">
           <img class="demographics-banner-icon d-none d-lg-inline-block" src="${static.url('edx.org/images/quote_prompt.png')}" alt="" aria-hidden="true">
           <div class="demographics-banner-prompt d-inline-block font-weight-bold text-white py-4 px-2 px-lg-3">
             ${_("Want to make edX better for everyone?")}
