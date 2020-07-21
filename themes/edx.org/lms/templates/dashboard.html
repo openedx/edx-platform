@@ -151,19 +151,24 @@ from student.models import CourseEnrollment
     account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
   %>
   % if display_demographics_banner:
-    <a href="${account_mfe_url}#demographics-information">
-      <div
-        class="demographics-banner d-flex justify-content-left align-items-center flex-column flex-lg-row py-1 px-4 mb-2 mb-lg-4">
-        <img class="demographics-banner-icon d-none d-lg-inline-block" src="${static.url('edx.org/images/quote_prompt.png')}" alt="" aria-hidden="true">
-        <div class="demographics-banner-prompt d-inline-block font-weight-bold text-white py-4 px-2 px-lg-3">
-          ${_("Want to make edX better for everyone?")}
+    <div class="demographics-banner">
+      <a href="#">
+        <span class="fa fa-times-circle text-white px-2 float-right" aria-hidden="true"></span>
+      </a>
+      <a href="${account_mfe_url}#demographics-information">
+        <div
+          class="d-flex justify-content-left align-items-center flex-column flex-lg-row py-1 px-4 mb-2 mb-lg-4">
+          <img class="demographics-banner-icon d-none d-lg-inline-block" src="${static.url('edx.org/images/quote_prompt.png')}" alt="" aria-hidden="true">
+          <div class="demographics-banner-prompt d-inline-block font-weight-bold text-white py-4 px-2 px-lg-3">
+            ${_("Want to make edX better for everyone?")}
+          </div>
+          <button class="demographics-banner-btn d-flex align-items-center bg-white font-weight-bold border-0 py-2 px-3 mx-2 mb-3 m-lg-0 shadow">
+            <span class="fa fa-thumbs-up px-2" aria-hidden="true"></span>
+            ${_("Get started")}
+          </button>
         </div>
-        <button class="demographics-banner-btn d-flex align-items-center bg-white font-weight-bold border-0 py-2 px-3 mx-2 mb-3 m-lg-0 shadow">
-          <span class="fa fa-thumbs-up px-2" aria-hidden="true"></span>
-          ${_("Get started")}
-        </button>
-      </div>
-    </a>
+      </a>
+   </div>
   % endif
   <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">

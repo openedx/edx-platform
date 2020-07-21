@@ -2,8 +2,11 @@
   .demographics-banner {
     background-color: #23419f;
     border-radius: 12px;
-    @media (min-width: 1200px) {
-      height: 64px;
+
+    .demographics-banner-2 {
+      @media (min-width: 1200px) {
+        height: 64px;
+      }
     }
     .demographics-banner-icon {
       height: 140px;
