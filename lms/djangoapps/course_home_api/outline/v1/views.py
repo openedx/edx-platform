@@ -2,11 +2,15 @@
 Outline Tab Views
 """
 
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.exceptions import APIException, ParseError
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from django.utils.translation import ugettext as _
 from edx_django_utils import monitoring as monitoring_utils
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 
@@ -21,11 +25,20 @@ from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, LATEST_UPDATE_FLAG
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
+from openedx.features.course_experience.views.welcome_message import PREFERENCE_KEY, WelcomeMessageFragmentView
 from student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
+
+
+class UnableToDismissWelcomeMessage(APIException):
+    status_code = 400
+    default_detail = 'Unable to dismiss welcome message.'
+    default_code = 'unable_to_dismiss_welcome_message'
 
 
 class OutlineTabView(RetrieveAPIView):
@@ -99,6 +112,13 @@ class OutlineTabView(RetrieveAPIView):
         show_handouts = is_enrolled or is_staff or allow_public
         handouts_html = get_course_info_section(request, request.user, course, 'handouts') if show_handouts else ''
 
+        welcome_message_html = None
+        if get_course_tag(request.user, course_key, PREFERENCE_KEY) != 'False':
+            if LATEST_UPDATE_FLAG.is_enabled(course_key):
+                welcome_message_html = LatestUpdateFragmentView().latest_update_html(request, course)
+            else:
+                welcome_message_html = WelcomeMessageFragmentView().welcome_message_html(request, course)
+
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
         date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
 
@@ -129,9 +149,32 @@ class OutlineTabView(RetrieveAPIView):
             'course_tools': course_tools,
             'dates_widget': dates_widget,
             'handouts_html': handouts_html,
+            'welcome_message_html': welcome_message_html,
         }
         context = self.get_serializer_context()
         context['course_key'] = course_key
         serializer = self.get_serializer_class()(data, context=context)
 
         return Response(serializer.data)
+
+
+@api_view(['POST'])
+@authentication_classes((JwtAuthentication,))
+@permission_classes((IsAuthenticated,))
+def dismiss_welcome_message(request):
+    course_id = request.data.get('course_id', None)
+
+    # If body doesnt contain 'course_id', return 400 to client.
+    if not course_id:
+        raise ParseError(_("'course_id' is required."))
+
+    # If body contains params other than 'course_id', return 400 to client.
+    if len(request.data) > 1:
+        raise ParseError(_("Only 'course_id' is expected."))
+
+    try:
+        course_key = CourseKey.from_string(course_id)
+        set_course_tag(request.user, course_key, PREFERENCE_KEY, 'False')
+        return Response({'message': _('Welcome message successfully dismissed.')})
+    except Exception:
+        raise UnableToDismissWelcomeMessage
