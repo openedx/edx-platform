@@ -299,6 +299,72 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                     self.assertIn(html_tag, assignment_title)
 
     @RELATIVE_DATES_FLAG.override(active=True)
+    @ddt.data(
+        ([], 3),
+        ([{
+            'due': None,
+            'start': None,
+            'name': 'student-training',
+            'examples': [
+                {
+                    'answer': ['Replace this text with your own sample response...'],
+                    'options_selected': [
+                        {'option': 'Fair', 'criterion': 'Ideas'},
+                        {'option': 'Good', 'criterion': 'Content'}
+                    ]
+                }, {
+                    'answer': ['Replace this text with another sample response...'],
+                    'options_selected': [
+                        {'option': 'Poor', 'criterion': 'Ideas'},
+                        {'option': 'Good', 'criterion': 'Content'}
+                    ]
+                }
+            ]
+        }, {
+            'due': '2029-01-01T00:00:00+00:00',
+            'start': '2001-01-01T00:00:00+00:00',
+            'must_be_graded_by': 3,
+            'name': 'peer-assessment',
+            'must_grade': 5
+        }, {
+            'due': '2029-01-01T00:00:00+00:00',
+            'start': '2001-01-01T00:00:00+00:00',
+            'name': 'self-assessment'
+        }], 5)
+    )
+    @ddt.unpack
+    def test_dates_with_openassessments(self, rubric_assessments, date_block_count):
+        course = create_self_paced_course_run(days_till_start=-1, org_id='TestOrg')
+
+        user = create_user()
+        request = self.make_request(user)
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+        now = datetime.now(utc)
+
+        chapter = ItemFactory.create(
+            parent=course,
+            category="chapter",
+            graded=True,
+        )
+        section = ItemFactory.create(
+            parent=chapter,
+            category="sequential",
+        )
+        vertical = ItemFactory.create(
+            parent=section,
+            category="vertical",
+        )
+        ItemFactory.create(
+            parent=vertical,
+            category="openassessment",
+            rubric_assessments=rubric_assessments,
+            submission_start=(now + timedelta(days=1)).isoformat(),
+            submission_end=(now + timedelta(days=7)).isoformat(),
+        )
+        blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
+        self.assertEqual(len(blocks), date_block_count)
+
+    @RELATIVE_DATES_FLAG.override(active=True)
     def test_enabled_block_types_with_expired_course(self):
         course = create_course_run(days_till_start=-100)
         user = create_user()
