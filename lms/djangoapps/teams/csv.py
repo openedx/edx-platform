@@ -270,11 +270,11 @@ class TeamMembershipImportManager(object):
         dupe_set = set()
         for teamset_id in teamset_ids:
             if teamset_id in dupe_set:
-                self.validation_errors.append("Teamset with id " + teamset_id + " is duplicated.")
+                self.validation_errors.append("Team-set with id " + teamset_id + " is duplicated.")
                 return False
             dupe_set.add(teamset_id)
             if teamset_id not in valid_teamset_ids:
-                self.validation_errors.append("Teamset with id " + teamset_id + " does not exist.")
+                self.validation_errors.append("Team-set with id " + teamset_id + " does not exist.")
                 return False
         return True
 
@@ -314,7 +314,7 @@ class TeamMembershipImportManager(object):
         This method will add a validation error and return False if this is the case.
         """
         if None in row:
-            error_message = "Team(s) {0} don't have matching teamsets.".format(
+            error_message = "Team(s) {0} don't have matching team-sets.".format(
                 row[None]
             )
             if self.add_error_and_check_if_max_exceeded(error_message):
