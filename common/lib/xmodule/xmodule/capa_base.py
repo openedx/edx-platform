@@ -1215,7 +1215,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         # Too late. Cannot submit
         if self.closed():
             log.error(
-                'ProblemClosedError: Problem %s, close date: %s, due:%s, attempts: %s/%s, is_past_due: %s',
+                'ProblemClosedError: Problem %s, close date: %s, due:%s, is_past_due: %s, attempts: %s/%s,',
                 text_type(self.location),
                 self.close_date,
                 self.due,
