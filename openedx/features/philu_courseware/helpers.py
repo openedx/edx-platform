@@ -5,8 +5,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.django.models import CourseKey, UsageKey
-from rest_framework import serializers
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ValidationError
 from submissions.api import SubmissionError
 
 from courseware.models import StudentModule
@@ -131,11 +130,11 @@ def validate_problem_id(problem_id):
     validate if problem_id is valid UsageKeyField or not
     """
     if not problem_id:
-        raise serializers.ValidationError({'problem_id': _('Problem id is required')})
+        raise ValidationError({'problem_id': _('Problem id is required')})
     try:
         return UsageKey.from_string(problem_id)
     except InvalidKeyError:
-        raise serializers.ValidationError({'problem_id': constants.INVALID_PROBLEM_ID_MSG})
+        raise ValidationError({'problem_id': _(constants.INVALID_PROBLEM_ID_MSG)})
 
 
 def revert_user_attempts_from_edx(course_id, user, problem_usage_key):
@@ -144,18 +143,20 @@ def revert_user_attempts_from_edx(course_id, user, problem_usage_key):
     :param user: Django User
     :param problem_usage_key: UsageKey problem id
     """
-    course_id = CourseKey.from_string(course_id)
-    module_state_key = problem_usage_key.map_into_course(course_id)
     try:
+        course_key = CourseKey.from_string(course_id)
+        module_state_key = problem_usage_key.map_into_course(course_key)
         enrollment.reset_student_attempts(
-            course_id,
+            course_key,
             user,
             module_state_key,
             requesting_user=user,
             delete_module=True
         )
+    except InvalidKeyError:
+        raise ValidationError(_('Course id is not valid.'))
     except StudentModule.DoesNotExist:
-        raise serializers.ValidationError(_('Module does not exist.'))
+        raise ValidationError(_('Module does not exist.'))
     except SubmissionError:
         # Trust the submissions API to log the error
         raise APIException(_('An error occurred while deleting the score.'))

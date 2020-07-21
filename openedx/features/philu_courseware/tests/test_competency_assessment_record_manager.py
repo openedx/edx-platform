@@ -18,15 +18,13 @@ class CompetencyAssessmentRecordManagerTestCase(TestCase):
             )
 
     def delete_post_assessment_attempts(self):
+        problem_id = UsageKey.from_string('block-v1:PUCIT+IT1+1+type@problem+block@7f1593ef300e4f569e26356b65d3b76b')
         return CompetencyAssessmentRecord.objects.revert_user_post_assessment_attempts(
-            user=self.user, problem_id=self.problem_id
+            user=self.user, problem_id=problem_id
         )
 
     def setUp(self):
         self.user = UserFactory()
-        self.problem_id = UsageKey.from_string(
-            'block-v1:PUCIT+IT1+1+type@problem+block@7f1593ef300e4f569e26356b65d3b76b'
-        )
 
     def test_revert_post_assessment_attempts_with_zero_attempts(self):
         """Test revert post assessment attempts method when user has not attempted any assessment"""
