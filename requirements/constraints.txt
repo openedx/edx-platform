@@ -115,7 +115,3 @@ numpy<1.19
 
 # scipy 1.5 equires Python 3.6
 scipy<1.5
-
-
-# latest ora causing failures
-ora2==2.8.6
