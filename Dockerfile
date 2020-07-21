@@ -3,9 +3,43 @@ FROM ubuntu:xenial as base
 # Install system requirements
 RUN apt update && \
     # Global requirements
-    DEBIAN_FRONTEND=noninteractive apt install -y language-pack-en git build-essential software-properties-common curl git-core libxml2-dev libxslt1-dev libmysqlclient-dev libxmlsec1-dev libfreetype6-dev libssl-dev swig gcc g++ \
+    DEBIAN_FRONTEND=noninteractive apt install -y \
+    build-essential \
+    curl \
+    # If we don't need gcc, we should remove it.
+    g++ \
+    gcc \
+    git \
+    git-core \
+    language-pack-en \
+    libfreetype6-dev \
+    libmysqlclient-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    libxslt1-dev \
+    software-properties-common \
+    swig \
     # openedx requirements
-    gettext gfortran graphviz libgraphviz-dev libffi-dev libfreetype6-dev libgeos-dev libjpeg8-dev liblapack-dev libpng-dev libsqlite3-dev libxml2-dev libxmlsec1-dev libxslt1-dev ntp pkg-config python3.5 python3-pip python3-dev \
+    gettext \
+    gfortran \
+    graphviz \
+    libffi-dev \
+    libfreetype6-dev \
+    libgeos-dev \
+    libgraphviz-dev \
+    libjpeg8-dev \
+    liblapack-dev \
+    libpng-dev \
+    libsqlite3-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    libxslt1-dev \
+    ntp \
+    pkg-config \
+    python3-dev \
+    python3-pip \
+    python3.5 \
     -qy && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
