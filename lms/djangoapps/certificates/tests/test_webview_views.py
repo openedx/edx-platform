@@ -164,6 +164,8 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
             <html>
             <body>
                 grade: ${eol_grade}
+                grade_percent: ${eol_grade_percent}
+                grade_integer: ${eol_grade_integer}
                 lang: ${LANGUAGE_CODE}
                 course name: ${accomplishment_copy_course_name}
                 mode: ${course_mode}
@@ -1585,6 +1587,9 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                     mock_get_org_id.return_value = None
                     response = self.client.get(test_url)
                     self.assertContains(response, "grade: 6.7")
+                    self.assertContains(response, "grade_percent: " + self.cert.grade)
+                    grade_percent = float(self.cert.grade)
+                    self.assertContains(response, "grade_integer: " + str(int(grade_percent*100)))
 
     @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
     def test_render_html_view_with_preview_mode_no_grade(self, mock_get_course_run_details):
@@ -1612,6 +1617,8 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                     mock_get_org_id.return_value = None
                     response = self.client.get(test_url)
                     self.assertContains(response, "grade: 1.0")
+                    self.assertContains(response, "grade_percent: 0.0")
+                    self.assertContains(response, "grade_integer: 0")
     # EOL
 
 

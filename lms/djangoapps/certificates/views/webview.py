@@ -159,6 +159,8 @@ def _update_certificate_context(context, course, user_certificate, platform_name
     except ValueError:
         grade_percent = 0.0
     context['eol_grade'] = grade_percent_scaled(grade_percent, grade_cutoff)
+    context['eol_grade_percent'] = str(grade_percent)
+    context['eol_grade_integer'] = str(int(grade_percent * 100))
     # EOL
 
     # Translators: This text describes the purpose (and therefore, value) of a course certificate
