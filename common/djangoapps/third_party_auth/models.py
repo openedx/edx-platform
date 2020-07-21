@@ -618,6 +618,13 @@ class SAMLProviderConfig(ProviderConfig):
             "This is helpful for testing/setup but should always be disabled before users start using this provider."
         ),
     )
+    country = models.CharField(
+        max_length=255,
+        help_text=(
+            u'String representation of the mapping between user`s IDP and edx`s country field.',
+        ),
+        blank=True,
+    )
     other_settings = models.TextField(
         verbose_name=u"Advanced settings", blank=True,
         help_text=(

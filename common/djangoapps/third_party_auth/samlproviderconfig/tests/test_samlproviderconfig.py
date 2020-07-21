@@ -23,7 +23,8 @@ SINGLE_PROVIDER_CONFIG = {
     'metadata_source': 'http://test.url',
     'name': 'name-of-config',
     'enabled': 'true',
-    'slug': 'test-slug'
+    'slug': 'test-slug',
+    'country': 'https:://example.customer.com/countrycode'
 }
 
 SINGLE_PROVIDER_CONFIG_2 = copy.copy(SINGLE_PROVIDER_CONFIG)
@@ -54,7 +55,8 @@ class SAMLProviderConfigTests(APITestCase):
         cls.samlproviderconfig, _ = SAMLProviderConfig.objects.get_or_create(
             entity_id=SINGLE_PROVIDER_CONFIG['entity_id'],
             metadata_source=SINGLE_PROVIDER_CONFIG['metadata_source'],
-            slug=SINGLE_PROVIDER_CONFIG['slug']
+            slug=SINGLE_PROVIDER_CONFIG['slug'],
+            country=SINGLE_PROVIDER_CONFIG['country'],
         )
 
     def setUp(self):
@@ -82,6 +84,7 @@ class SAMLProviderConfigTests(APITestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['entity_id'], SINGLE_PROVIDER_CONFIG['entity_id'])
         self.assertEqual(results[0]['metadata_source'], SINGLE_PROVIDER_CONFIG['metadata_source'])
+        self.assertEqual(response.data['results'][0]['country'], SINGLE_PROVIDER_CONFIG['country'])
         self.assertEqual(SAMLProviderConfig.objects.count(), 1)
 
     def test_get_one_config_by_enterprise_uuid_invalid_uuid(self):
@@ -131,6 +134,7 @@ class SAMLProviderConfigTests(APITestCase):
         self.assertEqual(SAMLProviderConfig.objects.count(), orig_count + 1)
         provider_config = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_2['slug'])
         self.assertEqual(provider_config.name, 'name-of-config-2')
+        self.assertEqual(provider_config.country, SINGLE_PROVIDER_CONFIG_2['country'])
 
         # check association has also been created
         self.assertTrue(
