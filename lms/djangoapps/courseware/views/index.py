@@ -92,6 +92,8 @@ class CoursewareIndex(View):
     View class for the Courseware page.
     """
 
+    slot_namespace = "courseware:index"
+
     @cached_property
     def enable_unenrolled_access(self):
         return COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(self.course_key)

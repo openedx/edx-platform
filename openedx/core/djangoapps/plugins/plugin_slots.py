@@ -19,11 +19,14 @@ def get_content_for_slot(project_type: str, slot_namespace: str, slot_name: str,
     Returns a list of additional content for a view slot. Will check if any plugin apps
     have that view in their view_context_config, and if so will call their
     selected function to get their context dicts.
-    Params:
-        project_type: a string that determines which project (lms or studio) the view is being called in. See the
+
+    Args:
+        project_type (str): a string that determines which project (lms or studio) the view is being called in. See the
             ProjectType enum in plugins/constants.py for valid options
-        slot_name: a string that determines which slot the plugin will render content for. These are unique for
+        slot_namespace (str): a string that specifies the namespace for this slot.
+        slot_name (str): a string that determines which slot the plugin will render content for. These are unique for
             each project type.
+        raw_context (Dict): the unfiltered context available to the internal view.
     """
     aggregate_slot_content = u""
     slot_functions = _get_cached_slot_functions_for_view(project_type, slot_namespace, slot_name)
