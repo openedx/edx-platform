@@ -2,8 +2,6 @@
 .PHONY: clean extract_translations help pull pull_translations push_translations requirements shell upgrade
 .PHONY: api-docs docs guides swagger
 
-include .travis/docker.mk
-
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
 
