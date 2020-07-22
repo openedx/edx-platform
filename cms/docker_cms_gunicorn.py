@@ -29,7 +29,7 @@ def close_all_caches():
     from django.core import cache as django_cache
     if hasattr(django_cache, 'caches'):
         get_cache = django_cache.caches.__getitem__
-    elif hasattr(django_cache, 'get_cache'):
+    else:
         get_cache = django_cache.get_cache  # pylint: disable=no-member
     for cache_name in settings.CACHES:
         cache = get_cache(cache_name)
@@ -46,5 +46,5 @@ def close_all_caches():
         cache.close()
 
 
-def post_fork(server, worker):  # pylint: disable=W0613
+def post_fork(_server, _worker):
     close_all_caches()
