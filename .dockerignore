@@ -1,10 +1,11 @@
 # .dockerignore for edx-platform.
 # There's a lot here, please try to keep it organized.
 
-### Large files that are not needed in the docker file
+### Files that are not needed in the docker file
 
 /test_root/
 .git
+Dockerfile
 
 ### Files private to developers
 
