@@ -133,7 +133,17 @@ def get_course_outline_block_tree(request, course_id):
         'discussion',
         'drag-and-drop-v2',
         'poll',
-        'word_cloud'
+        'word_cloud',
+        'lti',
+        'lti_consumer',
+        # Appsembler completable blocks installed to Tahoe
+        # TODO: this really should be dynamic
+        'done',
+        'freetextresponse',
+        'openassessment',
+        'problem-builder',
+        'sga',
+        'ubcpi'
     ]
     all_blocks = get_blocks(
         request,
