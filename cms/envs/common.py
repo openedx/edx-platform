@@ -661,13 +661,13 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
 
     # CORS and CSRF
     'django.middleware.csrf.CsrfViewMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    'django.contrib.sites.middleware.CurrentSiteMiddleware',
 
     # JWT auth
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
