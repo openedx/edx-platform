@@ -18,13 +18,14 @@ from third_party_auth.tests.samlutils import set_jwt_cookie
 from third_party_auth.models import SAMLProviderConfig
 from third_party_auth.tests import testutil
 
+# country here refers to the URN provided by a user's IDP
 SINGLE_PROVIDER_CONFIG = {
     'entity_id': 'id',
     'metadata_source': 'http://test.url',
     'name': 'name-of-config',
     'enabled': 'true',
     'slug': 'test-slug',
-    'country': 'https:://example.customer.com/countrycode'
+    'country': 'https://example.customer.com/countrycode'
 }
 
 SINGLE_PROVIDER_CONFIG_2 = copy.copy(SINGLE_PROVIDER_CONFIG)
@@ -178,3 +179,42 @@ class SAMLProviderConfigTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(SAMLProviderConfig.objects.count(), orig_count)
+
+    def test_create_one_config_with_no_country_urn(self):
+        """
+        POST auth/saml/v0/provider_config/ -d data
+        """
+        url = reverse('saml_provider_config-list')
+        provider_config_no_country = {
+            'entity_id': 'id',
+            'metadata_source': 'http://test.url',
+            'name': 'name-of-config-no-country',
+            'enabled': 'true',
+            'slug': 'test-slug-none',
+            'enterprise_customer_uuid': ENTERPRISE_ID,
+        }
+
+        response = self.client.post(url, provider_config_no_country)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        provider_config = SAMLProviderConfig.objects.get(slug='test-slug-none')
+        self.assertEqual(provider_config.country, '')
+
+    def test_create_one_config_with_empty_country_urn(self):
+        """
+        POST auth/saml/v0/provider_config/ -d data
+        """
+        url = reverse('saml_provider_config-list')
+        provider_config_blank_country = {
+            'entity_id': 'id',
+            'metadata_source': 'http://test.url',
+            'name': 'name-of-config-blank-country',
+            'enabled': 'true',
+            'slug': 'test-slug-empty',
+            'enterprise_customer_uuid': ENTERPRISE_ID,
+            'country': '',
+        }
+
+        response = self.client.post(url, provider_config_blank_country)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        provider_config = SAMLProviderConfig.objects.get(slug='test-slug-empty')
+        self.assertEqual(provider_config.country, '')

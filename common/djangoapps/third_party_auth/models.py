@@ -619,9 +619,9 @@ class SAMLProviderConfig(ProviderConfig):
         ),
     )
     country = models.CharField(
-        max_length=255,
+        max_length=128,
         help_text=(
-            u'String representation of the mapping between user`s IDP and edx`s country field.',
+            u'URN of SAML attribute containing the user`s country.',
         ),
         blank=True,
     )
@@ -699,7 +699,7 @@ class SAMLProviderConfig(ProviderConfig):
             conf = {}
         attrs = (
             'attr_user_permanent_id', 'attr_full_name', 'attr_first_name',
-            'attr_last_name', 'attr_username', 'attr_email', 'entity_id')
+            'attr_last_name', 'attr_username', 'attr_email', 'entity_id', 'country')
         attr_defaults = {
             'attr_full_name': 'default_full_name',
             'attr_first_name': 'default_first_name',
