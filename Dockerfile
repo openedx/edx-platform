@@ -76,17 +76,17 @@ EXPOSE 18000
 FROM base as lms
 ENV SERVICE_VARIANT lms
 ENV LMS_CFG /edx/etc/lms.yaml
-CMD gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn_conf.py --name lms --bind=0.0.0.0:18000 --max-requests=1000 --access-logfile - lms.wsgi:application
+CMD gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:18000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
 FROM lms as lms-newrelic
 RUN pip install newrelic
-CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn_conf.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
+CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
 FROM base as cms
 ENV SERVICE_VARIANT cms
 ENV STUDIO_CFG /edx/etc/studio.yaml
-CMD gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn_conf.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
+CMD gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
 
-FROM lms as cms-newrelic
+FROM cms as cms-newrelic
 RUN pip install newrelic
-CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn_conf.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
+CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
