@@ -82,6 +82,10 @@ FROM lms as lms-newrelic
 RUN pip install newrelic
 CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
+FROM lms as lms-devstack
+COPY ./lms/lms.yml /edx/etc/lms.yml
+CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
+
 FROM base as cms
 ENV SERVICE_VARIANT cms
 ENV STUDIO_CFG /edx/etc/studio.yaml
@@ -89,4 +93,8 @@ CMD gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --
 
 FROM cms as cms-newrelic
 RUN pip install newrelic
+CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
+
+FROM cms as cms-devstack
+# TODO: Copy cms.yaml to /edx/etc/cms.yml
 CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
