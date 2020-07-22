@@ -144,6 +144,18 @@ def delete_collection(collection_uuid):
     api_request('delete', api_url('collections', str(collection_uuid)))
 
 
+def get_bundles(uuids=None):
+    """
+    Get the details of all bundles
+    """
+    if uuids is None:
+        uuids = []
+    version_url = api_url('bundles') + '?uuid=' + ','.join(map(str, uuids))
+    response = api_request('get', version_url)
+    # build bundle from response, convert map object to list and return
+    return [_bundle_from_response(item) for item in response]
+
+
 def get_bundle(bundle_uuid):
     """
     Retrieve metadata about the specified bundle
