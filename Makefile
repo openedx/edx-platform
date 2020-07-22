@@ -105,14 +105,20 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
+split_requirements:
+	grep -E    "^-e (common|openedx|lms|cms|\.)" requirements/edx/base.txt > requirements/edx/base_in_tree.txt
+	grep -E -v "^-e (common|openedx|lms|cms|\.)(/| )" requirements/edx/base.txt > requirements/edx/base_not_in_tree.txt
+
 # These make targets currently only build LMS images.
 docker_build:
 	docker build . -f Dockerfile --target lms -t openedx/edx-platform
 	docker build . -f Dockerfile --target lms-newrelic -t openedx/edx-platform:latest-newrelic
+	docker build . -f Dockerfile --target lms-devstack -t openedx/edx-platform:latest-devstack
 
 docker_tag: docker_build
 	docker tag openedx/edx-platform openedx/edx-platform:${GITHUB_SHA}
 	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-newrelic
+	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-devstack
 
 docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
@@ -122,4 +128,6 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push "openedx/edx-platform:${GITHUB_SHA}"
 	docker push 'openedx/edx-platform:latest-newrelic'
 	docker push "openedx/edx-platform:${GITHUB_SHA}-newrelic"
+	docker push 'openedx/edx-platform:latest-devstack'
+	docker push "openedx/edx-platform:${GITHUB_SHA}-devstack"
 
