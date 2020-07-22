@@ -109,7 +109,7 @@ edx-celeryutils==0.5.1    # via -r requirements/edx/testing.txt, super-csv
 edx-completion==3.2.4     # via -r requirements/edx/testing.txt
 edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/testing.txt
-edx-django-utils==3.3.0   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
+edx-django-utils==3.4.0   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.1  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.3.26    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
@@ -185,7 +185,7 @@ mando==0.6.4              # via -r requirements/edx/testing.txt, radon
 markdown==2.6.11          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-wiki, staff-graded-xblock, xblock-poll
 markey==0.8               # via -r requirements/edx/testing.txt, enmerkar-underscore
 markupsafe==1.1.1         # via -r requirements/edx/testing.txt, chem, jinja2, mako, xblock
-maxminddb==1.5.4          # via -r requirements/edx/testing.txt, geoip2
+maxminddb==2.0.0          # via -r requirements/edx/testing.txt, geoip2
 mccabe==0.6.1             # via -r requirements/edx/testing.txt, flake8, pylint
 mistune==0.8.4            # via m2r
 mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, xblock-drag-and-drop-v2, xblock-poll
