@@ -10,11 +10,12 @@ class UpgradeMessageView extends Backbone.View {
     this.messageTpl = HtmlUtils.template(upgradeMessageTpl);
     this.$el = options.$el;
     this.render();
-    var courseUpsellButtons = this.$el.find(".program_dashboard_course_upsell_button");
-    trackECommerceEvents.trackUpsellClick(courseUpsellButtons, "program_dashboard_course", {
-      linkType : "button",
-      pageName : "program_dashboard",
-      linkCategory : "green_upgrade"
+
+    const courseUpsellButtons = this.$el.find('.program_dashboard_course_upsell_button');
+    trackECommerceEvents.trackUpsellClick(courseUpsellButtons, 'program_dashboard_course', {
+      linkType: 'button',
+      pageName: 'program_dashboard',
+      linkCategory: 'green_upgrade',
     });
   }
 
