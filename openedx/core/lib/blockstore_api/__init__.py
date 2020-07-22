@@ -22,6 +22,7 @@ from .methods import (
     update_collection,
     delete_collection,
     # Bundles:
+    get_bundles,
     get_bundle,
     create_bundle,
     update_bundle,
