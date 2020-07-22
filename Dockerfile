@@ -70,7 +70,7 @@ RUN npm set progress=false \
 
 RUN mkdir -p /edx/etc/
 
-EXPOSE 8000
+EXPOSE 18000
 
 FROM base as lms
 ENV SERVICE_VARIANT lms
