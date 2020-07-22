@@ -37,7 +37,7 @@ class CreateDevstackSiteCommandTestCase(TestCase):
 
     def setUp(self):
         assert settings.ENABLE_COMPREHENSIVE_THEMING
-        Client.objects.create(url=settings.FEATURES['AMC_APP_URL'], client_type=CONFIDENTIAL)
+        Client.objects.create(url=settings.AMC_APP_URL, client_type=CONFIDENTIAL)
 
     def test_no_sites(self):
         """
@@ -88,7 +88,7 @@ class RemoveSiteCommandTestCase(TestCase):
     """
     def setUp(self):
         assert settings.ENABLE_COMPREHENSIVE_THEMING
-        Client.objects.create(url=settings.FEATURES['AMC_APP_URL'], client_type=CONFIDENTIAL)
+        Client.objects.create(url=settings.AMC_APP_URL, client_type=CONFIDENTIAL)
 
         self.to_be_deleted = 'delete'
         self.shall_remain = 'keep'

@@ -69,7 +69,7 @@ class TahoeUserAdmin(UserAdmin, HijackUserAdminMixin):
             'opts': self.model._meta,  # pylint: disable=protected-access
             'form': form,
             'amc_user': user,
-            'amc_app_url': settings.FEATURES['AMC_APP_URL'],
+            'amc_app_url': settings.AMC_APP_URL,
             'title': 'Make AMC Admin',
             'tokens': get_amc_tokens(user),
         })
