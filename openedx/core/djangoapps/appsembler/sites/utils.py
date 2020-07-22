@@ -55,7 +55,7 @@ def get_amc_oauth_client():
     """
     Return the AMC OAuth2 Client model instance.
     """
-    return Client.objects.get(url=settings.FEATURES['AMC_APP_URL'])
+    return Client.objects.get(url=settings.AMC_APP_URL)
 
 
 @beeline.traced(name="get_amc_tokens")

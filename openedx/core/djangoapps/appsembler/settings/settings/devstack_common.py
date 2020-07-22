@@ -14,6 +14,9 @@ def plugin_settings(settings):
     settings.OAUTH_ENFORCE_SECURE = False
     settings.SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
+    if not settings.AMC_APP_URL:
+        settings.AMC_APP_URL = 'http://localhost:13000'
+
     # Disable caching in dev environment
     if not settings.FEATURES.get('ENABLE_DEVSTACK_CACHES', False):
         print('\nAppsembler: disabling devstack caches\n', file=sys.stderr)

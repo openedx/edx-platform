@@ -10,6 +10,8 @@ def plugin_settings(settings):
     """
     settings.USE_S3_FOR_CUSTOMER_THEMES = False
 
+    settings.AMC_APP_URL = 'http://localhost:13000'  # Tests needs this URL.
+
     # Allow enabling the APPSEMBLER_MULTI_TENANT_EMAILS when running unit tests via environment variables,
     # because it's disabled by default.
     settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'] = \
