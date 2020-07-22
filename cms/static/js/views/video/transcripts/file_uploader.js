@@ -1,9 +1,11 @@
 define(
     [
         'jquery', 'backbone', 'underscore',
-        'js/views/video/transcripts/utils'
+        'js/views/video/transcripts/utils',
+        'edx-ui-toolkit/js/utils/html-utils'
     ],
-function($, Backbone, _, TranscriptUtils) {
+function($, Backbone, _, TranscriptUtils, HtmlUtils) {
+    'use strict';
     var FileUploader = Backbone.View.extend({
         invisibleClass: 'is-invisible',
 
@@ -37,9 +39,8 @@ function($, Backbone, _, TranscriptUtils) {
 
                     return;
                 }
-                this.template = _.template(tpl);
-
-                tplContainer.html(this.template({
+                this.template = HtmlUtils.template(tpl);
+                HtmlUtils.setHtml(tplContainer, this.template({
                     ext: this.validFileExtensions,
                     component_locator: this.options.component_locator
                 }));
@@ -126,11 +127,12 @@ function($, Backbone, _, TranscriptUtils) {
         *
         */
         checkExtValidity: function(file) {
+            var fileExtension;
             if (!file.name) {
                 return void(0);
             }
 
-            var fileExtension = file.name
+            fileExtension = file.name
                                     .split('.')
                                     .pop()
                                     .toLowerCase();
@@ -153,7 +155,7 @@ function($, Backbone, _, TranscriptUtils) {
 
             this.$progress
                 .width(percentVal)
-                .html(percentVal)
+                .text(percentVal)
                 .removeClass(this.invisibleClass);
         },
 
@@ -177,7 +179,7 @@ function($, Backbone, _, TranscriptUtils) {
 
             this.$progress
                 .width(percentVal)
-                .html(percentVal);
+                .text(percentVal);
         },
 
         /**
