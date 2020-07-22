@@ -22,7 +22,7 @@ setup(
             "courseware = lms.djangoapps.courseware.tabs:CoursewareTab",
             "course_info = lms.djangoapps.courseware.tabs:CourseInfoTab",
             "dates = lms.djangoapps.courseware.tabs:DatesTab",
-            "discussion = lms.djangoapps.discussion.plugins:DiscussionTab",
+            "discussion = openedx.core.djangoapps.discussions.tabs:DiscussionTab",
             "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesTab",
             "external_discussion = lms.djangoapps.courseware.tabs:ExternalDiscussionCourseTab",
             "external_link = lms.djangoapps.courseware.tabs:ExternalLinkCourseTab",
@@ -43,6 +43,10 @@ setup(
             "course_reviews = openedx.features.course_experience.plugins:CourseReviewsTool",
             "verified_upgrade = lms.djangoapps.courseware.course_tools:VerifiedUpgradeTool",
             "financial_assistance = lms.djangoapps.courseware.course_tools:FinancialAssistanceTool",
+        ],
+        "openedx.discussion_apps": [
+            "cs_comments = lms.djangoapps.discussion.plugins:CommentServiceDiscussionApp",
+            "test_app = openedx.features.test_discussions_plugin:TestDiscussionsApp",
         ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",

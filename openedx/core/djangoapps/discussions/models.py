@@ -9,6 +9,14 @@ from organizations.models import Organization
 from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.discussions.discussions_apps import DiscussionAppsPluginManager
+
+
+def _get_provider_choices():
+    return [
+        (provider.name, provider.friendly_name)
+        for provider in DiscussionAppsPluginManager.get_discussion_apps()
+    ]
 
 
 class DiscussionProviderConfig(TimeStampedModel):
@@ -23,10 +31,12 @@ class DiscussionProviderConfig(TimeStampedModel):
     )
     provider = models.CharField(
         blank=False,
+        null=False,
         db_index=True,
         max_length=100,
         verbose_name=_("Discussion provider"),
         help_text=_("The discussion tool/provider."),
+        choices=_get_provider_choices(),
     )
     config = JSONField(
         blank=True,

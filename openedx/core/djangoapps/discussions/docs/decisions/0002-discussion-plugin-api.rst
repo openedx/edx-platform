@@ -10,7 +10,7 @@ Context
 -------
 
 Currently the Open edX platform provides its own discussions experience,
-using a form tool that ships with the platform and is well integrated
+using a forum tool that ships with the platform and is well integrated
 into it. There is a common need to support other, external discussion
 tools into the platform.
 
@@ -68,4 +68,4 @@ course setup.
 
 The intention is to support a way to override/extend this list so that
 an Open edX instance can focus on the key attributes they find
-interesting to expose. 
+interesting to expose.

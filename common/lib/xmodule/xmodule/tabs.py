@@ -7,7 +7,7 @@ import logging
 from abc import ABCMeta
 
 import six
-from django.core.files.storage import get_storage_class
+from django.utils.module_loading import import_string
 from six import text_type
 from xblock.fields import List
 
@@ -283,7 +283,7 @@ class TabFragmentViewMixin(object):
         Returns the view that will be used to render the fragment.
         """
         if not self._fragment_view:
-            self._fragment_view = get_storage_class(self.fragment_view_name)()
+            self._fragment_view = import_string(self.fragment_view_name)()
         return self._fragment_view
 
     def render_to_fragment(self, request, course, **kwargs):
