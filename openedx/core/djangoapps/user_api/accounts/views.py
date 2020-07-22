@@ -433,13 +433,13 @@ class DeactivateLogoutView(APIView):
             if verify_user_password_response.status_code != status.HTTP_204_NO_CONTENT:
                 return verify_user_password_response
             with transaction.atomic():
+                user_email = request.user.email  # Send the message to the unsuffixed email address.
                 if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
                     self._retire_user_email_for_multi_tenancy(request.user)
                 UserRetirementStatus.create_retirement(request.user)
                 # Unlink LMS social auth accounts
                 UserSocialAuth.objects.filter(user_id=request.user.id).delete()
                 # Change LMS password & email
-                user_email = request.user.email
                 request.user.email = get_retired_email_by_email(request.user.email)
                 request.user.save()
                 _set_unusable_password(request.user)
