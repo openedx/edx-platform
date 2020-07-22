@@ -839,6 +839,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         }
         return list(self.collection.find(query))
 
+    @beeline.traced(name="xmodule.mongo.base._cache_children")
     def _cache_children(self, course_key, items, depth=0):
         """
         Returns a dictionary mapping Location -> item data, populated with json data
@@ -848,6 +849,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         This will make a number of queries that is linear in the depth.
         """
 
+        beeline.add_context_field("course_key", course_key)
+        beeline.add_context_field("depth", depth)
         data = {}
         to_process = list(items)
         course_key = self.fill_in_run(course_key)
@@ -969,6 +972,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Load a list of xmodules from the data in items, with children cached up
         to specified depth
         """
+        beeline.add_context_field("course_key", course_key)
+        beeline.add_context_field("depth", depth)
         course_key = self.fill_in_run(course_key)
         data_cache = self._cache_children(course_key, items, depth)
 
@@ -1045,7 +1050,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         return courses_summaries
 
-    @beeline.traced(name="xmodule.mongo.base.get_course")
+    @beeline.traced(name="xmodule.mongo.base.get_courses")
     @autoretry_read()
     def get_courses(self, **kwargs):
         '''
@@ -1111,11 +1116,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         return BlockUsageLocator(course_key, 'course', course_key.run)
 
+    @beeline.traced(name="xmodule.mongo.base.get_course")
     def get_course(self, course_key, depth=0, **kwargs):
         """
         Get the course with the given courseid (org/course/run)
         """
         assert isinstance(course_key, CourseKey)
+        beeline.add_context_field("course_key", course_key)
+        beeline.add_context_field("depth", depth)
 
         if not course_key.deprecated:  # split course_key
             # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
