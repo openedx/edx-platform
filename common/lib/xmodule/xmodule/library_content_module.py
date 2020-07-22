@@ -315,6 +315,15 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         child_context = {} if not context else copy(context)
 
         for child in self._get_selected_child_blocks():
+            if child is None:
+                # TODO: Fix the underlying issue in TNL-7424
+                # This shouldn't be happening, but does for an as-of-now
+                # unknown reason. Until we address the underlying issue,
+                # let's at least log the error explicitly, ignore the
+                # exception, and prevent the page from resulting in a
+                # 500-response.
+                logger.error('Skipping display for child block that is None')
+                continue
             for displayable in child.displayable_items():
                 rendered_child = displayable.render(STUDENT_VIEW, child_context)
                 fragment.add_fragment_resources(rendered_child)
