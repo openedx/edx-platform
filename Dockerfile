@@ -60,6 +60,7 @@ ENV CONFIG_ROOT /edx/etc/
 ENV PATH /edx/app/edx-platform/edx-platform/bin:${PATH}
 ENV SETTINGS production
 
+# TODO: Install requirements before copying in code.
 RUN pip install setuptools==39.0.1 pip==9.0.3
 RUN pip install -r requirements/edx/base.txt
 
