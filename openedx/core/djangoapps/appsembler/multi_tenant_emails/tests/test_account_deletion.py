@@ -6,6 +6,7 @@ from mock import patch
 import pytest
 
 from django.urls import reverse
+from django.core import mail
 from rest_framework.test import APITestCase
 from rest_framework import status
 
@@ -124,6 +125,24 @@ class MultiTenantDeactivateLogoutViewTest(APITestCase):
 
         profile_meta = learner.profile.get_meta()
         assert profile_meta[DeactivateLogoutView.APPSEMBLER_RETIREMENT_EMAIL_META_KEY] == self.EMAIL
+
+    def test_email_retirement_email_without_suffix(self):
+        """
+        Ensure that the DeletionNotificationMessage email is sent to the unsuffixed email.
+
+        Fixes RED-1212
+        """
+        username = 'some_learner'
+
+        with with_organization_context(site_color=self.RED):
+            self.register_user(self.RED, username=username)
+            assert not len(mail.outbox), 'No emails should be sent yet.'
+            deactivate_res = self.deactivate_user(self.RED, username=username)
+
+        assert deactivate_res.status_code == status.HTTP_204_NO_CONTENT, deactivate_res.content
+        assert len(mail.outbox), 'Retirement email should be sent.'
+        deletion_notification_message = mail.outbox[0]
+        assert deletion_notification_message.to == [self.EMAIL], 'Un-suffixed email should be used'
 
     def test_allow_email_reuse_in_other_organization(self):
         """
