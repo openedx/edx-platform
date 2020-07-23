@@ -75,6 +75,7 @@ EXPOSE 18000
 
 FROM base as lms
 ENV SERVICE_VARIANT lms
+ENV DJANGO_SETTINGS_MODULE lms.envs.production
 ENV LMS_CFG /edx/etc/lms.yaml
 CMD gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:18000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
@@ -87,6 +88,7 @@ ENV LMS_CFG /edx/app/edx-platform/lms/devstack.yml
 
 FROM base as studio
 ENV SERVICE_VARIANT cms
+ENV DJANGO_SETTINGS_MODULE cms.envs.production
 ENV STUDIO_CFG /edx/etc/studio.yaml
 CMD gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
 
