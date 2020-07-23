@@ -10,7 +10,7 @@
             var eventAttrs = {linkName: linkName};
             var allowedAttrs = ['linkType', 'pageName', 'linkCategory'];
 
-            if (!window.analytics) {
+            if (!window.analytics || !window.analytics.trackLink) {
                 return;
             }
 
