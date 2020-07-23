@@ -2379,6 +2379,7 @@ INSTALLED_APPS = [
 
     # Discussion forums
     'openedx.core.djangoapps.django_comment_common',
+    'openedx.core.djangoapps.discussions',
 
     # Notes
     'edxnotes',
