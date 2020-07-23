@@ -132,13 +132,10 @@ class EdxFragmentView(FragmentView):
             'fragment': fragment,
             'page_title': self.standalone_page_title(request, fragment, **kwargs),
         })
-        if context.get('uses_bootstrap', False):
-            template = 'fragments/standalone-page-bootstrap.html'
-        else:
-            template = 'fragments/standalone-page-v1.html'
+        template_name = 'fragments/standalone-page-bootstrap.html'
 
         return render(
             request=request,
-            template_name=template,
+            template_name=template_name,
             context=context
         )
