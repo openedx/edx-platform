@@ -622,7 +622,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
                     platform_name=settings.PLATFORM_NAME,
                     button_panel=HTML(
                         '<div class="message-actions">'
-                        '<a class="btn btn-upgrade"'
+                        '<a id="certificate_upsell" class="btn btn-upgrade"'
                         'data-creative="original_message" data-position="course_message"'
                         'href="{upgrade_url}">{upgrade_label}</a>'
                         '</div>'
