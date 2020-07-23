@@ -73,41 +73,8 @@ DJFS = {
     'url_root': '/static/djpyfs',
 }
 
-################################ DEBUG TOOLBAR ################################
-
-INSTALLED_APPS += ['debug_toolbar']
-MIDDLEWARE += [
-    'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
-
-INTERNAL_IPS = ('127.0.0.1',)
-
-DEBUG_TOOLBAR_PANELS = (
-    'debug_toolbar.panels.versions.VersionsPanel',
-    'debug_toolbar.panels.timer.TimerPanel',
-    'debug_toolbar.panels.settings.SettingsPanel',
-    'debug_toolbar.panels.headers.HeadersPanel',
-    'debug_toolbar.panels.request.RequestPanel',
-    'debug_toolbar.panels.sql.SQLPanel',
-    'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
-    # ProfilingPanel has been intentionally removed for default devstack.py
-    # runtimes for performance reasons. If you wish to re-enable it in your
-    # local development environment, please create a new settings file
-    # that imports and extends devstack.py.
-)
-
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': 'lms.envs.devstack.should_show_debug_toolbar',
-}
-
-
 def should_show_debug_toolbar(request):
-    # We always want the toolbar on devstack unless running tests from another Docker container
-    if request.get_host().startswith('edx.devstack.lms:'):
-        return False
-    return True
+    return False
 
 ########################### PIPELINE #################################
 
@@ -207,7 +174,7 @@ FEATURES['COURSES_ARE_BROWSEABLE'] = True
 HOMEPAGE_COURSE_MAX = 9
 
 # Software secure fake page feature flag
-FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
+FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = False
 
 # Setting for the testing of Software Secure Result Callback
 VERIFY_STUDENT["SOFTWARE_SECURE"] = {
