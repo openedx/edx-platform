@@ -5,7 +5,6 @@
 
 /test_root/
 .git
-Dockerfile
 
 ### Files private to developers
 

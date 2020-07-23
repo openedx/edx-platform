@@ -1,5 +1,7 @@
 FROM ubuntu:xenial as base
 
+# Warning: This file is experimental.
+
 # Install system requirements
 RUN apt update && \
     # Global requirements
@@ -52,24 +54,38 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 
 WORKDIR /edx/app/edx-platform/edx-platform
 
-COPY . /edx/app/edx-platform/edx-platform
-
 ENV PATH /edx/app/edx-platform/nodeenv/bin:${PATH}
 ENV PATH ./node_modules/.bin:${PATH}
 ENV CONFIG_ROOT /edx/etc/
 ENV PATH /edx/app/edx-platform/edx-platform/bin:${PATH}
 ENV SETTINGS production
+RUN mkdir -p /edx/etc/
 
-# TODO: Install requirements before copying in code.
+# Copy just Python requirements & install them.
 RUN pip install setuptools==39.0.1 pip==9.0.3
+COPY requirements/ requirements/
+# TODO: For now, we must copy in all app code as well, because
+# base.txt requires in-tree packages. It would be good to move
+# those in-tree requirements to their own requirements file.
+COPY common common
+COPY openedx openedx
+COPY lms lms
+COPY cms cms
+COPY setup.py setup.py
 RUN pip install -r requirements/edx/base.txt
 
+# Copy just JS requirements and install them.
+COPY package.json package.json
+COPY package-lock.json package-lock.json
+# TODO: Shouldn't we use node==12.11.1?
 RUN nodeenv /edx/app/edx-platform/nodeenv --node=8.9.3 --prebuilt
+RUN npm set progress=false && npm install
 
-RUN npm set progress=false \
-    && npm install
-
-RUN mkdir -p /edx/etc/
+# Copy over remaining code.
+# (For now, that's just everything not in lms/, cms/ openedx/, or common/).
+# We do this as late as possible so that small changes to the repo don't bust
+# the requirements cache.
+COPY . .
 
 EXPOSE 18000
 
