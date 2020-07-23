@@ -4,7 +4,6 @@
 
 from datetime import datetime, timedelta
 from http.cookies import SimpleCookie
-from uuid import uuid4
 
 import ddt
 import mock
