@@ -19,10 +19,15 @@ from edx_proctoring.api import (
     get_exam_configuration_dashboard_url
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from help_tokens.core import HelpUrlExpert
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.decorators import api_view, authentication_classes, parser_classes
+from rest_framework.parsers import JSONParser
+
 from six import binary_type, text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -56,6 +61,7 @@ from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
+from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
 from static_replace import replace_static_urls
@@ -115,9 +121,9 @@ def _is_library_component_limit_reached(usage_key):
     return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
 
 
-@require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
-@login_required
-@expect_json
+@api_view(["DELETE", "GET", "PUT", "POST", "PATCH"])
+@authentication_classes([JwtAuthentication, BearerAuthentication, SessionAuthentication])
+@parser_classes([JSONParser])
 def xblock_handler(request, usage_key_string):
     """
     The restful handler for xblock requests.
@@ -202,22 +208,22 @@ def xblock_handler(request, usage_key_string):
             return _save_xblock(
                 request.user,
                 _get_xblock(usage_key, request.user),
-                data=request.json.get('data'),
-                children_strings=request.json.get('children'),
-                metadata=request.json.get('metadata'),
-                nullout=request.json.get('nullout'),
-                grader_type=request.json.get('graderType'),
-                is_prereq=request.json.get('isPrereq'),
-                prereq_usage_key=request.json.get('prereqUsageKey'),
-                prereq_min_score=request.json.get('prereqMinScore'),
-                prereq_min_completion=request.json.get('prereqMinCompletion'),
-                publish=request.json.get('publish'),
-                fields=request.json.get('fields'),
+                data=request.data.get('data'),
+                children_strings=request.data.get('children'),
+                metadata=request.data.get('metadata'),
+                nullout=request.data.get('nullout'),
+                grader_type=request.data.get('graderType'),
+                is_prereq=request.data.get('isPrereq'),
+                prereq_usage_key=request.data.get('prereqUsageKey'),
+                prereq_min_score=request.data.get('prereqMinScore'),
+                prereq_min_completion=request.data.get('prereqMinCompletion'),
+                publish=request.data.get('publish'),
+                fields=request.data.get('fields'),
             )
     elif request.method in ('PUT', 'POST'):
-        if 'duplicate_source_locator' in request.json:
-            parent_usage_key = usage_key_with_run(request.json['parent_locator'])
-            duplicate_source_usage_key = usage_key_with_run(request.json['duplicate_source_locator'])
+        if 'duplicate_source_locator' in request.data:
+            parent_usage_key = usage_key_with_run(request.data['parent_locator'])
+            duplicate_source_usage_key = usage_key_with_run(request.data['duplicate_source_locator'])
 
             source_course = duplicate_source_usage_key.course_key
             dest_course = parent_usage_key.course_key
@@ -243,19 +249,19 @@ def xblock_handler(request, usage_key_string):
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
-                request.json.get('display_name'),
+                request.data.get('display_name'),
             )
             return JsonResponse({
                 'locator': text_type(dest_usage_key),
                 'courseKey': text_type(dest_usage_key.course_key)
             })
         else:
-            return _create_item(request)
+            return _create_item(request.user, request.data)
     elif request.method == 'PATCH':
-        if 'move_source_locator' in request.json:
-            move_source_usage_key = usage_key_with_run(request.json.get('move_source_locator'))
-            target_parent_usage_key = usage_key_with_run(request.json.get('parent_locator'))
-            target_index = request.json.get('target_index')
+        if 'move_source_locator' in request.data:
+            move_source_usage_key = usage_key_with_run(request.data.get('move_source_locator'))
+            target_parent_usage_key = usage_key_with_run(request.data.get('parent_locator'))
+            target_index = request.data.get('target_index')
             if (
                     not has_studio_write_access(request.user, target_parent_usage_key.course_key) or
                     not has_studio_read_access(request.user, target_parent_usage_key.course_key)
@@ -697,19 +703,17 @@ def create_item(request):
     """
     Exposes internal helper method without breaking existing bindings/dependencies
     """
-    return _create_item(request)
+    return _create_item(request.user, request.json)
 
 
-@login_required
-@expect_json
-def _create_item(request):
+def _create_item(user, request_data):
     """View for create items."""
-    parent_locator = request.json['parent_locator']
+    parent_locator = request_data['parent_locator']
     usage_key = usage_key_with_run(parent_locator)
-    if not has_studio_write_access(request.user, usage_key.course_key):
+    if not has_studio_write_access(user, usage_key.course_key):
         raise PermissionDenied()
 
-    category = request.json['category']
+    category = request_data['category']
     if isinstance(usage_key, LibraryUsageLocator):
         # Only these categories are supported at this time.
         if category not in ['html', 'problem', 'video']:
@@ -729,10 +733,10 @@ def _create_item(request):
 
     created_block = create_xblock(
         parent_locator=parent_locator,
-        user=request.user,
+        user=user,
         category=category,
-        display_name=request.json.get('display_name'),
-        boilerplate=request.json.get('boilerplate'),
+        display_name=request_data.get('display_name'),
+        boilerplate=request_data.get('boilerplate'),
     )
 
     return JsonResponse(
