@@ -3,9 +3,11 @@ Fragment for rendering the course dates sidebar.
 """
 
 
+from django.db import transaction
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import get_language_bidi
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
@@ -47,6 +49,7 @@ class CourseDatesFragmentView(EdxFragmentView):
         return dates_fragment
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CourseDatesFragmentMobileView(CourseDatesFragmentView):
     """
     A course dates fragment to show dates on mobile apps.
