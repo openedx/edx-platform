@@ -13,6 +13,10 @@ lms/envs/private.py
 cms/envs/private.py
 # end-noclean
 
+# From Decentralized Devstack work. TODO clean up.
+requirements/edx/base_in_tree.txt
+requirements/edx/base_not_in_tree.txt
+
 ### Python artifacts
 *.pyc
 

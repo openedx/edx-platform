@@ -61,18 +61,16 @@ ENV PATH /edx/app/edx-platform/edx-platform/bin:${PATH}
 ENV SETTINGS production
 RUN mkdir -p /edx/etc/
 
-# Copy just Python requirements & install them.
+# Distinguish requirements that come from code within edx-platform
+# from external requirements (specifically, those from pip or GitHub).
+# Then, install just external requirements.
+# This way, the cached installations of external requirements are not
+# busted whenever edx-platform code is changed.
 RUN pip install setuptools==39.0.1 pip==9.0.3
 COPY requirements/ requirements/
-# TODO: For now, we must copy in all app code as well, because
-# base.txt requires in-tree packages. It would be good to move
-# those in-tree requirements to their own requirements file.
-COPY common common
-COPY openedx openedx
-COPY lms lms
-COPY cms cms
-COPY setup.py setup.py
-RUN pip install -r requirements/edx/base.txt
+RUN grep -E    "^-e (common|openedx|lms|cms|\.)(/| )" requirements/edx/base.txt > requirements/edx/base_in_tree.txt
+RUN grep -E -v "^-e (common|openedx|lms|cms|\.)(/| )" requirements/edx/base.txt > requirements/edx/base_not_in_tree.txt
+RUN pip install -r requirements/edx/base_not_in_tree.txt
 
 # Copy just JS requirements and install them.
 COPY package.json package.json
@@ -82,10 +80,12 @@ RUN nodeenv /edx/app/edx-platform/nodeenv --node=8.9.3 --prebuilt
 RUN npm set progress=false && npm install
 
 # Copy over remaining code.
-# (For now, that's just everything not in lms/, cms/ openedx/, or common/).
 # We do this as late as possible so that small changes to the repo don't bust
 # the requirements cache.
 COPY . .
+
+# Install remaining requirements -- that is, the in-tree ones.
+RUN pip install -r requirements/edx/base_in_tree.txt
 
 EXPOSE 18000
 
