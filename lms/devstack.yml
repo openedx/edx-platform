@@ -130,7 +130,6 @@ CERTIFICATE_TEMPLATE_LANGUAGES:
     en: English
     es: Español
 CERT_QUEUE: certificates
-CMS_BASE: edx.devstack.studio:18010
 CODE_JAIL:
     limits:
         CPU: 1
@@ -221,7 +220,6 @@ DATABASES:
 DATA_DIR: /edx/var/edxapp
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG: both
 DEFAULT_FEEDBACK_EMAIL: feedback@example.com
-DEFAULT_FILE_STORAGE: django.core.files.storage.FileSystemStorage
 DEFAULT_FROM_EMAIL: registration@example.com
 DEFAULT_JWT_ISSUER:
     AUDIENCE: lms-key
@@ -267,7 +265,6 @@ EMAIL_HOST_USER: ''
 EMAIL_PORT: 25
 EMAIL_USE_TLS: false
 ENABLE_COMPREHENSIVE_THEMING: false
-ENTERPRISE_API_URL: http://edx.devstack.lms:18000/enterprise/api/v1
 ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES:
 - audit
 - honor
@@ -338,10 +335,8 @@ GRADES_DOWNLOAD:
 HELP_TOKENS_BOOKS:
     course_author: http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course
     learner: http://edx.readthedocs.io/projects/open-edx-learner-guide
-HTTPS: 'on'
 ICP_LICENSE: null
 ICP_LICENSE_INFO: {}
-IDA_LOGOUT_URI_LIST: []
 ID_VERIFICATION_SUPPORT_LINK: ''
 JWT_AUTH:
     JWT_AUDIENCE: lms-key
@@ -364,9 +359,6 @@ LANGUAGE_CODE: en
 LANGUAGE_COOKIE: openedx-language-preference
 LEARNER_PORTAL_URL_ROOT: https://learner-portal-edx.devstack.lms:18000
 LEARNING_MICROFRONTEND_URL: null
-LMS_BASE: edx.devstack.lms:18000
-LMS_INTERNAL_ROOT_URL: http://edx.devstack.lms:18000
-LMS_ROOT_URL: http://edx.devstack.lms:18000
 LOCAL_LOGLEVEL: INFO
 LOGGING_ENV: sandbox
 LOGIN_REDIRECT_WHITELIST: []
@@ -376,7 +368,6 @@ LTI_USER_EMAIL_DOMAIN: lti.example.com
 MAILCHIMP_NEW_USER_LIST_ID: null
 MAINTENANCE_BANNER_TEXT: Sample banner message
 MEDIA_ROOT: /edx/var/edxapp/media/
-MEDIA_URL: /media/
 MICROSITE_CONFIGURATION: {}
 MICROSITE_ROOT_DIR: /edx/app/edxapp/edx-microsite
 MKTG_URLS: {}
@@ -594,9 +585,8 @@ ZENDESK_OAUTH_ACCESS_TOKEN: ''
 ZENDESK_URL: ''
 ZENDESK_USER: ''
 
-#####################################################################
-# The rest of this is copypasta'd in from base.py and devstack.py
-# Kyle
+
+# Adam
 #####################################################################
 
 LOGGING: {
@@ -673,6 +663,38 @@ LOGGING: {
         }
     }
 }
+
+# Don't use S3 in devstack, fall back to filesystem
+DEFAULT_FILE_STORAGE: django.core.files.storage.FileSystemStorage
+MEDIA_ROOT: /edx/var/edxapp/uploads
+MEDIA_URL: http://localhost:18000/media/
+ORA2_FILEUPLOAD_BACKEND: 'django'
+
+DEBUG: True
+USE_I18N: True
+LMS_BASE: 'localhost:18000'
+CMS_BASE: 'localhost:18010'
+
+# By default don't use a worker, execute tasks as if they were local functions
+CELERY_ALWAYS_EAGER: True
+HTTPS: 'off'
+
+LMS_ROOT_URL: http://edx.devstack.lms:18000
+LMS_BASE: edx.devstack.lms:18000
+SITE_NAME: edx.devstack.lms:18000
+LMS_INTERNAL_ROOT_URL: http://edx.devstack.lms:18000
+ENTERPRISE_API_URL: http://edx.devstack.lms:18000/enterprise/api/v1
+IDA_LOGOUT_URI_LIST: [
+    'http://localhost:18130/logout/',  # ecommerce
+    'http://localhost:18150/logout/',  # credentials
+    'http://localhost:18381/logout/',  # discovery
+]
+
+#####################################################################
+# The rest of this is copypasta'd in from base.py and devstack.py
+# Kyle
+#####################################################################
+
 DEFAULT_TEMPLATE_ENGINE: {
     "NAME": "django",
     "APP_DIRS": false,
