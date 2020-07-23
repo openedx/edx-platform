@@ -2,11 +2,18 @@ from logging import getLogger
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.django.models import CourseKey, UsageKey
+from rest_framework.exceptions import APIException, ValidationError
+from submissions.api import SubmissionError
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from courseware.models import StudentModule
+from lms.djangoapps.instructor import enrollment
 from xmodule.modulestore.django import modulestore
-from .models import CompetencyAssessmentRecord
+
 from . import constants
+from .models import CompetencyAssessmentRecord
 
 log = getLogger(__name__)
 
@@ -116,3 +123,40 @@ def is_post_assessment(section):
 
 def get_section_format(section):
     return section.format.lower() if section and section.format else ''
+
+
+def validate_problem_id(problem_id):
+    """
+    validate if problem_id is valid UsageKeyField or not
+    """
+    if not problem_id:
+        raise ValidationError({'problem_id': _('Problem id is required')})
+    try:
+        return UsageKey.from_string(problem_id)
+    except InvalidKeyError:
+        raise ValidationError({'problem_id': _(constants.INVALID_PROBLEM_ID_MSG)})
+
+
+def revert_user_attempts_from_edx(course_id, user, problem_usage_key):
+    """
+    :param course_id: str course id of user
+    :param user: Django User
+    :param problem_usage_key: UsageKey problem id
+    """
+    try:
+        course_key = CourseKey.from_string(course_id)
+        module_state_key = problem_usage_key.map_into_course(course_key)
+        enrollment.reset_student_attempts(
+            course_key,
+            user,
+            module_state_key,
+            requesting_user=user,
+            delete_module=True
+        )
+    except InvalidKeyError:
+        raise ValidationError(_('Course id is not valid.'))
+    except StudentModule.DoesNotExist:
+        raise ValidationError(_('Module does not exist.'))
+    except SubmissionError:
+        # Trust the submissions API to log the error
+        raise APIException(_('An error occurred while deleting the score.'))
