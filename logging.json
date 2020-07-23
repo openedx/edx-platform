@@ -1,0 +1,74 @@
+{
+    "disable_existing_loggers": false,
+    "handlers": {
+        "local": {
+            "class": "logging.NullHandler"
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": [
+                "require_debug_false"
+            ],
+            "class": "django.utils.log.AdminEmailHandler"
+        },
+        "tracking": {
+            "class": "logging.NullHandler"
+        },
+        "console": {
+            "level": "INFO",
+            "filters": [
+                "userid_context"
+            ],
+            "formatter": "standard",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "": {
+            "handlers": [
+                "console",
+                "local"
+            ],
+            "level": "INFO",
+            "propagate": false
+        },
+        "requests.packages.urllib3": {
+            "level": "WARN"
+        },
+        "django.request": {
+            "handlers": [
+                "mail_admins"
+            ],
+            "level": "ERROR",
+            "propagate": true
+        },
+        "tracking": {
+            "handlers": [
+                "console"
+            ],
+            "level": "DEBUG",
+            "propagate": false
+        }
+    },
+    "filters": {
+        "userid_context": {
+            "()": "openedx.core.djangoapps.util.log_utils.UserIdFilter"
+        },
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse"
+        }
+    },
+    "version": 1,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s %(levelname)s %(process)d [%(name)s] [user %(userid)s] %(filename)s:%(lineno)d - %(message)s"
+        },
+        "syslog_format": {
+            "format": "[service_variant=lms][%(name)s][env:sandbox] %(levelname)s [lms  %(process)d] [user %(userid)s] [%(filename)s:%(lineno)d] - %(message)s"
+        },
+        "raw": {
+            "format": "%(message)s"
+        }
+    }
+}
