@@ -97,4 +97,4 @@ RUN pip install newrelic
 CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
 
 FROM studio as studio-devstack
-ENV LMS_CFG /edx/app/edx-platform/edx-platform/cms/devstack.yml
+ENV STUDIO_CFG /edx/app/edx-platform/edx-platform/cms/devstack.yml
