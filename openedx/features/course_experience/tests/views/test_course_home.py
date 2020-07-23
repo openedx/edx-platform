@@ -981,7 +981,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertContains(response, 'section-upgrade')
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        self.assertContains(response, '<a class="btn-brand btn-upgrade"')
+        self.assertContains(response, '<a id="green_upgrade" class="btn-brand btn-upgrade"')
         self.assertContains(response, url)
         self.assertContains(
             response,
