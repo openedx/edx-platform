@@ -100,6 +100,7 @@ RUN pip install newrelic
 CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
 FROM lms as lms-devstack
+ENV LMS_CFG /edx/app/edx-platform/edx-platform/lms/devstack.yml
 ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
 
 FROM base as studio

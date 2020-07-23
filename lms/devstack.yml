@@ -130,6 +130,7 @@ CERTIFICATE_TEMPLATE_LANGUAGES:
     en: English
     es: Español
 CERT_QUEUE: certificates
+CMS_BASE: edx.devstack.studio:18010
 CODE_JAIL:
     limits:
         CPU: 1
@@ -220,6 +221,7 @@ DATABASES:
 DATA_DIR: /edx/var/edxapp
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG: both
 DEFAULT_FEEDBACK_EMAIL: feedback@example.com
+DEFAULT_FILE_STORAGE: django.core.files.storage.FileSystemStorage
 DEFAULT_FROM_EMAIL: registration@example.com
 DEFAULT_JWT_ISSUER:
     AUDIENCE: lms-key
@@ -265,6 +267,7 @@ EMAIL_HOST_USER: ''
 EMAIL_PORT: 25
 EMAIL_USE_TLS: false
 ENABLE_COMPREHENSIVE_THEMING: false
+ENTERPRISE_API_URL: http://edx.devstack.lms:18000/enterprise/api/v1
 ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES:
 - audit
 - honor
@@ -335,8 +338,10 @@ GRADES_DOWNLOAD:
 HELP_TOKENS_BOOKS:
     course_author: http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course
     learner: http://edx.readthedocs.io/projects/open-edx-learner-guide
+HTTPS: 'on'
 ICP_LICENSE: null
 ICP_LICENSE_INFO: {}
+IDA_LOGOUT_URI_LIST: []
 ID_VERIFICATION_SUPPORT_LINK: ''
 JWT_AUTH:
     JWT_AUDIENCE: lms-key
@@ -359,6 +364,9 @@ LANGUAGE_CODE: en
 LANGUAGE_COOKIE: openedx-language-preference
 LEARNER_PORTAL_URL_ROOT: https://learner-portal-edx.devstack.lms:18000
 LEARNING_MICROFRONTEND_URL: null
+LMS_BASE: edx.devstack.lms:18000
+LMS_INTERNAL_ROOT_URL: http://edx.devstack.lms:18000
+LMS_ROOT_URL: http://edx.devstack.lms:18000
 LOCAL_LOGLEVEL: INFO
 LOGGING_ENV: sandbox
 LOGIN_REDIRECT_WHITELIST: []
@@ -368,6 +376,7 @@ LTI_USER_EMAIL_DOMAIN: lti.example.com
 MAILCHIMP_NEW_USER_LIST_ID: null
 MAINTENANCE_BANNER_TEXT: Sample banner message
 MEDIA_ROOT: /edx/var/edxapp/media/
+MEDIA_URL: /media/
 MICROSITE_CONFIGURATION: {}
 MICROSITE_ROOT_DIR: /edx/app/edxapp/edx-microsite
 MKTG_URLS: {}
@@ -436,17 +445,22 @@ PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG:
 PASSWORD_RESET_SUPPORT_LINK: ''
 PAYMENT_SUPPORT_EMAIL: billing@example.com
 PDF_RECEIPT_BILLING_ADDRESS: 'Enter your receipt billing
+
     address here.
+
     '
 PDF_RECEIPT_COBRAND_LOGO_PATH: ''
 PDF_RECEIPT_DISCLAIMER_TEXT: 'ENTER YOUR RECEIPT DISCLAIMER TEXT HERE.
+
     '
 PDF_RECEIPT_FOOTER_TEXT: 'Enter your receipt footer text here.
+
     '
 PDF_RECEIPT_LOGO_PATH: ''
 PDF_RECEIPT_TAX_ID: 00-0000000
 PDF_RECEIPT_TAX_ID_LABEL: fake Tax ID
 PDF_RECEIPT_TERMS_AND_CONDITIONS: 'Enter your receipt terms and conditions here.
+
     '
 PLATFORM_DESCRIPTION: Your Platform Description Here
 PLATFORM_FACEBOOK_ACCOUNT: http://www.facebook.com/YourPlatformFacebookAccount
@@ -585,282 +599,3 @@ ZENDESK_OAUTH_ACCESS_TOKEN: ''
 ZENDESK_URL: ''
 ZENDESK_USER: ''
 
-
-# Adam
-#####################################################################
-
-LOGGING: {
-    "disable_existing_loggers": false,
-    "handlers": {
-        "local": {
-            "class": "logging.NullHandler"
-        },
-        "mail_admins": {
-            "level": "ERROR",
-            "filters": [
-                "require_debug_false"
-            ],
-            "class": "django.utils.log.AdminEmailHandler"
-        },
-        "tracking": {
-            "class": "logging.NullHandler"
-        },
-        "console": {
-            "level": "INFO",
-            "filters": [
-                "userid_context"
-            ],
-            "formatter": "standard",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout"
-        }
-    },
-    "loggers": {
-        "": {
-            "handlers": [
-                "console",
-                "local"
-            ],
-            "level": "INFO",
-            "propagate": false
-        },
-        "requests.packages.urllib3": {
-            "level": "WARN"
-        },
-        "django.request": {
-            "handlers": [
-                "mail_admins"
-            ],
-            "level": "ERROR",
-            "propagate": true
-        },
-        "tracking": {
-            "handlers": [
-                "console"
-            ],
-            "level": "DEBUG",
-            "propagate": false
-        }
-    },
-    "filters": {
-        "userid_context": {
-            "()": "openedx.core.djangoapps.util.log_utils.UserIdFilter"
-        },
-        "require_debug_false": {
-            "()": "django.utils.log.RequireDebugFalse"
-        }
-    },
-    "version": 1,
-    "formatters": {
-        "standard": {
-            "format": "%(asctime)s %(levelname)s %(process)d [%(name)s] [user %(userid)s] %(filename)s:%(lineno)d - %(message)s"
-        },
-        "syslog_format": {
-            "format": "[service_variant=lms][%(name)s][env:sandbox] %(levelname)s [lms  %(process)d] [user %(userid)s] [%(filename)s:%(lineno)d] - %(message)s"
-        },
-        "raw": {
-            "format": "%(message)s"
-        }
-    }
-}
-
-# Don't use S3 in devstack, fall back to filesystem
-DEFAULT_FILE_STORAGE: django.core.files.storage.FileSystemStorage
-MEDIA_ROOT: /edx/var/edxapp/uploads
-MEDIA_URL: http://localhost:18000/media/
-ORA2_FILEUPLOAD_BACKEND: 'django'
-
-DEBUG: True
-USE_I18N: True
-LMS_BASE: 'localhost:18000'
-CMS_BASE: 'localhost:18010'
-
-# By default don't use a worker, execute tasks as if they were local functions
-CELERY_ALWAYS_EAGER: True
-HTTPS: 'off'
-
-LMS_ROOT_URL: http://edx.devstack.lms:18000
-LMS_BASE: edx.devstack.lms:18000
-SITE_NAME: edx.devstack.lms:18000
-LMS_INTERNAL_ROOT_URL: http://edx.devstack.lms:18000
-ENTERPRISE_API_URL: http://edx.devstack.lms:18000/enterprise/api/v1
-IDA_LOGOUT_URI_LIST: [
-    'http://localhost:18130/logout/',  # ecommerce
-    'http://localhost:18150/logout/',  # credentials
-    'http://localhost:18381/logout/',  # discovery
-]
-
-#####################################################################
-# The rest of this is copypasta'd in from base.py and devstack.py
-# Kyle
-#####################################################################
-
-DEFAULT_TEMPLATE_ENGINE: {
-    "NAME": "django",
-    "APP_DIRS": false,
-    "OPTIONS": {
-        "debug": true,
-        "context_processors": [
-            "django.template.context_processors.request",
-            "django.template.context_processors.static",
-            "django.template.context_processors.i18n",
-            "django.contrib.auth.context_processors.auth",
-            "django.template.context_processors.csrf",
-            "django.template.context_processors.media",
-            "django.template.context_processors.tz",
-            "django.contrib.messages.context_processors.messages",
-            "sekizai.context_processors.sekizai",
-            "edxmako.shortcuts.marketing_link_context_processor",
-            "shoppingcart.context_processor.user_has_cart_context_processor",
-            "lms.djangoapps.courseware.context_processor.user_timezone_locale_prefs",
-            "help_tokens.context_processor",
-            "openedx.core.djangoapps.site_configuration.context_processors.configuration_context",
-            "mobile_api.context_processor.is_from_mobile_app",
-            "social_django.context_processors.backends",
-            "social_django.context_processors.login_redirect"
-        ],
-        "loaders": [
-            "openedx.core.djangoapps.theming.template_loaders.ThemeTemplateLoader",
-            "edxmako.makoloader.MakoFilesystemLoader",
-            "edxmako.makoloader.MakoAppDirectoriesLoader"
-        ]
-    },
-    "BACKEND": "django.template.backends.django.DjangoTemplates",
-    "DIRS": [
-        "/edx/app/edxapp/edx-platform/lms/templates",
-        "/edx/app/edxapp/edx-platform/common/templates",
-        "/edx/app/edxapp/edx-platform/common/lib/capa/capa/templates",
-        "/edx/app/edxapp/edx-platform/common/djangoapps/pipeline_mako/templates",
-        "/edx/app/edxapp/edx-platform/common/static"
-    ]
-}
-FEATURES: {
-    "ENABLE_DISCUSSION_HOME_PANEL": true,
-    "ALLOW_WIKI_ROOT_ACCESS": true,
-    "DISABLE_HONOR_CERTIFICATES": false,
-    "ENABLE_MOBILE_REST_API": true,
-    "ALLOW_COURSE_STAFF_GRADE_DOWNLOADS": false,
-    "ENABLE_SHOPPING_CART": true,
-    "ENABLE_PASSWORD_RESET_FAILURE_EMAIL": false,
-    "AUTH_USE_OPENID_PROVIDER": true,
-    "ENABLE_COOKIE_CONSENT": false,
-    "EXPOSE_CACHE_PROGRAMS_ENDPOINT": false,
-    "PREVENT_CONCURRENT_LOGINS": false,
-    "ENABLE_VIDEO_ABSTRACTION_LAYER_API": true,
-    "ENABLE_COUNTRY_ACCESS": false,
-    "ENABLE_COMBINED_LOGIN_REGISTRATION": true,
-    "ENABLE_SOFTWARE_SECURE_FAKE": true,
-    "ENABLE_CSMH_EXTENDED": true,
-    "ENABLE_CREDIT_ELIGIBILITY": false,
-    "ENABLE_SERVICE_STATUS": false,
-    "CUSTOM_COURSES_EDX": false,
-    "ENABLE_AUTOADVANCE_VIDEOS": false,
-    "ENABLE_COURSEWARE_SEARCH": false,
-    "ENABLE_GRADE_DOWNLOADS": true,
-    "ENABLE_DJANGO_ADMIN_SITE": true,
-    "ENABLE_ORA_ALL_FILE_URLS": false,
-    "ENABLE_VIDEO_BUMPER": false,
-    "ENABLE_COSMETIC_DISPLAY_PRICE": true,
-    "DISPLAY_HISTOGRAMS_TO_STAFF": false,
-    "ENABLE_ORA_USER_STATE_UPLOAD_DATA": false,
-    "ENABLE_TEXTBOOK": true,
-    "ENABLE_COURSE_GOALS": true,
-    "ENABLE_ORA_TEAM_SUBMISSIONS": false,
-    "SQUELCH_PII_IN_LOGS": false,
-    "ENABLE_INSTRUCTOR_ANALYTICS": false,
-    "ENABLE_LTI_PROVIDER": false,
-    "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": true,
-    "ENABLE_DISCUSSION_EMAIL_DIGEST": false,
-    "AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING": true,
-    "ENABLE_CCX_ANALYTICS_DASHBOARD_URL": false,
-    "ENABLE_OAUTH2_PROVIDER": true,
-    "ENABLE_COURSEWARE_MICROFRONTEND": true,
-    "DISABLE_AUDIT_CERTIFICATES": false,
-    "ENABLE_XBLOCK_XML_VALIDATION": true,
-    "ENABLE_ONE_CLICK_PROGRAM_PURCHASE": false,
-    "test_django_plugin": true,
-    "FALLBACK_TO_ENGLISH_TRANSCRIPTS": true,
-    "ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES": true,
-    "ENABLE_INSTRUCTOR_BACKGROUND_TASKS": true,
-    "MILESTONES_APP": true,
-    "ENABLE_ORA_USERNAMES_ON_DATA_EXPORT": false,
-    "ENABLE_XBLOCK_VIEW_ENDPOINT": false,
-    "DISPLAY_ANALYTICS_ENROLLMENTS": true,
-    "HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED": false,
-    "DISABLE_MOBILE_COURSE_AVAILABLE": false,
-    "ENABLE_PAYMENT_FAKE": true,
-    "ENABLE_VERIFIED_CERTIFICATES": false,
-    "ENABLE_BULK_ENROLLMENT_VIEW": false,
-    "EMBARGO": false,
-    "ENABLE_CREDIT_API": false,
-    "ENABLE_CROSS_DOMAIN_CSRF_COOKIE": false,
-    "ENABLE_ANNOUNCEMENTS": false,
-    "BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT": true,
-    "ENABLE_TEAMS": true,
-    "LICENSING": true,
-    "ENABLE_PAID_COURSE_REGISTRATION": true,
-    "SHOW_HEADER_LANGUAGE_SELECTOR": true,
-    "ALLOW_AUTOMATED_SIGNUPS": false,
-    "ALLOW_HIDING_DISCUSSION_TAB": false,
-    "ENABLE_PUBLISHER": false,
-    "DISABLE_START_DATES": false,
-    "SHOW_BUMPER_PERIODICITY": 604800,
-    "ENABLE_ENROLLMENT_RESET": true,
-    "PREVIEW_LMS_BASE": "preview.localhost:18000",
-    "COURSES_ARE_BROWSEABLE": true,
-    "MODE_CREATION_FOR_TESTING": false,
-    "COURSES_ARE_BROWSABLE": true,
-    "ALLOW_PUBLIC_ACCOUNT_CREATION": true,
-    "ENABLE_ENROLLMENT_TRACK_USER_PARTITION": true,
-    "ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA": false,
-    "ENABLE_MASQUERADE": true,
-    "AUTOPLAY_VIDEOS": false,
-    "MAX_PROBLEM_RESPONSES_COUNT": 5000,
-    "UNSUPPORTED_BROWSER_ALERT_VERSIONS": "{i:10,f:-3,o:-3,s:-3,c:-3}",
-    "STORE_BILLING_INFO": true,
-    "ENABLE_COURSE_DISCOVERY": false,
-    "ORGANIZATIONS_APP": true,
-    "RESTRICT_AUTOMATIC_AUTH": true,
-    "SHOW_FOOTER_LANGUAGE_SELECTOR": false,
-    "ALLOW_EMAIL_ADDRESS_CHANGE": true,
-    "ENABLE_OPENBADGES": false,
-    "ENABLE_DISCUSSION_SERVICE": true,
-    "DISPLAY_DEBUG_INFO_TO_STAFF": true,
-    "ENTRANCE_EXAMS": true,
-    "INDIVIDUAL_DUE_DATES": false,
-    "ENABLE_LMS_MIGRATION": false,
-    "ENABLE_ACCOUNT_DELETION": true,
-    "MAX_ENROLLMENT_INSTR_BUTTONS": 200,
-    "ENABLE_CHANGE_USER_PASSWORD_ADMIN": false,
-    "ANNOUNCEMENTS_PER_PAGE": 5,
-    "ENABLED_PAYMENT_REPORTS": [
-        "refund_report",
-        "itemized_purchase_report",
-        "university_revenue_share",
-        "certificate_status"
-    ],
-    "ENABLE_CORS_HEADERS": true,
-    "ENABLE_MAX_FAILED_LOGIN_ATTEMPTS": false,
-    "ENABLE_DASHBOARD_SEARCH": false,
-    "AUTOMATIC_AUTH_FOR_TESTING": true,
-    "LOG_POSTPAY_CALLBACKS": true,
-    "ENABLE_EDXNOTES": true,
-    "ENABLE_DEBUG_RUN_PYTHON": false,
-    "ENABLE_VIDEO_UPLOAD_PIPELINE": false,
-    "CERTIFICATES_INSTRUCTOR_GENERATION": false,
-    "ENABLE_COURSE_SORTING_BY_START_DATE": true,
-    "ENABLE_THIRD_PARTY_AUTH": true,
-    "ENABLE_PREREQUISITE_COURSES": false,
-    "ENABLE_FOOTER_MOBILE_APP_LINKS": false,
-    "ENABLE_MKTG_SITE": false,
-    "ENABLE_MKTG_EMAIL_OPT_IN": false,
-    "DISABLE_LOGIN_BUTTON": false,
-    "ENABLE_SYSADMIN_DASHBOARD": false,
-    "REROUTE_ACTIVATION_EMAIL": false,
-    "CERTIFICATES_HTML_VIEW": true,
-    "ENABLE_STUDENT_HISTORY_VIEW": true,
-    "ENABLE_SPECIAL_EXAMS": false,
-    "ENABLE_ENTERPRISE_INTEGRATION": true,
-    "ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF": true,
-    "ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER": false
-}
