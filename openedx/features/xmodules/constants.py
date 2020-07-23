@@ -14,4 +14,4 @@ XBLOCKS_EXCEPT_PROBLEM = [
     'problem-builder'
 ]
 
-date_format = '%b %d, %Y %Z'
+DATE_FORMAT = '%b %d, %Y %Z'

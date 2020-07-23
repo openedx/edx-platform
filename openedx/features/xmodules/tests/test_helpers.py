@@ -2,11 +2,11 @@ from datetime import datetime
 
 import pytest
 
-from openedx.features.xmodules.constants import date_format
+from openedx.features.xmodules.constants import DATE_FORMAT
 from openedx.features.xmodules.helpers import get_due_date_for_problem_xblock
 
 current_date = datetime.now()
-formatted_current_date = current_date.strftime(date_format)
+formatted_current_date = current_date.strftime(DATE_FORMAT)
 
 
 @pytest.mark.parametrize(
