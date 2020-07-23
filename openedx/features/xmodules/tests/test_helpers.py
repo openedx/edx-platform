@@ -2,16 +2,17 @@ from datetime import datetime
 
 import pytest
 
+from openedx.features.xmodules.constants import date_format
 from openedx.features.xmodules.helpers import get_due_date_for_problem_xblock
 
 current_date = datetime.now()
-formatted_date = current_date.strftime("%b %d, %Y %Z")
+formatted_current_date = current_date.strftime(date_format)
 
 
 @pytest.mark.parametrize(
    'due, module_category, expected_result', [
         (current_date, 'audio', None),
-        (current_date, 'problem', formatted_date),
+        (current_date, 'problem', formatted_current_date),
         (None, 'problem', None)
     ]
 )
