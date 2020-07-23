@@ -19,6 +19,7 @@ from openedx.features.edly.tests.factories import EdlySubOrganizationFactory, Ed
 from openedx.features.edly.utils import (
     create_user_link_with_edly_sub_organization,
     decode_edly_user_info_cookie,
+    edly_panel_user_has_edly_org_access,
     encode_edly_user_info_cookie,
     get_edly_sub_org_from_cookie,
     get_edx_org_from_cookie,
@@ -32,7 +33,7 @@ from student.roles import (
     CourseCreatorRole,
     GlobalCourseCreatorRole,
 )
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, GroupFactory
 
 def mock_render_to_string(template_name, context):
     """
@@ -238,3 +239,16 @@ class UtilsTests(TestCase):
         set_global_course_creator_status(self.request, self.user, True)
         assert self._get_course_creator_status(self.user) == 'granted'
         assert auth.user_has_role(self.user, CourseCreatorRole())
+
+    def test_edly_panel_user_has_edly_org_access(self):
+        """
+        Test if a user is edly panel user or edly panel admin user.
+        """
+        self._create_edly_sub_organization()
+        create_user_link_with_edly_sub_organization(self.request, self.request.user)
+
+        assert not edly_panel_user_has_edly_org_access(self.request)
+
+        edly_panel_user_group = GroupFactory(name=settings.EDLY_PANEL_USERS_GROUP)
+        self.request.user.groups.add(edly_panel_user_group)
+        assert edly_panel_user_has_edly_org_access(self.request)

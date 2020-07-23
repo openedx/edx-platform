@@ -233,3 +233,17 @@ def user_belongs_to_edly_organization(request, user):
         return True
 
     return False
+
+
+def edly_panel_user_has_edly_org_access(request):
+    """
+    Check if requesting user is an Edly panel user.
+    """
+    return EdlyUserProfile.objects.filter(
+        edly_sub_organizations__lms_site=request.site,
+        user=request.user,
+        user__groups__name__in=[
+            settings.EDLY_PANEL_ADMIN_USERS_GROUP,
+            settings.EDLY_PANEL_USERS_GROUP,
+        ]
+    ).exists()
