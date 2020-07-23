@@ -13,3 +13,5 @@ XBLOCKS_EXCEPT_PROBLEM = [
     'gp-v2-project',
     'problem-builder'
 ]
+
+DATE_FORMAT = '%b %d, %Y %Z'
