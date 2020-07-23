@@ -43,7 +43,7 @@ chardet==3.0.4            # via -r requirements/edx/testing.txt, pdfminer.six, p
 chem==1.2.0               # via -r requirements/edx/testing.txt
 click-log==0.3.2          # via -r requirements/edx/testing.txt, edx-lint
 click==7.1.2              # via -r requirements/edx/development.in, -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, click-log, code-annotations, edx-lint, nltk, pip-tools, user-util
-code-annotations==0.3.4   # via -r requirements/edx/testing.txt, edx-enterprise
+code-annotations==0.4.0   # via -r requirements/edx/testing.txt, edx-enterprise
 colorama==0.4.1           # via -r requirements/edx/testing.txt, radon
 contextlib2==0.6.0.post1  # via -r requirements/edx/testing.txt
 coreapi==2.3.3            # via -r requirements/edx/testing.txt, drf-yasg
@@ -109,7 +109,7 @@ edx-celeryutils==0.5.1    # via -r requirements/edx/testing.txt, super-csv
 edx-completion==3.2.4     # via -r requirements/edx/testing.txt
 edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/testing.txt
-edx-django-utils==3.4.0   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
+edx-django-utils==3.5.0   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.1  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.4.26    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
@@ -312,7 +312,7 @@ ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
 unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest-plugin
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
-urllib3==1.25.9           # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
+urllib3==1.25.10          # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/testing.txt
 virtualenv==20.0.27       # via -r requirements/edx/testing.txt, tox
 voluptuous==0.11.7        # via -r requirements/edx/testing.txt, ora2
