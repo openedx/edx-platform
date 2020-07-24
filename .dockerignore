@@ -19,7 +19,7 @@ cms/envs/private.py
 # end-noclean
 
 ### Python artifacts
-*.pyc
+**/*.pyc
 
 ### Editor and IDE artifacts
 *~
