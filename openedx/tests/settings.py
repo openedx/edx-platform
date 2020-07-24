@@ -67,6 +67,7 @@ INSTALLED_APPS = (
     'djcelery',
     'django_sites_extensions',
     'openedx.core.djangoapps.django_comment_common',
+    'openedx.core.djangoapps.discussions',
     'openedx.core.djangoapps.video_config',
     'openedx.core.djangoapps.video_pipeline',
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
