@@ -5,7 +5,6 @@ from ..data import ExternalDiscussionData
 from ..external_discussions import (
     create_external_discussion_mapping,
     get_external_discussion_context,
-    get_internal_discussion_context,
     remove_external_discussion_mapping
 )
 from ...models import ExternalDiscussionsIdMapping
@@ -76,17 +75,6 @@ class ExternalDiscussionTestCase(TestCase):
             invalid_course_key,
             invalid_usage_key
         )
-        self.assertIsNone(external_discussion_data)
-
-    def test_get_internal_discussion_context(self):
-        external_discussion_data = get_internal_discussion_context(self.external_discussion_id)
-
-        self.assertEqual(self.expected_discussion_data, external_discussion_data)
-
-    def test_get_internal_discussion_context_invalid_input(self):
-        invalid_external_id = "invalid_external_id"
-        external_discussion_data = get_internal_discussion_context(invalid_external_id)
-
         self.assertIsNone(external_discussion_data)
 
     def test_remove_external_discussion_mapping(self):

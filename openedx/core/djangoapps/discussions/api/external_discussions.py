@@ -71,20 +71,3 @@ def get_external_discussion_context(context_key: LearningContextKey, usage_key: 
         external_discussion_id=discussion_mapping.external_discussion_id,
         usage_key=discussion_mapping.usage_key
     )
-
-
-def get_internal_discussion_context(external_discussion_id: str) -> ExternalDiscussionData:
-    """
-    Return an ExternalDiscussionData object with the context_key and usage_key given the external_discussion_id
-    """
-    try:
-        discussion_mapping = ExternalDiscussionsIdMapping.objects \
-            .get(external_discussion_id=external_discussion_id)
-    except ExternalDiscussionsIdMapping.DoesNotExist:
-        return None
-
-    return ExternalDiscussionData(
-        context_key=discussion_mapping.context_key,
-        external_discussion_id=discussion_mapping.external_discussion_id,
-        usage_key=discussion_mapping.usage_key
-    )
