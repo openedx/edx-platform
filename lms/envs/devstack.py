@@ -375,6 +375,12 @@ if FEATURES['ENABLE_ENTERPRISE_INTEGRATION']:
 ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG = ()
 
 #####################################################################
+
+# django-session-cookie middleware
+DCS_SESSION_COOKIE_SAMESITE = 'Lax'
+DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+
+#####################################################################
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
     from .private import *  # pylint: disable=import-error,wildcard-import
