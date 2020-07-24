@@ -115,7 +115,7 @@ FROM lms as lms-devstack
 # We ought to be able to this higher up in the Dockerfile, and do it the same for Prod and Devstack.
 RUN mkdir -p test_root/log
 ENV DJANGO_SETTINGS_MODULE ""
-RUN NO_PREREQ_INSTALL=1 paver update_assets --settings devstack_decentralized
+RUN NO_PREREQ_INSTALL=1 paver update_assets lms --settings devstack_decentralized
 ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
 
 FROM base as studio
@@ -133,6 +133,6 @@ FROM studio as studio-devstack
 # We ought to be able to this higher up in the Dockerfile, and do it the same for Prod and Devstack.
 RUN mkdir -p test_root/log
 ENV DJANGO_SETTINGS_MODULE ""
-RUN NO_PREREQ_INSTALL=1 paver update_assets --settings devstack_decentralized
+RUN NO_PREREQ_INSTALL=1 paver update_assets cms --settings devstack_decentralized
 ENV DJANGO_SETTINGS_MODULE cms.envs.devstack_decentralized
 
