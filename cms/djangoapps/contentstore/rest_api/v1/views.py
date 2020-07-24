@@ -1,8 +1,8 @@
 "Contentstore Views"
+import copy
 
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -86,67 +86,75 @@ class ProctoredExamSettingsView(APIView):
         'proctoring_provider',
         'proctoring_escalation_email',
         'create_zendesk_tickets',
-        'start'
     ]
 
     def get(self, request, course_id):
-        # todo: should this be wrapped as a bulk operation?
+        """ GET handler """
         course_module = self._get_and_validate_course(request.user, course_id)
-        proctored_exam_settings = self._get_proctored_exam_settings(course_module)
+        course_metadata = CourseMetadata().fetch_all(course_module)
+        proctored_exam_settings = self._get_proctored_exam_setting_values(course_metadata)
 
         data = {}
 
-        data['proctored_exam_settings'] = self._get_settings_values(proctored_exam_settings)
+        data['proctored_exam_settings'] = proctored_exam_settings
         data['available_proctoring_providers'] = get_available_providers()
-
-        # move start key:value out of proctored_exam_settings dictionary and change key
-        data['course_start_date'] = proctored_exam_settings['start'].get('value')
-        del data['proctored_exam_settings']['start']
-
+        data['course_start_date'] = course_metadata['start'].get('value')
         data['is_staff'] = request.user.is_staff
 
         serializer = ProctoredExamConfigurationSerializer(data)
 
         return Response(serializer.data)
-        
+
     def post(self, request, course_id):
+        """ POST handler """
         exam_config = ProctoredExamSettingsSerializer(data=request.data.get('proctored_exam_settings', {}))
         exam_config.is_valid(raise_exception=True)
         with modulestore().bulk_operations(CourseKey.from_string(course_id)):
             course_module = self._get_and_validate_course(request.user, course_id)
-            proctored_exam_settings = self._get_proctored_exam_settings(course_module)
+            course_metadata = CourseMetadata().fetch_all(course_module)
 
+            models_to_update = {}
             for setting_key, value in exam_config.data.items():
-                model = proctored_exam_settings.get(setting_key)
+                model = course_metadata.get(setting_key)
                 if model:
-                    model['value'] = value
+                    models_to_update[setting_key] = copy.deepcopy(model)
+                    models_to_update[setting_key]['value'] = value
 
             # validate data formats and update the course module object
             is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
                 course_module,
-                proctored_exam_settings,
+                models_to_update,
                 user=request.user,
             )
 
             if not is_valid:
-                return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+                error_messages = [error.get('message') for error in errors]
+                return Response(
+                    {'detail': error_messages},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             # save to mongo
             modulestore().update_item(course_module, request.user.id)
+
+            # merge updated settings with all existing settings.
+            # do this because fields that could not be modified are excluded from the result
+            course_metadata = {**course_metadata, **updated_data}
+            updated_setttings = self._get_proctored_exam_setting_values(course_metadata)
+            serializer = ProctoredExamSettingsSerializer(updated_setttings)
             return Response({
-                'proctored_exam_settings': self._get_settings_values(proctored_exam_settings)
+                'proctored_exam_settings': serializer.data
             })
 
     @classmethod
-    def _get_proctored_exam_settings(cls, course_module):
-        course_metadata = CourseMetadata().fetch_all(course_module)
+    def _get_proctored_exam_setting_values(cls, course_metadata):
         return {
-            setting_key: course_metadata[setting_key]
+            setting_key: course_metadata[setting_key].get('value')
             for setting_key in cls.PROCTORED_EXAM_SETTINGS_KEYS
         }
-    
+
     @staticmethod
-    def _get_settings_values(settings):
+    def _get_exam_settings_fields(settings):
         return {
             setting_key: setting_value.get('value')
             for (setting_key, setting_value) in settings.items()
@@ -154,6 +162,7 @@ class ProctoredExamSettingsView(APIView):
 
     @staticmethod
     def _get_and_validate_course(user, course_id):
+        """ check if course_id exists and return it """
         course_key = CourseKey.from_string(course_id)
         course_module = get_course_and_check_access(course_key, user)
 
