@@ -27,7 +27,6 @@ class ScheduleOutlineProcessor(OutlineProcessor):
 
     Things we don't handle yet:
     * Beta test users
-    * Self-paced courses
     * Things that are made inaccessible after they're due.
     """
 
@@ -62,6 +61,8 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         if self._course_start is None or self.at_time < self._course_start:
             return set(full_course_outline.sequences)
 
+        self_paced = full_course_outline.self_paced
+
         inaccessible = set()
         for section in full_course_outline.sections:
             section_start = self.keys_to_schedule_fields[section.usage_key].get('start')
@@ -77,7 +78,13 @@ class ScheduleOutlineProcessor(OutlineProcessor):
                         inaccessible.add(seq.usage_key)
                         continue
 
-                    seq_due = self.keys_to_schedule_fields[seq.usage_key].get('due')
+                    # if course is self-paced, all sequences with enabled hide after due
+                    # must have due date equal to course's end date
+                    if self_paced:
+                        seq_due = self._course_end
+                    else:
+                        seq_due = self.keys_to_schedule_fields[seq.usage_key].get('due')
+
                     if seq.inaccessible_after_due:
                         if seq_due and self.at_time > seq_due:
                             inaccessible.add(seq.usage_key)

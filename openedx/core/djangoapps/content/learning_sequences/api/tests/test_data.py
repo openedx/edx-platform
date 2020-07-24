@@ -32,6 +32,7 @@ class TestCourseOutlineData(TestCase):
             published_at=datetime(2020, 5, 19, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2014",
             sections=generate_sections(cls.course_key, [3, 2]),
+            self_paced=False,
             course_visibility=CourseVisibility.PRIVATE
         )
 

@@ -43,6 +43,7 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2015",
             sections=generate_sections(cls.course_key, [2, 2]),
+            self_paced=False,
             course_visibility=CourseVisibility.PRIVATE
         )
 
@@ -133,6 +134,7 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
             sections=generate_sections(cls.course_key, [2, 1, 3]),
+            self_paced=False,
             course_visibility=CourseVisibility.PRIVATE
         )
         replace_course_outline(cls.simple_outline)
@@ -288,7 +290,8 @@ class ScheduleTestCase(CacheIsolationTestCase):
                         ),
                     ]
                 )
-            ]
+            ],
+            self_paced=False
         )
         replace_course_outline(cls.outline)
 
@@ -380,6 +383,105 @@ class ScheduleTestCase(CacheIsolationTestCase):
             assert key in student_details.outline.accessible_sequences
 
 
+class SelfPacedCourseOutlineTestCase(CacheIsolationTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Users...
+        cls.global_staff = User.objects.create_user(
+            'global_staff', email='gstaff@example.com', is_staff=True
+        )
+        cls.student = User.objects.create_user(
+            'student', email='student@example.com', is_staff=False
+        )
+
+        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
+
+        # The UsageKeys we're going to set up for date tests.
+        cls.section_key = cls.course_key.make_usage_key('chapter', 'ch1')
+
+        # Sequence with due date
+        cls.seq_due_key = cls.course_key.make_usage_key('sequential', 'seq')
+
+        # Sequence with due date and "inaccessible after due" enabled
+        cls.seq_hide_after_due_key = cls.course_key.make_usage_key('sequential', 'seq_hide_after_due_key')
+
+        # Set scheduling information into edx-when for a single Section with
+        # two sequences with due date
+        set_dates_for_course(
+            cls.course_key,
+            [
+                (
+                    cls.course_key.make_usage_key('course', 'course'),
+                    {
+                        'start': datetime(2020, 5, 10, tzinfo=timezone.utc),
+                    }
+                ),
+                (
+                    cls.section_key,
+                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
+                ),
+                (
+                    cls.seq_due_key,
+                    {'due': datetime(2020, 5, 21, tzinfo=timezone.utc)}
+                ),
+                (
+                    cls.seq_hide_after_due_key,
+                    {'due': datetime(2020, 5, 21, tzinfo=timezone.utc)}
+                ),
+            ]
+        )
+        visibility = VisibilityData(
+            hide_from_toc=False,
+            visible_to_staff_only=False
+        )
+        cls.outline = CourseOutlineData(
+            course_key=cls.course_key,
+            title="User Outline Test Course!",
+            published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
+            published_version="5ebece4b69dd593d82fe2020",
+            course_visibility=CourseVisibility.PRIVATE,
+            sections=[
+                CourseSectionData(
+                    usage_key=cls.section_key,
+                    title="Section",
+                    visibility=visibility,
+                    sequences=[
+                        CourseLearningSequenceData(
+                            usage_key=cls.seq_due_key,
+                            title='Due',
+                            visibility=visibility
+                        ),
+                        CourseLearningSequenceData(
+                            usage_key=cls.seq_hide_after_due_key,
+                            title='Inaccessible after due',
+                            visibility=visibility,
+                            inaccessible_after_due=True
+                        ),
+                    ],
+                ),
+            ],
+            self_paced=True,
+        )
+
+        replace_course_outline(cls.outline)
+
+        # Enroll student in the course
+        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
+
+    def test_sequences_accessible_after_due(self):
+        at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)
+        staff_outline = get_user_course_outline_details(self.course_key, self.global_staff, at_time).outline
+        student_outline = get_user_course_outline_details(self.course_key, self.student, at_time).outline
+
+        # Staff can always access all sequences
+        assert len(staff_outline.accessible_sequences) == 2
+
+        # In self-paced course, due date of sequences equals to due date of
+        # course, so here student should see all sequences, even if their
+        # due dates explicitly were set before end of course
+        assert len(student_outline.accessible_sequences) == 2
+
+
 class VisbilityTestCase(CacheIsolationTestCase):
     """
     Visibility-related tests.
@@ -455,7 +557,8 @@ class VisbilityTestCase(CacheIsolationTestCase):
                     ]
                 )
 
-            ]
+            ],
+            self_paced=False
         )
         replace_course_outline(cls.outline)
 
@@ -464,17 +567,17 @@ class VisbilityTestCase(CacheIsolationTestCase):
 
     def test_visibility(self):
         at_time = datetime(2020, 5, 21, tzinfo=timezone.utc)  # Exact value doesn't matter
-        staff_details = get_user_course_outline_details(self.course_key, self.global_staff, at_time)
-        student_details = get_user_course_outline_details(self.course_key, self.student, at_time)
+        staff_outline = get_user_course_outline_details(self.course_key, self.global_staff, at_time).outline
+        student_outline = get_user_course_outline_details(self.course_key, self.student, at_time).outline
 
         # Sections visible
-        assert len(staff_details.outline.sections) == 2
-        assert len(student_details.outline.sections) == 1
+        assert len(staff_outline.sections) == 2
+        assert len(student_outline.sections) == 1
 
         # Sequences visible
-        assert len(staff_details.outline.sequences) == 4
-        assert len(student_details.outline.sequences) == 1
-        assert self.normal_in_normal_key in student_details.outline.sequences
+        assert len(staff_outline.sequences) == 4
+        assert len(student_outline.sequences) == 1
+        assert self.normal_in_normal_key in student_outline.sequences
 
 
 class SequentialVisibilityTestCase(CacheIsolationTestCase):
@@ -508,6 +611,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
             sections=generate_sections(cls.course_key, [2, 1, 3]),
+            self_paced=False,
             course_visibility=CourseVisibility.PRIVATE
         )
         replace_course_outline(cls.course_outline)

@@ -45,6 +45,7 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
             sections=generate_sections(cls.course_key, [2, 2]),
+            self_paced=False,
             course_visibility=CourseVisibility.PUBLIC
         )
         replace_course_outline(cls.outline)

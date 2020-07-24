@@ -134,6 +134,9 @@ class CourseOutlineData:
 
     sections = attr.ib(type=List[CourseSectionData])
 
+    # Defines if course self-paced or instructor-paced.
+    self_paced = attr.ib(type=bool)
+
     # To make sure that our data structure is consistent, this field is
     # derived from what you pass into `sections`. Do not set this directly.
     sequences = attr.ib(type=Dict[UsageKey, CourseLearningSequenceData], init=False)

@@ -104,6 +104,7 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
         published_at=course_context.learning_context.published_at,
         published_version=course_context.learning_context.published_version,
         sections=sections_data,
+        self_paced=course_context.self_paced,
         course_visibility=CourseVisibility(course_context.course_visibility),
     )
     TieredCache.set_all_tiers(cache_key, outline_data, 300)
@@ -218,7 +219,10 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,
         accessible_sequences=accessible_sequences,
         **{
             name: getattr(trimmed_course_outline, name)
-            for name in ['course_key', 'title', 'published_at', 'published_version', 'sections', 'course_visibility']
+            for name in [
+                'course_key', 'title', 'published_at', 'published_version',
+                'sections', 'self_paced', 'course_visibility'
+            ]
         }
     )
 
@@ -266,6 +270,7 @@ def _update_course_context(course_outline: CourseOutlineData):
         learning_context=learning_context,
         defaults={
             'course_visibility': course_outline.course_visibility.value,
+            'self_paced': course_outline.self_paced,
         }
     )
     if created:

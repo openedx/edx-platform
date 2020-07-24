@@ -80,6 +80,7 @@ class CourseContext(TimeStampedModel):
     course_visibility = models.CharField(
         max_length=32, choices=[(constant.value, constant.value) for constant in CourseVisibility]
     )
+    self_paced = models.BooleanField(default=False)
 
 
 class LearningSequence(TimeStampedModel):
