@@ -4,80 +4,82 @@ Views to add features in courseware.
 
 from django.utils.translation import ugettext as _
 from rest_framework import status
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from submissions.api import SubmissionError
 
-from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from courseware.models import StudentModule
+from lms.djangoapps.instructor import enrollment
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.django.models import CourseKey, UsageKey
 from openedx.core.lib.api.view_utils import view_auth_classes
 
-from .constants import COMP_ASSESS_RECORD_SUCCESS_MSG
-from .helpers import get_competency_assessments_score, revert_user_attempts_from_edx, validate_problem_id
+from .helpers import validate_problem_id
 from .models import CompetencyAssessmentRecord
 from .serializers import CompetencyAssessmentRecordSerializer
 
 
-@api_view()
 @view_auth_classes(is_authenticated=True)
-@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
-def competency_assessments_score_view(request, chapter_id):
-    """
-    API View to fetch competency assessments score.
-    """
-    try:
-        score_dict = get_competency_assessments_score(request.user, chapter_id)
-        return Response(score_dict, status=status.HTTP_200_OK)
-    except (CourseAccessRedirect, CoursewareAccessException):
-        return Response({
-            'detail': _('User does not have access to this course'),
-        }, status=status.HTTP_403_FORBIDDEN)
+class CompetencyAssessmentAPIView(APIView):
+
+    def _get_score_response(self, chapter_id, status=status.HTTP_200_OK):
+        score = CompetencyAssessmentRecord.objects.get_score(self.request.user, chapter_id)
+        return Response(score, status=status)
+
+    def get(self, request, chapter_id):
+        """Return assessment score"""
+        return self._get_score_response(chapter_id)
+
+    def post(self, request, chapter_id):
+        """Save list of competency assessment records and return assessment score or errors"""
+        competency_records = request.data
+        serializer = CompetencyAssessmentRecordSerializer(data=competency_records, many=True, context={
+            'request': request
+        })
+        if serializer.is_valid():
+            serializer.save()
+            return self._get_score_response(chapter_id, status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
 @view_auth_classes(is_authenticated=True)
-def record_and_fetch_competency_assessment(request, chapter_id):
-    """
-    :param request:
-    :param chapter_id:
-    request's POST data must have following keys
-        problem_id: UsageKeyField, block-v1:PUCIT+IT1+1+type@problem+block@7f1593ef300e4f569e26356b65d3b76b
-        problem_text: String, This is a problem
-        assessment_type: String, pre/post
-        attempt: Integer, 1
-        correctness: String, correct/incorrect
-        choice_id: String, 1 or '0,1,2,3' in case of multiple selected choices
-        choice_text: String, This is correct choice
-        score:Integer, 1
-    :return: JSON
-    """
-    competency_records = request.data
+class RevertPostAssessmentAttemptsAPIView(APIView):
 
-    serializer = CompetencyAssessmentRecordSerializer(data=competency_records, context=dict(request=request), many=True)
-    if serializer.is_valid():
-        serializer.save()
-        competency_assessment_score = get_competency_assessments_score(request.user, chapter_id)
-        return Response(
-            {
-                'competency_assessment_score': competency_assessment_score,
-                'message': COMP_ASSESS_RECORD_SUCCESS_MSG
-            }, status=status.HTTP_201_CREATED)
-    else:
-        return Response({'message': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, course_id):
+        user = request.user
+        problem_id = request.data.get('problem_id')
+        validated_problem_id = validate_problem_id(problem_id)
+        reverted_attempts_count = CompetencyAssessmentRecord.objects.revert_user_post_assessment_attempts(
+            problem_id=validated_problem_id, user=user
+        )
+        has_deleted_post_assessment_attempts = reverted_attempts_count > 0
+        if has_deleted_post_assessment_attempts:
+            self._revert_user_attempts_from_edx(course_id, validated_problem_id)
 
+        return Response(status=status.HTTP_200_OK)
 
-@api_view(['POST'])
-@view_auth_classes(is_authenticated=True)
-@renderer_classes([JSONRenderer, BrowsableAPIRenderer])
-def revert_user_post_assessment_attempts(request, course_id):
-    user = request.user
-    problem_id = request.data.get('problem_id')
-    validated_problem_id = validate_problem_id(problem_id)
-    reverted_attempts_count = CompetencyAssessmentRecord.objects.revert_user_post_assessment_attempts(
-        problem_id=validated_problem_id, user=user
-    )
-    has_deleted_post_assessment_attempts = reverted_attempts_count > 0
-    if has_deleted_post_assessment_attempts:
-        revert_user_attempts_from_edx(course_id, user, validated_problem_id)
-
-    return Response(status=status.HTTP_200_OK)
+    def _revert_user_attempts_from_edx(self, course_id, problem_usage_key):
+        """
+        :param course_id: str course id
+        :param problem_usage_key: UsageKey problem id
+        """
+        try:
+            user = self.request.user
+            course_key = CourseKey.from_string(course_id)
+            module_state_key = problem_usage_key.map_into_course(course_key)
+            enrollment.reset_student_attempts(
+                course_key,
+                user,
+                module_state_key,
+                requesting_user=user,
+                delete_module=True
+            )
+        except InvalidKeyError:
+            raise ValidationError(_('Course id is not valid.'))
+        except StudentModule.DoesNotExist:
+            raise ValidationError(_('Module does not exist.'))
+        except SubmissionError:
+            # Trust the submissions API to log the error
+            raise APIException(_('An error occurred while deleting the score.'))
