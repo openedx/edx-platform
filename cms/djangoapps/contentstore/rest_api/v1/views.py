@@ -90,20 +90,21 @@ class ProctoredExamSettingsView(APIView):
 
     def get(self, request, course_id):
         """ GET handler """
-        course_module = self._get_and_validate_course_access(request.user, course_id)
-        course_metadata = CourseMetadata().fetch_all(course_module)
-        proctored_exam_settings = self._get_proctored_exam_setting_values(course_metadata)
+        with modulestore().bulk_operations(CourseKey.from_string(course_id)):
+            course_module = self._get_and_validate_course_access(request.user, course_id)
+            course_metadata = CourseMetadata().fetch_all(course_module)
+            proctored_exam_settings = self._get_proctored_exam_setting_values(course_metadata)
 
-        data = {}
+            data = {}
 
-        data['proctored_exam_settings'] = proctored_exam_settings
-        data['available_proctoring_providers'] = get_available_providers()
-        data['course_start_date'] = course_metadata['start'].get('value')
-        data['is_staff'] = request.user.is_staff
+            data['proctored_exam_settings'] = proctored_exam_settings
+            data['available_proctoring_providers'] = get_available_providers()
+            data['course_start_date'] = course_metadata['start'].get('value')
+            data['is_staff'] = request.user.is_staff
 
-        serializer = ProctoredExamConfigurationSerializer(data)
+            serializer = ProctoredExamConfigurationSerializer(data)
 
-        return Response(serializer.data)
+            return Response(serializer.data)
 
     def post(self, request, course_id):
         """ POST handler """
