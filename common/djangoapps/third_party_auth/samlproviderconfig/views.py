@@ -57,14 +57,14 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
             EnterpriseCustomerIdentityProvider,
             enterprise_customer__uuid=self.requested_enterprise_uuid
         )
-        return SAMLProviderConfig.objects.filter(slug=enterprise_customer_idp.provider_id)
+        return SAMLProviderConfig.objects.current_set().filter(slug=enterprise_customer_idp.provider_id)
 
     @property
     def requested_enterprise_uuid(self):
         """
         The enterprise customer uuid from request params or post body
         """
-        if self.request.method == "POST":
+        if self.request.method in ('POST', 'PUT'):
             uuid_str = self.request.POST.get('enterprise_customer_uuid')
             if uuid_str is None:
                 raise ParseError('Required enterprise_customer_uuid is missing')

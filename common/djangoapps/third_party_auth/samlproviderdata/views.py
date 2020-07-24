@@ -3,6 +3,7 @@
 """
 
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from edx_rbac.mixins import PermissionRequiredMixin
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets
@@ -52,7 +53,10 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
             EnterpriseCustomerIdentityProvider,
             enterprise_customer__uuid=self.requested_enterprise_uuid
         )
-        saml_provider = SAMLProviderConfig.objects.get(pk=enterprise_customer_idp.provider_id)
+        try:
+            saml_provider = SAMLProviderConfig.objects.current_set().get(slug=enterprise_customer_idp.provider_id)
+        except SAMLProviderConfig.DoesNotExist:
+            raise Http404('No matching SAML provider found.')
         return SAMLProviderData.objects.filter(entity_id=saml_provider.entity_id)
 
     @property
@@ -60,7 +64,7 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
         """
         The enterprise customer uuid from request params or post body
         """
-        if self.request.method in ('POST', 'PATCH', 'DELETE'):
+        if self.request.method in ('POST', 'PATCH'):
             uuid_str = self.request.POST.get('enterprise_customer_uuid')
             if uuid_str is None:
                 raise ParseError('Required enterprise_customer_uuid is missing')
