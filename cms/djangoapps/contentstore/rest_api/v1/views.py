@@ -34,7 +34,7 @@ class ProctoredExamSettingsView(APIView):
 
     **Returns**
 
-        * 200: OK - Proctored exam settings saved.
+        * 200: OK - Contains a set of course proctored exam settings.
         * 401: The requesting user is not authenticated.
         * 403: The requesting user lacks access to the course.
         * 404: The requested course does not exist.
@@ -69,7 +69,7 @@ class ProctoredExamSettingsView(APIView):
 
     **Returns**
 
-        * 200: OK - Contains a set of course proctored exam settings.
+        * 200: OK - Proctored exam settings saved.
         * 400: Bad Request - Unable to save requested settings.
         * 401: The requesting user is not authenticated.
         * 403: The requesting user lacks access to the course.
