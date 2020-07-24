@@ -62,6 +62,11 @@ git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752
 # back into the upstream code.
 git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-ratelimit-backend==2.0.1a5
 
+# This is tagged as 3.4.0 in the repo, but it was never released to PyPI due to
+# a broken test: https://github.com/python-social-auth/social-core/issues/485
+# Remove once package is released.
+git+https://github.com/python-social-auth/social-core.git@9d93069564a60495e0ebd697b33e16fcff14195b#egg=social-auth-core==3.4.0
+
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@ffec49bb09785fb688afc5d24714d4e43ae8449f#egg=codejail==3.0.1
 -e git+https://github.com/edx/acid-block.git@758855a67d2f12bd74db4d5e7a0862d6e65f079c#egg=acid-xblock
