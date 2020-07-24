@@ -8,6 +8,7 @@ from django.urls import reverse
 from course_modes.models import CourseMode
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -97,3 +98,27 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.assertEqual(handouts_html, '<p>Hi</p>' if handouts_visible else '')
 
     # TODO: write test_get_unknown_course when more data is pulled into the Outline Tab API
+
+    @ddt.data(True, False)
+    def test_welcome_message(self, welcome_message_is_dismissed):
+        self.store.create_item(
+            self.user.id, self.course.id,
+            'course_info',
+            'updates',
+            fields={
+                'items': [{
+                    'content': '<p>Welcome</p>',
+                    'status': 'visible',
+                    'date': 'July 23, 2020',
+                    'id': 1
+                }]
+            }
+        )
+        UserCourseTagFactory(
+            user=self.user,
+            course_id=self.course.id,
+            key='view-welcome-message',
+            value=False if welcome_message_is_dismissed else True
+        )
+        welcome_message_html = self.client.get(self.url).data['welcome_message_html']
+        self.assertEqual(welcome_message_html, None if welcome_message_is_dismissed else '<p>Welcome</p>')

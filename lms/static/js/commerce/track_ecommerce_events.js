@@ -10,7 +10,7 @@
             var eventAttrs = {linkName: linkName};
             var allowedAttrs = ['linkType', 'pageName', 'linkCategory'];
 
-            if (!window.analytics) {
+            if (!window.analytics || !window.analytics.trackLink) {
                 return;
             }
 
@@ -31,4 +31,6 @@
 
         return TrackECommerceEvents;
     });
-}).call(this, define || RequireJS.define);
+}).call(this,
+    typeof define === 'function' && define.amd ? define : RequireJS.define
+);

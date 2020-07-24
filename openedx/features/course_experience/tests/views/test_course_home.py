@@ -442,7 +442,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         bannerText = u'''<div class="first-purchase-offer-banner" role="note">
              <span class="first-purchase-offer-banner-bold">
              Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</span>
-             <br>Use code <b>EDXWELCOME</b> at checkout! <a href="{upgrade_link}">Upgrade Now</a>
+             <br>Use code <b>EDXWELCOME</b> at checkout! <a id="welcome" href="{upgrade_link}">Upgrade Now</a>
              </div>'''.format(
             discount_expiration_date=discount_expiration_date,
             percentage=percentage,
@@ -981,7 +981,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertContains(response, 'section-upgrade')
         url = EcommerceService().get_checkout_page_url(self.verified_mode.sku)
-        self.assertContains(response, '<a class="btn-brand btn-upgrade"')
+        self.assertContains(response, '<a id="green_upgrade" class="btn-brand btn-upgrade"')
         self.assertContains(response, url)
         self.assertContains(
             response,
