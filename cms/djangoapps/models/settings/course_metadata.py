@@ -317,7 +317,11 @@ class CourseMetadata(object):
             if proctoring_provider_model and proctoring_provider_model.get('value') == 'proctortrack':
                 if not escalation_email:
                     message = missing_escalation_email_msg.format(provider=proctoring_provider_model.get('value'))
-                    errors.append({'key': 'proctoring_provider', 'message': message, 'model': proctoring_provider_model})
+                    errors.append({
+                        'key': 'proctoring_provider',
+                        'message': message,
+                        'model': proctoring_provider_model
+                    })
 
             if (
                 escalation_email_model and not proctoring_provider_model and
@@ -325,7 +329,11 @@ class CourseMetadata(object):
             ):
                 if not escalation_email:
                     message = missing_escalation_email_msg.format(provider=descriptor.proctoring_provider)
-                    errors.append({'key': 'proctoring_escalation_email', 'message': message, 'model': escalation_email_model})
+                    errors.append({
+                        'key': 'proctoring_escalation_email',
+                        'message': message,
+                        'model': escalation_email_model
+                    })
 
         return errors
 
