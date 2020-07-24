@@ -1328,6 +1328,10 @@ INSTALLED_APPS = [
     # API access administration
     'openedx.core.djangoapps.api_admin',
 
+    # CORS and cross-domain CSRF
+    'corsheaders',
+    'openedx.core.djangoapps.cors_csrf',
+
     # History tables
     'simple_history',
 
@@ -1485,6 +1489,9 @@ INSTALLED_APPS = [
     # DRF filters
     'django_filters',
     'cms.djangoapps.api',
+
+    # edx-drf-extensions
+    'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
 
     # Entitlements, used in openedx tests
     'entitlements',
