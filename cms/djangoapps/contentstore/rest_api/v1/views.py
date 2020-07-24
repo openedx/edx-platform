@@ -90,7 +90,7 @@ class ProctoredExamSettingsView(APIView):
 
     def get(self, request, course_id):
         """ GET handler """
-        course_module = self._get_and_validate_course(request.user, course_id)
+        course_module = self._get_and_validate_course_access(request.user, course_id)
         course_metadata = CourseMetadata().fetch_all(course_module)
         proctored_exam_settings = self._get_proctored_exam_setting_values(course_metadata)
 
@@ -110,7 +110,7 @@ class ProctoredExamSettingsView(APIView):
         exam_config = ProctoredExamSettingsSerializer(data=request.data.get('proctored_exam_settings', {}))
         exam_config.is_valid(raise_exception=True)
         with modulestore().bulk_operations(CourseKey.from_string(course_id)):
-            course_module = self._get_and_validate_course(request.user, course_id)
+            course_module = self._get_and_validate_course_access(request.user, course_id)
             course_metadata = CourseMetadata().fetch_all(course_module)
 
             models_to_update = {}
@@ -128,7 +128,7 @@ class ProctoredExamSettingsView(APIView):
             )
 
             if not is_valid:
-                error_messages = [error.get('message') for error in errors]
+                error_messages = [{error.get('key'): error.get('message')} for error in errors]
                 return Response(
                     {'detail': error_messages},
                     status=status.HTTP_400_BAD_REQUEST
