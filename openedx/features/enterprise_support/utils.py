@@ -51,7 +51,8 @@ def update_logistration_context_for_enterprise(request, context, enterprise_cust
     """
     sidebar_context = {}
     if enterprise_customer:
-        sidebar_context = get_enterprise_sidebar_context(enterprise_customer, request)
+        is_proxy_login = request.GET.get('proxy_login')
+        sidebar_context = get_enterprise_sidebar_context(enterprise_customer, is_proxy_login)
 
     if sidebar_context:
         context['data']['registration_form_desc']['fields'] = enterprise_fields_only(
@@ -67,7 +68,7 @@ def update_logistration_context_for_enterprise(request, context, enterprise_cust
     update_third_party_auth_context_for_enterprise(request, context, enterprise_customer)
 
 
-def get_enterprise_sidebar_context(enterprise_customer, request):
+def get_enterprise_sidebar_context(enterprise_customer, is_proxy_login):
     """
     Get context information for enterprise sidebar for the given enterprise customer.
 
@@ -84,7 +85,6 @@ def get_enterprise_sidebar_context(enterprise_customer, request):
     branding_configuration = enterprise_customer.get('branding_configuration', {})
     logo_url = branding_configuration.get('logo', '') if isinstance(branding_configuration, dict) else ''
 
-    is_proxy_login = request.GET.get('proxy_login')
     if is_proxy_login:
         branded_welcome_template = configuration_helpers.get_value(
             'ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE',

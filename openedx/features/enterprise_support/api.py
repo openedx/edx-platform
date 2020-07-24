@@ -450,7 +450,7 @@ def enterprise_customer_for_request(request):
     Check all the context clues of the request to determine if
     the request being made is tied to a particular EnterpriseCustomer.
     """
-    if 'enterprise_customer' in request.session and request.session['enterprise_customer']:
+    if request.session.get('enterprise_customer'):
         return enterprise_customer_from_cache(request=request)
     else:
         enterprise_customer = enterprise_customer_from_api(request)
