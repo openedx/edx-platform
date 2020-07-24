@@ -618,6 +618,13 @@ class SAMLProviderConfig(ProviderConfig):
             "This is helpful for testing/setup but should always be disabled before users start using this provider."
         ),
     )
+    country = models.CharField(
+        max_length=128,
+        help_text=(
+            u'URN of SAML attribute containing the user`s country.',
+        ),
+        blank=True,
+    )
     other_settings = models.TextField(
         verbose_name=u"Advanced settings", blank=True,
         help_text=(
@@ -692,7 +699,7 @@ class SAMLProviderConfig(ProviderConfig):
             conf = {}
         attrs = (
             'attr_user_permanent_id', 'attr_full_name', 'attr_first_name',
-            'attr_last_name', 'attr_username', 'attr_email', 'entity_id')
+            'attr_last_name', 'attr_username', 'attr_email', 'entity_id', 'country')
         attr_defaults = {
             'attr_full_name': 'default_full_name',
             'attr_first_name': 'default_first_name',
