@@ -20,7 +20,6 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from pytz import UTC
 
-from contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from course_modes.models import CourseMode
 from models.settings.course_grading import GRADING_POLICY_CHANGED_EVENT_TYPE, CourseGradingModel, hash_grading_policy
@@ -1290,14 +1289,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         })
         self.assertEqual(response.status_code, 200)
 
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
-    def test_proctoring_provider_present_when_waffle_flag_enabled(self):
-        """
-        Tests that proctoring provider field is not filtered out when the waffle flag is enabled.
-        """
-        test_model = CourseMetadata.fetch(self.fullcourse)
-        self.assertIn('proctoring_provider', test_model)
-
     @ddt.data(True, False)
     @override_settings(
         PROCTORING_BACKENDS={
@@ -1306,10 +1297,9 @@ class CourseMetadataEditingTest(CourseTestCase):
         },
         PARTNER_SUPPORT_EMAIL='support@foobar.com'
     )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_does_not_allow_proctoring_provider_changes_after_course_start(self, staff_user):
         """
-        Course staff cannot modify proctoring provder after the course start date.
+        Course staff cannot modify proctoring provider after the course start date.
         Only admin users may update the provider if the course has started.
         """
         field_name = "proctoring_provider"
@@ -1341,118 +1331,6 @@ class CourseMetadataEditingTest(CourseTestCase):
             self.assertIsNone(test_model)
 
     @ddt.data(True, False)
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
-    def test_validate_update_allows_changes_to_settings_when_proctoring_provider_disabled(self, staff_user):
-        """
-        Course staff can modify Advanced Settings when the proctoring_provider settings is not available (i.e. when
-        the ENABLE_PROCTORING_PROVIDER_OVERRIDES is not enabled for the course). This ensures that our restrictions
-        on changing the proctoring_provider do not inhibit users from changing Advanced Settings when the
-        proctoring_provider setting is not available.
-        """
-        # It doesn't matter what the field is - just check that we can change any field.
-        field_name = "enable_proctored_exams"
-        course = CourseFactory.create(start=datetime.datetime.now(UTC) - datetime.timedelta(days=1))
-        user = UserFactory.create(is_staff=staff_user)
-
-        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
-            course,
-            {
-                field_name: {"value": True},
-            },
-            user=user
-        )
-        self.assertTrue(did_validate)
-        self.assertEqual(len(errors), 0)
-        self.assertIn(field_name, test_model)
-
-    @override_settings(
-        PROCTORING_BACKENDS={
-            'DEFAULT': 'test_proctoring_provider',
-            'test_proctoring_provider': {}
-        }
-    )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
-    def test_validate_update_does_not_filter_out_proctoring_provider_when_waffle_flag_enabled(self):
-        """
-        Tests that proctoring provider field is returned by validate_and_update_from_json method when
-        waffle flag is enabled.
-        """
-        field_name = "proctoring_provider"
-
-        _, _, test_model = CourseMetadata.validate_and_update_from_json(
-            self.course,
-            {
-                field_name: {"value": 'test_proctoring_provider'},
-            },
-            user=self.user
-        )
-        self.assertIn(field_name, test_model)
-
-    @override_settings(
-        PROCTORING_BACKENDS={
-            'DEFAULT': 'test_proctoring_provider',
-            'test_proctoring_provider': {}
-        }
-    )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
-    def test_update_from_json_does_not_filter_out_proctoring_provider_when_waffle_flag_enabled(self):
-        """
-        Tests that proctoring provider field is returned by update_from_json method when
-        waffle flag is enabled.
-        """
-        field_name = "proctoring_provider"
-        test_model = CourseMetadata.update_from_json(
-            self.course,
-            {
-                field_name: {"value": 'test_proctoring_provider'},
-            },
-            user=self.user
-        )
-        self.assertIn(field_name, test_model)
-
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
-    def test_proctoring_provider_not_present_when_waffle_flag_not_enabled(self):
-        """
-        Tests that proctoring provider field is filtered out when the waffle flag is not enabled.
-        """
-        test_model = CourseMetadata.fetch(self.fullcourse)
-        self.assertNotIn('proctoring_provider', test_model)
-
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
-    def test_validate_update_does_filter_out_proctoring_provider_when_waffle_flag_not_enabled(self):
-        """
-        Tests that proctoring provider field is not returned by validate_and_update_from_json method when
-        waffle flag is not enabled.
-        """
-        field_name = "proctoring_provider"
-
-        _, _, test_model = CourseMetadata.validate_and_update_from_json(
-            self.course,
-            {
-                field_name: {"value": 'test_proctoring_provider'},
-            },
-            user=self.user
-        )
-        self.assertNotIn(field_name, test_model)
-
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
-    def test_update_from_json_does_filter_out_proctoring_provider_when_waffle_flag_not_enabled(self):
-        """
-        Tests that proctoring provider field is not returned by update_from_json method when
-        waffle flag is not enabled.
-        """
-        field_name = "proctoring_provider"
-
-        test_model = CourseMetadata.update_from_json(
-            self.course,
-            {
-                field_name: {"value": 'test_proctoring_provider'},
-            },
-            user=self.user
-        )
-        self.assertNotIn(field_name, test_model)
-
-    @ddt.data(True, False)
     @override_settings(
         PROCTORING_BACKENDS={
             'DEFAULT': 'test_proctoring_provider',
@@ -1461,7 +1339,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         },
         FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True},
     )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_requires_escalation_email_for_proctortrack(self, include_blank_email):
         json_data = {
             "proctoring_provider": {"value": 'proctortrack'},
@@ -1489,7 +1366,6 @@ class CourseMetadataEditingTest(CourseTestCase):
             'proctortrack': {}
         }
     )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_does_not_require_escalation_email_by_default(self):
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
@@ -1509,7 +1385,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         },
         FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True},
     )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_cannot_unset_escalation_email_when_proctortrack_is_provider(self):
         course = CourseFactory.create()
         CourseMetadata.update_from_dict({"proctoring_provider": 'proctortrack'}, course, self.user)
@@ -1534,7 +1409,6 @@ class CourseMetadataEditingTest(CourseTestCase):
             'proctortrack': {}
         }
     )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_set_proctortrack_provider_with_valid_escalation_email(self):
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
             self.course,
@@ -1555,7 +1429,6 @@ class CourseMetadataEditingTest(CourseTestCase):
             'proctortrack': {}
         }
     )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_validate_update_escalation_email_not_requirement_disabled(self):
         """
         Tests the escalation email is not required if 'ENABLED_EXAM_SETTINGS_HTML_VIEW'

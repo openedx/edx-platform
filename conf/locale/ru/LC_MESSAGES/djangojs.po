@@ -128,6 +128,7 @@
 # Translators:
 # Alexander Eroshkin <gjrfytne@gmail.com>, 2019
 # Alexandr Kosharny <acosarnii@gmail.com>, 2016
+# Anastasija Teresenkova <anastasija_te@inbox.lv>, 2020
 # Andrey Bochkarev <abocha@ya.ru>, 2015
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
@@ -183,7 +184,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-19 20:42+0000\n"
+"POT-Creation-Date: 2020-07-26 20:42+0000\n"
 "PO-Revision-Date: 2020-07-14 21:10+0000\n"
 "Last-Translator: Irina Fedulova <istartlin@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"

@@ -37,7 +37,7 @@ botocore==1.8.17          # via -r requirements/edx/base.txt, boto3, s3transfer
 bridgekeeper==0.9         # via -r requirements/edx/base.txt
 celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-celery, django-user-tasks, edx-celeryutils, edx-enterprise
 certifi==2020.6.20        # via -r requirements/edx/base.txt, requests
-cffi==1.14.0              # via -r requirements/edx/base.txt, cryptography
+cffi==1.14.1              # via -r requirements/edx/base.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/base.txt, pdfminer.six, pysrt, requests
 chem==1.2.0               # via -r requirements/edx/base.txt
 click-log==0.3.2          # via edx-lint
@@ -47,7 +47,7 @@ colorama==0.4.1           # via radon
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.txt
 coreapi==2.3.3            # via -r requirements/edx/base.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/base.txt, coreapi, drf-yasg
-coverage==5.2             # via -r requirements/edx/coverage.txt, pytest-cov
+coverage==5.2.1           # via -r requirements/edx/coverage.txt, pytest-cov
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.in
 crowdsourcehinter-xblock==0.6  # via -r requirements/edx/base.txt
 cryptography==3.0         # via -r requirements/edx/base.txt, django-fernet-fields, edx-enterprise, pdfminer.six, pyjwt, social-auth-core
@@ -74,13 +74,13 @@ django-method-override==1.0.4  # via -r requirements/edx/base.txt
 django-model-utils==4.0.0  # via -r requirements/edx/base.txt, django-user-tasks, edx-bulk-grades, edx-celeryutils, edx-completion, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-rbac, edx-submissions, edx-when, edxval, ora2, super-csv
 django-mptt==0.11.0       # via -r requirements/edx/base.txt, django-wiki
 django-multi-email-field==0.6.2  # via -r requirements/edx/base.txt, edx-enterprise
-django-mysql==3.7.1       # via -r requirements/edx/base.txt
+django-mysql==3.8.1       # via -r requirements/edx/base.txt
 django-oauth-toolkit==1.3.2  # via -r requirements/edx/base.txt
 django-object-actions==2.0.0  # via -r requirements/edx/base.txt, edx-enterprise
 django-pipeline==1.7.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 django-pyfs==2.2          # via -r requirements/edx/base.txt
 git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-ratelimit-backend==2.0.1a5  # via -r requirements/edx/base.txt
-django-ratelimit==3.0.0   # via -r requirements/edx/base.txt
+django-ratelimit==3.0.1   # via -r requirements/edx/base.txt
 django-require==1.0.11    # via -r requirements/edx/base.txt
 django-sekizai==1.1.0     # via -r requirements/edx/base.txt, django-wiki
 django-ses==0.8.14        # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
@@ -108,7 +108,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.txt
 edx-django-utils==3.5.0   # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.1  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.4.27    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-enterprise==3.4.28    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.5.0           # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
@@ -116,7 +116,7 @@ edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/base.txt, edx-bulk-gra
 edx-organizations==5.2.0  # via -r requirements/edx/base.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.txt
 edx-proctoring==2.4.4     # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
-edx-rbac==1.3.1           # via -r requirements/edx/base.txt, edx-enterprise
+edx-rbac==1.3.2           # via -r requirements/edx/base.txt, edx-enterprise
 edx-rest-api-client==5.2.1  # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 edx-search==1.4.1         # via -r requirements/edx/base.txt
 edx-sga==0.11.0           # via -r requirements/edx/base.txt
@@ -170,7 +170,7 @@ lazy==1.4                 # via -r requirements/edx/base.txt, acid-xblock, bok-c
 lepl==5.1.3               # via -r requirements/edx/base.txt, rfc6266-parser
 libsass==0.10.0           # via -r requirements/edx/base.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/base.txt, ora2
-lti-consumer-xblock==2.0.2  # via -r requirements/edx/base.txt
+lti-consumer-xblock==2.0.4  # via -r requirements/edx/base.txt
 lxml==4.5.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, capa, edxval, lti-consumer-xblock, ora2, pyquery, safe-lxml, xblock, xmlsec
 mailsnake==1.6.4          # via -r requirements/edx/base.txt
 mako==1.1.3               # via -r requirements/edx/base.txt, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
@@ -192,28 +192,27 @@ nodeenv==1.4.0            # via -r requirements/edx/base.txt
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/base.txt
-ora2==2.8.8               # via -r requirements/edx/base.txt
+ora2==2.8.9               # via -r requirements/edx/base.txt
 packaging==20.4           # via -r requirements/edx/base.txt, bleach, drf-yasg, pytest, tox
-path.py==12.4.0           # via -r requirements/edx/base.txt, edx-enterprise, edx-i18n-tools, ora2, xmodule
+path.py==12.5.0           # via -r requirements/edx/base.txt, edx-enterprise, edx-i18n-tools, ora2, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, path.py
 pathlib2==2.3.5           # via pytest
 pathtools==0.1.2          # via -r requirements/edx/base.txt, watchdog
 paver==1.3.4              # via -r requirements/edx/base.txt
 pbr==5.4.5                # via -r requirements/edx/base.txt, stevedore
-pdfminer.six==20200720    # via -r requirements/edx/base.txt
+pdfminer.six==20200726    # via -r requirements/edx/base.txt
 piexif==1.1.3             # via -r requirements/edx/base.txt
 pillow==7.2.0             # via -r requirements/edx/base.txt, edx-enterprise, edx-organizations
 pluggy==0.13.1            # via -r requirements/edx/coverage.txt, diff-cover, pytest, tox
 polib==1.1.0              # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-i18n-tools
 psutil==1.2.1             # via -r requirements/edx/base.txt, edx-django-utils
 py2neo==3.1.2             # via -r requirements/edx/base.txt
-py==1.9.0                 # via pytest, tox
+py==1.9.0                 # via pytest, pytest-forked, tox
 pycodestyle==2.6.0        # via -r requirements/edx/testing.in, flake8
 pycontracts==1.8.12       # via -r requirements/edx/base.txt, edx-user-state-client
 pycountry==20.7.3         # via -r requirements/edx/base.txt
 pycparser==2.20           # via -r requirements/edx/base.txt, cffi
-pycryptodome==3.9.8       # via -r requirements/edx/base.txt, lti-consumer-xblock
-pycryptodomex==3.9.8      # via -r requirements/edx/base.txt, edx-proctoring, pyjwkest
+pycryptodomex==3.9.8      # via -r requirements/edx/base.txt, edx-proctoring, lti-consumer-xblock, pyjwkest
 pyflakes==2.2.0           # via flake8
 pygments==2.6.1           # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, diff-cover
 pyjwkest==1.4.2           # via -r requirements/edx/base.txt, edx-drf-extensions, lti-consumer-xblock
@@ -230,11 +229,11 @@ pysrt==1.1.2              # via -r requirements/edx/base.txt, edxval
 pytest-attrib==0.1.3      # via -r requirements/edx/testing.in
 pytest-cov==2.10.0        # via -r requirements/edx/testing.in
 pytest-django==3.8.0      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
-pytest-forked==1.2.0      # via pytest-xdist
+pytest-forked==1.3.0      # via pytest-xdist
 pytest-json-report==1.2.1  # via -r requirements/edx/testing.in
 pytest-metadata==1.8.0    # via -r requirements/edx/testing.in, pytest-json-report
 pytest-randomly==3.4.1    # via -r requirements/edx/testing.in
-pytest-xdist==1.33.0      # via -r requirements/edx/testing.in
+pytest-xdist==1.34.0      # via -r requirements/edx/testing.in
 pytest==5.3.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/base.txt
@@ -283,7 +282,7 @@ testfixtures==6.14.1      # via -r requirements/edx/base.txt, -r requirements/ed
 text-unidecode==1.3       # via -r requirements/edx/base.txt, faker, python-slugify
 toml==0.10.1              # via tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.in
-tox==3.18.0               # via -r requirements/edx/testing.in, tox-battery
+tox==3.18.1               # via -r requirements/edx/testing.in, tox-battery
 tqdm==4.48.0              # via -r requirements/edx/base.txt, nltk
 transifex-client==0.13.11  # via -r requirements/edx/testing.in
 typed-ast==1.4.1          # via astroid
@@ -293,7 +292,7 @@ unidiff==0.6.0            # via -r requirements/edx/testing.in, coverage-pytest-
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.10          # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/base.txt
-virtualenv==20.0.27       # via tox
+virtualenv==20.0.28       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.3          # via -r requirements/edx/base.txt
 wcwidth==0.2.5            # via pytest

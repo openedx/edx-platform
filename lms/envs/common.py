@@ -3655,6 +3655,10 @@ ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
     u'{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
     u'{privacy_policy_link_end} from {enterprise_name}.'
 )
+ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE = _(
+    u'{start_bold}{enterprise_name}{end_bold} has partnered with {start_bold}{platform_name}{end_bold} '
+    u'to offer you high-quality learning opportunities from the world\'s best institutions and universities.'
+)
 ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
     'age',
@@ -3914,9 +3918,6 @@ BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 # Which of django's caches to use for storing anonymous user state for XBlocks
 # in the blockstore-based XBlock runtime
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
-
-########################## LEARNER PORTAL ##############################
-LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
 
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'

@@ -13,7 +13,6 @@ import pytz
 from six import text_type
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.roles import GlobalStaff
 from xblock_django.models import XBlockStudioConfigurationFlag
@@ -128,11 +127,6 @@ class CourseMetadata(object):
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
             exclude_list.append('allow_unsupported_xblocks')
-
-        # If the ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled,
-        # do not show "Proctoring Configuration" in Studio Advanced Settings.
-        if not ENABLE_PROCTORING_PROVIDER_OVERRIDES.is_enabled(course_key):
-            exclude_list.append('proctoring_provider')
 
         # Do not show "Course Visibility For Unenrolled Learners" in Studio Advanced Settings
         # if the enable_anonymous_access flag is not enabled
@@ -252,7 +246,7 @@ class CourseMetadata(object):
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError, ValidationError) as err:
                 did_validate = False
-                errors.append({'message': text_type(err), 'model': model})
+                errors.append({'key': key, 'message': text_type(err), 'model': model})
 
         proctoring_errors = cls._validate_proctoring_settings(descriptor, filtered_dict, user)
         if proctoring_errors:
@@ -302,7 +296,7 @@ class CourseMetadata(object):
                 'The proctoring provider cannot be modified after a course has started.'
                 ' Contact {support_email} for assistance'
             ).format(support_email=settings.PARTNER_SUPPORT_EMAIL or 'support')
-            errors.append({'message': message, 'model': proctoring_provider_model})
+            errors.append({'key': 'proctoring_provider', 'message': message, 'model': proctoring_provider_model})
 
         # Require a valid escalation email if Proctortrack is chosen as the proctoring provider
         # This requirement will be disabled until release of the new exam settings view
@@ -317,7 +311,11 @@ class CourseMetadata(object):
             if proctoring_provider_model and proctoring_provider_model.get('value') == 'proctortrack':
                 if not escalation_email:
                     message = missing_escalation_email_msg.format(provider=proctoring_provider_model.get('value'))
-                    errors.append({'message': message, 'model': proctoring_provider_model})
+                    errors.append({
+                        'key': 'proctoring_provider',
+                        'message': message,
+                        'model': proctoring_provider_model
+                    })
 
             if (
                 escalation_email_model and not proctoring_provider_model and
@@ -325,7 +323,11 @@ class CourseMetadata(object):
             ):
                 if not escalation_email:
                     message = missing_escalation_email_msg.format(provider=descriptor.proctoring_provider)
-                    errors.append({'message': message, 'model': escalation_email_model})
+                    errors.append({
+                        'key': 'proctoring_escalation_email',
+                        'message': message,
+                        'model': escalation_email_model
+                    })
 
         return errors
 
@@ -334,9 +336,6 @@ class CourseMetadata(object):
         """
         Return whether the requested proctoring provider is different than the current proctoring provider, indicating
         that the user has requested a change to the proctoring_provider Advanced Setting.
-        The requested_provider will be None if the proctoring_provider setting is not available (e.g. if the
-        ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled for the course). In this case, we consider
-        that there is no change in the requested proctoring provider.
         """
         if requested_provider is None:
             return False

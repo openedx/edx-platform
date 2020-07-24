@@ -44,6 +44,8 @@ class DatesTabTestViews(BaseCourseHomeTests):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.data.get('learner_is_full_access'))
 
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True)
     def test_get_unauthenticated_user(self):
         self.client.logout()
         response = self.client.get(self.url)

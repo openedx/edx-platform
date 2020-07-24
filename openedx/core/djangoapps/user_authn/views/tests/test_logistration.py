@@ -424,15 +424,17 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.login_form.enterprise_customer_for_request')
     @ddt.data(
-        ('signin_user', False, None, None),
-        ('register_user', False, None, None),
-        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
-        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
-        ('signin_user', True, 'Fake EC', None),
-        ('register_user', True, 'Fake EC', None),
+        ('signin_user', False, None, None, False),
+        ('register_user', False, None, None, False),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', False),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', False),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', True),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', True),
+        ('signin_user', True, 'Fake EC', None, False),
+        ('register_user', True, 'Fake EC', None, False),
     )
     @ddt.unpack
-    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, mock_get_ec):
+    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, is_proxy, mock_get_ec):
         """
         Verify that when an EnterpriseCustomer is received on the login and register views,
         the appropriate sidebar is rendered.
@@ -445,7 +447,11 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         else:
             mock_get_ec.return_value = None
 
-        response = self.client.get(reverse(url_name), HTTP_ACCEPT="text/html")
+        params = []
+        if is_proxy:
+            params.append(("proxy_login", "True"))
+
+        response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         enterprise_sidebar_div_id = u'enterprise-content-container'
 
@@ -453,7 +459,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             self.assertNotContains(response, text=enterprise_sidebar_div_id)
         else:
             self.assertContains(response, text=enterprise_sidebar_div_id)
-            welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+            if is_proxy:
+                welcome_message = settings.ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE
+            else:
+                welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
             expected_message = Text(welcome_message).format(
                 start_bold=HTML('<b>'),
                 end_bold=HTML('</b>'),

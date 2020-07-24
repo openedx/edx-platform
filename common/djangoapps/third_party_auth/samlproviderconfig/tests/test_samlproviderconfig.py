@@ -17,6 +17,7 @@ from enterprise.constants import ENTERPRISE_ADMIN_ROLE, ENTERPRISE_LEARNER_ROLE
 from third_party_auth.tests.samlutils import set_jwt_cookie
 from third_party_auth.models import SAMLProviderConfig
 from third_party_auth.tests import testutil
+from third_party_auth.utils import convert_saml_slug_provider_id
 
 # country here refers to the URN provided by a user's IDP
 SINGLE_PROVIDER_CONFIG = {
@@ -71,7 +72,7 @@ class SAMLProviderConfigTests(APITestCase):
 
         # for GET to work, we need an association present
         EnterpriseCustomerIdentityProvider.objects.get_or_create(
-            provider_id=self.samlproviderconfig.slug,
+            provider_id=convert_saml_slug_provider_id(self.samlproviderconfig.slug),
             enterprise_customer_id=ENTERPRISE_ID
         )
         urlbase = reverse('saml_provider_config-list')
@@ -140,7 +141,7 @@ class SAMLProviderConfigTests(APITestCase):
         # check association has also been created
         self.assertTrue(
             EnterpriseCustomerIdentityProvider.objects.filter(
-                provider_id=provider_config.slug
+                provider_id=convert_saml_slug_provider_id(provider_config.slug)
             ).exists(),
             'Cannot find EnterpriseCustomer-->SAMLProviderConfig association'
         )
@@ -162,7 +163,7 @@ class SAMLProviderConfigTests(APITestCase):
         # check association has NOT been created
         self.assertFalse(
             EnterpriseCustomerIdentityProvider.objects.filter(
-                provider_id=SINGLE_PROVIDER_CONFIG_2['slug']
+                provider_id=convert_saml_slug_provider_id(SINGLE_PROVIDER_CONFIG_2['slug'])
             ).exists(),
             'Did not expect to find EnterpriseCustomer-->SAMLProviderConfig association'
         )

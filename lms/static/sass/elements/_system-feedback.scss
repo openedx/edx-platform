@@ -114,7 +114,8 @@
     }
   }
 
-  &.recovery-email-alert {
+  &.recovery-email-alert,
+  &.learner-portal-enabled-alert {
     &#banner-msg {
       background: $state-info-bg;
       box-shadow: none;

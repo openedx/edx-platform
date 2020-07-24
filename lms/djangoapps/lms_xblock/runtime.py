@@ -152,7 +152,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             services['completion'] = CompletionService(user=user, context_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
-        services['library_tools'] = LibraryToolsService(store)
+        services['library_tools'] = LibraryToolsService(store, user_id=user.id if user else None)
         services['partitions'] = PartitionService(
             course_id=kwargs.get('course_id'),
             cache=request_cache_dict

@@ -57,7 +57,7 @@
 #
 # Translators:
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2020
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# Anatoli Pena <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
@@ -106,7 +106,7 @@
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2020
 # Lohenrex <lohenrex.ragnarok@gmail.com>, 2018
 # Alex Dzul <alexexc2@gmail.com>, 2016
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# Anatoli Pena <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # AngelesAlvarez, 2020
 # Claudio Anibal Barahona Flores <claudio.barahona@unah.edu.hn>, 2015
@@ -144,7 +144,7 @@
 #
 # Translators:
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2020
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# Anatoli Pena <djanatoli@gmail.com>, 2016
 # Andres Garcia <afgarcia0479@misena.edu.co>, 2019
 # Morphyne <cirrosis60@gmail.com>, 2014
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
@@ -168,7 +168,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-12 20:42+0000\n"
+"POT-Creation-Date: 2020-07-19 20:42+0000\n"
 "PO-Revision-Date: 2020-06-14 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"

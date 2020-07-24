@@ -16,6 +16,7 @@ from enterprise.constants import ENTERPRISE_ADMIN_ROLE, ENTERPRISE_LEARNER_ROLE
 from third_party_auth.tests import testutil
 from third_party_auth.models import SAMLProviderData, SAMLProviderConfig
 from third_party_auth.tests.samlutils import set_jwt_cookie
+from third_party_auth.utils import convert_saml_slug_provider_id
 
 SINGLE_PROVIDER_CONFIG = {
     'entity_id': 'http://entity-id-1',
@@ -68,7 +69,7 @@ class SAMLProviderDataTests(APITestCase):
             fetched_at=SINGLE_PROVIDER_DATA['fetched_at']
         )
         cls.enterprise_customer_idp, _ = EnterpriseCustomerIdentityProvider.objects.get_or_create(
-            provider_id=cls.saml_provider_config.slug,
+            provider_id=convert_saml_slug_provider_id(cls.saml_provider_config.slug),
             enterprise_customer_id=ENTERPRISE_ID
         )
 
