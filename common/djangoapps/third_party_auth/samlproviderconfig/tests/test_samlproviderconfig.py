@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer
-from enterprise.constants import ENTERPRISE_ADMIN_ROLE
+from enterprise.constants import ENTERPRISE_ADMIN_ROLE, ENTERPRISE_LEARNER_ROLE
 from third_party_auth.tests.samlutils import set_jwt_cookie
 from third_party_auth.models import SAMLProviderConfig
 from third_party_auth.tests import testutil
@@ -218,3 +218,17 @@ class SAMLProviderConfigTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         provider_config = SAMLProviderConfig.objects.get(slug='test-slug-empty')
         self.assertEqual(provider_config.country, '')
+
+    def test_unauthenticated_request_is_forbidden(self):
+        self.client.logout()
+        urlbase = reverse('saml_provider_config-list')
+        query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
+        url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
+        set_jwt_cookie(self.client, self.user, [(ENTERPRISE_LEARNER_ROLE, ENTERPRISE_ID)])
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.client.logout()
+        set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, ENTERPRISE_ID_NON_EXISTENT)])
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

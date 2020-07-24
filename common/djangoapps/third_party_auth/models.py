@@ -625,6 +625,36 @@ class SAMLProviderConfig(ProviderConfig):
         ),
         blank=True,
     )
+    skip_hinted_login_dialog = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is enabled, users that visit a \"TPA hinted\" URL for this provider "
+            "(e.g. a URL ending with `?tpa_hint=[provider_name]`) will be forwarded directly to "
+            "the login URL of the provider instead of being first prompted with a login dialog."
+        ),
+    )
+    skip_registration_form = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is enabled, users will not be asked to confirm their details "
+            "(name, email, etc.) during the registration process. Only select this option "
+            "for trusted providers that are known to provide accurate user information."
+        ),
+    )
+    skip_email_verification = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is selected, users will not be required to confirm their "
+            "email, and their account will be activated immediately upon registration."
+        ),
+    )
+    send_to_registration_first = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is selected, users will be directed to the registration page "
+            "immediately after authenticating with the third party instead of the login page."
+        ),
+    )
     other_settings = models.TextField(
         verbose_name=u"Advanced settings", blank=True,
         help_text=(

@@ -274,6 +274,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'dummy-email-attr')
         kwargs.setdefault('max_session_length', None)
+        kwargs.setdefault('skip_registration_form', False)
         self.configure_saml_provider(**kwargs)
 
     @mock.patch('django.conf.settings.MESSAGE_STORAGE', 'django.contrib.messages.storage.cookie.CookieStorage')
