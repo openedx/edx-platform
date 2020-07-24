@@ -66,6 +66,7 @@ RUN mkdir -p /edx/etc/
 # Then, install just external requirements.
 # This way, the cached installations of external requirements are not
 # busted whenever edx-platform code is changed.
+# TODO this is quite a hack and should be done in `make upgrade` probably.
 RUN pip install setuptools==39.0.1 pip==9.0.3
 COPY requirements/ requirements/
 RUN grep -E    "^-e (common|openedx|lms|cms|\.)(/| )" requirements/edx/base.txt > requirements/edx/base_in_tree.txt
@@ -79,20 +80,29 @@ COPY package-lock.json package-lock.json
 RUN nodeenv /edx/app/edx-platform/nodeenv --node=8.9.3 --prebuilt
 RUN npm set progress=false && npm install
 
+# Install remaining requirements -- that is, the in-tree ones.
+COPY setup.py setup.py
+COPY common common
+COPY openedx openedx
+COPY lms lms
+COPY cms cms
+RUN pip install -r requirements/edx/base_in_tree.txt
+
+ENV LMS_CFG /edx/etc/lms.yml
+ENV STUDIO_CFG /edx/etc/studio.yml
+COPY lms/devstack.yml /edx/etc/lms.yml
+COPY cms/devstack.yml /edx/etc/studio.yml
+
 # Copy over remaining code.
 # We do this as late as possible so that small changes to the repo don't bust
 # the requirements cache.
 COPY . .
 
-# Install remaining requirements -- that is, the in-tree ones.
-RUN pip install -r requirements/edx/base_in_tree.txt
-
 EXPOSE 18000
 
 FROM base as lms
 ENV SERVICE_VARIANT lms
-ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
-ENV LMS_CFG /edx/etc/lms.yaml
+ENV DJANGO_SETTINGS_MODULE lms.envs.production
 CMD gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:18000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
 FROM lms as lms-newrelic
@@ -100,13 +110,17 @@ RUN pip install newrelic
 CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
 FROM lms as lms-devstack
-ENV LMS_CFG /edx/app/edx-platform/edx-platform/lms/devstack.yml
+# TODO: This compiles static assets.
+# However, it's a bit of a hack, it's slow, and it's inefficient because makes the final Docker cache layer very large.
+# We ought to be able to this higher up in the Dockerfile, and do it the same for Prod and Devstack.
+RUN mkdir -p test_root/log
+ENV DJANGO_SETTINGS_MODULE ""
+RUN NO_PREREQ_INSTALL=1 paver update_assets --settings devstack_decentralized
 ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
 
 FROM base as studio
 ENV SERVICE_VARIANT cms
 ENV DJANGO_SETTINGS_MODULE cms.envs.production
-ENV STUDIO_CFG /edx/etc/studio.yaml
 CMD gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
 
 FROM studio as studio-newrelic
@@ -114,4 +128,11 @@ RUN pip install newrelic
 CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
 
 FROM studio as studio-devstack
-ENV STUDIO_CFG /edx/app/edx-platform/edx-platform/cms/devstack.yml
+# TODO: This compiles static assets.
+# However, it's a bit of a hack, it's slow, and it's inefficient because makes the final Docker cache layer very large.
+# We ought to be able to this higher up in the Dockerfile, and do it the same for Prod and Devstack.
+RUN mkdir -p test_root/log
+ENV DJANGO_SETTINGS_MODULE ""
+RUN NO_PREREQ_INSTALL=1 paver update_assets --settings devstack_decentralized
+ENV DJANGO_SETTINGS_MODULE cms.envs.devstack_decentralized
+

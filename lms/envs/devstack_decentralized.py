@@ -1,7 +1,7 @@
 """
-Specific overrides to the base prod settings to make development easier.
+TODO hack for decentralized devstack spike.
+It'd better to just follow OEP-45 and just feed a devstack.yml file to production.py.
 """
-
 
 # Silence noisy logs
 import logging
