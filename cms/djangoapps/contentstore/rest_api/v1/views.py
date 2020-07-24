@@ -154,8 +154,12 @@ class ProctoredExamSettingsView(APIView):
         }
 
     @staticmethod
-    def _get_and_validate_course(user, course_id):
-        """ check if course_id exists and return it """
+    def _get_and_validate_course_access(user, course_id):
+        """
+        Check if course_id exists and is accessible by the user.
+
+        Returns a course_module object
+        """
         course_key = CourseKey.from_string(course_id)
         course_module = get_course_and_check_access(course_key, user)
 
