@@ -258,6 +258,10 @@ LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
 ENTERPRISE_LEARNER_PORTAL_NETLOC = 'localhost:8734'
 ENTERPRISE_LEARNER_PORTAL_BASE_URL = 'http://' + ENTERPRISE_LEARNER_PORTAL_NETLOC
 
+########################## ENTERPRISE ADMIN PORTAL ##############################
+ENTERPRISE_ADMIN_PORTAL_NETLOC = 'localhost:1991'
+ENTERPRISE_ADMIN_PORTAL_BASE_URL = 'http://' + ENTERPRISE_ADMIN_PORTAL_NETLOC
+
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
@@ -270,6 +274,7 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
 LOGIN_REDIRECT_WHITELIST = [
     CMS_BASE,
     ENTERPRISE_LEARNER_PORTAL_NETLOC,
+    ENTERPRISE_ADMIN_PORTAL_NETLOC,
 ]
 
 ###################### JWTs ######################
