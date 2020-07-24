@@ -154,13 +154,6 @@ class ProctoredExamSettingsView(APIView):
         }
 
     @staticmethod
-    def _get_exam_settings_fields(settings):
-        return {
-            setting_key: setting_value.get('value')
-            for (setting_key, setting_value) in settings.items()
-        }
-
-    @staticmethod
     def _get_and_validate_course(user, course_id):
         """ check if course_id exists and return it """
         course_key = CourseKey.from_string(course_id)
