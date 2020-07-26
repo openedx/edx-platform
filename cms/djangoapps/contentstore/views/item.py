@@ -19,13 +19,11 @@ from edx_proctoring.api import (
     get_exam_configuration_dashboard_url
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from help_tokens.core import HelpUrlExpert
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.decorators import api_view, authentication_classes, parser_classes
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import JSONParser
 
 from six import binary_type, text_type
@@ -61,7 +59,7 @@ from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
-from openedx.core.lib.api.authentication import BearerAuthentication
+from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
 from static_replace import replace_static_urls
@@ -122,8 +120,8 @@ def _is_library_component_limit_reached(usage_key):
 
 
 @api_view(["DELETE", "GET", "PUT", "POST", "PATCH"])
-@authentication_classes([JwtAuthentication, BearerAuthentication, SessionAuthentication])
 @parser_classes([JSONParser])
+@view_auth_classes()
 def xblock_handler(request, usage_key_string):
     """
     The restful handler for xblock requests.
