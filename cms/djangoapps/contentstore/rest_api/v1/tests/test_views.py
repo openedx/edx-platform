@@ -202,7 +202,6 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
 
         # response is correct
         assert response.status_code == status.HTTP_200_OK
-        self.maxDiff = None
         self.assertDictEqual(response.data, {
             'proctored_exam_settings': {
                 'enable_proctored_exams': True,
