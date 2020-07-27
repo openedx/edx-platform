@@ -155,7 +155,8 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         },
     )
     @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
-    def test_update_exam_settings_200(self):
+    def test_update_exam_settings_200_escalation_email(self):
+        """ update exam settings for provider that requires an escalation email (proctortrack) """
         self.client.login(username=self.global_staff.username, password=self.password)
         data = self.get_request_data(
             enable_proctored_exams=True,
@@ -181,6 +182,41 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         assert updated.enable_proctored_exams is True
         assert updated.proctoring_provider == 'proctortrack'
         assert updated.proctoring_escalation_email == 'foo@bar.com'
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'null',
+            'test_proctoring_provider': {}
+        },
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_update_exam_settings_200_no_escalation_email(self):
+        """ escalation email may be blank if not required by the provider """
+        self.client.login(username=self.global_staff.username, password=self.password)
+        data = self.get_request_data(
+            enable_proctored_exams=True,
+            proctoring_provider='test_proctoring_provider',
+            proctoring_escalation_email=''
+        )
+        response = self.make_request(data=data)
+
+        # response is correct
+        assert response.status_code == status.HTTP_200_OK
+        self.assertDictEqual(response.data, {
+            'proctored_exam_settings': {
+                'enable_proctored_exams': True,
+                'allow_proctoring_opt_out': True,
+                'proctoring_provider': 'test_proctoring_provider',
+                'proctoring_escalation_email': None,
+                'create_zendesk_tickets': True,
+            }
+        })
+
+        # course settings have been updated
+        updated = modulestore().get_item(self.course.location)
+        assert updated.enable_proctored_exams is True
+        assert updated.proctoring_provider == 'test_proctoring_provider'
+        assert updated.proctoring_escalation_email is None
 
     def test_update_exam_settings_excluded_field(self):
         """
