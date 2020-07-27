@@ -80,7 +80,6 @@ class CourseUpdatesFragmentView(EdxFragmentView):
     """
     A fragment to render the updates page for a course.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """
@@ -104,7 +103,6 @@ class CourseUpdatesFragmentView(EdxFragmentView):
             'updates': ordered_updates,
             'plain_html_updates': plain_html_updates,
             'disable_courseware_js': True,
-            'uses_pattern_library': True,
         }
         html = render_to_string('course_experience/course-updates-fragment.html', context)
         return Fragment(html)

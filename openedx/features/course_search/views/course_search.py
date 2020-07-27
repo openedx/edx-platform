@@ -51,7 +51,6 @@ class CourseSearchFragmentView(EdxFragmentView):
     """
     A fragment to render the home page for a course.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """
