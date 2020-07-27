@@ -1,7 +1,8 @@
 /**
  *
  * A library of helper functions to track ecommerce related events.
- *
+ * See here for the full list of upsell links and how to view these events in snowflake:
+ * https://openedx.atlassian.net/wiki/spaces/RS/pages/1675100377/How+to+find+upsell+link+click+events
  */
 (function(define) {
     'use strict';
