@@ -8,8 +8,6 @@ from rest_framework.reverse import reverse
 
 class GradedTotalSerializer(serializers.Serializer):
     earned = serializers.FloatField()
-    first_attempted = serializers.CharField()
-    graded = serializers.BooleanField()
     possible = serializers.FloatField()
 
 

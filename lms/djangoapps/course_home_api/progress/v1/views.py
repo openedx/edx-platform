@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.course_home_api.progress.v1.serializers import ProgressTabSerializer
 
-from student.models import CourseEnrollment, UserTestGroup
+from student.models import CourseEnrollment
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_with_access
@@ -39,10 +39,6 @@ class ProgressTabView(RetrieveAPIView):
 
         Body consists of the following fields:
 
-        user: Serialized User object. The serialization has the following fields:
-            username: (str) The username of the user
-            email: (str) the email of the user
-            is_staff: (bool) boolean indicating whether the user has staff permisions or not
         course_blocks:
             blocks: List of serialized Course Block objects. Each serialization has the following fields:
                 id: (str) The usage ID of the block.
@@ -55,11 +51,29 @@ class ProgressTabView(RetrieveAPIView):
                     xBlock on the web LMS.
                 children: (list) If the block has child blocks, a list of IDs of
                     the child blocks.
+        courseware_summary: List of serialized Chapters. each Chapter has the following fields:
+            display_name: (str) a str of what the name of the Chapter is for displaying on the site
+            subsections: List of serialized Subsections, each has the following fields:
+                display_name: (str) a str of what the name of the Subsection is for displaying on the site
+                due: (str) a DateTime string for when the Subsection is due
+                format: (str) the format, if any, of the Subsection (Homework, Exam, etc)
+                graded: (bool) whether or not the Subsection is graded
+                graded_total: an object containing the following fields
+                    earned: (float) the amount of points the user earned
+                    possible: (float) the amount of points the user could have earned
+                percent_graded: (float) the percentage of the points the user received for the subsection
+                show_correctness: (str) a str representing whether to show the problem/practice scores based on due date
+                show_grades: (bool) a bool for whether to show grades based on the access the user has
+                url: (str) the absolute path url to the Subsection
         enrollment_mode: (str) a str representing the enrollment the user has ('audit', 'verified', ...)
+        user_timezone: (str) The user's preferred timezone
+
+
 
     **Returns**
 
         * 200 on success with above fields.
+        * 302 if the user is not enrolled.
         * 403 if the user is not authenticated.
         * 404 if the course is not available or cannot be seen.
     """
@@ -102,8 +116,8 @@ class ProgressTabView(RetrieveAPIView):
 
         data = {
             'course_blocks': course_blocks,
-            'enrollment_mode': enrollment_mode,
             'courseware_summary': courseware_summary,
+            'enrollment_mode': enrollment_mode,
             'user_timezone': user_timezone,
         }
         context = self.get_serializer_context()
