@@ -959,3 +959,47 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
         )
         render_call_dict = mocked_render.call_args[0][1]
         assert expected_error == render_call_dict['error']
+
+
+class SsoRecordsTests(SupportViewTestCase):
+
+    def setUp(self):
+        """Make the user support staff"""
+        super(SsoRecordsTests, self).setUp()
+        SupportStaffRole().add_users(self.user)
+        self.student = UserFactory.create(username='student', email='test@example.com', password='test')
+        self.url = reverse("support:sso_records", kwargs={'username_or_email': self.student.username})
+        self.org_key_list = ['test_org']
+        for org_key in self.org_key_list:
+            lms_org = OrganizationFactory(
+                short_name=org_key
+            )
+            SAMLProviderConfigFactory(
+                organization=lms_org,
+                slug=org_key,
+                enabled=True,
+            )
+
+    def test_empty_response(self):
+        response = self.client.get(self.url)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 0)
+
+    def test_user_does_not_exist(self):
+        response = self.client.get(reverse("support:sso_records", kwargs={'username_or_email': 'wrong_username'}))
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 0)
+
+    def test_response(self):
+        user_social_auth = UserSocialAuth.objects.create(
+            user=self.student,
+            uid=self.student.email,
+            provider='tpa-saml'
+        )
+        response = self.client.get(self.url)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 1)
+        self.assertContains(response, '"uid": "test@example.com"')
