@@ -58,6 +58,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(CourseDateSummaryTest, self).setUp()
+        SelfPacedConfiguration.objects.create()
 
     def make_request(self, user):
         """ Creates a request """
@@ -68,6 +69,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         return request
 
     def test_course_info_feature_flag(self):
+        SelfPacedConfiguration().save()
         course = create_course_run()
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
@@ -300,7 +302,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     @RELATIVE_DATES_FLAG.override(active=True)
     @ddt.data(
-        ([], 3),
+        ([], 2),
         ([{
             'due': None,
             'start': None,
@@ -330,7 +332,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             'due': '2029-01-01T00:00:00+00:00',
             'start': '2001-01-01T00:00:00+00:00',
             'name': 'self-assessment'
-        }], 5)
+        }], 2)
     )
     @ddt.unpack
     def test_dates_with_openassessments(self, rubric_assessments, date_block_count):
@@ -723,19 +725,35 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         'info',
         'openedx.course_experience.course_home',
     )
+    @RELATIVE_DATES_FLAG.override(active=True)
     def test_dates_tab_link_render(self, url_name):
-        with freeze_time('2015-01-02'):
-            course = create_course_run()
-            user = create_user()
+        """ The dates tab link should only show for enrolled or staff users """
+        course = create_course_run()
+        html_elements = [
+            'class="dates-tab-link"',
+            'View all course dates</a>',
+        ]
+        url = reverse(url_name, args=(course.id,))
+
+        def assert_html_elements(assert_function, user):
             self.client.login(username=user.username, password=TEST_PASSWORD)
-            url = reverse(url_name, args=(course.id,))
             response = self.client.get(url, follow=True)
-            html_elements = [
-                'class="dates-tab-link"',
-                'View all course dates</a>',
-            ]
             for html in html_elements:
-                self.assertContains(response, html)
+                assert_function(response, html)
+            self.client.logout()
+
+        with freeze_time('2015-01-02'):
+            unenrolled_user = create_user()
+            assert_html_elements(self.assertNotContains, unenrolled_user)
+
+            staff_user = create_user()
+            staff_user.is_staff = True
+            staff_user.save()
+            assert_html_elements(self.assertContains, staff_user)
+
+            enrolled_user = create_user()
+            CourseEnrollmentFactory(course_id=course.id, user=enrolled_user, mode=CourseMode.VERIFIED)
+            assert_html_elements(self.assertContains, enrolled_user)
 
 
 @ddt.ddt
