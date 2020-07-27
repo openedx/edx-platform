@@ -12,8 +12,10 @@ from django.utils.translation import ugettext as _
 from edx_django_utils import monitoring as monitoring_utils
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey
 
+from course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
 from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
@@ -96,7 +98,7 @@ class OutlineTabView(RetrieveAPIView):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
 
-        _, request.user = setup_masquerade(
+        _masquerade, request.user = setup_masquerade(
             request,
             course_key,
             staff_access=has_access(request.user, 'staff', course_key),
@@ -108,8 +110,9 @@ class OutlineTabView(RetrieveAPIView):
         allow_public = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC
         is_enrolled = enrollment and enrollment.is_active
         is_staff = has_access(request.user, 'staff', course_key)
+        show_enrolled = is_enrolled or is_staff
 
-        show_handouts = is_enrolled or is_staff or allow_public
+        show_handouts = show_enrolled or allow_public
         handouts_html = get_course_info_section(request, request.user, course, 'handouts') if show_handouts else ''
 
         welcome_message_html = None
@@ -118,6 +121,18 @@ class OutlineTabView(RetrieveAPIView):
                 welcome_message_html = LatestUpdateFragmentView().latest_update_html(request, course)
             else:
                 welcome_message_html = WelcomeMessageFragmentView().welcome_message_html(request, course)
+
+        enroll_alert = {
+            'can_enroll': True,
+            'extra_text': None,
+        }
+        if not show_enrolled:
+            if CourseMode.is_masters_only(course_key):
+                enroll_alert['can_enroll'] = False
+                enroll_alert['extra_text'] = _('Please contact your degree administrator or '
+                                               'edX Support if you have questions.')
+            elif course.invitation_only:
+                enroll_alert['can_enroll'] = False
 
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
         date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
@@ -148,6 +163,7 @@ class OutlineTabView(RetrieveAPIView):
             'course_blocks': course_blocks,
             'course_tools': course_tools,
             'dates_widget': dates_widget,
+            'enroll_alert': enroll_alert,
             'handouts_html': handouts_html,
             'welcome_message_html': welcome_message_html,
         }
