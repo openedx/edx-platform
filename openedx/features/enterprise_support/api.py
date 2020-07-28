@@ -573,22 +573,23 @@ def get_enterprise_learner_data(user):
 @enterprise_is_enabled()
 def get_enterprise_learner_portal_enabled_message(request):
     """
-    Returns True if the user is linked to an Enterprise with the Learner Portal enabled.
+    Returns message to be displayed in dashboard if the user is linked to an Enterprise with the Learner Portal enabled.
 
     Note: request.session['enterprise_customer'] will be used in case the user is linked to
         multiple Enterprises. Otherwise, it won't exist and the Enterprise Learner data
         will be used. If that doesn't exist return None.
 
     Args:
-        request: request made to the LMs dashboard
+        request: request made to the LMS dashboard
     """
-    learner_data = get_enterprise_learner_data(request.user)
     if request.session['enterprise_customer']:
         enterprise_customer = request.session['enterprise_customer']
-    elif learner_data:
-        enterprise_customer = learner_data[0]['enterprise_customer']
     else:
-        return None
+        learner_data = get_enterprise_learner_data(request.user)
+        if learner_data:
+            enterprise_customer = learner_data[0]['enterprise_customer']
+        else:
+            return None
 
     if enterprise_customer['enable_learner_portal']:
         learner_portal_url = settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + enterprise_customer['slug']
