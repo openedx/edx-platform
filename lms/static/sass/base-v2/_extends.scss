@@ -1,6 +1,0 @@
-// Adds a simple extend that indicates that this user interface element should not print
-%ui-print-excluded {
-  @media print {
-    display: none !important;
-  }
-}
