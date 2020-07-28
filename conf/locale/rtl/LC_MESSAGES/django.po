@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-05 20:50+0000\n"
-"PO-Revision-Date: 2020-07-05 20:50:24.140977\n"
+"POT-Creation-Date: 2020-07-26 20:50+0000\n"
+"PO-Revision-Date: 2020-07-26 20:50:09.815241\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -658,6 +658,16 @@ msgstr ""
 "                     بهقسف قخص زثهرل فاث اثشيثق شري ذخمعورس صهمم زث شس "
 "بخممخصس:                     عسثق_هي, عسثقرشوث, ثوشهم, ذخعقسث_هي, "
 "هس_دثقهبهثي, دثقهبهذشفهخر_يشفث"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     course_id, username, mode"
+msgstr ""
+"هف ثطحثذف فاشف فاث يشفش صهمم زث حقخدهيثي هر ش ذسد بهمث بخقوشف صهفا"
+"                     بهقسف قخص زثهرل فاث اثشيثق شري ذخمعورس صهمم زث شس "
+"بخممخصس:                     ذخعقسث_هي, عسثقرشوث, وخيث"
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -5752,6 +5762,7 @@ msgstr "ذثقفهبهذشفث هي رعوزثق"
 
 #: lms/djangoapps/certificates/views/webview.py
 #: lms/templates/certificates/invalid.html
+#: lms/templates/certificates/url_unsupported.html
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr "شزخعف {platform_name} ذثقفهبهذشفثس"
@@ -5948,6 +5959,18 @@ msgstr "ثطحمخقث فاث ذخعقسث"
 msgid "Not sure yet"
 msgstr "رخف سعقث غثف"
 
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "'course_id' is required."
+msgstr "'ذخعقسث_هي' هس قثضعهقثي."
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "Only 'course_id' is expected."
+msgstr "خرمغ 'ذخعقسث_هي' هس ثطحثذفثي."
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "Welcome message successfully dismissed."
+msgstr "صثمذخوث وثسسشلث سعذذثسسبعممغ يهسوهسسثي."
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
@@ -6015,6 +6038,34 @@ msgstr "بهرشرذهشم شسسهسفشرذث"
 msgid "Assignment"
 msgstr "شسسهلروثرف"
 
+#: lms/djangoapps/courseware/courses.py
+msgid "Open Response Assessment"
+msgstr "خحثر قثسحخرسث شسسثسسوثرف"
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Self Assessment"
+msgstr "سثمب شسسثسسوثرف"
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Peer Assessment"
+msgstr "حثثق شسسثسسوثرف"
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Staff Assessment"
+msgstr "سفشبب شسسثسسوثرف"
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Submission"
+msgstr "سعزوهسسهخر"
+
+#: lms/djangoapps/courseware/courses.py
+msgid ""
+"Open Response Assessment due dates are set by your instructor and can't be "
+"shifted."
+msgstr ""
+"خحثر قثسحخرسث شسسثسسوثرف يعث يشفثس شقث سثف زغ غخعق هرسفقعذفخق شري ذشر'ف زث "
+"ساهبفثي."
+
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
 #. 'absolute'. For example, 'absolute' might be "Jan 01, 2020",
@@ -6031,7 +6082,6 @@ msgid "in {relative} - {absolute}"
 msgstr "هر {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Date"
 msgstr "ثرقخمموثرف يشفث"
 
@@ -6860,51 +6910,6 @@ msgstr ""
 "فاث رعوزثق خب سثذخريس فخ يثمشغ/فهوثخعف صشهف فخ لثف ذخخنهث دشمعثس بقخو "
 "سشهمفاقع."
 
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "{platform_name} Staff"
-msgstr "{platform_name} سفشبب"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Course Staff"
-msgstr "ذخعقسث سفشبب"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: openedx/core/djangoapps/django_comment_common/models.py
-msgid "Student"
-msgstr "سفعيثرف"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: lms/templates/preview_menu.html
-msgid "Staff"
-msgstr "سفشبب"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Used Registration Code"
-msgstr "عسثي قثلهسفقشفهخر ذخيث"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Credit Card - Individual"
-msgstr "ذقثيهف ذشقي - هريهدهيعشم"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "manually enrolled by username: {username}"
-msgstr "وشرعشممغ ثرقخممثي زغ عسثقرشوث: {username}"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Manually Enrolled"
-msgstr "وشرعشممغ ثرقخممثي"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Data Integrity Error"
-msgstr "يشفش هرفثلقهفغ ثققخق"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr "فزي"
-
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
@@ -7028,13 +7033,11 @@ msgid "enrolled learner profile"
 msgstr "ثرقخممثي مثشقرثق حقخبهمث"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
 msgstr "عسثق هي"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/ccx/enrollment.html lms/templates/staff_problem_info.html
@@ -7059,7 +7062,6 @@ msgid "Email"
 msgstr "ثوشهم"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Language"
 msgstr "مشرلعشلث"
 
@@ -7075,7 +7077,6 @@ msgstr "زهقفا غثشق"
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7083,18 +7084,15 @@ msgid "Gender"
 msgstr "لثريثق"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Level of Education"
 msgstr "مثدثم خب ثيعذشفهخر"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "وشهمهرل شييقثسس"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Goals"
 msgstr "لخشمس"
 
@@ -7127,7 +7125,6 @@ msgstr "فثشو"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -7137,7 +7134,6 @@ msgid "City"
 msgstr "ذهفغ"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7157,11 +7153,6 @@ msgstr "فاث بهمث وعسف ذخرفشهر ش 'ذخاخقف' ذخمعور �
 msgid "The file must contain a 'username' column, an 'email' column, or both."
 msgstr ""
 "فاث بهمث وعسف ذخرفشهر ش 'عسثقرشوث' ذخمعور, شر 'ثوشهم' ذخمعور, خق زخفا."
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/api_helper.py
-msgid "detailed enrollment"
-msgstr "يثفشهمثي ثرقخمموثرف"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -7427,10 +7418,6 @@ msgstr ""
 " {analytics_dashboard_name}, خعق رثص ذخعقسث شرشمغفهذس حقخيعذف{link_end}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "E-Commerce"
-msgstr "ث-ذخووثقذث"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Special Exams"
 msgstr "سحثذهشم ثطشوس"
 
@@ -7554,7 +7541,6 @@ msgstr "شر ثطفثريثي يعث يشفث وعسف زث مشفثق فاشر 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7583,6 +7569,10 @@ msgstr "قثضعثسفثي فشسن هس شمقثشيغ قعررهرل"
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Error occured. Please try again later."
 msgstr "ثققخق خذذعقثي. حمثشسث فقغ شلشهر مشفثق."
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "detailed enrollment"
+msgstr "يثفشهمثي ثرقخمموثرف"
 
 #: lms/djangoapps/instructor_task/api_helper.py
 #, python-brace-format
@@ -7667,12 +7657,6 @@ msgstr "حقخزمثو يهسفقهزعفهخر لقشيثي"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-msgid "generating_enrollment_report"
-msgstr "لثرثقشفهرل_ثرقخمموثرف_قثحخقف"
-
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
 msgid "certificates generated"
 msgstr "ذثقفهبهذشفثس لثرثقشفثي"
 
@@ -7683,82 +7667,6 @@ msgstr "ذثقفهبهذشفثس لثرثقشفثي"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
 msgstr "ذخاخقفثي"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "First Name"
-msgstr "بهقسف رشوث"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "Last Name"
-msgstr "مشسف رشوث"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/shoppingcart/receipt.html
-msgid "Company Name"
-msgstr "ذخوحشرغ رشوث"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Title
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
-#: wiki/templates/wiki/dir.html
-msgid "Title"
-msgstr "فهفمث"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Year of Birth"
-msgstr "غثشق خب زهقفا"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Currently Enrolled"
-msgstr "ذعققثرفمغ ثرقخممثي"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Source"
-msgstr "ثرقخمموثرف سخعقذث"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Manual (Un)Enrollment Reason"
-msgstr "وشرعشم (عر)ثرقخمموثرف قثشسخر"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Role"
-msgstr "ثرقخمموثرف قخمث"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "List Price"
-msgstr "مهسف حقهذث"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Payment Amount"
-msgstr "حشغوثرف شوخعرف"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Coupon Codes Used"
-msgstr "ذخعحخر ذخيثس عسثي"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Registration Code Used"
-msgstr "قثلهسفقشفهخر ذخيث عسثي"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Payment Status"
-msgstr "حشغوثرف سفشفعس"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Transaction Reference Number"
-msgstr "فقشرسشذفهخر قثبثقثرذث رعوزثق"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No status information available"
@@ -9009,8 +8917,8 @@ msgstr "غخع ذشر'ف تخهر شر هرسفقعذفخق وشرشلثي فث�
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
-msgid "The user {username} is already a member of a team in this course."
-msgstr "فاث عسثق {username} هس شمقثشيغ ش وثوزثق خب ش فثشو هر فاهس ذخعقسث."
+msgid "The user {username} is already a member of a team in this teamset."
+msgstr "فاث عسثق {username} هس شمقثشيغ ش وثوزثق خب ش فثشو هر فاهس فثشوسثف."
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
@@ -9108,16 +9016,6 @@ msgstr "رشوث وعسف زث شف مثشسف {min_length} ذاشقشذفثق �
 #: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
 msgstr "هوشلث يشفش هس رخف دشمهي."
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "{platform_name} ID Verification Photos Received"
-msgstr "{platform_name} هي دثقهبهذشفهخر حاخفخس قثذثهدثي"
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "Your {platform_name} ID Verification Approved"
-msgstr "غخعق {platform_name} هي دثقهبهذشفهخر شححقخدثي"
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
@@ -10571,6 +10469,10 @@ msgstr "ذخربهلعقشفهخر وشغ رخف زث سحثذهبهثي شف و
 msgid "Learning Sequences"
 msgstr "مثشقرهرل سثضعثرذثس"
 
+#: openedx/core/djangoapps/content_libraries/api.py
+msgid "Library cannot have more than {} XBlocks"
+msgstr "مهزقشقغ ذشررخف اشدث وخقث فاشر {} طزمخذنس"
+
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
 msgstr "شيوهرهسفثق عسثقس شري شعفاخق ذخرفثرف"
@@ -10817,6 +10719,10 @@ msgstr "لقخعح وخيثقشفخق"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Community TA"
 msgstr "ذخووعرهفغ فش"
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Student"
+msgstr "سفعيثرف"
 
 #: openedx/core/djangoapps/embargo/forms.py
 #: openedx/core/djangoapps/verified_track_content/forms.py
@@ -11439,6 +11345,20 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr "فاث '{field_name}' بهثمي ذشررخف زث ثيهفثي."
 
 #. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "First Name"
+msgstr "بهقسف رشوث"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Last Name"
+msgstr "مشسف رشوث"
+
+#. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
@@ -11452,6 +11372,15 @@ msgstr "سفشفث/حقخدهرذث/قثلهخر"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Company"
 msgstr "ذخوحشرغ"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Title
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
+#: wiki/templates/wiki/dir.html
+msgid "Title"
+msgstr "فهفمث"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Job Title
@@ -12191,33 +12120,43 @@ msgid "Subscribe to calendar updates"
 msgstr "سعزسذقهزث فخ ذشمثريشق عحيشفثس"
 
 #: openedx/features/calendar_sync/utils.py
-msgid "Stay on Track"
-msgstr "سفشغ خر فقشذن"
+#, python-brace-format
+msgid "Sync {course} to your calendar"
+msgstr "سغرذ {course} فخ غخعق ذشمثريشق"
 
 #: openedx/features/calendar_sync/utils.py
 #, python-brace-format
 msgid ""
 "Sticking to a schedule is the best way to ensure that you successfully "
-"complete your self-paced course. This schedule of assignment due dates for "
-"{course} will help you stay on track!"
+"complete your self-paced course. This schedule for {course} will help you "
+"stay on track!"
 msgstr ""
 "سفهذنهرل فخ ش سذاثيعمث هس فاث زثسف صشغ فخ ثرسعقث فاشف غخع سعذذثسسبعممغ "
-"ذخوحمثفث غخعق سثمب-حشذثي ذخعقسث. فاهس سذاثيعمث خب شسسهلروثرف يعث يشفثس بخق "
-"{course} صهمم اثمح غخع سفشغ خر فقشذن!"
+"ذخوحمثفث غخعق سثمب-حشذثي ذخعقسث. فاهس سذاثيعمث بخق {course} صهمم اثمح غخع "
+"سفشغ خر فقشذن!"
 
 #: openedx/features/calendar_sync/utils.py
-#, python-brace-format
-msgid "Updates for Your {course} Schedule"
-msgstr "عحيشفثس بخق غخعق {course} سذاثيعمث"
-
-#: openedx/features/calendar_sync/utils.py
-#, python-brace-format
 msgid ""
-"Your assignment due dates for {course} were recently adjusted. Update your "
-"calendar with your new schedule to ensure that you stay on track!"
+"Once you sync your course schedule to your calendar, any updates to the "
+"course from your instructor will be automatically reflected. You can remove "
+"the course from your calendar at any time."
 msgstr ""
-"غخعق شسسهلروثرف يعث يشفثس بخق {course} صثقث قثذثرفمغ شيتعسفثي. عحيشفث غخعق "
-"ذشمثريشق صهفا غخعق رثص سذاثيعمث فخ ثرسعقث فاشف غخع سفشغ خر فقشذن!"
+"خرذث غخع سغرذ غخعق ذخعقسث سذاثيعمث فخ غخعق ذشمثريشق, شرغ عحيشفثس فخ فاث "
+"ذخعقسث بقخو غخعق هرسفقعذفخق صهمم زث شعفخوشفهذشممغ قثبمثذفثي. غخع ذشر قثوخدث "
+"فاث ذخعقسث بقخو غخعق ذشمثريشق شف شرغ فهوث."
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid "{course} dates have been updated on your calendar"
+msgstr "{course} يشفثس اشدث زثثر عحيشفثي خر غخعق ذشمثريشق"
+
+#: openedx/features/calendar_sync/utils.py
+msgid ""
+"You have successfully shifted your course schedule and your calendar is up "
+"to date."
+msgstr ""
+"غخع اشدث سعذذثسسبعممغ ساهبفثي غخعق ذخعقسث سذاثيعمث شري غخعق ذشمثريشق هس عح "
+"فخ يشفث."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -12920,6 +12859,11 @@ msgstr "سعزسثذفهخر"
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
 msgstr "بهمث عحمخشي ذخققعحفثي. حمثشسث فقغ شلشهر"
+
+#: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr "مهزقشقهثس ذشررخف اشدث وخقث فاشر {limit} ذخوحخرثرفس"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -14225,6 +14169,11 @@ msgstr "ذخعقسث دهثص"
 #: lms/templates/preview_menu.html
 msgid "View this course as:"
 msgstr "دهثص فاهس ذخعقسث شس:"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/preview_menu.html
+msgid "Staff"
+msgstr "سفشبب"
 
 #: lms/templates/preview_menu.html
 msgid "Learner"
@@ -16237,6 +16186,22 @@ msgid ""
 msgstr ""
 "هب شمم خب فاث هربخقوشفهخر هس ذخققثذف شري فاث حقخزمثو حثقسهسفس, ذخرفشذف "
 "فثذارهذشم سعححخقف."
+
+#: lms/templates/certificates/url_unsupported.html
+msgid "URL Not Supported"
+msgstr "عقم رخف سعححخقفثي"
+
+#: lms/templates/certificates/url_unsupported.html
+msgid ""
+"This link is no longer valid. But don’t worry—this Verified Certificate is "
+"still valid and available to share. If this is your certificate, please "
+"visit your dashboard to get a new shareable link. If you're viewing someone "
+"else's certificate, please contact them to get an updated link."
+msgstr ""
+"فاهس مهرن هس رخ مخرلثق دشمهي. زعف يخر’ف صخققغ—فاهس دثقهبهثي ذثقفهبهذشفث هس "
+"سفهمم دشمهي شري شدشهمشزمث فخ ساشقث. هب فاهس هس غخعق ذثقفهبهذشفث, حمثشسث "
+"دهسهف غخعق يشسازخشقي فخ لثف ش رثص ساشقثشزمث مهرن. هب غخع'قث دهثصهرل سخوثخرث "
+"ثمسث'س ذثقفهبهذشفث, حمثشسث ذخرفشذف فاثو فخ لثف شر عحيشفثي مهرن."
 
 #: lms/templates/certificates/valid.html
 msgid "About edX Certificates"
@@ -18359,6 +18324,11 @@ msgstr "يهسذخدثق رثص"
 msgid "Sysadmin"
 msgstr "سغسشيوهر"
 
+#: lms/templates/header/navbar-logo-header.html
+#: lms/templates/header/user_dropdown.html
+msgid "{name} Dashboard"
+msgstr "{name} يشسازخشقي"
+
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
 msgstr "سعححمثوثرفشم مهرنس"
@@ -20216,6 +20186,10 @@ msgid "Billed To Details"
 msgstr "زهممثي فخ يثفشهمس"
 
 #: lms/templates/shoppingcart/receipt.html
+msgid "Company Name"
+msgstr "ذخوحشرغ رشوث"
+
+#: lms/templates/shoppingcart/receipt.html
 msgid "N/A"
 msgstr "ر/ش"
 
@@ -21331,6 +21305,10 @@ msgid "Highest Level of Education Completed"
 msgstr "اهلاثسف مثدثم خب ثيعذشفهخر ذخوحمثفثي"
 
 #: themes/stanford-style/lms/templates/register-form.html
+msgid "Year of Birth"
+msgstr "غثشق خب زهقفا"
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 "حمثشسث ساشقث صهفا عس غخعق قثشسخرس بخق قثلهسفثقهرل صهفا {platform_name}"
@@ -21608,7 +21586,7 @@ msgid "Learn more about certificates"
 msgstr "مثشقر وخقث شزخعف ذثقفهبهذشفثس"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Details & Schedule"
 msgstr "يثفشهمس & سذاثيعمث"
 
@@ -21630,6 +21608,12 @@ msgstr "ذخعقسث فثشو"
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Advanced Settings"
 msgstr "شيدشرذثي سثففهرلس"
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Proctored Exam Settings"
+msgstr "حقخذفخقثي ثطشو سثففهرلس"
 
 #: cms/templates/checklists.html cms/templates/widgets/header.html
 msgid "Checklists"
@@ -24419,8 +24403,8 @@ msgid "Must be greater than or equal to the course passing grade"
 msgstr "وعسف زث لقثشفثق فاشر خق ثضعشم فخ فاث ذخعقسث حشسسهرل لقشيث"
 
 #: cms/templates/settings_graders.html
-msgid "Grading Rules &amp; Policies"
-msgstr "لقشيهرل قعمثس &amp; حخمهذهثس"
+msgid "Grading Rules & Policies"
+msgstr "لقشيهرل قعمثس & حخمهذهثس"
 
 #: cms/templates/settings_graders.html
 msgid "Deadlines, requirements, and logistics around grading student work"
@@ -24477,10 +24461,6 @@ msgstr ""
 "غخع ذشر شمسخ ذقثشفث شسسهلروثرف فغحثس, سعذا شس اخوثصخقن, مشزس, ضعهظظثس, شري "
 "ثطشوس, شري سحثذهبغ اخص وعذا خب ش سفعيثرف'س لقشيث ثشذا شسسهلروثرف فغحث هس "
 "صخقفا."
-
-#: cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "يثفشهمس &amp; سذاثيعمث"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"

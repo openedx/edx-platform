@@ -1487,11 +1487,8 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         """
         if expect_email:
             # Verify that photo submission confirmation email was sent
-            subject = _(u"{platform_name} ID Verification Photos Received").format(
-                platform_name=settings.PLATFORM_NAME
-            )
             self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual(subject, mail.outbox[0].subject)
+            self.assertEqual('Thank you for submitting your photos!', mail.outbox[0].subject)
         else:
             # Verify that photo submission confirmation email was not sent
             self.assertEqual(len(mail.outbox), 0)
@@ -1541,6 +1538,20 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         Used as a side effect when mocking `verify_student.ssencrypt.has_valid_signature`.
         """
         return True
+
+    def _assert_verification_approved_email(self):
+        """Check that a verification approved email was sent."""
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.subject, 'Your édX ID verification was approved!')
+        self.assertIn('Your édX ID verification photos have been approved', email.body)
+
+    def _assert_verification_denied_email(self):
+        """Check that a verification approved email was sent."""
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(email.subject, 'Your édX Verification Has Been Denied')
+        self.assertIn('The photos you submitted for ID verification were not accepted', email.body)
 
     def test_invalid_json(self):
         """
@@ -1657,8 +1668,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         self.assertIsNone(old_verification.expiry_date)
         self.assertIsNone(old_verification.expiry_email_date)
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].content_subtype, 'html')
+        self._assert_verification_approved_email()
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1692,8 +1702,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         self.assertEqual(attempt.status, u'approved')
         self.assertEqual(attempt.expiry_date.date(), expiry_date.date())
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].content_subtype, 'html')
+        self._assert_verification_approved_email()
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1724,8 +1733,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
         self.assertEqual(attempt.error_msg, u'[{"photoIdReasons": ["Not provided"]}]')
         self.assertEqual(response.content.decode('utf-8'), 'OK!')
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].content_subtype, 'html')
+        self._assert_verification_denied_email()
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',

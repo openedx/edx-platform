@@ -80,6 +80,7 @@
 # Translators:
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # Alexandre DS <alexandre@cleverm8.com>, 2020
+# Arnaud Dupin de Beyssat <a.adupinbe@orange.fr>, 2020
 # Benjamin PENA <benjamin.pena@fun-mooc.fr>, 2019
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
@@ -144,6 +145,7 @@
 #
 # Translators:
 # Alexandre DS <alexandre@cleverm8.com>, 2020
+# Arnaud Dupin de Beyssat <a.adupinbe@orange.fr>, 2020
 # ASSYASS Mahmoud <mahmoud.assyass@gmail.com>, 2015
 # Aurélien Croq <sysadmin@themoocagency.com>, 2017
 # bekairi tahar <tahar48omar@gmail.com>, 2014
@@ -177,6 +179,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Arnaud Dupin de Beyssat <a.adupinbe@orange.fr>, 2020
 # Benjamin PENA <benjamin.pena@fun-mooc.fr>, 2019
 # Daniel Le Berre, 2014
 # Daniel Le Berre, 2014
@@ -204,9 +207,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-01 16:14+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-07-19 20:42+0000\n"
+"PO-Revision-Date: 2020-07-10 14:54+0000\n"
+"Last-Translator: Arnaud Dupin de Beyssat <a.adupinbe@orange.fr>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"

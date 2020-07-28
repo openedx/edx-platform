@@ -7,6 +7,7 @@ import json
 import re
 import unicodedata
 import unittest
+from datetime import datetime, timedelta
 
 import ddt
 from django.conf import settings
@@ -22,8 +23,10 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.http import int_to_base36
+from freezegun import freeze_time
 from mock import Mock, patch
 from oauth2_provider import models as dot_models
+from pytz import UTC
 from six.moves import range
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
@@ -181,31 +184,41 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     def test_ratelimited_from_different_ips_with_same_email(self):
         """
-        Test that password reset endpoint allow only one request per minute
+        Test that password reset endpoint allow only two requests per hour
         per email address.
         """
         cache.clear()
-        good_req = self.request_factory.post('/password_reset/', {'email': 'thisdoesnotexist@foo.com'})
-        good_req.user = AnonymousUser()
-        good_resp = password_reset(good_req)
-        self.assertEqual(good_resp.status_code, 200)
+        self.request_password_reset(200)
+        # now reset the time to 1 min from now in future and change the email and
+        # verify that it will allow another request from same IP
+        for status in [200, 403]:
+            reset_time = datetime.now(UTC) + timedelta(seconds=61)
+            with freeze_time(reset_time):
+                self.request_password_reset(status)
 
-        # change the IP and verify that the rate limiter should kick in and
-        # give a Forbidden response if the request is for same email address.
+        # Even changing the IP will not allow more than two requests for same email.
         new_ip = "8.8.8.8"
-        self.assertNotEqual(good_req.META.get('REMOTE_ADDR'), new_ip)
-
-        bad_req = self.request_factory.post(
-            '/password_reset/',
-            {'email': 'thisdoesnotexist@foo.com'},
-            REMOTE_ADDR=new_ip
-        )
-        bad_req.user = AnonymousUser()
-        bad_resp = password_reset(bad_req)
-        self.assertEqual(bad_resp.status_code, 403)
-        self.assertEqual(bad_req.META.get('REMOTE_ADDR'), new_ip)
+        self.request_password_reset(403, new_ip=new_ip)
 
         cache.clear()
+
+    def request_password_reset(self, status, new_ip=None):
+        extra_args = {}
+        if new_ip:
+            extra_args = {'REMOTE_ADDR': new_ip}
+
+        reset_request = self.request_factory.post(
+            '/password_reset/',
+            {'email': 'thisdoesnotexist@foo.com'},
+            **extra_args
+        )
+
+        if new_ip:
+            self.assertEqual(reset_request.META.get('REMOTE_ADDR'), new_ip)
+
+        reset_request.user = AnonymousUser()
+        response = password_reset(reset_request)
+        self.assertEqual(response.status_code, status)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @ddt.data(('plain_text', "You're receiving this e-mail because you requested a password reset"),

@@ -12,6 +12,7 @@ import six
 from dateutil.parser import parse
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -22,15 +23,21 @@ from requests.exceptions import ConnectionError, Timeout
 from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 
 from course_modes.models import CourseMode
+from entitlements.api import get_active_entitlement_list_for_user
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
-from openedx.core.djangoapps.catalog.utils import get_fulfillable_course_runs_for_entitlement, get_programs
+from openedx.core.djangoapps.catalog.utils import (
+    get_fulfillable_course_runs_for_entitlement,
+    get_programs,
+    get_programs_by_type
+)
 from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
+from openedx.core.djangoapps.enrollments.api import get_enrollments
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -892,3 +899,51 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             for instructor in course_instructors.get('instructors', []):
                 if instructor.get('name', '').strip() not in curr_instructors_names:
                     self.instructors.append(instructor)
+
+
+def is_user_enrolled_in_program_type(user, program_type, paid_modes=False, enrollments=None, entitlements=None):
+    """
+    This method will Look at the learners Enrollments and Entitlements to determine
+    if a learner is enrolled in a Program of the given type.
+
+    NOTE: This method relies on the Program Cache right now. The goal is to move away from this
+    in the future.
+
+    Arguments:
+        user (User): The user we are looking for.
+        program_type (String): The Program type we are looking for.
+        paid_modes (bool): Request if the user is enrolled in a Program in a paid mode, False by default.
+
+    Returns:
+        bool: True is the user is enrolled in programs of the requested Type
+    """
+    course_runs = set()
+    course_uuids = set()
+    programs = get_programs_by_type(Site.objects.get_current(), program_type)
+    if not programs:
+        return False
+
+    for program in programs:
+        for course in program.get('courses', []):
+            course_uuids.add(course.get('uuid'))
+            for course_run in course.get('course_runs', []):
+                course_runs.add(course_run['key'])
+
+    # Check Entitlements first, because there will be less Course Entitlements than
+    # Course Run Enrollments.
+    student_entitlements = entitlements if entitlements is not None else get_active_entitlement_list_for_user(user)
+    for entitlement in student_entitlements:
+        if str(entitlement.course_uuid) in course_uuids:
+            return True
+
+    student_enrollments = enrollments if enrollments is not None else get_enrollments(user.username)
+    for enrollment in student_enrollments:
+        course_run_id = enrollment['course_details']['course_id']
+        if paid_modes:
+            course_run_key = CourseKey.from_string(course_run_id)
+            paid_modes = [mode.slug for mode in CourseMode.paid_modes_for_course(course_run_key)]
+            if enrollment['mode'] in paid_modes and course_run_id in course_runs:
+                return True
+        elif course_run_id in course_runs:
+            return True
+    return False

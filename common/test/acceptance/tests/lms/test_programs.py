@@ -74,30 +74,6 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         cache_programs_page.visit()
 
 
-class ProgramListingPageTest(ProgramPageBase):
-    """Verify user-facing behavior of the program listing page."""
-    shard = 21
-
-    def setUp(self):
-        super(ProgramListingPageTest, self).setUp()
-
-        self.listing_page = ProgramListingPage(self.browser)
-
-    def test_no_programs(self):
-        """
-        Verify that no cards appear when the user has enrollments
-        but none are included in an active program.
-        """
-        self.auth()
-        self.stub_catalog_api(self.programs, self.pathways)
-        self.cache_programs()
-
-        self.listing_page.visit()
-
-        self.assertTrue(self.listing_page.is_sidebar_present)
-        self.assertFalse(self.listing_page.are_cards_present)
-
-
 class ProgramListingPageA11yTest(ProgramPageBase):
     """Test program listing page accessibility."""
     a11y = True

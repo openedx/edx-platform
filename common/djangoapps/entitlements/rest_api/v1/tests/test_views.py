@@ -13,10 +13,12 @@ from django.urls import reverse
 from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseKey
+from pytz import UTC
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -953,6 +955,44 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         )
 
         CourseEnrollment.enroll(self.user, self.course.id, mode=course_entitlement.mode)
+        data = {
+            'course_run_id': str(self.course.id)
+        }
+        response = self.client.post(
+            url,
+            data=json.dumps(data),
+            content_type='application/json',
+        )
+        course_entitlement.refresh_from_db()
+
+        assert response.status_code == 201
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+        assert course_entitlement.enrollment_course_run is not None
+
+    @patch("entitlements.rest_api.v1.views.get_course_runs_for_course")
+    def test_enrollment_closed_upgrade_open(self, mock_get_course_runs):
+        """
+        Test that user can still select a session while course enrollment
+        is closed and upgrade deadline is in future.
+        """
+        course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
+        mock_get_course_runs.return_value = self.return_values
+
+        # Setup enrollment period to be in the past
+        utc_now = datetime.now(UTC)
+        self.course.enrollment_start = utc_now - timedelta(days=15)
+        self.course.enrollment_end = utc_now - timedelta(days=1)
+        self.course = self.update_course(self.course, self.user.id)
+        CourseOverview.update_select_courses([self.course.id], force_update=True)
+
+        assert CourseEnrollment.is_enrollment_closed(self.user, self.course)
+        assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
+
+        url = reverse(
+            self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
+            args=[str(course_entitlement.uuid)]
+        )
+
         data = {
             'course_run_id': str(self.course.id)
         }

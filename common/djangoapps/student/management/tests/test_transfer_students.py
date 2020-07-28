@@ -13,7 +13,6 @@ from opaque_keys.edx import locator
 from six import text_type
 
 from course_modes.models import CourseMode
-from shoppingcart.models import CertificateItem, Order
 from student.models import (
     EVENT_NAME_ENROLLMENT_ACTIVATED,
     EVENT_NAME_ENROLLMENT_DEACTIVATED,
@@ -132,14 +131,6 @@ class TestTransferStudents(ModuleStoreTestCase):
         self.assertEqual((mode, True), CourseEnrollment.enrollment_mode_for_user(student, new_course_one.id))
         self.assertEqual((mode, True), CourseEnrollment.enrollment_mode_for_user(student, new_course_two.id))
 
-        # Confirm the student has not be refunded.
-        target_certs = CertificateItem.objects.filter(
-            course_id=course.id, user_id=student, status='purchased', mode=mode
-        )
-        self.assertTrue(target_certs[0])
-        self.assertFalse(target_certs[0].refund_requested_time)
-        self.assertEqual(target_certs[0].order.status, 'purchased')
-
     def _create_course(self, course_location):
         """
         Creates a course
@@ -159,7 +150,3 @@ class TestTransferStudents(ModuleStoreTestCase):
                                  mode_display_name='verified cert',
                                  min_price=50)
         course_mode.save()
-        # When there is no expiration date on a verified mode, the user can always get a refund
-        cart = Order.get_cart_for_user(user=student)
-        CertificateItem.add_to_order(cart, course_id, 50, 'verified')
-        cart.purchase()

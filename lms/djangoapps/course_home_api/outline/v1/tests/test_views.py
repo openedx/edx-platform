@@ -8,8 +8,11 @@ from django.urls import reverse
 from course_modes.models import CourseMode
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 
 @ddt.ddt
@@ -18,10 +21,9 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     Tests for the Outline Tab API
     """
 
-    @classmethod
-    def setUpClass(cls):
-        BaseCourseHomeTests.setUpClass()
-        cls.url = reverse('course-home-outline-tab', args=[cls.course.id])
+    def setUp(self):
+        super().setUp()
+        self.url = reverse('course-home-outline-tab', args=[self.course.id])
 
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
     def test_get_authenticated_enrolled_user(self, enrollment_mode):
@@ -62,7 +64,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         set_user_preference(user, 'time_zone', 'Asia/Tokyo')
         CourseEnrollment.enroll(user, self.course.id)
 
-        self.upgrade_to_staff()  # needed for masquerade
+        self.switch_to_staff()  # needed for masquerade
 
         # Sanity check on our normal user
         self.assertEqual(self.client.get(self.url).data['dates_widget']['user_timezone'], None)
@@ -71,4 +73,52 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.update_masquerade(username=user.username)
         self.assertEqual(self.client.get(self.url).data['dates_widget']['user_timezone'], 'Asia/Tokyo')
 
+    @ddt.data(
+        (True, True, True, True),  # happy path
+        (True, False, False, True),  # is enrolled
+        (False, True, False, True),  # is staff
+        (False, False, True, True),  # public visibility
+        (False, False, False, False),  # no access
+    )
+    @ddt.unpack
+    @COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.override()
+    def test_handouts(self, is_enrolled, is_staff, is_public, handouts_visible):
+        if is_enrolled:
+            CourseEnrollment.enroll(self.user, self.course.id)
+        if is_staff:
+            self.user.is_staff = True
+            self.user.save()
+        if is_public:
+            self.course.course_visibility = COURSE_VISIBILITY_PUBLIC
+            self.course = self.update_course(self.course, self.user.id)
+
+        self.store.create_item(self.user.id, self.course.id, 'course_info', 'handouts', fields={'data': '<p>Hi</p>'})
+
+        handouts_html = self.client.get(self.url).data['handouts_html']
+        self.assertEqual(handouts_html, '<p>Hi</p>' if handouts_visible else '')
+
     # TODO: write test_get_unknown_course when more data is pulled into the Outline Tab API
+
+    @ddt.data(True, False)
+    def test_welcome_message(self, welcome_message_is_dismissed):
+        self.store.create_item(
+            self.user.id, self.course.id,
+            'course_info',
+            'updates',
+            fields={
+                'items': [{
+                    'content': '<p>Welcome</p>',
+                    'status': 'visible',
+                    'date': 'July 23, 2020',
+                    'id': 1
+                }]
+            }
+        )
+        UserCourseTagFactory(
+            user=self.user,
+            course_id=self.course.id,
+            key='view-welcome-message',
+            value=False if welcome_message_is_dismissed else True
+        )
+        welcome_message_html = self.client.get(self.url).data['welcome_message_html']
+        self.assertEqual(welcome_message_html, None if welcome_message_is_dismissed else '<p>Welcome</p>')

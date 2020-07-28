@@ -107,7 +107,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-05 20:42+0000\n"
+"POT-Creation-Date: 2020-07-26 20:42+0000\n"
 "PO-Revision-Date: 2020-06-14 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -7142,7 +7142,7 @@ msgstr "Gönder"
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "tartışma %(author)s tarafından %(time_ago)s önce başlatıldı"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7309,11 +7309,11 @@ msgstr "isimsiz olarak ileti yolla"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
-msgstr ""
+msgstr "sınıf arkadaşlarına anonim olarak ileti gönder"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Error posting your message."
-msgstr ""
+msgstr "İletinizi yüklerken sorun çıktı."
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -8577,7 +8577,7 @@ msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Create an account"
-msgstr ""
+msgstr "Yeni hesap oluştur"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore

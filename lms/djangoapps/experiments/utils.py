@@ -48,7 +48,6 @@ experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 PROGRAM_INFO_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_programs',
-    flag_undefined_default=False
 )
 
 # .. toggle_name: experiments.add_dashboard_info
@@ -62,10 +61,26 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-118
 # .. toggle_status: supported
-DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace,
-                                 u'add_dashboard_info',
-                                 flag_undefined_default=False)
+DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace, u'add_dashboard_info')
 # TODO END: clean up as part of REVEM-199 (End)
+
+# TODO: Clean up as part of REV-1205 (START)
+# .. toggle_name: experiments.add_upsell_tracking
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Make sure upsell tracking JS works as expected.
+# .. toggle_category: experiments
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2020-7-7
+# .. toggle_expiration_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: REV-1205
+# .. toggle_status: supported
+UPSELL_TRACKING_FLAG = WaffleFlag(
+    waffle_namespace=experiments_namespace,
+    flag_name=u'add_upsell_tracking'
+)
+# TODO END: Clean up as part of REV-1205 (End)
 
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):

@@ -68,12 +68,6 @@ class CourseHomeView(CourseTabView):
         """
         return super(CourseHomeView, self).get(request, course_id, 'courseware', **kwargs)
 
-    def uses_bootstrap(self, request, course, tab):
-        """
-        Always render this tab with bootstrap.
-        """
-        return True
-
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = six.text_type(course.id)
         home_fragment_view = CourseHomeFragmentView()
@@ -258,7 +252,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'update_message_fragment': update_message_fragment,
             'course_sock_fragment': course_sock_fragment,
             'disable_courseware_js': True,
-            'uses_pattern_library': True,
+            'uses_bootstrap': True,
             'upgrade_price': upgrade_price,
             'upgrade_url': upgrade_url,
             'has_discount': has_discount,

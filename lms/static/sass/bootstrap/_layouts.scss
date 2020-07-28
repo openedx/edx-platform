@@ -51,7 +51,7 @@
   display: flex;
   flex-wrap: wrap;
   border-bottom: 1px solid $border-color;
-  padding: $baseline $baseline*2;
+  padding: $baseline;
 
   .page-header-search {
     @include margin-right($baseline);
@@ -107,7 +107,7 @@
 }
 
 .page-content {
-  padding: $baseline*2;
+  padding: $baseline;
 
   // Adjust styles for desktop sized screens
   @include media-breakpoint-up(md) {

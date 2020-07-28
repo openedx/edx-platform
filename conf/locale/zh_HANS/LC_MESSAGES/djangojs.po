@@ -205,7 +205,7 @@
 # GoodLuck <1833447072@qq.com>, 2014
 # ifLab <webmaster@iflab.org>, 2018-2019
 # Jiazhen Tan <jessie12@live.cn>, 2016
-# jsgang <jsgang9@gmail.com>, 2015-2017
+# jsgang <jsgang9@gmail.com>, 2015-2017,2020
 # LIU NIAN <lauraqq@gmail.com>, 2015
 # dae18ada8f5d984070f88a11bd09a0d3_87cf90e <6d2a6f2312a2a802f0de112b58b74c46_176438>, 2015
 # dae18ada8f5d984070f88a11bd09a0d3_87cf90e <6d2a6f2312a2a802f0de112b58b74c46_176438>, 2015
@@ -226,9 +226,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-05 20:42+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-07-26 20:42+0000\n"
+"PO-Revision-Date: 2020-07-13 02:53+0000\n"
+"Last-Translator: jsgang <jsgang9@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"

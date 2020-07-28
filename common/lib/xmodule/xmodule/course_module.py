@@ -49,6 +49,7 @@ DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
 )
 
 DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
+EXAM_SETTINGS_HTML_VIEW_ENABLED = settings.FEATURES.get('ENABLE_EXAM_SETTINGS_HTML_VIEW', False)
 
 COURSE_VISIBILITY_PRIVATE = 'private'
 COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
@@ -871,7 +872,8 @@ class CourseFields(object):
             "Note that enabling proctored exams will also enable timed exams."
         ),
         default=False,
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     proctoring_provider = ProctoringProvider(
@@ -887,6 +889,7 @@ class CourseFields(object):
             ),
         ),
         scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     proctoring_escalation_email = EmailString(
@@ -897,7 +900,8 @@ class CourseFields(object):
             "(e.g. appeals, delayed reviews, etc.)."
         ),
         default=None,
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     allow_proctoring_opt_out = Boolean(
@@ -908,7 +912,8 @@ class CourseFields(object):
             "This setting only applies if proctored exams are enabled for the course."
         ),
         default=True,
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     create_zendesk_tickets = Boolean(
@@ -917,7 +922,8 @@ class CourseFields(object):
             "Enter true or false. If this value is true, a Zendesk ticket will be created for suspicious attempts."
         ),
         default=True,
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     enable_timed_exams = Boolean(
@@ -927,7 +933,8 @@ class CourseFields(object):
             "Regardless of this setting, timed exams are enabled if Enable Proctored Exams is set to true."
         ),
         default=False,
-        scope=Scope.settings
+        scope=Scope.settings,
+        deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )
 
     minimum_grade_credit = Float(

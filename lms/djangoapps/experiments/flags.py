@@ -61,7 +61,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         self.num_buckets = num_buckets
         self.experiment_id = experiment_id
         self.bucket_flags = [
-            CourseWaffleFlag(waffle_namespace, '{}.{}'.format(flag_name, bucket), flag_undefined_default=False)
+            CourseWaffleFlag(waffle_namespace, '{}.{}'.format(flag_name, bucket))
             for bucket in range(num_buckets)
         ]
 
@@ -119,6 +119,12 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         # Keep some imports in here, because this class is commonly used at a module level, and we want to avoid
         # circular imports for any models.
         from experiments.models import ExperimentKeyValue
+        from lms.djangoapps.courseware.access import has_access
+        from lms.djangoapps.courseware.masquerade import (
+            setup_masquerade,
+            is_masquerading,
+            get_specific_masquerading_user,
+        )
 
         request = get_current_request()
         if not request:
@@ -127,6 +133,13 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         if not hasattr(request, 'user') or not request.user.id:
             # We need username for stable bucketing and id for tracking, so just skip anonymous (not-logged-in) users
             return 0
+
+        user = get_specific_masquerading_user(request.user, course_key)
+        if user is None:
+            user = request.user
+            masquerading_as_specific_student = False
+        else:
+            masquerading_as_specific_student = True
 
         # Use course key in experiment name to separate caches and segment calls per-course-run
         experiment_name = self.namespaced_flag_name + ('.{}'.format(course_key) if course_key else '')
@@ -146,10 +159,10 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             values = ExperimentKeyValue.objects.filter(experiment_id=self.experiment_id).values('key', 'value')
             values = {pair['key']: pair['value'] for pair in values}
 
-            if not self._is_enrollment_inside_date_bounds(values, request.user, course_key):
+            if not self._is_enrollment_inside_date_bounds(values, user, course_key):
                 return self._cache_bucket(experiment_name, 0)
 
-        bucket = stable_bucketing_hash_group(experiment_name, self.num_buckets, request.user.username)
+        bucket = stable_bucketing_hash_group(experiment_name, self.num_buckets, user.username)
 
         # Now check if the user is forced into a particular bucket, using our subordinate bucket flags
         for i, bucket_flag in enumerate(self.bucket_flags):
@@ -158,9 +171,9 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
                 break
 
         session_key = 'tracked.{}'.format(experiment_name)
-        if track and hasattr(request, 'session') and session_key not in request.session:
+        if track and hasattr(request, 'session') and session_key not in request.session and not masquerading_as_specific_student:
             segment.track(
-                user_id=request.user.id,
+                user_id=user.id,
                 event_name='edx.bi.experiment.user.bucketed',
                 properties={
                     'site': request.site.domain,
@@ -168,7 +181,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
                     'experiment': self.flag_name,
                     'course_id': str(course_key) if course_key else None,
                     'bucket': bucket,
-                    'is_staff': request.user.is_staff,
+                    'is_staff': user.is_staff,
                     'nonInteraction': 1,
                 }
             )

@@ -232,7 +232,6 @@ def login_and_registration_form(request, initial_mode="login"):
             settings.FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER']
         ),
     }
-
     enterprise_customer = enterprise_customer_for_request(request)
     update_logistration_context_for_enterprise(request, context, enterprise_customer)
 

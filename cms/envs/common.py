@@ -43,6 +43,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 import importlib.util
 import os
 import sys
+from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
@@ -412,6 +413,9 @@ ENABLE_JASMINE = False
 # IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
 
+############################# MICROFRONTENDS ###################################
+COURSE_AUTHORING_MICROFRONTEND_URL = None
+
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
     # Note: Ensure 'CUSTOM_COURSE_URLS' has a matching value in lms/envs/common.py
@@ -657,8 +661,15 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
+
+    # CORS and CSRF
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
+
+    # JWT auth
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
     # Allows us to define redirects via Django admin
@@ -1317,6 +1328,10 @@ INSTALLED_APPS = [
     # API access administration
     'openedx.core.djangoapps.api_admin',
 
+    # CORS and cross-domain CSRF
+    'corsheaders',
+    'openedx.core.djangoapps.cors_csrf',
+
     # History tables
     'simple_history',
 
@@ -1475,6 +1490,9 @@ INSTALLED_APPS = [
     'django_filters',
     'cms.djangoapps.api',
 
+    # edx-drf-extensions
+    'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
+
     # Entitlements, used in openedx tests
     'entitlements',
 
@@ -1502,6 +1520,8 @@ INSTALLED_APPS = [
 
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
+
+    'ratelimitbackend',
 ]
 
 
@@ -2074,8 +2094,16 @@ FINANCIAL_REPORTS = {
     'ROOT_PATH': 'sandbox',
 }
 
+############# CORS headers for cross-domain requests #################
+if FEATURES.get('ENABLE_CORS_HEADERS'):
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+        'use-jwt-cookie',
+    )
+
 CORS_ORIGIN_WHITELIST = []
 CORS_ORIGIN_ALLOW_ALL = False
+
 
 LOGIN_REDIRECT_WHITELIST = []
 
@@ -2253,4 +2281,11 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 DISABLE_DEPRECATED_SIGNUP_URL = False
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
-LOGISTRATION_RATELIMIT_RATE = '500/5m'
+LOGISTRATION_RATELIMIT_RATE = '100/5m'
+
+##### PASSWORD RESET RATE LIMIT SETTINGS #####
+PASSWORD_RESET_IP_RATE = '1/m'
+PASSWORD_RESET_EMAIL_RATE = '2/h'
+
+######################## Setting for content libraries ########################
+MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000

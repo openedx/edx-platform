@@ -477,6 +477,23 @@ def get_user_roles(username):
     return _data_api().get_user_roles(username)
 
 
+def serialize_enrollments(enrollments):
+    """
+    Takes a list of CourseEnrollment objects and serializes them.
+
+    Serialized result will be compatible will the results from `get_enrollments`. If
+    the `get_enrollments` function changes to return non-serialized data, this will
+    need to change as well.
+
+    Args:
+        enrollments: list of CourseEnrollment objects to be serialized
+
+    Returns:
+        A list of enrollments
+    """
+    return _data_api().serialize_enrollments(enrollments)
+
+
 def _data_api():
     """Returns a Data API.
     This relies on Django settings to find the appropriate data API.

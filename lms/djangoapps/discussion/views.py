@@ -30,7 +30,7 @@ import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
-from lms.djangoapps.discussion.config.waffle import is_forum_daily_digest_enabled
+from lms.djangoapps.discussion.config.settings import is_forum_daily_digest_enabled
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
@@ -695,7 +695,6 @@ class DiscussionBoardFragmentView(EdxFragmentView):
     """
     Component implementation of the discussion board.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(
         self,

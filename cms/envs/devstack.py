@@ -5,6 +5,7 @@ Specific overrides to the base prod settings to make development easier.
 
 import logging
 from os.path import abspath, dirname, join
+from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -213,3 +214,11 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
     from .private import *  # pylint: disable=import-error,wildcard-import
+
+############# CORS headers for cross-domain requests #################
+FEATURES['ENABLE_CORS_HEADERS'] = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+    'use-jwt-cookie',
+)

@@ -1214,12 +1214,15 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         # Too late. Cannot submit
         if self.closed():
-            problem_location = text_type(self.location)
-            if 'HarvardX+MCB80.1x+3T2019' in problem_location:
-                log.info(
-                    'Problem %s closed, close date: %s, attempts: %s/%s, is_past_due: %s',
-                    problem_location, self.close_date, self.attempts, self.max_attempts, self.is_past_due()
-                )
+            log.error(
+                'ProblemClosedError: Problem %s, close date: %s, due:%s, is_past_due: %s, attempts: %s/%s,',
+                text_type(self.location),
+                self.close_date,
+                self.due,
+                self.is_past_due(),
+                self.attempts,
+                self.max_attempts,
+            )
             event_info['failure'] = 'closed'
             self.track_function_unmask('problem_check_fail', event_info)
             raise NotFoundError(_("Problem is closed."))

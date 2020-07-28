@@ -226,7 +226,7 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
         """
         return self._get_request_cache().setdefault('flags', {})
 
-    def is_flag_active(self, flag_name, check_before_waffle_callback=None, flag_undefined_default=None):
+    def is_flag_active(self, flag_name, check_before_waffle_callback=None):
         """
         Returns and caches whether the provided flag is active.
 
@@ -239,6 +239,10 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
         Important: Caching for the check_before_waffle_callback must be handled
             by the callback itself.
 
+        Note: A waffle flag's default is False if not defined. If you think you
+            need the default to be True, see the module docstring for
+            alternatives.
+
         Arguments:
             flag_name (String): The name of the flag to check.
             check_before_waffle_callback (function): (Optional) A function that
@@ -246,63 +250,55 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
                 check_before_waffle_callback(namespaced_flag_name) returns True
                 or False, it is returned. If it returns None, then waffle is
                 used.
-            DEPRECATED flag_undefined_default (Boolean): A default value to be
-                returned if the waffle flag is to be checked, but doesn't exist.
-                See module docstring for alternative.
+
+        """
+        # validate arguments
+        namespaced_flag_name = self._namespaced_name(flag_name)
+
+        if check_before_waffle_callback:
+            value = check_before_waffle_callback(namespaced_flag_name)
+            if value is not None:
+                # Do not cache value for the callback, because the key might be different.
+                # The callback needs to handle its own caching if it wants it.
+                self._set_waffle_flag_metric(namespaced_flag_name, value)
+                return value
+
+        value = self._cached_flags.get(namespaced_flag_name)
+        if value is not None:
+            self._set_waffle_flag_metric(namespaced_flag_name, value)
+            return value
+
+        request = crum.get_current_request()
+        if not request:
+            log.warning(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
+            # Return the Flag's Everyone value if not in a request context.
+            # Note: this skips the cache as the value might be different
+            # in a normal request context. This case seems to occur when
+            # a page redirects to a 404, or for celery workers.
+            value = self._is_flag_active_for_everyone(namespaced_flag_name)
+            self._set_waffle_flag_metric(namespaced_flag_name, value)
+            set_custom_metric('warn_flag_no_request_return_value', value)
+            return value
+
+        value = flag_is_active(request, namespaced_flag_name)
+        self._cached_flags[namespaced_flag_name] = value
+
+        self._set_waffle_flag_metric(namespaced_flag_name, value)
+        return value
+
+    def _is_flag_active_for_everyone(self, namespaced_flag_name):
+        """
+        Returns True if the waffle flag is configured as active for Everyone,
+        False otherwise.
         """
         # Import is placed here to avoid model import at project startup.
         from waffle.models import Flag
 
-        if flag_undefined_default:
-            warnings.warn(
-                # NOTE: This will be removed once ARCHBOM-132, currently in-progress, is complete.
-                'flag_undefined_default has been deprecated. For existing uses this is already actively being fixed.',
-                DeprecationWarning
-            )
-
-        # validate arguments
-        namespaced_flag_name = self._namespaced_name(flag_name)
-        value = None
-        if check_before_waffle_callback:
-            value = check_before_waffle_callback(namespaced_flag_name)
-
-        if value is None:
-            # Do not get cached value for the callback, because the key might be different.
-            # The callback needs to handle its own caching if it wants it.
-            value = self._cached_flags.get(namespaced_flag_name)
-            if value is None:
-
-                if flag_undefined_default is not None:
-                    # determine if the flag is undefined in waffle
-                    try:
-                        Flag.objects.get(name=namespaced_flag_name)
-                    except Flag.DoesNotExist:
-                        if flag_undefined_default:
-                            # This metric will go away once this has been fully retired with ARCHBOM-132.
-                            # Also, even though the value will only track the last flag, that should be enough.
-                            set_custom_metric('temp_flag_default_used', namespaced_flag_name)
-                        value = flag_undefined_default
-
-                if value is None:
-                    request = crum.get_current_request()
-                    if request:
-                        value = flag_is_active(request, namespaced_flag_name)
-                    else:
-                        log.warning(u"%sFlag '%s' accessed without a request", self.log_prefix, namespaced_flag_name)
-                        set_custom_metric('warn_flag_no_request', True)
-                        # Return the default value if not in a request context.
-                        # Note: this skips the cache as the value might be different
-                        # in a normal request context. This case seems to occur when
-                        # a page redirects to a 404. In this case, we'll just return
-                        # the default value.
-                        value = bool(flag_undefined_default)
-                        self._set_waffle_flag_metric(namespaced_flag_name, value)
-                        return value
-
-                self._cached_flags[namespaced_flag_name] = value
-
-        self._set_waffle_flag_metric(namespaced_flag_name, value)
-        return value
+        try:
+            waffle_flag = Flag.objects.get(name=namespaced_flag_name)
+            return (waffle_flag.everyone is True)
+        except Flag.DoesNotExist:
+            return False
 
     def _set_waffle_flag_metric(self, name, value):
         """
@@ -379,16 +375,14 @@ class WaffleFlag(object):
     Represents a single waffle flag, using a cached waffle namespace.
     """
 
-    def __init__(self, waffle_namespace, flag_name, flag_undefined_default=None):
+    def __init__(self, waffle_namespace, flag_name):
         """
         Initializes the waffle flag instance.
 
         Arguments:
             waffle_namespace (WaffleFlagNamespace | String): Namespace for this flag.
             flag_name (String): The name of the flag (without namespacing).
-            DEPRECATED flag_undefined_default (Boolean): A default value to be returned
-                if the waffle flag is to be checked, but doesn't exist. See module
-                docstring for alternative.
+
         """
         if isinstance(waffle_namespace, six.string_types):
             waffle_namespace = WaffleFlagNamespace(name=waffle_namespace)
@@ -396,7 +390,6 @@ class WaffleFlag(object):
         self.waffle_namespace = waffle_namespace
         self.waffle_namespace = waffle_namespace
         self.flag_name = flag_name
-        self.flag_undefined_default = flag_undefined_default
 
     @property
     def namespaced_flag_name(self):
@@ -409,10 +402,7 @@ class WaffleFlag(object):
         """
         Returns whether or not the flag is enabled.
         """
-        return self.waffle_namespace.is_flag_active(
-            self.flag_name,
-            flag_undefined_default=self.flag_undefined_default
-        )
+        return self.waffle_namespace.is_flag_active(self.flag_name)
 
     @contextmanager
     def override(self, active=True):
@@ -477,7 +467,6 @@ class CourseWaffleFlag(WaffleFlag):
         return self.waffle_namespace.is_flag_active(
             self.flag_name,
             check_before_waffle_callback=self._get_course_override_callback(course_key),
-            flag_undefined_default=self.flag_undefined_default
         )
 
     def is_enabled_without_course_context(self):

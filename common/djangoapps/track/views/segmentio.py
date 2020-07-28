@@ -127,7 +127,7 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
 
     # Start with the context provided by Segment in the "client" field if it exists
     # We should tightly control which fields actually get included in the event emitted.
-    segment_context = full_segment_event.get('context')
+    segment_context = full_segment_event.get('context', {})
 
     # Build up the event context by parsing fields out of the event received from Segment
     context = {}
@@ -163,7 +163,7 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     if 'application' not in app_context:
         context['application'] = {
             'name': app_context.get('app_name', ''),
-            'version': '' if not segment_context else segment_context.get('app', {}).get('version', '')
+            'version': segment_context.get('app', {}).get('version', ''),
         }
     app_context.pop('app_name', None)
 

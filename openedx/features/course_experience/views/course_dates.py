@@ -3,15 +3,22 @@ Fragment for rendering the course dates sidebar.
 """
 
 
+from django.db import transaction
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import get_language_bidi
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
+from lms.djangoapps.courseware.tabs import DatesTab
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from student.models import CourseEnrollment
 
 
 class CourseDatesFragmentView(EdxFragmentView):
@@ -28,9 +35,16 @@ class CourseDatesFragmentView(EdxFragmentView):
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         course_date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
 
+        dates_tab_enabled = DatesTab.is_enabled(course, request.user)
+        if course_home_mfe_dates_tab_is_active(course_key):
+            dates_tab_link = get_microfrontend_url(course_key=course.id, view_name='dates')
+        else:
+            dates_tab_link = reverse('dates', args=[course.id])
+
         context = {
             'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime'],
-            'dates_tab_link': reverse('dates', args=[course.id]),
+            'dates_tab_link': dates_tab_link,
+            'dates_tab_enabled': dates_tab_enabled,
         }
         html = render_to_string(self.template_name, context)
         dates_fragment = Fragment(html)
@@ -39,6 +53,7 @@ class CourseDatesFragmentView(EdxFragmentView):
         return dates_fragment
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CourseDatesFragmentMobileView(CourseDatesFragmentView):
     """
     A course dates fragment to show dates on mobile apps.
@@ -49,7 +64,6 @@ class CourseDatesFragmentMobileView(CourseDatesFragmentView):
     mechanism to automatically create/recreate session with the server for all
     authenticated requests if the server returns 404.
     """
-    _uses_pattern_library = False
     template_name = 'course_experience/mobile/course-dates-fragment.html'
 
     def get(self, request, *args, **kwargs):

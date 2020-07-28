@@ -42,7 +42,8 @@ from student.models import (
     UserProfile,
     UserTestGroup,
     BulkUnenrollConfiguration,
-    AccountRecoveryConfiguration
+    AccountRecoveryConfiguration,
+    BulkChangeEnrollmentConfiguration
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
@@ -541,6 +542,7 @@ admin.site.register(AccountRecoveryConfiguration, ConfigurationModelAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 admin.site.register(RegistrationCookieConfiguration, ConfigurationModelAdmin)
 admin.site.register(BulkUnenrollConfiguration, ConfigurationModelAdmin)
+admin.site.register(BulkChangeEnrollmentConfiguration, ConfigurationModelAdmin)
 
 
 # We must first un-register the User model since it may also be registered by the auth app.

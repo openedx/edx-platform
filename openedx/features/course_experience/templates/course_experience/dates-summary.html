@@ -21,9 +21,12 @@ from django.utils.translation import ugettext as _
             % if course_date.description:
                 <p class="description">${course_date.description}</p>
             % endif
+            % if course_date.extra_info:
+                <div class="extra-info">${course_date.extra_info}</div>
+            % endif
             % if course_date.link and course_date.link_text:
                 <div class="date-summary-link">
-                    <a href="${course_date.link}">${course_date.link_text}</a>
+                    <a id="course_home_dates" href="${course_date.link}">${course_date.link_text}</a>
                 </div>
             % endif
         </div>

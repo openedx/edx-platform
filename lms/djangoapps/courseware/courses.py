@@ -3,7 +3,6 @@ Functions for accessing and displaying courses within the
 courseware.
 """
 
-
 import logging
 from collections import defaultdict, namedtuple
 from datetime import datetime
@@ -11,8 +10,8 @@ from datetime import datetime
 import pytz
 import six
 from crum import get_current_request
+from dateutil.parser import parse as parse_date
 from django.conf import settings
-from django.db.models import Prefetch
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import ugettext as _
@@ -25,7 +24,6 @@ from six import text_type
 from openedx.core.lib.cache_utils import request_cached
 
 import branding
-from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     AuthenticationRequiredAccessError,
@@ -60,6 +58,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.features.course_experience.utils import is_block_structure_complete_for_assignments
 from static_replace import replace_static_urls
 from survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from util.date_utils import strftime_localized
@@ -73,7 +72,7 @@ log = logging.getLogger(__name__)
 # Used by get_course_assignments below. You shouldn't need to use this type directly.
 _Assignment = namedtuple(
     'Assignment', ['block_key', 'title', 'url', 'date', 'contains_gated_content', 'complete', 'past_due',
-                   'assignment_type']
+                   'assignment_type', 'extra_info']
 )
 
 
@@ -501,15 +500,16 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
     if num_return is None in date increasing order.
     """
     date_blocks = []
-    for assignment in get_course_assignments(course.id, user, request, include_access=include_access):
+    for assignment in get_course_assignments(course.id, user, include_access=include_access):
         date_block = CourseAssignmentDate(course, user)
         date_block.date = assignment.date
         date_block.contains_gated_content = assignment.contains_gated_content
         date_block.complete = assignment.complete
         date_block.assignment_type = assignment.assignment_type
         date_block.past_due = assignment.past_due
-        date_block.link = assignment.url
+        date_block.link = request.build_absolute_uri(assignment.url) if assignment.url else ''
         date_block.set_title(assignment.title, link=assignment.url)
+        date_block._extra_info = assignment.extra_info  # pylint: disable=protected-access
         date_blocks.append(date_block)
     date_blocks = sorted((b for b in date_blocks if b.is_enabled or include_past_dates), key=date_block_key_fn)
     if num_return:
@@ -518,7 +518,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
 
 
 @request_cached()
-def get_course_assignments(course_key, user, request, include_access=False):
+def get_course_assignments(course_key, user, include_access=False):
     """
     Returns a list of assignment (at the subsection/sequential level) due dates for the given course.
 
@@ -535,27 +535,92 @@ def get_course_assignments(course_key, user, request, include_access=False):
         for subsection_key in block_data.get_children(section_key):
             due = block_data.get_xblock_field(subsection_key, 'due')
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
-            if not due or not graded:
-                continue
+            if due and graded:
+                contains_gated_content = include_access and block_data.get_xblock_field(
+                    subsection_key, 'contains_gated_content', False)
+                title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
 
-            contains_gated_content = include_access and block_data.get_xblock_field(
-                subsection_key, 'contains_gated_content', False)
-            title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
+                assignment_type = block_data.get_xblock_field(subsection_key, 'format', None)
 
-            assignment_type = block_data.get_xblock_field(subsection_key, 'format', None)
+                url = None
+                start = block_data.get_xblock_field(subsection_key, 'start')
+                assignment_released = not start or start < now
+                if assignment_released:
+                    url = reverse('jump_to', args=[course_key, subsection_key])
 
-            url = ''
-            start = block_data.get_xblock_field(subsection_key, 'start')
-            assignment_released = not start or start < now
-            if assignment_released:
-                url = reverse('jump_to', args=[course_key, subsection_key])
-                url = request and request.build_absolute_uri(url)
+                complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                past_due = not complete and due < now
+                assignments.append(_Assignment(
+                    subsection_key, title, url, due, contains_gated_content, complete, past_due, assignment_type, None
+                ))
 
-            complete = block_data.get_xblock_field(subsection_key, 'complete', False)
-            past_due = not complete and due < now
-            assignments.append(_Assignment(
-                subsection_key, title, url, due, contains_gated_content, complete, past_due, assignment_type
-            ))
+            # Load all dates for ORA blocks as separate assignments
+            descendents = block_data.get_children(subsection_key)
+            while descendents:
+                descendent = descendents.pop()
+                descendents.extend(block_data.get_children(descendent))
+                if block_data.get_xblock_field(descendent, 'category', None) == 'openassessment':
+                    graded = block_data.get_xblock_field(descendent, 'graded', False)
+                    has_score = block_data.get_xblock_field(descendent, 'has_score', False)
+                    weight = block_data.get_xblock_field(descendent, 'weight', 1)
+                    if not (graded and has_score and (weight is None or weight > 0)):
+                        continue
+
+                    all_assessments = [{
+                        'name': 'submission',
+                        'due': block_data.get_xblock_field(descendent, 'submission_due'),
+                        'start': block_data.get_xblock_field(descendent, 'submission_start'),
+                        'required': True
+                    }]
+                    valid_assessments = block_data.get_xblock_field(descendent, 'valid_assessments')
+                    print(valid_assessments)
+
+                    if valid_assessments:
+                        all_assessments.extend(valid_assessments)
+
+                    assignment_type = block_data.get_xblock_field(descendent, 'format', None)
+                    complete = is_block_structure_complete_for_assignments(block_data, descendent)
+
+                    block_title = block_data.get_xblock_field(descendent, 'title', _('Open Response Assessment'))
+
+                    for assessment in all_assessments:
+                        due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC) if assessment.get('due') else None
+                        if due is None:
+                            continue
+
+                        assessment_name = assessment.get('name')
+                        if assessment_name is None:
+                            continue
+
+                        if assessment_name == 'self-assessment':
+                            assessment_type = _("Self Assessment")
+                        elif assessment_name == 'peer-assessment':
+                            assessment_type = _("Peer Assessment")
+                        elif assessment_name == 'staff-assessment':
+                            assessment_type = _("Staff Assessment")
+                        elif assessment_name == 'submission':
+                            assessment_type = _("Submission")
+                        else:
+                            assessment_type = assessment_name
+                        title = "{} ({})".format(block_title, assessment_type)
+                        url = ''
+                        start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC) if assessment.get('start') else None
+                        assignment_released = not start or start < now
+                        if assignment_released:
+                            url = reverse('jump_to', args=[course_key, descendent])
+
+                        past_due = not complete and due and due < now
+                        assignments.append(_Assignment(
+                            descendent,
+                            title,
+                            url,
+                            due,
+                            False,
+                            complete,
+                            past_due,
+                            assignment_type,
+                            _("Open Response Assessment due dates are set by your instructor and can't be shifted.")
+                        ))
 
     return assignments
 

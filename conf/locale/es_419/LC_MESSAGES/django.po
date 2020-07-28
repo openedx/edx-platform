@@ -7,7 +7,7 @@
 # Adolfo Michel <Michel.14.993@gmail.com>, 2017
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2020
 # arrow1234 <aleoncavallo@gmail.com>, 2014
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# Anatoli Pena <djanatoli@gmail.com>, 2016
 # AngelesAlvarez, 2019
 # Anthony Mangano <amangano@edx.org>, 2017
 # Antonio Pardo <apardo@alabs.org>, 2013
@@ -58,6 +58,7 @@
 # Ned Weitzman <nweitzman@edx.org>, 2017
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
+# Paulina Rodriguez <pauli.rodriguez.c@gmail.com>, 2020
 # rcelaya <rcelaya@ula.ve>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014-2015
 # Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
@@ -116,7 +117,7 @@
 # Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2014
 # Adolfo Michel <Michel.14.993@gmail.com>, 2017
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2020
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
+# Anatoli Pena <djanatoli@gmail.com>, 2016
 # 15d70039da093fd796cb78400efe6224_d9c7fb5 <9dafa8baa31ffa87b3f23172673a99b8_107209>, 2013
 # 15d70039da093fd796cb78400efe6224_d9c7fb5 <9dafa8baa31ffa87b3f23172673a99b8_107209>, 2013
 # AngelesAlvarez, 2019
@@ -177,6 +178,7 @@
 # Nicolas CS <nicolascs23@gmail.com>, 2016
 # Omar Al-Ithawi <i@omardo.com>, 2020
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
+# Paulina Rodriguez <pauli.rodriguez.c@gmail.com>, 2020
 # palichis <palichis@solid-ec.org>, 2015
 # Etna Pretelín Ricárdez, 2014
 # Rubén Torres <r.torres@usal.es>, 2015
@@ -256,7 +258,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-01 16:15+0000\n"
+"POT-Creation-Date: 2020-07-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -6417,7 +6419,6 @@ msgid "in {relative} - {absolute}"
 msgstr "Dentro de {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Enrollment Date"
 msgstr "Fecha de inscripción"
 
@@ -7277,51 +7278,6 @@ msgstr ""
 "El número de segundos de retraso/tiempo de espera para obtener el valor de "
 "la cookie desde sailthru."
 
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "{platform_name} Staff"
-msgstr "El equipo de {platform_name}"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Course Staff"
-msgstr "Equipo del curso"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: openedx/core/djangoapps/django_comment_common/models.py
-msgid "Student"
-msgstr "Estudiante"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: lms/templates/preview_menu.html
-msgid "Staff"
-msgstr "Equipo"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Used Registration Code"
-msgstr "Códigos de registro de usuario"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Credit Card - Individual"
-msgstr "Tarjeta de crédito - Individual"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "manually enrolled by username: {username}"
-msgstr "inscrito manualmente por el usuario: {username} "
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Manually Enrolled"
-msgstr "Inscrito manualmente"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Data Integrity Error"
-msgstr "Error de integridad de datos"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr "No definida"
-
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
@@ -7446,13 +7402,11 @@ msgid "enrolled learner profile"
 msgstr "Perfil del estudiante inscrito."
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "User ID"
 msgstr "ID de usuario"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/schedules/admin.py
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/ccx/enrollment.html lms/templates/staff_problem_info.html
@@ -7477,7 +7431,6 @@ msgid "Email"
 msgstr "Correo electrónico"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Language"
 msgstr "Idioma"
 
@@ -7493,7 +7446,6 @@ msgstr "Año de nacimiento"
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the user's gender.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7501,18 +7453,15 @@ msgid "Gender"
 msgstr "Género"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Level of Education"
 msgstr "Nivel educativo"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Mailing Address"
 msgstr "Dirección de correspondencia"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 msgid "Goals"
 msgstr "Objetivos"
 
@@ -7545,7 +7494,6 @@ msgstr "Equipo"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -7555,7 +7503,6 @@ msgid "City"
 msgstr "Ciudad"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -7578,11 +7525,6 @@ msgid "The file must contain a 'username' column, an 'email' column, or both."
 msgstr ""
 "El archivo debe contener una columna con el 'nombre de usuario', una columna"
 " con eñ 'email', o ambos"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/api_helper.py
-msgid "detailed enrollment"
-msgstr "Inscripción detallada"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
@@ -7857,10 +7799,6 @@ msgstr ""
 "producto para las analíticas del curso{link_end}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "E-Commerce"
-msgstr "E-Commerce"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Special Exams"
 msgstr "Examenes especiales"
 
@@ -7987,7 +7925,6 @@ msgstr ""
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -8016,6 +7953,10 @@ msgstr "La tarea solicitada ya está en ejecución"
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Error occured. Please try again later."
 msgstr "Ocurrió un problema. Por favor intente más tarde."
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "detailed enrollment"
+msgstr "Inscripción detallada"
 
 #: lms/djangoapps/instructor_task/api_helper.py
 #, python-brace-format
@@ -8100,12 +8041,6 @@ msgstr "Distribución de calificaciones del problema"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-msgid "generating_enrollment_report"
-msgstr "generating_enrollment_report"
-
-#. Translators: This is a past-tense verb that is inserted into task progress
-#. messages as {action}.
-#: lms/djangoapps/instructor_task/tasks.py
 msgid "certificates generated"
 msgstr "Certificados generados"
 
@@ -8116,82 +8051,6 @@ msgstr "Certificados generados"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
 msgstr "cohortado"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "First Name"
-msgstr "Primer Nombre"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the First Name
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py
-msgid "Last Name"
-msgstr "Apellido"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/templates/shoppingcart/receipt.html
-msgid "Company Name"
-msgstr "Nombre de la organización"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Title
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/user_api/accounts/settings_views.py
-#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
-#: wiki/templates/wiki/dir.html
-msgid "Title"
-msgstr "Título"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Year of Birth"
-msgstr "Año de nacimiento"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Currently Enrolled"
-msgstr "Actualmente inscrito"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Source"
-msgstr "Origen de la inscripción"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Manual (Un)Enrollment Reason"
-msgstr "Motivo de (des)Inscripción manual"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Enrollment Role"
-msgstr "Rol"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "List Price"
-msgstr "Precio de lista"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Payment Amount"
-msgstr "Valor del pago"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Coupon Codes Used"
-msgstr "Código de cupón utilizado"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Registration Code Used"
-msgstr "Código de inscripción utilizado"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Payment Status"
-msgstr "Estado del pago"
-
-#: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-msgid "Transaction Reference Number"
-msgstr "Número de referencia de la transacción"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No status information available"
@@ -9477,8 +9336,8 @@ msgstr "No puede unirse a un equipo administrado por un instructor."
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
-msgid "The user {username} is already a member of a team in this course."
-msgstr "El usuario {username} ya es un miembro del equipo del curso."
+msgid "The user {username} is already a member of a team in this teamset."
+msgstr ""
 
 #: lms/djangoapps/teams/views.py
 #, python-brace-format
@@ -9578,16 +9437,6 @@ msgstr "El Nombre debe contener un mínimo de {min_length} caracteres."
 #: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
 msgstr "Los datos de imagen no es válida."
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "{platform_name} ID Verification Photos Received"
-msgstr "{platform_name} ID de verificación de las fotos recibidas"
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "Your {platform_name} ID Verification Approved"
-msgstr "Su ID de verificación  {platform_name} aprobada"
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
@@ -11056,6 +10905,10 @@ msgstr "La configuración no se puede especificar en más de un nivel a la vez."
 msgid "Learning Sequences"
 msgstr ""
 
+#: openedx/core/djangoapps/content_libraries/api.py
+msgid "Library cannot have more than {} XBlocks"
+msgstr ""
+
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
 msgstr "Administrar usuarios y contenido de autor"
@@ -11308,6 +11161,10 @@ msgstr "Moderador del Grupo"
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Community TA"
 msgstr "Profesor asistente de la comunidad"
+
+#: openedx/core/djangoapps/django_comment_common/models.py
+msgid "Student"
+msgstr "Estudiante"
 
 #: openedx/core/djangoapps/embargo/forms.py
 #: openedx/core/djangoapps/verified_track_content/forms.py
@@ -11947,6 +11804,20 @@ msgid "The '{field_name}' field cannot be edited."
 msgstr "El campo '{field_name}' no puede ser editado."
 
 #. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "First Name"
+msgstr "Primer Nombre"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the First Name
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py
+msgid "Last Name"
+msgstr "Apellido"
+
+#. Translators: This label appears above a field on the registration form
 #. which allows the user to input the State/Province/Region in which they
 #. live.
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
@@ -11960,6 +11831,15 @@ msgstr "Estado/Provincia/Región"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Company"
 msgstr "Empresa"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Title
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
+#: wiki/templates/wiki/dir.html
+msgid "Title"
+msgstr "Título"
 
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Job Title
@@ -12715,30 +12595,34 @@ msgid "Subscribe to calendar updates"
 msgstr "Suscribirse a las actualizaciones de calendario"
 
 #: openedx/features/calendar_sync/utils.py
-msgid "Stay on Track"
-msgstr "Manténgase al día"
+#, python-brace-format
+msgid "Sync {course} to your calendar"
+msgstr ""
 
 #: openedx/features/calendar_sync/utils.py
 #, python-brace-format
 msgid ""
 "Sticking to a schedule is the best way to ensure that you successfully "
-"complete your self-paced course. This schedule of assignment due dates for "
-"{course} will help you stay on track!"
+"complete your self-paced course. This schedule for {course} will help you "
+"stay on track!"
 msgstr ""
-"Cumplir con un horario es la mejor manera de asegurarse de completar con "
-"éxito su curso a su propio ritmo. ¡Este cronograma de fechas de vencimiento "
-"de tareas para {course} lo ayudará a mantenerse en el camino!"
 
 #: openedx/features/calendar_sync/utils.py
-#, python-brace-format
-msgid "Updates for Your {course} Schedule"
-msgstr "Actualizaciones para su calendario de {course}"
-
-#: openedx/features/calendar_sync/utils.py
-#, python-brace-format
 msgid ""
-"Your assignment due dates for {course} were recently adjusted. Update your "
-"calendar with your new schedule to ensure that you stay on track!"
+"Once you sync your course schedule to your calendar, any updates to the "
+"course from your instructor will be automatically reflected. You can remove "
+"the course from your calendar at any time."
+msgstr ""
+
+#: openedx/features/calendar_sync/utils.py
+#, python-brace-format
+msgid "{course} dates have been updated on your calendar"
+msgstr ""
+
+#: openedx/features/calendar_sync/utils.py
+msgid ""
+"You have successfully shifted your course schedule and your calendar is up "
+"to date."
 msgstr ""
 
 #: openedx/features/content_type_gating/models.py
@@ -13456,6 +13340,11 @@ msgstr "Subsección"
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
 msgstr "La carga del archivo ha fallado. Por favor intente nuevamente."
+
+#: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -14759,6 +14648,11 @@ msgstr "Ver curso"
 #: lms/templates/preview_menu.html
 msgid "View this course as:"
 msgstr "Ver este curso como:"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/preview_menu.html
+msgid "Staff"
+msgstr "Equipo"
 
 #: lms/templates/preview_menu.html
 msgid "Learner"
@@ -18984,6 +18878,11 @@ msgstr "Encontrar curso"
 msgid "Sysadmin"
 msgstr "Sysadmin"
 
+#: lms/templates/header/navbar-logo-header.html
+#: lms/templates/header/user_dropdown.html
+msgid "{name} Dashboard"
+msgstr ""
+
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
 msgstr "Enlaces complementarios"
@@ -20909,6 +20808,10 @@ msgid "Billed To Details"
 msgstr "Detalles de facturación"
 
 #: lms/templates/shoppingcart/receipt.html
+msgid "Company Name"
+msgstr "Nombre de la organización"
+
+#: lms/templates/shoppingcart/receipt.html
 msgid "N/A"
 msgstr "N/D"
 
@@ -22033,6 +21936,10 @@ msgid "Highest Level of Education Completed"
 msgstr "Máximo nivel educativo completado"
 
 #: themes/stanford-style/lms/templates/register-form.html
+msgid "Year of Birth"
+msgstr "Año de nacimiento"
+
+#: themes/stanford-style/lms/templates/register-form.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 "Por favor indícanos las razones que te motivan a registrarse en "
@@ -22317,7 +22224,7 @@ msgid "Learn more about certificates"
 msgstr "Aprender más acerca de los certificados"
 
 #: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings_advanced.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 msgid "Details & Schedule"
 msgstr "Detalles y Calendario"
 
@@ -22339,6 +22246,12 @@ msgstr "Equipo del curso"
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Advanced Settings"
 msgstr "Configuración avanzada"
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Proctored Exam Settings"
+msgstr ""
 
 #: cms/templates/checklists.html cms/templates/widgets/header.html
 msgid "Checklists"
@@ -25199,8 +25112,8 @@ msgid "Must be greater than or equal to the course passing grade"
 msgstr "Debe ser mayor o igual a la calificación mínima para aprobar."
 
 #: cms/templates/settings_graders.html
-msgid "Grading Rules &amp; Policies"
-msgstr "Reglas y políticas de calificación"
+msgid "Grading Rules & Policies"
+msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Deadlines, requirements, and logistics around grading student work"
@@ -25260,10 +25173,6 @@ msgstr ""
 "Puede también crear tipos de actividades, como tareas, laboratorios, quizes,"
 " exámenes y especificar el peso que tendrá cada actividad en la calificación"
 " final del estudiante."
-
-#: cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "Detalles y Calendario"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"

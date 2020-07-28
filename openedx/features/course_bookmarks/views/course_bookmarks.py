@@ -56,7 +56,7 @@ class CourseBookmarksView(View):
             'course_url': course_url,
             'bookmarks_fragment': bookmarks_fragment,
             'disable_courseware_js': True,
-            'uses_pattern_library': True,
+            'uses_bootstrap': True,
         }
         return render_to_response('course_bookmarks/course-bookmarks.html', context)
 
@@ -65,6 +65,7 @@ class CourseBookmarksFragmentView(EdxFragmentView):
     """
     Fragment view that shows a user's bookmarks for a course.
     """
+
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the user's course bookmarks as a fragment.

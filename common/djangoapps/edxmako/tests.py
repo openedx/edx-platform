@@ -98,6 +98,21 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             link = marketing_link('TOS')
             self.assertEqual(link, expected_link)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_link_map_url_reverse(self):
+        url_link_map = {
+            'ABOUT': 'dashboard',
+            'BAD_URL': 'foobarbaz',
+        }
+
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
+            with override_settings(MKTG_URL_LINK_MAP=url_link_map):
+                link = marketing_link('ABOUT')
+                assert link == '/dashboard'
+
+                link = marketing_link('BAD_URL')
+                assert link == '#'
+
 
 class AddLookupTests(TestCase):
     """

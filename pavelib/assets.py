@@ -43,7 +43,6 @@ COMMON_LOOKUP_PATHS = [
     path("common/static/sass"),
     path('node_modules/@edx'),
     path('node_modules'),
-    path('node_modules/edx-pattern-library/node_modules'),
 ]
 
 # A list of NPM installed libraries that should be copied into the common

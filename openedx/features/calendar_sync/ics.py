@@ -9,12 +9,13 @@ from icalendar import Calendar, Event, vCalAddress, vText
 
 from lms.djangoapps.courseware.courses import get_course_assignments
 from openedx.core.djangoapps.site_configuration.helpers import get_value
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangolib.markup import HTML
 
 from . import get_calendar_event_id
 
 
-def generate_ics_for_event(uid, title, course_name, now, start, organizer_name, organizer_email):
+def generate_ics_for_event(uid, title, course_name, now, start, organizer_name, organizer_email, config):
     """
     Generates an ics-formatted bytestring for the given assignment information.
 
@@ -36,6 +37,7 @@ def generate_ics_for_event(uid, title, course_name, now, start, organizer_name, 
     event.add('dtstart', start)
     event.add('duration', timedelta(0))
     event.add('transp', 'TRANSPARENT')  # available, rather than busy
+    event.add('sequence', config.ics_sequence)
 
     cal = Calendar()
     cal.add('prodid', '-//Open edX//calendar_sync//EN')
@@ -46,28 +48,31 @@ def generate_ics_for_event(uid, title, course_name, now, start, organizer_name, 
     return cal.to_ical()
 
 
-def generate_ics_for_user_course(course, user, request):
+def generate_ics_files_for_user_course(course, user, user_calendar_sync_config_instance):
     """
     Generates ics-formatted bytestrings of all assignments for a given course and user.
 
     To pretty-print each bytestring, do: `ics.decode('utf8').replace('\r\n', '\n')`
 
-    Returns an iterable of ics files, each one representing an assignment.
+    Returns a dictionary of ics files, each one representing an assignment.
     """
-    assignments = get_course_assignments(course.id, user, request)
+    assignments = get_course_assignments(course.id, user)
     platform_name = get_value('platform_name', settings.PLATFORM_NAME)
     platform_email = get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     now = datetime.now(pytz.utc)
+    site_config = SiteConfiguration.get_configuration_for_org(course.org)
 
-    return (
-        generate_ics_for_event(
+    ics_files = {}
+    for assignment in assignments:
+        ics_files[assignment.title] = generate_ics_for_event(
             now=now,
             organizer_name=platform_name,
             organizer_email=platform_email,
             start=assignment.date,
             title=assignment.title,
             course_name=course.display_name_with_default,
-            uid=get_calendar_event_id(user, str(assignment.block_key), 'due', request.site.domain),
+            uid=get_calendar_event_id(user, str(assignment.block_key), 'due', site_config.site.domain),
+            config=user_calendar_sync_config_instance,
         )
-        for assignment in assignments
-    )
+
+    return ics_files

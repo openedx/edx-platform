@@ -6,10 +6,10 @@
 #
 common/lib/sandbox-packages  # via -r requirements/edx-sandbox/py35.in
 common/lib/symmath  # via -r requirements/edx-sandbox/py35.in
-cffi==1.14.0              # via -r requirements/edx-sandbox/shared.txt, cryptography
+cffi==1.14.1              # via -r requirements/edx-sandbox/shared.txt, cryptography
 chem==1.2.0               # via -r requirements/edx-sandbox/py35.in
 click==7.1.2              # via -r requirements/edx-sandbox/shared.txt, nltk
-cryptography==2.9.2       # via -r requirements/edx-sandbox/shared.txt
+cryptography==3.0         # via -r requirements/edx-sandbox/shared.txt
 cycler==0.10.0            # via matplotlib
 decorator==4.4.2          # via networkx
 joblib==0.14.1            # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt, nltk
@@ -27,11 +27,11 @@ pyparsing==2.2.0          # via -r requirements/edx-sandbox/py35.in, chem, matpl
 python-dateutil==2.4.0    # via -c requirements/edx-sandbox/../constraints.txt, matplotlib
 pytz==2020.1              # via matplotlib
 random2==1.0.1            # via -r requirements/edx-sandbox/py35.in
-regex==2020.6.8           # via -r requirements/edx-sandbox/shared.txt, nltk
+regex==2020.7.14          # via -r requirements/edx-sandbox/shared.txt, nltk
 scipy==1.2.1              # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/py35.in, chem, openedx-calc
 six==1.15.0               # via -r requirements/edx-sandbox/shared.txt, chem, cryptography, cycler, matplotlib, openedx-calc, python-dateutil
 sympy==1.4                # via -r requirements/edx-sandbox/py35.in, symmath
-tqdm==4.47.0              # via -r requirements/edx-sandbox/shared.txt, nltk
+tqdm==4.48.0              # via -r requirements/edx-sandbox/shared.txt, nltk
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

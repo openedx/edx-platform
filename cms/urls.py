@@ -293,6 +293,11 @@ urlpatterns += [
 # API docs.
 urlpatterns += make_docs_urls(api_info)
 
+# edx-drf-extensions csrf app
+urlpatterns += [
+    url(r'', include('csrf.urls')),
+]
+
 if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
     urlpatterns += [
         url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))
@@ -300,3 +305,8 @@ if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
 
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.CMS))
+
+# Contentstore
+urlpatterns += [
+    url(r'^api/contentstore/', include('cms.djangoapps.contentstore.rest_api.urls'))
+]

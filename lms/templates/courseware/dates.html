@@ -82,6 +82,11 @@ from openedx.core.djangolib.markup import HTML, Text
                                     <div class="timeline-description ${access_class} ${not_released}">
                                         ${block.description}
                                     </div>
+                                    % if block.extra_info:
+                                        <div class="timeline-extra-info ${access_class} ${not_released}">
+                                            ${block.extra_info}
+                                        </div>
+                                    % endif
                                 % endif
                             </div>
                         </div>
@@ -94,4 +99,15 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform(iterationKey=".localized_datetime");
+</%static:require_module_async>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+  var personalizedLearnerSchedulesLink = $(".personalized_learner_schedules_button");
+
+    TrackECommerceEvents.trackUpsellClick(personalizedLearnerSchedulesLink, 'dates_upgrade', {
+      pageName: "dates_tab",
+      linkType: "button",
+      linkCategory: "personalized_learner_schedules"
+    });
+
 </%static:require_module_async>

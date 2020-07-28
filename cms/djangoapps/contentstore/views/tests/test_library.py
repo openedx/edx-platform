@@ -8,6 +8,7 @@ More important high-level tests are in contentstore/tests/test_libraries.py
 import ddt
 import mock
 from django.conf import settings
+from django.urls import reverse
 from mock import patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from six import binary_type, text_type
@@ -342,3 +343,21 @@ class UnitTestLibraries(CourseTestCase):
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, extra_user.username)
+
+    def test_component_limits(self):
+        """
+        Test that component limits in libraries are respected.
+        """
+        with self.settings(MAX_BLOCKS_PER_CONTENT_LIBRARY=1):
+            library = LibraryFactory.create()
+            data = {
+                'parent_locator': str(library.location),
+                'category': 'html'
+            }
+            response = self.client.ajax_post(reverse('xblock_handler'), data)
+            self.assertEqual(response.status_code, 200)
+
+            # Adding another component should cause failure:
+            response = self.client.ajax_post(reverse('xblock_handler'), data)
+            self.assertEqual(response.status_code, 400)
+            self.assertIn('cannot have more than 1 component', parse_json(response)['error'])

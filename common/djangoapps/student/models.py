@@ -1028,19 +1028,6 @@ class CourseEnrollmentManager(models.Manager):
     Custom manager for CourseEnrollment with Table-level filter methods.
     """
 
-    def num_enrolled_in(self, course_id):
-        """
-        Returns the count of active enrollments in a course.
-        'course_id' is the course_id to return enrollments
-        """
-
-        enrollment_number = super(CourseEnrollmentManager, self).get_queryset().filter(
-            course_id=course_id,
-            is_active=1
-        ).count()
-
-        return enrollment_number
-
     def is_small_course(self, course_id):
         """
         Returns false if the number of enrollments are one greater than 'max_enrollments' else true
@@ -1430,7 +1417,7 @@ class CourseEnrollment(models.Model):
                 )
 
     @classmethod
-    def enroll(cls, user, course_key, mode=None, check_access=False):
+    def enroll(cls, user, course_key, mode=None, check_access=False, can_upgrade=False):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -1453,6 +1440,11 @@ class CourseEnrollment(models.Model):
                 The default is set to False to avoid breaking legacy code or
                 code with non-standard flows (ex. beta tester invitations), but
                 for any standard enrollment flow you probably want this to be True.
+
+        `can_upgrade`: if course is upgradeable, alow learners to enroll even
+                if enrollment is closed. This is a special case for entitlements
+                while selecting a session. The default is set to False to avoid
+                breaking the orignal course enroll code.
 
         Exceptions that can be raised: NonExistentCourseError,
         EnrollmentClosedError, CourseFullError, AlreadyEnrolledError.  All these
@@ -1477,7 +1469,7 @@ class CourseEnrollment(models.Model):
                 raise NonExistentCourseError
 
         if check_access:
-            if cls.is_enrollment_closed(user, course):
+            if cls.is_enrollment_closed(user, course) and not can_upgrade:
                 log.warning(
                     u"User %s failed to enroll in course %s because enrollment is closed",
                     user.username,
@@ -2914,6 +2906,18 @@ class BulkUnenrollConfiguration(ConfigurationModel):
         help_text=_(u"It expect that the data will be provided in a csv file format with \
                     first row being the header and columns will be as follows: \
                     user_id, username, email, course_id, is_verified, verification_date")
+    )
+
+
+class BulkChangeEnrollmentConfiguration(ConfigurationModel):
+    """
+    config model for the bulk_change_enrollment_csv command
+    """
+    csv_file = models.FileField(
+        validators=[FileExtensionValidator(allowed_extensions=[u'csv'])],
+        help_text=_(u"It expect that the data will be provided in a csv file format with \
+                    first row being the header and columns will be as follows: \
+                    course_id, username, mode")
     )
 
 

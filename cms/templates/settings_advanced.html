@@ -3,6 +3,8 @@
 <%def name="online_help_token()"><% return "advanced" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
+  import six
+  from six.moves.urllib.parse import quote
   from django.utils.translation import ugettext as _
   from contentstore import utils
   from openedx.core.djangolib.js_utils import (
@@ -95,6 +97,7 @@
       <div class="bit">
       % if context_course:
         <%
+          url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='')
           details_url = utils.reverse_course_url('settings_handler', context_course.id)
           grading_url = utils.reverse_course_url('grading_handler', context_course.id)
           course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
@@ -106,6 +109,9 @@
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
+            % if course_authoring_microfrontend_url:
+              <li class="nav-item"><a href="${course_authoring_microfrontend_url}/proctored-exam-settings/${url_encoded_course_id}">${_("Proctored Exam Settings")}</a></li>
+            % endif
           </ul>
         </nav>
       % endif

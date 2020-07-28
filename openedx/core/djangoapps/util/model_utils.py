@@ -23,5 +23,5 @@ class CreatorMixin(object):
         super(CreatorMixin, self).contribute_to_class(cls, name, *args, **kwargs)
         setattr(cls, name, Creator(self))
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         return self.to_python(value)

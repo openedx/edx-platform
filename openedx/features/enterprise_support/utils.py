@@ -10,7 +10,7 @@ from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
-from enterprise.models import EnterpriseCustomerUser
+from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomer
 from social_django.models import UserSocialAuth
 
 import third_party_auth
@@ -51,7 +51,8 @@ def update_logistration_context_for_enterprise(request, context, enterprise_cust
     """
     sidebar_context = {}
     if enterprise_customer:
-        sidebar_context = get_enterprise_sidebar_context(enterprise_customer)
+        is_proxy_login = request.GET.get('proxy_login')
+        sidebar_context = get_enterprise_sidebar_context(enterprise_customer, is_proxy_login)
 
     if sidebar_context:
         context['data']['registration_form_desc']['fields'] = enterprise_fields_only(
@@ -67,7 +68,7 @@ def update_logistration_context_for_enterprise(request, context, enterprise_cust
     update_third_party_auth_context_for_enterprise(request, context, enterprise_customer)
 
 
-def get_enterprise_sidebar_context(enterprise_customer):
+def get_enterprise_sidebar_context(enterprise_customer, is_proxy_login):
     """
     Get context information for enterprise sidebar for the given enterprise customer.
 
@@ -84,10 +85,16 @@ def get_enterprise_sidebar_context(enterprise_customer):
     branding_configuration = enterprise_customer.get('branding_configuration', {})
     logo_url = branding_configuration.get('logo', '') if isinstance(branding_configuration, dict) else ''
 
-    branded_welcome_template = configuration_helpers.get_value(
-        'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
-        settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
-    )
+    if is_proxy_login:
+        branded_welcome_template = configuration_helpers.get_value(
+            'ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE',
+            settings.ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE
+        )
+    else:
+        branded_welcome_template = configuration_helpers.get_value(
+            'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
+            settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+        )
 
     branded_welcome_string = Text(branded_welcome_template).format(
         start_bold=HTML('<b>'),
@@ -283,6 +290,41 @@ def _get_sync_learner_profile_data(enterprise_customer):
     return False
 
 
+def get_enterprise_learner_portals(request):
+    """
+    Gets the formatted portal names and slugs that can be used
+    to generate links for enabled enterprise Learner Portals.
+
+    Caches and returns results in/from the user's request session if provided.
+    """
+    # Prevent a circular import.
+    from openedx.features.enterprise_support.api import enterprise_enabled
+
+    if enterprise_enabled():
+        # If the key exists return that value
+        if 'enterprise_learner_portals' in request.session:
+            return json.loads(request.session['enterprise_learner_portals'])
+
+        user = request.user
+        # Ordering is important, this is consistent with how we decide on which
+        # enterprise_customer is the selected one for an enterprise_customer
+        enterprise_learner_portals = [{
+            'name': enterprise_customer_user.enterprise_customer.name,
+            'slug': enterprise_customer_user.enterprise_customer.slug,
+            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
+        } for enterprise_customer_user in EnterpriseCustomerUser.objects.filter(
+            user_id=user.id, enterprise_customer__enable_learner_portal=True
+        ).prefetch_related(
+            'enterprise_customer', 'enterprise_customer__branding_configuration'
+        ).order_by('-enterprise_customer__active', '-modified')]
+
+        # Cache the result in the user's request session
+        request.session['enterprise_learner_portals'] = json.dumps(enterprise_learner_portals)
+
+        return enterprise_learner_portals
+    return None
+
+
 def get_enterprise_learner_generic_name(request):
     """
     Get a generic name concatenating the Enterprise Customer name and 'Learner'.
@@ -342,3 +384,7 @@ def get_provider_login_url(request, provider_id, redirect_url=None):
         redirect_url=redirect_url if redirect_url else get_next_url_for_login_page(request)
     )
     return provider_login_url
+
+
+def fetch_enterprise_customer_by_id(enterprise_uuid):
+    return EnterpriseCustomer.objects.get(uuid=enterprise_uuid)

@@ -100,11 +100,6 @@ FEATURES = {
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
-    # settings for forums/discussions to on/off daily digest feature. Set this to True if you want to
-    # enable the UI for the users to subscribe and unsubscribe for daily digest. This setting is the
-    # part of deprecation of daily digest in production.
-    'ENABLE_FORUM_DAILY_DIGEST': True,
-
     # Set this to True if you want the discussion digest emails enabled automatically for new users.
     # This will be set on all new account registrations.
     # It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled, since
@@ -531,10 +526,6 @@ SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
 # Maximum of 6 retries before giving up.
 SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
 
-PASSWORD_RESET_EMAIL_RATE_LIMIT = {
-    'no_of_emails': 1,
-    'per_seconds': 60
-}
 RETRY_CALENDAR_SYNC_EMAIL_MAX_ATTEMPTS = 5
 # Deadline message configurations
 COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
@@ -1508,7 +1499,7 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
 
     # Generate code ownership metrics. Keep this immediately after RequestCacheMiddleware.
-    'lms.djangoapps.monitoring.middleware.CodeOwnerMetricMiddleware',
+    'edx_django_utils.monitoring.code_owner.middleware.CodeOwnerMetricMiddleware',
 
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMetricsMiddleware',
@@ -2563,15 +2554,17 @@ INSTALLED_APPS = [
     # Management of external user ids
     'openedx.core.djangoapps.external_user_ids',
 
+    # Provides api for Demographics support
+    'openedx.core.djangoapps.demographics',
+
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
 
-    # Monitoring utilities for LMS
-    'lms.djangoapps.monitoring.apps.MonitoringConfig',
-
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
+
+    'ratelimitbackend',
 ]
 
 ######################### CSRF #########################################
@@ -3662,6 +3655,10 @@ ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
     u'{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
     u'{privacy_policy_link_end} from {enterprise_name}.'
 )
+ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE = _(
+    u'{start_bold}{enterprise_name}{end_bold} has partnered with {start_bold}{platform_name}{end_bold} '
+    u'to offer you high-quality learning opportunities from the world\'s best institutions and universities.'
+)
 ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
     'age',
@@ -3775,7 +3772,11 @@ RATELIMIT_ENABLE = True
 RATELIMIT_RATE = '120/m'
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
-LOGISTRATION_RATELIMIT_RATE = '500/5m'
+LOGISTRATION_RATELIMIT_RATE = '100/5m'
+
+##### PASSWORD RESET RATE LIMIT SETTINGS #####
+PASSWORD_RESET_IP_RATE = '1/m'
+PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 ############### Settings for Retirement #####################
 RETIRED_USERNAME_PREFIX = 'retired__user_'
@@ -3918,9 +3919,6 @@ BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 # in the blockstore-based XBlock runtime
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
 
-########################## LEARNER PORTAL ##############################
-LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
-
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'
 MICROSITE_CONFIGURATION = {}
@@ -3931,3 +3929,6 @@ GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
 
 ##################### SUPPORT URL ############################
 SUPPORT_HOW_TO_UNENROLL_LINK = ''
+
+######################## Setting for content libraries ########################
+MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
