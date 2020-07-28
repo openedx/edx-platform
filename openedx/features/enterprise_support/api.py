@@ -23,7 +23,7 @@ from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerErr
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.utils import get_data_consent_share_cache_key
 from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
@@ -592,10 +592,10 @@ def get_enterprise_learner_portal_enabled_message(request):
 
     if enterprise_customer['enable_learner_portal']:
         learner_portal_url = settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + enterprise_customer['slug']
-        return _(
+        return Text(_(
             "Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a custom dashboard for learning. "
             "{link_start}Click here{link_end} to continue in that experience."
-        ).format(
+        )).format(
             enterprise_customer_name=enterprise_customer['name'],
             link_start=HTML("<a href='{learner_portal_url}'>").format(
                 learner_portal_url=learner_portal_url,
