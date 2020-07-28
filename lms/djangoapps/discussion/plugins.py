@@ -31,10 +31,3 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
         if not super(DiscussionTab, cls).is_enabled(course, user):
             return False
         return utils.is_discussion_enabled(course.id)
-
-    @property
-    def uses_bootstrap(self):
-        """
-        Returns true if this tab is rendered with Bootstrap.
-        """
-        return True
