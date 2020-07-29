@@ -44,9 +44,9 @@ class CoursewareTab(EnrolledTab):
     def __init__(self, tab_dict):
         def link_func(course, reverse_func):
             if course_home_mfe_outline_tab_is_active(course.id):
-                return get_microfrontend_url(course_key=course.id, view_name=self.view_name)
+                return get_microfrontend_url(course_key=course.id, view_name='home')
             else:
-                reverse_name_func = lambda course_test: default_course_url_name(course_test.id)
+                reverse_name_func = lambda course: default_course_url_name(course.id)
                 url_func = course_reverse_func_from_name_func(reverse_name_func)
                 return url_func(course, reverse_func)
 

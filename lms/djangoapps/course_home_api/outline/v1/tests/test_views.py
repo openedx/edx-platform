@@ -45,6 +45,11 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.assertTrue(all((block.get('title') != "") for block in date_blocks))
         self.assertTrue(all(block.get('date') for block in date_blocks))
 
+        resume_course = response.data.get('resume_course')
+        resume_course_url = resume_course.get('url')
+        if resume_course_url:
+            self.assertIn('http://', resume_course_url)
+
     @COURSE_HOME_MICROFRONTEND.override(active=True)
     @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
     def test_get_authenticated_user_not_enrolled(self):

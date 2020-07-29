@@ -62,6 +62,11 @@ class EnrollAlertSerializer(serializers.Serializer):
     extra_text = serializers.CharField()
 
 
+class ResumeCourseSerializer(serializers.Serializer):
+    has_visited_course = serializers.BooleanField()
+    url = serializers.URLField()
+
+
 class OutlineTabSerializer(serializers.Serializer):
     """
     Serializer for the Outline Tab
@@ -73,4 +78,5 @@ class OutlineTabSerializer(serializers.Serializer):
     enroll_alert = EnrollAlertSerializer()
     handouts_html = serializers.CharField()
     offer_html = serializers.CharField()
+    resume_course = ResumeCourseSerializer()
     welcome_message_html = serializers.CharField()
