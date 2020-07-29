@@ -20,7 +20,7 @@ from student.roles import CourseAccessRole
 
 from opaque_keys.edx.keys import CourseKey
 
-from organizations.models import Organization
+from organizations.models import Organization, OrganizationCourse
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
@@ -117,6 +117,12 @@ def import_course_on_site_creation(organization_id):
                 role='instructor',  # This is called "Course Admin" in Studio.
                 course_id=course_target_id,
                 org=organization.short_name
+            )
+
+            OrganizationCourse.objects.create(
+                organization=organization,
+                course_id=unicode(course_target_id),
+                active=True
             )
 
     # catch all exceptions so we can update the state and properly cleanup the course.
