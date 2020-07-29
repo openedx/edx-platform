@@ -142,7 +142,7 @@ def get_course_outline_block_tree(request, course_id):
         'freetextresponse',
         'openassessment',
         'problem-builder',
-        'sga',
+        'edx_sga',
         'ubcpi'
     ]
     all_blocks = get_blocks(
