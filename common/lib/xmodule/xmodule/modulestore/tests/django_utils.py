@@ -486,7 +486,7 @@ class ModuleStoreTestCase(
     CREATE_USER = True
 
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = '__all__'
 
     @classmethod
     def setUpClass(cls):
