@@ -18,7 +18,10 @@ from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangoapps.waffle_utils import WaffleFlag
 from student.helpers import get_next_url_for_login_page
+
+ENTERPRISE_HEADER_LINKS = WaffleFlag('enterprise', 'enterprise_header_links')
 
 
 def get_data_consent_share_cache_key(user_id, course_id):
@@ -300,18 +303,19 @@ def get_enterprise_learner_portals(request):
     # Prevent a circular import.
     from openedx.features.enterprise_support.api import enterprise_enabled
 
-    if enterprise_enabled():
+    user = request.user
+    # Only cache this if a learner is authenticated (AnonymousUser exists and should not be tracked)
+    if enterprise_enabled() and ENTERPRISE_HEADER_LINKS.is_enabled() and user and user.id:
         # If the key exists return that value
         if 'enterprise_learner_portals' in request.session:
             return json.loads(request.session['enterprise_learner_portals'])
-
-        user = request.user
         # Ordering is important, this is consistent with how we decide on which
         # enterprise_customer is the selected one for an enterprise_customer
         enterprise_learner_portals = [{
             'name': enterprise_customer_user.enterprise_customer.name,
             'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
+            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url if
+            enterprise_customer_user.enterprise_customer.branding_configuration else None,
         } for enterprise_customer_user in EnterpriseCustomerUser.objects.filter(
             user_id=user.id, enterprise_customer__enable_learner_portal=True
         ).prefetch_related(
