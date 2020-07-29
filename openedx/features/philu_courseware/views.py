@@ -67,12 +67,12 @@ class RevertPostAssessmentAttemptsAPIView(APIView):
         """
         try:
             user = self.request.user
-            course_key = CourseKey.from_string(course_id)
-            module_state_key = problem_usage_key.map_into_course(course_key)
+            course_id = CourseKey.from_string(course_id)
+            module_state_key = problem_usage_key.map_into_course(course_id)
             enrollment.reset_student_attempts(
-                course_key,
-                user,
-                module_state_key,
+                course_id=course_id,
+                student=user,
+                module_state_key=module_state_key,
                 requesting_user=user,
                 delete_module=True
             )
