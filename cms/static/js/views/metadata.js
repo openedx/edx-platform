@@ -507,7 +507,8 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
                 frag.appendChild($(template({key: key, value: value}))[0]);
             });
 
-            list.html(HtmlUtils.HTML([frag]).toString());
+            // xss-lint: disable=javascript-jquery-html
+            list.html([frag]);
         },
 
         addEntry: function(event) {
