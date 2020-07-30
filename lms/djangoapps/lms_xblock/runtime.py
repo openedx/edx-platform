@@ -164,6 +164,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         self.request_token = kwargs.pop('request_token', None)
         services['teams'] = TeamsService()
         services['teams_configuration'] = TeamsConfigurationService()
+        services['call_to_action'] = CallToActionService()
         super(LmsModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):

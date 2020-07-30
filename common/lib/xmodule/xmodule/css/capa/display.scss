@@ -995,6 +995,15 @@ div.problem .action {
 
       white-space: nowrap;
     }
+
+    .submit-cta {
+        display: inline-block;
+        margin-top: $baseline / 2 + 2;
+        margin-left: 16px;
+    }
+    .submit-cta-description {
+        margin-left: 8px;
+    }
   }
 
   .submission-feedback {
