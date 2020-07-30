@@ -5,7 +5,10 @@ Tests for Blockstore-based Content Libraries
 import unittest
 from uuid import UUID
 
+import ddt
+from django.conf import settings
 from django.contrib.auth.models import Group
+from django.test.utils import override_settings
 from mock import patch
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
@@ -13,6 +16,7 @@ from openedx.core.djangoapps.content_libraries.api import BlockLimitReachedError
 from student.tests.factories import UserFactory
 
 
+@ddt.ddt
 class ContentLibrariesTest(ContentLibrariesRestApiTest):
     """
     General tests for Blockstore-based Content Libraries
@@ -82,6 +86,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
 
         self._create_library(slug="Invalid Slug!", title="Library with Bad Slug", expect_response=400)
 
+    @ddt.data(True, False)
     @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootPagination.page_size", new=2)
     @override_settings(SEARCH_ENGINE="search.tests.mock_search_engine.MockSearchEngine")
     def test_list_library(self, is_indexing_enabled):
@@ -106,7 +111,6 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
 
             # Create another library which causes number of libraries to exceed the page size
             self._create_library(slug="some-slug-3", title="Existing Library")
-
             # Verify that if `pagination` param isn't sent, API still honors the max page size.
             # This is for maintaining compatibility with older non pagination-aware clients.
             result = self._list_libraries()
