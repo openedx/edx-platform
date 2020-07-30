@@ -40,6 +40,7 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
 from openedx.core.toggles import ENTRANCE_EXAMS
@@ -1221,6 +1222,17 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         'category': xblock.category,
         'has_children': xblock.has_children
     }
+
+    if xblock.category == 'course':
+        discussions_config = DiscussionsConfiguration.get(course.id)
+        show_unit_level_discussions_toggle = (
+            discussions_config.enabled and
+            discussions_config.supports_in_context_discussions() and
+            discussions_config.enable_in_context and
+            discussions_config.unit_level_visibility
+        )
+        xblock_info["unit_level_discussions"] = show_unit_level_discussions_toggle
+
     if is_concise:
         if child_info and child_info.get('children', []):
             xblock_info['child_info'] = child_info
