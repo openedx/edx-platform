@@ -73,10 +73,14 @@ define(['js/views/validation',
                 });
                 cm.on('focus', function(mirror) {
                     $(textarea).parent().children('label').addClass('is-focused');
+                    var wrapperElement = $(mirror.getWrapperElement())
+                    wrapperElement.removeClass('json-error');
+                    wrapperElement.siblings('.advanced-setting-json-error').hide();
                 });
                 cm.on('blur', function(mirror) {
                     $(textarea).parent().children('label').removeClass('is-focused');
-                    var key = $(mirror.getWrapperElement()).closest('.field-group').children('.key').attr('id');
+                    var wrapperElement = $(mirror.getWrapperElement())
+                    var key = wrapperElement.closest('.field-group').children('.key').attr('id');
                     var stringValue = $.trim(mirror.getValue());
                 // update CodeMirror to show the trimmed value.
                     mirror.setValue(stringValue);
@@ -104,6 +108,9 @@ define(['js/views/validation',
                         var modelVal = self.model.get(key);
                         modelVal.value = JSONValue;
                         self.model.set(key, modelVal);
+                    } else {
+                        wrapperElement.addClass('json-error');
+                        wrapperElement.siblings('.advanced-setting-json-error').show();
                     }
                 });
             },
