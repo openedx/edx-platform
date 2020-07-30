@@ -222,12 +222,9 @@ def create_account_with_params(request, params):
     if skip_email:
         registration.activate()
     else:
+        create_or_set_user_attribute_created_on_site(user, request.site)
+        preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
         compose_and_send_activation_email(user, profile, registration)
-
-    # Perform operations that are non-critical parts of account creation
-    create_or_set_user_attribute_created_on_site(user, request.site)
-
-    preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
