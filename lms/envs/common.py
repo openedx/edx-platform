@@ -600,7 +600,7 @@ def _make_mako_template_dirs(settings):
 
 
 CONTEXT_PROCESSORS = [
-    'lms.djangoapps.homepage.custom_context_processors.notifications_configs',
+    'lms.djangoapps.homepage.custom_context_processors.notifications_context',
     'django.template.context_processors.request',
     'django.template.context_processors.static',
     'django.contrib.messages.context_processors.messages',
