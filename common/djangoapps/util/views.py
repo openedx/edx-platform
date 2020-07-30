@@ -1,6 +1,3 @@
-
-
-import ast
 import json
 import logging
 import sys
@@ -14,7 +11,6 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpRespon
 from django.views.decorators.csrf import ensure_csrf_cookie, requires_csrf_token
 from django.views.defaults import server_error
 from django.shortcuts import redirect
-from django.urls import reverse
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves import map
@@ -201,28 +197,16 @@ def reset_course_deadlines(request):
     Set the start_date of a schedule to today, which in turn will adjust due dates for
     sequentials belonging to a self paced course
     """
-    from lms.urls import RENDER_XBLOCK_NAME
-    from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
-
-    detail_id_dict = ast.literal_eval(request.POST.get('reset_deadlines_redirect_url_id_dict'))
-    redirect_url = request.POST.get('reset_deadlines_redirect_url_base', COURSE_HOME_VIEW_NAME)
-    course_key = CourseKey.from_string(detail_id_dict['course_id'])
-    masquerade_details, masquerade_user = setup_masquerade(
+    course_key = CourseKey.from_string(request.POST.get('course_id'))
+    _course_masquerade, user = setup_masquerade(
         request,
         course_key,
         has_access(request.user, 'staff', course_key)
     )
-    if masquerade_details and masquerade_details.role == 'student' and masquerade_details.user_name and (
-        redirect_url == COURSE_HOME_VIEW_NAME
-    ):
-        # Masquerading as a specific student, so reset that student's schedule
-        user = masquerade_user
-    else:
-        user = request.user
 
     missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, user)
     if missed_deadlines and not missed_gated_content:
         reset_self_paced_schedule(user, course_key)
-    if redirect_url == RENDER_XBLOCK_NAME:
-        detail_id_dict.pop('course_id')
-    return redirect(reverse(redirect_url, kwargs=detail_id_dict))
+
+    referrer = request.META.get('HTTP_REFERER')
+    return redirect(referrer) if referrer else HttpResponse()

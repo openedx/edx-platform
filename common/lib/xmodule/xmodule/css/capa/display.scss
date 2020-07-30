@@ -995,6 +995,19 @@ div.problem .action {
 
       white-space: nowrap;
     }
+
+    .submit-cta {
+        display: inline-block;
+    }
+    .submit-cta-description {
+        margin-left: 8px;
+    }
+    .submit-cta-link-button {
+        background: none;
+        border: none;
+        color: $blue;
+        cursor: pointer;
+    }
   }
 
   .submission-feedback {

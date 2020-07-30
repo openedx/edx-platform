@@ -78,7 +78,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME)
-        reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -95,8 +94,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
             # managed by edx-when.
             'in_edx_when': edx_when_api.is_enabled_for_course(course_key),
             'reset_deadlines_url': reset_deadlines_url,
-            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
-            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)},
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'on_course_outline_page': True,
             'missed_deadlines': missed_deadlines,

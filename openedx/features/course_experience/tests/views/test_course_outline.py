@@ -232,9 +232,9 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         response = self.client.get(url)
 
         if should_display:
-            self.assertContains(response, '<div class="dates-banner-text"')
+            self.assertContains(response, '<div class="banner-cta-text"')
         else:
-            self.assertNotContains(response, '<div class="dates-banner-text"')
+            self.assertNotContains(response, '<div class="banner-cta-text"')
 
     @RELATIVE_DATES_FLAG.override(active=True)
     def test_reset_course_deadlines(self):
@@ -256,7 +256,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         self.client.login(username=staff.username, password=TEST_PASSWORD)
         self.update_masquerade(course=course, username=self.user.username)
 
-        post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
+        post_dict = {'course_id': str(course.id)}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
         updated_schedule = Schedule.objects.get(id=student_schedule.id)
         self.assertEqual(updated_schedule.start_date.date(), datetime.datetime.today().date())
@@ -281,7 +281,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
         self.client.login(username=staff.username, password=TEST_PASSWORD)
         self.update_masquerade(course=course)
 
-        post_dict = {'reset_deadlines_redirect_url_id_dict': json.dumps({'course_id': str(course.id)})}
+        post_dict = {'course_id': str(course.id)}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
         updated_student_schedule = Schedule.objects.get(id=student_schedule.id)
         self.assertEqual(updated_student_schedule.start_date, student_schedule.start_date)
