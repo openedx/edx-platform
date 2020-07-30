@@ -1,0 +1,26 @@
+<form>
+<h3 class="modal-section-title">
+    <%- gettext('Discussion') %>
+</h3>
+<div class="modal-section-content discussion-enabled">
+    <label class="label">
+        <input type="checkbox" id="discussion_enabled" name="discussion_enabled" class="input input-checkbox" />
+        <% if (xblockInfo.isVertical()) { %>
+            <%- gettext('Enable discussion') %>
+        <% } else { %>
+            <%- gettext('Enable discussion for all child units') %>
+        <% } %>
+     </label>
+    <% if (!xblockInfo.isVertical()) { %>
+        <% if (hasDiscussionEnabled === 'partially_enabled') { %>
+            <p class="tip tip-warning">
+                <%- gettext('Currently discussions are enabled only for some children. If you change the state of the checkbox above, they will be enabled or disabled for all child units.') %>
+            </p>
+        <% } else if (!hasChildren) { %>
+            <p class="tip tip-warning">
+                <%- gettext('This block does not have any children, so making changes to this checkbox will not have any effect.') %>
+            </p>
+        <% } %>
+    <% } %>
+</div>
+</form>

@@ -16,7 +16,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, HighlightsXBlockModal,
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
-        StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
+        StaffLockEditor, UnitAccessEditor, DiscussionEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
         AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
@@ -822,6 +822,71 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
+    DiscussionEditor = AbstractEditor.extend({
+        templateName: 'discussion-editor',
+        className: 'edit-discussion',
+        afterRender: function() {
+            AbstractEditor.prototype.afterRender.call(this);
+            this.setStatus(this.currentValue());
+        },
+
+        currentValue: function() {
+            var discussion_enabled = this.model.get('discussion_enabled');
+            if (discussion_enabled === 'partially_enabled') {
+                return discussion_enabled
+            }
+            return discussion_enabled === true || discussion_enabled === 'enabled';
+        },
+
+        hasChildren: function() {
+            var child_info = this.model.get('child_info');
+            if (child_info && child_info.children) {
+              return Object.keys(child_info.children).length > 0;
+            }
+            return false;
+        },
+
+        setStatus: function(value) {
+            if (value === 'partially_enabled') {
+                this.$('#discussion_enabled').prop('indeterminate', true);
+            } else {
+                this.$('#discussion_enabled').prop('checked', value);
+            }
+        },
+
+        isIndeterminate: function() {
+            return this.$('#discussion_enabled').is(':indeterminate');
+        },
+
+        isEnabled: function() {
+            return this.$('#discussion_enabled').is(':checked');
+        },
+
+        hasChanges: function() {
+            return this.currentValue() !== this.isEnabled();
+        },
+
+        getRequestData: function() {
+            if (!this.isIndeterminate() && this.hasChanges()) {
+                return {
+                    publish: 'republish',
+                    metadata: {
+                        discussion_enabled: this.isEnabled()
+                    }
+                };
+            } else {
+                return {};
+            }
+        },
+
+        getContext: function() {
+            return {
+                hasDiscussionEnabled: this.currentValue(),
+                hasChildren: this.hasChildren(),
+            };
+        },
+    });
+
     ContentVisibilityEditor = AbstractVisibilityEditor.extend({
         templateName: 'content-visibility-editor',
         className: 'edit-content-visibility',
@@ -1057,7 +1122,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 editors: []
             };
             if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor, UnitAccessEditor];
+                editors = [StaffLockEditor, UnitAccessEditor, DiscussionEditor];
             } else {
                 tabs = [
                     {
@@ -1069,6 +1134,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                         name: 'visibility',
                         displayName: gettext('Visibility'),
                         editors: []
+                    },
+                    {
+                        name: 'discussion',
+                        displayName: gettext('Discussion'),
+                        editors: [DiscussionEditor]
                     }
                 ];
                 if (xblockInfo.isChapter()) {
