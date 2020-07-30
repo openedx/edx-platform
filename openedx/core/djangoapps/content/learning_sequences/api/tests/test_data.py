@@ -4,8 +4,8 @@ from unittest import TestCase
 from opaque_keys.edx.keys import CourseKey
 import attr
 
-from ..data import (
-    CourseOutlineData, CourseSectionData, CourseLearningSequenceData, VisibilityData
+from ...data import (
+    CourseOutlineData, CourseSectionData, CourseLearningSequenceData, VisibilityData, CourseVisibility
 )
 
 
@@ -31,7 +31,8 @@ class TestCourseOutlineData(TestCase):
             title="Exciting Test Course!",
             published_at=datetime(2020, 5, 19, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2014",
-            sections=generate_sections(cls.course_key, [3, 2])
+            sections=generate_sections(cls.course_key, [3, 2]),
+            course_visibility=CourseVisibility.PRIVATE
         )
 
     def test_deprecated_course_key(self):
