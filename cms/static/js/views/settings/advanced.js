@@ -79,7 +79,7 @@ define(['js/views/validation',
                 });
                 cm.on('blur', function(mirror) {
                     var $wrapperElement, key, stringValue;
-                    $wrapperElement = $(mirror.getWrapperElement())
+                    $wrapperElement = $(mirror.getWrapperElement());
                     key = $wrapperElement.closest('.field-group').children('.key').attr('id');
                     stringValue = $.trim(mirror.getValue());
                     $(textarea).parent().children('label').removeClass('is-focused');
