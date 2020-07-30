@@ -568,9 +568,6 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             data = old_content['data'] if 'data' in old_content else None
 
         if fields:
-            discussion_enabled = fields.pop('discussion_enabled', None)
-            set_discussion_toggle(discussion_enabled, xblock, user)
-
             for field_name in fields:
                 setattr(xblock, field_name, fields[field_name])
 
@@ -628,6 +625,10 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
             # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
             # the intent is to make it None, use the nullout field
             if metadata is not None:
+                discussion_enabled = metadata.pop('discussion_enabled', None)
+                if discussion_enabled is not None:
+                    set_discussion_toggle(discussion_enabled, xblock, user)
+
                 for metadata_key, value in metadata.items():
                     field = xblock.fields[metadata_key]
 
@@ -1257,23 +1258,23 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             'group_access': xblock.group_access,
             'user_partitions': user_partitions,
             'show_correctness': xblock.show_correctness,
+            'discussion_enabled': xblock.discussion_enabled
+            if hasattr(xblock, 'discussion_enabled')
+            else getattr(xblock, 'get_discussion_toggle_status', lambda: None)()
         })
 
         if xblock.category == 'sequential':
             xblock_info.update({
                 'hide_after_due': xblock.hide_after_due,
-                'discussion_enabled': xblock.get_discussion_toggle_status()
             })
         elif xblock.category in ('chapter', 'course'):
             if xblock.category == 'chapter':
                 xblock_info.update({
                     'highlights': xblock.highlights,
-                    'discussion_enabled': xblock.get_discussion_toggle_status()
                 })
             elif xblock.category == 'course':
                 xblock_info.update({
                     'highlights_enabled_for_messaging': course.highlights_enabled_for_messaging,
-                    'discussion_enabled': xblock.get_discussion_toggle_status()
                 })
             xblock_info.update({
                 'highlights_enabled': highlights_setting.is_enabled(),
