@@ -841,7 +841,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         hasChildren: function() {
             var child_info = this.model.get('child_info');
             if (child_info && child_info.children) {
-              return Object.keys(child_info.children).length > 0;
+                return Object.keys(child_info.children).length > 0;
             }
             return false;
         },
@@ -855,7 +855,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         isIndeterminate: function() {
-            return this.$('#discussion_enabled').is(':indeterminate');
+            // The indeterminate jQuery selector works correctly with recent browsers,
+            // but fails in the tests.
+            return !!this.$('#discussion_enabled')
+                .filter(function(){ return this.indeterminate}).length;
         },
 
         isEnabled: function() {

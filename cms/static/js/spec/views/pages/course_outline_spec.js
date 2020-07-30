@@ -11,10 +11,11 @@ import Course from 'js/models/course';
 describe('CourseOutlinePage', function() {
     var createCourseOutlinePage, displayNameInput, model, outlinePage, requests, getItemsOfType, getItemHeaders,
         verifyItemsExpanded, expandItemsAndVerifyState, collapseItemsAndVerifyState, selectBasicSettings,
-        selectVisibilitySettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
-        createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced,
-        mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
-        selectOnboardingExam, createMockCourseJSONWithReviewRules,mockCourseJSONWithReviewRules,
+        selectVisibilitySettings, selectAdvancedSettings, selectDiscussionSettings, createMockCourseJSON,
+        createMockSectionJSON, createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON,
+        setSelfPaced, mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON,
+        mockCourseEntranceExamJSON, selectOnboardingExam, createMockCourseJSONWithReviewRules,
+        mockCourseJSONWithReviewRules,
         mockOutlinePage = readFixtures('templates/mock/mock-course-outline-page.underscore'),
         mockRerunNotification = readFixtures('templates/mock/mock-course-rerun-notification.underscore');
 
@@ -140,7 +141,9 @@ describe('CourseOutlinePage', function() {
             edited_by: 'MockUser',
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {
+                selectable_partitions: []
+            }
         }, options);
     };
 
@@ -195,6 +198,10 @@ describe('CourseOutlinePage', function() {
 
     selectAdvancedSettings = function() {
         $(".modal-section .settings-tab-button[data-tab='advanced']").click();
+    };
+
+    selectDiscussionSettings = function() {
+        $(".modal-section .settings-tab-button[data-tab='discussion']").click();
     };
 
     setSelfPaced = function() {
@@ -295,7 +302,7 @@ describe('CourseOutlinePage', function() {
             'course-outline', 'xblock-string-field-editor', 'modal-button',
             'basic-modal', 'course-outline-modal', 'release-date-editor',
             'due-date-editor', 'grading-editor', 'publish-editor',
-            'staff-lock-editor', 'unit-access-editor', 'content-visibility-editor',
+            'staff-lock-editor', 'unit-access-editor', 'discussion-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
             'course-highlights-enable'
@@ -1015,6 +1022,16 @@ describe('CourseOutlinePage', function() {
             );
             expect($modalWindow.find('.outline-subsection').length).toBe(2);
         });
+
+        it('shows discussion settings', function() {
+            createCourseOutlinePage(this, mockCourseJSON, false);
+            outlinePage.$('.section-header-actions .configure-button').click();
+            selectDiscussionSettings();
+
+            expect($('.modal-section .settings-tab-button[data-tab="basic"]')).not.toHaveClass('active');
+            expect($('.modal-section .settings-tab-button[data-tab="visibility"]')).not.toHaveClass('active');
+            expect($('.modal-section .settings-tab-button[data-tab="discussion"]')).toHaveClass('active');
+        });
     });
 
     describe('Subsection', function() {
@@ -1259,6 +1276,58 @@ describe('CourseOutlinePage', function() {
             createCourseOutlinePage(this, mockNoPrereqCourseJSON, false);
             outlinePage.$('.outline-unit .configure-button').click();
             expect($('.settings-tabs-header').length).toBe(0);
+        });
+
+        describe('discussion settings', function () {
+            it('shows discussion settings', function() {
+                createCourseOutlinePage(this, mockCourseJSON, false);
+                outlinePage.$('.outline-subsection .configure-button').click();
+                selectDiscussionSettings();
+
+                expect($('.modal-section .settings-tab-button[data-tab="basic"]')).not.toHaveClass('active');
+                expect($('.modal-section .settings-tab-button[data-tab="visibility"]')).not.toHaveClass('active');
+                expect($('.modal-section .settings-tab-button[data-tab="discussion"]')).toHaveClass('active');
+            });
+
+            it('marks checkbox as disabled', function() {
+                createCourseOutlinePage(this, mockCourseJSON, false);
+                outlinePage.$('.outline-subsection .configure-button').click();
+                selectDiscussionSettings();
+
+                var discussionCheckbox = $('#discussion_enabled');
+                expect(discussionCheckbox).toExist();
+                expect(discussionCheckbox.is(':checked')).toBeFalsy();
+            });
+
+            it('marks checkbox as enabled', function() {
+                var mockCourseWithSubsectionDiscussionEnabledJSON = createMockCourseJSON({}, [
+                    createMockSectionJSON({}, [
+                        createMockSubsectionJSON({discussion_enabled: 'enabled'}, [])
+                    ])
+                ]);
+
+                createCourseOutlinePage(this, mockCourseWithSubsectionDiscussionEnabledJSON, false);
+                outlinePage.$('.outline-subsection .configure-button').click();
+                selectDiscussionSettings();
+                expect($('#discussion_enabled').is(':checked')).toBeTruthy();
+            });
+
+            it('marks checkbox as partially enabled', function() {
+                var mockCourseWithSubsectionDiscussionPartiallyEnabledJSON = createMockCourseJSON({}, [
+                    createMockSectionJSON({}, [
+                        createMockSubsectionJSON({discussion_enabled: 'partially_enabled'}, [])
+                    ])
+                ]);
+
+                createCourseOutlinePage(this, mockCourseWithSubsectionDiscussionPartiallyEnabledJSON, false);
+                outlinePage.$('.outline-subsection .configure-button').click();
+                selectDiscussionSettings();
+
+                var discussionCheckbox = $('#discussion_enabled');
+                expect(discussionCheckbox).toExist();
+                expect(discussionCheckbox.is(':checked')).toBeFalsy();
+                expect(discussionCheckbox.is(':indeterminate')).toBeTruthy();
+            });
         });
 
         it('can show correct editors for self_paced course', function() {
@@ -2228,6 +2297,29 @@ describe('CourseOutlinePage', function() {
             );
             expect(messages.length).toBe(1);
             expect(messages).toContainText('Contains staff only content');
+        });
+
+        describe('discussion settings', function () {
+            it('shows discussion settings', function() {
+                getUnitStatus();
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('.modal-section .edit-discussion')).toExist();
+            });
+
+            it('marks checkbox as disabled', function() {
+                getUnitStatus();
+                outlinePage.$('.outline-unit .configure-button').click();
+
+                var discussionCheckbox = $('#discussion_enabled');
+                expect(discussionCheckbox).toExist();
+                expect(discussionCheckbox.is(':checked')).toBeFalsy();
+            });
+
+            it('marks checkbox as enabled', function() {
+                getUnitStatus({discussion_enabled: true});
+                outlinePage.$('.outline-unit .configure-button').click();
+                expect($('#discussion_enabled').is(':checked')).toBeTruthy();
+            });
         });
 
         verifyTypePublishable('unit', function(options) {
