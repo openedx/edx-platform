@@ -30,6 +30,23 @@ from openedx.core.djangolib.markup import HTML
       <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
           <span class="submit-label">${ submit_button }</span>
       </button>
+
+      % if submit_disabled_cta:
+        <form class="submit-cta" method="post" action="${submit_disabled_cta['link']}">
+          <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+          % for form_name, form_value in submit_disabled_cta['form_values'].items():
+              <input type="hidden" name="${form_name}" value="${form_value}">
+          % endfor
+          <button class="submit-cta-link-button btn-brand">${submit_disabled_cta['link_name']}
+            <span class="submit-cta-description" tabindex="0" role="note" aria-label="description">
+              <span data-tooltip="${submit_disabled_cta['description']}" data-tooltip-show-on-click="true"
+                  class="fa fa-info-circle fa-lg" aria-hidden="true">
+              </span>
+            </span>
+            <span class="sr">(${submit_disabled_cta['description']})</span>
+          </button>
+        </form>
+      % endif
       <div class="submission-feedback" id="submission_feedback_${short_id}">
         % if attempts_allowed:
           ${ungettext("You have used {num_used} of {num_total} attempt", "You have used {num_used} of {num_total} attempts", attempts_allowed).format(num_used=attempts_used, num_total=attempts_allowed)}

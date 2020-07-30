@@ -737,6 +737,11 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         submit_button = self.submit_button_name()
         submit_button_submitting = self.submit_button_submitting_name()
         should_enable_submit_button = self.should_enable_submit_button()
+        submit_disabled_ctas = None
+        if not should_enable_submit_button:
+            cta_service = self.runtime.service(self, "call_to_action")
+            if cta_service:
+                submit_disabled_ctas = cta_service.get_ctas(self, 'capa_submit_disabled')
 
         content = {
             'name': self.display_name_with_default,
@@ -775,6 +780,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             'answer_notification_message': answer_notification_message,
             'has_saved_answers': self.has_saved_answers,
             'save_message': save_message,
+            'submit_disabled_cta': submit_disabled_ctas[0] if submit_disabled_ctas else None,
         }
 
         html = self.runtime.render_template('problem.html', context)
