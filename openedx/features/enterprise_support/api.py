@@ -582,7 +582,7 @@ def get_enterprise_learner_portal_enabled_message(request):
     Args:
         request: request made to the LMS dashboard
     """
-    if 'enterprise_customer' in request.session:
+    if 'enterprise_customer' in request.session and request.session['enterprise_customer']:
         enterprise_customer = request.session['enterprise_customer']
     else:
         learner_data = get_enterprise_learner_data(request.user)
