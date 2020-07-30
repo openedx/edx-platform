@@ -31,8 +31,6 @@ from django.utils.http import base36_to_int, urlsafe_base64_encode
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
-from edx_ace import ace
-from edx_ace.recipient import Recipient
 from edx_django_utils import monitoring as monitoring_utils
 from eventtracking import tracker
 from ipware.ip import get_ip
@@ -49,6 +47,7 @@ from edx_ace.recipient import Recipient
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 
+from common.lib.mandrill_client.client import MandrillClient
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -1170,18 +1169,11 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
         ),
     })
 
-    msg = EmailChange().personalize(
-        recipient=Recipient(user.username, new_email),
-        language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
-        user_context=message_context,
-    )
-
-    try:
-        ace.send(msg)
-    except Exception:
-        from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-        log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
-        raise ValueError(_('Unable to send email activation link. Please try again later.'))
+    # We need to send emails by Mandrill rather than edx-ace so we are making a core change here for that.
+    context = {
+        "verify_email_link": message_context['confirm_link']
+    }
+    MandrillClient().send_mail(MandrillClient.VERIFY_CHANGE_USER_EMAIL, message_context['new_email'], context)
 
     if not secondary_email_change_request:
         # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
@@ -1273,6 +1265,9 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
             return response
 
         user.email = pec.new_email
+        # We are making user active to cater edge case. If newly registered user requests to update email address
+        # without activating his/her account than by confirming new email address user account will be activated.
+        user.is_active = True
         user.save()
         pec.delete()
         # And send it to the new email...

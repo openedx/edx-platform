@@ -51,6 +51,7 @@ from lms.djangoapps.onboarding.signals import save_interests
 from lms.djangoapps.philu_overrides.helpers import save_user_partner_network_consent
 from lms.djangoapps.student_dashboard.views import get_joined_communities, get_recommended_xmodule_courses
 from nodebb.helpers import update_nodebb_for_user_status
+from student.models import PendingEmailChange
 
 log = logging.getLogger("edx.onboarding")
 
@@ -469,11 +470,20 @@ def update_account_settings(request):
 
     _, unattended_org_surveys = affiliated_unattended_surveys(user_extended_profile)
 
+    pending_new_email = ''
+    is_email_change_pending = False
+    pending_email_change = PendingEmailChange.objects.filter(user=request.user).first()
+    if pending_email_change:
+        is_email_change_pending = True
+        pending_new_email = pending_email_change.new_email
+
     ctx = {
         'form': form,
         'admin_has_pending_admin_suggestion_request': user_extended_profile.admin_has_pending_admin_suggestion_request(),
         'org_url': reverse('get_organizations'),
         'partners_opt_in': partners_opt_in,
+        'is_email_change_pending': is_email_change_pending,
+        'pending_new_email': pending_new_email,
         'is_poc': user_extended_profile.is_organization_admin,
         'is_first_user': user_extended_profile.is_first_signup_in_org if user_extended_profile.organization else False,
         'non_profile_organization': Organization.is_non_profit(user_extended_profile),
