@@ -1079,8 +1079,6 @@ def dates(request, course_id):
         'missed_deadlines': missed_deadlines,
         'missed_gated_content': missed_gated_content,
         'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
-        'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
-        'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)},
         'has_ended': course.has_ended(),
     }
 
@@ -1687,8 +1685,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'is_learning_mfe': request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL),
             'is_mobile_app': is_request_from_mobile_app(request),
             'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
-            'reset_deadlines_redirect_url_base': COURSE_DATES_NAME,
-            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)}
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 

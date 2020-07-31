@@ -3205,7 +3205,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
                 graded=True,
             )
         response = self._get_response(self.course)
-        self.assertContains(response, 'div class="dates-banner-text"')
+        self.assertContains(response, 'div class="banner-cta-text"')
 
 
 class TestShowCoursewareMFE(TestCase):

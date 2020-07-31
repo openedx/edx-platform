@@ -13,8 +13,8 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
 %>
 
 <%def name="reset_dates_banner()">
-    <div class="dates-banner ${additional_styling_class}">
-        <div class="dates-banner-text">
+    <div class="banner-cta ${additional_styling_class}">
+        <div class="banner-cta-text">
         % if is_mobile_app:
                 ${_('It looks like you missed some important deadlines based on our suggested schedule. ')}
                 ${_('To keep yourself on track, you can update this schedule and shift the past due assignments into the future by visiting ')}
@@ -26,20 +26,19 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
             % endif
         </div>
         % if not is_mobile_app:
-            <div class="upgrade-button">
+            <div class="banner-cta-button">
                 <form method="post" action="${reset_deadlines_url}">
                     <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                    <input type="hidden" name="reset_deadlines_redirect_url_base" value="${reset_deadlines_redirect_url_base}">
-                    <input type="hidden" name="reset_deadlines_redirect_url_id_dict" value="${reset_deadlines_redirect_url_id_dict}">
-                    <button class="btn reset-deadlines-button">${_("Shift due dates")}</button>
+                    <input type="hidden" name="course_id" value="${course.id}">
+                    <button class="btn">${_("Shift due dates")}</button>
                 </form>
             </div>
         % endif
     </div>
 </%def>
 <%def name="upgrade_to_reset_banner()">
-    <div class="dates-banner ${additional_styling_class}">
-        <div class="dates-banner-text">
+    <div class="banner-cta ${additional_styling_class}">
+        <div class="banner-cta-text">
             % if is_mobile_app:
                 <strong>${_('You are auditing this course,')}</strong>
                 ${_(' which means that you are unable to participate in graded assignments.')}
@@ -51,7 +50,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
             % endif
         </div>
         % if not is_mobile_app:
-            <div class="upgrade-button">
+            <div class="banner-cta-button">
                 <a class="personalized_learner_schedules_button" href="${verified_upgrade_link}">
                     <button type="button">
                         ${_('Upgrade to shift due dates')}
@@ -62,8 +61,8 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
     </div>
 </%def>
 <%def name="upgrade_to_complete_graded_banner()">
-    <div class="dates-banner ${additional_styling_class}">
-        <div class="dates-banner-text">
+    <div class="banner-cta ${additional_styling_class}">
+        <div class="banner-cta-text">
             % if is_mobile_app:
                 <strong>${_('You are auditing this course,')}</strong>
                 ${_(' which means that you are unable to participate in graded assignments.')}
@@ -75,7 +74,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
             % endif
         </div>
         % if not is_mobile_app:
-            <div class="upgrade-button">
+            <div class="banner-cta-button">
                 <a class="personalized_learner_schedules_button" href="${verified_upgrade_link}">
                     <button type="button">
                         ${_('Upgrade now')}
@@ -89,8 +88,8 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
 % if not has_ended:
     % if on_dates_tab and not missed_deadlines:
         %if getattr(course, 'self_paced', False):
-        <div class="dates-banner">
-            <div class="dates-banner-text">
+        <div class="banner-cta">
+            <div class="banner-cta-text">
                 <strong>${_("We've built a suggested schedule to help you stay on track.")}</strong>
                 ${_("But don't worry—it's flexible so you can learn at your own pace. If you happen to fall behind on our suggested dates, you'll be able to adjust them to keep yourself on track.")}
             </div>
