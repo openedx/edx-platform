@@ -30,6 +30,24 @@ from openedx.core.djangolib.markup import HTML
   <%include file='bookmark_button.html' args="bookmark_id=bookmark_id, is_bookmarked=bookmarked"/>
 % endif
 
+% if vertical_banner_ctas and not is_mobile_app:
+  ## We don't show any CTA banners on the mobile app yet, they need to handle these especially.
+  % for vertical_banner_cta in vertical_banner_ctas:
+    <div class="banner-cta has-button">
+      <div class="banner-cta-text">${vertical_banner_cta['description']}</div>
+      <div class="banner-cta-button">
+        <form method="post" action="${vertical_banner_cta['link']}">
+          <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+          % for form_name, form_value in vertical_banner_cta['form_values'].items():
+            <input type="hidden" name="${form_name}" value="${form_value}">
+          % endfor
+          <button class="btn">${vertical_banner_cta['link_name']}</button>
+        </form>
+      </div>
+    </div>
+  % endfor
+% endif
+
 <div class="vert-mod">
 % for idx, item in enumerate(items):
   % if item['content']:
