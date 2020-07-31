@@ -16,7 +16,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, HighlightsXBlockModal,
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
-        StaffLockEditor, UnitAccessEditor, DiscussionEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
+        StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
         AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor;
 
     CourseOutlineXBlockModal = BaseModal.extend({
@@ -822,7 +822,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         }
     });
 
-    DiscussionEditor = AbstractEditor.extend({
+    var DiscussionEditor = AbstractEditor.extend({
         templateName: 'discussion-editor',
         className: 'edit-discussion',
         afterRender: function() {

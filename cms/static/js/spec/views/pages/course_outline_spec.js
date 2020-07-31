@@ -11,11 +11,10 @@ import Course from 'js/models/course';
 describe('CourseOutlinePage', function() {
     var createCourseOutlinePage, displayNameInput, model, outlinePage, requests, getItemsOfType, getItemHeaders,
         verifyItemsExpanded, expandItemsAndVerifyState, collapseItemsAndVerifyState, selectBasicSettings,
-        selectVisibilitySettings, selectAdvancedSettings, selectDiscussionSettings, createMockCourseJSON,
-        createMockSectionJSON, createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON,
-        setSelfPaced, mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON,
-        mockCourseEntranceExamJSON, selectOnboardingExam, createMockCourseJSONWithReviewRules,
-        mockCourseJSONWithReviewRules,
+        selectVisibilitySettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
+        createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced,
+        mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
+        selectOnboardingExam, createMockCourseJSONWithReviewRules, mockCourseJSONWithReviewRules,
         mockOutlinePage = readFixtures('templates/mock/mock-course-outline-page.underscore'),
         mockRerunNotification = readFixtures('templates/mock/mock-course-rerun-notification.underscore');
 
@@ -142,7 +141,6 @@ describe('CourseOutlinePage', function() {
             user_partitions: [],
             group_access: {},
             user_partition_info: {
-                selectable_partitions: []
             }
         }, options);
     };
@@ -200,9 +198,9 @@ describe('CourseOutlinePage', function() {
         $(".modal-section .settings-tab-button[data-tab='advanced']").click();
     };
 
-    selectDiscussionSettings = function() {
+    function selectDiscussionSettings() {
         $(".modal-section .settings-tab-button[data-tab='discussion']").click();
-    };
+    }
 
     setSelfPaced = function() {
         /* global course */
