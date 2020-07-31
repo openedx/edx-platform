@@ -14,7 +14,7 @@ describe('CourseOutlinePage', function() {
         selectVisibilitySettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
         createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced,
         mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
-        selectOnboardingExam, createMockCourseJSONWithReviewRules, mockCourseJSONWithReviewRules,
+        selectOnboardingExam, createMockCourseJSONWithReviewRules,mockCourseJSONWithReviewRules,
         mockOutlinePage = readFixtures('templates/mock/mock-course-outline-page.underscore'),
         mockRerunNotification = readFixtures('templates/mock/mock-course-rerun-notification.underscore');
 
@@ -140,8 +140,7 @@ describe('CourseOutlinePage', function() {
             edited_by: 'MockUser',
             user_partitions: [],
             group_access: {},
-            user_partition_info: {
-            }
+            user_partition_info: {}
         }, options);
     };
 
