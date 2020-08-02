@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-26 20:50+0000\n"
-"PO-Revision-Date: 2020-07-26 20:50:09.815241\n"
+"POT-Creation-Date: 2020-08-02 20:50+0000\n"
+"PO-Revision-Date: 2020-08-02 20:50:49.101331\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -231,6 +231,7 @@ msgstr "حقخبثسسهخرشم ثي"
 #: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_sourced_block.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/unit_block.py
@@ -2082,6 +2083,7 @@ msgstr "طوم يشفش بخق فاث شررخفشفهخر"
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/library_sourced_block.py
 #: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/unit_block.py
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -3842,6 +3844,30 @@ msgstr "مهزقشقغ يهسحمشغ رشوث"
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "ثرفثق فاث رشوثس خب فاث شيدشرذثي ذخوحخرثرفس فخ عسث هر غخعق مهزقشقغ."
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Library Block"
+msgstr "مهزقشقغ زمخذن"
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Enter the IDs of the library XBlock that you wish to use."
+msgstr "ثرفثق فاث هيس خب فاث مهزقشقغ طزمخذن فاشف غخع صهسا فخ عسث."
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid ""
+"No XBlock has been configured for this component. Enter the target ID below "
+"or in the editor"
+msgstr ""
+"رخ طزمخذن اشس زثثر ذخربهلعقثي بخق فاهس ذخوحخرثرف. ثرفثق فاث فشقلثف هي زثمخص "
+"خق هر فاث ثيهفخق"
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Open Editor"
+msgstr "خحثر ثيهفخق"
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Importing Library Block failed - are the IDs valid and readable?"
+msgstr "هوحخقفهرل مهزقشقغ زمخذن بشهمثي - شقث فاث هيس دشمهي شري قثشيشزمث?"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -5958,6 +5984,14 @@ msgstr "ثطحمخقث فاث ذخعقسث"
 #: lms/djangoapps/course_goals/models.py
 msgid "Not sure yet"
 msgstr "رخف سعقث غثف"
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid ""
+"Please contact your degree administrator or edX Support if you have "
+"questions."
+msgstr ""
+"حمثشسث ذخرفشذف غخعق يثلقثث شيوهرهسفقشفخق خق ثيط سعححخقف هب غخع اشدث "
+"ضعثسفهخرس."
 
 #: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid "'course_id' is required."
@@ -12420,6 +12454,17 @@ msgstr ""
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
+msgid ""
+"Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a "
+"custom dashboard for learning. {link_start}Click here{link_end} to continue "
+"in that experience."
+msgstr ""
+"غخعق خقلشرهظشفهخر {bold_start}{enterprise_customer_name}{bold_end} عسثس ش "
+"ذعسفخو يشسازخشقي بخق مثشقرهرل. {link_start}ذمهذن اثقث{link_end} فخ ذخرفهرعث "
+"هر فاشف ثطحثقهثرذث."
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
 msgid "Enrollment in {course_title} was not complete."
 msgstr "ثرقخمموثرف هر {course_title} صشس رخف ذخوحمثفث."
 
@@ -13496,7 +13541,6 @@ msgstr "سثري شر ثوشهم فخ {email}"
 
 #: cms/templates/widgets/tabs-aggregator.html
 #: lms/templates/courseware/static_tab.html
-#: lms/templates/courseware/tab-view-v2.html
 #: lms/templates/courseware/tab-view.html
 msgid "name"
 msgstr "رشوث"

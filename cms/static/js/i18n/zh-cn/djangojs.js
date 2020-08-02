@@ -1745,7 +1745,6 @@
     "This learner is currently sharing a limited profile.": "\u8be5\u5b66\u751f\u5f53\u524d\u516c\u5f00\u90e8\u5206\u4e2a\u4eba\u4fe1\u606f\u3002",
     "This link will open in a modal window": "\u8be5\u94fe\u63a5\u5c06\u5728\u6a21\u5f0f\u7a97\u53e3\u4e2d\u6253\u5f00",
     "This link will open in a new browser window/tab": "\u8be5\u94fe\u63a5\u5c06\u5728\u65b0\u6d4f\u89c8\u5668\u7a97\u53e3/\u6807\u7b7e\u9875\u4e2d\u6253\u5f00",
-    "This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.": "\u6b64\u60c5\u51b5\u53ef\u80fd\u7531\u4e8e\u670d\u52a1\u5668\u9519\u8bef\u6216\u8005\u60a8\u7684\u7f51\u7edc\u8fde\u63a5\u9519\u8bef\u5bfc\u81f4\u3002\u5c1d\u8bd5\u5237\u65b0\u9875\u9762\u6216\u8005\u786e\u4fdd\u7f51\u7edc\u7545\u901a\u3002",
     "This page contains information about orders that you have placed with {platform_name}.": "\u6b64\u9875\u9762\u5305\u542b\u60a8\u5728{platform_name}\u6240\u4e0b\u7684\u8ba2\u5355\u4fe1\u606f\u3002",
     "This post could not be closed. Refresh the page and try again.": "\u65e0\u6cd5\u5173\u95ed\u6b64\u5e16\u5b50\uff0c\u8bf7\u5237\u65b0\u9875\u9762\u5e76\u91cd\u8bd5\u3002",
     "This post could not be flagged for abuse. Refresh the page and try again.": "\u65e0\u6cd5\u5c06\u6b64\u5e16\u5b50\u4e3e\u62a5\u4e3a\u6ee5\u7528\uff0c\u8bf7\u5237\u65b0\u9875\u9762\u5e76\u91cd\u8bd5\u3002",
