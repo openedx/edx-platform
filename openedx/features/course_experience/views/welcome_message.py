@@ -24,6 +24,7 @@ class WelcomeMessageFragmentView(EdxFragmentView):
     """
     A fragment that displays a course's welcome message.
     """
+    _uses_pattern_library = False
 
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """

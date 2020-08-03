@@ -397,7 +397,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-26 20:42+0000\n"
+"POT-Creation-Date: 2020-07-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -976,13 +976,6 @@ msgid ""
 "                     first row being the header and columns will be as "
 "follows:                     user_id, username, email, course_id, "
 "is_verified, verification_date"
-msgstr ""
-
-#: common/djangoapps/student/models.py
-msgid ""
-"It expect that the data will be provided in a csv file format with"
-"                     first row being the header and columns will be as "
-"follows:                     course_id, username, mode"
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -5563,7 +5556,6 @@ msgstr "证书ID编号"
 
 #: lms/djangoapps/certificates/views/webview.py
 #: lms/templates/certificates/invalid.html
-#: lms/templates/certificates/url_unsupported.html
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr "关于 {platform_name} 认证证书"
@@ -5749,18 +5741,6 @@ msgstr "探索课程"
 msgid "Not sure yet"
 msgstr "再想想"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
-msgid "'course_id' is required."
-msgstr ""
-
-#: lms/djangoapps/course_home_api/outline/v1/views.py
-msgid "Only 'course_id' is expected."
-msgstr ""
-
-#: lms/djangoapps/course_home_api/outline/v1/views.py
-msgid "Welcome message successfully dismissed."
-msgstr ""
-
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
@@ -5826,32 +5806,6 @@ msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Assignment"
-msgstr ""
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Open Response Assessment"
-msgstr ""
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Self Assessment"
-msgstr ""
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Peer Assessment"
-msgstr ""
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Staff Assessment"
-msgstr ""
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Submission"
-msgstr ""
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
 msgstr ""
 
 #. Translators: 'absolute' is a date such as "Jan 01,
@@ -15054,18 +15008,6 @@ msgid ""
 "If all of the information is correct and the problem persists, contact "
 "technical support."
 msgstr "如果所有信息正确但问题仍然存在，请联系技术支持团队。"
-
-#: lms/templates/certificates/url_unsupported.html
-msgid "URL Not Supported"
-msgstr ""
-
-#: lms/templates/certificates/url_unsupported.html
-msgid ""
-"This link is no longer valid. But don’t worry—this Verified Certificate is "
-"still valid and available to share. If this is your certificate, please "
-"visit your dashboard to get a new shareable link. If you're viewing someone "
-"else's certificate, please contact them to get an updated link."
-msgstr ""
 
 #: lms/templates/certificates/valid.html
 msgid "About edX Certificates"

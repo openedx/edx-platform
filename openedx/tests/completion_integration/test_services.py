@@ -124,7 +124,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         """
         module_system = get_test_system(course_id=module.location.course_key)
         module_system.descriptor_runtime = module.runtime._descriptor_system  # pylint: disable=protected-access
-        module_system._services['library_tools'] = LibraryToolsService(self.store, self.user.id)  # pylint: disable=protected-access
+        module_system._services['library_tools'] = LibraryToolsService(self.store)  # pylint: disable=protected-access
 
         def get_module(descriptor):
             """Mocks module_system get_module function"""

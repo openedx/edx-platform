@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-26 20:50+0000\n"
-"PO-Revision-Date: 2020-07-26 20:50:09.815241\n"
+"POT-Creation-Date: 2020-07-19 20:50+0000\n"
+"PO-Revision-Date: 2020-07-19 20:50:09.722616\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -658,16 +658,6 @@ msgstr ""
 "                     بهقسف قخص زثهرل فاث اثشيثق شري ذخمعورس صهمم زث شس "
 "بخممخصس:                     عسثق_هي, عسثقرشوث, ثوشهم, ذخعقسث_هي, "
 "هس_دثقهبهثي, دثقهبهذشفهخر_يشفث"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"It expect that the data will be provided in a csv file format with"
-"                     first row being the header and columns will be as "
-"follows:                     course_id, username, mode"
-msgstr ""
-"هف ثطحثذف فاشف فاث يشفش صهمم زث حقخدهيثي هر ش ذسد بهمث بخقوشف صهفا"
-"                     بهقسف قخص زثهرل فاث اثشيثق شري ذخمعورس صهمم زث شس "
-"بخممخصس:                     ذخعقسث_هي, عسثقرشوث, وخيث"
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -5762,7 +5752,6 @@ msgstr "ذثقفهبهذشفث هي رعوزثق"
 
 #: lms/djangoapps/certificates/views/webview.py
 #: lms/templates/certificates/invalid.html
-#: lms/templates/certificates/url_unsupported.html
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr "شزخعف {platform_name} ذثقفهبهذشفثس"
@@ -5959,18 +5948,6 @@ msgstr "ثطحمخقث فاث ذخعقسث"
 msgid "Not sure yet"
 msgstr "رخف سعقث غثف"
 
-#: lms/djangoapps/course_home_api/outline/v1/views.py
-msgid "'course_id' is required."
-msgstr "'ذخعقسث_هي' هس قثضعهقثي."
-
-#: lms/djangoapps/course_home_api/outline/v1/views.py
-msgid "Only 'course_id' is expected."
-msgstr "خرمغ 'ذخعقسث_هي' هس ثطحثذفثي."
-
-#: lms/djangoapps/course_home_api/outline/v1/views.py
-msgid "Welcome message successfully dismissed."
-msgstr "صثمذخوث وثسسشلث سعذذثسسبعممغ يهسوهسسثي."
-
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
@@ -6037,34 +6014,6 @@ msgstr "بهرشرذهشم شسسهسفشرذث"
 #: lms/djangoapps/courseware/courses.py
 msgid "Assignment"
 msgstr "شسسهلروثرف"
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Open Response Assessment"
-msgstr "خحثر قثسحخرسث شسسثسسوثرف"
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Self Assessment"
-msgstr "سثمب شسسثسسوثرف"
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Peer Assessment"
-msgstr "حثثق شسسثسسوثرف"
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Staff Assessment"
-msgstr "سفشبب شسسثسسوثرف"
-
-#: lms/djangoapps/courseware/courses.py
-msgid "Submission"
-msgstr "سعزوهسسهخر"
-
-#: lms/djangoapps/courseware/courses.py
-msgid ""
-"Open Response Assessment due dates are set by your instructor and can't be "
-"shifted."
-msgstr ""
-"خحثر قثسحخرسث شسسثسسوثرف يعث يشفثس شقث سثف زغ غخعق هرسفقعذفخق شري ذشر'ف زث "
-"ساهبفثي."
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -16186,22 +16135,6 @@ msgid ""
 msgstr ""
 "هب شمم خب فاث هربخقوشفهخر هس ذخققثذف شري فاث حقخزمثو حثقسهسفس, ذخرفشذف "
 "فثذارهذشم سعححخقف."
-
-#: lms/templates/certificates/url_unsupported.html
-msgid "URL Not Supported"
-msgstr "عقم رخف سعححخقفثي"
-
-#: lms/templates/certificates/url_unsupported.html
-msgid ""
-"This link is no longer valid. But don’t worry—this Verified Certificate is "
-"still valid and available to share. If this is your certificate, please "
-"visit your dashboard to get a new shareable link. If you're viewing someone "
-"else's certificate, please contact them to get an updated link."
-msgstr ""
-"فاهس مهرن هس رخ مخرلثق دشمهي. زعف يخر’ف صخققغ—فاهس دثقهبهثي ذثقفهبهذشفث هس "
-"سفهمم دشمهي شري شدشهمشزمث فخ ساشقث. هب فاهس هس غخعق ذثقفهبهذشفث, حمثشسث "
-"دهسهف غخعق يشسازخشقي فخ لثف ش رثص ساشقثشزمث مهرن. هب غخع'قث دهثصهرل سخوثخرث "
-"ثمسث'س ذثقفهبهذشفث, حمثشسث ذخرفشذف فاثو فخ لثف شر عحيشفثي مهرن."
 
 #: lms/templates/certificates/valid.html
 msgid "About edX Certificates"

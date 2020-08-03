@@ -23,7 +23,6 @@ from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerErr
 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.utils import get_data_consent_share_cache_key
 from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
@@ -451,7 +450,7 @@ def enterprise_customer_for_request(request):
     Check all the context clues of the request to determine if
     the request being made is tied to a particular EnterpriseCustomer.
     """
-    if 'enterprise_customer' in request.session and request.session['enterprise_customer']:
+    if 'enterprise_customer' in request.session:
         return enterprise_customer_from_cache(request=request)
     else:
         enterprise_customer = enterprise_customer_from_api(request)
@@ -568,45 +567,6 @@ def get_enterprise_learner_data(user):
         enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
         if enterprise_learner_data:
             return enterprise_learner_data['results']
-
-
-@enterprise_is_enabled()
-def get_enterprise_learner_portal_enabled_message(request):
-    """
-    Returns message to be displayed in dashboard if the user is linked to an Enterprise with the Learner Portal enabled.
-
-    Note: request.session['enterprise_customer'] will be used in case the user is linked to
-        multiple Enterprises. Otherwise, it won't exist and the Enterprise Learner data
-        will be used. If that doesn't exist return None.
-
-    Args:
-        request: request made to the LMS dashboard
-    """
-    if 'enterprise_customer' in request.session and request.session['enterprise_customer']:
-        enterprise_customer = request.session['enterprise_customer']
-    else:
-        learner_data = get_enterprise_learner_data(request.user)
-        if learner_data:
-            enterprise_customer = learner_data[0]['enterprise_customer']
-        else:
-            return None
-
-    if enterprise_customer['enable_learner_portal']:
-        learner_portal_url = settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + enterprise_customer['slug']
-        return Text(_(
-            "Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a custom dashboard for learning. "
-            "{link_start}Click here{link_end} to continue in that experience."
-        )).format(
-            enterprise_customer_name=enterprise_customer['name'],
-            link_start=HTML("<a href='{learner_portal_url}'>").format(
-                learner_portal_url=learner_portal_url,
-            ),
-            link_end=HTML("</a>"),
-            bold_start=HTML("<b>"),
-            bold_end=HTML("</b>"),
-        )
-    else:
-        return None
 
 
 def get_consent_notification_data(enterprise_customer):

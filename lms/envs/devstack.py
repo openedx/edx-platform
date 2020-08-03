@@ -251,17 +251,6 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
-########################## PROGRAMS LEARNER PORTAL ##############################
-LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
-
-########################## ENTERPRISE LEARNER PORTAL ##############################
-ENTERPRISE_LEARNER_PORTAL_NETLOC = 'localhost:8734'
-ENTERPRISE_LEARNER_PORTAL_BASE_URL = 'http://' + ENTERPRISE_LEARNER_PORTAL_NETLOC
-
-########################## ENTERPRISE ADMIN PORTAL ##############################
-ENTERPRISE_ADMIN_PORTAL_NETLOC = 'localhost:1991'
-ENTERPRISE_ADMIN_PORTAL_BASE_URL = 'http://' + ENTERPRISE_ADMIN_PORTAL_NETLOC
-
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
@@ -271,11 +260,7 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
 )
 
-LOGIN_REDIRECT_WHITELIST = [
-    CMS_BASE,
-    ENTERPRISE_LEARNER_PORTAL_NETLOC,
-    ENTERPRISE_ADMIN_PORTAL_NETLOC,
-]
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ###################### JWTs ######################
 JWT_AUTH.update({
@@ -374,6 +359,8 @@ MKTG_URLS = {
     'TOS_AND_HONOR': '/edx-terms-service',
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
 }
+
+ENTERPRISE_LEARNER_PORTAL_BASE_URL = 'http://localhost:8734'
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 

@@ -64,7 +64,7 @@
 # Ron Lucke <ronlucke@googlemail.com>, 2014
 # Ron Lucke <ronlucke@googlemail.com>, 2014
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
-# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2020
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2019
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/).
 # Copyright (C) 2020 EdX
@@ -129,9 +129,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-19 20:42+0000\n"
-"PO-Revision-Date: 2020-07-20 16:32+0000\n"
-"Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
+"POT-Creation-Date: 2020-07-12 20:42+0000\n"
+"PO-Revision-Date: 2020-06-14 20:45+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
@@ -5824,7 +5824,7 @@ msgstr "Zertifikat"
 
 #: cms/static/js/certificates/views/certificate_preview.js
 msgid "Deactivating"
-msgstr "Deaktivieren"
+msgstr ""
 
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
@@ -5838,7 +5838,7 @@ msgstr "Du hast bislang keine Zertifikate erhalten."
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
-msgstr "\"<%- signatoryName %>\" von der Liste der Unterzeichner löschen?"
+msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -6169,8 +6169,6 @@ msgid ""
 "Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
 "<%- (fileExtensions) %> to upload."
 msgstr ""
-"Es können nur  <%- fileTypes %> Dateien hochgeladen werden. Bitte wählen Sie"
-" eine Datei mit der Endung <%- (fileExtensions) %> zum Hochladen aus."
 
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
@@ -6357,7 +6355,7 @@ msgstr "{selectedProvider} Anmeldeinformationen gespeichert"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%- name %>”"
-msgstr "Eine neue PDF zu “<%- name %>” hochladen "
+msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -6984,16 +6982,12 @@ msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than <%- limit %> characters."
 msgstr ""
-"Die Gesamtlänge der Felder \"Organisation\", \"Kursnummer\" und \"Kurslauf\""
-" darf nicht mehr als <%- limit %> Zeichen enthalten."
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
 "more than <%- limit %> characters."
 msgstr ""
-"Die Gesamtlänge der Organisations- und Bibliothekscodefelder darf nicht mehr"
-" als <%- limit %> Zeichen enthalten."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -11274,10 +11268,6 @@ msgid ""
 " back to a basic exam. You may not configure it as a special exam now. "
 "Contact edX Support for assistance."
 msgstr ""
-"Dieser Unterabschnitt wurde für die Teilnehmer als Sonderprüfung "
-"veröffentlicht, anschließend aber wieder zu einer Grundprüfung "
-"zurückgewandelt. Die Prüfung kann jetzt nicht mehr als Sonderprüfung "
-"konfiguriert werden. Wenden Sie sich zur Unterstützung an den edX-Support."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
@@ -11286,11 +11276,6 @@ msgid ""
 " basic exam by selecting 'None', but you will NOT be able to configure it as"
 " a special exam in the future."
 msgstr ""
-"Diese Sonderprüfung wurde für die Teilnehmer veröffentlicht und kann nicht "
-"in eine andere Art von Sonderprüfung umgewandelt werden. Dieser "
-"Unterabschnitt kann jedoch wieder in eine Basisprüfung umgewandelt werden, "
-"indem Sie \"None\" wählen. Sie können die Prüfung in Zukunft NICHT mehr als "
-"Sonderprüfung konfigurieren."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

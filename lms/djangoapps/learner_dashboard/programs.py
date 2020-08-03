@@ -31,6 +31,7 @@ class ProgramsFragmentView(EdxFragmentView):
     """
     A fragment to program listing.
     """
+    _uses_pattern_library = False
 
     def render_to_fragment(self, request, **kwargs):
         """
@@ -83,6 +84,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     """
     Render the program details fragment.
     """
+    _uses_pattern_library = False
 
     def render_to_fragment(self, request, program_uuid, **kwargs):
         """View details about a specific program."""

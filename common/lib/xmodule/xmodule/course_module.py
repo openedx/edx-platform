@@ -911,7 +911,7 @@ class CourseFields(object):
             "without proctoring. If this value is false, all learners must take the exam with proctoring. "
             "This setting only applies if proctored exams are enabled for the course."
         ),
-        default=False,
+        default=True,
         scope=Scope.settings,
         deprecated=EXAM_SETTINGS_HTML_VIEW_ENABLED
     )

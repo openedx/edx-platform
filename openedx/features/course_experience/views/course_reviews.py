@@ -32,6 +32,12 @@ class CourseReviewsView(CourseTabView):
         """
         return super(CourseReviewsView, self).get(request, course_id, 'courseware', **kwargs)
 
+    def uses_bootstrap(self, request, course, tab):
+        """
+        Always render this tab with bootstrap.
+        """
+        return True
+
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = six.text_type(course.id)
         reviews_fragment_view = CourseReviewsFragmentView()

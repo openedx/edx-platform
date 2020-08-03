@@ -21,6 +21,7 @@ class LatestUpdateFragmentView(EdxFragmentView):
     """
     A fragment that displays the latest course update.
     """
+    _uses_pattern_library = False
 
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """

@@ -826,11 +826,13 @@ def _update_and_import_module(
         # if library exists, update source_library_version and children
         # according to this existing library and library content block.
         if store.get_library(block.source_library_key):
+
             # Update library content block's children on draft branch
             with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                LibraryToolsService(store, user_id).update_children(
+                LibraryToolsService(store).update_children(
                     block,
-                    version=block.source_library_version,
+                    user_id,
+                    version=block.source_library_version
                 )
 
             # Publish it if importing the course for branch setting published_only.

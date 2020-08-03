@@ -111,6 +111,13 @@ class CourseTab(six.with_metaclass(ABCMeta, object)):
         """
         raise NotImplementedError()
 
+    @property
+    def uses_bootstrap(self):
+        """
+        Returns true if this tab is rendered with Bootstrap.
+        """
+        return False
+
     def get(self, key, default=None):
         """
         Akin to the get method on Python dictionary objects, gracefully returns the value associated with the

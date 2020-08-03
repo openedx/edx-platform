@@ -44,10 +44,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.enterprise_support.api import (
-    get_dashboard_consent_notification,
-    get_enterprise_learner_portal_enabled_message,
-)
+from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 from shoppingcart.models import DonationConfiguration
 from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
@@ -626,9 +623,6 @@ def student_dashboard(request):
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
-    # Display a message guiding the user to their Enterprise's Learner Portal if enabled
-    enterprise_learner_portal_enabled_message = get_enterprise_learner_portal_enabled_message(request)
-
     recovery_email_message = recovery_email_activation_message = None
     if is_secondary_email_feature_enabled():
         try:
@@ -839,7 +833,6 @@ def student_dashboard(request):
         'empty_dashboard_message': empty_dashboard_message,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
-        'enterprise_learner_portal_enabled_message': enterprise_learner_portal_enabled_message,
         'show_load_all_courses_link': show_load_all_courses_link(user, course_limit, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (START)
         'course_info': get_dashboard_course_info(user, course_enrollments),

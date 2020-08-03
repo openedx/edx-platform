@@ -8,10 +8,10 @@ import ddt
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.enterprise_support.utils import ENTERPRISE_HEADER_LINKS, get_enterprise_learner_portals
+from openedx.features.enterprise_support.utils import get_enterprise_learner_portals
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCustomerBrandingConfigurationFactory, EnterpriseCustomerUserFactory,
@@ -48,7 +48,6 @@ class TestEnterpriseUtils(TestCase):
             self.client.get(resource)
             self.assertEqual(mock_customer_request.call_count, expected_calls)
 
-    @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
     def test_get_enterprise_learner_portals_uncached(self):
         """
         Test that only enabled enterprise portals are returned
@@ -69,7 +68,6 @@ class TestEnterpriseUtils(TestCase):
             'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
         })
 
-    @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
     def test_get_enterprise_learner_portals_cached(self):
         enterprise_customer_data = {
             'name': 'Enabled Customer',

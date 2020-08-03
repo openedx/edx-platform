@@ -27,8 +27,7 @@
                     urgency: 'high',
                     type: '',
                     hideCloseBtn: true,
-                    isRecoveryEmailMsg: false,
-                    isLearnerPortalEnabled: false
+                    isRecoveryEmailMsg: false
                 });
             },
 

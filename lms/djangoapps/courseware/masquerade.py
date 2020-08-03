@@ -326,18 +326,6 @@ def is_masquerading_as_specific_student(user, course_key):
     return bool(course_masquerade and course_masquerade.user_name)
 
 
-def get_specific_masquerading_user(user, course_key):
-    """
-    Return the specific user that a staff member is masquerading as, or None if they aren't.
-    """
-    course_masquerade = get_course_masquerade(user, course_key)
-    is_specific_user = bool(course_masquerade and course_masquerade.user_name)
-    if is_specific_user:
-        return User.objects.get(username=course_masquerade.user_name)
-    else:
-        return None
-
-
 def get_masquerading_user_group(course_key, user, user_partition):
     """
     If the current user is masquerading as a generic learner in a specific group, return that group.

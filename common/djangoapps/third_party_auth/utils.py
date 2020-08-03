@@ -30,24 +30,6 @@ def user_exists(details):
     return False
 
 
-def convert_saml_slug_provider_id(provider):
-    """
-    Provider id is stored with the backend type prefixed to it (ie "saml-")
-    Slug is stored without this prefix.
-    This just converts between them whenever you expect the opposite of what you currently have.
-
-    Arguments:
-        provider (string): provider_id or slug
-
-    Returns:
-        (string): Opposite of what you inputted (slug -> provider_id; provider_id -> slug)
-    """
-    if provider.startswith('saml-'):
-        return provider[5:]
-    else:
-        return 'saml-' + provider
-
-
 def validate_uuid4_string(uuid_string):
     """
     Returns True if valid uuid4 string, or False

@@ -500,9 +500,6 @@ FRONTEND_LOGIN_URL = '/login'
 FRONTEND_LOGOUT_URL = '/logout'
 FRONTEND_REGISTER_URL = '/register'
 
-# Programs Learner Portal URL
-LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
-
 ECOMMERCE_API_URL = 'https://ecommerce.example.com/api/v2/'
 ECOMMERCE_PUBLIC_URL_ROOT = None
 ENTERPRISE_API_URL = 'http://enterprise.example.com/enterprise/api/v1/'

@@ -11,7 +11,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ParseError
 
 from enterprise.models import EnterpriseCustomerIdentityProvider
-from third_party_auth.utils import validate_uuid4_string, convert_saml_slug_provider_id
+from third_party_auth.utils import validate_uuid4_string
 
 from ..models import SAMLProviderConfig, SAMLProviderData
 from .serializers import SAMLProviderDataSerializer
@@ -54,8 +54,7 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
             enterprise_customer__uuid=self.requested_enterprise_uuid
         )
         try:
-            saml_provider = SAMLProviderConfig.objects.current_set().get(
-                slug=convert_saml_slug_provider_id(enterprise_customer_idp.provider_id))
+            saml_provider = SAMLProviderConfig.objects.current_set().get(slug=enterprise_customer_idp.provider_id)
         except SAMLProviderConfig.DoesNotExist:
             raise Http404('No matching SAML provider found.')
         return SAMLProviderData.objects.filter(entity_id=saml_provider.entity_id)

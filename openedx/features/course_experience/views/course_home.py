@@ -68,6 +68,12 @@ class CourseHomeView(CourseTabView):
         """
         return super(CourseHomeView, self).get(request, course_id, 'courseware', **kwargs)
 
+    def uses_bootstrap(self, request, course, tab):
+        """
+        Always render this tab with bootstrap.
+        """
+        return True
+
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = six.text_type(course.id)
         home_fragment_view = CourseHomeFragmentView()
@@ -78,6 +84,7 @@ class CourseHomeFragmentView(EdxFragmentView):
     """
     A fragment to render the home page for a course.
     """
+    _uses_pattern_library = False
 
     def _get_resume_course_info(self, request, course_id):
         """

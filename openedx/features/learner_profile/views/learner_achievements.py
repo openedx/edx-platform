@@ -16,6 +16,7 @@ class LearnerAchievementsFragmentView(EdxFragmentView):
     """
     A fragment to render a learner's achievements.
     """
+    _uses_pattern_library = False
 
     def render_to_fragment(self, request, username=None, own_profile=False, **kwargs):
         """

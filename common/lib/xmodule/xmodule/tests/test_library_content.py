@@ -33,7 +33,7 @@ class LibraryContentTest(MixedSplitTestCase):
     def setUp(self):
         super(LibraryContentTest, self).setUp()
 
-        self.tools = LibraryToolsService(self.store, self.user_id)
+        self.tools = LibraryToolsService(self.store)
         self.library = LibraryFactory.create(modulestore=self.store)
         self.lib_blocks = [
             self.make_block("html", self.library, data="Hello world from block {}".format(i))
