@@ -484,7 +484,6 @@ class XModuleMixin(XModuleFields, XBlock):
         else:
             return [self.display_name_with_default_escaped]
 
-    @beeline.traced(name="x_module.get_children")
     def get_children(self, usage_id_filter=None, usage_key_filter=None):  # pylint: disable=arguments-differ
         """Returns a list of XBlock instances for the children of
         this module"""
@@ -493,7 +492,6 @@ class XModuleMixin(XModuleFields, XBlock):
         if usage_id_filter is None and usage_key_filter is not None:
             usage_id_filter = usage_key_filter
 
-        beeline.add_context_field("usage_id_filter", usage_id_filter)
         return [
             child
             for child
@@ -501,13 +499,11 @@ class XModuleMixin(XModuleFields, XBlock):
             if child is not None
         ]
 
-    @beeline.traced(name="x_module.get_child")
     def get_child(self, usage_id):
         """
         Return the child XBlock identified by ``usage_id``, or ``None`` if there
         is an error while retrieving the block.
         """
-        beeline.add_context_field("usage_id", usage_id)
         try:
             child = super(XModuleMixin, self).get_child(usage_id)
         except ItemNotFoundError:
