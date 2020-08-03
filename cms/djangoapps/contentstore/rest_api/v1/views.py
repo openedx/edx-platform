@@ -16,6 +16,7 @@ from xmodule.modulestore.django import modulestore
 from contentstore.rest_api.v1.serializers import (
     ProctoredExamConfigurationSerializer,
     ProctoredExamSettingsSerializer,
+    LimitedProctoredExamSettingsSerializer,
 )
 
 
@@ -108,8 +109,12 @@ class ProctoredExamSettingsView(APIView):
 
     def post(self, request, course_id):
         """ POST handler """
-        exam_config = ProctoredExamSettingsSerializer(data=request.data.get('proctored_exam_settings', {}))
-        exam_config.is_valid(raise_exception=True)
+        serializer = ProctoredExamSettingsSerializer if request.user.is_staff else LimitedProctoredExamSettingsSerializer
+        exam_config = serializer(data=request.data.get('proctored_exam_settings', {}))
+        valid_request = exam_config.is_valid()
+        if not request.user.is_staff and valid_request and ProctoredExamSettingsSerializer(data=request.data.get('proctored_exam_settings', {})).is_valid():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         with modulestore().bulk_operations(CourseKey.from_string(course_id)):
             course_module = self._get_and_validate_course_access(request.user, course_id)
             course_metadata = CourseMetadata().fetch_all(course_module)
