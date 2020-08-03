@@ -128,7 +128,7 @@ edx-submissions==3.1.12   # via -r requirements/edx/testing.txt, ora2
 edx-tincan-py35==0.0.9    # via -r requirements/edx/testing.txt, edx-enterprise
 edx-user-state-client==1.2.0  # via -r requirements/edx/testing.txt
 edx-when==1.3.0           # via -r requirements/edx/testing.txt, edx-proctoring
-edxval==1.3.9             # via -r requirements/edx/testing.txt
+edxval==1.4.0             # via -r requirements/edx/testing.txt
 elasticsearch==1.9.0      # via -r requirements/edx/testing.txt, edx-search
 enmerkar-underscore==1.0.0  # via -r requirements/edx/testing.txt
 enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-underscore
@@ -230,7 +230,7 @@ pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
 pylint-django==2.0.11     # via -r requirements/edx/testing.txt, edx-lint
 pylint-plugin-utils==0.6  # via -r requirements/edx/testing.txt, pylint-celery, pylint-django
 pylint==2.4.4             # via -r requirements/edx/testing.txt, edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
-pymongo==3.10.1           # via -r requirements/edx/testing.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
+pymongo==3.11.0           # via -r requirements/edx/testing.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/testing.txt
 pyparsing==2.4.7          # via -r requirements/edx/testing.txt, chem, openedx-calc, packaging, pycontracts
 pyquery==1.4.1            # via -r requirements/edx/testing.txt
@@ -304,7 +304,7 @@ text-unidecode==1.3       # via -r requirements/edx/testing.txt, faker, python-s
 toml==0.10.1              # via -r requirements/edx/testing.txt, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
 tox==3.18.1               # via -r requirements/edx/testing.txt, tox-battery
-tqdm==4.48.0              # via -r requirements/edx/testing.txt, nltk
+tqdm==4.48.1              # via -r requirements/edx/testing.txt, nltk
 transifex-client==0.13.11  # via -r requirements/edx/testing.txt
 typed-ast==1.4.1          # via -r requirements/edx/testing.txt, astroid
 ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-samesite
@@ -313,7 +313,7 @@ unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
 urllib3==1.25.10          # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/testing.txt
-virtualenv==20.0.28       # via -r requirements/edx/testing.txt, tox
+virtualenv==20.0.29       # via -r requirements/edx/testing.txt, tox
 voluptuous==0.11.7        # via -r requirements/edx/testing.txt, ora2
 vulture==1.6              # via -r requirements/edx/development.in
 watchdog==0.10.3          # via -r requirements/edx/testing.txt

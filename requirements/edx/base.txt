@@ -114,7 +114,7 @@ edx-submissions==3.1.12   # via -r requirements/edx/base.in, ora2
 edx-tincan-py35==0.0.9    # via edx-enterprise
 edx-user-state-client==1.2.0  # via -r requirements/edx/base.in
 edx-when==1.3.0           # via -r requirements/edx/base.in, edx-proctoring
-edxval==1.3.9             # via -r requirements/edx/base.in
+edxval==1.4.0             # via -r requirements/edx/base.in
 elasticsearch==1.9.0      # via edx-search
 enmerkar-underscore==1.0.0  # via -r requirements/edx/base.in
 enmerkar==0.7.1           # via enmerkar-underscore
@@ -185,7 +185,7 @@ pycryptodomex==3.9.8      # via -r requirements/edx/base.in, edx-proctoring, lti
 pygments==2.6.1           # via -r requirements/edx/base.in
 pyjwkest==1.4.2           # via -r requirements/edx/base.in, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.in, drf-jwt, edx-rest-api-client, social-auth-core
-pymongo==3.10.1           # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
+pymongo==3.11.0           # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/base.in
 pyparsing==2.4.7          # via chem, openedx-calc, packaging, pycontracts
 pysrt==1.1.2              # via -r requirements/edx/base.in, edxval
@@ -230,7 +230,7 @@ super-csv==0.9.9          # via -r requirements/edx/base.in, edx-bulk-grades
 sympy==1.6.1              # via symmath
 testfixtures==6.14.1      # via edx-enterprise
 text-unidecode==1.3       # via python-slugify
-tqdm==4.48.0              # via -r requirements/edx/../edx-sandbox/shared.txt, nltk
+tqdm==4.48.1              # via -r requirements/edx/../edx-sandbox/shared.txt, nltk
 ua-parser==0.10.0         # via django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/base.in, edx-enterprise
 uritemplate==3.0.1        # via coreapi, drf-yasg
