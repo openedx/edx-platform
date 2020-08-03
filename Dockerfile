@@ -42,7 +42,7 @@ RUN apt update && \
     python3-dev \
     python3-pip \
     python3.5 \
-    -qy && rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
