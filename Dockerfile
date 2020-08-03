@@ -5,7 +5,7 @@ FROM ubuntu:xenial as base
 # Install system requirements
 RUN apt update && \
     # Global requirements
-    DEBIAN_FRONTEND=noninteractive apt install -y \
+    DEBIAN_FRONTEND=noninteractive apt-get install --yes \
     build-essential \
     curl \
     # If we don't need gcc, we should remove it.
@@ -135,4 +135,3 @@ RUN mkdir -p test_root/log
 ENV DJANGO_SETTINGS_MODULE ""
 RUN NO_PREREQ_INSTALL=1 paver update_assets cms --settings devstack_decentralized
 ENV DJANGO_SETTINGS_MODULE cms.envs.devstack_decentralized
-
