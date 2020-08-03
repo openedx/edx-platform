@@ -18,7 +18,7 @@ so, `Open edX Ubuntu 16.04 64-bit Installation`_ has instructions to install
 it on an existing Ubuntu 16.04 server.
 
 .. _Open edX Developer Stack: https://github.com/edx/devstack
-.. _Open edX Ubuntu 16.04 64-bit Installation: https://openedx.atlassian.net/wiki/display/OpenOPS/Native+Open+edX+Ubuntu+16.04+64+bit+Installation
+.. _Open edX Ubuntu 16.04 64-bit Installation: https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/146440579/Native+Open+edX+platform+Ubuntu+16.04+64+bit+Installation
 
 
 License
