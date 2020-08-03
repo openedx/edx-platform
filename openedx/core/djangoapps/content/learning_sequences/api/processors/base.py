@@ -8,8 +8,6 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from ..data import ScheduleData, ScheduleItemData
-
 User = get_user_model()
 log = logging.getLogger(__name__)
 

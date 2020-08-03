@@ -59,7 +59,7 @@ def create_course_enrollment_celebration(sender, instance, created, **kwargs):
 
     # The UI for celebrations is only supported on the MFE right now, so don't turn on
     # celebrations unless this enrollment's course is MFE-enabled.
-    if not REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(instance.course_id):
+    if not REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled():
         return
 
     try:

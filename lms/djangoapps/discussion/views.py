@@ -695,7 +695,6 @@ class DiscussionBoardFragmentView(EdxFragmentView):
     """
     Component implementation of the discussion board.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(
         self,

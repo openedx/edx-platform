@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from edx_when.api import get_dates_for_course
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from ..data import ScheduleData, ScheduleItemData, UserCourseOutlineData
+from ...data import ScheduleData, ScheduleItemData, UserCourseOutlineData
 from .base import OutlineProcessor
 
 User = get_user_model()

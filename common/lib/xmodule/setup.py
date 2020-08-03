@@ -33,6 +33,7 @@ XBLOCKS = [
     "course_info = xmodule.html_module:CourseInfoBlock",
     "html = xmodule.html_module:HtmlBlock",
     "library = xmodule.library_root_xblock:LibraryRoot",
+    "library_sourced = xmodule.library_sourced_block:LibrarySourcedBlock",
     "problem = xmodule.capa_module:ProblemBlock",
     "static_tab = xmodule.html_module:StaticTabBlock",
     "unit = xmodule.unit_block:UnitBlock",

@@ -25,15 +25,21 @@ TODO: Validate all datetimes to be UTC.
 """
 import logging
 from datetime import datetime, timezone
+from enum import Enum
 from typing import Dict, List, Optional, Set
 
 import attr
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-
 User = get_user_model()
 log = logging.getLogger(__name__)
+
+
+class CourseVisibility(Enum):
+    PRIVATE = "private"
+    PUBLIC_OUTLINE = "public_outline"
+    PUBLIC = "public"
 
 
 class ObjectDoesNotExist(Exception):
@@ -131,6 +137,8 @@ class CourseOutlineData:
     # To make sure that our data structure is consistent, this field is
     # derived from what you pass into `sections`. Do not set this directly.
     sequences = attr.ib(type=Dict[UsageKey, CourseLearningSequenceData], init=False)
+
+    course_visibility = attr.ib(validator=attr.validators.in_(CourseVisibility))
 
     def __attrs_post_init__(self):
         """Post-init hook that validates and inits the `sequences` field."""

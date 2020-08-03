@@ -104,6 +104,13 @@ from student.models import CourseEnrollment
         banner.showMessage(${recovery_email_activation_message | n, dump_js_escaped_json})
       </%static:require_module>
   % endif
+  % if enterprise_learner_portal_enabled_message:
+      <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+        var banner = new MessageBannerView({urgency: 'low', type: 'warning', isLearnerPortalEnabled: true});
+        $('#content').prepend(banner.$el);
+        banner.showMessage(${enterprise_learner_portal_enabled_message | n, dump_js_escaped_json})
+      </%static:require_module>
+  % endif
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">
