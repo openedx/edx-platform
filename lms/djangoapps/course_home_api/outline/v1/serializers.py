@@ -71,4 +71,5 @@ class OutlineTabSerializer(serializers.Serializer):
     dates_widget = DatesWidgetSerializer()
     enroll_alert = EnrollAlertSerializer()
     handouts_html = serializers.CharField()
+    offer_html = serializers.CharField()
     welcome_message_html = serializers.CharField()
