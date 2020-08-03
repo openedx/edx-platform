@@ -15,7 +15,7 @@ def initialize_course_settings(sender, instance, created, **kwargs):
     """
     When ever a new course is created
     1: We add a default entry for the given course in the CustomSettings Model
-    2: We add a an honor mode for the given course so students can view certificates on their dashboard and progress page
+    2: We add an honor mode for the given course so students can view certificates on their dashboard and progress page
     """
 
     if created:

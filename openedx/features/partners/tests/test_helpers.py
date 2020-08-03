@@ -4,10 +4,10 @@ from django.contrib.auth.models import Permission
 from mock import patch
 from organizations.tests.factories import UserFactory
 
+from custom_settings.tests.factories import CustomSettingsFactory
 from openedx.features.partners import helpers
 from openedx.features.partners.tests.factories import (
     CourseCardFactory,
-    CustomSettingsFactory,
     PartnerCommunityFactory,
     PartnerCourseOverviewFactory,
     PartnerFactory,

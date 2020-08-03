@@ -18,6 +18,9 @@ class CustomSettings(models.Model):
     seo_tags = models.TextField(null=True, blank=True)
     course_open_date = models.DateTimeField(null=True)
 
+    class Meta:
+        app_label = 'custom_settings'
+
     def __unicode__(self):
         return '{} | {}'.format(self.id, self.is_featured)
 
