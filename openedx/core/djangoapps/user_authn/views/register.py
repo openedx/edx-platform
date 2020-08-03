@@ -212,6 +212,11 @@ def create_account_with_params(request, params):
         django_login(request, new_user)
         request.session.set_expiry(0)
 
+    # Sites using multiple languages need to record the language used during registration.
+    # If not, compose_and_send_activation_email will be sent in site's default language only.
+    create_or_set_user_attribute_created_on_site(user, request.site)
+    preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
+
     # Check if system is configured to skip activation email for the current user.
     skip_email = _skip_activation_email(
         user, running_pipeline, third_party_provider,
@@ -220,8 +225,6 @@ def create_account_with_params(request, params):
     if skip_email:
         registration.activate()
     else:
-        create_or_set_user_attribute_created_on_site(user, request.site)
-        preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
         compose_and_send_activation_email(user, profile, registration)
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
