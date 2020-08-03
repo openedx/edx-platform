@@ -2575,6 +2575,8 @@ REST_FRAMEWORK = {
     },
 }
 
+REGISTRATION_VALIDATION_RATELIMIT = '30/7d'
+
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
 }
