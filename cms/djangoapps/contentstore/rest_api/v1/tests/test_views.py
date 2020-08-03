@@ -274,3 +274,21 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         updated = modulestore().get_item(self.course.location)
         assert updated.enable_proctored_exams is False
         assert updated.proctoring_provider == 'null'
+
+    def test_403_if_instructor_request_includes_opting_out_or_zendesk(self):
+        self.client.login(username=self.course_instructor, password=self.password)
+        data = self.get_request_data()
+        response = self.make_request(data=data)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_200_for_instructor_request(self):
+        self.client.login(username=self.course_instructor, password=self.password)
+        data = {
+            'proctored_exam_settings': {
+                'enable_proctored_exams': True,
+                'proctoring_provider': 'proctortrack',
+                'proctoring_escalation_email': 'foo@bar.com',
+            }
+        }
+        response = self.make_request(data=data)
+        assert response.status_code == status.HTTP_200_OK
