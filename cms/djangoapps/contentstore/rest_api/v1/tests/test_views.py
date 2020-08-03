@@ -9,9 +9,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from opaque_keys.edx.keys import CourseKey
 
-from contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -154,7 +152,6 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
             'proctortrack': {}
         },
     )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_update_exam_settings_200_escalation_email(self):
         """ update exam settings for provider that requires an escalation email (proctortrack) """
         self.client.login(username=self.global_staff.username, password=self.password)
@@ -189,7 +186,6 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
             'test_proctoring_provider': {}
         },
     )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_update_exam_settings_200_no_escalation_email(self):
         """ escalation email may be blank if not required by the provider """
         self.client.login(username=self.global_staff.username, password=self.password)
@@ -250,7 +246,6 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
             'test_proctoring_provider': {}
         },
     )
-    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
     def test_update_exam_settings_invalid_value(self):
         self.client.login(username=self.global_staff.username, password=self.password)
         data = self.get_request_data(
