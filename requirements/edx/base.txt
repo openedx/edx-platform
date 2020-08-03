@@ -185,7 +185,7 @@ pycryptodomex==3.9.8      # via -r requirements/edx/base.in, edx-proctoring, lti
 pygments==2.6.1           # via -r requirements/edx/base.in
 pyjwkest==1.4.2           # via -r requirements/edx/base.in, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.in, drf-jwt, edx-rest-api-client, social-auth-core
-pymongo==3.11.0           # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
+pymongo==3.10.1           # via -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/base.in
 pyparsing==2.4.7          # via chem, openedx-calc, packaging, pycontracts
 pysrt==1.1.2              # via -r requirements/edx/base.in, edxval
