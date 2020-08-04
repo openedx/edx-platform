@@ -92,5 +92,6 @@ class EnterpriseCustomerBrandingConfigurationFactory(factory.django.DjangoModelF
         model = EnterpriseCustomerBrandingConfiguration
 
     logo = FAKER.image_url()
-    banner_background_color = FAKER.color()
-    banner_border_color = FAKER.color()
+    primary_color = FAKER.color()
+    secondary_color = FAKER.color()
+    tertiary_color = FAKER.color()
