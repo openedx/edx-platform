@@ -2,19 +2,17 @@
 Outline Tab Views
 """
 
+from django.http.response import Http404
+from django.urls import reverse
+from django.utils.translation import gettext as _
+from edx_django_utils import monitoring as monitoring_utils
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import APIException, ParseError
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
-from django.utils.translation import ugettext as _
-from edx_django_utils import monitoring as monitoring_utils
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from django.http.response import Http404
-from django.urls import reverse
-from django.utils.translation import ugettext as _
-from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
@@ -28,11 +26,13 @@ from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, LATEST_UPDATE_FLAG
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
 from openedx.features.course_experience.views.welcome_message import PREFERENCE_KEY, WelcomeMessageFragmentView
+from openedx.features.discounts.utils import generate_offer_html
 from student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
@@ -109,6 +109,7 @@ class OutlineTabView(RetrieveAPIView):
             reset_masquerade_data=True,
         )
 
+        course_overview = CourseOverview.get_from_id(course_key)
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
         allow_anonymous = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
         allow_public = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC
@@ -118,6 +119,9 @@ class OutlineTabView(RetrieveAPIView):
 
         show_handouts = show_enrolled or allow_public
         handouts_html = get_course_info_section(request, request.user, course, 'handouts') if show_handouts else ''
+
+        # TODO: TNL-7185 Legacy: Refactor to return the offer data and format the message in the MFE
+        offer_html = generate_offer_html(request.user, course_overview)
 
         welcome_message_html = None
         if get_course_tag(request.user, course_key, PREFERENCE_KEY) != 'False':
@@ -169,6 +173,7 @@ class OutlineTabView(RetrieveAPIView):
             'dates_widget': dates_widget,
             'enroll_alert': enroll_alert,
             'handouts_html': handouts_html,
+            'offer_html': offer_html,
             'welcome_message_html': welcome_message_html,
         }
         context = self.get_serializer_context()
