@@ -198,10 +198,6 @@ class MigrationTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={})
-    @unittest.skip(
-        'Temporarily skipping until the last release of https://openedx.atlassian.net/browse/ENT-2892 in which'
-        'we rename two columns.'
-    )
     def test_migrations_are_in_sync(self):
         """
         Tests that the migration files are in sync with the models.
