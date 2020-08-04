@@ -1170,9 +1170,9 @@ def _progress(request, course_key, student_id):
         'masquerade': masquerade,
         'supports_preview_menu': True,
         'student': student,
-        'credit_course_requirements': _credit_course_requirements(course_key, student),
+        'credit_course_requirements': credit_course_requirements(course_key, student),
         'course_expiration_fragment': course_expiration_fragment,
-        'certificate_data': _get_cert_data(student, course, enrollment_mode, course_grade)
+        'certificate_data': get_cert_data(student, course, enrollment_mode, course_grade)
     }
 
     context.update(
@@ -1230,7 +1230,7 @@ def _certificate_message(student, course, enrollment_mode):
     return REQUESTING_CERT_DATA
 
 
-def _get_cert_data(student, course, enrollment_mode, course_grade=None):
+def get_cert_data(student, course, enrollment_mode, course_grade=None):
     """Returns students course certificate related data.
     Arguments:
         student (User): Student for whom certificate to retrieve.
@@ -1257,7 +1257,7 @@ def _get_cert_data(student, course, enrollment_mode, course_grade=None):
     return cert_data
 
 
-def _credit_course_requirements(course_key, student):
+def credit_course_requirements(course_key, student):
     """Return information about which credit requirements a user has satisfied.
     Arguments:
         course_key (CourseKey): Identifier for the course.
