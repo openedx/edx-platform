@@ -121,3 +121,6 @@ scipy<1.5
 
 # geoip2 requires Python 3.6
 geoip2<4.0.1
+
+# tests failing for pymongo==3.11
+pymongo<3.11
