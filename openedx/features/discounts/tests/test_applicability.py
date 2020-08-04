@@ -171,6 +171,7 @@ class TestApplicability(ModuleStoreTestCase):
         with patch('openedx.features.discounts.applicability.stable_bucketing_hash_group', return_value=group_number):
             assert _is_in_holdback_and_bucket(self.user) == in_holdback
 
+    @pytest.mark.skip(reason="fix under work by revenue team")
     def test_holdback_expiry(self):
         with patch('openedx.features.discounts.applicability.stable_bucketing_hash_group', return_value=0):
             with patch(
