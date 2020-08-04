@@ -34,7 +34,7 @@ class ShowAnswerFieldOverride(FieldOverrideProvider):
         # SHOWANSWER.FINISHED is left on a Course. In that case, we continue
         # to follow the same mapping of FINISHED -> AFTER_ALL_ATTEMPTS_OR_CORRECT.
         # This value will then be inherited throughout the rest of the Course.
-        if not has_showanswer and block.category == 'course':
+        if not has_showanswer and block and block.category == 'course':
             return SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT
         elif not has_showanswer:
             return default
@@ -53,4 +53,4 @@ class ShowAnswerFieldOverride(FieldOverrideProvider):
     @classmethod
     def enabled_for(cls, course):
         """ Enabled only for Self-Paced courses using Personalized User Schedules. """
-        return course.self_paced and RELATIVE_DATES_FLAG.is_enabled(course.id)
+        return course and course.self_paced and RELATIVE_DATES_FLAG.is_enabled(course.id)
