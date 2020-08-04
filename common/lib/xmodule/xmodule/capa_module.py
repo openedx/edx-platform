@@ -316,7 +316,7 @@ class ProblemBlock(
             for option_response in root.findall("optionresponse"):
                 option_response_xml = etree.tostring(option_response, method="html").decode("utf-8")
                 option_input = option_response.find("optioninput")
-                if option_input is not None:
+                if option_input is not None and "options" in option_input:
                     option_input_attrib = option_input.get("options", "")
                     option_input_attrib = "[" + option_input_attrib.strip("()").replace("'", '"') + "]"
                     values_of_dropdown = ", ".join(json.loads(option_input_attrib))
