@@ -2,7 +2,6 @@ import factory
 from factory.django import DjangoModelFactory
 from faker.providers import internet
 
-from custom_settings.models import CustomSettings
 from lms.djangoapps.onboarding.models import FocusArea, Organization
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.features.course_card.models import CourseCard
@@ -30,20 +29,6 @@ class PartnerUserFactory(DjangoModelFactory):
 
     partner = factory.SubFactory(PartnerFactory)
     user = factory.SubFactory(UserFactory)
-
-
-class CustomSettingsFactory(DjangoModelFactory):
-    class Meta:
-        model = CustomSettings
-
-    is_featured = True
-    show_grades = False
-    enable_enrollment_email = True
-    auto_enroll = True
-    tags = factory.Faker('word')
-    course_short_id = factory.Faker('random_int')
-    seo_tags = factory.Faker('word')
-    course_open_date = factory.Faker('date_time')
 
 
 class PartnerCourseOverviewFactory(CourseOverviewFactory):
