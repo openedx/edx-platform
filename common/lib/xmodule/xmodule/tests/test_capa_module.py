@@ -39,6 +39,8 @@ from xmodule.tests import DATA_DIR
 from ..capa_base import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
 
+unittest.TestCase.maxDiff = None
+
 
 class CapaFactory(object):
     """
@@ -2509,7 +2511,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
             'problem_types': ["multiplechoiceresponse"],
             'content': {
                 'display_name': name,
-                'capa_content': ' Label Some comment Apple Banana Chocolate Donut '
+                'capa_content': 'Label Some comment Apple Banana Chocolate Donut'
             }
         })
 
@@ -2542,7 +2544,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["optionresponse", "multiplechoiceresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': ' Label Some comment Donut Buggy '
+                    'capa_content': 'Label Some comment Donut Buggy'
                 }
             }
         )
@@ -2579,7 +2581,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': [],
                 'content': {
                     'display_name': name,
-                    'capa_content': ' '
+                    'capa_content': ''
                 }
             }
         )
@@ -2607,7 +2609,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["choiceresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2628,7 +2630,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["optionresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2653,7 +2655,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["multiplechoiceresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2681,7 +2683,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["numericalresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2706,7 +2708,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["stringresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2720,7 +2722,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
         """)
         name = "Non latin Input"
         descriptor = self._create_descriptor(sample_text_input_problem_xml, name=name)
-        capa_content = " FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
+        capa_content = "FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL"
 
         descriptor_dict = descriptor.index_dictionary()
         self.assertEqual(
@@ -2752,7 +2754,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["choiceresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2778,7 +2780,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["optionresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2804,7 +2806,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["multiplechoiceresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2828,7 +2830,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["numericalresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2852,7 +2854,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': ["stringresponse"],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )
@@ -2884,7 +2886,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
                 'problem_types': [],
                 'content': {
                     'display_name': name,
-                    'capa_content': capa_content.replace("\n", " ")
+                    'capa_content': capa_content.replace("\n", " ").strip()
                 }
             }
         )

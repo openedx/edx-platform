@@ -7,6 +7,7 @@ import re
 import sys
 
 import six
+from bleach.sanitizer import Cleaner
 from lxml import etree
 from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
@@ -17,7 +18,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawMixin
-from xmodule.util.misc import escape_html_characters
 from xmodule.util.sandboxing import get_python_lib_zip
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
@@ -33,6 +33,13 @@ from xmodule.xml_module import XmlMixin
 from .capa_base import CapaMixin, ComplexEncoder, _
 
 log = logging.getLogger("edx.courseware")
+
+
+def _remove_html_tags_and_extra_spaces(data):
+    """ Remove html tags and extra white spaces e.g newline, tabs etc from provided data """
+    cleaner = Cleaner(tags=[], strip=True)
+    cleaned_text = " ".join(re.split(r"\s+", cleaner.clean(data), flags=re.UNICODE)).strip()
+    return cleaned_text
 
 
 @XBlock.wants('user')
@@ -300,7 +307,26 @@ class ProblemBlock(
         """
         Return dictionary prepared with module content and type for indexing.
         """
+        def _make_optionresponse_indexable(xml_content):
+            """
+            Extract options from dropdown and replace the actual xml for optionresponse with them.
+            """
+            xml_content_copy = xml_content[:]
+            root = etree.fromstring(xml_content_copy)
+            for option_response in root.findall("optionresponse"):
+                option_response_xml = etree.tostring(option_response, method="html").decode("utf-8")
+                option_input = option_response.find("optioninput")
+                if option_input is not None:
+                    option_input_attrib = option_input.get("options", "")
+                    option_input_attrib = "[" + option_input_attrib.strip("()").replace("'", '"') + "]"
+                    values_of_dropdown = ", ".join(json.loads(option_input_attrib))
+                    xml_content_copy = xml_content_copy.replace(option_response_xml, values_of_dropdown)
+            return xml_content_copy
+
         xblock_body = super(ProblemBlock, self).index_dictionary()
+
+        capa_content = _make_optionresponse_indexable(self.data)
+
         # Removing solutions and hints, as well as script and style
         capa_content = re.sub(
             re.compile(
@@ -313,9 +339,9 @@ class ProblemBlock(
                 re.DOTALL |
                 re.VERBOSE),
             "",
-            self.data
+            capa_content
         )
-        capa_content = escape_html_characters(capa_content)
+        capa_content = _remove_html_tags_and_extra_spaces(capa_content)
         capa_body = {
             "capa_content": capa_content,
             "display_name": self.display_name,
