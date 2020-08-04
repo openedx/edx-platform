@@ -33,6 +33,7 @@ from lms.djangoapps.courseware.models import (
     OrgDynamicUpgradeDeadlineConfiguration
 )
 from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -60,6 +61,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
     def make_request(self, user):
+        """ Creates a request """
         request = RequestFactory().request()
         request.user = user
         self.addCleanup(crum.set_current_request, None)
@@ -297,6 +299,72 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 # Can't determine if it is released so it does not get a link
                 for html_tag in assignment_title_html:
                     self.assertIn(html_tag, assignment_title)
+
+    @RELATIVE_DATES_FLAG.override(active=True)
+    @ddt.data(
+        ([], 3),
+        ([{
+            'due': None,
+            'start': None,
+            'name': 'student-training',
+            'examples': [
+                {
+                    'answer': ['Replace this text with your own sample response...'],
+                    'options_selected': [
+                        {'option': 'Fair', 'criterion': 'Ideas'},
+                        {'option': 'Good', 'criterion': 'Content'}
+                    ]
+                }, {
+                    'answer': ['Replace this text with another sample response...'],
+                    'options_selected': [
+                        {'option': 'Poor', 'criterion': 'Ideas'},
+                        {'option': 'Good', 'criterion': 'Content'}
+                    ]
+                }
+            ]
+        }, {
+            'due': '2029-01-01T00:00:00+00:00',
+            'start': '2001-01-01T00:00:00+00:00',
+            'must_be_graded_by': 3,
+            'name': 'peer-assessment',
+            'must_grade': 5
+        }, {
+            'due': '2029-01-01T00:00:00+00:00',
+            'start': '2001-01-01T00:00:00+00:00',
+            'name': 'self-assessment'
+        }], 5)
+    )
+    @ddt.unpack
+    def test_dates_with_openassessments(self, rubric_assessments, date_block_count):
+        course = create_self_paced_course_run(days_till_start=-1, org_id='TestOrg')
+
+        user = create_user()
+        request = self.make_request(user)
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+        now = datetime.now(utc)
+
+        chapter = ItemFactory.create(
+            parent=course,
+            category="chapter",
+            graded=True,
+        )
+        section = ItemFactory.create(
+            parent=chapter,
+            category="sequential",
+        )
+        vertical = ItemFactory.create(
+            parent=section,
+            category="vertical",
+        )
+        ItemFactory.create(
+            parent=vertical,
+            category="openassessment",
+            rubric_assessments=rubric_assessments,
+            submission_start=(now + timedelta(days=1)).isoformat(),
+            submission_end=(now + timedelta(days=7)).isoformat(),
+        )
+        blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
+        self.assertEqual(len(blocks), date_block_count)
 
     @RELATIVE_DATES_FLAG.override(active=True)
     def test_enabled_block_types_with_expired_course(self):
@@ -658,22 +726,36 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(block.relative_datestring, expected_date_string)
 
     @ddt.data(
-        'info',
-        'openedx.course_experience.course_home',
+        ('info', True),
+        ('info', False),
+        ('openedx.course_experience.course_home', True),
+        ('openedx.course_experience.course_home', False),
     )
+    @ddt.unpack
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
-    def test_dates_tab_link_render(self, url_name):
+    @RELATIVE_DATES_FLAG.override(active=True)
+    def test_dates_tab_link_render(self, url_name, mfe_active):
         """ The dates tab link should only show for enrolled or staff users """
         course = create_course_run()
         html_elements = [
             'class="dates-tab-link"',
             'View all course dates</a>',
         ]
+        # The url should change based on the mfe being active.
+        if mfe_active:
+            html_elements.append('/course/' + str(course.id) + '/dates')
+        else:
+            html_elements.append('/courses/' + str(course.id) + '/dates')
         url = reverse(url_name, args=(course.id,))
 
         def assert_html_elements(assert_function, user):
             self.client.login(username=user.username, password=TEST_PASSWORD)
-            response = self.client.get(url, follow=True)
+            if mfe_active:
+                with COURSE_HOME_MICROFRONTEND.override(active=True), \
+                     COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True):
+                    response = self.client.get(url, follow=True)
+            else:
+                response = self.client.get(url, follow=True)
             for html in html_elements:
                 assert_function(response, html)
             self.client.logout()
@@ -809,6 +891,7 @@ class TestDateAlerts(SharedModuleStoreTestCase):
 
 @ddt.ddt
 class TestScheduleOverrides(SharedModuleStoreTestCase):
+    """ Tests for Schedule Overrides """
 
     def setUp(self):
         super(TestScheduleOverrides, self).setUp()
@@ -833,6 +916,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         self._check_text(block)
 
     def _check_text(self, upgrade_date_summary):
+        """ Validates the text on an upgrade_date_summary """
         self.assertEqual(upgrade_date_summary.title, 'Upgrade to Verified Certificate')
         self.assertEqual(
             upgrade_date_summary.description,

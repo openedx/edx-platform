@@ -311,41 +311,6 @@ def run_pep8(options):  # pylint: disable=unused-argument
 
 
 @task
-@needs('pavelib.prereqs.install_python_prereqs')
-@timed
-def run_complexity():
-    """
-    Uses radon to examine cyclomatic complexity.
-    For additional details on radon, see https://radon.readthedocs.org/
-    """
-    system_string = '/ '.join(ALL_SYSTEMS.split(',')) + '/'
-    complexity_report_dir = (Env.REPORT_DIR / "complexity")
-    complexity_report = complexity_report_dir / "python_complexity.log"
-
-    # Ensure an empty complexity report dir is in place.
-    _prepare_report_dir(complexity_report_dir)
-
-    print("--> Calculating cyclomatic complexity of python files...")
-    try:
-        sh(
-            "radon cc {system_string} --total-average > {complexity_report}".format(
-                system_string=system_string,
-                complexity_report=complexity_report
-            )
-        )
-        complexity_metric = _get_count_from_last_line(complexity_report, "python_complexity")
-        _write_metric(
-            complexity_metric,
-            (Env.METRICS_DIR / "python_complexity")
-        )
-        print("--> Python cyclomatic complexity report complete.")
-        print("radon cyclomatic complexity score: {metric}".format(metric=str(complexity_metric)))
-
-    except BuildFailure:
-        print("FAILURE: Unable to calculate python-only code-complexity.")
-
-
-@task
 @needs(
     'pavelib.prereqs.install_node_prereqs',
     'pavelib.utils.test.utils.ensure_clean_package_lock',
@@ -682,13 +647,8 @@ def _get_count_from_last_line(filename, file_type):
         return 0
 
     last_line = report_contents.strip()
-
-    if file_type == "python_complexity":
-        # Example of the last line of a complexity report: "Average complexity: A (1.93953443446)"
-        regex = r'\d+.\d+'
-    else:
-        # Example of the last line of a compact-formatted eslint report (for example): "62829 problems"
-        regex = r'^\d+'
+    # Example of the last line of a compact-formatted eslint report (for example): "62829 problems"
+    regex = r'^\d+'
 
     try:
         return float(re.search(regex, last_line).group(0))

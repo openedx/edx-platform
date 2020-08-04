@@ -179,7 +179,7 @@ def generate_course_expired_message(user, course):
             )
 
             return HTML(full_message).format(
-                a_open=HTML(u'<a href="{upgrade_link}">').format(
+                a_open=HTML(u'<a id="FBE_banner" href="{upgrade_link}">').format(
                     upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
                 ),
                 sronly_span_open=HTML('<span class="sr-only">'),

@@ -738,6 +738,11 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
         'courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
 
+##### Show Answer Override for Self-Paced Courses #####
+FIELD_OVERRIDE_PROVIDERS += (
+    'openedx.features.personalized_learner_schedules.show_answer.show_answer_field_override.ShowAnswerFieldOverride',
+)
+
 ##### Self-Paced Course Due Dates #####
 XBLOCK_FIELD_DATA_WRAPPERS += (
     'lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap',

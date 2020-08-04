@@ -8,7 +8,7 @@ from django.urls import re_path
 
 from lms.djangoapps.course_home_api.dates.v1.views import DatesTabView
 from lms.djangoapps.course_home_api.course_metadata.v1.views import CourseHomeMetadataView
-from lms.djangoapps.course_home_api.outline.v1.views import OutlineTabView
+from lms.djangoapps.course_home_api.outline.v1.views import OutlineTabView, dismiss_welcome_message
 from lms.djangoapps.course_home_api.progress.v1.views import ProgressTabView
 
 urlpatterns = []
@@ -37,6 +37,14 @@ urlpatterns += [
         r'v1/outline/{}'.format(settings.COURSE_KEY_PATTERN),
         OutlineTabView.as_view(),
         name='course-home-outline-tab'
+    ),
+]
+
+urlpatterns += [
+    re_path(
+        r'v1/dismiss_welcome_message',
+        dismiss_welcome_message,
+        name='course-experience-dismiss-welcome-message'
     ),
 ]
 

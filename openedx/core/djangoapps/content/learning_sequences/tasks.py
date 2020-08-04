@@ -9,8 +9,9 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
 from .api import replace_course_outline
-from .api.data import (
-    CourseOutlineData, CourseSectionData, CourseLearningSequenceData, VisibilityData
+from .data import (
+    CourseOutlineData, CourseSectionData, CourseLearningSequenceData, VisibilityData,
+    CourseVisibility
 )
 
 
@@ -21,6 +22,14 @@ def update_from_modulestore(course_key):
 
     We should move this out so that learning_sequences does not depend on
     ModuleStore.
+    """
+    course_outline_data = get_outline_from_modulestore(course_key)
+    replace_course_outline(course_outline_data)
+
+
+def get_outline_from_modulestore(course_key):
+    """
+    Get CourseOutlineData corresponding to param:course_key
     """
     def _make_section_data(section):
         sequences_data = []
@@ -63,6 +72,6 @@ def update_from_modulestore(course_key):
             published_at=course.subtree_edited_on,
             published_version=str(course.course_version),  # .course_version is a BSON obj
             sections=sections_data,
+            course_visibility=CourseVisibility(course.course_visibility),
         )
-
-    replace_course_outline(course_outline_data)
+    return course_outline_data

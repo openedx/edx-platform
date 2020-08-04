@@ -5,18 +5,52 @@
     @media (min-width: 1200px) {
       height: 64px;
     }
+
+    .btn-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 15px;
+      text-align: center;
+      font-size: 24px;
+      line-height: 1.42857;
+    }
+
+    .demographics-dismiss-container {
+      margin-left: -40px;
+
+      .demographics-dismiss-btn {
+        font-size: 20px
+      }
+      .demographics-dismiss-btn:hover {
+        background-image: none;
+        background-color: #23419f;
+        border: none;
+      }
+    }
+
     .demographics-banner-icon {
       height: 140px;
     }
+
     .demographics-banner-prompt {
       font-size: 24px;
       line-height: 24px;
+      width: 85%;
+
+      @media (min-width: 1200px) {
+        width: unset;
+      }
     }
+
     .demographics-banner-btn {
       color: #23419f;
       border-radius: 20px;
       font-size: 14px;
-      min-width: 150px;
+
+      @media (min-width: 1200px) {
+        min-width: 150px;
+      }
+
       /* Below are to override the overly-broad `button` selectors in lms/static/sass/shared/_forms.scss */
       box-shadow: unset;
       text-shadow: unset;
@@ -29,6 +63,7 @@
       }
     }
   }
+
   .side-container {
     .wrapper-coaching {
       border: 1px solid $gray-500;

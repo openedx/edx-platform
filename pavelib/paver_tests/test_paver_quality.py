@@ -94,7 +94,7 @@ class TestPaverQualityOptions(unittest.TestCase):
 class TestPaverReportViolationsCounts(unittest.TestCase):
     """
     For testing utility functions for getting counts from reports for
-    run_eslint, run_complexity, run_xsslint, and run_xsscommitlint.
+    run_eslint, run_xsslint, and run_xsscommitlint.
     """
 
     def setUp(self):
@@ -127,22 +127,6 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
             f.write("foo/bar/js/fizzbuzz.js: line 45, col 59, Missing semicolon.")
         actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "eslint")  # pylint: disable=protected-access
         self.assertEqual(actual_count, None)
-
-    def test_complexity_value(self):
-        with open(self.f.name, 'w') as f:
-            f.write("Average complexity: A (1.93953443446)")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
-        self.assertEqual(actual_count, 1.93953443446)
-
-    def test_truncated_complexity_report(self):
-        with open(self.f.name, 'w') as f:
-            f.write("M 110:4 FooBar.default - A")
-        actual_count = pavelib.quality._get_count_from_last_line(self.f.name, "python_complexity")  # pylint: disable=protected-access
-        self.assertEqual(actual_count, None)
-
-    def test_no_complexity_report(self):
-        with self.assertRaises(BuildFailure):
-            pavelib.quality._get_count_from_last_line("non-existent-file", "python_complexity")  # pylint: disable=protected-access
 
     def test_generic_value(self):
         """
