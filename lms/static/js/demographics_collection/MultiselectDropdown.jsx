@@ -89,7 +89,7 @@ class MultiselectDropdown extends React.Component {
 
   renderUnselect() {
     return this.props.selected.length > 0 && (
-      <button onClick={this.handleRemoveAllClick}>X</button>
+      <button id="unselect-button" onClick={this.handleRemoveAllClick}>x</button>
     )
   }
 
@@ -132,8 +132,9 @@ class MultiselectDropdown extends React.Component {
 
 export { MultiselectDropdown };
 
-// TODO: Flesh these out more
 MultiselectDropdown.propTypes = {
+  label: PropTypes.string,
+  emptyLabel: PropTypes.string,
   options: PropTypes.array.isRequired,
   selected: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
