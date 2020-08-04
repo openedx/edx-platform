@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { CheckBox } from '@edx/paragon/static';
-
 class MultiselectDropdown extends React.Component {
   constructor(props) {
     super(props);
@@ -10,23 +8,39 @@ class MultiselectDropdown extends React.Component {
       open: false,
     };
 
+    // this version of React does not support React.createRef()
+    this.buttonRef = null;
+    this.setButtonRef = (element) => {
+      this.buttonRef = element;
+    }
+
+    this.focusButton = this.focusButton.bind(this);
+    this.handleKeydown = this.handleKeydown.bind(this);
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleRemoveAllClick = this.handleRemoveAllClick.bind(this);
     this.handleOptionClick = this.handleOptionClick.bind(this);
+  }
+
+  componentDidMount(){
+    document.addEventListener("keydown", this.handleKeydown, false);
+  }
+
+  componentWillUnmount(){
+    document.removeEventListener("keydown", this.handleKeydown, false);
   }
 
   findOption(data) {
     return this.props.options.find((o) => o.value == data || o.label == data);
   }
 
-  displayValue() {
-    if (this.props.selected.length == 0) {
-      return this.props.emptyLabel;
-    }
+  focusButton() {
+    if (this.buttonRef) this.buttonRef.focus();
+  }
 
-    return this.props.selected.map((value) => {
-      return this.findOption(value).label;
-    }).join(", ")
+  handleKeydown(e) {
+    if (this.state.open && event.keyCode == 27) {
+      this.setState({ open: false }, this.focusButton);
+    }
   }
 
   handleButtonClick(e) {
@@ -35,6 +49,7 @@ class MultiselectDropdown extends React.Component {
 
   handleRemoveAllClick(e) {
     this.props.onChange([]);
+    this.focusButton();
     e.stopPropagation();
   }
 
@@ -62,32 +77,54 @@ class MultiselectDropdown extends React.Component {
     this.props.onChange(newSelected);
   }
 
+  renderSelected() {
+    if (this.props.selected.length == 0) {
+      return this.props.emptyLabel;
+    }
+
+    return this.props.selected.map((value) => {
+      return this.findOption(value).label;
+    }).join(", ")
+  }
+
+  renderUnselect() {
+    return this.props.selected.length > 0 && (
+      <button onClick={this.handleRemoveAllClick}>X</button>
+    )
+  }
+
   renderMenu() {
+    if (!this.state.open) {
+      return;
+    }
+
     const options = this.props.options.map((option, index) => {
       const checked = this.props.selected.includes(option.value);
       return (
-        <div key={index}>
-          <input type="checkbox" id={option.value} value={option.value} checked={checked} onChange={this.handleOptionClick}/>
-          <label htmlFor={option.value}>{option.label}</label>
+        <div key={index} id={`${option.value}-option-container`}>
+          <input id={`${option.value}-option-checkbox`} type="checkbox" value={option.value} checked={checked} onChange={this.handleOptionClick}/>
+          <label htmlFor={`${option.value}-option-checkbox`}>{option.label}</label>
         </div>
       )
     })
 
     return (
-      <div>
+      <fieldset id="multiselect-dropdown-fieldset">
+        <legend className="sr-only">{this.props.label}</legend>
         {options}
-      </div>
+      </fieldset>
     )
   }
 
   render() {
     return (
       <div className="multiselect-dropdown">
-        <button onClick={this.handleButtonClick}>
-          {this.displayValue()}
-          <button onClick={this.handleRemoveAllClick}>X</button>
+        <div id="multiselect-dropdown-label">{this.props.label}</div>
+        <button id="multiselect-dropdown-button" type="button" ref={this.setButtonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
+          {this.renderSelected()}
+          {this.renderUnselect()}
         </button>
-        {this.state.open && this.renderMenu()}
+        {this.renderMenu()}
       </div>
     )
   }
@@ -95,6 +132,7 @@ class MultiselectDropdown extends React.Component {
 
 export { MultiselectDropdown };
 
+// TODO: Flesh these out more
 MultiselectDropdown.propTypes = {
   options: PropTypes.array.isRequired,
   selected: PropTypes.array.isRequired,
