@@ -230,7 +230,7 @@ pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
 pylint-django==2.0.11     # via -r requirements/edx/testing.txt, edx-lint
 pylint-plugin-utils==0.6  # via -r requirements/edx/testing.txt, pylint-celery, pylint-django
 pylint==2.4.4             # via -r requirements/edx/testing.txt, edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
-pymongo==3.11.0           # via -r requirements/edx/testing.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
+pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/testing.txt
 pyparsing==2.4.7          # via -r requirements/edx/testing.txt, chem, openedx-calc, packaging, pycontracts
 pyquery==1.4.1            # via -r requirements/edx/testing.txt
