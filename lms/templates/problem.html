@@ -32,16 +32,33 @@ from openedx.core.djangolib.markup import HTML
       </button>
 
       % if submit_disabled_cta:
-        <div class="submit-cta">
-          <a href="${submit_disabled_cta['link']}">${submit_disabled_cta['link_name']}
-            <span class="submit-cta-description" tabindex="0" role="note" aria-label="Clarification">
+        % if 'form_values' in submit_disabled_cta:
+          <form class="submit-cta" method="post" action="${submit_disabled_cta['link']}">
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+            % for form_name, form_value in submit_disabled_cta['form_values'].items():
+                <input type="hidden" name="${form_name}" value="${form_value}">
+            % endfor
+            <button class="submit-cta-link-button btn-brand">${submit_disabled_cta['link_name']}
+              <span class="submit-cta-description" tabindex="0" role="note" aria-label="description">
+                <span data-tooltip="${submit_disabled_cta['description']}" data-tooltip-show-on-click="true"
+                    class="fa fa-info-circle fa-lg" aria-hidden="true">
+                </span>
+              </span>
+              <span class="sr">(${submit_disabled_cta['description']})</span>
+            </button>
+          </div>
+        % else:
+          <div class="submit-cta">
+            <a href="${submit_disabled_cta['link']}">${submit_disabled_cta['link_name']}
+              <span class="submit-cta-description" tabindex="0" role="note" aria-label="description">
                 <span data-tooltip="${submit_disabled_cta['description']}" data-tooltip-show-on-click="true"
                     class="fa fa-info-circle fa-lg" aria-hidden="true">
                 </span>
                 <span class="sr">(${submit_disabled_cta['description']})</span>
-            </span>
-          </a>
-        </div>
+              </span>
+            </a>
+          </div>
+        % endif
       % endif
       <div class="submission-feedback" id="submission_feedback_${short_id}">
         % if attempts_allowed:

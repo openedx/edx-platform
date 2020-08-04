@@ -998,11 +998,16 @@ div.problem .action {
 
     .submit-cta {
         display: inline-block;
-        margin-top: $baseline / 2 + 2;
-        margin-left: 16px;
     }
     .submit-cta-description {
         margin-left: 8px;
+    }
+    .submit-cta-link-button {
+        background: none;
+        border: none;
+        /*optional*/
+        color: $blue;
+        cursor: pointer;
     }
   }
 

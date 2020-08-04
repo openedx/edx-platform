@@ -20,7 +20,8 @@ from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resour
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import CallToActionService, SettingsService, TeamsConfigurationService
+from xmodule.services import SettingsService, TeamsConfigurationService
+from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from xmodule.x_module import ModuleSystem
 
 
