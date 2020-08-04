@@ -4,7 +4,7 @@ Tabs for courseware.
 
 from functools import cmp_to_key
 
-from openedx.core.lib.plugins import PluginManager
+from edx_django_utils.plugins.plugin_manager import PluginManager
 
 
 # Stevedore extension point namespaces

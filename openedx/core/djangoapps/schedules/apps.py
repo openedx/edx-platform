@@ -3,7 +3,9 @@
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
-from openedx.core.djangoapps.plugins.constants import PluginSignals, ProjectType
+from edx_django_utils.plugins.constants import PluginSignals
+
+from openedx.core.djangoapps.plugins.constants import ProjectType
 
 
 class SchedulesConfig(AppConfig):

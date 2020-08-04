@@ -5,7 +5,7 @@ Tests for the plugin API
 
 from django.test import TestCase
 
-from openedx.core.lib.plugins import PluginError
+from edx_django_utils.plugins.plugin_manager import PluginError
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 
 

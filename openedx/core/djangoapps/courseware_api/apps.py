@@ -7,7 +7,9 @@ Signal handlers are connected here.
 
 from django.apps import AppConfig
 
-from openedx.core.djangoapps.plugins.constants import PluginURLs, ProjectType
+from edx_django_utils.plugins.constants import PluginURLs
+
+from openedx.core.djangoapps.plugins.constants import ProjectType
 
 
 class CoursewareAPIConfig(AppConfig):

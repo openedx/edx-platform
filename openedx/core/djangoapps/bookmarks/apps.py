@@ -6,7 +6,9 @@ Configuration for bookmarks Django app
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
-from openedx.core.djangoapps.plugins.constants import PluginSettings, PluginURLs, ProjectType, SettingsType
+from edx_django_utils.plugins.constants import PluginSettings, PluginURLs
+
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
 
 class BookmarksConfig(AppConfig):

@@ -9,7 +9,9 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from openedx.core.djangoapps.plugins.constants import PluginSettings, ProjectType, SettingsType
+from edx_django_utils.plugins.constants import PluginSettings
+
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
 log = logging.getLogger(__name__)
 
