@@ -2669,7 +2669,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=747 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=749 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3240,8 +3240,6 @@ CREATE TABLE `enterprise_enterprisecustomerbrandingconfiguration` (
   `modified` datetime(6) NOT NULL,
   `logo` varchar(255) DEFAULT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
-  `banner_background_color` varchar(7) DEFAULT NULL,
-  `banner_border_color` varchar(7) DEFAULT NULL,
   `primary_color` varchar(7) DEFAULT NULL,
   `secondary_color` varchar(7) DEFAULT NULL,
   `tertiary_color` varchar(7) DEFAULT NULL,
