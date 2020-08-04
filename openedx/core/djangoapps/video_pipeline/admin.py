@@ -34,7 +34,7 @@ class VEMPipelineIntegrationAdmin(ConfigurationModelAdmin):
 
 
 admin.site.register(VideoPipelineIntegration, ConfigurationModelAdmin)
-admin.site.register(VEMPipelineIntegration, VEMPipelineIntegrationAdmin)
+admin.site.register(VEMPipelineIntegration, ConfigurationModelAdmin)
 
 admin.site.register(VideoUploadsEnabledByDefault, ConfigurationModelAdmin)
 admin.site.register(CourseVideoUploadsEnabledByDefault, CourseVideoUploadsEnabledByDefaultAdmin)
