@@ -10,4 +10,5 @@ imgkit==1.0.1
 pdfkit==0.6.1
 -e git+https://github.com/philanthropy-u/xblock-poll#egg=xblock-poll
 -e git+https://github.com/philanthropy-u/edx-notifications.git@9c602923d0e8a7b512a52bc4d0df5c7043286386#egg=edx-notifications
+openedx-scorm-xblock==9.2.0
 django-multiselectfield==0.1.12
