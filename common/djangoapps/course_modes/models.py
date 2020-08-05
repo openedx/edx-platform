@@ -177,13 +177,6 @@ class CourseMode(models.Model):
     # Modes that are allowed to upsell
     UPSELL_TO_VERIFIED_MODES = [HONOR, AUDIT]
 
-    # Courses purchased through the shoppingcart
-    # should be "honor". Since we've changed the DEFAULT_MODE_SLUG from
-    # "honor" to "audit", we still need to have the shoppingcart
-    # use "honor"
-    DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
-    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
-
     CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
 
     class Meta(object):

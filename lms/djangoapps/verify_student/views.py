@@ -400,12 +400,7 @@ class PayAndVerifyView(View):
         verification_good_until = self._verification_valid_until(request.user)
 
         # get available payment processors
-        if relevant_course_mode.sku:
-            # transaction will be conducted via ecommerce service
-            processors = ecommerce_api_client(request.user).payment.processors.get()
-        else:
-            # transaction will be conducted using legacy shopping cart
-            processors = [settings.CC_PROCESSOR_NAME]
+        processors = ecommerce_api_client(request.user).payment.processors.get()
 
         # Render the top-level page
         context = {

@@ -74,8 +74,6 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
-FEATURES['ENABLE_SHOPPING_CART'] = True
-
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 
 # Toggles embargo on for testing
@@ -276,27 +274,6 @@ OAUTH_ENFORCE_SECURE = False
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
-
-###################### Payment ##############################3
-# Enable fake payment processing page
-FEATURES['ENABLE_PAYMENT_FAKE'] = True
-
-# Configure the payment processor to use the fake processing page
-# Since both the fake payment page and the shoppingcart app are using
-# the same settings, we can generate this randomly and guarantee
-# that they are using the same secret.
-RANDOM_SHARED_SECRET = ''.join(
-    choice(ascii_letters + digits + punctuation)
-    for x in range(250)
-)
-
-CC_PROCESSOR_NAME = 'CyberSource2'
-CC_PROCESSOR['CyberSource2']['SECRET_KEY'] = RANDOM_SHARED_SECRET
-CC_PROCESSOR['CyberSource2']['ACCESS_KEY'] = "0123456789012345678901"
-CC_PROCESSOR['CyberSource2']['PROFILE_ID'] = "edx"
-CC_PROCESSOR['CyberSource2']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
-
-FEATURES['STORE_BILLING_INFO'] = True
 
 ########################### SYSADMIN DASHBOARD ################################
 FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
