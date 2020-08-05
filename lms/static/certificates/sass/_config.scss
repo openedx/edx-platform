@@ -70,7 +70,7 @@ $font-path: '../../certificates/fonts';
   src: url('#{$font-path}/OpenSans/OpenSans-Regular-webfont.woff');
   src:
     url('#{$font-path}/OpenSans/OpenSans-Regular-webfont.woff2') format('woff2'),
-    url('#{$font-path}/OpenSansOpenSans-Regular-webfont.ttf') format('truetype');
+    url('#{$font-path}/OpenSans/OpenSans-Regular-webfont.ttf') format('truetype');
 }
 
 @font-face {
