@@ -40,14 +40,17 @@ from student.views import create_account_with_params
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
+    unenroll_email,
     # get_user_email_language,
     # send_beta_role_email,
     # send_mail_to_student,
-    # unenroll_email
 )
 
 from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
-from openedx.core.djangoapps.appsembler.api.v1.api import enroll_learners_in_course
+from openedx.core.djangoapps.appsembler.api.v1.api import (
+    enroll_learners_in_course,
+    unenroll_learners_in_course,
+)
 from openedx.core.djangoapps.appsembler.api.v1.filters import (
     CourseEnrollmentFilter,
     CourseOverviewFilter,
@@ -336,7 +339,7 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                 response_code = status.HTTP_400_BAD_REQUEST
             else:
                 action = serializer.data.get('action')
-                if action == 'enroll':
+                if action in {'enroll', 'unenroll'}:
                     # Do bulk enrollment
                     email_learners = serializer.data.get('email_learners')
                     identifiers = serializer.data.get('identifiers')
@@ -349,13 +352,32 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                                                             secure=request.is_secure())
                         else:
                             email_params = {}
-                        results = enroll_learners_in_course(course_id=course_key,
-                                                            identifiers=identifiers,
-                                                            enroll_func=partial(enroll_email,
-                                                                                auto_enroll=auto_enroll,
-                                                                                email_students=email_learners,
-                                                                                email_params=email_params),
-                                                            request_user=request.user)
+
+                        if action == 'enroll':
+                            results = enroll_learners_in_course(
+                                course_id=course_key,
+                                identifiers=identifiers,
+                                enroll_func=partial(
+                                    enroll_email,
+                                    auto_enroll=auto_enroll,
+                                    email_students=email_learners,
+                                    email_params=email_params,
+                                ),
+                                request_user=request.user,
+                            )
+                            response_code = status.HTTP_201_CREATED
+                        else:
+                            results = unenroll_learners_in_course(
+                                course_id=course_key,
+                                identifiers=identifiers,
+                                unenroll_func=partial(
+                                    unenroll_email,
+                                    email_students=email_learners,
+                                    email_params=email_params,
+                                ),
+                                request_user=request.user,
+                            )
+                            response_code = status.HTTP_200_OK
 
                     response_data = {
                         'auto_enroll': serializer.data.get('auto_enroll'),
@@ -364,10 +386,8 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                         'courses': serializer.data.get('courses'),
                         'results': results,
                     }
-                    response_code = status.HTTP_201_CREATED
                 else:
-                    # Only 'enroll' is supported. Will add 'unenroll' as follow
-                    # on work
+                    # Only 'enroll' and 'unenroll` are supported.
                     response_data = {
                         'error': 'action-not-supported',
                         'action_not_supported': action

@@ -21,6 +21,10 @@ from student.models import (
     DEFAULT_TRANSITION_STATE,
     UNENROLLED_TO_ENROLLED,
     UNENROLLED_TO_ALLOWEDTOENROLL,
+    ENROLLED_TO_UNENROLLED,
+    ALLOWEDTOENROLL_TO_UNENROLLED,
+    UNENROLLED_TO_UNENROLLED,
+    CourseEnrollment,
     ManualEnrollmentAudit
 )
 
@@ -31,6 +35,37 @@ from organizations.models import (
 
 
 log = logging.getLogger(__name__)
+
+
+def enrollment_learners_context(course_id, identifiers):
+    """
+    Get emails (and learner language) from a list of learner identifiers.
+    :param course_id: The course ID.
+    :param identifiers: list of usernames/emails of students.
+    :return: iterator of tuples
+        (
+            user: User: The User object if found,
+            identifier: string: The dentifier as-is,
+            email: string: Learner email by the identifier,
+            language: string: Learner language,
+        )
+    """
+    # Ensuring the course is linked to an organization
+    _site = get_site_for_course(course_id)
+    _org = OrganizationCourse.objects.get(course_id=str(course_id))
+
+    for identifier in identifiers:
+        language = None
+        user = None
+        try:
+            user = get_student_from_identifier(identifier)
+        except User.DoesNotExist:
+            email = identifier
+        else:
+            email = user.email
+            language = get_user_email_language(user)
+
+        yield user, email, identifier, language
 
 
 def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
@@ -51,9 +86,6 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
     ## Future Design and considerations
     - We want to decouple concerns
         - email notification is a seperate method or class
-
-    - Move the inner code it's own function. Probably make the outer an iterator
-      on the identifiers
     """
 
     reason = kwargs.get('reason', u'')
@@ -61,24 +93,11 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
     role = kwargs.get('role')
 
     results = []
-    site = get_site_for_course(course_id)
-    org = OrganizationCourse.objects.get(course_id=str(course_id))
 
     enrollment_obj = None
     state_transition = DEFAULT_TRANSITION_STATE
 
-    for identifier in identifiers:
-        user = None
-        email = None
-        language = None
-        try:
-            user = get_student_from_identifier(identifier)
-        except User.DoesNotExist:
-            email = identifier
-        else:
-            email = user.email
-            language = get_user_email_language(user)
-
+    for user, identifier, email, language in enrollment_learners_context(course_id, identifiers):
         try:
             # Use django.core.validators.validate_email to check email address
             # validity (obviously, cannot check if email actually /exists/,
@@ -120,6 +139,76 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
             log.exception(u"Error while enrolling student")
+            results.append({
+                'identifier': identifier,
+                'error': True,
+                'error_message': str(exc),
+            })
+        else:
+            ManualEnrollmentAudit.create_manual_enrollment_audit(
+                request_user, email, state_transition, reason, enrollment_obj, role
+            )
+            results.append({
+                'identifier': identifier,
+                'before': before.to_dict(),
+                'after': after.to_dict(),
+            })
+    return results
+
+
+def unenroll_learners_in_course(course_id, identifiers, unenroll_func, **kwargs):
+    """
+    Unenroll learners via email or username in a course.
+
+    This function assumes that the site has been verified to own this course
+
+    This method is a quick hack. It copies from the existing appsembler_api
+    from Ginkgo. See:
+        lms/djangoapps/instructor/views/api.py:students_update_enrollment
+
+    TODO: There's some repetition between the functions {enroll,unenroll}_learners_in_course.
+          The issue is that `students_update_enrollment` isn't very modular.
+          We need to refactor both of our and edX's functions to avoid having
+          the `appsembler/api/v1/api.py` module altogether.
+    """
+    reason = kwargs.get('reason', u'')
+    request_user = kwargs.get('request_user')
+    role = kwargs.get('role')
+    results = []
+    enrollment_obj = None
+
+    for user, identifier, email, language in enrollment_learners_context(course_id, identifiers):
+        try:
+            validate_email(email)  # Raises ValidationError if invalid
+            before, after = unenroll_func(
+                course_id=course_id,
+                student_email=email,
+            )
+            before_enrollment = before.to_dict()['enrollment']
+            before_allowed = before.to_dict()['allowed']
+            enrollment_obj = CourseEnrollment.get_enrollment(user, course_id) if user else None
+
+            if before_enrollment:
+                state_transition = ENROLLED_TO_UNENROLLED
+            else:
+                if before_allowed:
+                    state_transition = ALLOWEDTOENROLL_TO_UNENROLLED
+                else:
+                    state_transition = UNENROLLED_TO_UNENROLLED
+        except ValidationError:
+            # Flag this email as an error if invalid, but continue checking
+            # the remaining in the list
+            results.append({
+                'identifier': identifier,
+                'invalidIdentifier': True,
+            })
+
+        # TODO: Broad except is an anti-pattern that we should not be using:
+        #       See: https://realpython.com/the-most-diabolical-python-antipattern/
+        except Exception as exc:  # pylint: disable=broad-except
+            # catch and log any exceptions
+            # so that one error doesn't cause a 500.
+            log.exception(u"Error while unenrolling student")
             results.append({
                 'identifier': identifier,
                 'error': True,
