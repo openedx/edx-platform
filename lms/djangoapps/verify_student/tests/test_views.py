@@ -1002,7 +1002,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 class CheckoutTestMixin(object):
     """
     Mixin implementing test methods that should behave identically regardless
-    of which backend is used (shoppingcart or ecommerce service).  Subclasses
+    of which backend is used (currently only the ecommerce service).  Subclasses
     immediately follow for each backend, which inherit from TestCase and
     define methods needed to customize test parameters, and patch the
     appropriate checkout method.
