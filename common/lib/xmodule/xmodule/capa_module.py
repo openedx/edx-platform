@@ -307,25 +307,14 @@ class ProblemBlock(
         """
         Return dictionary prepared with module content and type for indexing.
         """
-        def _make_optionresponse_indexable(xml_content):
-            """
-            Extract options from dropdown and replace the actual xml for optionresponse with them.
-            """
-            xml_content_copy = xml_content[:]
-            root = etree.fromstring(xml_content_copy)
-            for option_response in root.findall("optionresponse"):
-                option_response_xml = etree.tostring(option_response, method="html").decode("utf-8")
-                option_input = option_response.find("optioninput")
-                if option_input is not None and "options" in option_input:
-                    option_input_attrib = option_input.get("options", "")
-                    option_input_attrib = "[" + option_input_attrib.strip("()").replace("'", '"') + "]"
-                    values_of_dropdown = ", ".join(json.loads(option_input_attrib))
-                    xml_content_copy = xml_content_copy.replace(option_response_xml, values_of_dropdown)
-            return xml_content_copy
-
         xblock_body = super(ProblemBlock, self).index_dictionary()
 
-        capa_content = _make_optionresponse_indexable(self.data)
+        # Make optioninput's options index friendly by replacing the actual tag with the values
+        capa_content = re.sub(
+            r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>',
+            lambda matched: matched.group(1).replace("'", '').replace(",", ", ") if matched.group(1) else None,
+            self.data
+        )
 
         # Removing solutions and hints, as well as script and style
         capa_content = re.sub(
