@@ -23,7 +23,9 @@ class WordCloudBlockTest(TestCase):
     raw_field_data = {
         'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
         'top_words': {'cat': 10, 'dog': 5, 'dad': 2},
-        'submitted': False
+        'submitted': False,
+        'display_name': 'Word Cloud Block',
+        'instructions': 'Enter some random words that comes to your mind'
     }
 
     def test_xml_import_export_cycle(self):
@@ -102,3 +104,21 @@ class WordCloudBlockTest(TestCase):
         )
 
         self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']))
+
+    def test_indexibility(self):
+        """
+        Test indexibility of Word Cloud
+        """
+
+        module_system = get_test_system()
+        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        self.assertEqual(
+            block.index_dictionary(),
+            {
+                'content_type': 'Word Cloud',
+                'content': {
+                    'display_name': 'Word Cloud Block',
+                    'instructions': 'Enter some random words that comes to your mind'
+                }
+            }
+        )
