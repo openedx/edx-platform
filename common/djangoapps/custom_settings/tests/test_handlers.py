@@ -9,7 +9,7 @@ from openedx.features.philu_utils.py_test import does_not_raise
 
 @pytest.mark.django_db
 @pytest.mark.parametrize('created', [False, True])
-def test_get_course_open_date_from_settings(created):
+def test_initialize_course_settings(created):
     """Assert that CustomSettings and CourseMode objects are created when handler is called"""
     course_overview = CourseOverviewFactory(display_name='test_overview')
 
