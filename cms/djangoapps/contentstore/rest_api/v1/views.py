@@ -61,7 +61,6 @@ class ProctoredExamSettingsView(APIView):
                 "proctortrack"
             ],
             "course_start_date": "2013-02-05T05:00:00Z",
-            "is_staff": true
         }
 
     ------------------------------------------------------------------------------------
@@ -101,7 +100,6 @@ class ProctoredExamSettingsView(APIView):
             data['proctored_exam_settings'] = proctored_exam_settings
             data['available_proctoring_providers'] = get_available_providers()
             data['course_start_date'] = course_metadata['start'].get('value')
-            data['is_staff'] = request.user.is_staff
 
             serializer = ProctoredExamConfigurationSerializer(data)
 

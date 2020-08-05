@@ -98,7 +98,6 @@ class ProctoringExamSettingsGetTests(ProctoringExamSettingsTestMixin, ModuleStor
             },
             'course_start_date': '2030-01-01T00:00:00Z',
             'available_proctoring_providers': ['null'],
-            'is_staff': user.is_staff,
         }
 
     def make_request(self, course_id=None, data=None):
@@ -196,7 +195,7 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         data = self.get_request_data(
             enable_proctored_exams=True,
             proctoring_provider='test_proctoring_provider',
-            proctoring_escalation_email=''
+            proctoring_escalation_email=None
         )
         response = self.make_request(data=data)
 
