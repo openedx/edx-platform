@@ -307,7 +307,7 @@ unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
 urllib3==1.25.10          # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/testing.txt
-virtualenv==20.0.29       # via -r requirements/edx/testing.txt, tox
+virtualenv==20.0.30       # via -r requirements/edx/testing.txt, tox
 voluptuous==0.11.7        # via -r requirements/edx/testing.txt, ora2
 vulture==1.6              # via -r requirements/edx/development.in
 watchdog==0.10.3          # via -r requirements/edx/testing.txt
