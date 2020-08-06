@@ -3,16 +3,22 @@
     display: block;
     border-radius: 2px;
     border: solid 1px #0175b4;
-    background: white;
-    color: #2d323e;
     font-size: 14px;
     font-weight: bold;
     line-height: 24px;
+
+    // if you change colors here, modify them in hover block below too
+    background: white;
+    color: #2d323e;
 
     &:hover,
     &:focus,
     &:active {
       box-shadow: 0 2px 1px $shadow;
+
+      // re-specify colors to overwrite any styling from our reset styles
+      background: white;
+      color: #2d323e;
     }
   }
 
