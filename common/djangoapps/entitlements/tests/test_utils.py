@@ -155,14 +155,15 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
 
         assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
-    def test_course_run_fulfillable_enrollment_ended_upgrade_open(self):
+    def test_course_run_fulfillable_already_enrolled_course_ended(self):
         course_overview = self.create_course(
             start_from_now=-3,
-            end_from_now=2,
+            end_from_now=-1,
             enrollment_start_from_now=-2,
             enrollment_end_from_now=-1,
         )
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+        CourseEnrollmentFactory.create(user=entitlement.user, course_id=course_overview.id)
 
         assert is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
