@@ -66,12 +66,30 @@ def convert_exceptions(fn):
     return wrapped_fn
 
 
-class LibraryRootPagination(PageNumberPagination):
+class LibraryApiPagination(PageNumberPagination):
     """
     Paginates over ContentLibraryMetadata objects.
     """
     page_size = 50
     page_size_query_param = 'page_size'
+
+    apidoc_params = [
+        apidocs.query_parameter(
+            'pagination',
+            bool,
+            description="Enables paginated schema",
+        ),
+        apidocs.query_parameter(
+            'page',
+            int,
+            description="Page number of result. Defaults to 1",
+        ),
+        apidocs.query_parameter(
+            'page_size',
+            int,
+            description="Page size of the result. Defaults to 50",
+        ),
+    ]
 
 
 @view_auth_classes()
@@ -82,21 +100,7 @@ class LibraryRootView(APIView):
 
     @apidocs.schema(
         parameters=[
-            apidocs.query_parameter(
-                'pagination',
-                bool,
-                description="Enables paginated schema",
-            ),
-            apidocs.query_parameter(
-                'page',
-                int,
-                description="Page number of result. Defaults to 1",
-            ),
-            apidocs.query_parameter(
-                'page_size',
-                int,
-                description="Page size of the result. Defaults to 50",
-            ),
+            *LibraryApiPagination.apidoc_params,
             apidocs.query_parameter(
                 'org',
                 str,
@@ -116,7 +120,7 @@ class LibraryRootView(APIView):
         org = request.query_params.get('org', None)
         text_search = request.query_params.get('text_search', None)
 
-        paginator = LibraryRootPagination()
+        paginator = LibraryApiPagination()
         queryset = api.get_libraries_for_user(request.user, org=org)
         if text_search:
             result = api.get_metadata_from_index(queryset, text_search=text_search)
@@ -407,14 +411,35 @@ class LibraryBlocksView(APIView):
     """
     Views to work with XBlocks in a specific content library.
     """
+    @apidocs.schema(
+        parameters=[
+            *LibraryApiPagination.apidoc_params,
+            apidocs.query_parameter(
+                'text_search',
+                str,
+                description="The string used to filter libraries by searching in title, id, org, or description",
+            ),
+        ],
+    )
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
         Get the list of all top-level blocks in this content library
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
+        text_search = request.query_params.get('text_search', None)
+
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        result = api.get_library_blocks(key)
+        result = api.get_library_blocks(key, text_search=text_search)
+
+        # Verify `pagination` param to maintain compatibility with older
+        # non pagination-aware clients
+        if request.GET.get('pagination', 'false').lower() == 'true':
+            paginator = LibraryApiPagination()
+            result = paginator.paginate_queryset(result, request)
+            serializer = LibraryXBlockMetadataSerializer(result, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
         return Response(LibraryXBlockMetadataSerializer(result, many=True).data)
 
     @convert_exceptions

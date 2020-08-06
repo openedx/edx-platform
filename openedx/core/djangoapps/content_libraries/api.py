@@ -58,7 +58,11 @@ from xblock.exceptions import XBlockNotFoundError
 from openedx.core.djangoapps.content_libraries import permissions
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
-from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, ItemNotIndexedException
+from openedx.core.djangoapps.content_libraries.libraries_index import (
+    ContentLibraryIndexer,
+    LibraryBlockIndexer,
+    ItemNotIndexedException,
+)
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary, ContentLibraryPermission
 from openedx.core.djangoapps.content_libraries.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -497,28 +501,58 @@ def delete_library(library_key):
         raise
 
 
-def get_library_blocks(library_key):
+def get_library_blocks(library_key, text_search=None):
     """
     Get the list of top-level XBlocks in the specified library.
 
     Returns a list of LibraryXBlockMetadata objects
     """
+    metadata = None
     ref = ContentLibrary.objects.get_by_key(library_key)
     lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
     usages = lib_bundle.get_top_level_usages()
-    blocks = []
-    for usage_key in usages:
-        # For top-level definitions, we can go from definition key to usage key using the following, but this would not
-        # work for non-top-level blocks as they may have multiple usages. Top level blocks are guaranteed to have only
-        # a single usage in the library, which is part of the definition of top level block.
-        def_key = lib_bundle.definition_for_usage(usage_key)
-        blocks.append(LibraryXBlockMetadata(
-            usage_key=usage_key,
-            def_key=def_key,
-            display_name=get_block_display_name(def_key),
-            has_unpublished_changes=lib_bundle.does_definition_have_unpublished_changes(def_key),
-        ))
-    return blocks
+
+    if LibraryBlockIndexer.indexing_is_enabled():
+        try:
+            metadata = [
+                {
+                    **item,
+                    "id": LibraryUsageLocatorV2.from_string(item['id']),
+                }
+                for item in LibraryBlockIndexer.get_items(usages, text_search=text_search)
+                if item is not None
+            ]
+        except (ItemNotIndexedException, KeyError, ConnectionError) as e:
+            log.exception(e)
+
+    # If indexing is disabled, or connection to elastic failed
+    if metadata is None:
+        metadata = []
+        for usage_key in usages:
+            # For top-level definitions, we can go from definition key to usage key using the following, but this would not
+            # work for non-top-level blocks as they may have multiple usages. Top level blocks are guaranteed to have only
+            # a single usage in the library, which is part of the definition of top level block.
+            def_key = lib_bundle.definition_for_usage(usage_key)
+            display_name = get_block_display_name(def_key)
+            if (text_search is None or
+                    text_search.lower() in display_name.lower() or
+                    text_search.lower() in str(usage_key).lower()):
+                metadata.append({
+                    "id": usage_key,
+                    "def_key": def_key,
+                    "display_name": display_name,
+                    "has_unpublished_changes": lib_bundle.does_definition_have_unpublished_changes(def_key),
+                })
+
+    return [
+        LibraryXBlockMetadata(
+            usage_key=item['id'],
+            def_key=item['def_key'],
+            display_name=item['display_name'],
+            has_unpublished_changes=item['has_unpublished_changes'],
+        )
+        for item in metadata
+    ]
 
 
 def _lookup_usage_key(usage_key):

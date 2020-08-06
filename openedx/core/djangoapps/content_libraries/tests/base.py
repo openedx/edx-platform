@@ -221,9 +221,16 @@ class ContentLibrariesRestApiTest(APITestCase):
         else:
             return self._api('put', url, {"access_level": access_level}, expect_response)
 
-    def _get_library_blocks(self, lib_key, expect_response=200):
+    def _get_library_blocks(self, lib_key, query_params_dict=None, expect_response=200):
         """ Get the list of XBlocks in the library """
-        return self._api('get', URL_LIB_BLOCKS.format(lib_key=lib_key), None, expect_response)
+        if query_params_dict is None:
+            query_params_dict = {}
+        return self._api(
+            'get',
+            URL_LIB_BLOCKS.format(lib_key=lib_key) + '?' + urlencode(query_params_dict),
+            None,
+            expect_response
+        )
 
     def _add_block_to_library(self, lib_key, block_type, slug, parent_block=None, expect_response=200):
         """ Add a new XBlock to the library """

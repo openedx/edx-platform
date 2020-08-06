@@ -89,7 +89,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         self._create_library(slug="Invalid Slug!", title="Library with Bad Slug", expect_response=400)
 
     @ddt.data(True, False)
-    @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootPagination.page_size", new=2)
+    @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)
     def test_list_library(self, is_indexing_enabled):
         """
         Test the /libraries API and its pagination
@@ -246,6 +246,59 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         self.assertEqual(self._get_library_block_olx(block_id), orig_olx)
 
         # fin
+
+    @ddt.data(True, False)
+    @patch("openedx.core.djangoapps.content_libraries.views.LibraryApiPagination.page_size", new=2)
+    def test_list_library_blocks(self, is_indexing_enabled):
+        """
+        Test the /libraries/{lib_key_str}/blocks API and its pagination
+        """
+        features = settings.FEATURES
+        features['ENABLE_CONTENT_LIBRARY_INDEX'] = is_indexing_enabled
+        with override_settings(FEATURES=features):
+            lib = self._create_library(slug="list_blocks-slug" + str(is_indexing_enabled), title="Library 1")
+            block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
+            block2 = self._add_block_to_library(lib["id"], "unit", "unit1")
+            self._add_block_to_library(lib["id"], "problem", "problem2", parent_block=block2["id"])
+
+            result = self._get_library_blocks(lib["id"])
+            self.assertEqual(len(result), 2)
+            self.assertIn(block1, result)
+
+            result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
+            self.assertEqual(len(result['results']), 2)
+            self.assertEqual(result['next'], None)
+
+            self._add_block_to_library(lib["id"], "problem", "problem3")
+            # Test pagination
+            result = self._get_library_blocks(lib["id"])
+            self.assertEqual(len(result), 3)
+            result = self._get_library_blocks(lib["id"], {'pagination': 'true'})
+            self.assertEqual(len(result['results']), 2)
+            self.assertIn('page=2', result['next'])
+            self.assertIn('pagination=true', result['next'])
+            result = self._get_library_blocks(lib["id"], {'pagination': 'true', 'page': '2'})
+            self.assertEqual(len(result['results']), 1)
+            self.assertEqual(result['next'], None)
+
+    @ddt.data(True, False)
+    def test_library_blocks_filters(self, is_indexing_enabled):
+        """
+        Test the filters in the list libraries API
+        """
+        features = settings.FEATURES
+        features['ENABLE_CONTENT_LIBRARY_INDEX'] = is_indexing_enabled
+        with override_settings(FEATURES=features):
+            lib = self._create_library(slug="test-lib-blocks" + str(is_indexing_enabled), title="Title")
+            block1 = self._add_block_to_library(lib["id"], "problem", "foo-bar")
+            block2 = self._add_block_to_library(lib["id"], "problem", "foo-baz")
+            block3 = self._add_block_to_library(lib["id"], "problem", "bar-baz")
+
+            self._set_library_block_olx(block1["id"], "<problem display_name=\"DisplayName\"></problem>")
+
+            self.assertEqual(len(self._get_library_blocks(lib["id"])), 3)
+            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Foo'})), 2)
+            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Display'})), 1)
 
     def test_library_blocks_with_hierarchy(self):
         """

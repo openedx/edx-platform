@@ -72,7 +72,7 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
     """
     id = serializers.CharField(source="usage_key", read_only=True)
     def_key = serializers.CharField(read_only=True)
-    block_type = serializers.CharField(source="def_key.block_type")
+    block_type = serializers.CharField(source="usage_key.block_type")
     display_name = serializers.CharField(read_only=True)
     has_unpublished_changes = serializers.BooleanField(read_only=True)
     # When creating a new XBlock in a library, the slug becomes the ID part of
