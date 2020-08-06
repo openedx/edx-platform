@@ -55,7 +55,7 @@ django-config-models==2.0.2  # via -r requirements/edx/base.in, edx-enterprise
 django-cookies-samesite==0.6.6  # via -r requirements/edx/base.in
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-enterprise
-django-crum==0.7.6        # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring, edx-rbac, super-csv
+django-crum==0.7.6       # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring, edx-rbac, super-csv
 django-fernet-fields==0.6  # via -r requirements/edx/base.in, edx-enterprise, edxval
 django-filter==2.3.0      # via -r requirements/edx/base.in, edx-enterprise
 django-ipware==2.1.0      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, edx-enterprise, edx-proctoring
@@ -167,7 +167,7 @@ oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requi
 openedx-calc==1.0.9       # via -r requirements/edx/base.in
 ora2==2.8.9               # via -r requirements/edx/base.in
 packaging==20.4           # via bleach, drf-yasg
-path.py==12.5.0           # via edx-enterprise, edx-i18n-tools, ora2, xmodule
+path.py==12.5.0           # via edx-enterprise, edx-i18n-tools, ora2, staff-graded-xblock, xmodule
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, path.py
 pathtools==0.1.2          # via -r requirements/edx/paver.txt, watchdog
 paver==1.3.4              # via -r requirements/edx/paver.txt
@@ -224,7 +224,7 @@ sorl-thumbnail==12.6.3    # via -r requirements/edx/base.in, django-wiki
 sortedcontainers==2.2.2   # via -r requirements/edx/base.in, pdfminer.six
 soupsieve==2.0.1          # via beautifulsoup4
 sqlparse==0.3.1           # via -r requirements/edx/base.in, django
-staff-graded-xblock==0.8  # via -r requirements/edx/base.in
+staff-graded-xblock==0.9  # via -r requirements/edx/base.in
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, code-annotations, edx-ace, edx-enterprise, edx-opaque-keys
 super-csv==0.9.9          # via -r requirements/edx/base.in, edx-bulk-grades
 sympy==1.6.1              # via symmath
