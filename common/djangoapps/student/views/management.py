@@ -1251,18 +1251,6 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         meta['old_emails'].append([user.email, datetime.datetime.now(UTC).isoformat()])
         u_prof.set_meta(meta)
         u_prof.save()
-        # Send it to the old email...
-        try:
-            user.email_user(
-                subject,
-                message,
-                configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-            )
-        except Exception:    # pylint: disable=broad-except
-            log.warning('Unable to send confirmation email to old address', exc_info=True)
-            response = render_to_response("email_change_failed.html", {'email': user.email})
-            transaction.set_rollback(True)
-            return response
 
         user.email = pec.new_email
         # We are making user active to cater edge case. If newly registered user requests to update email address
@@ -1270,18 +1258,6 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         user.is_active = True
         user.save()
         pec.delete()
-        # And send it to the new email...
-        try:
-            user.email_user(
-                subject,
-                message,
-                configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-            )
-        except Exception:  # pylint: disable=broad-except
-            log.warning('Unable to send confirmation email to new address', exc_info=True)
-            response = render_to_response("email_change_failed.html", {'email': pec.new_email})
-            transaction.set_rollback(True)
-            return response
 
         response = render_to_response("email_change_successful.html", address_context)
         return response
