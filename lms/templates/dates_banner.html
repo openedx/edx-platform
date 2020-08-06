@@ -34,9 +34,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app and not is_learning_mfe 
                 <div class="banner-cta-button">
                     <form method="post" action="${reset_deadlines_url}">
                         <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                        <input type="hidden" name="reset_deadlines_redirect_url_base" value="${reset_deadlines_redirect_url_base}">
-                        <input type="hidden" name="reset_deadlines_redirect_url_id_dict" value="${reset_deadlines_redirect_url_id_dict}">
-                        <input type="hidden" name="is_learning_mfe" value="${is_learning_mfe or False}">
+                        <input type="hidden" name="course_id" value="${course.id}">
                         <button class="btn">${_("Shift due dates")}</button>
                     </form>
                 </div>
