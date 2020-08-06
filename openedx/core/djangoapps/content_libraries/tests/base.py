@@ -56,12 +56,12 @@ def elasticsearch_test(func):
             'host': settings.TEST_ELASTICSEARCH_HOST,
             'port': settings.TEST_ELASTICSEARCH_PORT,
         }])(func)
-        func = patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SEARCH_KWARGS", new={
+        func = patch("openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase.SEARCH_KWARGS", new={
             'refresh': 'wait_for'
         })(func)
         return func
     else:
-        return patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SEARCH_KWARGS", new={})(func)
+        return patch("openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase.SEARCH_KWARGS", new={})(func)
 
 
 @requires_blockstore

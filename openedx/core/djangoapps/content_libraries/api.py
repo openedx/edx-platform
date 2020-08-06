@@ -58,7 +58,7 @@ from xblock.exceptions import XBlockNotFoundError
 from openedx.core.djangoapps.content_libraries import permissions
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
-from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryNotIndexedException
+from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, ItemNotIndexedException
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary, ContentLibraryPermission
 from openedx.core.djangoapps.content_libraries.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -240,8 +240,8 @@ def get_metadata_from_index(queryset, text_search=None):
     if ContentLibraryIndexer.indexing_is_enabled():
         try:
             library_keys = [lib.library_key for lib in queryset]
-            metadata = ContentLibraryIndexer.get_libraries(library_keys, text_search=text_search)
-        except (LibraryNotIndexedException, KeyError, ElasticConnectionError) as e:
+            metadata = ContentLibraryIndexer.get_items(library_keys, text_search=text_search)
+        except (ItemNotIndexedException, KeyError, ElasticConnectionError) as e:
             log.exception(e)
 
     # If ContentLibraryIndex is not available, we query blockstore for a limited set of metadata
@@ -588,7 +588,7 @@ def set_library_block_olx(usage_key, new_olx_str):
     write_draft_file(draft.uuid, metadata.def_key.olx_path, new_olx_str.encode('utf-8'))
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(metadata.def_key.bundle_uuid, draft_name=DRAFT_NAME).clear()
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=usage_key.context_key)
+    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=usage_key.context_key, usage_key=usage_key)
 
 
 def create_library_block(library_key, block_type, definition_id):
@@ -630,7 +630,7 @@ def create_library_block(library_key, block_type, definition_id):
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(ref.bundle_uuid, draft_name=DRAFT_NAME).clear()
     # Now return the metadata about the new block:
-    LIBRARY_BLOCK_CREATED.send(sender=None, library_key=ref.library_key)
+    LIBRARY_BLOCK_CREATED.send(sender=None, library_key=ref.library_key, usage_key=usage_key)
     return get_library_block(usage_key)
 
 
@@ -683,7 +683,7 @@ def delete_library_block(usage_key, remove_from_parent=True):
         pass
     # Clear the bundle cache so everyone sees the deleted block immediately:
     lib_bundle.cache.clear()
-    LIBRARY_BLOCK_DELETED.send(sender=None, library_key=lib_bundle.library_key)
+    LIBRARY_BLOCK_DELETED.send(sender=None, library_key=lib_bundle.library_key, usage_key=usage_key)
 
 
 def create_library_block_child(parent_usage_key, block_type, definition_id):
@@ -755,7 +755,7 @@ def add_library_block_static_asset_file(usage_key, file_name, file_content):
     file_metadata = blockstore_cache.get_bundle_file_metadata_with_cache(
         bundle_uuid=def_key.bundle_uuid, path=file_path, draft_name=DRAFT_NAME,
     )
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key)
+    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key, usage_key=usage_key)
     return LibraryXBlockStaticFile(path=file_metadata.path, url=file_metadata.url, size=file_metadata.size)
 
 
@@ -776,7 +776,7 @@ def delete_library_block_static_asset_file(usage_key, file_name):
     write_draft_file(draft.uuid, file_path, contents=None)
     # Clear the bundle cache so everyone sees the new file immediately:
     lib_bundle.cache.clear()
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key)
+    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key, usage_key=usage_key)
 
 
 def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
@@ -903,7 +903,7 @@ def publish_changes(library_key):
         return  # If there is no draft, no action is needed.
     LibraryBundle(library_key, ref.bundle_uuid).cache.clear()
     LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
-    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key)
+    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key, update_blocks=True)
 
 
 def revert_changes(library_key):
@@ -919,4 +919,4 @@ def revert_changes(library_key):
     else:
         return  # If there is no draft, no action is needed.
     LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
-    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key)
+    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key, update_blocks=True)

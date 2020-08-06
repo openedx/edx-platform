@@ -7,7 +7,9 @@ from textwrap import dedent
 
 from django.core.management import BaseCommand
 from opaque_keys.edx.locator import LibraryLocatorV2
-from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer
+from openedx.core.djangoapps.content_libraries.api import DRAFT_NAME
+from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryBlockIndexer
+from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 
 from cms.djangoapps.contentstore.management.commands.prompt import query_yes_no
@@ -57,7 +59,8 @@ class Command(BaseCommand):
         if options['clear-all']:
             if options['force'] or query_yes_no(self.CONFIRMATION_PROMPT_CLEAR, default="no"):
                 logging.info("Removing all libraries from the index")
-                ContentLibraryIndexer.remove_all_libraries()
+                ContentLibraryIndexer.remove_all_items()
+                LibraryBlockIndexer.remove_all_items()
             return
 
         if options['all']:
@@ -70,4 +73,9 @@ class Command(BaseCommand):
             logging.info("Indexing libraries: {}".format(options['library_ids']))
             library_keys = list(map(LibraryLocatorV2.from_string, options['library_ids']))
 
-        ContentLibraryIndexer.index_libraries(library_keys)
+        ContentLibraryIndexer.index_items(library_keys)
+
+        for library_key in library_keys:
+            ref = ContentLibrary.objects.get_by_key(library_key)
+            lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
+            LibraryBlockIndexer.index_items(lib_bundle.get_all_usages())
