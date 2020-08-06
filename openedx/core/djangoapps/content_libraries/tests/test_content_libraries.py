@@ -134,9 +134,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         """
         Test the filters in the list libraries API
         """
-        features = settings.FEATURES
-        features['ENABLE_CONTENT_LIBRARY_INDEX'] = is_indexing_enabled
-        with override_settings(FEATURES=features):
+        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
             self._create_library(slug="test-lib1", title="Foo", description="Bar")
             self._create_library(slug="test-lib2", title="Library-Title-2", description="Bar2")
             self._create_library(slug="l3", title="Library-Title-3", description="Description")
@@ -253,12 +251,11 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         """
         Test the /libraries/{lib_key_str}/blocks API and its pagination
         """
-        features = settings.FEATURES
-        features['ENABLE_CONTENT_LIBRARY_INDEX'] = is_indexing_enabled
-        with override_settings(FEATURES=features):
+        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
             lib = self._create_library(slug="list_blocks-slug" + str(is_indexing_enabled), title="Library 1")
             block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
             block2 = self._add_block_to_library(lib["id"], "unit", "unit1")
+
             self._add_block_to_library(lib["id"], "problem", "problem2", parent_block=block2["id"])
 
             result = self._get_library_blocks(lib["id"])
@@ -286,13 +283,11 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         """
         Test the filters in the list libraries API
         """
-        features = settings.FEATURES
-        features['ENABLE_CONTENT_LIBRARY_INDEX'] = is_indexing_enabled
-        with override_settings(FEATURES=features):
+        with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
             lib = self._create_library(slug="test-lib-blocks" + str(is_indexing_enabled), title="Title")
             block1 = self._add_block_to_library(lib["id"], "problem", "foo-bar")
-            block2 = self._add_block_to_library(lib["id"], "problem", "foo-baz")
-            block3 = self._add_block_to_library(lib["id"], "problem", "bar-baz")
+            self._add_block_to_library(lib["id"], "problem", "foo-baz")
+            self._add_block_to_library(lib["id"], "problem", "bar-baz")
 
             self._set_library_block_olx(block1["id"], "<problem display_name=\"DisplayName\"></problem>")
 

@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from django.conf import settings
 from django.dispatch import receiver
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
-from search.elastic import ElasticSearchEngine, _translate_hits, _process_field_filters, RESERVED_CHARACTERS
+from search.elastic import _translate_hits, RESERVED_CHARACTERS
 from search.search_engine_base import SearchEngine
 from opaque_keys.edx.locator import LibraryUsageLocatorV2
 
@@ -28,16 +28,14 @@ log = logging.getLogger(__name__)
 MAX_SIZE = 10000  # 10000 is the maximum records elastic is able to return in a single result. Defaults to 10.
 
 
-class ItemNotIndexedException(Exception):
-    """
-    Item wasn't indexed in ElasticSearch
-    """
-
-
 class SearchIndexerBase(ABC):
+    """
+    Abstract Base Class for implementing library search indexers.
+    """
     INDEX_NAME = None
     DOCUMENT_TYPE = None
     ENABLE_INDEXING_KEY = None
+    SCHEMA_VERSION = 0
     SEARCH_KWARGS = {
         # Set this to True or 'wait_for' if immediate refresh is required after any update.
         # See elastic docs for more information.
@@ -61,67 +59,31 @@ class SearchIndexerBase(ABC):
         return searcher.index(cls.DOCUMENT_TYPE, items, **cls.SEARCH_KWARGS)
 
     @classmethod
-    def search(cls, **kwargs):
+    def get_items(cls, ids=None, filter_terms=None, text_search=None):
         """
-        Search the index with the given kwargs
+        Retrieve a list of items from the index.
+        Arguments:
+            ids - List of ids to be searched for in the index
+            filter_terms - Dictionary of filters to be applied
+            text_search - String which is used to do a text search in the supported indexes.
         """
-        searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
-        response = searcher.search(doc_type=cls.DOCUMENT_TYPE, field_dictionary=kwargs, size=MAX_SIZE)
-        return sorted(response["results"], key=lambda i: i['data']["id"])
-
-    @classmethod
-    def get_items(cls, ids, text_search=None):
-        """
-        Retrieve a list of items from the index
-        """
-        searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
-        ids_str = [str(i) for i in ids]
-
-        response = searcher.search(
-            doc_type=cls.DOCUMENT_TYPE,
-            field_dictionary={
-                "id": ids_str,
-                "schema_version": cls.SCHEMA_VERSION
-            },
-            size=MAX_SIZE,
-        )
-        if len(response["results"]) != len(ids_str):
-            missing = set(ids_str) - set([result["data"]["id"] for result in response["results"]])
-            missing = set(ids_str) - set([result["data"]["id"] for result in response["results"]])
-            raise ItemNotIndexedException("Keys not found in index: {}".format(missing))
+        if filter_terms is None:
+            filter_terms = {}
+        if ids is not None:
+            filter_terms = {
+                "id": [str(item) for item in ids],
+                "schema_version": [cls.SCHEMA_VERSION],
+                **filter_terms,
+            }
 
         if text_search:
-            # Elastic is hit twice if text_search is valid
-            # Once above to identify unindexed libraries, and now to filter with text_search
-            if isinstance(searcher, ElasticSearchEngine):
-                response = _translate_hits(searcher._es.search(
-                    doc_type=cls.DOCUMENT_TYPE,
-                    index=searcher.index_name,
-                    body=cls.build_elastic_query(ids_str, text_search),
-                    size=MAX_SIZE
-                ))
-            else:
-                # This is used only for running tests. TODO: Remove this and use elasticsearch in tests.
-                response = searcher.search(
-                    doc_type=cls.DOCUMENT_TYPE,
-                    field_dictionary={"id": ids_str},
-                    query_string=text_search,
-                    size=MAX_SIZE
-                )
+            response = cls._perform_elastic_search(filter_terms, text_search)
+        else:
+            searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
+            response = searcher.search(doc_type=cls.DOCUMENT_TYPE, field_dictionary=filter_terms, size=MAX_SIZE)
 
-        # Search results may not retain the original order of keys - we use this
-        # dict to construct a list in the original order of ids
-        response_dict = {
-            result["data"]["id"]: result["data"]
-            for result in response["results"]
-        }
-
-        return [
-            response_dict[key]
-            if key in response_dict
-            else None
-            for key in ids_str
-        ]
+        response = [result["data"] for result in response["results"]]
+        return sorted(response, key=lambda i: i["id"])
 
     @classmethod
     def remove_items(cls, ids):
@@ -149,16 +111,37 @@ class SearchIndexerBase(ABC):
         """
         return settings.FEATURES.get(cls.ENABLE_INDEXING_KEY, False)
 
+    @classmethod
+    def _perform_elastic_search(cls, filter_terms, text_search):
+        """
+        Build a query and search directly on elasticsearch
+        """
+        searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
+        return _translate_hits(searcher._es.search(  # pylint: disable=protected-access
+            doc_type=cls.DOCUMENT_TYPE,
+            index=searcher.index_name,
+            body=cls.build_elastic_query(filter_terms, text_search),
+            size=MAX_SIZE
+        ))
+
     @staticmethod
-    def build_elastic_query(ids_str, text_search):
+    def build_elastic_query(filter_terms, text_search):
         """
         Build and return an elastic query for doing text search on a library
         """
         # Remove reserved characters (and ") from the text to prevent unexpected errors.
         text_search_normalised = text_search.translate(text_search.maketrans('', '', RESERVED_CHARACTERS + '"'))
-        text_search_normalised = text_search.replace('-',' ')
+        text_search_normalised = text_search.replace('-', ' ')
         # Wrap with asterix to enable partial matches
         text_search_normalised = "*{}*".format(text_search_normalised)
+        terms = [
+            {
+                'terms': {
+                    item: filter_terms[item]
+                }
+            }
+            for item in filter_terms
+        ]
         return {
             'query': {
                 'filtered': {
@@ -172,8 +155,8 @@ class SearchIndexerBase(ABC):
                                         "minimum_should_match": "100%",
                                     },
                                 },
-                                # Add a special wildcard search for id, as it contains a ":" character which is filtered out
-                                # in query_string
+                                # Add a special wildcard search for id, as it contains a ":" character which is
+                                # filtered out in query_string
                                 {
                                     'wildcard': {
                                         'id': {
@@ -185,8 +168,8 @@ class SearchIndexerBase(ABC):
                         },
                     },
                     'filter': {
-                        'terms': {
-                            'id': ids_str
+                        'bool': {
+                            'must': terms
                         }
                     }
                 },
@@ -205,9 +188,9 @@ class ContentLibraryIndexer(SearchIndexerBase):
     SCHEMA_VERSION = 0
 
     @classmethod
-    def get_item_definition(cls, library_key):
-        ref = ContentLibrary.objects.get_by_key(library_key)
-        lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
+    def get_item_definition(cls, item):
+        ref = ContentLibrary.objects.get_by_key(item)
+        lib_bundle = LibraryBundle(item, ref.bundle_uuid, draft_name=DRAFT_NAME)
         num_blocks = len(lib_bundle.get_top_level_usages())
         last_published = lib_bundle.get_last_published_time()
         last_published_str = None
@@ -221,7 +204,7 @@ class ContentLibraryIndexer(SearchIndexerBase):
         # with outdated indexes which might cause errors due to missing/invalid attributes.
         return {
             "schema_version": ContentLibraryIndexer.SCHEMA_VERSION,
-            "id": str(library_key),
+            "id": str(item),
             "uuid": str(bundle_metadata.uuid),
             "title": bundle_metadata.title,
             "description": bundle_metadata.description,
@@ -232,7 +215,7 @@ class ContentLibraryIndexer(SearchIndexerBase):
             "has_unpublished_deletes": has_unpublished_deletes,
             # only 'content' field is analyzed by elastisearch, and allows text-search
             "content": {
-                "id": str(library_key),
+                "id": str(item),
                 "title": bundle_metadata.title,
                 "description": bundle_metadata.description,
             },
@@ -250,17 +233,17 @@ class LibraryBlockIndexer(SearchIndexerBase):
     SCHEMA_VERSION = 0
 
     @classmethod
-    def get_item_definition(cls, usage_key):
+    def get_item_definition(cls, item):
         from openedx.core.djangoapps.content_libraries.api import get_block_display_name, _lookup_usage_key
 
-        def_key, lib_bundle = _lookup_usage_key(usage_key)
-        is_child = usage_key in lib_bundle.get_bundle_includes().keys()
+        def_key, lib_bundle = _lookup_usage_key(item)
+        is_child = item in lib_bundle.get_bundle_includes().keys()
 
-        # NOTE: Increment ContentLibraryIndexer.SCHEMA_VERSION if the following schema is updated to avoid dealing
+        # NOTE: Increment LibraryBlockIndexer.SCHEMA_VERSION if the following schema is updated to avoid dealing
         # with outdated indexes which might cause errors due to missing/invalid attributes.
         return {
-            "schema_version": ContentLibraryIndexer.SCHEMA_VERSION,
-            "id": str(usage_key),
+            "schema_version": LibraryBlockIndexer.SCHEMA_VERSION,
+            "id": str(item),
             "library_key": str(lib_bundle.library_key),
             "is_child": is_child,
             "def_key": str(def_key),
@@ -269,7 +252,7 @@ class LibraryBlockIndexer(SearchIndexerBase):
             "has_unpublished_changes": lib_bundle.does_definition_have_unpublished_changes(def_key),
             # only 'content' field is analyzed by elastisearch, and allows text-search
             "content": {
-                "id": str(usage_key),
+                "id": str(item),
                 "display_name": get_block_display_name(def_key),
             },
         }
@@ -288,8 +271,10 @@ def index_library(sender, library_key, **kwargs):  # pylint: disable=unused-argu
         try:
             ContentLibraryIndexer.index_items([library_key])
             if kwargs.get('update_blocks', False):
-                blocks = LibraryBlockIndexer.search(library_key=str(library_key))
-                usage_keys = [LibraryUsageLocatorV2.from_string(block['data']['id']) for block in blocks]
+                blocks = LibraryBlockIndexer.get_items(filter_terms={
+                    'library_key': str(library_key)
+                })
+                usage_keys = [LibraryUsageLocatorV2.from_string(block['id']) for block in blocks]
                 LibraryBlockIndexer.index_items(usage_keys)
         except ElasticConnectionError as e:
             log.exception(e)
@@ -303,8 +288,10 @@ def remove_library_index(sender, library_key, **kwargs):  # pylint: disable=unus
     if ContentLibraryIndexer.indexing_is_enabled():
         try:
             ContentLibraryIndexer.remove_items([library_key])
-            blocks = LibraryBlockIndexer.search(library_key=str(library_key))
-            LibraryBlockIndexer.remove_items([block['data']['id'] for block in blocks])
+            blocks = LibraryBlockIndexer.get_items(filter_terms={
+                'library_key': str(library_key)
+            })
+            LibraryBlockIndexer.remove_items([block['id'] for block in blocks])
         except ElasticConnectionError as e:
             log.exception(e)
 
