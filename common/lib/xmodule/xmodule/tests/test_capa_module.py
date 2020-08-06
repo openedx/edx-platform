@@ -2109,7 +2109,6 @@ class ProblemBlockTest(unittest.TestCase):
 
 @ddt.ddt
 class ProblemBlockXMLTest(unittest.TestCase):
-    maxDiff = None
     sample_checkbox_problem_xml = textwrap.dedent("""
         <problem>
             <p>Title</p>
