@@ -9,13 +9,13 @@ from course_modes.models import CourseMode
 %>
 
 <%
-additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
+additional_styling_class = 'on-mobile' if is_mobile_app and not is_learning_mfe else 'has-button'
 %>
 
 <%def name="reset_dates_banner()">
     <div class="banner-cta ${additional_styling_class}">
         <div class="banner-cta-text">
-        % if is_mobile_app:
+        % if is_mobile_app and not is_learning_mfe:
                 ${_('It looks like you missed some important deadlines based on our suggested schedule. ')}
                 ${_('To keep yourself on track, you can update this schedule and shift the past due assignments into the future by visiting ')}
                 <a class="mobile-dates-link" href="${web_app_course_url}">edx.org</a>.
@@ -25,21 +25,27 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
                 ${_("To keep yourself on track, you can update this schedule and shift the past due assignments into the future. Don't worry—you won't lose any of the progress you've made when you shift your due dates.")}
             % endif
         </div>
-        % if not is_mobile_app:
-            <div class="banner-cta-button">
-                <form method="post" action="${reset_deadlines_url}">
-                    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                    <input type="hidden" name="course_id" value="${course.id}">
-                    <button class="btn">${_("Shift due dates")}</button>
-                </form>
-            </div>
+        % if not is_mobile_app or is_learning_mfe:
+            % if is_learning_mfe:
+                <div class="banner-cta-button">
+                    <button class="btn" onclick="reset_dates()">${_("Shift due dates")}</button>
+                </div>
+            % else:
+                <div class="banner-cta-button">
+                    <form method="post" action="${reset_deadlines_url}">
+                        <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                        <input type="hidden" name="course_id" value="${course.id}">
+                        <button class="btn">${_("Shift due dates")}</button>
+                    </form>
+                </div>
+            % endif
         % endif
     </div>
 </%def>
 <%def name="upgrade_to_reset_banner()">
     <div class="banner-cta ${additional_styling_class}">
         <div class="banner-cta-text">
-            % if is_mobile_app:
+            % if is_mobile_app and not is_learning_mfe:
                 <strong>${_('You are auditing this course,')}</strong>
                 ${_(' which means that you are unable to participate in graded assignments.')}
                 ${_(' It looks like you missed some important deadlines based on our suggested schedule. Graded assignments and schedule adjustment are available to Verified Track learners.')}
@@ -49,7 +55,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
                 ${_(' It looks like you missed some important deadlines based on our suggested schedule. To complete graded assignments as part of this course and shift the past due assignments into the future, you can upgrade today.')}
             % endif
         </div>
-        % if not is_mobile_app:
+        % if not is_mobile_app or is_learning_mfe:
             <div class="banner-cta-button">
                 <a class="personalized_learner_schedules_button" href="${verified_upgrade_link}">
                     <button type="button">
@@ -63,7 +69,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
 <%def name="upgrade_to_complete_graded_banner()">
     <div class="banner-cta ${additional_styling_class}">
         <div class="banner-cta-text">
-            % if is_mobile_app:
+            % if is_mobile_app and not is_learning_mfe:
                 <strong>${_('You are auditing this course,')}</strong>
                 ${_(' which means that you are unable to participate in graded assignments.')}
                 ${_('Graded assignments are available to Verified Track learners.')}
@@ -73,7 +79,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
                 ${_(' To complete graded assignments as part of this course, you can upgrade today.')}
             % endif
         </div>
-        % if not is_mobile_app:
+        % if not is_mobile_app or is_learning_mfe:
             <div class="banner-cta-button">
                 <a class="personalized_learner_schedules_button" href="${verified_upgrade_link}">
                     <button type="button">
@@ -105,4 +111,12 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
             ${reset_dates_banner()}
         % endif
     % endif
+% endif
+
+% if is_learning_mfe:
+    <script>
+        function reset_dates() {
+            parent.postMessage('reset_dates', '*');
+        }
+    </script>
 % endif

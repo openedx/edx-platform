@@ -69,6 +69,23 @@ class CourseMasquerade(object):
         """
         self.__init__(**state)
 
+    def get_active_group_name(self, available):
+        """
+        Lookup the active group name, from available options
+
+        Returns: the corresponding group name, if exists,
+            else, return None
+        """
+        if not (self.group_id and self.user_partition_id):
+            return None
+        for group in available:
+            if (
+                self.group_id == group.get('group_id') and
+                self.user_partition_id == group.get('user_partition_id')
+            ):
+                return group.get('name')
+        return None
+
 
 @method_decorator(login_required, name='dispatch')
 class MasqueradeView(View):
@@ -103,7 +120,7 @@ class MasqueradeView(View):
                 'course_key': course_key_string,
                 'group_id': course.group_id,
                 'role': course.role,
-                'user_name': course.user_name or ' ',
+                'user_name': course.user_name or None,
                 'user_partition_id': course.user_partition_id,
             },
             'available': [
@@ -128,6 +145,7 @@ class MasqueradeView(View):
                     }
                     for group in partition.groups
                 ])
+        data['active']['group_name'] = course.get_active_group_name(data['available'])
         return JsonResponse(data)
 
     @method_decorator(expect_json)
@@ -158,7 +176,7 @@ class MasqueradeView(View):
                 return JsonResponse({
                     'success': False,
                     'error': _(
-                        u'There is no user with the username or email address u"{user_identifier}" '
+                        u'There is no user with the username or email address "{user_identifier}" '
                         'enrolled in this course.'
                     ).format(
                         user_identifier=user_name,
