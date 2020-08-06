@@ -222,6 +222,65 @@ class TestBlocksView(SharedModuleStoreTestCase):
                 block_data['type'] in self.BLOCK_TYPES_WITH_STUDENT_VIEW_DATA
             )
 
+    def test_extra_field_when_requested(self):
+        """
+        Tests if all requested extra fields appear in output
+
+        Requests the fields specified under "COURSE_BLOCKS_API_EXTRA_FIELDS"
+        in the Test Django settings
+
+        Test setting "COURSE_BLOCKS_API_EXTRA_FIELDS" contains:
+            - other_course_settings
+            - course_visibility
+        """
+        response = self.verify_response(params={
+            'all_blocks': True,
+            'requested_fields': ['other_course_settings', 'course_visibility'],
+        })
+        self.verify_response_block_dict(response)
+        for block_data in six.itervalues(response.data['blocks']):
+            self.assert_in_iff(
+                'other_course_settings',
+                block_data,
+                block_data['type'] == 'course'
+            )
+
+            self.assert_in_iff(
+                'course_visibility',
+                block_data,
+                block_data['type'] == 'course'
+            )
+
+    def test_extra_field_when_not_requested(self):
+        """
+        Tests if fields that weren't requested would appear in output
+
+        Requests some of the fields specified under
+        "COURSE_BLOCKS_API_EXTRA_FIELDS" in the Test Django settings
+        The other extra fields specified in Test Django settings weren't
+        requested to see if they would show up in the output or not
+
+        Test setting "COURSE_BLOCKS_API_EXTRA_FIELDS" contains:
+            - other_course_settings
+            - course_visibility
+        """
+        response = self.verify_response(params={
+            'all_blocks': True,
+            'requested_fields': ['course_visibility'],
+        })
+        self.verify_response_block_dict(response)
+        for block_data in six.itervalues(response.data['blocks']):
+            self.assertNotIn(
+                'other_course_settings',
+                block_data
+            )
+
+            self.assert_in_iff(
+                'course_visibility',
+                block_data,
+                block_data['type'] == 'course'
+            )
+
     def test_navigation_param(self):
         response = self.verify_response(params={'nav_depth': 10})
         self.verify_response_block_dict(response)

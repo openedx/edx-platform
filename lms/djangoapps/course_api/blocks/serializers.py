@@ -15,6 +15,7 @@ from .transformers.block_counts import BlockCountsTransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
 from .transformers.navigation import BlockNavigationTransformer
 from .transformers.student_view import StudentViewTransformer
+from .transformers.extra_fields import ExtraFieldsTransformer
 
 
 class SupportedFieldType(object):
@@ -80,7 +81,9 @@ SUPPORTED_FIELDS = [
         BlockCompletionTransformer.COMPLETION,
         BlockCompletionTransformer,
         'completion'
-    )
+    ),
+
+    *[SupportedFieldType(field_name) for field_name in ExtraFieldsTransformer.get_requested_extra_fields()],
 ]
 
 # This lists the names of all fields that are allowed

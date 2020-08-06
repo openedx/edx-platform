@@ -187,6 +187,10 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
 
           * show_correctness: Whether to show scores/correctness to learners for the current sequence or problem.
             Returned only if "show_correctness" is included in the "requested_fields" parameter.
+
+          * Additional XBlock fields can be included in the response if they are
+            configured via the COURSE_BLOCKS_API_EXTRA_FIELDS Django setting and
+            requested via the "requested_fields" parameter.
     """
 
     def list(self, request, usage_key_string, hide_access_denials=False):  # pylint: disable=arguments-differ
