@@ -162,16 +162,23 @@ class LibraryBundle(object):
             except KeyError:
                 return None
 
+    def get_all_usages(self):
+        """
+        Get usage keys of all the blocks in this bundle
+        """
+        usage_keys = []
+        for olx_file_path in self.get_olx_files():
+            block_type, usage_id, _unused = olx_file_path.split('/')
+            usage_key = LibraryUsageLocatorV2(self.library_key, block_type, usage_id)
+            usage_keys.append(usage_key)
+
+        return usage_keys
+
     def get_top_level_usages(self):
         """
         Get the set of usage keys in this bundle that have no parent.
         """
-        own_usage_keys = []
-        for olx_file_path in self.get_olx_files():
-            block_type, usage_id, _unused = olx_file_path.split('/')
-            usage_key = LibraryUsageLocatorV2(self.library_key, block_type, usage_id)
-            own_usage_keys.append(usage_key)
-
+        own_usage_keys = self.get_all_usages()
         usage_keys_with_parents = self.get_bundle_includes().keys()
         return [usage_key for usage_key in own_usage_keys if usage_key not in usage_keys_with_parents]
 
