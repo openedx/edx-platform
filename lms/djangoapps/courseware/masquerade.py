@@ -132,6 +132,11 @@ class MasqueradeView(View):
                     'name': 'Learner',
                     'role': 'student',
                 },
+                {
+                    'name': 'Specific Student...',
+                    'role': 'student',
+                    'user_name': course.user_name or '',
+                },
             ],
         }
         for partition in partitions:
