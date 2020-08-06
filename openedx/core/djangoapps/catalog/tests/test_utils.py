@@ -655,14 +655,19 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
     def test_unpublished_sessions_for_entitlement(self, mock_get_edx_api_data):
         """
         Test unpublished course runs are not part of visible session entitlements when the user
-        is not enrolled.
+        is not enrolled and upgrade deadline is passed.
         """
         catalog_course_run = CourseRunFactory.create(status=COURSE_UNPUBLISHED)
         catalog_course = CourseFactory(course_runs=[catalog_course_run])
         mock_get_edx_api_data.return_value = catalog_course
         course_key = CourseKey.from_string(catalog_course_run.get('key'))
         course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
-        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
+        CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            min_price=100,
+            course_id=course_overview.id,
+            expiration_datetime=now() - timedelta(days=1)
+        )
         entitlement = CourseEntitlementFactory(
             user=self.user, mode=CourseMode.VERIFIED
         )
