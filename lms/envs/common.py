@@ -488,6 +488,11 @@ FEATURES = {
     'ENABLE_ORA_USERNAMES_ON_DATA_EXPORT': False,
 }
 
+# Specifies extra XBlock fields that should available when requested via the Course Blocks API
+# Should be a list of tuples of (block_type, field_name), where block_type can also be "*" for all block types.
+# e.g. COURSE_BLOCKS_API_EXTRA_FIELDS = [  ('course', 'other_course_settings'), ("problem", "weight")  ]
+COURSE_BLOCKS_API_EXTRA_FIELDS = []
+
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
 COURSE_REVIEWS_TOOL_PROVIDER_FRAGMENT_NAME = 'coursetalk-reviews-fragment.html'
 COURSE_REVIEWS_TOOL_PROVIDER_PLATFORM_KEY = 'edx'
