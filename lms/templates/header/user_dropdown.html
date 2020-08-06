@@ -23,6 +23,9 @@ username = self.real_user.username
 resume_block = retrieve_last_sitewide_block_completed(self.real_user)
 displayname = get_enterprise_learner_generic_name(request) or username
 enterprise_customer_portals = get_enterprise_learner_portals(request)
+## Enterprises with the learner portal enabled should not show order history, as it does
+## not apply to the learner's method of purchasing content.
+should_show_order_history = should_redirect_to_order_history_microfrontend() and not enterprise_customer_portals
 %>
 
 <div class="nav-item hidden-mobile">
@@ -50,7 +53,7 @@ enterprise_customer_portals = get_enterprise_learner_portals(request)
 
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('learner_profile', kwargs={'username': username})}" role="menuitem">${_("Profile")}</a></div>
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('account_settings')}" role="menuitem">${_("Account")}</a></div>
-        % if should_redirect_to_order_history_microfrontend():
+        % if should_show_order_history:
             <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${settings.ORDER_HISTORY_MICROFRONTEND_URL}" role="menuitem">${_("Order History")}</a></div>
         % endif
         <div class="mobile-nav-item dropdown-item dropdown-nav-item"><a href="${reverse('logout')}" role="menuitem">${_("Sign Out")}</a></div>
