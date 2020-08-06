@@ -31,6 +31,7 @@ class MandrillClient(object):
     ON_DEMAND_WEEKLY_MODULE_SKIP_TEMPLATE = 'on-demand-module-skip'
     ON_DEMAND_REMINDER_EMAIL_TEMPLATE = 'on-demand-reminder-email'
     CHANGE_USER_EMAIL_ALERT = 'change-user-email-alert'
+    VERIFY_CHANGE_USER_EMAIL = 'verify-email-change'
     DOWNLOAD_CERTIFICATE = 'download-certificate'
     USER_BADGE_EMAIL_TEMPLATE = 'user-badge-email'
     REFERRAL_INITIAL_EMAIL = 'referral-email'

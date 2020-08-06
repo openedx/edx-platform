@@ -8126,8 +8126,7 @@ def update_user_email(user, old_email, new_email):
     # send email to new and old account
     context = {
         'old_email': old_email,
-        'new_email': new_email,
-        'platform_name': configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
+        'new_email': new_email
     }
     MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, old_email, context)
     MandrillClient().send_mail(MandrillClient.CHANGE_USER_EMAIL_ALERT, new_email, context)
