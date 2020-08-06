@@ -91,9 +91,6 @@ path<13.2.0
 # ARCHBOM-1141: pip-tools upgrade requires pip upgrade
 pip-tools<5.0.0
 
-# BOM-1430: pytest 5.4.0 breaks reporting sometimes: https://github.com/pytest-dev/pytest/issues/6925
-pytest<5.4.0
-
 # pytest-django 3.9.0 has a fix for pytest 5.4.0+ that breaks cleanup after failed tests in earlier pytest versions
 # https://github.com/pytest-dev/pytest-django/issues/824
 pytest-django<3.9.0
