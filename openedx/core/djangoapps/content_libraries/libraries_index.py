@@ -67,7 +67,7 @@ class SearchIndexerBase(ABC):
         """
         searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
         response = searcher.search(doc_type=cls.DOCUMENT_TYPE, field_dictionary=kwargs, size=MAX_SIZE)
-        return response["results"]
+        return sorted(response["results"], key=lambda i: i['data']["id"])
 
     @classmethod
     def get_items(cls, ids, text_search=None):
@@ -101,6 +101,7 @@ class SearchIndexerBase(ABC):
                     size=MAX_SIZE
                 ))
             else:
+                # This is used only for running tests. TODO: Remove this and use elasticsearch in tests.
                 response = searcher.search(
                     doc_type=cls.DOCUMENT_TYPE,
                     field_dictionary={"id": ids_str},
