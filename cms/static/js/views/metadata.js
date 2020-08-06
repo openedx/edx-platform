@@ -6,10 +6,11 @@ define(
         'js/models/license', 'js/views/license',
         'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist',
-        'js/views/video/translations_editor'
+        'js/views/video/translations_editor',
+        'edx-ui-toolkit/js/utils/html-utils'
     ],
 function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
-         LicenseModel, LicenseView, TranscriptUtils, VideoList, VideoTranslations) {
+         LicenseModel, LicenseView, TranscriptUtils, VideoList, VideoTranslations, HtmlUtils) {
     'use strict';
     var Metadata = {};
 
@@ -22,10 +23,11 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
             var self = this,
                 counter = 0,
                 locator = self.$el.closest('[data-locator]').data('locator'),
-                courseKey = self.$el.closest('[data-course-key]').data('course-key');
+                courseKey = self.$el.closest('[data-course-key]').data('course-key'),
+                attributes = {numEntries: this.collection.length, locator: locator};
 
             this.template = this.loadTemplate('metadata-editor');
-            this.$el.html(this.template({numEntries: this.collection.length, locator: locator}));
+            this.$el.html(HtmlUtils.HTML(this.template(attributes)).toString());
 
             this.collection.each(
                 function(model) {
@@ -323,12 +325,16 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
             list.empty();
             _.each(value, function(ele, index) {
                 var template = _.template(
-                    '<li class="list-settings-item">' +
-                        '<input type="text" class="input" value="<%- ele %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-index="<%- index %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">' + gettext('Remove') + '</span></a>' +   // eslint-disable-line max-len
-                    '</li>'
+                    HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<li class="list-settings-item">'),
+                        HtmlUtils.HTML('<input type="text" class="input" value="<%- ele %>">'),
+                        HtmlUtils.HTML('<a href="#" class="remove-action remove-setting" data-index="<%- index %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">'), // eslint-disable-line max-len
+                        gettext('Remove'),
+                        HtmlUtils.HTML('</span></a>'),
+                        HtmlUtils.HTML('</li>')
+                    ).toString()
                 );
-                list.append($(template({ele: ele, index: index})));
+                list.append(HtmlUtils.HTML($(template({ele: ele, index: index}))).toString());
             });
         },
 
@@ -489,16 +495,19 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
 
             _.each(value, function(value, key) {
                 var template = _.template(
-                    '<li class="list-settings-item">' +
-                        '<input type="text" class="input input-key" value="<%= key %>">' +
-                        '<input type="text" class="input input-value" value="<%= value %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>' +  // eslint-disable-line max-len
-                    '</li>'
+                    HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<li class="list-settings-item">'),
+                        HtmlUtils.HTML('<input type="text" class="input input-key" value="<%- key %>">'),
+                        HtmlUtils.HTML('<input type="text" class="input input-value" value="<%- value %>">'),
+                        HtmlUtils.HTML('<a href="#" class="remove-action remove-setting" data-value="<%- value %>"><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>'), // eslint-disable-line max-len
+                        HtmlUtils.HTML('</li>')
+                    ).toString()
                 );
 
                 frag.appendChild($(template({key: key, value: value}))[0]);
             });
 
+            // xss-lint: disable=javascript-jquery-html
             list.html([frag]);
         },
 
@@ -564,7 +573,7 @@ function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, Uploa
             });
 
             this.$('#' + this.uniqueId).val(value);
-            this.$('.wrapper-uploader-actions').html(html);
+            this.$('.wrapper-uploader-actions').html(HtmlUtils.HTML((html)).toString());
         },
 
         upload: function(event) {
