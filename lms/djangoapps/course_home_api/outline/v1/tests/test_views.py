@@ -4,6 +4,7 @@ Tests for Outline Tab API in the Course Home API
 
 import ddt
 from django.urls import reverse
+from mock import patch
 
 from course_modes.models import CourseMode
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
@@ -148,3 +149,19 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         )
         welcome_message_html = self.client.get(self.url).data['welcome_message_html']
         self.assertEqual(welcome_message_html, None if welcome_message_is_dismissed else '<p>Welcome</p>')
+
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    def test_offer_html(self):
+        with patch('lms.djangoapps.course_home_api.outline.v1.views.generate_offer_html') as gen_html:
+            html = '<div>Offer HTML</div>'
+            gen_html.return_value = html
+            self.assertEqual(self.client.get(self.url).data['offer_html'], html)
+
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    def test_course_expired_html(self):
+        with patch('lms.djangoapps.course_home_api.outline.v1.views.generate_course_expired_message') as gen_html:
+            html = '<div>Course expired HTML</div>'
+            gen_html.return_value = html
+            self.assertEqual(self.client.get(self.url).data['course_expired_html'], html)

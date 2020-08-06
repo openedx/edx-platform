@@ -28,6 +28,7 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
+from openedx.features.course_duration_limits.access import generate_course_expired_message
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, LATEST_UPDATE_FLAG
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
@@ -120,8 +121,9 @@ class OutlineTabView(RetrieveAPIView):
         show_handouts = show_enrolled or allow_public
         handouts_html = get_course_info_section(request, request.user, course, 'handouts') if show_handouts else ''
 
-        # TODO: TNL-7185 Legacy: Refactor to return the offer data and format the message in the MFE
+        # TODO: TNL-7185 Legacy: Refactor to return the offer & expired data and format the message in the MFE
         offer_html = generate_offer_html(request.user, course_overview)
+        course_expired_html = generate_course_expired_message(request.user, course_overview)
 
         welcome_message_html = None
         if get_course_tag(request.user, course_key, PREFERENCE_KEY) != 'False':
@@ -169,6 +171,7 @@ class OutlineTabView(RetrieveAPIView):
 
         data = {
             'course_blocks': course_blocks,
+            'course_expired_html': course_expired_html,
             'course_tools': course_tools,
             'dates_widget': dates_widget,
             'enroll_alert': enroll_alert,
