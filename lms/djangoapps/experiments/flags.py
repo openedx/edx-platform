@@ -30,8 +30,14 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
     "main_flag.BUCKET_NUM" (e.g. "course_experience.animated_exy.0") to force
     users that pass the first main waffle check into a specific bucket experience.
 
-    If you pass this flag a course key, tracking calls to segment will be made per-course-run
-    (rather than one call overall) and will include the course key.
+    If a user is not forced into a specific bucket by one of the aforementioned smaller flags,
+    then they will be randomly assigned a default bucket based on a consistent hash of:
+      * (flag_name, course_key, username) if use_course_aware_bucketing=True, or
+      * (flag_name, username)             if use_course_aware_bucketing=False.
+
+    Note that you may call `.get_bucket` without a course_key, in which case:
+    * the smaller flags will be evaluated without course context, and
+    * the default bucket will be evaluated as if use_course_aware_bucketing=False.
 
     You can also control whether the experiment only affects future enrollments by setting
     an ExperimentKeyValue model object with a key of 'enrollment_start' to the date of the
@@ -56,7 +62,15 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             ...
 
     """
-    def __init__(self, waffle_namespace, flag_name, num_buckets=2, experiment_id=None, **kwargs):
+    def __init__(
+            self,
+            waffle_namespace,
+            flag_name,
+            num_buckets=2,
+            experiment_id=None,
+            use_course_aware_bucketing=True,
+            **kwargs
+    ):
         super().__init__(waffle_namespace, flag_name, **kwargs)
         self.num_buckets = num_buckets
         self.experiment_id = experiment_id
@@ -64,6 +78,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             CourseWaffleFlag(waffle_namespace, '{}.{}'.format(flag_name, bucket))
             for bucket in range(num_buckets)
         ]
+        self.use_course_aware_bucketing = use_course_aware_bucketing
 
     def _cache_bucket(self, key, value):
         request_cache = RequestCache('experiments')
@@ -119,12 +134,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         # Keep some imports in here, because this class is commonly used at a module level, and we want to avoid
         # circular imports for any models.
         from experiments.models import ExperimentKeyValue
-        from lms.djangoapps.courseware.access import has_access
-        from lms.djangoapps.courseware.masquerade import (
-            setup_masquerade,
-            is_masquerading,
-            get_specific_masquerading_user,
-        )
+        from lms.djangoapps.courseware.masquerade import get_specific_masquerading_user
 
         request = get_current_request()
         if not request:
@@ -141,8 +151,16 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         else:
             masquerading_as_specific_student = True
 
-        # Use course key in experiment name to separate caches and segment calls per-course-run
-        experiment_name = self.namespaced_flag_name + ('.{}'.format(course_key) if course_key else '')
+        # If a course key is passed in, include it in the experiment name
+        # in order to separate caches and analytics calls per course-run.
+        # If we are using course-aware bucketing, then also append that course key
+        # to `bucketing_group_name`, such that users can be hashed into different
+        # buckets for different course-runs.
+        experiment_name = bucketing_group_name = self.namespaced_flag_name
+        if course_key:
+            experiment_name += ".{}".format(course_key)
+        if course_key and self.use_course_aware_bucketing:
+            bucketing_group_name += ".{}".format(course_key)
 
         # Check if we have a cache for this request already
         request_cache = RequestCache('experiments')
@@ -162,16 +180,28 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             if not self._is_enrollment_inside_date_bounds(values, user, course_key):
                 return self._cache_bucket(experiment_name, 0)
 
-        bucket = stable_bucketing_hash_group(experiment_name, self.num_buckets, user.username)
-
-        # Now check if the user is forced into a particular bucket, using our subordinate bucket flags
+        # Determine the user's bucket.
+        # First check if forced into a particular bucket, using our subordinate bucket flags.
+        # If not, calculate their default bucket using a consistent hash function.
         for i, bucket_flag in enumerate(self.bucket_flags):
-            if bucket_flag.is_enabled(course_key):
+            forced_into_bucket = (
+                bucket_flag.is_enabled(course_key) if course_key
+                else bucket_flag.is_enabled_without_course_context()
+            )
+            if forced_into_bucket:
                 bucket = i
                 break
+        else:
+            bucket = stable_bucketing_hash_group(
+                bucketing_group_name, self.num_buckets, user.username
+            )
 
         session_key = 'tracked.{}'.format(experiment_name)
-        if track and hasattr(request, 'session') and session_key not in request.session and not masquerading_as_specific_student:
+        if (
+                track and hasattr(request, 'session') and
+                session_key not in request.session and
+                not masquerading_as_specific_student
+        ):
             segment.track(
                 user_id=user.id,
                 event_name='edx.bi.experiment.user.bucketed',
@@ -198,10 +228,13 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         return self.is_enabled()
 
     def is_experiment_on(self, course_key=None):
-        # If no course_key is supplied check the global flag irrespective of courses
+        """
+        Return whether the overall experiment flag is enabled for this user.
+
+        This disregards `.bucket_flags`.
+        """
         if course_key is None:
             return super().is_enabled_without_course_context()
-
         return super().is_enabled(course_key)
 
     @contextmanager

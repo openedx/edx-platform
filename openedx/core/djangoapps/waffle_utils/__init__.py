@@ -477,7 +477,7 @@ class CourseWaffleFlag(WaffleFlag):
         """
         return self._is_enabled()
 
-    def is_enabled(self, course_key=None):
+    def is_enabled(self, course_key):
         """
         Returns whether or not the flag is enabled within the context of a given course.
 
