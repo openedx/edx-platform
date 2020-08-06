@@ -3,6 +3,8 @@ Views to add features in courseware.
 """
 
 from django.utils.translation import ugettext as _
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.django.models import CourseKey, UsageKey
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.response import Response
@@ -10,9 +12,7 @@ from rest_framework.views import APIView
 from submissions.api import SubmissionError
 
 from courseware.models import StudentModule
-from lms.djangoapps.instructor import enrollment
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.django.models import CourseKey, UsageKey
+from lms.djangoapps.instructor.enrollment import reset_student_attempts
 from openedx.core.lib.api.view_utils import view_auth_classes
 
 from .helpers import validate_problem_id
@@ -22,10 +22,7 @@ from .serializers import CompetencyAssessmentRecordSerializer
 
 @view_auth_classes(is_authenticated=True)
 class CompetencyAssessmentAPIView(APIView):
-
-    def _get_score_response(self, chapter_id, status=status.HTTP_200_OK):
-        score = CompetencyAssessmentRecord.objects.get_score(self.request.user, chapter_id)
-        return Response(score, status=status)
+    """Competency assessment APIs to save user attempts and get assessment scores"""
 
     def get(self, request, chapter_id):
         """Return assessment score"""
@@ -43,9 +40,14 @@ class CompetencyAssessmentAPIView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def _get_score_response(self, chapter_id, status=status.HTTP_200_OK):
+        score = CompetencyAssessmentRecord.objects.get_score(self.request.user, chapter_id)
+        return Response(score, status=status)
+
 
 @view_auth_classes(is_authenticated=True)
 class RevertPostAssessmentAttemptsAPIView(APIView):
+    """Revert user post assessment attempts API"""
 
     def post(self, request, course_id):
         user = request.user
@@ -69,7 +71,7 @@ class RevertPostAssessmentAttemptsAPIView(APIView):
             user = self.request.user
             course_id = CourseKey.from_string(course_id)
             module_state_key = problem_usage_key.map_into_course(course_id)
-            enrollment.reset_student_attempts(
+            reset_student_attempts(
                 course_id=course_id,
                 student=user,
                 module_state_key=module_state_key,

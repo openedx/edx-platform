@@ -1,13 +1,11 @@
 from copy import deepcopy
 
 from django.urls import reverse
-
-from rest_framework.test import APITestCase
 from rest_framework import status
-
-from student.tests.factories import UserFactory
+from rest_framework.test import APITestCase
 
 from openedx.features.philu_courseware.constants import INVALID_PROBLEM_ID_MSG
+from student.tests.factories import UserFactory
 
 INVALID_ASSESSMENT_TYPE = 'This is invalid assessment type'
 INVALID_CORRECTNESS = 'This is invalid correctness'

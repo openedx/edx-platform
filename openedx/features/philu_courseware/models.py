@@ -5,8 +5,10 @@ from opaque_keys.edx.django.models import UsageKeyField
 
 from .constants import (
     COMPETENCY_ASSESSMENT_DEFAULT_PROBLEMS_COUNT,
-    COMPETENCY_ASSESSMENT_TYPE_CHOICES, CORRECT_ASSESSMENT_KEY,
-    CORRECTNESS_CHOICES, PRE_ASSESSMENT_KEY,
+    COMPETENCY_ASSESSMENT_TYPE_CHOICES,
+    CORRECT_ASSESSMENT_KEY,
+    CORRECTNESS_CHOICES,
+    PRE_ASSESSMENT_KEY
 )
 
 
@@ -44,7 +46,7 @@ class CompetencyAssessmentManager(models.Manager):
         """
             Sample result of upper query. This Query will return results of problems from latest attempt
             for both "Pre" and "Post" assessments. All attempts are saved in our table and we are concerned only with the
-            latest one, hence sub query provide us the latest attempt of all problems
+            latest one, hence sub query provides us the latest attempt of all problems
 
             |  id   | assessment_count | assessment_type   |  correctness  |
             +-------+------------------+-------------------+---------------+
