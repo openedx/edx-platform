@@ -58,7 +58,9 @@ class PersonalizedLearnerScheduleCallToAction:
         else:
             can_attempt = True
 
-        return xblock.self_paced and can_attempt and xblock.is_past_due()
+        is_past_due = xblock.is_past_due() if callable(xblock.is_past_due) else xblock.is_past_due
+
+        return xblock.self_paced and can_attempt and is_past_due
 
     @staticmethod
     def _make_reset_deadlines_cta(xblock):
