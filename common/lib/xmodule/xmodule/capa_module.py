@@ -35,13 +35,6 @@ from .capa_base import CapaMixin, ComplexEncoder, _
 log = logging.getLogger("edx.courseware")
 
 
-def _remove_html_tags_and_extra_spaces(data):
-    """ Remove html tags and extra white spaces e.g newline, tabs etc from provided data """
-    cleaner = Cleaner(tags=[], strip=True)
-    cleaned_text = " ".join(re.split(r"\s+", cleaner.clean(data), flags=re.UNICODE)).strip()
-    return cleaned_text
-
-
 @XBlock.wants('user')
 @XBlock.needs('i18n')
 class ProblemBlock(
@@ -310,11 +303,7 @@ class ProblemBlock(
         xblock_body = super(ProblemBlock, self).index_dictionary()
 
         # Make optioninput's options index friendly by replacing the actual tag with the values
-        capa_content = re.sub(
-            r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>',
-            lambda matched: matched.group(1).replace("'", '').replace(",", ", ") if matched.group(1) else None,
-            self.data
-        )
+        capa_content = re.sub(r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>', r'\1', self.data)
 
         # Removing solutions and hints, as well as script and style
         capa_content = re.sub(
@@ -330,7 +319,12 @@ class ProblemBlock(
             "",
             capa_content
         )
-        capa_content = _remove_html_tags_and_extra_spaces(capa_content)
+        capa_content = re.sub(
+            r"(\s|&nbsp;|//)+",
+            " ",
+            Cleaner(tags=[], strip=True).clean(capa_content)
+        )
+
         capa_body = {
             "capa_content": capa_content,
             "display_name": self.display_name,
