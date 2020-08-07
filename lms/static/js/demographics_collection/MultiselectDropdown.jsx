@@ -101,9 +101,11 @@ class MultiselectDropdown extends React.Component {
     const options = this.props.options.map((option, index) => {
       const checked = this.props.selected.includes(option.value);
       return (
-        <div key={index} id={`${option.value}-option-container`}>
-          <input id={`${option.value}-option-checkbox`} type="checkbox" value={option.value} checked={checked} onChange={this.handleOptionClick}/>
-          <label htmlFor={`${option.value}-option-checkbox`}>{option.label}</label>
+        <div key={index} id={`${option.value}-option-container`} className="option-container">
+          <label className="option-label">
+            <input id={`${option.value}-option-checkbox`} className="option-checkbox" type="checkbox" value={option.value} checked={checked} onChange={this.handleOptionClick}/>
+            {option.label}
+          </label>
         </div>
       )
     })
