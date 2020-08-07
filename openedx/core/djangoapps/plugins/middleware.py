@@ -13,7 +13,7 @@ class ViewNameAndSlotMiddleware(MiddlewareMixin):
         # For class-based views the view function will have a `view_class` attribute
         # and we can get the slot_namespace from that
         view = getattr(view_func, 'view_class', view_func)
-        request.slot_namespace = view.__qualname__
+        request.slot_namespace = None
         if hasattr(view, 'slot_namespace'):
             assert isinstance(view.slot_namespace, str)
             request.slot_namespace = view.slot_namespace
