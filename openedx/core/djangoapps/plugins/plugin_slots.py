@@ -17,8 +17,8 @@ COMMON_ALLOW_LIST = ['request', 'current_url']
 def get_content_for_slot(project_type: str, slot_namespace: str, slot_name: str, raw_context: Dict) -> str:
     """
     Returns a list of additional content for a view slot. Will check if any plugin apps
-    have that view in their view_context_config, and if so will call their
-    selected function to get their context dicts.
+    have that view in their slots_configs, and if so will call their selected function to
+    get injected content for the slot.
 
     Args:
         project_type (str): a string that determines which project (lms or studio) the view is being called in. See the
