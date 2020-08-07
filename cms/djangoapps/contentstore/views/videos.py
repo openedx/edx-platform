@@ -44,7 +44,6 @@ from pytz import UTC
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
 from contentstore.video_utils import validate_video_image
-from contentstore.views.helpers import get_course_hash_value
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
@@ -826,19 +825,18 @@ def storage_service_bucket(course_key=None):
 
     conn = s3.connection.S3Connection(**params)
     vem_pipeline = VEMPipelineIntegration.current()
-    course_hash_value = get_course_hash_value(course_key)
-
-    vem_override = course_key and waffle_flags()[ENABLE_VEM_PIPELINE].is_enabled(course_key)
-    allow_course_to_use_vem = vem_pipeline.enabled and course_hash_value < vem_pipeline.vem_enabled_courses_percentage
 
     # We don't need to validate our bucket, it requires a very permissive IAM permission
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each
     # environment (since we share a single bucket for multiple deployments in some configurations)
-    if vem_override or allow_course_to_use_vem:
-        LOGGER.info('Uploading course: {} to VEM bucket.'.format(course_key))
+    #
+    # All the videos should go to VEM by default. VEDA related code will remain in-place
+    # until its deprecation.
+    if vem_pipeline and vem_pipeline.enabled:
         return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False)
     else:
+        LOGGER.info('Uploading course: {} to VEDA bucket.'.format(course_key))
         return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['BUCKET'], validate=False)
 
 

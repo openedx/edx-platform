@@ -291,18 +291,3 @@ def is_item_in_course_tree(item):
         ancestor = ancestor.get_parent()
 
     return ancestor is not None
-
-
-def get_course_hash_value(course_key):
-    """
-    Returns a hash value for the given course key.
-
-    If course key is None, function returns an out of bound value which will
-    never satisfy the vem_enabled_courses_percentage condition
-    """
-    out_of_bound_value = 100
-    if course_key:
-        m = hashlib.md5(str(course_key).encode())
-        return int(m.hexdigest(), base=16) % 100
-
-    return out_of_bound_value
