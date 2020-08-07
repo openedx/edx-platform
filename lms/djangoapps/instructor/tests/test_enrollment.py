@@ -34,6 +34,8 @@ from lms.djangoapps.instructor.enrollment import (
     send_beta_role_email,
     unenroll_email
 )
+from lms.djangoapps.teams.models import CourseTeamMembership
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
@@ -327,6 +329,12 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
                 parent=cls.course,
                 publish_item=True,
             )
+            cls.team_enabled_ora = ItemFactory.create(
+                parent=cls.parent,
+                category="openassessment",
+                teams_enabled=True,
+                selected_teamset_id='final project teamset'
+            )
 
     def setUp(self):
         super(TestInstructorEnrollmentStudentModule, self).setUp()
@@ -435,11 +443,145 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         score = sub_api.get_score(student_item)
         self.assertIs(score, None)
 
+    # pylint: disable=attribute-defined-outside-init
+    def setup_team(self):
+        """ Set up a team with teammates and StudentModules """
+        # Make users
+        self.teammate_a = UserFactory()
+        self.teammate_b = UserFactory()
+        # This teammate has never opened the assignment so they don't have a state
+        self.lazy_teammate = UserFactory()
+
+        # Enroll users in course, so we can add them to the team with add_user
+        CourseEnrollment.enroll(self.user, self.course_key)
+        CourseEnrollment.enroll(self.teammate_a, self.course_key)
+        CourseEnrollment.enroll(self.teammate_b, self.course_key)
+        CourseEnrollment.enroll(self.lazy_teammate, self.course_key)
+
+        # Make team
+        self.team = CourseTeamFactory.create(
+            course_id=self.course_key,
+            topic_id=self.team_enabled_ora.selected_teamset_id
+        )
+        # Add users to team
+        self.team.add_user(self.user)
+        self.team.add_user(self.teammate_a)
+        self.team.add_user(self.teammate_b)
+        self.team.add_user(self.lazy_teammate)
+
+        # Create student modules for everyone but lazy_student
+        self.team_state_dict = {
+            'attempts': 1,
+            'saved_files_descriptions': ['summary', 'proposal', 'diagrams'],
+            'saved_files_sizes': [1364677, 958418],
+            'saved_files_names': ['case_study_abstract.txt', 'design_prop.pdf', 'diagram1.png']
+        }
+        team_state = json.dumps(self.team_state_dict)
+
+        StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course_key,
+            module_state_key=self.team_enabled_ora.location,
+            state=team_state,
+        )
+        StudentModule.objects.create(
+            student=self.teammate_a,
+            course_id=self.course_key,
+            module_state_key=self.team_enabled_ora.location,
+            state=team_state,
+        )
+        StudentModule.objects.create(
+            student=self.teammate_b,
+            course_id=self.course_key,
+            module_state_key=self.team_enabled_ora.location,
+            state=team_state,
+        )
+
+    def test_reset_team_attempts(self):
+        self.setup_team()
+        team_ora_location = self.team_enabled_ora.location
+        # All teammates should have a student module (except lazy_teammate)
+        self.assertIsNotNone(self.get_student_module(self.user, team_ora_location))
+        self.assertIsNotNone(self.get_student_module(self.teammate_a, team_ora_location))
+        self.assertIsNotNone(self.get_student_module(self.teammate_b, team_ora_location))
+        self.assert_no_student_module(self.lazy_teammate, team_ora_location)
+
+        reset_student_attempts(self.course_key, self.user, team_ora_location, requesting_user=self.user)
+
+        # Everyone's state should have had the attempts set to zero but otherwise unchanged
+        attempt_reset_team_state_dict = dict(self.team_state_dict)
+        attempt_reset_team_state_dict['attempts'] = 0
+
+        def _assert_student_module(user):
+            student_module = self.get_student_module(user, team_ora_location)
+            self.assertIsNotNone(student_module)
+            student_state = json.loads(student_module.state)
+            self.assertDictEqual(student_state, attempt_reset_team_state_dict)
+
+        _assert_student_module(self.user)
+        _assert_student_module(self.teammate_a)
+        _assert_student_module(self.teammate_b)
+        # Still should have no state
+        self.assert_no_student_module(self.lazy_teammate, team_ora_location)
+
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    def test_delete_team_attempts(self, _mock_signal):
+        self.setup_team()
+        team_ora_location = self.team_enabled_ora.location
+        # All teammates should have a student module (except lazy_teammate)
+        self.assertIsNotNone(self.get_student_module(self.user, team_ora_location))
+        self.assertIsNotNone(self.get_student_module(self.teammate_a, team_ora_location))
+        self.assertIsNotNone(self.get_student_module(self.teammate_b, team_ora_location))
+        self.assert_no_student_module(self.lazy_teammate, team_ora_location)
+
+        reset_student_attempts(
+            self.course_key, self.user, team_ora_location, requesting_user=self.user, delete_module=True
+        )
+
+        # No one should have a state now
+        self.assert_no_student_module(self.user, team_ora_location)
+        self.assert_no_student_module(self.teammate_a, team_ora_location)
+        self.assert_no_student_module(self.teammate_b, team_ora_location)
+        self.assert_no_student_module(self.lazy_teammate, team_ora_location)
+
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
+    def test_delete_team_attempts_no_team_fallthrough(self, _mock_signal):
+        self.setup_team()
+        team_ora_location = self.team_enabled_ora.location
+
+        # Remove self.user from the team
+        CourseTeamMembership.objects.get(user=self.user, team=self.team).delete()
+
+        # All teammates should have a student module (except lazy_teammate)
+        self.assertIsNotNone(self.get_student_module(self.user, team_ora_location))
+        self.assertIsNotNone(self.get_student_module(self.teammate_a, team_ora_location))
+        self.assertIsNotNone(self.get_student_module(self.teammate_b, team_ora_location))
+        self.assert_no_student_module(self.lazy_teammate, team_ora_location)
+
+        reset_student_attempts(
+            self.course_key, self.user, team_ora_location, requesting_user=self.user, delete_module=True
+        )
+
+        # self.user should be deleted, but no other teammates should be affected.
+        self.assert_no_student_module(self.user, team_ora_location)
+        self.assertIsNotNone(self.get_student_module(self.teammate_a, team_ora_location))
+        self.assertIsNotNone(self.get_student_module(self.teammate_b, team_ora_location))
+        self.assert_no_student_module(self.lazy_teammate, team_ora_location)
+
+    def assert_no_student_module(self, user, location):
+        """ Assert that there is no student module for the given user and item for self.course_key """
+        with self.assertRaises(StudentModule.DoesNotExist):
+            self.get_student_module(user, location)
+
+    def get_student_module(self, user, location):
+        """ Get the student module for the given user and item for self.course_key"""
+        return StudentModule.objects.get(
+            student=user, course_id=self.course_key, module_state_key=location
+        )
+
     def get_state(self, location):
         """Reload and grab the module state from the database"""
-        return StudentModule.objects.get(
-            student=self.user, course_id=self.course_key, module_state_key=location
-        ).state
+        return self.get_student_module(self.user, location).state
 
     def test_reset_student_attempts_children(self):
         parent_state = json.loads(self.get_state(self.parent.location))
