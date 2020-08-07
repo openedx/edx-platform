@@ -297,7 +297,7 @@ testfixtures==6.14.1      # via -r requirements/edx/testing.txt, edx-enterprise
 text-unidecode==1.3       # via -r requirements/edx/testing.txt, faker, python-slugify
 toml==0.10.1              # via -r requirements/edx/testing.txt, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
-tox==3.18.1               # via -r requirements/edx/testing.txt, tox-battery
+tox==3.19.0               # via -r requirements/edx/testing.txt, tox-battery
 tqdm==4.48.2              # via -r requirements/edx/testing.txt, nltk
 transifex-client==0.13.11  # via -r requirements/edx/testing.txt
 typed-ast==1.4.1          # via -r requirements/edx/testing.txt, astroid
