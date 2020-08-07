@@ -184,11 +184,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         # First check if forced into a particular bucket, using our subordinate bucket flags.
         # If not, calculate their default bucket using a consistent hash function.
         for i, bucket_flag in enumerate(self.bucket_flags):
-            forced_into_bucket = (
-                bucket_flag.is_enabled(course_key) if course_key
-                else bucket_flag.is_enabled_without_course_context()
-            )
-            if forced_into_bucket:
+            if bucket_flag.is_enabled(course_key):
                 bucket = i
                 break
         else:
@@ -224,17 +220,12 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
     def is_enabled(self, course_key=None):
         return self.get_bucket(course_key) != 0
 
-    def is_enabled_without_course_context(self):
-        return self.is_enabled()
-
     def is_experiment_on(self, course_key=None):
         """
         Return whether the overall experiment flag is enabled for this user.
 
         This disregards `.bucket_flags`.
         """
-        if course_key is None:
-            return super().is_enabled_without_course_context()
         return super().is_enabled(course_key)
 
     @contextmanager

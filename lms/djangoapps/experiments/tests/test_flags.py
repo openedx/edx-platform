@@ -137,11 +137,9 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
 
     def test_is_enabled(self):
         with patch('experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=1):
-            self.assertEqual(self.flag.is_enabled_without_course_context(), True)
             self.assertEqual(self.flag.is_enabled(self.key), True)
             self.assertEqual(self.flag.is_enabled(), True)
         with patch('experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=0):
-            self.assertEqual(self.flag.is_enabled_without_course_context(), False)
             self.assertEqual(self.flag.is_enabled(self.key), False)
             self.assertEqual(self.flag.is_enabled(), False)
 
