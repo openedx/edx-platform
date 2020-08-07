@@ -30,7 +30,14 @@ class CallToActionService(PluginManager):
                 'foo': 'bar',
             },
             # A long-form description to be associated with the CTA
-            'description': "If you don't want to do this problem, just skip it!"
+            'description': "If you don't want to do this problem, just skip it!",
+            # A data set we include if the CTA is being rendered within an iframe. For example,
+            # we do this in Learning MFE. This dictionary is passed to its's parent container via
+            # parent.postMessage.  Parent containers should use window.onmessage event handler to
+            # catch this dataset.
+            'event_data': {
+                'foo': 'bar',
+            },
         }]
 
         Note: Future versions of this class may add a way to control the CTA method (POST vs GET),
