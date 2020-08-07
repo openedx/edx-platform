@@ -1,13 +1,11 @@
-from importlib import import_module
 from logging import getLogger
-from typing import Dict, List, Tuple, Callable
+from typing import Dict
 
 from django.apps import AppConfig
-from importlib_metadata import ModuleNotFoundError
 
-from openedx.core.lib.cache_utils import process_cached
-from . import constants, registry
+from . import constants
 from .plugin_contexts import get_plugins_view_context
+from .utils import get_cached_functions_for_plugin
 
 log = getLogger(__name__)
 
@@ -29,7 +27,7 @@ def get_content_for_slot(project_type: str, slot_namespace: str, slot_name: str,
         raw_context (Dict): the unfiltered context available to the internal view.
     """
     aggregate_slot_content = u""
-    slot_functions = _get_cached_slot_functions_for_view(project_type, slot_namespace, slot_name)
+    slot_functions = get_cached_functions_for_plugin(_get_slots_function_path, project_type, slot_namespace, slot_name)
 
     # Each view can pass the approved part of the context, in the context itself.
     context_allow_list = raw_context.get('context_allow_list', [])
@@ -65,45 +63,6 @@ def get_content_for_slot(project_type: str, slot_namespace: str, slot_name: str,
             continue
 
     return aggregate_slot_content
-
-
-@process_cached
-def _get_cached_slot_functions_for_view(
-    project_type: str, slot_namespace: str, slot_name: str
-) -> List[Tuple[Callable, str]]:
-    """
-    Returns a list of tuples where the first item is the slot function
-    and the second item is the name of the plugin it's being called from.
-    NOTE: These will be functions will be cached (in RAM not memcache) on this unique
-    combination. If we enable many new views to use this system, we may notice an
-    increase in memory usage as the entirety of these functions will be held in memory.
-    """
-    slot_functions = []
-    for app_config in registry.get_app_configs(project_type):
-        slot_function_path = _get_slots_function_path(app_config, project_type, slot_namespace, slot_name)
-        if slot_function_path:
-            module_path, _, name = slot_function_path.rpartition('.')
-            try:
-                module = import_module(module_path)
-            except (ImportError, ModuleNotFoundError):
-                log.exception(
-                    "Failed to import %s plugin when rendering content for slot %s",
-                    module_path,
-                    slot_name,
-                )
-                continue
-            slot_function = getattr(module, name, None)
-            if slot_function:
-                plugin_name, _, _ = module_path.partition('.')
-                slot_functions.append((slot_function, plugin_name))
-            else:
-                log.warning(
-                    "Failed to retrieve %s function from %s plugin when rendering content for slot %s",
-                    name,
-                    module_path,
-                    slot_name,
-                )
-    return slot_functions
 
 
 def _get_slots_function_path(app_config: AppConfig, project_type: str, slot_namespace: str, slot_name: str) -> str:

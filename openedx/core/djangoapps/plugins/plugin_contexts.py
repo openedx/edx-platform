@@ -5,6 +5,7 @@ from logging import getLogger
 from openedx.core.lib.cache_utils import process_cached
 
 from . import constants, registry
+from .utils import get_cached_functions_for_plugin
 
 
 log = getLogger(__name__)
@@ -30,7 +31,7 @@ def get_plugins_view_context(project_type, view_name, existing_context=None):
     if existing_context is None:
         existing_context = {}
 
-    context_functions = _get_cached_context_functions_for_view(project_type, view_name)
+    context_functions = get_cached_functions_for_plugin(_get_context_function_path, project_type, view_name)
 
     for (context_function, plugin_name) in context_functions:
         try:
@@ -46,44 +47,6 @@ def get_plugins_view_context(project_type, view_name, existing_context=None):
         aggregate_context["plugins"][plugin_name] = plugin_context
 
     return aggregate_context
-
-
-@process_cached
-def _get_cached_context_functions_for_view(project_type, view_name):
-    """
-    Returns a list of tuples where the first item is the context function
-    and the second item is the name of the plugin it's being called from.
-
-    NOTE: These will be functions will be cached (in RAM not memcache) on this unique
-    combination. If we enable many new views to use this system, we may notice an
-    increase in memory usage as the entirety of these functions will be held in memory.
-    """
-    context_functions = []
-    for app_config in registry.get_app_configs(project_type):
-        context_function_path = _get_context_function_path(app_config, project_type, view_name)
-        if context_function_path:
-            module_path, _, name = context_function_path.rpartition('.')
-            try:
-                module = import_module(module_path)
-            except (ImportError, ModuleNotFoundError):
-                log.exception(
-                    "Failed to import %s plugin when creating %s context",
-                    module_path,
-                    view_name
-                )
-                continue
-            context_function = getattr(module, name, None)
-            if context_function:
-                plugin_name, _, _ = module_path.partition('.')
-                context_functions.append((context_function, plugin_name))
-            else:
-                log.warning(
-                    "Failed to retrieve %s function from %s plugin when creating %s context",
-                    name,
-                    module_path,
-                    view_name
-                )
-    return context_functions
 
 
 def _get_context_function_path(app_config, project_type, view_name):
