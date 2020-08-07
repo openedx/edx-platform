@@ -77,6 +77,11 @@ class DateSummary(object):
         """The detail text displayed by this summary."""
         return ''
 
+    @property
+    def extra_info(self):
+        """Extra detail to display as a tooltip."""
+        return None
+
     def register_alerts(self, request, course):
         """
         Registers any relevant course alerts given the current request.
@@ -388,6 +393,7 @@ class CourseAssignmentDate(DateSummary):
         self.contains_gated_content = False
         self.complete = None
         self.past_due = None
+        self._extra_info = None
 
     @property
     def date(self):
@@ -404,6 +410,10 @@ class CourseAssignmentDate(DateSummary):
     @property
     def link(self):
         return self.assignment_link
+
+    @property
+    def extra_info(self):
+        return self._extra_info
 
     @link.setter
     def link(self, link):
@@ -612,7 +622,7 @@ class VerifiedUpgradeDeadlineDate(DateSummary):
                     platform_name=settings.PLATFORM_NAME,
                     button_panel=HTML(
                         '<div class="message-actions">'
-                        '<a class="btn btn-upgrade"'
+                        '<a id="certificate_upsell" class="btn btn-upgrade"'
                         'data-creative="original_message" data-position="course_message"'
                         'href="{upgrade_url}">{upgrade_label}</a>'
                         '</div>'

@@ -2,18 +2,23 @@
 Outline Tab Views
 """
 
+from django.http.response import Http404
+from django.urls import reverse
+from django.utils.translation import gettext as _
+from edx_django_utils import monitoring as monitoring_utils
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from opaque_keys.edx.keys import CourseKey
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.exceptions import APIException, ParseError
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from edx_django_utils import monitoring as monitoring_utils
-from django.urls import reverse
-from opaque_keys.edx.keys import CourseKey
-
+from course_modes.models import CourseMode
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
 from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active, course_home_mfe_outline_tab_is_active
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
@@ -21,11 +26,23 @@ from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
+from openedx.features.course_duration_limits.access import generate_course_expired_message
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, LATEST_UPDATE_FLAG
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
+from openedx.features.course_experience.views.welcome_message import PREFERENCE_KEY, WelcomeMessageFragmentView
+from openedx.features.discounts.utils import generate_offer_html
 from student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
+
+
+class UnableToDismissWelcomeMessage(APIException):
+    status_code = 400
+    default_detail = 'Unable to dismiss welcome message.'
+    default_code = 'unable_to_dismiss_welcome_message'
 
 
 class OutlineTabView(RetrieveAPIView):
@@ -76,6 +93,9 @@ class OutlineTabView(RetrieveAPIView):
         course_key = CourseKey.from_string(course_key_string)
         course_usage_key = modulestore().make_course_usage_key(course_key)
 
+        if not course_home_mfe_outline_tab_is_active(course_key):
+            raise Http404
+
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_metric('course_id', course_key_string)
         monitoring_utils.set_custom_metric('user_id', request.user.id)
@@ -83,21 +103,46 @@ class OutlineTabView(RetrieveAPIView):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
 
-        _, request.user = setup_masquerade(
+        _masquerade, request.user = setup_masquerade(
             request,
             course_key,
             staff_access=has_access(request.user, 'staff', course_key),
             reset_masquerade_data=True,
         )
 
+        course_overview = CourseOverview.get_from_id(course_key)
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
         allow_anonymous = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
         allow_public = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC
         is_enrolled = enrollment and enrollment.is_active
         is_staff = has_access(request.user, 'staff', course_key)
+        show_enrolled = is_enrolled or is_staff
 
-        show_handouts = is_enrolled or is_staff or allow_public
+        show_handouts = show_enrolled or allow_public
         handouts_html = get_course_info_section(request, request.user, course, 'handouts') if show_handouts else ''
+
+        # TODO: TNL-7185 Legacy: Refactor to return the offer & expired data and format the message in the MFE
+        offer_html = generate_offer_html(request.user, course_overview)
+        course_expired_html = generate_course_expired_message(request.user, course_overview)
+
+        welcome_message_html = None
+        if get_course_tag(request.user, course_key, PREFERENCE_KEY) != 'False':
+            if LATEST_UPDATE_FLAG.is_enabled(course_key):
+                welcome_message_html = LatestUpdateFragmentView().latest_update_html(request, course)
+            else:
+                welcome_message_html = WelcomeMessageFragmentView().welcome_message_html(request, course)
+
+        enroll_alert = {
+            'can_enroll': True,
+            'extra_text': None,
+        }
+        if not show_enrolled:
+            if CourseMode.is_masters_only(course_key):
+                enroll_alert['can_enroll'] = False
+                enroll_alert['extra_text'] = _('Please contact your degree administrator or '
+                                               'edX Support if you have questions.')
+            elif course.invitation_only:
+                enroll_alert['can_enroll'] = False
 
         course_tools = CourseToolsPluginManager.get_enabled_course_tools(request, course_key)
         date_blocks = get_course_date_blocks(course, request.user, request, num_assignments=1)
@@ -126,12 +171,38 @@ class OutlineTabView(RetrieveAPIView):
 
         data = {
             'course_blocks': course_blocks,
+            'course_expired_html': course_expired_html,
             'course_tools': course_tools,
             'dates_widget': dates_widget,
+            'enroll_alert': enroll_alert,
             'handouts_html': handouts_html,
+            'offer_html': offer_html,
+            'welcome_message_html': welcome_message_html,
         }
         context = self.get_serializer_context()
         context['course_key'] = course_key
         serializer = self.get_serializer_class()(data, context=context)
 
         return Response(serializer.data)
+
+
+@api_view(['POST'])
+@authentication_classes((JwtAuthentication,))
+@permission_classes((IsAuthenticated,))
+def dismiss_welcome_message(request):
+    course_id = request.data.get('course_id', None)
+
+    # If body doesnt contain 'course_id', return 400 to client.
+    if not course_id:
+        raise ParseError(_("'course_id' is required."))
+
+    # If body contains params other than 'course_id', return 400 to client.
+    if len(request.data) > 1:
+        raise ParseError(_("Only 'course_id' is expected."))
+
+    try:
+        course_key = CourseKey.from_string(course_id)
+        set_course_tag(request.user, course_key, PREFERENCE_KEY, 'False')
+        return Response({'message': _('Welcome message successfully dismissed.')})
+    except Exception:
+        raise UnableToDismissWelcomeMessage

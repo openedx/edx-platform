@@ -84,6 +84,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     tabs = serializers.ListField()
     verified_mode = serializers.DictField()
     show_calculator = serializers.BooleanField()
+    original_user_is_staff = serializers.BooleanField()
     is_staff = serializers.BooleanField()
     can_load_courseware = serializers.DictField()
     notes = serializers.DictField()

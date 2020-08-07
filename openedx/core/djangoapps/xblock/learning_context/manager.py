@@ -1,8 +1,7 @@
 """
 Helper methods for working with learning contexts
 """
-
-
+from opaque_keys import OpaqueKey
 from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
@@ -38,9 +37,11 @@ def get_learning_context_impl(key):
         context_type = key.CANONICAL_NAMESPACE  # e.g. 'lib'
     elif isinstance(key, UsageKeyV2):
         context_type = key.context_key.CANONICAL_NAMESPACE
-    else:
+    elif isinstance(key, OpaqueKey):
         # Maybe this is an older modulestore key etc.
         raise TypeError("Opaque key {} does not have a learning context.".format(key))
+    else:
+        raise TypeError("key '{}' is not an opaque key. You probably forgot [KeyType].from_string(...)".format(key))
 
     try:
         return _learning_context_cache[context_type]

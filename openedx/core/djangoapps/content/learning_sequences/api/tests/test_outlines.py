@@ -4,20 +4,24 @@ models for this app.
 """
 from datetime import datetime, timezone
 
-from django.contrib.auth.models import User, AnonymousUser
+import attr
+from django.contrib.auth.models import AnonymousUser, User
 from edx_when.api import set_dates_for_course
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
-import attr
 
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from ..data import (
-    CourseOutlineData, CourseSectionData, CourseLearningSequenceData,
-    VisibilityData
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+
+from ...data import (
+    CourseLearningSequenceData, CourseOutlineData, CourseSectionData, VisibilityData, CourseVisibility
 )
 from ..outlines import (
-    get_course_outline, get_user_course_outline,
-    get_user_course_outline_details, replace_course_outline
+    get_course_outline,
+    get_user_course_outline,
+    get_user_course_outline_details,
+    replace_course_outline
 )
 from .test_data import generate_sections
 
@@ -39,6 +43,7 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2015",
             sections=generate_sections(cls.course_key, [2, 2]),
+            course_visibility=CourseVisibility.PRIVATE
         )
 
     def test_deprecated_course_key(self):
@@ -118,22 +123,22 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
         cls.student = User.objects.create_user(
             'student', email='student@example.com', is_staff=False
         )
-        # TODO: Add AnonymousUser here.
+        cls.anonymous_user = AnonymousUser()
 
         # Seed with data
         cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
-        normal_visibility = VisibilityData(
-            hide_from_toc=False,
-            visible_to_staff_only=False
-        )
         cls.simple_outline = CourseOutlineData(
             course_key=cls.course_key,
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
-            sections=generate_sections(cls.course_key, [2, 1, 3])
+            sections=generate_sections(cls.course_key, [2, 1, 3]),
+            course_visibility=CourseVisibility.PRIVATE
         )
         replace_course_outline(cls.simple_outline)
+
+        # Enroll student in the course
+        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
 
     def test_simple_outline(self):
         """This outline is the same for everyone."""
@@ -177,7 +182,7 @@ class ScheduleTestCase(CacheIsolationTestCase):
         cls.student = User.objects.create_user(
             'student', email='student@example.com', is_staff=False
         )
-        # TODO: Add AnonymousUser here.
+        cls.anonymous_user = AnonymousUser()
 
         cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
 
@@ -249,6 +254,7 @@ class ScheduleTestCase(CacheIsolationTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
+            course_visibility=CourseVisibility.PRIVATE,
             sections=[
                 CourseSectionData(
                     usage_key=cls.section_key,
@@ -285,6 +291,9 @@ class ScheduleTestCase(CacheIsolationTestCase):
             ]
         )
         replace_course_outline(cls.outline)
+
+        # Enroll student in the course
+        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
 
     def get_details(self, at_time):
         staff_details = get_user_course_outline_details(self.course_key, self.global_staff, at_time)
@@ -385,7 +394,8 @@ class VisbilityTestCase(CacheIsolationTestCase):
         cls.student = User.objects.create_user(
             'student', email='student@example.com', is_staff=False
         )
-        # TODO: Add AnonymousUser here.
+        cls.anonymous_user = AnonymousUser()
+
         cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
 
         # The UsageKeys we're going to set up for date tests.
@@ -416,6 +426,7 @@ class VisbilityTestCase(CacheIsolationTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
+            course_visibility=CourseVisibility.PRIVATE,
             sections=[
                 CourseSectionData(
                     usage_key=cls.normal_section_key,
@@ -448,6 +459,9 @@ class VisbilityTestCase(CacheIsolationTestCase):
         )
         replace_course_outline(cls.outline)
 
+        # Enroll student in the course
+        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
+
     def test_visibility(self):
         at_time = datetime(2020, 5, 21, tzinfo=timezone.utc)  # Exact value doesn't matter
         staff_details = get_user_course_outline_details(self.course_key, self.global_staff, at_time)
@@ -461,3 +475,127 @@ class VisbilityTestCase(CacheIsolationTestCase):
         assert len(staff_details.outline.sequences) == 4
         assert len(student_details.outline.sequences) == 1
         assert self.normal_in_normal_key in student_details.outline.sequences
+
+
+class SequentialVisibilityTestCase(CacheIsolationTestCase):
+    """
+    Tests sequentials visibility under different course visibility settings i.e public, public_outline, private
+    and different types of users e.g unenrolled, enrolled, anonymous, staff
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        super(SequentialVisibilityTestCase, cls).setUpTestData()
+
+        cls.global_staff = User.objects.create_user('global_staff', email='gstaff@example.com', is_staff=True)
+        cls.student = User.objects.create_user('student', email='student@example.com', is_staff=False)
+        cls.unenrolled_student = User.objects.create_user('unenrolled', email='unenrolled@example.com', is_staff=False)
+        cls.anonymous_user = AnonymousUser()
+
+        # Handy variable as we almost always need to test with all types of users
+        cls.all_users = [cls.global_staff, cls.student, cls.unenrolled_student, cls.anonymous_user]
+
+        cls.course_access_time = datetime(2020, 5, 21, tzinfo=timezone.utc)  # Some random time in past
+
+        # Create course, set it start date to some time in past and attach outline to it
+        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T0")
+        set_dates_for_course(
+            cls.course_key, [(cls.course_key.make_usage_key('course', 'course'), {'start': cls.course_access_time})]
+        )
+        cls.course_outline = CourseOutlineData(
+            course_key=cls.course_key,
+            title="User Outline Test Course!",
+            published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
+            published_version="5ebece4b69dd593d82fe2020",
+            sections=generate_sections(cls.course_key, [2, 1, 3]),
+            course_visibility=CourseVisibility.PRIVATE
+        )
+        replace_course_outline(cls.course_outline)
+
+        # enroll student into the course
+        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
+
+    @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
+    def test_public_course_outline(self):
+        """Test that public course outline is the same for everyone."""
+        course_outline = attr.evolve(self.course_outline, course_visibility=CourseVisibility.PUBLIC)
+        replace_course_outline(course_outline)
+
+        for user in self.all_users:
+            with self.subTest(user=user):
+                user_course_outline = get_user_course_outline(self.course_key, user, self.course_access_time)
+
+                self.assertEqual(len(user_course_outline.sections), 3)
+                self.assertEqual(len(user_course_outline.sequences), 6)
+                self.assertTrue(
+                    all([
+                        seq.usage_key in user_course_outline.accessible_sequences
+                        for seq in user_course_outline.sequences.values()
+                    ]),
+                    "Sequences should be accessible to all users for a public course"
+                )
+
+    @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
+    def test_public_outline_course_outline(self):
+        """
+        Test that a course with public_outline access has same outline for everyone
+        except that the links are not accessible for non-enrolled and anonymous user.
+        """
+        course_outline = attr.evolve(self.course_outline, course_visibility=CourseVisibility.PUBLIC_OUTLINE)
+        replace_course_outline(course_outline)
+
+        for user in self.all_users:
+            with self.subTest(user=user):
+                user_course_outline = get_user_course_outline(self.course_key, user, self.course_access_time)
+
+                self.assertEqual(len(user_course_outline.sections), 3)
+                self.assertEqual(len(user_course_outline.sequences), 6)
+
+                is_sequence_accessible = [
+                    seq.usage_key in user_course_outline.accessible_sequences
+                    for seq in user_course_outline.sequences.values()
+                ]
+
+                if user in [self.anonymous_user, self.unenrolled_student]:
+                    self.assertTrue(
+                        all(not is_accessible for is_accessible in is_sequence_accessible),
+                        "Sequences shouldn't be accessible to anonymous or non-enrolled students "
+                        "for a public_outline course"
+                    )
+                else:
+                    self.assertTrue(
+                        all(is_sequence_accessible),
+                        "Sequences should be accessible to enrolled, staff users for a public_outline course"
+                    )
+
+    @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
+    def test_private_course_outline(self):
+        """
+        Test that the outline of a course with private access is only accessible/visible
+        to enrolled user or staff.
+        """
+        course_outline = attr.evolve(self.course_outline, course_visibility=CourseVisibility.PRIVATE)
+        replace_course_outline(course_outline)
+
+        for user in self.all_users:
+            with self.subTest(user=user):
+                user_course_outline = get_user_course_outline(self.course_key, user, self.course_access_time)
+
+                is_sequence_accessible = [
+                    seq.usage_key in user_course_outline.accessible_sequences
+                    for seq in user_course_outline.sequences.values()
+                ]
+
+                if user in [self.anonymous_user, self.unenrolled_student]:
+                    self.assertTrue(
+                        len(user_course_outline.sections) == len(user_course_outline.sequences) == 0,
+                        "No section of a private course should be visible to anonymous or non-enrolled student"
+                    )
+                else:
+                    # Enrolled or Staff User
+                    self.assertEqual(len(user_course_outline.sections), 3)
+                    self.assertEqual(len(user_course_outline.sequences), 6)
+                    self.assertTrue(
+                        all(is_sequence_accessible),
+                        "Sequences should be accessible to enrolled, staff users for a public_outline course"
+                    )

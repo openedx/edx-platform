@@ -440,7 +440,7 @@ def get_expiration_banner_text(user, course, language='en'):
         bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\
                      <br>Upgrade by {upgrade_deadline} to get unlimited access to the course as long as it exists\
-                     on the site. <a href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past\
+                     on the site. <a id="FBE_banner" href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past\
                      {expiration_date}</span></a>'.format(
             expiration_date=formatted_expiration_date,
             upgrade_link=upgrade_link,

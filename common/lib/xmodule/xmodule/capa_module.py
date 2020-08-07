@@ -37,6 +37,7 @@ log = logging.getLogger("edx.courseware")
 
 @XBlock.wants('user')
 @XBlock.needs('i18n')
+@XBlock.wants('call_to_action')
 class ProblemBlock(
         CapaMixin, RawMixin, XmlMixin, EditingMixin,
         XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):

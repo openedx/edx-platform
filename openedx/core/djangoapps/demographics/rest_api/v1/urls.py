@@ -4,6 +4,7 @@ URL Routes for this app.
 from django.conf.urls import url
 from .views import DemographicsStatusView
 
+
 urlpatterns = [
     url(
         r'^demographics/status/$',
