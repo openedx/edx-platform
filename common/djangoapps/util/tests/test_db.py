@@ -198,9 +198,6 @@ class MigrationTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={})
-    @unittest.skip(
-        "Temporary skip for https://openedx.atlassian.net/browse/PROD-1886 where a column is to be removed"
-    )
     def test_migrations_are_in_sync(self):
         """
         Tests that the migration files are in sync with the models.
