@@ -16,10 +16,10 @@ log = getLogger(__name__)
 
 class Command(BaseCommand):
     help = """
-        Auto Score ORA assesment for On Demand Course if learner has completed all the necessary steps i-e 
-        submitted their responses, assess required peers responses and finally own assessment if required, if that 
+        Auto Score ORA assesment for On Demand Course if learner has completed all the necessary steps i-e
+        submitted their responses, assess required peers responses and finally own assessment if required, if that
         learner ends up in a waiting queue after 2 weeks of response submission this command will auto-score the
-        learner ORA assessment for those users. 
+        learner ORA assessment for those users.
     """
 
     def handle(self, *args, **options):
@@ -36,30 +36,26 @@ class Command(BaseCommand):
                 current_module = (delta_days.days / 7) + 1
                 user = enrollment.user
 
-                if current_module < 3:
-                    log.info('Current module is less than 3')
-                    continue
-                else:
-                    max_module = 1
+                max_module = 1
 
-                    course_chapters = modulestore().get_items(
-                        course.id,
-                        qualifiers={'category': 'course'}
-                    )
-                    for index_chapter, chapter in enumerate(course_chapters[0].children):
-                        if max_module < current_module:
-                            sequentials = modulestore().get_item(chapter)
-                            for index_sequential, sequential in enumerate(sequentials.children):
-                                verticals = modulestore().get_item(sequential)
-                                for index_vertical, vertical in enumerate(verticals.children):
-                                    vertical_blocks = modulestore().get_item(vertical)
-                                    for index_block, block in enumerate(vertical_blocks.children):
-                                        if (block.block_type == ORA_BLOCK_TYPE and
-                                                can_auto_score_ora(enrollment, course, block, index_chapter)):
-                                            anonymous_user = get_anonymous_user(user, course.id)
-                                            student = {
-                                                'anonymous_user_id': anonymous_user.anonymous_user_id
-                                            }
-                                            autoscore_ora(course.id, unicode(block), student)
+                course_chapters = modulestore().get_items(
+                    course.id,
+                    qualifiers={'category': 'course'}
+                )
+                for index_chapter, chapter in enumerate(course_chapters[0].children):
+                    if max_module < current_module:
+                        sequentials = modulestore().get_item(chapter)
+                        for index_sequential, sequential in enumerate(sequentials.children):
+                            verticals = modulestore().get_item(sequential)
+                            for index_vertical, vertical in enumerate(verticals.children):
+                                vertical_blocks = modulestore().get_item(vertical)
+                                for index_block, block in enumerate(vertical_blocks.children):
+                                    if (block.block_type == ORA_BLOCK_TYPE and
+                                            can_auto_score_ora(enrollment, course, block, index_chapter)):
+                                        anonymous_user = get_anonymous_user(user, course.id)
+                                        student = {
+                                            'anonymous_user_id': anonymous_user.anonymous_user_id
+                                        }
+                                        autoscore_ora(course.id, unicode(block), student)
 
-                        max_module = max_module + 1
+                    max_module = max_module + 1

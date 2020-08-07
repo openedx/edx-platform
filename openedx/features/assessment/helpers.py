@@ -12,6 +12,7 @@ from pytz import utc
 from submissions.api import reset_score, set_score
 from submissions.models import Submission
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.url_utils import unquote_slashes
 from openedx.features.philu_utils.utils import get_anonymous_user
 from xmodule.modulestore.django import modulestore
@@ -54,7 +55,6 @@ def can_auto_score_ora(enrollment, course, block, index_chapter):
     delta_days = today - enrollment.created.date()
     response_submission_delta = today - response_submission.created_at.date()
 
-    # check if this chapter is 2 weeks older or not.
     module_access_days = delta_days.days - (index_chapter * 7)
     waiting_for_others_submission_exists = AssessmentWorkflow.objects.filter(
         status=ASSESSMENT_WORKFLOW_WAITING_STATUS,
@@ -62,10 +62,22 @@ def can_auto_score_ora(enrollment, course, block, index_chapter):
         item_id=block,
         submission_uuid=response_submission.uuid
     ).exists()
+    days_to_wait_auto_assessment = get_ora_days_to_wait_from_site_configurations()
     return (
-        module_access_days >= DAYS_TO_WAIT_AUTO_ASSESSMENT and
-        response_submission_delta.days >= DAYS_TO_WAIT_AUTO_ASSESSMENT and
+        module_access_days >= days_to_wait_auto_assessment and
+        response_submission_delta.days >= days_to_wait_auto_assessment and
         waiting_for_others_submission_exists
+    )
+
+
+def get_ora_days_to_wait_from_site_configurations():
+    """
+    This function returns the maximum number of day to wait in-order to auto score ora. This value is fetched from
+    site configuration, with a hardcoded default value from constants.
+    """
+    return configuration_helpers.get_value(
+        'DAYS_TO_WAIT_AUTO_ASSESSMENT',
+        DAYS_TO_WAIT_AUTO_ASSESSMENT
     )
 
 
