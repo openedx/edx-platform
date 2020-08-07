@@ -1,10 +1,16 @@
+import logging
+
 from django.urls import reverse
 from django.utils.translation import gettext as _
+
+log = logging.getLogger(__name__)
 
 
 class PersonalizedLearnerScheduleCallToAction:
     CAPA_SUBMIT_DISABLED = 'capa_submit_disabled'
     VERTICAL_BANNER = 'vertical_banner'
+
+    past_due_class_warnings = set()
 
     def get_ctas(self, xblock, category):
         """
@@ -58,9 +64,23 @@ class PersonalizedLearnerScheduleCallToAction:
         else:
             can_attempt = True
 
-        is_past_due = xblock.is_past_due() if callable(xblock.is_past_due) else xblock.is_past_due
+        if callable(xblock.is_past_due):
+            is_past_due = xblock.is_past_due()
+        else:
+            PersonalizedLearnerScheduleCallToAction._log_past_due_warning(type(xblock).__name__)
+            is_past_due = xblock.is_past_due
 
         return xblock.self_paced and can_attempt and is_past_due
+
+    @staticmethod
+    def _log_past_due_warning(name):
+        if name in PersonalizedLearnerScheduleCallToAction.past_due_class_warnings:
+            return
+
+        log.warning('PersonalizedLearnerScheduleCallToAction has encountered an xblock that defines is_past_due '
+                    'as a property. This is supported for now, but may not be in the future. Please change '
+                    '%s.is_past_due into a method.', name)
+        PersonalizedLearnerScheduleCallToAction.past_due_class_warnings.add(name)
 
     @staticmethod
     def _make_reset_deadlines_cta(xblock):
