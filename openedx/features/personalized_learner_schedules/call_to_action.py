@@ -1,7 +1,11 @@
 import logging
 
+from crum import get_current_request
 from django.urls import reverse
 from django.utils.translation import gettext as _
+
+from lms.djangoapps.course_home_api.utils import is_request_from_learning_mfe
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 log = logging.getLogger(__name__)
 
@@ -34,6 +38,13 @@ class PersonalizedLearnerScheduleCallToAction:
         }]
         """
         ctas = []
+
+        # Some checks to disable PLS calls to action until these environments (mobile and MFE) support them natively
+        request = get_current_request()
+        is_mobile_app = request and is_request_from_mobile_app(request)
+        is_learning_mfe = request and is_request_from_learning_mfe(request)
+        if is_mobile_app or is_learning_mfe:
+            return []
 
         if category == self.CAPA_SUBMIT_DISABLED:
             # xblock is a capa problem, and the submit button is disabled. Check if it's because of a personalized
