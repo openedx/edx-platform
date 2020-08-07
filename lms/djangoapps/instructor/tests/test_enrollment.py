@@ -443,7 +443,8 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         score = sub_api.get_score(student_item)
         self.assertIs(score, None)
 
-    def setup_team(self):  # pylint: disable=attribute-defined-outside-init
+    # pylint: disable=attribute-defined-outside-init
+    def setup_team(self):
         """ Set up a team with teammates and StudentModules """
         # Make users
         self.teammate_a = UserFactory()
