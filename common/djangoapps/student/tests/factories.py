@@ -14,6 +14,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import (
     AccountRecovery,
+    AnonymousUserId,
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -211,3 +212,10 @@ class AccountRecoveryFactory(DjangoModelFactory):
     user = None
     secondary_email = factory.Sequence(u'robot+test+recovery+{0}@edx.org'.format)
     is_active = True
+
+
+class AnonymousUserIdFactory(DjangoModelFactory):
+    class Meta:
+        model = AnonymousUserId
+
+    user = factory.SubFactory(UserFactory)
