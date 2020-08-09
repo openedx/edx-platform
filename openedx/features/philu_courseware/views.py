@@ -78,6 +78,8 @@ class RevertPostAssessmentAttemptsAPIView(APIView):
                 requesting_user=user,
                 delete_module=True
             )
+        except ValueError:
+            raise ValidationError(_('Problem state is invalid.'))
         except InvalidKeyError:
             raise ValidationError(_('Course id is not valid.'))
         except StudentModule.DoesNotExist:
