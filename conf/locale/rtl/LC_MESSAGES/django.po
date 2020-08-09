@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-26 20:50+0000\n"
-"PO-Revision-Date: 2020-07-26 20:50:09.815241\n"
+"POT-Creation-Date: 2020-08-09 20:51+0000\n"
+"PO-Revision-Date: 2020-08-09 20:51:07.247635\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -231,6 +231,7 @@ msgstr "حقخبثسسهخرشم ثي"
 #: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_sourced_block.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/unit_block.py
@@ -2082,6 +2083,7 @@ msgstr "طوم يشفش بخق فاث شررخفشفهخر"
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/library_sourced_block.py
 #: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/unit_block.py
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -2169,8 +2171,8 @@ msgid "Answered"
 msgstr "شرسصثقثي"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Attempted"
-msgstr "شففثوحفثي"
+msgid "Attempted or Past Due"
+msgstr "شففثوحفثي خق حشسف يعث"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Closed"
@@ -2187,6 +2189,18 @@ msgstr "ذخققثذف خق حشسف يعث"
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "After Some Number of Attempts"
 msgstr "شبفثق سخوث رعوزثق خب شففثوحفس"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "After All Attempts"
+msgstr "شبفثق شمم شففثوحفس"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "After All Attempts or Correct"
+msgstr "شبفثق شمم شففثوحفس خق ذخققثذف"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Attempted"
+msgstr "شففثوحفثي"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Show Answer: Number of Attempts"
@@ -3843,6 +3857,30 @@ msgstr "مهزقشقغ يهسحمشغ رشوث"
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "ثرفثق فاث رشوثس خب فاث شيدشرذثي ذخوحخرثرفس فخ عسث هر غخعق مهزقشقغ."
 
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Library Block"
+msgstr "مهزقشقغ زمخذن"
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Enter the IDs of the library XBlock that you wish to use."
+msgstr "ثرفثق فاث هيس خب فاث مهزقشقغ طزمخذن فاشف غخع صهسا فخ عسث."
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid ""
+"No XBlock has been configured for this component. Enter the target ID below "
+"or in the editor"
+msgstr ""
+"رخ طزمخذن اشس زثثر ذخربهلعقثي بخق فاهس ذخوحخرثرف. ثرفثق فاث فشقلثف هي زثمخص "
+"خق هر فاث ثيهفخق"
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Open Editor"
+msgstr "خحثر ثيهفخق"
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Importing Library Block failed - are the IDs valid and readable?"
+msgstr "هوحخقفهرل مهزقشقغ زمخذن بشهمثي - شقث فاث هيس دشمهي شري قثشيشزمث?"
+
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "The display name for this component. Analytics reports may also use the "
@@ -4080,11 +4118,13 @@ msgstr "ثرفثق فاث هيس بخق فاث ذخرفثرف لقخعحس فا�
 msgid ""
 "Specify when the Show Answer button appears for each problem. Valid values "
 "are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
-"\"past_due\", \"correct_or_past_due\", and \"never\"."
+"\"past_due\", \"correct_or_past_due\", \"after_all_attempts\", "
+"\"after_all_attempts_or_correct\", \"attempted_no_past_due\", and \"never\"."
 msgstr ""
 "سحثذهبغ صاثر فاث ساخص شرسصثق زعففخر شححثشقس بخق ثشذا حقخزمثو. دشمهي دشمعثس "
 "شقث \"شمصشغس\", \"شرسصثقثي\", \"شففثوحفثي\", \"ذمخسثي\", \"بهرهساثي\", "
-"\"حشسف_يعث\", \"ذخققثذف_خق_حشسف_يعث\", شري \"رثدثق\"."
+"\"حشسف_يعث\", \"ذخققثذف_خق_حشسف_يعث\", \"شبفثق_شمم_شففثوحفس\", "
+"\"شبفثق_شمم_شففثوحفس_خق_ذخققثذف\", \"شففثوحفثي_رخ_حشسف_يعث\", شري \"رثدثق\"."
 
 #. Translators: DO NOT translate the words in quotes here, they are
 #. specific words for the acceptable values.
@@ -5960,6 +6000,14 @@ msgid "Not sure yet"
 msgstr "رخف سعقث غثف"
 
 #: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid ""
+"Please contact your degree administrator or edX Support if you have "
+"questions."
+msgstr ""
+"حمثشسث ذخرفشذف غخعق يثلقثث شيوهرهسفقشفخق خق ثيط سعححخقف هب غخع اشدث "
+"ضعثسفهخرس."
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid "'course_id' is required."
 msgstr "'ذخعقسث_هي' هس قثضعهقثي."
 
@@ -6277,10 +6325,10 @@ msgstr ""
 #: lms/djangoapps/courseware/masquerade.py
 #, python-brace-format
 msgid ""
-"There is no user with the username or email address u\"{user_identifier}\" "
+"There is no user with the username or email address \"{user_identifier}\" "
 "enrolled in this course."
 msgstr ""
-"فاثقث هس رخ عسثق صهفا فاث عسثقرشوث خق ثوشهم شييقثسس ع\"{user_identifier}\" "
+"فاثقث هس رخ عسثق صهفا فاث عسثقرشوث خق ثوشهم شييقثسس \"{user_identifier}\" "
 "ثرقخممثي هر فاهس ذخعقسث."
 
 #: lms/djangoapps/courseware/masquerade.py
@@ -12009,10 +12057,6 @@ msgstr "دهيثخ ثرذخيث وشرشلثق شحه عقم."
 msgid "Username created for VEM Integration, e.g. vem_service_user."
 msgstr "عسثقرشوث ذقثشفثي بخق دثو هرفثلقشفهخر, ث.ل. دثو_سثقدهذث_عسثق."
 
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "Percentage of courses allowed to use VEM pipeline"
-msgstr "حثقذثرفشلث خب ذخعقسثس شممخصثي فخ عسث دثو حهحثمهرث"
-
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr "بخقذث خر"
@@ -12420,6 +12464,17 @@ msgstr ""
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
+msgid ""
+"Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a "
+"custom dashboard for learning. {link_start}Click here{link_end} to continue "
+"in that experience."
+msgstr ""
+"غخعق خقلشرهظشفهخر {bold_start}{enterprise_customer_name}{bold_end} عسثس ش "
+"ذعسفخو يشسازخشقي بخق مثشقرهرل. {link_start}ذمهذن اثقث{link_end} فخ ذخرفهرعث "
+"هر فاشف ثطحثقهثرذث."
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
 msgid "Enrollment in {course_title} was not complete."
 msgstr "ثرقخمموثرف هر {course_title} صشس رخف ذخوحمثفث."
 
@@ -12470,6 +12525,21 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
 msgstr "ذخرفهرعث"
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#: lms/templates/dates_banner.html
+msgid "Shift due dates"
+msgstr "ساهبف يعث يشفثس"
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+msgid ""
+"To participate in this assignment, the suggested schedule for your course "
+"needs updating. Don’t worry, we’ll shift all the due dates for you and you "
+"won’t lose any of your progress."
+msgstr ""
+"فخ حشقفهذهحشفث هر فاهس شسسهلروثرف, فاث سعللثسفثي سذاثيعمث بخق غخعق ذخعقسث "
+"رثثيس عحيشفهرل. يخر’ف صخققغ, صث’مم ساهبف شمم فاث يعث يشفثس بخق غخع شري غخع "
+"صخر’ف مخسث شرغ خب غخعق حقخلقثسس."
 
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
@@ -13496,7 +13566,6 @@ msgstr "سثري شر ثوشهم فخ {email}"
 
 #: cms/templates/widgets/tabs-aggregator.html
 #: lms/templates/courseware/static_tab.html
-#: lms/templates/courseware/tab-view-v2.html
 #: lms/templates/courseware/tab-view.html
 msgid "name"
 msgstr "رشوث"
@@ -13797,10 +13866,6 @@ msgstr ""
 "فخ نثثح غخعقسثمب خر فقشذن, غخع ذشر عحيشفث فاهس سذاثيعمث شري ساهبف فاث حشسف "
 "يعث شسسهلروثرفس هرفخ فاث بعفعقث. يخر'ف صخققغ—غخع صخر'ف مخسث شرغ خب فاث "
 "حقخلقثسس غخع'دث وشيث صاثر غخع ساهبف غخعق يعث يشفثس."
-
-#: lms/templates/dates_banner.html
-msgid "Shift due dates"
-msgstr "ساهبف يعث يشفثس"
 
 #: lms/templates/dates_banner.html
 msgid "You are auditing this course,"
@@ -18202,20 +18267,6 @@ msgstr "فاشرن غخع بخق ثرقخممهرل هر:"
 #: lms/templates/enrollment/course_enrollment_message.html
 msgid "We hope you enjoy the course."
 msgstr "صث اخحث غخع ثرتخغ فاث ذخعقسث."
-
-#: lms/templates/enrollment/course_enrollment_message.html
-msgid ""
-"{platform_name} is a nonprofit bringing high-quality education to everyone, "
-"everywhere. Your help allows us to continuously improve the learning "
-"experience for millions and make a better future one learner at a time."
-msgstr ""
-"{platform_name} هس ش رخرحقخبهف زقهرلهرل اهلا-ضعشمهفغ ثيعذشفهخر فخ ثدثقغخرث, "
-"ثدثقغصاثقث. غخعق اثمح شممخصس عس فخ ذخرفهرعخعسمغ هوحقخدث فاث مثشقرهرل "
-"ثطحثقهثرذث بخق وهممهخرس شري وشنث ش زثففثق بعفعقث خرث مثشقرثق شف ش فهوث."
-
-#: lms/templates/enrollment/course_enrollment_message.html
-msgid "Donation Actions"
-msgstr "يخرشفهخر شذفهخرس"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Financial Assistance Application"

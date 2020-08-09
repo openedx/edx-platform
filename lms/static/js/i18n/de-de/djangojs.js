@@ -1916,7 +1916,6 @@
     "This learner will be removed from the team,allowing another learner to take the available spot.": "Dieser Lernende wird aus dem Team entfernt, so dass ein anderer Lernender den verf\u00fcgbaren Platz einnehmen kann. ",
     "This link will open in a modal window": "Dieser Link wird in einem Dialogfenster ge\u00f6ffnet",
     "This link will open in a new browser window/tab": "Dieser Link wird in einem neuen Browserfenster/Reiter ge\u00f6ffnet",
-    "This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.": "Dieses Problem wurde durch einen Fehler auf unserem Server oder mit Ihrer Internetverbindung verursacht. Versuchen Sie die Seite neu zu laden und/oder pr\u00fcfen sie ihre Internetverbindung",
     "This page contains information about orders that you have placed with {platform_name}.": "Diese Seite beinhaltet alle Informationen zu Ihren Bestellungen, welche Sie auf der {platform_name} get\u00e4tigt haben.",
     "This post could not be closed. Refresh the page and try again.": "Dieser Beitrag konnte nicht geschlossen werden. Aktualisieren Sie die Seite und versuchen Sie es erneut.",
     "This post could not be flagged for abuse. Refresh the page and try again.": "Dieser Beitrag konnte nicht als missbr\u00e4uchlich gekennzeichnet werden. Aktualisieren Sie die Seite und versuchen Sie es erneut.",

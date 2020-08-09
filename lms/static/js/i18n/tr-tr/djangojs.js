@@ -1786,7 +1786,6 @@
     "This learner is currently sharing a limited profile.": "Bu \u00f6\u011frenci \u015fu anda s\u0131n\u0131rl\u0131 bir profil payla\u015f\u0131yor.",
     "This link will open in a modal window": "Bu ba\u011flant\u0131 yeni bir kip penceresinde a\u00e7\u0131lacak",
     "This link will open in a new browser window/tab": "Bu ba\u011flant\u0131 taray\u0131c\u0131da yeni bir pencere veya sekmede a\u00e7\u0131lacak",
-    "This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.": "Bu durum sunucudaki bir hatadan veya \u0130nternet ba\u011flant\u0131n\u0131zdan kaynaklanm\u0131\u015f olabilir. Sayfay\u0131 yeniden y\u00fcklemeyi deneyin veya \u00e7evrimi\u00e7i oldu\u011funuza emin olun.",
     "This page contains information about orders that you have placed with {platform_name}.": "Bu sayfa {platform_name} i\u00e7inde verdi\u011finiz sipari\u015fleriniz hakk\u0131nda bilgileri i\u00e7erir.",
     "This post could not be closed. Refresh the page and try again.": "Bu g\u00f6nderi kapat\u0131lamaz. Sayfay\u0131 yenileyin ve tekrar deneyin.",
     "This post could not be flagged for abuse. Refresh the page and try again.": "Bu g\u00f6nderiye taciz i\u015faretlemesi yap\u0131lamaz. Sayfay\u0131 yenileyin ve tekrar deneyin.",
