@@ -1391,7 +1391,6 @@
     "This is the name of the group": "\u0110\u00e2y l\u00e0 t\u00ean c\u1ee7a nh\u00f3m",
     "This link will open in a modal window": "Li\u00ean k\u1ebft n\u00e0y s\u1ebd m\u1edf ra trong m\u1ed9t c\u1eeda s\u1ed5 con",
     "This link will open in a new browser window/tab": "\u0110\u01b0\u1eddng d\u1eabn s\u1ebd m\u1edf tr\u00ean m\u1ed9t trang tr\u00ecnh duy\u1ec7t m\u1edbi",
-    "This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.": "L\u1ed7i n\u00e0y c\u00f3 th\u1ec3 do m\u00e1y ch\u1ee7 c\u1ee7a ch\u00fang t\u00f4i ho\u1eb7c k\u1ebft n\u1ed1i internet c\u1ee7a b\u1ea1n. H\u00e3y th\u1eed t\u1ea3i l\u1ea1i trang ho\u1eb7c ki\u1ec3m tra l\u1ea1i k\u1ebft n\u1ed1i internet.",
     "This page contains information about orders that you have placed with {platform_name}.": "Trang n\u00e0y ch\u1ee9a th\u00f4ng tin v\u1ec1 nh\u1eefng \u0111\u01a1n h\u00e0ng m\u00e0 b\u1ea1n \u0111\u00e3 \u0111\u1eb7t v\u1edbi {platform_name}.",
     "This post could not be closed. Refresh the page and try again.": "Kh\u00f4ng th\u1ec3 \u0111\u00f3ng b\u00e0i n\u00e0y. L\u00e0m m\u1edbi l\u1ea1i trang v\u00e0 th\u1eed l\u1ea1i.",
     "This post could not be flagged for abuse. Refresh the page and try again.": "B\u00e0i n\u00e0y kh\u00f4ng th\u1ec3 b\u1ecb g\u1eafn c\u1edd vi ph\u1ea1m. L\u00e0m m\u1edbi l\u1ea1i trang v\u00e0 th\u1eed l\u1ea1i.",

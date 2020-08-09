@@ -8,6 +8,7 @@
 # Al Firdaus, 2014
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2018-2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
 # ichs <ichsansp@outlook.com>, 2014
@@ -73,6 +74,7 @@
 # Translators:
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020
 # fizdoonk, 2013
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Prita Ika Dewi <prita.tenda@gmail.com>, 2014
@@ -102,7 +104,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-19 20:42+0000\n"
+"POT-Creation-Date: 2020-08-02 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
 "Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
@@ -294,6 +296,7 @@ msgstr "Edukasi Profesional"
 #: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_sourced_block.py
 #: common/lib/xmodule/xmodule/lti_module.py
 #: common/lib/xmodule/xmodule/split_test_module.py
 #: common/lib/xmodule/xmodule/unit_block.py
@@ -710,6 +713,13 @@ msgid ""
 "                     first row being the header and columns will be as "
 "follows:                     user_id, username, email, course_id, "
 "is_verified, verification_date"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid ""
+"It expect that the data will be provided in a csv file format with"
+"                     first row being the header and columns will be as "
+"follows:                     course_id, username, mode"
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -2105,6 +2115,7 @@ msgstr "Data XML untuk anotasi"
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/library_sourced_block.py
 #: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/unit_block.py
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -3869,6 +3880,28 @@ msgstr "Nama Tampilan Library"
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Enter the names of the advanced components to use in your library."
 msgstr "Masukkan nama komponen lanjutan untuk digunakan di perpustakaan Anda."
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Library Block"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Enter the IDs of the library XBlock that you wish to use."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid ""
+"No XBlock has been configured for this component. Enter the target ID below "
+"or in the editor"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Open Editor"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+msgid "Importing Library Block failed - are the IDs valid and readable?"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -5764,6 +5797,7 @@ msgstr "Nomor ID Sertifikat"
 
 #: lms/djangoapps/certificates/views/webview.py
 #: lms/templates/certificates/invalid.html
+#: lms/templates/certificates/url_unsupported.html
 #, python-brace-format
 msgid "About {platform_name} Certificates"
 msgstr "Tentang Sertifikat {platform_name}"
@@ -5963,6 +5997,24 @@ msgstr "Eksplor Pelatihan"
 msgid "Not sure yet"
 msgstr "Belum yakin"
 
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid ""
+"Please contact your degree administrator or edX Support if you have "
+"questions."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "'course_id' is required."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "Only 'course_id' is expected."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "Welcome message successfully dismissed."
+msgstr ""
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
@@ -6028,6 +6080,32 @@ msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Assignment"
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Open Response Assessment"
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Self Assessment"
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Peer Assessment"
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Staff Assessment"
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
+msgid "Submission"
+msgstr ""
+
+#: lms/djangoapps/courseware/courses.py
+msgid ""
+"Open Response Assessment due dates are set by your instructor and can't be "
+"shifted."
 msgstr ""
 
 #. Translators: 'absolute' is a date such as "Jan 01,
@@ -12027,6 +12105,14 @@ msgstr ""
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
+msgid ""
+"Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a "
+"custom dashboard for learning. {link_start}Click here{link_end} to continue "
+"in that experience."
+msgstr ""
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
 msgid "Enrollment in {course_title} was not complete."
 msgstr "Pendaftaran ke {course_title} belum selesai."
 
@@ -13049,7 +13135,6 @@ msgstr "Kirim email ke {email}"
 
 #: cms/templates/widgets/tabs-aggregator.html
 #: lms/templates/courseware/static_tab.html
-#: lms/templates/courseware/tab-view-v2.html
 #: lms/templates/courseware/tab-view.html
 msgid "name"
 msgstr "Nama"
@@ -15730,6 +15815,18 @@ msgid ""
 msgstr ""
 "Jika semua informasi sudah benar dan masalah masih tetap terjadi, hubungi "
 "teknisi kami."
+
+#: lms/templates/certificates/url_unsupported.html
+msgid "URL Not Supported"
+msgstr ""
+
+#: lms/templates/certificates/url_unsupported.html
+msgid ""
+"This link is no longer valid. But don’t worry—this Verified Certificate is "
+"still valid and available to share. If this is your certificate, please "
+"visit your dashboard to get a new shareable link. If you're viewing someone "
+"else's certificate, please contact them to get an updated link."
+msgstr ""
 
 #: lms/templates/certificates/valid.html
 msgid "About edX Certificates"

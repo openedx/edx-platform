@@ -62,6 +62,7 @@
 # cholif yulian <cholifyulian123@gmail.com>, 2015
 # Eka Y Saputra <ekajogja@ymail.com>, 2014
 # erdi tama <erditama@gmail.com>, 2016
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020
 # Lucki Haryadi <suryaharyadi@gmail.com>, 2016
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # Zainab Amir <zamir@edx.org>, 2019
@@ -80,7 +81,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-19 20:42+0000\n"
+"POT-Creation-Date: 2020-08-02 20:42+0000\n"
 "PO-Revision-Date: 2020-06-14 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
@@ -91,6 +92,14 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.8.0\n"
 
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
@@ -100,8 +109,9 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
-#: lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "Menyimpan"
 
@@ -308,6 +318,10 @@ msgstr "Kesalahan"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "Mengupdate dengan konten library terakhir"
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid "Unable to update settings"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
@@ -2840,10 +2854,6 @@ msgid "Team Search"
 msgstr "Pencarian Tim"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Showing results for \"{searchString}\""
-msgstr "Menampilkan hasil untuk \"{searchString}\""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
 msgstr "Buat Tim Baru"
 
@@ -2880,6 +2890,10 @@ msgid ""
 msgstr ""
 "Anda dapat mengeluarkan anggota dari tim ini, terutama jika mereka tidak "
 "berpartisipasi dalam aktivitas tim."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Showing results for \"{searchString}\""
+msgstr "Menampilkan hasil untuk \"{searchString}\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Search teams"
@@ -5490,15 +5504,6 @@ msgstr "Pencapaian"
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
 msgstr "Profil"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"Ini mungkin terjadi karena ada kesalahan di server kami atau koneksi "
-"Internet Anda. Coba refresh halaman untuk memastikan Anda online."
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"

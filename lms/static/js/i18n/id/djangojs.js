@@ -1409,7 +1409,6 @@
     "This learner is currently sharing a limited profile.": "Peserta ini membagikan profil yang terbatas.",
     "This link will open in a modal window": "Tautan ini akan terbuka di jendela modal",
     "This link will open in a new browser window/tab": "Tautan ini akan dibuka di jendela/tab peramban baru",
-    "This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.": "Ini mungkin terjadi karena ada kesalahan di server kami atau koneksi Internet Anda. Coba refresh halaman untuk memastikan Anda online.",
     "This page contains information about orders that you have placed with {platform_name}.": "Halaman ini mengandung informasi mengenai pesanan yang telah Anda buat dengan {platform_name}",
     "This post could not be closed. Refresh the page and try again.": "Post ini tidak dapat ditutup. Refresh halaman ini dan coba lagi.",
     "This post could not be flagged for abuse. Refresh the page and try again.": "Post ini tidak dapat ditandai sebagai penyalahgunaan. Refresh halaman ini dan coba lagi.",
