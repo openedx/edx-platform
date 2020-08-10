@@ -15,7 +15,12 @@ from django.test.client import RequestFactory
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings as cookie_settings
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.features.edly import cookies as cookies_api
-from openedx.features.edly.tests.factories import EdlySubOrganizationFactory, EdlyUserProfileFactory, SiteFactory
+from openedx.features.edly.tests.factories import (
+    EdlyOrganizationFactory,
+    EdlySubOrganizationFactory,
+    EdlyUserProfileFactory,
+    SiteFactory,
+)
 from openedx.features.edly.utils import (
     create_user_link_with_edly_sub_organization,
     decode_edly_user_info_cookie,
@@ -26,7 +31,8 @@ from openedx.features.edly.utils import (
     set_global_course_creator_status,
     update_course_creator_status,
     user_has_edly_organization_access,
-    user_belongs_to_edly_organization,
+    user_belongs_to_edly_sub_organization,
+    user_can_login_on_requested_edly_organization,
 )
 from student import auth
 from student.roles import (
@@ -139,22 +145,61 @@ class UtilsTests(TestCase):
         user_has_access = user_has_edly_organization_access(self.request)
         assert user_has_access is False
 
-    def test_user_linked_with_edly_organization(self):
+    def test_user_linked_with_edly_sub_organization(self):
         """
         Test user is linked with a valid site.
         """
         edly_sub_organization = EdlySubOrganizationFactory(lms_site=self.request.site)
         self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization)
 
-        assert user_belongs_to_edly_organization(self.request, self.user) is True
+        assert user_belongs_to_edly_sub_organization(self.request, self.user) is True
 
-    def test_user_not_linked_with_edly_organization(self):
+    def test_user_not_linked_with_edly_sub_organization(self):
         """
         Test user is not linked with a valid site.
         """
         self._create_edly_sub_organization()
 
-        assert user_belongs_to_edly_organization(self.request, self.user) is False
+        assert user_belongs_to_edly_sub_organization(self.request, self.user) is False
+
+    def test_user_can_login_on_requested_edly_organization(self):
+        """
+        Test user can login on the requested URL site if linked with its parent edly-organization.
+        """
+        edly_sub_organization_linked_to_site = self._create_edly_sub_organization()
+        edly_sub_organization_linked_to_user = EdlySubOrganizationFactory(
+            lms_site=SiteFactory(),
+            edly_organization=edly_sub_organization_linked_to_site.edly_organization,
+        )
+        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization_linked_to_user)
+
+        assert user_can_login_on_requested_edly_organization(self.request, self.user) is False
+
+        edly_sub_organization_linked_to_site.edly_organization.enable_all_edly_sub_org_login = True
+        edly_sub_organization_linked_to_site.edly_organization.save()
+
+        assert user_can_login_on_requested_edly_organization(self.request, self.user) is True
+
+    def test_user_cannot_login_on_requested_edly_organization(self):
+        """
+        Test user cannot login on the requested URL site if not linked with its parent edly-organization.
+        """
+        assert user_can_login_on_requested_edly_organization(self.request, self.user) is False
+
+        edly_sub_organization_linked_to_site = self._create_edly_sub_organization()
+
+        edly_sub_organization_linked_to_user = EdlySubOrganizationFactory(
+            lms_site=SiteFactory(),
+            edly_organization=EdlyOrganizationFactory(),
+        )
+        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization_linked_to_user)
+
+        assert user_can_login_on_requested_edly_organization(self.request, self.user) is False
+
+        edly_sub_organization_linked_to_site.edly_organization.enable_all_edly_sub_org_login = True
+        edly_sub_organization_linked_to_site.edly_organization.save()
+
+        assert user_can_login_on_requested_edly_organization(self.request, self.user) is False
 
     def test_get_edly_sub_org_from_cookie(self):
         """

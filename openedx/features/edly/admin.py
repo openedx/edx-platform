@@ -50,7 +50,7 @@ class EdlyOrganizationAdmin(admin.ModelAdmin):
     Admin interface for the "EdlyOrganization" object.
     """
     search_fields = ['name', 'slug']
-    list_display = ['name', 'slug', 'created', 'modified']
+    list_display = ['name', 'slug', 'enable_all_edly_sub_org_login', 'created', 'modified']
     inlines = [EdlySubOrganizationInlineAdmin]
 
 
