@@ -18,8 +18,9 @@ class Command(BaseCommand):
     help = """
         Auto Score ORA assesment for On Demand Course if learner has completed all the necessary steps i-e
         submitted their responses, assess required peers responses and finally own assessment if required, if that
-        learner ends up in a waiting queue after 2 weeks of response submission this command will auto-score the
-        learner ORA assessment for those users.
+        learner ends up in a waiting queue after certain (configurable) days of response submission this command will
+        auto-score the learner ORA assessment for those users. The no of days to wait to auto-score ORA is configurable
+        from site configurations model though its default value is 3 days.
     """
 
     def handle(self, *args, **options):
@@ -38,10 +39,8 @@ class Command(BaseCommand):
 
                 max_module = 1
 
-                course_chapters = modulestore().get_items(
-                    course.id,
-                    qualifiers={'category': 'course'}
-                )
+                course_chapters = modulestore().get_items(course.id, qualifiers={'category': 'course'})
+
                 for index_chapter, chapter in enumerate(course_chapters[0].children):
                     if max_module < current_module:
                         sequentials = modulestore().get_item(chapter)
