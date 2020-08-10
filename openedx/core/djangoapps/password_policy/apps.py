@@ -9,7 +9,7 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from edx_django_utils.plugins.constants import PluginSettings
+from edx_django_utils.plugins import PluginSettings
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 

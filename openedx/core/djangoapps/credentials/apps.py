@@ -6,7 +6,7 @@ Credentials Configuration
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
 
-from edx_django_utils.plugins.constants import PluginSettings, PluginSignals
+from edx_django_utils.plugins import PluginSettings, PluginSignals
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 

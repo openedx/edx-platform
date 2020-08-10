@@ -10,7 +10,7 @@ from hashlib import sha1
 import six
 
 from openedx.core.lib.cache_utils import process_cached
-from edx_django_utils.plugins.plugin_manager import PluginManager
+from edx_django_utils.plugins import PluginManager
 
 
 class TransformerRegistry(PluginManager):

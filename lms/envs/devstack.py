@@ -11,7 +11,7 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 # pylint: enable=unicode-format-string
 #####################################################################
-from edx_django_utils.plugins import plugin_settings
+from edx_django_utils import plugins
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
@@ -309,7 +309,7 @@ JWT_AUTH.update({
         'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
     ),
 })
-plugin_settings.add_plugins(__name__, ProjectType.LMS, SettingsType.DEVSTACK)
+plugins.add_plugins(__name__, ProjectType.LMS, SettingsType.DEVSTACK)
 
 
 ######################### Django Rest Framework ########################

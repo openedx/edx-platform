@@ -19,7 +19,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import iteritems, text_type
 
-from edx_django_utils.plugins.plugin_contexts import get_plugins_view_context
+from edx_django_utils import plugins
 
 import track.views
 from bulk_email.api import is_bulk_email_feature_enabled
@@ -800,7 +800,7 @@ def student_dashboard(request):
         # TODO START: clean up as part of REVEM-199 (END)
     }
 
-    context_from_plugins = get_plugins_view_context(
+    context_from_plugins = plugins.get_plugins_view_context(
         ProjectType.LMS,
         COURSE_DASHBOARD_PLUGIN_VIEW_NAME,
         context

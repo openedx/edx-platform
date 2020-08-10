@@ -3,7 +3,7 @@ A module containing the CallToActionService which can be used for an xblock Runt
 specific CTAs for specific XBlock contexts.
 """
 
-from edx_django_utils.plugins.plugin_manager import PluginManager
+from edx_django_utils.plugins import PluginManager
 
 
 class CallToActionService(PluginManager):

@@ -2076,10 +2076,10 @@ SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Installed Django Apps #########################
 
-from edx_django_utils.plugins import plugin_apps, plugin_settings
+from edx_django_utils import plugins
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
-INSTALLED_APPS.extend(plugin_apps.get_apps(ProjectType.CMS))
-plugin_settings.add_plugins(__name__, ProjectType.CMS, SettingsType.COMMON)
+INSTALLED_APPS.extend(plugins.get_apps(ProjectType.CMS))
+plugins.add_plugins(__name__, ProjectType.CMS, SettingsType.COMMON)
 
 # Course exports streamed in blocks of this size. 8192 or 8kb is the default
 # setting for the FileWrapper class used to iterate over the export file data.

@@ -8,7 +8,7 @@ Signal handlers are connected here.
 from django.apps import AppConfig
 from django.conf import settings
 
-from edx_django_utils.plugins import plugin_signals
+from edx_django_utils import plugins
 
 from openedx.core.djangoapps.plugins.constants import ProjectType
 
@@ -31,4 +31,4 @@ class PluginsConfig(AppConfig):
         else:
             project_type = ProjectType.CMS
 
-        plugin_signals.connect_receivers(project_type)
+        plugins.connect_receivers(project_type)

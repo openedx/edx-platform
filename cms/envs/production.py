@@ -17,7 +17,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from path import Path as path
 
-from edx_django_utils.plugins import plugin_settings
+from edx_django_utils import plugins
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
@@ -541,7 +541,7 @@ MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY'
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
-plugin_settings.add_plugins(__name__, ProjectType.CMS, SettingsType.PRODUCTION)
+plugins.add_plugins(__name__, ProjectType.CMS, SettingsType.PRODUCTION)
 
 ########################## Derive Any Derived Settings  #######################
 
