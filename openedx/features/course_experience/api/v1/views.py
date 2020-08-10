@@ -57,9 +57,9 @@ def reset_course_deadlines(request):
 
         return Response({
             'body': format_html('<a href="{}">{}</a>', body_link, _('View all dates')),
-            'header': format_html(
-                '<div>{}</div>', _('Your due dates have been successfully shifted to help you stay on track.')
-            ),
+            'header': _('Your due dates have been successfully shifted to help you stay on track.'),
+            'link': body_link,
+            'link_text': _('View all dates'),
             'message': _('Deadlines successfully reset.'),
         })
     except Exception:
