@@ -1,20 +1,29 @@
 import React from 'react';
+import isFunction from 'lodash/isFunction';
 
-const Page = ({ children }) => children || null;
-const Header = ({ children }) => children || null;
-const Closer = ({ children }) => children || null;
-
-export class Wizard extends React.Component {
+const Page = ({ children }) => children;
+const Header = () => null;
+const Closer = () => null;
+export default class Wizard extends React.Component {
   constructor(props) {
     super(props);
+    this.findSubComponentByType = this.findSubComponentByType.bind(this);
+    this.handleNext = this.handleNext.bind(this);
     this.state = {
-      currentPage: this.props.setPage || 1,
+      currentPage: 1,
       totalPages: 0,
       pages: [],
+      wizardContext: {},
     }
-    this.handleNext = this.handleNext.bind(this);
-    this.findSubComponentByType = this.findSubComponentByType.bind(this);
-    this.renderPages = this.renderPages.bind(this);
+  }
+
+  componentDidMount() {
+    const pages = this.findSubComponentByType('Page');
+    const totalPages = pages.length;
+    const wizardContext = this.props.wizardContext;
+    const closer = this.findSubComponentByType('Closer')[0];
+    pages.push(closer);
+    this.setState({ pages, totalPages, wizardContext });
   }
 
   handleNext() {
@@ -27,38 +36,42 @@ export class Wizard extends React.Component {
     return this.props.children.filter((child) => child.type.name === type)
   }
 
-  componentDidMount() {
-    const pages = this.findSubComponentByType('Page')
-    const totalPages = pages.length;
-    const closer = this.findSubComponentByType("Closer")[0];
-    if (closer) {
-      pages.push(closer);
-    }
-    this.setState({ pages, totalPages })
-  }
-
-  renderPages() {
-    return this.state.pages.find((page, i) => i + 1 === this.state.currentPage);
-  }
 
   renderHeader() {
-    const header = this.findSubComponentByType("Header")[0];
+    const header = this.findSubComponentByType('Header')[0];
     return header.props.children({ currentPage: this.state.currentPage, totalPages: this.state.totalPages })
   }
 
+  renderPage() {
+    if (this.state.totalPages) {
+      const page = this.state.pages[this.state.currentPage - 1];
+      if(page.type.name === 'Closer') {
+        return page.props.children;
+      }
+
+      if (isFunction(page.props.children)) {
+        return page.props.children({ wizardConsumer: this.props.wizardContext });
+      } else {
+        return page.props.children;
+      }
+    }
+    return null;
+  }
+
   render() {
+    const finalPage = this.state.pages.length === this.state.currentPage;
     return (
       <div className="wizard-container">
         <div className="wizard-header">
           {this.state.totalPages >= this.state.currentPage && this.renderHeader()}
         </div>
-        <div>
-          {this.renderPages()}
-        </div>
         <br />
+        <div>
+          {this.renderPage()}
+        </div>
         <div className="wizard-footer">
-          <button className="wizard-button" onClick={() => { }}>Finish Later</button>
-          <button className="wizard-button blue" hidden={this.state.pages.length === this.state.currentPage} onClick={this.handleNext}>Next</button>
+          <button className={`wizard-button ${finalPage && 'blue'}`} onClick={this.props.onWizardComplete}>{finalPage ? "Return to my dashboard" : "Finish later"}</button>
+          <button className="wizard-button blue" hidden={finalPage} onClick={this.handleNext}>Next</button>
         </div>
       </div>
     );
