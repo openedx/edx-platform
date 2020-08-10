@@ -35,7 +35,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
       * (flag_name, course_key, username) if use_course_aware_bucketing=True, or
       * (flag_name, username)             if use_course_aware_bucketing=False.
 
-    Note that you may call `.get_bucket` without a course_key, in which case:
+    Note that you may call `.get_bucket` and `.is_enabled` without a course_key, in which case:
     * the smaller flags will be evaluated without course context, and
     * the default bucket will be evaluated as if use_course_aware_bucketing=False.
 
@@ -128,8 +128,29 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         """
         Return which bucket number the specified user is in.
 
-        Bucket 0 is assumed to be the control bucket and will be returned if the experiment is not enabled for
-        this user and course.
+        The user may be force-bucketed if matching subordinate flags of the form
+        "main_flag.BUCKET_NUM" exist. Otherwise, they will be hashed into a default
+        bucket based on their username, the experiment name, and the course-run key.
+
+        If `self.use_course_aware_bucketing` is False, the course-run key will
+        be omitted from the hashing formula, thus making it so a given user
+        has the same default bucket across all course runs; however, subordinate
+        flags that match the course-run key will still apply.
+
+        If `course_key` argument is omitted altogether, then subordinate flags
+        will be evaluated outside of the course-run context, and the default bucket
+        will be calculated as if `self.use_course_aware_bucketing` is False.
+
+        Finally, Bucket 0 is assumed to be the control bucket and will be returned if the
+        experiment is not enabled for this user and course.
+
+        Arguments:
+            course_key (Optional[CourseKey])
+            track (bool):
+                Whether an analytics event should be generated if the user is
+                bucketed for the first time.
+
+        Returns: int
         """
         # Keep some imports in here, because this class is commonly used at a module level, and we want to avoid
         # circular imports for any models.
@@ -218,6 +239,16 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         return self._cache_bucket(experiment_name, bucket)
 
     def is_enabled(self, course_key=None):
+        """
+        Return whether the requesting user is in a nonzero bucket for the given course.
+
+        See the docstring of `.get_bucket` for more details.
+
+        Arguments:
+            course_key (Optional[CourseKey])
+
+        Returns: bool
+        """
         return self.get_bucket(course_key) != 0
 
     def is_experiment_on(self, course_key=None):
