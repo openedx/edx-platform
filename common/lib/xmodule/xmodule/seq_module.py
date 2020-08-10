@@ -253,6 +253,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                     prereq_met, prereq_meta_info = self._compute_is_prereq_met(True)
             meta = self._get_render_metadata(context, display_items, prereq_met, prereq_meta_info, banner_text, STUDENT_VIEW)
             meta['display_name'] = self.display_name_with_default
+            meta['format'] = getattr(self, 'format', '')
             return json.dumps(meta)
         raise NotFoundError('Unexpected dispatch type')
 
