@@ -2732,7 +2732,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=751 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=752 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3592,6 +3592,7 @@ CREATE TABLE `enterprise_historicallicensedenterprisecourseenrollment` (
   `history_type` varchar(1) NOT NULL,
   `enterprise_course_enrollment_id` int(11) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
+  `is_revoked` tinyint(1) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_historica_history_user_id_1db87766_fk_auth_user` (`history_user_id`),
   KEY `enterprise_historicallicens_id_ff4cfd4f` (`id`),
@@ -3657,6 +3658,7 @@ CREATE TABLE `enterprise_licensedenterprisecourseenrollment` (
   `modified` datetime(6) NOT NULL,
   `license_uuid` char(32) NOT NULL,
   `enterprise_course_enrollment_id` int(11) NOT NULL,
+  `is_revoked` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_course_enrollment_id` (`enterprise_course_enrollment_id`),
   CONSTRAINT `enterprise_licensede_enterprise_course_en_db2f5a9f_fk_enterpris` FOREIGN KEY (`enterprise_course_enrollment_id`) REFERENCES `enterprise_enterprisecourseenrollment` (`id`)
