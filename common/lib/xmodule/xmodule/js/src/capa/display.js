@@ -667,10 +667,10 @@
                     *  2. we've to record each and every attempt of the learner.
                     * Both are done in `competencyAssessmentHandler`
                     * */
-                    if (window.competencyAssessmentHandler) {
+                    if (window.competencyAssessment.submitResponseHandler) {
                         // This function is defined in'features/philu_courseware/competency-assessments.js(philu-edx-theme)'
                         // which is included in courseware.html 'lms/templates/courseware/courseware.html(philu-edx-theme)'
-                        competencyAssessmentHandler(that,response);
+                        competencyAssessment.submitResponseHandler(that,response);
                     }
 
                     break;
