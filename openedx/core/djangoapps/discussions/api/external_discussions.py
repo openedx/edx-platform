@@ -15,12 +15,11 @@ def create_external_discussion_mapping(
     """
 
     try:
-        discussion_mapping = ExternalDiscussionsIdMapping.objects \
-            .create(
-                context_key=context_key,
-                usage_key=usage_key,
-                external_discussion_id=external_discussion_id
-            )
+        discussion_mapping = ExternalDiscussionsIdMapping.objects.create(
+            context_key=context_key,
+            usage_key=usage_key,
+            external_discussion_id=external_discussion_id
+        )
     except IntegrityError:
         raise ValueError(
             "Unable to create External Discussion Mapping. A mapping already exists for "
@@ -43,15 +42,15 @@ def remove_external_discussion_mapping(external_discussion_data: ExternalDiscuss
     Returns True on success, and False on failure
     """
     try:
-        discussion_mapping = ExternalDiscussionsIdMapping.objects \
-            .get(
-                context_key=external_discussion_data.context_key,
-                external_discussion_id=external_discussion_data.external_discussion_id,
-                usage_key=external_discussion_data.usage_key
-            )
-        discussion_mapping.delete()
+        discussion_mapping = ExternalDiscussionsIdMapping.objects.get(
+            context_key=external_discussion_data.context_key,
+            external_discussion_id=external_discussion_data.external_discussion_id,
+            usage_key=external_discussion_data.usage_key
+        )
     except ExternalDiscussionsIdMapping.DoesNotExist:
         return False
+
+    discussion_mapping.delete()
 
     return True
 
@@ -61,8 +60,10 @@ def get_external_discussion_context(context_key: LearningContextKey, usage_key: 
     Return an ExternalDiscussionData object with the external_discussion_id given the context_key and usage_key
     """
     try:
-        discussion_mapping = ExternalDiscussionsIdMapping.objects \
-            .get(context_key=context_key, usage_key=usage_key)
+        discussion_mapping = ExternalDiscussionsIdMapping.objects.get(
+            context_key=context_key,
+            usage_key=usage_key
+        )
     except ExternalDiscussionsIdMapping.DoesNotExist:
         return None
 
