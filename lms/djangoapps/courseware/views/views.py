@@ -584,7 +584,6 @@ class StaticCourseTabView(EdxFragmentView):
             'active_page': 'static_tab_{0}'.format(tab['url_slug']),
             'tab': tab,
             'fragment': fragment,
-            'uses_pattern_library': False,
             'disable_courseware_js': True,
         })
 

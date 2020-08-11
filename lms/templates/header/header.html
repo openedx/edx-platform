@@ -22,15 +22,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
 
-## Add UI Toolkit components if using the Pattern Library
-% if uses_pattern_library:
-    <%block name="js_extra">
-    <%static:require_module module_name="js/header_factory" class_name="HeaderFactory">
-    HeaderFactory();
-    </%static:require_module>
-    </%block>
-% endif
-
 <%
   unsupported_browser_alert_versions = configuration_helpers.get_value('UNSUPPORTED_BROWSER_ALERT_VERSIONS', settings.FEATURES.get('UNSUPPORTED_BROWSER_ALERT_VERSIONS'))
 %>
