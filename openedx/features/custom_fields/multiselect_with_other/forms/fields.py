@@ -1,3 +1,5 @@
+""" This module contains formfield for multi select"""
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectFormField
@@ -14,8 +16,7 @@ from openedx.features.custom_fields.multiselect_with_other.helpers import (
 
 
 class MultiSelectWithOtherFormField(MultiSelectFormField):
-    """
-    Form field class to handle other text input field within the multiselect field
+    """ Form field class to handle other text input field within the multiselect field
     """
 
     def __init__(self, other_max_length=None, *args, **kwargs):
@@ -37,8 +38,10 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
         return len(value) <= self.other_max_length
 
     def validate(self, value):
-        """
-        Validate that the input is a list or tuple.
+        """ Validate that the input is a list or tuple.
+        :param value: list of selected choices
+        :type value: list
+        :raise ValidationError: Validation Error
         """
         if self.required and not value:
             raise ValidationError(self.error_messages['required'], code='required')
@@ -54,13 +57,24 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
                     )
 
     def to_python(self, value):
-        """
-        Returns a list of strings
+        """ This function filters for the value that is automatically put
+        into the form payload when other field is selected in usage of
+        MultiSelectWithOtherField
+        :param value: list of strings
+        :type value: list
+        :return: list of strings with the other field checkbox value removed
+        :rtype: list
         """
         return filter_other_field_checkbox_value(
             super(MultiSelectWithOtherFormField, self).to_python(value)
         )
 
     def clean(self, value):
+        """ Return values that are not empty
+        :param value: list of selected choices
+        :type value: list
+        :return: values that are not empty
+        :rtype: list
+        """
         value = [val for val in value if val not in self.empty_values]
         return super(MultiSelectWithOtherFormField, self).clean(value)
