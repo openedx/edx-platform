@@ -15,11 +15,10 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
+from edx_django_utils.plugins import get_plugins_view_context
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import iteritems, text_type
-
-from edx_django_utils.plugins import get_plugins_view_context
 
 import track.views
 from bulk_email.api import is_bulk_email_feature_enabled

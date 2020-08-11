@@ -27,8 +27,8 @@ import dateutil
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
-from path import Path as path
 from edx_django_utils.plugins import add_plugins
+from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
