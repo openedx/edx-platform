@@ -1,5 +1,8 @@
 Plugins App
 ===========
 
-App helps interface with installed plugins that are created using method in `edx_django_utils/plugins`.
-Specifically, it provides/defines constants imported/utilized by plugins used in edx-platform and it insures django signals work correctly between edx-platform and installed plugins
+This app provides edx-platform specific constants and support for the Django Plugin infrastructure defined in `edx_django_utils/plugins`_.
+
+It enables you to add a plugin to LMS or CMS, including ensuring Django signals work correctly between edx-platform and installed plugins.
+
+.. _edx_django_utils/plugins: https://github.com/edx/edx-django-utils/tree/master/edx_django_utils/plugins

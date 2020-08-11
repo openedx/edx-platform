@@ -86,8 +86,8 @@ Most python plugins are enabled using one of two methods:
 1. A Python Entry point: the core Open edX platform provides a standard plugin loading mechanism in |edx_django_utils.plugins|_ which uses `stevedore`_ to find all installed python packages that declare a specific "entry point" in their setup.py file. See the ``entry_points`` defined in edx-platform's own ``setup.py`` for examples.
 2. A Django setting: Some plugins require modification of Django settings, which is typically done by editing ``/edx/etc/lms.yml`` (in Production) or ``edx-platform/lms/envs/private.py`` (on Devstack).
 
-.. |edx_django_utils.plugins.plugin_manager| replace:: ``edx_django_utils.plugins.plugin_manager``
-.. _edx_django_utils.plugins.plugin_manager: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins/plugin_manager.py
+.. |edx_django_utils.plugins| replace:: ``edx_django_utils.plugins``
+.. _edx_django_utils.plugins: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins.py
 .. _stevedore: https://pypi.org/project/stevedore/
 
 Here are the different integration points that python plugins can use:

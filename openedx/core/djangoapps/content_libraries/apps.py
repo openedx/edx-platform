@@ -5,7 +5,6 @@ Django AppConfig for Content Libraries Implementation
 
 
 from django.apps import AppConfig
-
 from edx_django_utils.plugins import PluginURLs, PluginSettings
 
 from openedx.core.djangoapps.plugins.constants import ProjectType

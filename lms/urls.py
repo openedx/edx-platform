@@ -11,7 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
 from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
-
 from edx_django_utils.plugins import get_plugin_url_patterns
 
 from branding import views as branding_views

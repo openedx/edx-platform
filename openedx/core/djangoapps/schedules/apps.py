@@ -2,7 +2,6 @@
 
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
-
 from edx_django_utils.plugins import PluginSignals
 
 from openedx.core.djangoapps.plugins.constants import ProjectType

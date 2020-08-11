@@ -2078,6 +2078,7 @@ SYSTEM_WIDE_ROLE_CLASSES = []
 
 from edx_django_utils.plugins import get_plugin_apps, add_plugins
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
+
 INSTALLED_APPS.extend(get_plugin_apps(ProjectType.CMS))
 add_plugins(__name__, ProjectType.CMS, SettingsType.COMMON)
 
