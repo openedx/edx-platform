@@ -62,8 +62,8 @@
                     <tr>
                         <td width="70">
                             <a href="{% with_link_tracking homepage_url %}"><img
-                                    src="https://media.sailthru.com/595/1k1/8/o/599f355101b3f.png" width="70"
-                                    height="30" alt="{% filter force_escape %}{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}{% endfilter %}"/></a>
+                                    src="{% with_link_tracking logo_image_url %}" 
+                                    height="50" alt="{% filter force_escape %}{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}{% endfilter %}"/></a>
                         </td>
                         <td align="right" style="text-align: {{ LANGUAGE_BIDI|yesno:"left,right" }};">
                             <a class="login" href="{% with_link_tracking dashboard_url %}" style="color: #005686;">{%  trans "Sign In" %}</a>
@@ -173,8 +173,10 @@
                         <td>
                             &copy; {% now "Y" %} {{ platform_name }}, {% trans "All rights reserved" as tmsg %}{{ tmsg | force_escape }}.<br/>
                             <br/>
-                            {% trans "Our mailing address is" as tmsg %}{{ tmsg | force_escape }}:<br/>
-                            {{ contact_mailing_address }}
+                            {% if contact_mailing_address %}
+                                {% trans "Our mailing address is" as tmsg %}{{ tmsg | force_escape }}:<br/>
+                                {{ contact_mailing_address }}
+                            {% endif %}
                         </td>
                     </tr>
                     {% if unsubscribe_url %}

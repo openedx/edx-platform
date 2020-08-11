@@ -7,6 +7,7 @@ from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 
 from edxmako.shortcuts import marketing_link
+from branding import api as branding_api
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 
 
@@ -25,6 +26,7 @@ def get_base_template_context(site):
         # Platform information
         'homepage_url': marketing_link('ROOT'),
         'dashboard_url': dashboard_url,
+        'logo_image_url': branding_api.get_logo_url(),
         'template_revision': getattr(settings, 'EDX_PLATFORM_REVISION', None),
         'platform_name': get_config_value_from_site_or_settings(
             'PLATFORM_NAME',
