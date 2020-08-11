@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from lms.djangoapps.courseware.courses import get_course_info_section
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
@@ -100,10 +99,7 @@ from openedx.core.djangolib.markup import HTML, Text
               </a>
             % endfor
           % endif
-          % if SelfPacedConfiguration.current().enable_course_home_improvements:
-            ${HTML(dates_fragment.body_html())}
-          % endif
-          <h3 class="hd hd-3  handouts-header">${_(course.info_sidebar_name)}</h3>
+          <h3 class="hd hd-3 handouts-header">${_("Course Handouts")}</h3>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
         </section>
       % else:

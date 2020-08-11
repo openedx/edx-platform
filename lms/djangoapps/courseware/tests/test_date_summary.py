@@ -38,7 +38,6 @@ from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
@@ -56,10 +55,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
 
-    def setUp(self):
-        super(CourseDateSummaryTest, self).setUp()
-        SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
-
     def make_request(self, user):
         """ Creates a request """
         request = RequestFactory().request()
@@ -67,17 +62,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.addCleanup(crum.set_current_request, None)
         crum.set_current_request(request)
         return request
-
-    def test_course_info_feature_flag(self):
-        SelfPacedConfiguration(enable_course_home_improvements=False).save()
-        course = create_course_run()
-        user = create_user()
-        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
-
-        self.client.login(username=user.username, password=TEST_PASSWORD)
-        url = reverse('info', args=(course.id,))
-        response = self.client.get(url)
-        self.assertNotContains(response, 'date-summary', status_code=302)
 
     def test_course_home_logged_out(self):
         course = create_course_run()

@@ -14,8 +14,4 @@ class SelfPacedConfiguration(ConfigurationModel):
 
     .. no_pii:
     """
-
-    enable_course_home_improvements = BooleanField(
-        default=False,
-        verbose_name=_("Enable course home page improvements.")
-    )
+    pass

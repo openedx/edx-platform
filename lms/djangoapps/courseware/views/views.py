@@ -103,7 +103,6 @@ from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
@@ -401,36 +400,6 @@ def course_info(request, course_id):
     Display the course's info.html, or 404 if there is no such course.
     Assumes the course_id is in a valid format.
     """
-    # TODO: LEARNER-611: This can be deleted with Course Info removal.  The new
-    #    Course Home is using its own processing of last accessed.
-    def get_last_accessed_courseware(course, request, user):
-        """
-        Returns the courseware module URL that the user last accessed, or None if it cannot be found.
-        """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, request.user, course, depth=2
-        )
-        course_module = get_module_for_descriptor(
-            user,
-            request,
-            course,
-            field_data_cache,
-            course.id,
-            course=course,
-            will_recheck_access=True,
-        )
-        chapter_module = get_current_child(course_module)
-        if chapter_module is not None:
-            section_module = get_current_child(chapter_module)
-            if section_module is not None:
-                url = reverse('courseware_section', kwargs={
-                    'course_id': text_type(course.id),
-                    'chapter': chapter_module.url_name,
-                    'section': section_module.url_name
-                })
-                return url
-        return None
-
     course_key = CourseKey.from_string(course_id)
 
     return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
