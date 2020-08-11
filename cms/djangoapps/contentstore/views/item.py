@@ -108,9 +108,6 @@ def set_discussion_toggle(value, xblock, user):
     """
     Recursively update all children of given xblock in modulestore
     """
-    if xblock.category not in ["vertical", "sequential", "chapter", "course"]:
-        return
-
     if hasattr(xblock, "is_discussable"):
         xblock.is_discussable = value
         _update_with_callback(xblock, user)
@@ -130,18 +127,6 @@ def _is_library_component_limit_reached(usage_key):
         return False
     total_children = len(parent.children)
     return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
-
-
-def set_discussion_toggle(value, xblock, user):
-    """
-    Recursively update all children of given xblock in modulestore
-    """
-    for child in xblock.get_children():
-        if child.category in ["chapter", "sequential"]:
-            set_discussion_toggle(value, child, user)
-        else:
-            child.discussion_enabled = value
-            _save_xblock(user, child)
 
 
 @require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
