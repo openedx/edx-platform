@@ -100,7 +100,12 @@ from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
 from .component import ADVANCED_COMPONENT_TYPES
 from .item import create_xblock_info
-from .library import LIBRARIES_ENABLED, get_library_creator_status
+from .library import (
+    LIBRARY_AUTHORING_MICROFRONTEND_URL,
+    LIBRARIES_ENABLED,
+    get_library_creator_status,
+    should_redirect_to_library_authoring_mfe,
+)
 
 log = logging.getLogger(__name__)
 
@@ -554,8 +559,10 @@ def course_listing(request):
         u'archived_courses': archived_courses,
         u'in_process_course_actions': in_process_course_actions,
         u'libraries_enabled': LIBRARIES_ENABLED,
+        u'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
+        u'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
         u'libraries': [format_library_for_view(lib) for lib in libraries],
-        u'show_new_library_button': get_library_creator_status(user),
+        u'show_new_library_button': get_library_creator_status(user) and not should_redirect_to_library_authoring_mfe(),
         u'user': user,
         u'request_course_creator_url': reverse('request_course_creator'),
         u'course_creator_status': _get_course_creator_status(user),

@@ -72,11 +72,6 @@ class VEMPipelineIntegration(ConfigurationModel):
         help_text=_('Username created for VEM Integration, e.g. vem_service_user.')
     )
 
-    vem_enabled_courses_percentage = models.IntegerField(
-        default=0,
-        help_text=_('Percentage of courses allowed to use VEM pipeline')
-    )
-
     def get_service_user(self):
         User = get_user_model()  # pylint: disable=invalid-name
         return User.objects.get(username=self.service_username)

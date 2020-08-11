@@ -618,6 +618,43 @@ class SAMLProviderConfig(ProviderConfig):
             "This is helpful for testing/setup but should always be disabled before users start using this provider."
         ),
     )
+    country = models.CharField(
+        max_length=128,
+        help_text=(
+            u'URN of SAML attribute containing the user`s country.',
+        ),
+        blank=True,
+    )
+    skip_hinted_login_dialog = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is enabled, users that visit a \"TPA hinted\" URL for this provider "
+            "(e.g. a URL ending with `?tpa_hint=[provider_name]`) will be forwarded directly to "
+            "the login URL of the provider instead of being first prompted with a login dialog."
+        ),
+    )
+    skip_registration_form = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is enabled, users will not be asked to confirm their details "
+            "(name, email, etc.) during the registration process. Only select this option "
+            "for trusted providers that are known to provide accurate user information."
+        ),
+    )
+    skip_email_verification = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is selected, users will not be required to confirm their "
+            "email, and their account will be activated immediately upon registration."
+        ),
+    )
+    send_to_registration_first = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is selected, users will be directed to the registration page "
+            "immediately after authenticating with the third party instead of the login page."
+        ),
+    )
     other_settings = models.TextField(
         verbose_name=u"Advanced settings", blank=True,
         help_text=(
@@ -692,7 +729,7 @@ class SAMLProviderConfig(ProviderConfig):
             conf = {}
         attrs = (
             'attr_user_permanent_id', 'attr_full_name', 'attr_first_name',
-            'attr_last_name', 'attr_username', 'attr_email', 'entity_id')
+            'attr_last_name', 'attr_username', 'attr_email', 'entity_id', 'country')
         attr_defaults = {
             'attr_full_name': 'default_full_name',
             'attr_first_name': 'default_first_name',

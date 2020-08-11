@@ -43,6 +43,7 @@ When refering to XBlocks, we use the entry-point name. For example,
 import importlib.util
 import os
 import sys
+from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
@@ -404,6 +405,19 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     # .. toggle_status: supported
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
+
+    # .. toggle_name: ENABLE_LIBRARY_AUTHORING_MICROFRONTEND
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable the Library Authoring MFE
+    # .. toggle_category: micro-frontend
+    # .. toggle_use_cases: incremental_release
+    # .. toggle_creation_date: 2020-06-20
+    # .. toggle_expiration_date: 2020-12-31
+    # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
+    # .. toggle_status: supported
+    # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
+    'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
 }
 
 ENABLE_JASMINE = False
@@ -414,6 +428,7 @@ IDA_LOGOUT_URI_LIST = []
 
 ############################# MICROFRONTENDS ###################################
 COURSE_AUTHORING_MICROFRONTEND_URL = None
+LIBRARY_AUTHORING_MICROFRONTEND_URL = None
 
 ############################# SOCIAL MEDIA SHARING #############################
 SOCIAL_SHARING_SETTINGS = {
@@ -660,8 +675,15 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
+
+    # CORS and CSRF
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
+
+    # JWT auth
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
     # Allows us to define redirects via Django admin
@@ -1320,6 +1342,10 @@ INSTALLED_APPS = [
     # API access administration
     'openedx.core.djangoapps.api_admin',
 
+    # CORS and cross-domain CSRF
+    'corsheaders',
+    'openedx.core.djangoapps.cors_csrf',
+
     # History tables
     'simple_history',
 
@@ -1478,6 +1504,9 @@ INSTALLED_APPS = [
     # DRF filters
     'django_filters',
     'cms.djangoapps.api',
+
+    # edx-drf-extensions
+    'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
 
     # Entitlements, used in openedx tests
     'entitlements',
@@ -1647,6 +1676,7 @@ OPTIONAL_APPS = (
     ('integrated_channels.sap_success_factors', None),
     ('integrated_channels.xapi', None),
     ('integrated_channels.cornerstone', None),
+    ('integrated_channels.canvas', None),
 )
 
 
@@ -2080,8 +2110,15 @@ FINANCIAL_REPORTS = {
     'ROOT_PATH': 'sandbox',
 }
 
-CORS_ORIGIN_WHITELIST = []
-CORS_ORIGIN_ALLOW_ALL = False
+############# CORS headers for cross-domain requests #################
+if FEATURES.get('ENABLE_CORS_HEADERS'):
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ORIGIN_WHITELIST = ()
+    CORS_ORIGIN_ALLOW_ALL = False
+    CORS_ALLOW_INSECURE = False
+    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+        'use-jwt-cookie',
+    )
 
 LOGIN_REDIRECT_WHITELIST = []
 

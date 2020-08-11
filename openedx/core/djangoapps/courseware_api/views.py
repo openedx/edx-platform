@@ -48,16 +48,16 @@ class CoursewareMeta:
             course_key,
         )
         self.effective_user = self.overview.effective_user
-        # We need to memoize `is_staff` _before_ we configure masquerade.
-        self.is_staff = has_access(self.effective_user, 'staff', self.overview).has_access
+        self.original_user_is_staff = has_access(request.user, 'staff', self.overview).has_access
         self.course_key = course_key
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration'])
-        course_masquerade, _user = setup_masquerade(
+        course_masquerade, user = setup_masquerade(
             request,
             course_key,
-            staff_access=self.is_staff,
+            staff_access=self.original_user_is_staff,
         )
+        self.is_staff = has_access(user, 'staff', self.overview).has_access
         self.course_masquerade = course_masquerade
 
     def __getattr__(self, name):
@@ -208,7 +208,8 @@ class CoursewareInformation(RetrieveAPIView):
             * mode: `audit`, `verified`, etc
             * is_active: boolean
         * can_load_course: Whether the user can view the course (AccessResponse object)
-        * is_staff: Whether the user has staff access to the course
+        * is_staff: Whether the effective user has staff access to the course
+        * original_user_is_staff: Whether the original user has staff access to the course
 
     **Parameters:**
 

@@ -10,10 +10,10 @@ from openedx.core.djangolib.markup import HTML, Text
 <li class="action action-select">
     <input type="hidden" name="contribution" value="${price_before_discount or min_price}" />
     % if content_gating_enabled or course_duration_limit_enabled:
-        <button type="submit" name="verified_mode">
+        <button id="track_selection_upgrade" type="submit" name="verified_mode">
             <span>${_('Pursue the Verified Track')}</span>
     % else:
-        <button type="submit" name="verified_mode">
+        <button id="track_selection_upgrade" type="submit" name="verified_mode">
             <span>${_('Pursue a Verified Certificate')}</span>
     % endif
         % if price_before_discount:
@@ -23,3 +23,14 @@ from openedx.core.djangolib.markup import HTML, Text
         % endif
         </button>
 </li>
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+var upgradeLink = $("#track_selection_upgrade");
+
+TrackECommerceEvents.trackUpsellClick(upgradeLink, 'track_selection', {
+    pageName: "track_selection",
+    linkType: "button",
+    linkCategory: "(none)"
+});
+
+</%static:require_module_async> 

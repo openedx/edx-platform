@@ -14,6 +14,7 @@ class DateSummarySerializer(serializers.Serializer):
     """
     Serializer for Date Summary Objects.
     """
+    assignment_type = serializers.CharField(default=None)
     complete = serializers.NullBooleanField()
     date = serializers.DateTimeField()
     date_type = serializers.CharField()

@@ -488,6 +488,11 @@ FEATURES = {
     'ENABLE_ORA_USERNAMES_ON_DATA_EXPORT': False,
 }
 
+# Specifies extra XBlock fields that should available when requested via the Course Blocks API
+# Should be a list of tuples of (block_type, field_name), where block_type can also be "*" for all block types.
+# e.g. COURSE_BLOCKS_API_EXTRA_FIELDS = [  ('course', 'other_course_settings'), ("problem", "weight")  ]
+COURSE_BLOCKS_API_EXTRA_FIELDS = []
+
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
 COURSE_REVIEWS_TOOL_PROVIDER_FRAGMENT_NAME = 'coursetalk-reviews-fragment.html'
 COURSE_REVIEWS_TOOL_PROVIDER_PLATFORM_KEY = 'edx'
@@ -2774,12 +2779,11 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
+    CORS_ALLOW_INSECURE = False
     CORS_ALLOW_HEADERS = corsheaders_default_headers + (
         'use-jwt-cookie',
     )
 
-CORS_ORIGIN_WHITELIST = []
-CORS_ORIGIN_ALLOW_ALL = False
 # Default cache expiration for the cross-domain proxy HTML page.
 # This is a static page that can be iframed into an external page
 # to simulate cross-domain requests.
@@ -3179,6 +3183,7 @@ OPTIONAL_APPS = [
     ('integrated_channels.sap_success_factors', None),
     ('integrated_channels.cornerstone', None),
     ('integrated_channels.xapi', None),
+    ('integrated_channels.canvas', None),
 
     # Required by the Enterprise App
     ('django_object_actions', None),  # https://github.com/crccheck/django-object-actions
@@ -3656,6 +3661,10 @@ ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
     u'{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
     u'{privacy_policy_link_end} from {enterprise_name}.'
 )
+ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE = _(
+    u'{start_bold}{enterprise_name}{end_bold} has partnered with {start_bold}{platform_name}{end_bold} '
+    u'to offer you high-quality learning opportunities from the world\'s best institutions and universities.'
+)
 ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
     'age',
@@ -3915,9 +3924,6 @@ BLOCKSTORE_API_URL = 'http://localhost:18250/api/v1/'
 # Which of django's caches to use for storing anonymous user state for XBlocks
 # in the blockstore-based XBlock runtime
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
-
-########################## LEARNER PORTAL ##############################
-LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
 
 ######################### MICROSITE ###############################
 MICROSITE_ROOT_DIR = '/edx/app/edxapp/edx-microsite'

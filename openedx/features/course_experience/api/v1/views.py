@@ -82,6 +82,7 @@ class CourseDeadlinesMobileView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
+        # Although this course data is not used this method will return 404 if course does not exist
         get_course_with_access(request.user, 'load', course_key)
 
         serializer = self.get_serializer({})

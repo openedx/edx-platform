@@ -13,6 +13,7 @@ from support.views.feature_based_enrollments import FeatureBasedEnrollmentsSuppo
 from support.views.index import index
 from support.views.manage_user import ManageUserDetailView, ManageUserSupportView
 from support.views.program_enrollments import LinkProgramEnrollmentSupportView, ProgramEnrollmentsInspectorView
+from support.views.sso_records import SsoView
 
 COURSE_ENTITLEMENTS_VIEW = EntitlementSupportView.as_view()
 
@@ -44,5 +45,6 @@ urlpatterns = [
         r'program_enrollments_inspector/?$',
         ProgramEnrollmentsInspectorView.as_view(),
         name='program_enrollments_inspector'
-    )
+    ),
+    url(r'sso_records/(?P<username_or_email>[\w.@+-]+)?$', SsoView.as_view(), name='sso_records'),
 ]

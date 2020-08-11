@@ -109,6 +109,8 @@ class SamlIntegrationTestUtilities(object):
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
         kwargs.setdefault('max_session_length', None)
+        kwargs.setdefault('send_to_registration_first', False)
+        kwargs.setdefault('skip_email_verification', False)
         saml_provider = self.configure_saml_provider(**kwargs)  # pylint: disable=no-member
 
         if fetch_metadata:

@@ -64,7 +64,7 @@
 # Ron Lucke <ronlucke@googlemail.com>, 2014
 # Ron Lucke <ronlucke@googlemail.com>, 2014
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
-# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2019
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2020
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/).
 # Copyright (C) 2020 EdX
@@ -129,9 +129,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-07-12 20:42+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-08-02 20:42+0000\n"
+"PO-Revision-Date: 2020-07-20 16:32+0000\n"
+"Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
@@ -139,6 +139,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -149,8 +157,9 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
-#: lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "Speichert"
 
@@ -373,6 +382,10 @@ msgstr "Fehler"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "Aktualisiere mit den neuesten Bibliotheken"
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
+msgid "Unable to update settings"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
@@ -2997,10 +3010,6 @@ msgid "Team Search"
 msgstr "Teamsuche"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Showing results for \"{searchString}\""
-msgstr "Suchergebnisse für: \"{searchString}\""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
 msgstr "Ein neues Team erstellen"
 
@@ -3036,6 +3045,10 @@ msgid ""
 msgstr ""
 "Du kannst Mitglieder aus diesem Team entfernen, insbesondere wenn sie nicht "
 "an der Aktivität des Teams teilgenommen haben."
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Showing results for \"{searchString}\""
+msgstr "Suchergebnisse für: \"{searchString}\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Search teams"
@@ -5765,16 +5778,6 @@ msgstr "Leistungen"
 msgid "Profile"
 msgstr "Profil"
 
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-"Dieses Problem wurde durch einen Fehler auf unserem Server oder mit Ihrer "
-"Internetverbindung verursacht. Versuchen Sie die Seite neu zu laden und/oder"
-" prüfen sie ihre Internetverbindung"
-
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr "Studio hat Probleme beim Speichern Ihrer Arbeit"
@@ -5824,7 +5827,7 @@ msgstr "Zertifikat"
 
 #: cms/static/js/certificates/views/certificate_preview.js
 msgid "Deactivating"
-msgstr ""
+msgstr "Deaktivieren"
 
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
@@ -5838,7 +5841,7 @@ msgstr "Du hast bislang keine Zertifikate erhalten."
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
-msgstr ""
+msgstr "\"<%- signatoryName %>\" von der Liste der Unterzeichner löschen?"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -6169,6 +6172,8 @@ msgid ""
 "Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
 "<%- (fileExtensions) %> to upload."
 msgstr ""
+"Es können nur  <%- fileTypes %> Dateien hochgeladen werden. Bitte wählen Sie"
+" eine Datei mit der Endung <%- (fileExtensions) %> zum Hochladen aus."
 
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
@@ -6355,7 +6360,7 @@ msgstr "{selectedProvider} Anmeldeinformationen gespeichert"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%- name %>”"
-msgstr ""
+msgstr "Eine neue PDF zu “<%- name %>” hochladen "
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -6982,12 +6987,16 @@ msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than <%- limit %> characters."
 msgstr ""
+"Die Gesamtlänge der Felder \"Organisation\", \"Kursnummer\" und \"Kurslauf\""
+" darf nicht mehr als <%- limit %> Zeichen enthalten."
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
 "more than <%- limit %> characters."
 msgstr ""
+"Die Gesamtlänge der Organisations- und Bibliothekscodefelder darf nicht mehr"
+" als <%- limit %> Zeichen enthalten."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -11268,6 +11277,10 @@ msgid ""
 " back to a basic exam. You may not configure it as a special exam now. "
 "Contact edX Support for assistance."
 msgstr ""
+"Dieser Unterabschnitt wurde für die Teilnehmer als Sonderprüfung "
+"veröffentlicht, anschließend aber wieder zu einer Grundprüfung "
+"zurückgewandelt. Die Prüfung kann jetzt nicht mehr als Sonderprüfung "
+"konfiguriert werden. Wenden Sie sich zur Unterstützung an den edX-Support."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""
@@ -11276,6 +11289,11 @@ msgid ""
 " basic exam by selecting 'None', but you will NOT be able to configure it as"
 " a special exam in the future."
 msgstr ""
+"Diese Sonderprüfung wurde für die Teilnehmer veröffentlicht und kann nicht "
+"in eine andere Art von Sonderprüfung umgewandelt werden. Dieser "
+"Unterabschnitt kann jedoch wieder in eine Basisprüfung umgewandelt werden, "
+"indem Sie \"None\" wählen. Sie können die Prüfung in Zukunft NICHT mehr als "
+"Sonderprüfung konfigurieren."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"

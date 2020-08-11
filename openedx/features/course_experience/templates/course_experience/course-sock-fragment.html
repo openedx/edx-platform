@@ -58,7 +58,7 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
                     </div>
                 % endif
                 <img class="mini-cert" alt="Example Certificate Image" src="${static.url('course_experience/images/verified-cert.png')}"/>
-                <a href="${upgrade_url}">
+                <a id="sock" href="${upgrade_url}">
                     <div class="btn btn-upgrade stuck-top focusable action-upgrade-certificate" data-creative="original_sock" data-position="sock">
                         ${Text(_('Upgrade ({course_price})')).format(course_price=HTML(course_price))}
                     </div>

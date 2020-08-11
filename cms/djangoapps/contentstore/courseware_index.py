@@ -178,8 +178,7 @@ class SearchIndexerBase(object, metaclass=ABCMeta):
             Returns:
             item_content_groups - content groups assigned to indexed item
             """
-            is_indexable = hasattr(item, "index_dictionary")
-            item_index_dictionary = item.index_dictionary() if is_indexable else None
+            item_index_dictionary = item.index_dictionary()
             # if it's not indexable and it does not have children, then ignore
             if not item_index_dictionary and not item.has_children:
                 return

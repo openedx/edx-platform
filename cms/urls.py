@@ -293,6 +293,11 @@ urlpatterns += [
 # API docs.
 urlpatterns += make_docs_urls(api_info)
 
+# edx-drf-extensions csrf app
+urlpatterns += [
+    url(r'', include('csrf.urls')),
+]
+
 if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
     urlpatterns += [
         url(r'coverage_context', include('openedx.testing.coverage_context_listener.urls'))

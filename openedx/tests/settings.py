@@ -81,6 +81,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.user_api',
     'course_modes.apps.CourseModesConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
+    'openedx.core.djangoapps.content_libraries',
     'openedx.core.djangoapps.dark_lang',
     'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
@@ -104,6 +105,7 @@ INSTALLED_APPS = (
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
     'entitlements',
+    'organizations',
 )
 
 LMS_ROOT_URL = "http://localhost:8000"
@@ -128,6 +130,8 @@ RETIRED_USERNAME_PREFIX = 'retired__user_'
 
 PROCTORING_SETTINGS = {}
 
+ROOT_URLCONF = None
+RUN_BLOCKSTORE_TESTS = False
 
 # Software Secure request retry settings
 # Time in seconds before a retry of the task should be 60 mints.

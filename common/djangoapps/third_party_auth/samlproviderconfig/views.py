@@ -15,6 +15,7 @@ from third_party_auth.utils import validate_uuid4_string
 
 from ..models import SAMLProviderConfig
 from .serializers import SAMLProviderConfigSerializer
+from ..utils import convert_saml_slug_provider_id
 
 
 class SAMLProviderMixin(object):
@@ -57,14 +58,15 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
             EnterpriseCustomerIdentityProvider,
             enterprise_customer__uuid=self.requested_enterprise_uuid
         )
-        return SAMLProviderConfig.objects.filter(slug=enterprise_customer_idp.provider_id)
+        return SAMLProviderConfig.objects.current_set().filter(
+            slug=convert_saml_slug_provider_id(enterprise_customer_idp.provider_id))
 
     @property
     def requested_enterprise_uuid(self):
         """
         The enterprise customer uuid from request params or post body
         """
-        if self.request.method == "POST":
+        if self.request.method in ('POST', 'PUT'):
             uuid_str = self.request.POST.get('enterprise_customer_uuid')
             if uuid_str is None:
                 raise ParseError('Required enterprise_customer_uuid is missing')
@@ -103,7 +105,7 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         # Associate the enterprise customer with the provider
         association_obj = EnterpriseCustomerIdentityProvider(
             enterprise_customer=enterprise_customer,
-            provider_id=serializer.data['slug']
+            provider_id=convert_saml_slug_provider_id(serializer.data['slug'])
         )
         association_obj.save()
 

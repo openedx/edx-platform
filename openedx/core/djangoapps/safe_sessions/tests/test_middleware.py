@@ -306,10 +306,6 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     def test_error(self):
         self.verify_error(302)
 
-    def test_error_from_mobile_web_view(self):
-        self.request.path = '/xblock/block-v1:org+course+run+type@html+block@block_id'
-        self.verify_error(401)
-
     @override_settings(MOBILE_APP_USER_AGENT_REGEXES=[r'open edX Mobile App'])
     def test_error_from_mobile_app(self):
         self.request.META = {'HTTP_USER_AGENT': 'open edX Mobile App Version 2.1'}

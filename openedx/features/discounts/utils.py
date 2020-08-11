@@ -87,7 +87,7 @@ def format_strikeout_price(user, course, base_price=None, check_for_discount=Tru
             )).format(
                 original_price=original_price,
                 formatted_discount_price=formatted_discount_price,
-                s_sr=HTML("<span class='sr'>"),
+                s_sr=HTML("<span class='sr-only'>"),
                 s_op=HTML("<span class='price original'>"),
                 e_p=HTML("</span>"),
                 e_sr=HTML("</span>"),
@@ -133,11 +133,11 @@ def generate_offer_html(user, course):
                 br=HTML('<br>'),
                 banner_open=HTML(
                     '<div class="first-purchase-offer-banner" role="note">'
-                    '<span class="first-purchase-offer-banner-bold">'
+                    '<span class="first-purchase-offer-banner-bold"><b>'
                 ),
                 discount_expiration_date=discount_expiration_date.strftime(u'%B %d'),
                 percentage=discount_percentage(course),
-                span_close=HTML('</span>'),
+                span_close=HTML('</b></span>'),
                 div_close=HTML('</div>'),
                 strikeout_price=HTML(format_strikeout_price(user, course, check_for_discount=False)[0])
             )

@@ -45,7 +45,10 @@ from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_bann
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
-from shoppingcart.models import DonationConfiguration
+from openedx.features.enterprise_support.api import (
+    get_dashboard_consent_notification,
+    get_enterprise_learner_portal_enabled_message,
+)
 from student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from student.models import (
@@ -109,47 +112,6 @@ def _get_recently_enrolled_courses(course_enrollments):
     ]
 
 
-def _allow_donation(course_modes, course_id, enrollment):
-    """
-    Determines if the dashboard will request donations for the given course.
-
-    Check if donations are configured for the platform, and if the current course is accepting donations.
-
-    Args:
-        course_modes (dict): Mapping of course ID's to course mode dictionaries.
-        course_id (str): The unique identifier for the course.
-        enrollment(CourseEnrollment): The enrollment object in which the user is enrolled
-
-    Returns:
-        True if the course is allowing donations.
-
-    """
-    if course_id not in course_modes:
-        flat_unexpired_modes = {
-            text_type(course_id): [mode for mode in modes]
-            for course_id, modes in iteritems(course_modes)
-        }
-        flat_all_modes = {
-            text_type(course_id): [mode.slug for mode in modes]
-            for course_id, modes in iteritems(CourseMode.all_modes_for_courses([course_id]))
-        }
-        log.error(
-            u'Can not find `%s` in course modes.`%s`. All modes: `%s`',
-            course_id,
-            flat_unexpired_modes,
-            flat_all_modes
-        )
-    donations_enabled = configuration_helpers.get_value(
-        'ENABLE_DONATIONS',
-        DonationConfiguration.current().enabled
-    )
-    return (
-        donations_enabled and
-        enrollment.mode in course_modes[course_id] and
-        course_modes[course_id][enrollment.mode].min_price == 0
-    )
-
-
 def _create_recent_enrollment_message(course_enrollments, course_modes):
     """
     Builds a recent course enrollment message.
@@ -179,11 +141,6 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):
             [enrollment.course_overview.display_name for enrollment in recently_enrolled_courses]
         )
 
-        allow_donations = any(
-            _allow_donation(course_modes, enrollment.course_overview.id, enrollment)
-            for enrollment in recently_enrolled_courses
-        )
-
         platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
 
         return render_to_string(
@@ -191,7 +148,6 @@ def _create_recent_enrollment_message(course_enrollments, course_modes):
             {
                 'course_names': course_names,
                 'enrollments_count': enrollments_count,
-                'allow_donations': allow_donations,
                 'platform_name': platform_name,
                 'course_id': recently_enrolled_courses[0].course_overview.id if enrollments_count == 1 else None
             }
@@ -623,6 +579,9 @@ def student_dashboard(request):
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
+    # Display a message guiding the user to their Enterprise's Learner Portal if enabled
+    enterprise_learner_portal_enabled_message = get_enterprise_learner_portal_enabled_message(request)
+
     recovery_email_message = recovery_email_activation_message = None
     if is_secondary_email_feature_enabled():
         try:
@@ -833,6 +792,7 @@ def student_dashboard(request):
         'empty_dashboard_message': empty_dashboard_message,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
+        'enterprise_learner_portal_enabled_message': enterprise_learner_portal_enabled_message,
         'show_load_all_courses_link': show_load_all_courses_link(user, course_limit, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (START)
         'course_info': get_dashboard_course_info(user, course_enrollments),
