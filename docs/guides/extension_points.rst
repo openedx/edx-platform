@@ -87,7 +87,7 @@ Most python plugins are enabled using one of two methods:
 2. A Django setting: Some plugins require modification of Django settings, which is typically done by editing ``/edx/etc/lms.yml`` (in Production) or ``edx-platform/lms/envs/private.py`` (on Devstack).
 
 .. |edx_django_utils.plugins| replace:: ``edx_django_utils.plugins``
-.. _edx_django_utils.plugins: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins.py
+.. _edx_django_utils.plugins: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins
 .. _stevedore: https://pypi.org/project/stevedore/
 
 Here are the different integration points that python plugins can use:
