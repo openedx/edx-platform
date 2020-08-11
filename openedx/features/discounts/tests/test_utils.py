@@ -38,7 +38,7 @@ class TestStrikeoutPrice(TestCase):
             content, has_discount = utils.format_strikeout_price(Mock(name='user'), Mock(name='course'))
 
         assert six.text_type(content) == (
-            u"<span class='sr'>"
+            u"<span class='sr-only'>"
             u"Original price: <span class='price original'>{original_price}</span>, discount price: "
             u"</span>"
             u"<span class='price discount'>{discount_price}</span> "

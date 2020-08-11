@@ -36,6 +36,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError
 
+from ..config.waffle import REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND
+
 from .component import CONTAINER_TEMPLATES, get_component_templates
 from .user import user_with_role
 
@@ -44,6 +46,21 @@ __all__ = ['library_handler', 'manage_library_users']
 log = logging.getLogger(__name__)
 
 LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
+ENABLE_LIBRARY_AUTHORING_MICROFRONTEND = settings.FEATURES.get('ENABLE_LIBRARY_AUTHORING_MICROFRONTEND', False)
+LIBRARY_AUTHORING_MICROFRONTEND_URL = settings.LIBRARY_AUTHORING_MICROFRONTEND_URL
+
+
+def should_redirect_to_library_authoring_mfe():
+    """
+    Boolean helper method, returns whether or not to redirect to the Library
+    Authoring MFE based on settings and flags.
+    """
+
+    return (
+        ENABLE_LIBRARY_AUTHORING_MICROFRONTEND and
+        LIBRARY_AUTHORING_MICROFRONTEND_URL and
+        REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND.is_enabled()
+    )
 
 
 def get_library_creator_status(user):

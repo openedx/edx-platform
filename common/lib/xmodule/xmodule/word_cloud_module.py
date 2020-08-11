@@ -309,3 +309,27 @@ class WordCloudBlock(  # pylint: disable=abstract-method
         add_webpack_to_fragment(fragment, 'WordCloudBlockStudio')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
+
+    def index_dictionary(self):
+        """
+        Return dictionary prepared with module content and type for indexing.
+        """
+        # return key/value fields in a Python dict object
+        # values may be numeric / string or dict
+        # default implementation is an empty dict
+
+        xblock_body = super(WordCloudBlock, self).index_dictionary()
+
+        index_body = {
+            "display_name": self.display_name,
+            "instructions": self.instructions,
+        }
+
+        if "content" in xblock_body:
+            xblock_body["content"].update(index_body)
+        else:
+            xblock_body["content"] = index_body
+
+        xblock_body["content_type"] = "Word Cloud"
+
+        return xblock_body

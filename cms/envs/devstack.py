@@ -145,6 +145,9 @@ FEATURES['ENABLE_CREATOR_GROUP'] = False
 ################### FRONTEND APPLICATION PUBLISHER URL ###################
 FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
 
+################### FRONTEND APPLICATION LIBRARY AUTHORING ###################
+LIBRARY_AUTHORING_MICROFRONTEND_URL = 'http://localhost:3001'
+
 ################################# DJANGO-REQUIRE ###############################
 
 # Whether to run django-require in debug mode.

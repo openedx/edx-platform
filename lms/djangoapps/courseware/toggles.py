@@ -21,7 +21,9 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
 # .. toggle_tickets: TNL-7000
 # .. toggle_status: supported
-REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'courseware_mfe')
+REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', use_course_aware_bucketing=False
+)
 
 # Waffle flag to display a link for the new learner experience to course teams without redirecting students.
 #

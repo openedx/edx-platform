@@ -426,8 +426,8 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         discount_expiration_date = get_discount_expiration_date(user, self.course).strftime(u'%B %d')
         upgrade_link = verified_upgrade_deadline_link(user=user, course=self.course)
         bannerText = u'''<div class="first-purchase-offer-banner" role="note">
-             <span class="first-purchase-offer-banner-bold">
-             Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</span>
+             <span class="first-purchase-offer-banner-bold"><b>
+             Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</b></span>
              <br>Use code <b>EDXWELCOME</b> at checkout! <a id="welcome" href="{upgrade_link}">Upgrade Now</a>
              </div>'''.format(
             discount_expiration_date=discount_expiration_date,

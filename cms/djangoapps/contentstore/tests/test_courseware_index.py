@@ -56,9 +56,6 @@ from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
 
-class NonIndexableXBlock(XBlock):
-    """XBlock for testing indexibility"""
-
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
     "chapter": "sequential",
@@ -353,33 +350,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 3)
 
-    @XBlock.register_temp_plugin(NonIndexableXBlock)
-    def _test_not_indexable(self, store):
-        """ test not indexable items """
-        # Publish the vertical to start with
-        self.publish_item(store, self.vertical.location)
-        self.reindex_course(store)
-        response = self.search()
-        self.assertEqual(response["total"], 4)
-
-        # Add a non-indexable item
-        ItemFactory.create(
-            parent_location=self.vertical.location,
-            category="nonindexablexblock",
-            display_name="Some other content",
-            publish_item=False,
-            modulestore=store,
-        )
-        self.reindex_course(store)
-        response = self.search()
-        self.assertEqual(response["total"], 4)
-
-        # even after publishing, we should not find the non-indexable item
-        self.publish_item(store, self.vertical.location)
-        self.reindex_course(store)
-        response = self.search()
-        self.assertEqual(response["total"], 4)
-
     def _test_start_date_propagation(self, store):
         """ make sure that the start date is applied at the right level """
         early_date = self.course.start
@@ -565,10 +535,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     @ddt.data(*WORKS_WITH_STORES)
     def test_deleting_item(self, store_type):
         self._perform_test_using_store(store_type, self._test_deleting_item)
-
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_not_indexable(self, store_type):
-        self._perform_test_using_store(store_type, self._test_not_indexable)
 
     @ddt.data(*WORKS_WITH_STORES)
     def test_start_date_propagation(self, store_type):
@@ -903,25 +869,6 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 1)
 
-    @XBlock.register_temp_plugin(NonIndexableXBlock)
-    def _test_not_indexable(self, store):
-        """ test not indexable items """
-        self.reindex_library(store)
-        response = self.search()
-        self.assertEqual(response["total"], 2)
-
-        # Add a non-indexable item
-        ItemFactory.create(
-            parent_location=self.library.location,
-            category="nonindexablexblock",
-            display_name="Assessment",
-            publish_item=False,
-            modulestore=store,
-        )
-        self.reindex_library(store)
-        response = self.search()
-        self.assertEqual(response["total"], 2)
-
     @patch('django.conf.settings.SEARCH_ENGINE', None)
     def _test_search_disabled(self, store):
         """ if search setting has it as off, confirm that nothing is indexed """
@@ -949,10 +896,6 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
     @ddt.data(*WORKS_WITH_STORES)
     def test_deleting_item(self, store_type):
         self._perform_test_using_store(store_type, self._test_deleting_item)
-
-    @ddt.data(*WORKS_WITH_STORES)
-    def test_not_indexable(self, store_type):
-        self._perform_test_using_store(store_type, self._test_not_indexable)
 
     @ddt.data(*WORKS_WITH_STORES)
     def test_search_disabled(self, store_type):

@@ -30,6 +30,7 @@ CLASS_PRIORITY = ['video', 'problem']
 
 @XBlock.needs('user', 'bookmarks')
 @XBlock.wants('completion')
+@XBlock.wants('call_to_action')
 class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
@@ -91,6 +92,9 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
                 'content': rendered_child.content
             })
 
+        cta_service = self.runtime.service(self, 'call_to_action')
+        vertical_banner_ctas = cta_service and cta_service.get_ctas(self, 'vertical_banner')
+
         completed = self.is_block_complete_for_assignments(completion_service)
         past_due = completed is False and self.due and self.due < datetime.now(pytz.UTC)
         fragment_context = {
@@ -101,6 +105,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             'completed': completed,
             'past_due': past_due,
             'subsection_format': context.get('format', ''),
+            'vertical_banner_ctas': vertical_banner_ctas,
         }
 
         if view == STUDENT_VIEW:

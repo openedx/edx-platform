@@ -700,12 +700,8 @@ To view JavaScript code style quality run this command::
 Code Complexity Tools
 =====================
 
-Two tools are available for evaluating complexity of edx-platform code:
+Tool(s) available for evaluating complexity of edx-platform code:
 
-- `radon <https://radon.readthedocs.org/en/latest/>`__ for Python code
-  complexity.  To obtain complexity, run::
-
-       paver run_complexity
 
 - `plato <https://github.com/es-analysis/plato>`__ for JavaScript code
   complexity. Several options are available on the command line; see

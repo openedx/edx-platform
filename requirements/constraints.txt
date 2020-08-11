@@ -40,7 +40,7 @@ drf-yasg<1.17.1
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.4.33
+edx-enterprise==3.4.40
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
@@ -91,13 +91,6 @@ path<13.2.0
 # ARCHBOM-1141: pip-tools upgrade requires pip upgrade
 pip-tools<5.0.0
 
-# BOM-1430: pytest 5.4.0 breaks reporting sometimes: https://github.com/pytest-dev/pytest/issues/6925
-pytest<5.4.0
-
-# pytest-django 3.9.0 has a fix for pytest 5.4.0+ that breaks cleanup after failed tests in earlier pytest versions
-# https://github.com/pytest-dev/pytest-django/issues/824
-pytest-django<3.9.0
-
 # Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
 python-dateutil==2.4.0
 
@@ -121,3 +114,7 @@ scipy<1.5
 
 # geoip2 requires Python 3.6
 geoip2<4.0.1
+
+# tests failing for pymongo==3.11
+pymongo<3.11
+

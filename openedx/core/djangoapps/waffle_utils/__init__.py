@@ -456,38 +456,20 @@ class CourseWaffleFlag(WaffleFlag):
 
         return course_override_callback
 
-    def _is_enabled(self, course_key=None):
-        """
-        Returns whether or not the flag is enabled without error checking.
-
-        Arguments:
-            course_key (CourseKey): The course to check for override before
-            checking waffle.
-        """
-        return self.waffle_namespace.is_flag_active(
-            self.flag_name,
-            check_before_waffle_callback=self._get_course_override_callback(course_key),
-        )
-
-    def is_enabled_without_course_context(self):
-        """
-        Returns whether or not the flag is enabled outside the context of a given course.
-        This should only be used when a course waffle flag must be used outside of a course.
-        If this is intended for use with a simple global setting, use simple waffle flag instead.
-        """
-        return self._is_enabled()
-
-    def is_enabled(self, course_key=None):
+    def is_enabled(self, course_key=None):  # pylint: disable=arguments-differ
         """
         Returns whether or not the flag is enabled within the context of a given course.
 
         Arguments:
-            course_key (CourseKey): The course to check for override before
-            checking waffle.
+            course_key (Optional[CourseKey]): The course to check for override before
+                checking waffle. If omitted, check whether the flag is enabled
+                outside the context of any course.
         """
-        # validate arguments
-        assert issubclass(type(course_key), CourseKey), u"The course_key '{}' must be a CourseKey.".format(
-            str(course_key)
+        if course_key:
+            assert isinstance(course_key, CourseKey), (
+                "Provided course_key '{}' is not instance of CourseKey.".format(course_key)
+            )
+        return self.waffle_namespace.is_flag_active(
+            self.flag_name,
+            check_before_waffle_callback=self._get_course_override_callback(course_key),
         )
-
-        return self._is_enabled(course_key)

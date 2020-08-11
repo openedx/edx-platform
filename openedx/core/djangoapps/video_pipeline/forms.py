@@ -4,7 +4,10 @@ Defines a form to provide validations for course-specific configuration.
 from django import forms
 
 from openedx.core.djangoapps.video_config.forms import CourseSpecificFlagAdminBaseForm
-from openedx.core.djangoapps.video_pipeline.models import CourseVideoUploadsEnabledByDefault
+from openedx.core.djangoapps.video_pipeline.models import (
+    CourseVideoUploadsEnabledByDefault,
+    VEMPipelineIntegration,
+)
 
 
 class CourseVideoUploadsEnabledByDefaultAdminForm(CourseSpecificFlagAdminBaseForm):
@@ -19,14 +22,8 @@ class CourseVideoUploadsEnabledByDefaultAdminForm(CourseSpecificFlagAdminBaseFor
 
 class VEMPipelineIntegrationAdminForm(forms.ModelForm):
     """
-    Form for VEM Pipeline Integration Admin class
+    Form for VEM Pipeline Integration Admin class.
     """
-
-    def clean_vem_enabled_courses_percentage(self):
-        """
-        Validates that vem_enabled_courses_percentage lies between 0 to 100.
-        """
-        vem_enabled_courses_percentage = self.cleaned_data['vem_enabled_courses_percentage']
-        if vem_enabled_courses_percentage < 0 or vem_enabled_courses_percentage > 100:
-            raise forms.ValidationError('Invalid percentage, the value must be between 0 and 100')
-        return vem_enabled_courses_percentage
+    class Meta(object):
+        model = VEMPipelineIntegration
+        fields = '__all__'
