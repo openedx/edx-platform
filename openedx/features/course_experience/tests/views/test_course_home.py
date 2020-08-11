@@ -52,7 +52,6 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     RELATIVE_DATES_FLAG,
-    SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
 )
 from student.models import CourseEnrollment, FBEEnrollmentExclusion
@@ -252,7 +251,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         remove_course_updates(self.staff_user, self.course)
         super(TestCourseHomePageAccess, self).tearDown()
 
-    @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
         [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, True, False],
         [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, True, False],
@@ -334,7 +332,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                     self.assertContains(private_response,
                                         'You must be enrolled in the course to see course content.')
 
-    @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
         [CourseUserType.ANONYMOUS, 'To see course content'],
         [CourseUserType.ENROLLED, None],
