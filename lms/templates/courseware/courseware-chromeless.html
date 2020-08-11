@@ -11,7 +11,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
-<%include file="/dates_banner.html" />
+% if is_mobile_app:
+  <%include file="/dates_banner.html" />
+% endif
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title:

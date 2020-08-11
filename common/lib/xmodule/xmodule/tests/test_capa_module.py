@@ -2536,14 +2536,21 @@ class ProblemBlockXMLTest(unittest.TestCase):
         name = "Other Test Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
         self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
-        six.assertCountEqual(
-            self, descriptor.index_dictionary(), {
+
+        # We are converting problem_types to a set to compare it later without taking into account the order
+        # the reasoning behind is that the problem_types (property) is represented by dict and when it is converted
+        # to list its ordering is different everytime.
+
+        indexing_result = descriptor.index_dictionary()
+        indexing_result['problem_types'] = set(indexing_result['problem_types'])
+        self.assertDictEqual(
+            indexing_result, {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ["optionresponse", "multiplechoiceresponse"],
+                'problem_types': set(["optionresponse", "multiplechoiceresponse"]),
                 'content': {
                     'display_name': name,
-                    'capa_content': ' Label Some comment Donut Buggy '
-                }
+                    'capa_content': " Label Some comment Donut Buggy '1','2' "
+                },
             }
         )
 
@@ -2619,7 +2626,7 @@ class ProblemBlockXMLTest(unittest.TestCase):
             Dropdown problems allow learners to select only one option from a list of options.
             Description
             You can use the following example problem as a model.
-            Which of the following countries celebrates its independence on August 15?
+            Which of the following countries celebrates its independence on August 15? 'India','Spain','China','Bermuda'
         """)
         self.assertEqual(descriptor.problem_types, {"optionresponse"})
         self.assertEqual(

@@ -99,7 +99,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.in
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.in
 edx-django-utils==3.7.2   # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.1  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.4.40    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
+edx-enterprise==3.5.0     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
@@ -159,7 +159,7 @@ mongoengine==0.20.0       # via -r requirements/edx/base.in
 more-itertools==8.4.0     # via -r requirements/edx/paver.txt, zipp
 mpmath==1.1.0             # via sympy
 mysqlclient==2.0.1        # via -r requirements/edx/base.in
-newrelic==5.14.1.144      # via -r requirements/edx/base.in, edx-django-utils
+newrelic==5.16.0.145      # via -r requirements/edx/base.in, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/../edx-sandbox/shared.txt, chem
 nodeenv==1.4.0            # via -r requirements/edx/base.in
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, chem, openedx-calc, scipy

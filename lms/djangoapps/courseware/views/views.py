@@ -55,6 +55,7 @@ from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.course_home_api.utils import is_request_from_learning_mfe
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner, check_public_access
 from lms.djangoapps.courseware.courses import (
@@ -583,7 +584,6 @@ class StaticCourseTabView(EdxFragmentView):
             'active_page': 'static_tab_{0}'.format(tab['url_slug']),
             'tab': tab,
             'fragment': fragment,
-            'uses_pattern_library': False,
             'disable_courseware_js': True,
         })
 
@@ -1682,7 +1682,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'web_app_course_url': reverse(COURSE_HOME_VIEW_NAME, args=[course.id]),
             'on_courseware_page': True,
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
-            'is_learning_mfe': request.META.get('HTTP_REFERER', '').startswith(settings.LEARNING_MICROFRONTEND_URL),
+            'is_learning_mfe': is_request_from_learning_mfe(request),
             'is_mobile_app': is_request_from_mobile_app(request),
             'reset_deadlines_url': reverse(RESET_COURSE_DEADLINES_NAME),
         }
