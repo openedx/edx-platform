@@ -33,34 +33,6 @@ CLASS_PRIORITY = ['video', 'problem']
 _ = lambda text: text
 
 
-class VerticalFields(object):
-    is_discussable = Boolean(
-        display_name=_("Enable Discussion"),
-        help=_(
-            "This setting enables a discussion for this entire Unit. If enabled, a discussion component "
-            "will show up with this Unit."
-        ),
-        default=False,
-        scope=Scope.settings,
-    )
-
-    @property
-    def enable_discussion(self):
-        return self.enable_discussion_flag
-
-    @enable_discussion.setter
-    def enable_discussion(self, value):
-        def get_course_node(node):
-            node = node.get_parent()
-            while node.xml_element_name() != "course":
-                node = node.get_parent()
-            return node
-
-        # We shouldn't override what is set at course level
-        if get_course_node(self).enable_discussion:
-            self.enable_discussion_flag = value
-
-
 @XBlock.needs('user', 'bookmarks')
 @XBlock.wants('completion')
 @XBlock.wants('call_to_action')
@@ -308,9 +280,3 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
                 all_complete = True
 
         return all_complete
-
-    def set_discussion_status(self, is_enable_discussion):
-        self.discussions_enabled = is_enable_discussion
-
-    def get_discussion_status(self):
-        return self.discussions_enabled
