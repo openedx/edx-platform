@@ -304,10 +304,10 @@ if 'openedx.testing.coverage_context_listener' in settings.INSTALLED_APPS:
     ]
 
 # pylint: disable=wrong-import-position, wrong-import-order
-from edx_django_utils import plugins
+from edx_django_utils.plugins import get_plugin_url_patterns
 # pylint: disable=wrong-import-position
 from openedx.core.djangoapps.plugins.constants import ProjectType
-urlpatterns.extend(plugins.get_patterns(ProjectType.CMS))
+urlpatterns.extend(get_plugin_url_patterns(ProjectType.CMS))
 
 # Contentstore
 urlpatterns += [

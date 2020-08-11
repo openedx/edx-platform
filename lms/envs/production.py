@@ -29,7 +29,7 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
 from path import Path as path
 
-from edx_django_utils import plugins
+from edx_django_utils.plugins import add_plugins
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
@@ -951,7 +951,7 @@ MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY'
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
 # Load production.py in plugins
-plugins.add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
+add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
 
 ########################## Derive Any Derived Settings  #######################
 

@@ -199,11 +199,11 @@ BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 #####################################################################
 
 # pylint: disable=wrong-import-order, wrong-import-position
-from edx_django_utils import plugins
+from edx_django_utils.plugins import add_plugins
 # pylint: disable=wrong-import-order, wrong-import-position
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
-plugins.add_plugins(__name__, ProjectType.CMS, SettingsType.DEVSTACK)
+add_plugins(__name__, ProjectType.CMS, SettingsType.DEVSTACK)
 
 
 OPENAPI_CACHE_TIMEOUT = 0

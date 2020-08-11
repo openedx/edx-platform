@@ -3880,11 +3880,11 @@ SYSTEM_WIDE_ROLE_CLASSES = []
 
 ############## Plugin Django Apps #########################
 
-from edx_django_utils.plugins import plugin_apps, plugin_settings
+from edx_django_utils.plugins import get_plugin_apps, add_plugins
 # pylint: disable=wrong-import-position, wrong-import-order
-from openedx.core.djangoapps import plugins
-INSTALLED_APPS.extend(plugins.get_apps(ProjectType.LMS))
-plugins.add_plugins(__name__, ProjectType.LMS, SettingsType.COMMON)
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
+INSTALLED_APPS.extend(get_plugin_apps(ProjectType.LMS))
+add_plugins(__name__, ProjectType.LMS, SettingsType.COMMON)
 
 DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 

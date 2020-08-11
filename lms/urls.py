@@ -12,7 +12,7 @@ from django.views.generic.base import RedirectView
 from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
 
-from edx_django_utils import plugins
+from edx_django_utils.plugin import get_plugin_url_patterns
 
 from branding import views as branding_views
 from debug import views as debug_views
@@ -962,7 +962,7 @@ urlpatterns.append(
     ),
 )
 
-urlpatterns.extend(plugins.get_patterns(ProjectType.LMS))
+urlpatterns.extend(get_plugin_url_patterns(ProjectType.LMS))
 
 # Course Home API urls
 urlpatterns += [

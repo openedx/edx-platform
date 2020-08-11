@@ -26,7 +26,7 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 from six.moves import range
 
-from edx_django_utils import plugins
+from edx_django_utils.plugins import add_plugins
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
@@ -558,7 +558,7 @@ JWT_AUTH.update({
 # pylint: enable=unicode-format-string
 ####################### Plugin Settings ##########################
 
-plugins.add_plugins(__name__, ProjectType.LMS, SettingsType.TEST)
+add_plugins(__name__, ProjectType.LMS, SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################
 
