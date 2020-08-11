@@ -1,7 +1,8 @@
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
-from lms.djangoapps.courseware.courses import get_course_by_id
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from lms.djangoapps.courseware.courses import get_course_by_id
 
 
 def can_view_teams(function):

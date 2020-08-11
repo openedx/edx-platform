@@ -1,31 +1,26 @@
-from w3lib.url import add_or_replace_parameter
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import redirect, render_to_response
 from django.utils.translation import ugettext as _
-from django_comment_client.utils import has_discussion_privileges
 from django_countries import countries
+from w3lib.url import add_or_replace_parameter
 
-from nodebb.constants import TEAM_PLAYER_ENTRY_INDEX
 from courseware.courses import has_access
+from django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams import is_feature_enabled
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from lms.djangoapps.teams.serializers import (
-    BulkTeamCountTopicSerializer,
-)
+from lms.djangoapps.teams.serializers import BulkTeamCountTopicSerializer
 from lms.djangoapps.teams.views import get_alphabetical_topics
+from nodebb.constants import TEAM_PLAYER_ENTRY_INDEX
 from nodebb.models import TeamGroupChat
-from openedx.features.badging.models import Badge
 from openedx.features.badging.constants import TEAM_PLAYER
+from openedx.features.badging.models import Badge
 from student.models import CourseEnrollment
 
-
 from .decorators import can_view_teams
-from .helpers import serialize, make_embed_url, get_user_recommended_team, \
-    get_user_course_with_access, get_team_topic
+from .helpers import get_team_topic, get_user_course_with_access, get_user_recommended_team, make_embed_url, serialize
 from .serializers import CustomCourseTeamSerializer
 
 

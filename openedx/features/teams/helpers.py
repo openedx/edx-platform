@@ -1,9 +1,10 @@
 from random import choice
-from django.conf import settings
 
+from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
-from lms.djangoapps.teams.models import CourseTeam
+
 from courseware.courses import get_course_with_access
+from lms.djangoapps.teams.models import CourseTeam
 
 USER_ICON_COLORS = [
     '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',

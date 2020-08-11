@@ -1,27 +1,24 @@
 import factory
-
 from django.conf import settings
 from django.db.models import signals
 
 from lms.djangoapps.onboarding.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from openedx.features.teams.helpers import (
+    TEAM_BANNER_COLORS,
+    USER_ICON_COLORS,
+    generate_random_team_banner_color,
+    generate_random_user_icon_color,
+    get_team_topic,
+    get_user_course_with_access,
+    get_user_recommended_team,
+    make_embed_url,
+    serialize
+)
+from openedx.features.teams.serializers import CustomCourseTeamCreationSerializer
+from openedx.features.teams.tests.factories import CourseTeamFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from openedx.features.teams.tests.factories import CourseTeamFactory
-from openedx.features.teams.serializers import CustomCourseTeamCreationSerializer
-from openedx.features.teams.helpers import (
-    USER_ICON_COLORS,
-    TEAM_BANNER_COLORS,
-    generate_random_user_icon_color,
-    generate_random_team_banner_color,
-    make_embed_url,
-    serialize,
-    get_user_recommended_team,
-    get_user_course_with_access,
-    get_team_topic
-)
-
+from xmodule.modulestore.tests.factories import CourseFactory
 
 USER_COUNTRY = 'US'
 

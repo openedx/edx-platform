@@ -1,27 +1,20 @@
 import factory
-
-from django.db.models import signals
 from django.conf import settings
-from django.test.client import RequestFactory
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.db.models import signals
+from django.test.client import RequestFactory
 
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory
-from lms.djangoapps.teams.tests.factories import CourseTeamMembershipFactory
 from lms.djangoapps.onboarding.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from openedx.features.teams.helpers import TEAM_BANNER_COLORS, USER_ICON_COLORS
 from openedx.features.teams.serializers import (
     CustomCourseTeamCreationSerializer,
-    CustomUserMembershipSerializer,
-    CustomCourseTeamSerializer
+    CustomCourseTeamSerializer,
+    CustomUserMembershipSerializer
 )
-from openedx.features.teams.helpers import (
-    USER_ICON_COLORS,
-    TEAM_BANNER_COLORS,
-)
-
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 VALID_COUNTRY = 'LA'
 VALID_LANGUAGE = 'kl'

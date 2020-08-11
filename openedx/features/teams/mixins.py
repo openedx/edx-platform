@@ -1,4 +1,5 @@
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 

@@ -3,7 +3,8 @@
 from django.conf.urls import url
 
 from lms.djangoapps.teams.api_urls import TEAM_ID_PATTERN, TOPIC_ID_PATTERN
-from .views import browse_teams, create_team, my_team, browse_topic_teams, update_team, view_team, edit_team_memberships
+
+from .views import browse_teams, browse_topic_teams, create_team, edit_team_memberships, my_team, update_team, view_team
 
 urlpatterns = [
     url(r"^browse_teams/$", browse_teams, name="teams_dashboard"),

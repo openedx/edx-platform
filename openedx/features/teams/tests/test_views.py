@@ -1,23 +1,22 @@
 import urllib
 
-import mock
 import factory
-from pyquery import PyQuery
+import mock
 from django.conf import settings
-from django.db.models import signals
 from django.core.urlresolvers import reverse
+from django.db.models import signals
 from django.test.client import Client
+from pyquery import PyQuery
 from w3lib.url import add_or_replace_parameter
 
-from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
-from lms.djangoapps.teams.tests.factories import CourseTeamMembershipFactory
 from lms.djangoapps.onboarding.tests.factories import UserFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamMembershipFactory
+from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
+from openedx.features.teams.tests.factories import CourseTeamFactory
 from student.tests.factories import CourseEnrollmentFactory
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from openedx.features.teams.tests.factories import CourseTeamFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 TOTAL_TEAMS = 3
 TOTAL_TOPICS = 1

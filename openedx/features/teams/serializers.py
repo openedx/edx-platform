@@ -1,10 +1,14 @@
 """Defines serializers used by the Team API."""
-from lms.djangoapps.teams.serializers import (
-    CourseTeamCreationSerializer, CountryField, CourseTeamSerializer, UserMembershipSerializer
-)
-from rest_framework import serializers
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from rest_framework import serializers
+
+from lms.djangoapps.teams.serializers import (
+    CountryField,
+    CourseTeamCreationSerializer,
+    CourseTeamSerializer,
+    UserMembershipSerializer
+)
 
 from .helpers import generate_random_team_banner_color, generate_random_user_icon_color
 
