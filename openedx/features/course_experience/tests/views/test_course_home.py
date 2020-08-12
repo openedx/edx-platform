@@ -252,39 +252,39 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         super(TestCourseHomePageAccess, self).tearDown()
 
     @ddt.data(
-        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, True, False],
-        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, True, False],
-        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, True, False],
-        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, True, False],
-        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, True, True],
-        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, True, True],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False, True, False],
+        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, False, True, False],
+        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, False, True, False],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False, True, False],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, False, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, False, True, True],
 
-        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, True, False],
-        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, True, False],
-        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, True, False],
-        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, True, False],
-        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, True, True],
-        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, True, True],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, False, True, False],
+        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, False, True, False],
+        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, False, True, False],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, False, True, False],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, False, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, False, True, True],
 
-        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, False, True],
-        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, False, True],
-        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ENROLLED, False, True],
-        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ENROLLED, False, True],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, True, False, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, True, False, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ENROLLED, True, False, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ENROLLED, True, False, True],
 
-        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True, True],
-        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True, True],
-        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED_STAFF, True, True],
-        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED_STAFF, True, True],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True, True, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED_STAFF, True, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED_STAFF, True, True, True],
 
-        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True, True],
-        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True, True],
-        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.GLOBAL_STAFF, True, True],
-        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.GLOBAL_STAFF, True, True],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True, True, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.GLOBAL_STAFF, True, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.GLOBAL_STAFF, True, True, True],
     )
     @ddt.unpack
     def test_home_page(
             self, enable_unenrolled_access, course_visibility, user_type,
-            expected_enroll_message, expected_course_outline,
+             expect_course_tools_visible, expected_enroll_message, expected_course_outline,
     ):
         self.create_user_for_course(self.course, user_type)
 
@@ -298,8 +298,13 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                 private_url = course_home_url(self.private_course)
                 private_response = self.client.get(private_url)
 
-        # Verify that the course tools and dates are always shown
-        self.assertContains(response, TEST_COURSE_TOOLS)
+        # Verify that the course tools are shown if the user is enrolled or staff
+        # Originally, Reviews was a tool visible to all users, but this has been removed
+        # All remaining course tools require enrollment to be enabled
+        if expect_course_tools_visible:
+            self.assertContains(response, TEST_COURSE_TOOLS)
+        else:
+            self.assertNotContains(response, TEST_COURSE_TOOLS)
 
         is_anonymous = user_type is CourseUserType.ANONYMOUS
         is_enrolled = user_type is CourseUserType.ENROLLED
@@ -333,13 +338,13 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                                         'You must be enrolled in the course to see course content.')
 
     @ddt.data(
-        [CourseUserType.ANONYMOUS, 'To see course content'],
-        [CourseUserType.ENROLLED, None],
-        [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
-        [CourseUserType.UNENROLLED_STAFF, 'You must be enrolled in the course to see course content.'],
+        [CourseUserType.ANONYMOUS, False, 'To see course content'],
+        [CourseUserType.ENROLLED, True, None],
+        [CourseUserType.UNENROLLED, False, 'You must be enrolled in the course to see course content.'],
+        [CourseUserType.UNENROLLED_STAFF, True, 'You must be enrolled in the course to see course content.'],
     )
     @ddt.unpack
-    def test_home_page_not_unified(self, user_type, expected_message):
+    def test_home_page_not_unified(self, user_type, expect_course_tools_visible, expected_message):
         """
         Verifies the course home tab when not unified.
         """
@@ -349,8 +354,13 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         url = course_home_url(self.course)
         response = self.client.get(url)
 
-        # Verify that the course tools and dates are always shown
-        self.assertContains(response, TEST_COURSE_TOOLS)
+        # Verify that the course tools are shown if the user is enrolled or staff
+        # Originally, Reviews was a tool visible to all users, but this has been removed
+        # All remaining course tools require enrollment to be enabled
+        if expect_course_tools_visible:
+            self.assertContains(response, TEST_COURSE_TOOLS)
+        else:
+            self.assertNotContains(response, TEST_COURSE_TOOLS)
 
         # Verify that the outline, start button, course sock, and welcome message
         # are only shown to enrolled users.
