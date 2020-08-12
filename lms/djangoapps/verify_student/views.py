@@ -1144,7 +1144,7 @@ def results_callback(request):
         log.debug(u"Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
         status = "denied"
-        reverify_url = IDVerificationService.email_reverify_url()
+        reverify_url = '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
         verification_status_email_vars['reasons'] = reason
         verification_status_email_vars['reverify_url'] = reverify_url
         verification_status_email_vars['faq_url'] = settings.ID_VERIFICATION_SUPPORT_LINK
