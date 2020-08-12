@@ -144,6 +144,7 @@ urlpatterns = [
 
     url(r'^api/commerce/', include(('commerce.api.urls', 'lms.djangoapps.commerce'), namespace='commerce_api')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls')),
+    url(r'^api/toggles/', include('openedx.core.djangoapps.waffle_utils.urls')),
     url(r'^rss_proxy/', include('rss_proxy.urls')),
     url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
 
