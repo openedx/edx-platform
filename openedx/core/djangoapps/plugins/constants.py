@@ -1,3 +1,7 @@
+"""
+Constants used by django app plugins
+"""
+
 # expose constants from edx-django-utils so plugins using these continue to work
 from edx_django_utils.plugins import PluginSettings, PluginURLs  # pylint: disable=unused-import
 
