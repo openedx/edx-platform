@@ -18,7 +18,7 @@ path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requi
 pathtools==0.1.2          # via watchdog
 paver==1.3.4              # via -r requirements/edx/paver.in
 pbr==5.4.5                # via stevedore
-psutil==1.2.1             # via -r requirements/edx/paver.in
+psutil==5.7.2             # via -r requirements/edx/paver.in
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in, edx-opaque-keys
 python-memcached==1.59    # via -r requirements/edx/paver.in
 requests==2.24.0          # via -r requirements/edx/paver.in

@@ -57,11 +57,11 @@ def track_memory_usage(metric, course_id):
     """
     memory_types = ['rss', 'vms']
     process = psutil.Process()
-    baseline_memory_info = process.get_memory_info()
+    baseline_memory_info = process.memory_info()
     baseline_usages = [getattr(baseline_memory_info, memory_type) for memory_type in memory_types]
     yield
     for memory_type, baseline_usage in zip(memory_types, baseline_usages):
-        total_memory_info = process.get_memory_info()
+        total_memory_info = process.memory_info()
         total_usage = getattr(total_memory_info, memory_type)
         memory_used = total_usage - baseline_usage
 
