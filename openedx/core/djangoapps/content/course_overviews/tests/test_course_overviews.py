@@ -130,6 +130,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             'invitation_only',
             'max_student_enrollments_allowed',
             'catalog_visibility',
+            'discussion_enabled',
         ]
         for attribute_name in fields_to_test:
             course_value = getattr(course, attribute_name)

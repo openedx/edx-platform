@@ -63,7 +63,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 11  # this one goes to eleven
+    VERSION = 12
 
     # Cache entry versioning.
     version = IntegerField()
@@ -123,6 +123,9 @@ class CourseOverview(TimeStampedModel):
     self_paced = BooleanField(default=False)
     marketing_url = TextField(null=True)
     eligible_for_financial_aid = BooleanField(default=True)
+
+    # Discussions
+    discussion_enabled = BooleanField(default=True)
 
     language = TextField(null=True)
 
@@ -225,6 +228,8 @@ class CourseOverview(TimeStampedModel):
         course_overview.effort = CourseDetails.fetch_about_attribute(course.id, 'effort')
         course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
         course_overview.self_paced = course.self_paced
+
+        course_overview.discussion_enabled = course.discussion_enabled
 
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
