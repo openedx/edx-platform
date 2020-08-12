@@ -284,7 +284,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
     @ddt.unpack
     def test_home_page(
             self, enable_unenrolled_access, course_visibility, user_type,
-             expect_course_tools_visible, expected_enroll_message, expected_course_outline,
+            expect_course_tools_visible, expected_enroll_message, expected_course_outline,
     ):
         self.create_user_for_course(self.course, user_type)
 
