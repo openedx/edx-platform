@@ -180,7 +180,7 @@ class OutlineTabView(RetrieveAPIView):
         transformers = BlockStructureTransformers()
         transformers += get_course_block_access_transformers(request.user)
         transformers += [
-            BlocksAPITransformer(None, None, depth=4),
+            BlocksAPITransformer(None, None, depth=3),
         ]
 
         course_blocks = get_course_blocks(request.user, course_usage_key, transformers, include_completion=True)
