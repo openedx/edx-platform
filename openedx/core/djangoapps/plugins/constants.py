@@ -10,6 +10,7 @@ from edx_django_utils.plugins import (
     PluginContexts,  # pylint: disable=unused-import
 )
 
+
 class ProjectType():
     """
     The ProjectType enum defines the possible values for the Django Projects
