@@ -27,7 +27,7 @@
     "edx-pattern-library": "0.18.1",
     "edx-proctoring-proctortrack": "git+https://git@github.com/joshivj/edx-proctoring-proctortrack.git#c4f49973562bf0e54518b74efce20bafa299616a",
     "edx-ui-toolkit": "1.5.2",
-    "exports-loader": "0.6.4",
+    "exports-loader": "0.7.0",
     "extract-text-webpack-plugin": "2.1.2",
     "file-loader": "1.1.6",
     "font-awesome": "4.7.0",
