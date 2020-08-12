@@ -5,9 +5,8 @@ Zendesk Proxy Configuration
 
 
 from django.apps import AppConfig
-from edx_django_utils.plugins import PluginURLs, PluginSettings
 
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType, PluginURLs, PluginSettings
 
 
 class ZendeskProxyConfig(AppConfig):

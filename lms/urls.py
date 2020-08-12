@@ -10,7 +10,6 @@ from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
 from edx_api_doc_tools import make_docs_urls
-from edx_django_utils.plugins import get_plugin_url_patterns
 from ratelimitbackend import admin
 
 from branding import views as branding_views
@@ -42,7 +41,8 @@ from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.lang_pref import views as lang_pref_views
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
-from openedx.core.djangoapps.plugins.constants import ProjectType
+from openedx.core.djangoapps.plugins import constants as plugin_constants
+from openedx.core.djangoapps.plugins import plugin_urls
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -961,7 +961,7 @@ urlpatterns.append(
     ),
 )
 
-urlpatterns.extend(get_plugin_url_patterns(ProjectType.LMS))
+urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
 
 # Course Home API urls
 urlpatterns += [

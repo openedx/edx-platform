@@ -15,7 +15,6 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
-from edx_django_utils.plugins import get_plugins_view_context
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import iteritems, text_type
@@ -36,7 +35,8 @@ from openedx.core.djangoapps.catalog.utils import (
     get_visible_sessions_for_entitlement
 )
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings
-from openedx.core.djangoapps.plugins.constants import ProjectType
+from openedx.core.djangoapps.plugins import constants as plugin_constants
+from openedx.core.djangoapps.plugins.plugin_contexts import get_plugins_view_context
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -800,7 +800,7 @@ def student_dashboard(request):
     }
 
     context_from_plugins = get_plugins_view_context(
-        ProjectType.LMS,
+        plugin_constants.ProjectType.LMS,
         COURSE_DASHBOARD_PLUGIN_VIEW_NAME,
         context
     )

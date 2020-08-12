@@ -3,9 +3,8 @@
 olx_rest_api Django application initialization.
 """
 from django.apps import AppConfig
-from edx_django_utils.plugins import PluginURLs
 
-from openedx.core.djangoapps.plugins.constants import ProjectType
+from openedx.core.djangoapps.plugins.constants import PluginURLs, ProjectType
 
 
 class OlxRestApiAppConfig(AppConfig):

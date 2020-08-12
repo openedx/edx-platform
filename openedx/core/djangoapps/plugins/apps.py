@@ -7,17 +7,14 @@ Signal handlers are connected here.
 
 from django.apps import AppConfig
 from django.conf import settings
-from edx_django_utils.plugins import connect_plugin_receivers
-
-from openedx.core.djangoapps.plugins.constants import ProjectType
+from . import constants, plugin_signals
 
 
 class PluginsConfig(AppConfig):
     """
     Application Configuration for Plugins.
     """
-
-    name = 'openedx.core.djangoapps.plugins'
+    name = u'openedx.core.djangoapps.plugins'
 
     plugin_app = {}
 
@@ -26,8 +23,8 @@ class PluginsConfig(AppConfig):
         Connect plugin receivers to their signals.
         """
         if settings.ROOT_URLCONF == 'lms.urls':
-            project_type = ProjectType.LMS
+            project_type = constants.ProjectType.LMS
         else:
-            project_type = ProjectType.CMS
+            project_type = constants.ProjectType.CMS
 
-        connect_plugin_receivers(project_type)
+        plugin_signals.connect_receivers(project_type)

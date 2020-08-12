@@ -2,7 +2,7 @@
 A plugin manager to retrieve the dynamic course partitions generators.
 """
 
-from edx_django_utils.plugins import PluginManager
+from openedx.core.lib.plugins import PluginManager
 
 
 class DynamicPartitionGeneratorsPluginManager(PluginManager):

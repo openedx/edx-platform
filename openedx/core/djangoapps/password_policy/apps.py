@@ -8,9 +8,8 @@ from dateutil.parser import parse as parse_date
 from django.apps import AppConfig
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from edx_django_utils.plugins import PluginSettings
 
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
+from openedx.core.djangoapps.plugins.constants import PluginSettings, ProjectType, SettingsType
 
 log = logging.getLogger(__name__)
 

@@ -11,7 +11,7 @@ from django.core.files.storage import get_storage_class
 from six import text_type
 from xblock.fields import List
 
-from edx_django_utils.plugins import PluginError
+from openedx.core.lib.plugins import PluginError
 
 log = logging.getLogger("edx.courseware")
 

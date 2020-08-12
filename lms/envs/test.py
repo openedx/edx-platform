@@ -23,11 +23,10 @@ from uuid import uuid4
 
 import openid.oidutil
 from django.utils.translation import ugettext_lazy
-from edx_django_utils.plugins import add_plugins
 from path import Path as path
 from six.moves import range
 
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
 
@@ -558,7 +557,7 @@ JWT_AUTH.update({
 # pylint: enable=unicode-format-string
 ####################### Plugin Settings ##########################
 
-add_plugins(__name__, ProjectType.LMS, SettingsType.TEST)
+plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################
 
