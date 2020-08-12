@@ -107,7 +107,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.txt
 edx-django-utils==3.7.3   # via -r requirements/edx/base.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.1  # via -r requirements/edx/base.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.5.3     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+edx-enterprise==3.6.0     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, ora2
 edx-lint==1.5.0           # via -r requirements/edx/testing.in
 edx-milestones==0.3.0     # via -r requirements/edx/base.txt
@@ -283,7 +283,7 @@ transifex-client==0.13.11  # via -r requirements/edx/testing.in
 typed-ast==1.4.1          # via astroid
 ua-parser==0.10.0         # via -r requirements/edx/base.txt, django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/base.txt, edx-enterprise
-unidiff==0.6.0            # via -r requirements/edx/testing.in
+unidiff==0.6.0            # via -r requirements/edx/testing.in, coverage-pytest-plugin
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.10          # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/base.txt
