@@ -108,7 +108,8 @@ DEBUG_TOOLBAR_CONFIG = {
 
 def should_show_debug_toolbar(request):
     # We always want the toolbar on devstack unless running tests from another Docker container
-    if request.get_host().startswith('edx.devstack.studio:'):
+    hostname = request.get_host()
+    if hostname.startswith('edx.devstack.studio:') or hostname.startswith('studio.devstack.edx:'):
         return False
     return True
 
