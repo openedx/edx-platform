@@ -1094,18 +1094,6 @@ PIPELINE['STYLESHEETS'] = {
         ],
         'output_filename': 'css/studio-main-v1-rtl.css',
     },
-    'style-main-v2': {
-        'source_filenames': [
-            'css/studio-main-v2.css',
-        ],
-        'output_filename': 'css/studio-main-v2.css',
-    },
-    'style-main-v2-rtl': {
-        'source_filenames': [
-            'css/studio-main-v2-rtl.css',
-        ],
-        'output_filename': 'css/studio-main-v2-rtl.css',
-    },
     'style-xmodule-annotations': {
         'source_filenames': [
             'css/vendor/ova/annotator.css',

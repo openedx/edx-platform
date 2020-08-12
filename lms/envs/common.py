@@ -1805,18 +1805,6 @@ PIPELINE['STYLESHEETS'] = {
         ],
         'output_filename': 'css/lms-main-v1-rtl.css',
     },
-    'style-main-v2': {
-        'source_filenames': [
-            'css/lms-main-v2.css',
-        ],
-        'output_filename': 'css/lms-main-v2.css',
-    },
-    'style-main-v2-rtl': {
-        'source_filenames': [
-            'css/lms-main-v2-rtl.css',
-        ],
-        'output_filename': 'css/lms-main-v2-rtl.css',
-    },
     'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
@@ -1892,18 +1880,6 @@ PIPELINE['STYLESHEETS'] = {
             'css/vendor/font-awesome.css',
         ],
         'output_filename': 'css/certificates-style-rtl.css'
-    },
-    'style-learner-dashboard': {
-        'source_filenames': [
-            'css/lms-learner-dashboard.css',
-        ],
-        'output_filename': 'css/lms-learner-dashboard.css',
-    },
-    'style-learner-dashboard-rtl': {
-        'source_filenames': [
-            'css/lms-learner-dashboard-rtl.css',
-        ],
-        'output_filename': 'css/lms-learner-dashboard-rtl.css',
     },
     'style-mobile': {
         'source_filenames': [
