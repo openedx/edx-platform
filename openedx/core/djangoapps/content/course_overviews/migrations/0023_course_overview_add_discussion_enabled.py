@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='courseoverview',
             name='discussion_enabled',
-            field=models.BooleanField(default=True),
+            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='historicalcourseoverview',
             name='discussion_enabled',
-            field=models.BooleanField(default=True),
+            field=models.BooleanField(default=False),
         ),
     ]

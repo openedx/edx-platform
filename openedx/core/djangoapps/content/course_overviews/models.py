@@ -125,7 +125,7 @@ class CourseOverview(TimeStampedModel):
     eligible_for_financial_aid = BooleanField(default=True)
 
     # Discussions
-    discussion_enabled = BooleanField(default=True)
+    discussion_enabled = BooleanField(default=False)
 
     language = TextField(null=True)
 
