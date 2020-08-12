@@ -191,7 +191,7 @@ class Command(BaseCommand):
         message_context = get_base_template_context(site)
         message_context.update({
             'platform_name': settings.PLATFORM_NAME,
-            'lms_verification_link': IDVerificationService.email_reverify_url(),
+            'lms_verification_link': '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL),
             'help_center_link': settings.ID_VERIFICATION_SUPPORT_LINK
         })
 

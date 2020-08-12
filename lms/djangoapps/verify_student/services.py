@@ -264,15 +264,3 @@ class IDVerificationService(object):
             else:
                 location = reverse(url_name)
         return location
-
-    @classmethod
-    def email_reverify_url(cls):
-        """
-        Return a URL string for reverification emails:
-            If waffle flag is active, returns URL for IDV microfrontend.
-            Else, returns URL for reverify view.
-        """
-        if redirect_to_idv_microfrontend():
-            return '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL)
-        else:
-            return '{}{}'.format(settings.LMS_ROOT_URL, reverse('verify_student_reverify'))
