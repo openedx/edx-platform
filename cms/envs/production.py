@@ -15,12 +15,13 @@ import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
+from edx_django_utils.plugins import add_plugins
 from path import Path as path
+
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
 from .common import *
 
-from openedx.core.djangoapps.plugins import constants as plugin_constants
-from openedx.core.djangoapps.plugins import plugin_settings
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.logsettings import get_logger_config
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
@@ -539,7 +540,7 @@ MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY'
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.PRODUCTION)
+add_plugins(__name__, ProjectType.CMS, SettingsType.PRODUCTION)
 
 ########################## Derive Any Derived Settings  #######################
 

@@ -1,11 +1,11 @@
 """
 Helper methods for working with learning contexts
 """
+from edx_django_utils.plugins import PluginManager
 from opaque_keys import OpaqueKey
 from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-from openedx.core.lib.plugins import PluginManager
 
 
 class LearningContextPluginManager(PluginManager):

@@ -5,7 +5,7 @@ Support for course tool plugins.
 
 from enum import Enum
 
-from openedx.core.lib.plugins import PluginManager
+from edx_django_utils.plugins import PluginManager
 
 # Stevedore extension point namespace
 COURSE_TOOLS_NAMESPACE = 'openedx.course_tool'

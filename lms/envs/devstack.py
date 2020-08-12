@@ -11,8 +11,9 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 # pylint: enable=unicode-format-string
 #####################################################################
-from openedx.core.djangoapps.plugins import constants as plugin_constants
-from openedx.core.djangoapps.plugins import plugin_settings
+from edx_django_utils.plugins import add_plugins
+
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -309,7 +310,7 @@ JWT_AUTH.update({
         'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
     ),
 })
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.DEVSTACK)
+add_plugins(__name__, ProjectType.LMS, SettingsType.DEVSTACK)
 
 
 ######################### Django Rest Framework ########################
