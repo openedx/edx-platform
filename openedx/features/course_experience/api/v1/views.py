@@ -1,3 +1,10 @@
+import six
+
+from django.conf import settings
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.translation import ugettext as _
+
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import APIException, ParseError
 from rest_framework.permissions import IsAuthenticated
@@ -7,6 +14,8 @@ from rest_framework.generics import RetrieveAPIView
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.courses import get_course_with_access
 
 from opaque_keys.edx.keys import CourseKey
@@ -31,15 +40,28 @@ def reset_course_deadlines(request):
 
     # If body doesnt contain 'course_key', return 400 to client.
     if not course_key:
-        raise ParseError("'course_key' is required.")
+        raise ParseError(_("'course_key' is required."))
 
     # If body contains params other than 'course_key', return 400 to client.
     if len(request.data) > 1:
-        raise ParseError("Only 'course_key' is expected.")
+        raise ParseError(_("Only 'course_key' is expected."))
 
     try:
         reset_self_paced_schedule(request.user, course_key)
-        return Response({'message': 'Deadlines successfully reset.'})
+
+        key = CourseKey.from_string(course_key)
+        if course_home_mfe_dates_tab_is_active(key):
+            body_link = get_microfrontend_url(course_key=course_key, view_name='dates')
+        else:
+            body_link = '{}{}'.format(settings.LMS_ROOT_URL, reverse('dates', args=[six.text_type(course_key)]))
+
+        return Response({
+            'body': format_html('<a href="{}">{}</a>', body_link, _('View all dates')),
+            'header': format_html(
+                '<div>{}</div>', _('Your due dates have been successfully shifted to help you stay on track.')
+            ),
+            'message': _('Deadlines successfully reset.'),
+        })
     except Exception:
         raise UnableToResetDeadlines
 

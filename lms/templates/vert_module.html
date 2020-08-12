@@ -34,15 +34,21 @@ from openedx.core.djangolib.markup import HTML
   % for vertical_banner_cta in vertical_banner_ctas:
     <div class="banner-cta has-button">
       <div class="banner-cta-text">${vertical_banner_cta['description']}</div>
-      <div class="banner-cta-button">
-        <form method="post" action="${vertical_banner_cta['link']}">
-          <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-          % for form_name, form_value in vertical_banner_cta['form_values'].items():
-            <input type="hidden" name="${form_name}" value="${form_value}">
-          % endfor
-          <button class="btn">${vertical_banner_cta['link_name']}</button>
-        </form>
-      </div>
+      % if vertical_banner_cta.get('event_data'):
+        <div class="banner-cta-button">
+            <button class="btn" onclick="emit_event(${vertical_banner_cta['event_data']})">${vertical_banner_cta['link_name']}</button>
+        </div>
+      % else:
+        <div class="banner-cta-button">
+          <form method="post" action="${vertical_banner_cta['link']}">
+            <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+            % for form_name, form_value in vertical_banner_cta['form_values'].items():
+              <input type="hidden" name="${form_name}" value="${form_value}">
+            % endfor
+            <button class="btn">${vertical_banner_cta['link_name']}</button>
+          </form>
+        </div>
+     % endif
     </div>
   % endfor
 % endif
@@ -60,3 +66,9 @@ from openedx.core.djangolib.markup import HTML
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform('.localized-datetime');
 </%static:require_module_async>
+
+<script>
+    function emit_event(message) {
+        parent.postMessage(message, '*');
+    }
+</script>
