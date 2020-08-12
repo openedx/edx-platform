@@ -35,6 +35,7 @@ try:
         EnterpriseCustomerUser,
         PendingEnterpriseCustomerUser
     )
+    from enterprise.api.v1.serializers import EnterpriseCustomerUserReadOnlySerializer
     from consent.models import DataSharingConsent, DataSharingConsentTextOverrides
 except ImportError:
     pass
@@ -438,7 +439,7 @@ def enterprise_customer_uuid_for_request(request):
     if not enterprise_customer_uuid and request.user.is_authenticated:
         # If there's no way to get an Enterprise UUID for the request, check to see
         # if there's already an Enterprise attached to the requesting user on the backend.
-        learner_data = get_enterprise_learner_data(request.user)
+        learner_data = get_enterprise_learner_data_from_db(request.user)
         if learner_data:
             enterprise_customer_uuid = learner_data[0]['enterprise_customer']['uuid']
 
@@ -470,7 +471,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value == 0:
         return False
 
-    enterprise_learner_details = get_enterprise_learner_data(user)
+    enterprise_learner_details = get_enterprise_learner_data_from_db(user)
     if not enterprise_learner_details:
         consent_needed = False
     else:
@@ -560,7 +561,7 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
 
 
 @enterprise_is_enabled()
-def get_enterprise_learner_data(user):
+def get_enterprise_learner_data_from_api(user):
     """
     Client API operation adapter/wrapper
     """
@@ -568,6 +569,17 @@ def get_enterprise_learner_data(user):
         enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
         if enterprise_learner_data:
             return enterprise_learner_data['results']
+
+
+@enterprise_is_enabled()
+def get_enterprise_learner_data_from_db(user):
+    """
+    Query the database directly and use the same serializer that the api call would use to return the same results.
+    """
+    if user.is_authenticated:
+        queryset = EnterpriseCustomerUser.objects.filter(user_id=user.id)
+        serializer = EnterpriseCustomerUserReadOnlySerializer(queryset, many=True)
+        return serializer.data
 
 
 @enterprise_is_enabled()
@@ -585,7 +597,7 @@ def get_enterprise_learner_portal_enabled_message(request):
     if 'enterprise_customer' in request.session and request.session['enterprise_customer']:
         enterprise_customer = request.session['enterprise_customer']
     else:
-        learner_data = get_enterprise_learner_data(request.user)
+        learner_data = get_enterprise_learner_data_from_db(request.user)
         if learner_data:
             enterprise_customer = learner_data[0]['enterprise_customer']
         else:
