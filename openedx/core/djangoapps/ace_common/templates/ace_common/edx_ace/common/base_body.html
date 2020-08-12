@@ -61,9 +61,15 @@
                 <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
                     <tr>
                         <td width="70">
-                            <a href="{% with_link_tracking homepage_url %}"><img
-                                    src="{% with_link_tracking logo_image_url %}" 
-                                    height="50" alt="{% filter force_escape %}{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}{% endfilter %}"/></a>
+                            {% if logo_image_url %}
+                                <a href="{% with_link_tracking homepage_url %}"><img
+                                        src="{% with_link_tracking logo_image_url %}" 
+                                        height="50" alt="{% filter force_escape %}{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}{% endfilter %}"/></a>
+                            {% else %}
+                                <a href="{% with_link_tracking homepage_url %}"><img
+                                    src="https://media.sailthru.com/595/1k1/8/o/599f355101b3f.png" width="70"
+                                    height="30" alt="{% filter force_escape %}{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}{% endfilter %}"/></a>
+                            {% endif %}
                         </td>
                         <td align="right" style="text-align: {{ LANGUAGE_BIDI|yesno:"left,right" }};">
                             <a class="login" href="{% with_link_tracking dashboard_url %}" style="color: #005686;">{%  trans "Sign In" %}</a>

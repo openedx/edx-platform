@@ -22,11 +22,15 @@ def get_base_template_context(site):
     except NoReverseMatch:
         dashboard_url = reverse('home')
 
+    logo_image_url = None
+    if settings.ENABLE_COMPREHENSIVE_THEMING:
+        logo_image_url = branding_api.get_logo_url()
+
     return {
         # Platform information
         'homepage_url': marketing_link('ROOT'),
         'dashboard_url': dashboard_url,
-        'logo_image_url': branding_api.get_logo_url(),
+        'logo_image_url': logo_image_url,
         'template_revision': getattr(settings, 'EDX_PLATFORM_REVISION', None),
         'platform_name': get_config_value_from_site_or_settings(
             'PLATFORM_NAME',
