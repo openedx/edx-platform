@@ -857,9 +857,9 @@ COURSE_MODE_DEFAULTS = {
     'description': None,
     'expiration_datetime': None,
     'min_price': 0,
-    'name': _(u'Audit'),
+    'name': _(u'Honor'),
     'sku': None,
-    'slug': u'audit',
+    'slug': u'honor',
     'suggested_prices': '',
 }
 
