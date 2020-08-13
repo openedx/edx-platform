@@ -343,15 +343,8 @@ urlpatterns += [
         r'^courses/{}/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        courseware_views.course_info,
+        courseware_views.course_about,
         name='course_root',
-    ),
-    url(
-        r'^courses/{}/info$'.format(
-            settings.COURSE_ID_PATTERN,
-        ),
-        courseware_views.course_info,
-        name='info',
     ),
     # TODO arjun remove when custom tabs in place, see courseware/courses.py
     url(

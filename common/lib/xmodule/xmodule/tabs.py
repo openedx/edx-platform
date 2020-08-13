@@ -384,7 +384,6 @@ class CourseTabList(List):
         """
 
         course.tabs.extend([
-            CourseTab.load('course_info'),
             CourseTab.load('courseware')
         ])
 
@@ -469,19 +468,6 @@ class CourseTabList(List):
                     yield tab
 
     @classmethod
-    def upgrade_tabs(cls, tabs):
-        """
-        Reverse and Rename Courseware to Course and Course Info to Home Tabs.
-        """
-        if tabs and len(tabs) > 1:
-            if tabs[0].get('type') == 'courseware' and tabs[1].get('type') == 'course_info':
-                tabs[0], tabs[1] = tabs[1], tabs[0]
-                tabs[0]['name'] = _('Home')
-                tabs[1]['name'] = _('Course')
-
-        return tabs
-
-    @classmethod
     def validate_tabs(cls, tabs):
         """
         Check that the tabs set for the specified course is valid.  If it
@@ -489,22 +475,18 @@ class CourseTabList(List):
 
         Specific rules checked:
         - if no tabs specified, that's fine
-        - if tabs specified, first two must have type 'courseware' and 'course_info', in that order.
+        - if tabs specified, first must have type 'courseware'.
 
         """
         if tabs is None or len(tabs) == 0:
             return
 
-        if len(tabs) < 2:
-            raise InvalidTabsException("Expected at least two tabs.  tabs: '{0}'".format(tabs))
+        if len(tabs) < 1:
+            raise InvalidTabsException("Expected at least one tab.  tabs: '{0}'".format(tabs))
 
-        if tabs[0].get('type') != 'course_info':
+        if tabs[0].get('type') != 'courseware':
             raise InvalidTabsException(
-                "Expected first tab to have type 'course_info'.  tabs: '{0}'".format(tabs))
-
-        if tabs[1].get('type') != 'courseware':
-            raise InvalidTabsException(
-                "Expected second tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
+                "Expected first tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
 
         # the following tabs should appear only once
         # TODO: don't import openedx capabilities from common
@@ -547,7 +529,6 @@ class CourseTabList(List):
         """
         Overrides the from_json method to de-serialize the CourseTab objects from a json-like representation.
         """
-        self.upgrade_tabs(values)
         self.validate_tabs(values)
         tabs = []
         for tab_dict in values:

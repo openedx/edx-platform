@@ -392,19 +392,6 @@ def jump_to(_request, course_id, location):
     return redirect(redirect_url)
 
 
-@ensure_csrf_cookie
-@ensure_valid_course_key
-@data_sharing_consent_required
-def course_info(request, course_id):
-    """
-    Display the course's info.html, or 404 if there is no such course.
-    Assumes the course_id is in a valid format.
-    """
-    course_key = CourseKey.from_string(course_id)
-
-    return redirect(reverse(course_home_url_name(course_key), args=[course_id]))
-
-
 class StaticCourseTabView(EdxFragmentView):
     """
     View that displays a static course tab with a given name.

@@ -61,23 +61,6 @@ class CoursewareTab(EnrolledTab):
         return True
 
 
-class CourseInfoTab(CourseTab):
-    """
-    The course info view.
-    """
-    type = 'course_info'
-    title = ugettext_noop('Home')
-    priority = 20
-    view_name = 'info'
-    tab_id = 'info'
-    is_movable = False
-    is_default = False
-
-    @classmethod
-    def is_enabled(cls, course, user=None):
-        return True
-
-
 class SyllabusTab(EnrolledTab):
     """
     A tab for the course syllabus.
