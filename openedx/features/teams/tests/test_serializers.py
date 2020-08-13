@@ -1,3 +1,4 @@
+""" Test class for teams serializer """
 import factory
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import naturaltime

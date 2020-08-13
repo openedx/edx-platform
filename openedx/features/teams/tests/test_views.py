@@ -1,3 +1,4 @@
+""" All tests for teams application views"""
 import urllib
 
 import factory
@@ -45,7 +46,7 @@ class TeamsTestsBaseClass(ModuleStoreTestCase):
         self.course = self._create_course()
 
         self.teams = []
-        for i in range(TOTAL_TEAMS):
+        for _ in range(TOTAL_TEAMS):
             self.teams.append(self._create_team(self.course.id, topic_id=self.course.teams_topics[0]['id']))
 
         self.user = self._create_user()
@@ -78,12 +79,7 @@ class TeamsTestsBaseClass(ModuleStoreTestCase):
 
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def _create_team(self, course_id, topic_id):
-        """ Create a CourseTeam for provided course_id and topic_id
-
-        Arguments:
-            course_id {int} -- id of the course for which the team is to be created
-            topic_id {int} -- id of the topic for which the team is to be created
-        """
+        """ Create a CourseTeam for provided course_id and topic_id """
         team = CourseTeamFactory.create(
             course_id=course_id,
             topic_id=topic_id,
@@ -94,42 +90,19 @@ class TeamsTestsBaseClass(ModuleStoreTestCase):
 
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def _create_user(self, username=TEST_USERNAME, password=TEST_PASSWORD, **kwargs):
-        """ Create a User for provided username and password.
-
-        Arguments:
-            username {string} -- username for the user
-            password {string} -- password for the user
-            kwargs {dict} -- any additional attributes for the user
-        """
+        """ Create a User for provided username and password """
         user = UserFactory.create(username=username, password=password, **kwargs)
         return user
 
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def _create_team_membership(self, team, user):
-        """Create a team membership object that is responsible for joining of a user in a team.
-
-        Arguments:
-            team {CourseTeam} -- Team to join
-            user {User} -- User who is going to join the team
-
-        Returns:
-            CourseTeamMembership
-        """
+        """Create a team membership object that is responsible for joining of a user in a team """
         membership = CourseTeamMembershipFactory.create(team=team, user=user)
         return membership
 
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def _enroll_user_in_course(self, user, course_id):
-        """Enroll a user in a course
-
-
-        Arguments:
-            user {User} -- User who is going to be enrolled in a course
-            course_id {int} -- Id of the course in which to enroll the user
-
-        Returns:
-            CourseEnrollment
-        """
+        """Enroll a user in a course """
         enrollment = CourseEnrollmentFactory(user=user, course_id=course_id)
         return enrollment
 
@@ -210,7 +183,7 @@ class BrowseTeamsTestCase(TeamsTestsBaseClass):
         """
         client = Client()
         staff_user = self._create_user(username='staff_test_user', is_staff=True)
-        enrolled_user = self._enroll_user_in_course(user=staff_user, course_id=self.course.id)
+        self._enroll_user_in_course(user=staff_user, course_id=self.course.id)
         client.login(username=staff_user.username, password=TEST_PASSWORD)
 
         response = client.get(self.url)
