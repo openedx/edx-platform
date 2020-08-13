@@ -199,6 +199,13 @@ class AccountCreationForm(forms.Form):
                                 "required": _("To enroll, you must follow the honor code.")
                             }
                         )
+                elif field_name == "confirm_password":
+                    if field_value == "required" and data.get("password"):
+                        self.fields[field_name] = forms.CharField(
+                            error_messages={
+                                "required": _("Please confirm password.")
+                            }
+                        )    
                 else:
                     required = field_value == "required"
                     min_length = 1
@@ -230,6 +237,16 @@ class AccountCreationForm(forms.Form):
             temp_user = User(username=username, email=email) if username else None
             validate_password(password, temp_user)
         return password
+
+    def clean_confirm_password(self):
+        """Enforce confirm password policies (if applicable)"""
+        confirm_password = self.cleaned_data["confirm_password"]
+        if (
+                "password" in self.cleaned_data and
+                self.cleaned_data["password"] != confirm_password
+        ):
+            raise ValidationError(_("The passwords must match."))
+        return confirm_password
 
     def clean_email(self):
         """ Enforce email restrictions (if applicable) """
@@ -298,6 +315,7 @@ class RegistrationFormFactory(object):
 
     EXTRA_FIELDS = [
         "confirm_email",
+        "confirm_password",
         "first_name",
         "last_name",
         "city",
@@ -553,6 +571,25 @@ class RegistrationFormFactory(object):
             restrictions=password_validators_restrictions(),
             required=required
         )
+
+    def _add_confirm_password_field(self, form_desc, required=True):
+        """Add a password confirmation field to a form description
+        Args:
+            form_desc: A form description
+            required: Whether this field is required. Defaults to True.
+        """
+        confirm_password_label = _(u"Confirm password")
+
+        error_msg = _(u"Please confirm password.")
+
+        form_desc.add_field(
+            "confirm_password",
+            label=confirm_password_label,
+            field_type="password",
+            instructions=password_validators_instruction_texts(),
+            restrictions=password_validators_restrictions(),
+            required=required
+        )        
 
     def _add_level_of_education_field(self, form_desc, required=True):
         """Add a level of education field to a form description.
