@@ -169,11 +169,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self._assert_api_client_with_user(ConsentApiClient, mock_jwt_builder)
 
     @httpretty.activate
-    def test_consent_needed_for_course(self):
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    def test_consent_needed_for_course(self, mock_get_enterprise_learner_data):
         user = UserFactory(username='janedoe')
         request = mock.MagicMock(session={}, user=user, site=SiteFactory(domain="example.com"))
         ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
         course_id = 'fake-course'
+        mock_get_enterprise_learner_data.return_value = self.get_mock_enterprise_learner_results()
         self.mock_enterprise_learner_api()
 
         # test not required consent for example non enterprise customer
@@ -219,7 +221,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self.assertFalse(course_id in consent_required)
 
     @httpretty.activate
-    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data')
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
     @mock.patch('openedx.features.enterprise_support.api.EnterpriseCustomer')
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline')
     @mock.patch('openedx.features.enterprise_support.api.Registry')
