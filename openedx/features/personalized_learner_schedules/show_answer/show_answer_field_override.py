@@ -53,4 +53,8 @@ class ShowAnswerFieldOverride(FieldOverrideProvider):
     @classmethod
     def enabled_for(cls, course):
         """ Enabled only for Self-Paced courses using Personalized User Schedules. """
-        return course and course.self_paced and RELATIVE_DATES_FLAG.is_enabled(course.id)
+        # Returning False while we figure out a bug where Course Level Show Answer settings are not
+        # being properly applied and are being overridden with AFTER_ALL_ATTEMPTS_OR_CORRECT
+        # *****IMPORTANT*****: comment the tests back in when this is re-enabled
+        return False
+        # return course and course.self_paced and RELATIVE_DATES_FLAG.is_enabled(course.id)
