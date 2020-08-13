@@ -394,9 +394,6 @@ if FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION'):
         'enterprise.SystemWideEnterpriseUserRoleAssignment',
     )
 
-# List of enterprise customer uuids to exclude from transition to use of enterprise-catalog
-ENTERPRISE_CUSTOMERS_EXCLUDED_FROM_CATALOG = ()
-
 #####################################################################
 
 # django-session-cookie middleware
