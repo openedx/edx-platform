@@ -7,6 +7,7 @@ import json
 from babel.numbers import get_currency_symbol
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from django.conf import settings
 from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -20,10 +21,14 @@ from course_modes.models import CourseMode
 from edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access_response import (
+    CoursewareMicrofrontendDisabledAccessError,
+)
 from lms.djangoapps.courseware.courses import check_course_access, get_course_by_id
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
+from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
@@ -62,6 +67,34 @@ class CoursewareMeta:
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
+
+    def is_microfrontend_enabled_for_user(self):
+        """
+        This method is the "opposite" of _redirect_to_learning_mfe in
+        lms/djangoapps/courseware/views/index.py. But not exactly...
+
+        1. It needs to respect the global
+           ENABLE_COURSEWARE_MICROFRONTEND feature flag and redirect users
+           out of the MFE experience if it's turned off.
+        2. It needs to redirect for old Mongo courses.
+        3. It does NOT need to worry about exams - the MFE will handle
+           those on its own. As of this writing, it will redirect back to
+           the LMS experience, but that may change soon.
+        4. Finally, it needs to redirect users who are bucketed out of
+           the MFE experience, but who aren't staff. Staff are allowed to
+           stay.
+        """
+        # REDIRECT: feature disabled globally
+        if not settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND'):
+            return False
+        # REDIRECT: Old Mongo courses, until removed from platform
+        if self.course_key.deprecated:
+            return False
+        # REDIRECT: If the user isn't staff, redirect if they're bucketed into the old LMS experience.
+        if not self.original_user_is_staff and not REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(self.course_key):
+            return False
+        # STAY: If the user has made it past all the above, they're good to stay!
+        return True
 
     @property
     def enrollment(self):
@@ -107,7 +140,7 @@ class CoursewareMeta:
 
     @property
     def can_load_courseware(self):
-        return check_course_access(
+        access_response = check_course_access(
             self.overview,
             self.effective_user,
             'load',
@@ -115,6 +148,12 @@ class CoursewareMeta:
             check_survey_complete=False,
             check_if_authenticated=True,
         ).to_json()
+        # Only check whether the MFE is enabled if the user would otherwise be allowed to see it
+        # This means that if the user was denied access, they'll see a meaningful message first if
+        # there is one.
+        if access_response and not self.is_microfrontend_enabled_for_user():
+            return CoursewareMicrofrontendDisabledAccessError().to_json()
+        return access_response
 
     @property
     def tabs(self):

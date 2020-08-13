@@ -81,7 +81,9 @@ class CourseApiTestViews(BaseCoursewareTests):
         (False, None, ACCESS_GRANTED),
     )
     @ddt.unpack
-    def test_course_metadata(self, logged_in, enrollment_mode, enable_anonymous):
+    @mock.patch('openedx.core.djangoapps.courseware_api.views.CoursewareMeta.is_microfrontend_enabled_for_user')
+    def test_course_metadata(self, logged_in, enrollment_mode, enable_anonymous, is_microfrontend_enabled_for_user):
+        is_microfrontend_enabled_for_user.return_value = True
         check_public_access = mock.Mock()
         check_public_access.return_value = enable_anonymous
         with mock.patch('lms.djangoapps.courseware.access_utils.check_public_access', check_public_access):
