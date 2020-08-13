@@ -440,13 +440,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
 
         course_id = 'course-v1:edX+DemoX+Demo_Course'
-        return_to = 'info'
+        return_to = 'courseware'
 
         expected_url_args = {
             'course_id': ['course-v1:edX+DemoX+Demo_Course'],
             'failure_url': ['http://localhost:8000/dashboard?consent_failed=course-v1%3AedX%2BDemoX%2BDemo_Course'],
             'enterprise_customer_uuid': ['cf246b88-d5f6-4908-a522-fc307e0b0c59'],
-            'next': ['http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/info']
+            'next': ['http://localhost:8000/courses/course-v1:edX+DemoX+Demo_Course/courseware']
         }
 
         actual_url = get_enterprise_consent_url(request_mock, course_id, return_to=return_to)

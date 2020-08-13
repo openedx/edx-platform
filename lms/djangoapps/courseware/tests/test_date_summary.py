@@ -401,7 +401,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(block.title, 'current_datetime')
 
     @ddt.data(
-        'info',
         'openedx.course_experience.course_home',
     )
     def test_todays_date_no_timezone(self, url_name):
@@ -422,7 +421,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 self.assertContains(response, html)
 
     @ddt.data(
-        'info',
         'openedx.course_experience.course_home',
     )
     def test_todays_date_timezone(self, url_name):
@@ -451,7 +449,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.assertEqual(block.date, course.start)
 
     @ddt.data(
-        'info',
         'openedx.course_experience.course_home',
     )
     def test_start_date_render(self, url_name):
@@ -468,7 +465,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 self.assertContains(response, html)
 
     @ddt.data(
-        'info',
         'openedx.course_experience.course_home',
     )
     def test_start_date_render_time_zone(self, url_name):
@@ -706,8 +702,6 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.assertEqual(block.relative_datestring, expected_date_string)
 
     @ddt.data(
-        ('info', True),
-        ('info', False),
         ('openedx.course_experience.course_home', True),
         ('openedx.course_experience.course_home', False),
     )
