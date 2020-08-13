@@ -1,13 +1,11 @@
 from copy import deepcopy
 
 from django.urls import reverse
-
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 
+from openedx.features.philu_courseware.constants import INVALID_PROBLEM_ID_MSG
 from student.tests.factories import UserFactory
-
-from openedx.features.philu_courseware.constants import COMP_ASSESS_RECORD_SUCCESS_MSG, INVALID_PROBLEM_ID_MSG
 
 INVALID_ASSESSMENT_TYPE = 'This is invalid assessment type'
 INVALID_CORRECTNESS = 'This is invalid correctness'
@@ -18,7 +16,7 @@ class CompetencyAssessmentRecordTest(APITestCase):
     def setUp(self):
         self.user = UserFactory()
         self.client.force_authenticate(self.user)
-        self.end_point = reverse('record_and_fetch_competency_assessment', kwargs=dict(chapter_id=1))
+        self.end_point = reverse('competency_assessment', kwargs=dict(chapter_id=1))
         self.valid_record = {
             'chapter_id': 'test-chapter',
             'problem_id': 'block-v1:PUCIT+IT1+1+type@problem+block@7f1593ef300e4f569e26356b65d3b76b',
@@ -37,7 +35,6 @@ class CompetencyAssessmentRecordTest(APITestCase):
             data=[self.valid_record], format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['message'], COMP_ASSESS_RECORD_SUCCESS_MSG)
 
     def test_invalid_problem_id(self):
         record = deepcopy(self.valid_record)
@@ -48,7 +45,7 @@ class CompetencyAssessmentRecordTest(APITestCase):
             data=[record], format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(INVALID_PROBLEM_ID_MSG, response.data['message'][0]['problem_id'])
+        self.assertIn(INVALID_PROBLEM_ID_MSG, response.data[0]['problem_id'])
 
     def test_invalid_correctness_and_assessment_type(self):
         record = deepcopy(self.valid_record)
@@ -60,10 +57,8 @@ class CompetencyAssessmentRecordTest(APITestCase):
             data=[record], format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(NOT_VALID_CHOICE_FORMAT.format(INVALID_ASSESSMENT_TYPE),
-                      response.data['message'][0]['assessment_type'])
-        self.assertIn(NOT_VALID_CHOICE_FORMAT.format(INVALID_CORRECTNESS),
-                      response.data['message'][0]['correctness'])
+        self.assertIn(NOT_VALID_CHOICE_FORMAT.format(INVALID_ASSESSMENT_TYPE), response.data[0]['assessment_type'])
+        self.assertIn(NOT_VALID_CHOICE_FORMAT.format(INVALID_CORRECTNESS), response.data[0]['correctness'])
 
     def test_all_missing_keys(self):
         for key in self.valid_record.keys():
@@ -77,6 +72,5 @@ class CompetencyAssessmentRecordTest(APITestCase):
             data=[pay_load], format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn(missing_key, response.data['message'][0].keys())
-        self.assertIn('This field is required.',
-                      response.data['message'][0][missing_key])
+        self.assertIn(missing_key, response.data[0].keys())
+        self.assertIn('This field is required.', response.data[0][missing_key])
