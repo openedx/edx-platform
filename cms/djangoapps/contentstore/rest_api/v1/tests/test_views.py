@@ -275,6 +275,12 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         response = self.make_request(data=data)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'null',
+            'proctortrack': {}
+        },
+    )
     def test_200_for_instructor_request(self):
         self.client.login(username=self.course_instructor, password=self.password)
         data = {
