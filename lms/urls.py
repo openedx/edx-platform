@@ -44,7 +44,6 @@ from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdm
 from openedx.core.djangoapps.plugins import constants as plugin_constants
 from openedx.core.djangoapps.plugins import plugin_urls
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
@@ -887,7 +886,6 @@ if settings.FEATURES.get('ENABLE_LTI_PROVIDER'):
     ]
 
 urlpatterns += [
-    url(r'^config/self_paced', ConfigurationModelCurrentAPIView.as_view(model=SelfPacedConfiguration)),
     url(r'^config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsApiConfig)),
     url(r'^config/catalog', ConfigurationModelCurrentAPIView.as_view(model=CatalogIntegration)),
     url(r'^config/forums', ConfigurationModelCurrentAPIView.as_view(model=ForumsConfig)),
