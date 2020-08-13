@@ -1,6 +1,6 @@
 import { fetchCourseBlocks, selectBlock } from 'BlockBrowser/data/actions/courseBlocks';
 import { connect } from 'react-redux';
-
+import { createProblemResponsesReportTask } from '../../data/actions/problemResponses';
 import Main from './Main';
 
 const mapStateToProps = state => ({
@@ -10,8 +10,16 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   onSelectBlock: blockId => dispatch(selectBlock(blockId)),
-  fetchCourseBlocks: (courseId, excludeBlockTypes) =>
-    dispatch(fetchCourseBlocks(courseId, excludeBlockTypes)),
+  fetchCourseBlocks:
+    (courseId, excludeBlockTypes) =>
+      dispatch(fetchCourseBlocks(courseId, excludeBlockTypes)),
+  createProblemResponsesReportTask:
+    (problemResponsesEndpoint, taskStatusEndpoint, problemLocation) =>
+      dispatch(
+        createProblemResponsesReportTask(
+            problemResponsesEndpoint, taskStatusEndpoint, problemLocation,
+        ),
+      ),
 });
 
 const MainContainer = connect(
