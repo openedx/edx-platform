@@ -31,11 +31,6 @@ def waffle_flags():
     """
     return WaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Studio: ')
 
-# Flags
-ENABLE_PROCTORING_PROVIDER_OVERRIDES = CourseWaffleFlag(
-    waffle_namespace=waffle_flags(),
-    flag_name=u'enable_proctoring_provider_overrides',
-)
 
 # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.
 ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(

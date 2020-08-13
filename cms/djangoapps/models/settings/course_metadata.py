@@ -13,7 +13,6 @@ import pytz
 from six import text_type
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.roles import GlobalStaff
 from xblock_django.models import XBlockStudioConfigurationFlag
@@ -128,11 +127,6 @@ class CourseMetadata(object):
         # display the "Allow Unsupported XBlocks" setting.
         if not XBlockStudioConfigurationFlag.is_enabled():
             exclude_list.append('allow_unsupported_xblocks')
-
-        # If the ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled,
-        # do not show "Proctoring Configuration" in Studio Advanced Settings.
-        if not ENABLE_PROCTORING_PROVIDER_OVERRIDES.is_enabled(course_key):
-            exclude_list.append('proctoring_provider')
 
         # Do not show "Course Visibility For Unenrolled Learners" in Studio Advanced Settings
         # if the enable_anonymous_access flag is not enabled
@@ -342,9 +336,6 @@ class CourseMetadata(object):
         """
         Return whether the requested proctoring provider is different than the current proctoring provider, indicating
         that the user has requested a change to the proctoring_provider Advanced Setting.
-        The requested_provider will be None if the proctoring_provider setting is not available (e.g. if the
-        ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled for the course). In this case, we consider
-        that there is no change in the requested proctoring provider.
         """
         if requested_provider is None:
             return False
