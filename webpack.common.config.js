@@ -106,7 +106,6 @@ module.exports = Merge.smart({
             CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
             CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
             CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
-            CourseTalkReviews: './openedx/features/course_experience/static/course_experience/js/CourseTalkReviews.js',
             Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
             Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
             LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
