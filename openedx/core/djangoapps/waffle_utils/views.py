@@ -10,6 +10,8 @@ from rest_framework import permissions, views
 from rest_framework.response import Response
 from waffle.models import Flag, Switch
 
+from .models import WaffleFlagCourseOverrideModel
+
 
 class ToggleStateView(views.APIView):
     """
@@ -30,6 +32,7 @@ class ToggleStateView(views.APIView):
         """
         switches_dict = {}
         self._add_waffle_switch_state(switches_dict)
+        self._add_waffle_switch_computed_status(switches_dict)
         switch_list = list(switches_dict.values())
         switch_list.sort(key=lambda toggle: toggle['name'])
         return switch_list
@@ -47,12 +50,27 @@ class ToggleStateView(views.APIView):
             switch['created'] = str(switch_data.created)
             switch['modified'] = str(switch_data.modified)
 
+    def _add_waffle_switch_computed_status(self, switch_dict):
+        """
+        Add computed status to each waffle switch.
+        """
+        for switch in switch_dict.values():
+            computed_status = 'off'
+            if 'is_active' in switch:
+                if switch['is_active'] == 'true':
+                    computed_status = 'on'
+                else:
+                    computed_status = 'off'
+            switch['computed_status'] = computed_status
+
     def _get_all_waffle_flags(self):
         """
         Gets all waffle flags and their state.
         """
         flags_dict = {}
         self._add_waffle_flag_state(flags_dict)
+        self._add_waffle_flag_course_override_state(flags_dict)
+        self._add_waffle_flag_computed_status(flags_dict)
         flag_list = list(flags_dict.values())
         flag_list.sort(key=lambda toggle: toggle['name'])
         return flag_list
@@ -75,6 +93,72 @@ class ToggleStateView(views.APIView):
                 flag['note'] = flag_data.note
             flag['created'] = str(flag_data.created)
             flag['modified'] = str(flag_data.modified)
+
+    def _add_waffle_flag_course_override_state(self, flags_dict):
+        """
+        Add waffle flag course override state from the WaffleFlagCourseOverrideModel model.
+        """
+        # This dict is keyed by flag name, and contains dicts keyed by course_id, the contains
+        # the final dict of metadata for a single course override that will be returned.
+        flag_course_overrides = OrderedDict()
+        # Note: We can't just get enabled records, because if a historical record is enabled but
+        #   the current record is disabled, we would not know this. We get all records, and mark
+        #   some overrides as disabled, and then later filter the disabled records.
+        course_overrides_data = WaffleFlagCourseOverrideModel.objects.all()
+        course_overrides_data = course_overrides_data.order_by('waffle_flag', 'course_id', '-change_date')
+        for course_override_data in course_overrides_data:
+            flag_name = course_override_data.waffle_flag
+            course_id = str(course_override_data.course_id)
+            if flag_name not in flag_course_overrides:
+                flag_course_overrides[flag_name] = OrderedDict()
+            course_overrides = flag_course_overrides[flag_name]
+            if course_id not in course_overrides:
+                course_overrides[course_id] = OrderedDict()
+            course_override = course_overrides[course_id]
+            # data is reverse ordered by date, so the first record is the current record
+            if 'course_id' not in course_override:
+                course_override['course_id'] = course_id
+                if not course_override_data.enabled:
+                    # The current record may be disabled, but later history might be enabled.
+                    # We'll filter these disabled records below.
+                    course_override['disabled'] = True
+                else:
+                    course_override['force'] = course_override_data.override_choice
+                    course_override['modified'] = str(course_override_data.change_date)
+            # data is reverse ordered by date, so the last record is the oldest record
+            course_override['created'] = str(course_override_data.change_date)
+
+        for flag_name, course_overrides_dict in flag_course_overrides.items():
+            course_overrides = [
+                course_override for course_override in course_overrides_dict.values()
+                if 'disabled' not in course_override
+            ]
+            if course_overrides:
+                flag = self._get_or_create_toggle_response(flags_dict, flag_name)
+                flag['course_overrides'] = course_overrides
+
+    def _add_waffle_flag_computed_status(self, flags_dict):
+        """
+        Add computed status to each waffle flag.
+        """
+        for flag in flags_dict.values():
+            computed_status = 'off'
+            if 'everyone' in flag:
+                if flag['everyone'] == 'yes':
+                    computed_status = 'on'
+                elif flag['everyone'] == 'unknown':
+                    computed_status = 'both'
+            # check course overrides only if computed_status is not already 'both'
+            if computed_status != 'both' and 'course_overrides' in flag:
+                has_force_on = any(override['force'] == 'on' for override in flag['course_overrides'])
+                has_force_off = any(override['force'] == 'off' for override in flag['course_overrides'])
+                if has_force_on and has_force_off:
+                    computed_status = 'both'
+                elif has_force_on:
+                    computed_status = 'on' if computed_status == 'on' else 'both'
+                elif has_force_off:
+                    computed_status = 'off' if computed_status == 'off' else 'both'
+            flag['computed_status'] = computed_status
 
     def _get_or_create_toggle_response(self, toggles_dict, toggle_name):
         """
