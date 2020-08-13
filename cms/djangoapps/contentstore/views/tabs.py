@@ -180,8 +180,8 @@ def get_tab_by_locator(tab_list, usage_key_string):
 
 def validate_args(num, tab_type):
     "Throws for the disallowed cases."
-    if num <= 1:
-        raise ValueError('Tabs 1 and 2 cannot be edited')
+    if num < 1:
+        raise ValueError('Tab 1 cannot be edited')
     if tab_type == 'static_tab':
         raise ValueError('Tabs of type static_tab cannot be edited here (use Studio)')
 
