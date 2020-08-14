@@ -2791,7 +2791,7 @@ LOGIN_REDIRECT_WHITELIST = []
 # - 'hidden': to not display the field
 
 REGISTRATION_EXTRA_FIELDS = {
-    'confirm_email': 'hidden',
+    'confirm_email': 'required',
     'confirm_password': 'required',
     'level_of_education': 'optional',
     'gender': 'optional',
