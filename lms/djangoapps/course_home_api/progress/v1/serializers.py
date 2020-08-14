@@ -66,18 +66,43 @@ class CertificateDataSerializer(serializers.Serializer):
         return cert_data.cert_status == CertificateStatuses.requesting and cert_data.request_cert_url is not None
 
 
-class CreditCourseRequirementsSerializer(serializers.Serializer):
+class CreditRequirementSerializer(serializers.Serializer):
     """
-    Serializer for credit_course_requirements
+    Serializer for credit requirement objects
     """
     display_name = serializers.CharField()
-    namespace = serializers.CharField()
     min_grade = serializers.SerializerMethodField()
     status = serializers.CharField()
     status_date = serializers.DateTimeField()
 
-    def get_min_grade(self, req):
-        return req['criteria']['min_grade'] * 100
+    def get_min_grade(self, requirement):
+        if requirement['namespace'] == 'grade':
+            return requirement['criteria']['min_grade'] * 100
+        else:
+            return None
+
+
+class CreditCourseRequirementsSerializer(serializers.Serializer):
+    """
+    Serializer for credit_course_requirements
+    """
+    dashboard_url = serializers.SerializerMethodField()
+    eligibility_status = serializers.CharField()
+    requirements = CreditRequirementSerializer(many=True)
+
+    def get_dashboard_url(self, _):
+        relative_path = reverse('dashboard')
+        request = self.context['request']
+        return request.build_absolute_uri(relative_path)
+
+
+class VerificationDataSerializer(serializers.Serializer):
+    """
+    Serializer for verification data object
+    """
+    link = serializers.URLField()
+    status = serializers.CharField()
+    status_date = serializers.DateTimeField()
 
 
 class ProgressTabSerializer(serializers.Serializer):
@@ -85,7 +110,10 @@ class ProgressTabSerializer(serializers.Serializer):
     Serializer for progress tab
     """
     certificate_data = CertificateDataSerializer()
+    credit_course_requirements = CreditCourseRequirementsSerializer()
+    credit_support_url = serializers.URLField()
     courseware_summary = ChapterSerializer(many=True)
     enrollment_mode = serializers.CharField()
     studio_url = serializers.CharField()
     user_timezone = serializers.CharField()
+    verification_data = VerificationDataSerializer()
