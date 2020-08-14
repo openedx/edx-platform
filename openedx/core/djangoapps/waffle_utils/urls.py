@@ -4,5 +4,5 @@ from django.conf.urls import url
 from openedx.core.djangoapps.waffle_utils.views import ToggleStateView
 
 urlpatterns = [
-    url(r'^state/', ToggleStateView.as_view(), name="toggle_state"),
+    url(r'^v0/state/', ToggleStateView.as_view(), name="toggle_state"),
 ]
