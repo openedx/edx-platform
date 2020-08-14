@@ -2,6 +2,7 @@
 Views that we will use to view toggle state in edx-platform.
 """
 from collections import OrderedDict
+from django.conf import settings
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.permissions import IsStaff
@@ -24,6 +25,7 @@ class ToggleStateView(views.APIView):
         response = OrderedDict()
         response['waffle_flags'] = self._get_all_waffle_flags()
         response['waffle_switches'] = self._get_all_waffle_switches()
+        response['django_settings'] = self._get_settings_state()
         return Response(response)
 
     def _get_all_waffle_switches(self):
@@ -174,3 +176,23 @@ class ToggleStateView(views.APIView):
         toggle['name'] = toggle_name
         toggles_dict[toggle_name] = toggle
         return toggle
+
+    def _get_settings_state(self):
+        """
+        Returns a dictionary of settings values. Will only return values that are set to true or false.
+        """
+
+        bool_settings = list()
+        for setting_name, setting_value in vars(settings).items():
+            if isinstance(setting_value, dict):
+                for dict_name, dict_value in setting_value.items():
+                    if isinstance(dict_value, bool):
+                        bool_settings.append(
+                            {
+                                'name': "{setting_name}['{dict_name}']".format(setting_name=setting_name, dict_name=dict_name),
+                                'is_active': dict_value,
+                            }
+                        )
+            elif isinstance(setting_value, bool):
+                bool_settings.append({'name': setting_name, 'is_active': setting_value})
+        return bool_settings
