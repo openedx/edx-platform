@@ -54,9 +54,10 @@ for temporarily instrumenting/monitoring waffle flag usage.
 """
 
 import logging
-import warnings
+import traceback
 from abc import ABCMeta
 from contextlib import contextmanager
+from weakref import WeakSet
 
 import crum
 import six
@@ -183,6 +184,9 @@ class WaffleSwitch(object):
     """
     Represents a single waffle switch, using a cached namespace.
     """
+    # use a WeakSet so these instances can be garbage collected if need be
+    _class_instances = WeakSet()
+
     def __init__(self, waffle_namespace, switch_name):
         """
         Arguments:
@@ -194,6 +198,24 @@ class WaffleSwitch(object):
 
         self.waffle_namespace = waffle_namespace
         self.switch_name = switch_name
+        self._module_name = _traceback_to_module_name(traceback.extract_stack(), self.__module__)
+        self._class_instances.add(self)
+
+    @classmethod
+    def get_instances(cls):
+        """ Returns a WeakSet of the instantiated instances of WaffleFlag. """
+        return cls._class_instances
+
+    @property
+    def module_name(self):
+        """
+        Returns the module name. This is cached to work with the WeakSet instances.
+        """
+        return self._module_name
+
+    @module_name.setter
+    def module_name(self, value):
+        self._module_name = value
 
     @property
     def namespaced_switch_name(self):
@@ -374,6 +396,8 @@ class WaffleFlag(object):
     """
     Represents a single waffle flag, using a cached waffle namespace.
     """
+    # use a WeakSet so these instances can be garbage collected if need be
+    _class_instances = WeakSet()
 
     def __init__(self, waffle_namespace, flag_name):
         """
@@ -390,6 +414,24 @@ class WaffleFlag(object):
         self.waffle_namespace = waffle_namespace
         self.waffle_namespace = waffle_namespace
         self.flag_name = flag_name
+        self._module_name = _traceback_to_module_name(traceback.extract_stack(), self.__module__)
+        self._class_instances.add(self)
+
+    @classmethod
+    def get_instances(cls):
+        """ Returns a WeakSet of the instantiated instances of WaffleFlag. """
+        return cls._class_instances
+
+    @property
+    def module_name(self):
+        """
+        Returns the module name. This is cached to work with the WeakSet instances.
+        """
+        return self._module_name
+
+    @module_name.setter
+    def module_name(self, value):
+        self._module_name = value
 
     @property
     def namespaced_flag_name(self):
@@ -473,3 +515,16 @@ class CourseWaffleFlag(WaffleFlag):
             self.flag_name,
             check_before_waffle_callback=self._get_course_override_callback(course_key),
         )
+
+
+def _traceback_to_module_name(traceback, class_module):
+    try:
+        class_file_name = traceback[-1].filename
+        class_module_as_path = class_module.replace('.', '/')
+        module_index = class_file_name.index(class_module_as_path)
+        instance_file_name = traceback[-2].filename
+        instance_partial_file_name = instance_file_name[module_index:]
+        instance_module_name = instance_partial_file_name.replace('/', '.').replace('.py', '').replace('.__init__', '')
+        return instance_module_name
+    except Exception:  # pylint: disable=broad-except
+        return 'error.parsing.module'
