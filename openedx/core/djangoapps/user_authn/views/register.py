@@ -45,6 +45,7 @@ from openedx.core.djangoapps.user_api.accounts.api import (
     get_email_validation_error,
     get_name_validation_error,
     get_password_validation_error,
+    get_confirm_password_validation_error,
     get_username_existence_validation_error,
     get_username_validation_error
 )
@@ -709,6 +710,11 @@ class RegistrationValidationView(APIView):
         password = request.data.get('password')
         return get_password_validation_error(password, username, email)
 
+    def confirm_password_handler(self, request):
+        password = request.data.get('password')
+        confirm_password = request.data.get('confirm_password')
+        return get_confirm_password_validation_error(confirm_password, password)
+
     def country_handler(self, request):
         country = request.data.get('country')
         return get_country_validation_error(country)
@@ -719,6 +725,7 @@ class RegistrationValidationView(APIView):
         "email": email_handler,
         "confirm_email": confirm_email_handler,
         "password": password_handler,
+        "confirm_password": confirm_password_handler,
         "country": country_handler
     }
 
@@ -734,6 +741,7 @@ class RegistrationValidationView(APIView):
             "email": "mslm@gmail.com",
             "confirm_email": "mslm@gmail.com",
             "password": "password123",
+            "confirm_password": "password123",
             "country": "PK"
         }
         ```

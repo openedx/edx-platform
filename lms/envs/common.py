@@ -2792,6 +2792,7 @@ LOGIN_REDIRECT_WHITELIST = []
 
 REGISTRATION_EXTRA_FIELDS = {
     'confirm_email': 'hidden',
+    'confirm_password': 'required',
     'level_of_education': 'optional',
     'gender': 'optional',
     'year_of_birth': 'optional',
@@ -2811,6 +2812,7 @@ REGISTRATION_FIELD_ORDER = [
     "email",
     "confirm_email",
     "password",
+    "confirm_password",
     "city",
     "state",
     "country",
