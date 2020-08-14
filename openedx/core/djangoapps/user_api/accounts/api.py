@@ -586,7 +586,7 @@ def _validate_password(password, username=None, email=None):
 
 def _validate_confirm_password(confirm_password, password):
     if not confirm_password:
-        raise errors.AccountPasswordInvalid('Please enter your Confirm password.')
+        raise errors.AccountPasswordInvalid('Password confirmation is required.')
     if confirm_password != password:
         raise errors.AccountPasswordInvalid('Passwords do not match.')
 
