@@ -38,7 +38,7 @@ cffi==1.14.1              # via -r requirements/edx/../edx-sandbox/shared.txt, c
 chardet==3.0.4            # via -r requirements/edx/paver.txt, pdfminer.six, pysrt, requests
 chem==1.2.0               # via -r requirements/edx/base.in
 click==7.1.2              # via -r requirements/edx/../edx-sandbox/shared.txt, code-annotations, nltk, user-util
-code-annotations==0.4.0   # via edx-enterprise
+code-annotations==0.5.0   # via edx-enterprise
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.in
 coreapi==2.3.3            # via drf-yasg
 coreschema==0.0.4         # via coreapi, drf-yasg

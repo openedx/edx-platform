@@ -42,7 +42,7 @@ chardet==3.0.4            # via -r requirements/edx/base.txt, pdfminer.six, pysr
 chem==1.2.0               # via -r requirements/edx/base.txt
 click-log==0.3.2          # via edx-lint
 click==7.1.2              # via -r requirements/edx/base.txt, click-log, code-annotations, edx-lint, nltk, user-util
-code-annotations==0.4.0   # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-enterprise
+code-annotations==0.5.0   # via -r requirements/edx/base.txt, -r requirements/edx/testing.in, edx-enterprise
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.txt
 coreapi==2.3.3            # via -r requirements/edx/base.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/base.txt, coreapi, drf-yasg
