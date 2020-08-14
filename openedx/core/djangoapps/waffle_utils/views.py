@@ -4,6 +4,7 @@ Views that we will use to view toggle state in edx-platform.
 from collections import OrderedDict
 from django.conf import settings
 
+from edx_django_utils.monitoring.code_owner.utils import get_code_owner_from_module, is_code_owner_mappings_configured
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.permissions import IsStaff
 from rest_framework.authentication import SessionAuthentication
@@ -11,6 +12,7 @@ from rest_framework import permissions, views
 from rest_framework.response import Response
 from waffle.models import Flag, Switch
 
+from . import WaffleFlag, WaffleSwitch
 from .models import WaffleFlagCourseOverrideModel
 
 
@@ -33,11 +35,22 @@ class ToggleStateView(views.APIView):
         Gets all waffle switches and their state.
         """
         switches_dict = {}
+        self._add_waffle_switch_instances(switches_dict)
         self._add_waffle_switch_state(switches_dict)
         self._add_waffle_switch_computed_status(switches_dict)
         switch_list = list(switches_dict.values())
         switch_list.sort(key=lambda toggle: toggle['name'])
         return switch_list
+
+    def _add_waffle_switch_instances(self, switches_dict):
+        """
+        Add details from waffle switch instances, like code_owner.
+        """
+        waffle_switch_instances = WaffleSwitch.get_instances()
+        for switch_instance in waffle_switch_instances:
+            switch_name = switch_instance.namespaced_switch_name
+            switch = self._get_or_create_toggle_response(switches_dict, switch_name)
+            self._add_toggle_instance_details(switch, switch_instance)
 
     def _add_waffle_switch_state(self, switches_dict):
         """
@@ -70,12 +83,34 @@ class ToggleStateView(views.APIView):
         Gets all waffle flags and their state.
         """
         flags_dict = {}
+        self._add_waffle_flag_instances(flags_dict)
         self._add_waffle_flag_state(flags_dict)
         self._add_waffle_flag_course_override_state(flags_dict)
         self._add_waffle_flag_computed_status(flags_dict)
         flag_list = list(flags_dict.values())
         flag_list.sort(key=lambda toggle: toggle['name'])
         return flag_list
+
+    def _add_waffle_flag_instances(self, flags_dict):
+        """
+        Add details from waffle flag instances, like code_owner.
+        """
+        waffle_flag_instances = WaffleFlag.get_instances()
+        for flag_instance in waffle_flag_instances:
+            flag_name = flag_instance.namespaced_flag_name
+            flag = self._get_or_create_toggle_response(flags_dict, flag_name)
+            self._add_toggle_instance_details(flag, flag_instance)
+
+    def _add_toggle_instance_details(self, toggle, toggle_instance):
+        """
+        Add details (class, module, code_owner) from a specific toggle instance.
+        """
+        toggle['class'] = toggle_instance.__class__.__name__
+        toggle['module'] = toggle_instance.module_name
+        if is_code_owner_mappings_configured():
+            code_owner = get_code_owner_from_module(toggle_instance.module_name)
+            if code_owner:
+                toggle['code_owner'] = code_owner
 
     def _add_waffle_flag_state(self, flags_dict):
         """
