@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-09 20:51+0000\n"
-"PO-Revision-Date: 2020-08-09 20:51:07.247635\n"
+"POT-Creation-Date: 2020-08-16 20:50+0000\n"
+"PO-Revision-Date: 2020-08-16 20:50:30.089357\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -5426,6 +5426,10 @@ msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be logged in to see this course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "Please view your course in the existing experience"
 msgstr ""
 
 #: lms/djangoapps/courseware/course_tools.py
@@ -11059,6 +11063,27 @@ msgid ""
 "{expiration_date}{span_close}{a_close}"
 msgstr ""
 
+#: openedx/features/course_experience/api/v1/views.py
+msgid "'course_key' is required."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Only 'course_key' is expected."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "View all dates"
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid ""
+"Your due dates have been successfully shifted to help you stay on track."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Deadlines successfully reset."
+msgstr ""
+
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
@@ -12212,14 +12237,6 @@ msgstr ""
 msgid "name"
 msgstr ""
 
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu"
-msgstr ""
-
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu dropdown"
-msgstr ""
-
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
@@ -13322,6 +13339,10 @@ msgstr ""
 
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
+msgstr ""
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu"
 msgstr ""
 
 #: lms/templates/user_dropdown.html
@@ -16771,10 +16792,6 @@ msgid ""
 "more than {max_entries} responses, try generating the report on a chapter-"
 "by-chapter, or problem-by-problem basis, or contact your site administrator "
 "to increase the limit."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of problem responses"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html

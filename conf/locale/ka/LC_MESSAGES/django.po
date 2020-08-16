@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-02 20:43+0000\n"
+"POT-Creation-Date: 2020-08-09 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -2128,8 +2128,8 @@ msgid "Answered"
 msgstr "პასუხგაცემული"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Attempted"
-msgstr "მცდელობა"
+msgid "Attempted or Past Due"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Closed"
@@ -2146,6 +2146,18 @@ msgstr "სწორი ან ვადაგასული"
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "After Some Number of Attempts"
 msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "After All Attempts"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "After All Attempts or Correct"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Attempted"
+msgstr "მცდელობა"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Show Answer: Number of Attempts"
@@ -4050,12 +4062,9 @@ msgstr ""
 msgid ""
 "Specify when the Show Answer button appears for each problem. Valid values "
 "are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
-"\"past_due\", \"correct_or_past_due\", and \"never\"."
+"\"past_due\", \"correct_or_past_due\", \"after_all_attempts\", "
+"\"after_all_attempts_or_correct\", \"attempted_no_past_due\", and \"never\"."
 msgstr ""
-"თითოეული პრობლემისთვის, განსაზღვრეთ, თუ როდის გამოჩნდეს ღილაკი პასუხის "
-"ჩვენება. დაშვებული მნიშვნელობებია \"always\", \"answered\", \"attempted\", "
-"\"closed\", \"finished\", \"past_due\", \"correct_or_past_due\" და "
-"\"never\"."
 
 #. Translators: DO NOT translate the words in quotes here, they are
 #. specific words for the acceptable values.
@@ -6198,7 +6207,7 @@ msgstr ""
 #: lms/djangoapps/courseware/masquerade.py
 #, python-brace-format
 msgid ""
-"There is no user with the username or email address u\"{user_identifier}\" "
+"There is no user with the username or email address \"{user_identifier}\" "
 "enrolled in this course."
 msgstr ""
 
@@ -11641,10 +11650,6 @@ msgstr ""
 msgid "Username created for VEM Integration, e.g. vem_service_user."
 msgstr ""
 
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "Percentage of courses allowed to use VEM pipeline"
-msgstr ""
-
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr ""
@@ -12041,6 +12046,18 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
 msgstr "გაგრძელება"
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#: lms/templates/dates_banner.html
+msgid "Shift due dates"
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+msgid ""
+"To participate in this assignment, the suggested schedule for your course "
+"needs updating. Don’t worry, we’ll shift all the due dates for you and you "
+"won’t lose any of your progress."
+msgstr ""
 
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
@@ -13324,10 +13341,6 @@ msgid ""
 "To keep yourself on track, you can update this schedule and shift the past "
 "due assignments into the future. Don't worry—you won't lose any of the "
 "progress you've made when you shift your due dates."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid "Shift due dates"
 msgstr ""
 
 #: lms/templates/dates_banner.html
@@ -17476,21 +17489,6 @@ msgstr ""
 #: lms/templates/enrollment/course_enrollment_message.html
 msgid "We hope you enjoy the course."
 msgstr ""
-
-#: lms/templates/enrollment/course_enrollment_message.html
-msgid ""
-"{platform_name} is a nonprofit bringing high-quality education to everyone, "
-"everywhere. Your help allows us to continuously improve the learning "
-"experience for millions and make a better future one learner at a time."
-msgstr ""
-"{platform_name} არის არაკომერციული და უზრუნველყოფს უმაღლესი ხარისხის "
-"განათლებას ყველასთვის, ყველგან. თქვენი დახმარება საშუალებას გვაძლევს "
-"მუდმივად გავაუმჯობესოთ სწავლის გამოცდილება და შევქმნათ უკეთესი მომავალი "
-"მილიონებისთვის."
-
-#: lms/templates/enrollment/course_enrollment_message.html
-msgid "Donation Actions"
-msgstr "შემოწირულობის ქმედებები"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Financial Assistance Application"

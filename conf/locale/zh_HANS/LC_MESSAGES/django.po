@@ -397,7 +397,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-09 20:43+0000\n"
+"POT-Creation-Date: 2020-08-16 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -5854,6 +5854,10 @@ msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be logged in to see this course"
+msgstr ""
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "Please view your course in the existing experience"
 msgstr ""
 
 #: lms/djangoapps/courseware/course_tools.py
@@ -11586,6 +11590,27 @@ msgstr ""
 "{a_open}现在升级{sronly_span_open} 以确保{expiration_date}前保留访问权 "
 "{span_close}{a_close}。"
 
+#: openedx/features/course_experience/api/v1/views.py
+msgid "'course_key' is required."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Only 'course_key' is expected."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "View all dates"
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid ""
+"Your due dates have been successfully shifted to help you stay on track."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Deadlines successfully reset."
+msgstr ""
+
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
@@ -12750,14 +12775,6 @@ msgstr "发送邮件到 {email}"
 msgid "name"
 msgstr "名称"
 
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu"
-msgstr "用户菜单"
-
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu dropdown"
-msgstr "用户菜单下拉列表"
-
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
@@ -13863,6 +13880,10 @@ msgstr ""
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "课程面板："
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu"
+msgstr "用户菜单"
 
 #: lms/templates/user_dropdown.html
 msgid "More options"
@@ -17398,10 +17419,6 @@ msgid ""
 "to increase the limit."
 msgstr ""
 "生成的报告仅限于{max_entries}个答案。如果您希望超过{max_entries}个答案，请尝试逐个章节或逐个问题地生成报告，或者与您的站点管理员联系提高数量的上限。"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of problem responses"
-msgstr "下载包含问题答案的CSV文件"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Click to list certificates that are issued for this course:"
