@@ -88,7 +88,10 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return rt_repr
 
 
-def get_test_system(course_id=CourseKey.from_string('/'.join(['org', 'course', 'run']))):
+def get_test_system(
+    course_id=CourseKey.from_string('/'.join(['org', 'course', 'run'])),
+    user=None,
+):
     """
     Construct a test ModuleSystem instance.
 
@@ -101,7 +104,8 @@ def get_test_system(course_id=CourseKey.from_string('/'.join(['org', 'course', '
     where `my_render_func` is a function of the form my_render_func(template, context).
 
     """
-    user = Mock(name='get_test_system.user', is_staff=False)
+    if not user:
+        user = Mock(name='get_test_system.user', is_staff=False)
 
     descriptor_system = get_test_descriptor_system()
 
