@@ -468,7 +468,7 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
             enrollment = schedule.enrollment
             course = schedule.enrollment.course
             user = enrollment.user
-            start_date = schedule.start_date
+            start_date = max(filter(None, (schedule.start_date, course.start)))
             LOG.info(u'Received a schedule for user {} in course {} for date {}'.format(
                 user.username,
                 self.course_id,
