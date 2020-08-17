@@ -578,7 +578,7 @@ class RegistrationFormFactory(object):
             form_desc: A form description
             required: Whether this field is required. Defaults to True.
         """
-        confirm_password_label = _(u"Confirm password")
+        confirm_password_label = _(u"Confirm Password")
 
         error_msg = _(u"Please confirm password.")
 
