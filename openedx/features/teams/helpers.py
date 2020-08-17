@@ -52,12 +52,12 @@ def generate_random_team_banner_color():
 
 
 def make_embed_url(team_group_chat, user, topic_url=None):
-    """ Create team group chat room embed url to embed into iFrame. First try to make url from topic_url, if it is none
-    then from team_group_chat slug and if both are none then from room id.
+    """ Create an embeddable url, for team group chat, to embed into iFrame. First try to make url from topic_url,
+    if it is None then from team_group_chat slug and if both are None then from room id.
     :param TeamGroupChat team_group_chat: Team group chat object
     :param User user: User object
     :param string topic_url: Topic url extracted from http request
-    :return: An embed url
+    :return: An embeddable url
     :rtype: string
     """
     if topic_url:
