@@ -51,6 +51,17 @@ ORGANIZATION_PROTECTED_MODES = (
 )
 
 
+def get_team_by_team_id(team_id):
+    """
+    API Function to lookup team object by team_id, which is globally unique.
+    If there is no such team, return None.
+    """
+    try:
+        return CourseTeam.objects.get(team_id=team_id)
+    except CourseTeam.DoesNotExist:
+        return None
+
+
 def get_team_by_discussion(discussion_id):
     """
     This is a function to get team object by the discussion_id passed in.

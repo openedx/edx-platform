@@ -25,6 +25,13 @@ class TeamsServiceTests(ModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_key)
         self.team.add_user(self.user)
 
+    def test_get_team_by_team_id(self):
+        team = self.service.get_team_by_team_id('NONEXISTANCE')
+        self.assertIsNone(team)
+
+        team = self.service.get_team_by_team_id(self.team.team_id)
+        self.assertEqual(team, self.team)
+
     def test_get_team(self):
         user_team = self.service.get_team(self.user, self.course_key, self.team.topic_id)
         self.assertEqual(user_team, self.team)
