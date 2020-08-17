@@ -24,6 +24,7 @@ from openedx.core.djangoapps.catalog.cache import (
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
@@ -33,7 +34,8 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     CourseRunFactory,
     PathwayFactory,
     ProgramFactory,
-    ProgramTypeFactory
+    ProgramTypeFactory,
+    ProgramTypeAttrsFactory
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
@@ -50,6 +52,7 @@ from openedx.core.djangoapps.catalog.utils import (
     get_program_types,
     get_programs,
     get_programs_by_type,
+    get_programs_by_type_slug,
     get_visible_sessions_for_entitlement,
     normalize_program_type,
 )
@@ -830,7 +833,7 @@ class TestProgramCourseRunCrawling(TestCase):
 
 @skip_unless_lms
 class TestGetProgramsByType(CacheIsolationTestCase):
-    """ Test for the ``get_programs_by_type()`` function. """
+    """ Test for the ``get_programs_by_type()`` and the ``get_programs_by_type_slug()`` functions. """
     ENABLED_CACHES = ['default']
 
     @classmethod
@@ -839,11 +842,26 @@ class TestGetProgramsByType(CacheIsolationTestCase):
         super(TestGetProgramsByType, cls).setUpClass()
         cls.site = SiteFactory()
         cls.other_site = SiteFactory()
-        cls.masters_program_1 = ProgramFactory.create(type='Masters')
-        cls.masters_program_2 = ProgramFactory.create(type='Masters')
-        cls.masters_program_other_site = ProgramFactory.create(type='Masters')
-        cls.bachelors_program = ProgramFactory.create(type='Bachelors')
-        cls.no_type_program = ProgramFactory.create(type=None)
+        cls.masters_program_1 = ProgramFactory.create(
+            type='Masters',
+            type_attrs=ProgramTypeAttrsFactory.create(slug="masters")
+        )
+        cls.masters_program_2 = ProgramFactory.create(
+            type='Masters',
+            type_attrs=ProgramTypeAttrsFactory.create(slug="masters")
+        )
+        cls.masters_program_other_site = ProgramFactory.create(
+            type='Masters',
+            type_attrs=ProgramTypeAttrsFactory.create(slug="masters")
+        )
+        cls.bachelors_program = ProgramFactory.create(
+            type='Bachelors',
+            type_attrs=ProgramTypeAttrsFactory.create(slug="bachelors")
+        )
+        cls.no_type_program = ProgramFactory.create(
+            type=None,
+            type_attrs=None
+        )
 
     def setUp(self):
         """ Loads program data into the cache before each test function. """
@@ -865,41 +883,58 @@ class TestGetProgramsByType(CacheIsolationTestCase):
         cache.set_many(cached_programs, None)
 
         programs_by_type = defaultdict(list)
+        programs_by_type_slug = defaultdict(list)
         for program in all_programs:
             program_type = normalize_program_type(program.get('type'))
+            program_type_slug = (program.get('type_attrs') or {}).get('slug')
             site_id = self.site.id
 
             if program == self.masters_program_other_site:
                 site_id = self.other_site.id
 
-            cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(site_id=site_id, program_type=program_type)
-            programs_by_type[cache_key].append(program['uuid'])
+            program_type_cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(
+                site_id=site_id,
+                program_type=program_type
+            )
+            program_type_slug_cache_key = PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL.format(
+                site_id=site_id,
+                program_slug=program_type_slug
+            )
+            programs_by_type[program_type_cache_key].append(program['uuid'])
+            programs_by_type_slug[program_type_slug_cache_key].append(program['uuid'])
 
         cache.set_many(programs_by_type, None)
+        cache.set_many(programs_by_type_slug, None)
 
     def test_get_masters_programs(self):
         expected_programs = [self.masters_program_1, self.masters_program_2]
         six.assertCountEqual(self, expected_programs, get_programs_by_type(self.site, 'masters'))
+        six.assertCountEqual(self, expected_programs, get_programs_by_type_slug(self.site, 'masters'))
 
     def test_get_bachelors_programs(self):
         expected_programs = [self.bachelors_program]
         self.assertEqual(expected_programs, get_programs_by_type(self.site, 'bachelors'))
+        self.assertEqual(expected_programs, get_programs_by_type_slug(self.site, 'bachelors'))
 
     def test_get_no_such_type_programs(self):
         expected_programs = []
         self.assertEqual(expected_programs, get_programs_by_type(self.site, 'doctorate'))
+        self.assertEqual(expected_programs, get_programs_by_type_slug(self.site, 'doctorate'))
 
     def test_get_masters_programs_other_site(self):
         expected_programs = [self.masters_program_other_site]
         self.assertEqual(expected_programs, get_programs_by_type(self.other_site, 'masters'))
+        self.assertEqual(expected_programs, get_programs_by_type_slug(self.other_site, 'masters'))
 
     def test_get_programs_null_type(self):
         expected_programs = [self.no_type_program]
         self.assertEqual(expected_programs, get_programs_by_type(self.site, None))
+        self.assertEqual(expected_programs, get_programs_by_type_slug(self.site, None))
 
     def test_get_programs_false_type(self):
         expected_programs = []
         self.assertEqual(expected_programs, get_programs_by_type(self.site, False))
+        self.assertEqual(expected_programs, get_programs_by_type_slug(self.site, False))
 
     def test_normalize_program_type(self):
         self.assertEqual('none', normalize_program_type(None))

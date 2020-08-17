@@ -5,7 +5,6 @@ Tests for the course modes API.
 
 import json
 import unittest
-from itertools import product
 
 import ddt
 from django.conf import settings
@@ -15,7 +14,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
 
-from course_modes.api.v1.views import CourseModesView
+from course_modes.rest_api.v1.views import CourseModesView
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -79,7 +78,7 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
         """
         Required method to implement AuthAndScopesTestMixin.
         """
-        pass
+        pass  # pylint: disable=unnecessary-pass
 
     @ddt.data(*JWT_AUTH_TYPES)
     def test_jwt_on_behalf_of_user(self, auth_type):

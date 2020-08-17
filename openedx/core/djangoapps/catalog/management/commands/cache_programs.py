@@ -18,6 +18,7 @@ from openedx.core.djangoapps.catalog.cache import (
     PROGRAM_CACHE_KEY_TPL,
     PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL,
     PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
@@ -64,6 +65,7 @@ class Command(BaseCommand):
         courses = {}
         catalog_courses = {}
         programs_by_type = {}
+        programs_by_type_slug = {}
         organizations = {}
         for site in Site.objects.all():
             site_config = getattr(site, 'configuration', None)
@@ -93,6 +95,7 @@ class Command(BaseCommand):
             courses.update(self.get_courses(new_programs))
             catalog_courses.update(self.get_catalog_courses(new_programs))
             programs_by_type.update(self.get_programs_by_type(site, new_programs))
+            programs_by_type_slug.update(self.get_programs_by_type_slug(site, new_programs))
             organizations.update(self.get_programs_by_organization(new_programs))
 
             logger.info(u'Caching UUIDs for {total} programs for site {site_name}.'.format(
@@ -122,6 +125,9 @@ class Command(BaseCommand):
 
         logger.info(text_type('Caching program UUIDs by {} program types.'.format(len(programs_by_type))))
         cache.set_many(programs_by_type, None)
+
+        logger.info(text_type('Caching program UUIDs by {} program type slugs.'.format(len(programs_by_type_slug))))
+        cache.set_many(programs_by_type_slug, None)
 
         logger.info(u'Caching programs uuids for {} organizations'.format(len(organizations)))
         cache.set_many(organizations, None)
@@ -262,6 +268,18 @@ class Command(BaseCommand):
             cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(site_id=site.id, program_type=program_type)
             programs_by_type[cache_key].append(program['uuid'])
         return programs_by_type
+
+    def get_programs_by_type_slug(self, site, programs):
+        """
+        Returns a dictionary mapping site-aware cache keys corresponding to program types
+        to lists of program uuids with that type.
+        """
+        programs_by_type_slug = defaultdict(list)
+        for program in programs.values():
+            program_slug = program.get('type_attrs', {}).get('slug')
+            cache_key = PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL.format(site_id=site.id, program_slug=program_slug)
+            programs_by_type_slug[cache_key].append(program['uuid'])
+        return programs_by_type_slug
 
     def get_programs_by_organization(self, programs):
         """

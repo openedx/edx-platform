@@ -1587,23 +1587,23 @@ class TestProgramEnrollment(SharedModuleStoreTestCase):
 
     def test_user_not_in_program(self, mock_get_programs_by_type):
         mock_get_programs_by_type.return_value = [self.program]
-        self.assertFalse(is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS))
+        self.assertFalse(is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS))
 
     def test_user_enrolled_in_mb_program(self, mock_get_programs_by_type):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.VERIFIED)
         mock_get_programs_by_type.return_value = [self.program]
-        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS))
+        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS))
 
     def test_user_enrolled_unpaid_in_program(self, mock_get_programs_by_type):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.AUDIT)
         mock_get_programs_by_type.return_value = [self.program]
-        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS))
+        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS))
 
     def test_user_enrolled_unpaid_in_program_paid_only_request(self, mock_get_programs_by_type):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.AUDIT)
         mock_get_programs_by_type.return_value = [self.program]
         self.assertFalse(
-            is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS, paid_modes=True)
+            is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS, paid_modes=True)
         )
 
     def test_user_with_entitlement_no_enrollment(self, mock_get_programs_by_type):
@@ -1613,4 +1613,4 @@ class TestProgramEnrollment(SharedModuleStoreTestCase):
             course_uuid=self.program['courses'][0]['uuid']
         )
         mock_get_programs_by_type.return_value = [self.program]
-        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type=self.MICROBACHELORS))
+        self.assertTrue(is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS))
