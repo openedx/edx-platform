@@ -32,7 +32,7 @@ def enrollment_confirmation(sender, event=None, user=None, **kwargs):
             if is_mini_lesson:
                 template = MandrillClient.MINI_COURSE_ENROLMENT
                 context.update(
-                    {'full_name': user.first_name + " " + user.last_name}
+                    {'full_name': user.get_full_name()}
                 )
             elif course.self_paced:
                 template = MandrillClient.ON_DEMAND_SCHEDULE_EMAIL_TEMPLATE
@@ -45,7 +45,7 @@ def enrollment_confirmation(sender, event=None, user=None, **kwargs):
                 template = MandrillClient.ENROLLMENT_CONFIRMATION_TEMPLATE
                 context.update(
                     {'signin_url': settings.LMS_ROOT_URL + '/login',
-                     'full_name': user.first_name + " " + user.last_name}
+                     'full_name': user.get_full_name()}
                 )
             MandrillClient().send_mail(
                 template,
