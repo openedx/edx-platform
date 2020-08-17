@@ -54,6 +54,7 @@ for temporarily instrumenting/monitoring waffle flag usage.
 """
 
 import logging
+import re
 import traceback
 from abc import ABCMeta
 from contextlib import contextmanager
@@ -198,7 +199,7 @@ class WaffleSwitch(object):
 
         self.waffle_namespace = waffle_namespace
         self.switch_name = switch_name
-        self._module_name = _traceback_to_module_name(traceback.extract_stack(), self.__module__)
+        self._module_name = _get_instance_module_name(self)
         self._class_instances.add(self)
 
     @classmethod
@@ -414,7 +415,7 @@ class WaffleFlag(object):
         self.waffle_namespace = waffle_namespace
         self.waffle_namespace = waffle_namespace
         self.flag_name = flag_name
-        self._module_name = _traceback_to_module_name(traceback.extract_stack(), self.__module__)
+        self._module_name = _get_instance_module_name(self)
         self._class_instances.add(self)
 
     @classmethod
@@ -517,14 +518,41 @@ class CourseWaffleFlag(WaffleFlag):
         )
 
 
-def _traceback_to_module_name(traceback, class_module):
+def _get_instance_module_name(instance_object):
+    """
+    Returns the module in which the passed instance object was defined.
+
+    This must be called from the ``__init__`` method of the instance class.
+    """
     try:
-        class_file_name = traceback[-1].filename
-        class_module_as_path = class_module.replace('.', '/')
-        module_index = class_file_name.index(class_module_as_path)
-        instance_file_name = traceback[-2].filename
-        instance_partial_file_name = instance_file_name[module_index:]
-        instance_module_name = instance_partial_file_name.replace('/', '.').replace('.py', '').replace('.__init__', '')
+        stack = traceback.extract_stack()
+        # Example: 'openedx.core.djangoapps.waffle_utils'
+        instance_class_module = instance_object.__class__.__module__
+        # Example: 'openedx/core/djangoapps/waffle_utils'
+        class_module_as_path = instance_class_module.replace('.', '/')
+        module_string_index = -1
+        # start searching at -2, because -1 starts in this function.
+        # search up the stack to max of -10, because the class hierarchy
+        # shouldn't be that deep.
+        for stack_index in range(-2, -10, -1):
+            # Example: '/edx/app/edxapp/edx-platform/openedx/core/djangoapps/waffle_utils/__init__.py'
+            class_file_name = stack[stack_index].filename
+            if module_string_index == -1:
+                module_string_index = class_file_name.find(class_module_as_path)
+            if stack[stack_index].name != '__init__':
+                # assumes the instance is being defined as soon as we are
+                # no longer in any __init__ method of the class hierarchy.
+                break
+        # Example: '/edx/app/edxapp/edx-platform/openedx/core/djangoapps/programs/__init__.py'
+        instance_file_name = stack[stack_index].filename
+        # Example: 'openedx/core/djangoapps/programs/__init__.py'
+        instance_module_name = instance_file_name[module_string_index:]
+        # Example: 'openedx.core.djangoapps.programs.__init__.py'
+        instance_module_name = instance_module_name.replace('/', '.')
+        # Example: 'openedx.core.djangoapps.programs.__init__'
+        instance_module_name = re.sub(r'\.py$', '', instance_module_name)
+        # Example: 'openedx.core.djangoapps.programs'
+        instance_module_name = re.sub(r'\.__init__$', '', instance_module_name)
         return instance_module_name
     except Exception:  # pylint: disable=broad-except
         return 'error.parsing.module'
