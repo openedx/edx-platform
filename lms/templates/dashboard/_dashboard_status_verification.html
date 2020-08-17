@@ -21,7 +21,12 @@ from lms.djangoapps.verify_student.services import IDVerificationService
     %elif verification_status == 'pending':
         <li class="status status-verification is-pending">
             <span class="title status-title">${_("Current Verification Status: Pending")}</span>
-            <p class="status-note">${_("Your edX ID verification is pending. Your verification information has been submitted and will be reviewed shortly.")}</p>
+            <p class="status-note">
+                ${_("Your edX ID verification is pending. Your verification information has been submitted and will be reviewed shortly.")}
+                <br><br>
+                ${_("Unsure if you completed ID verification successfully? ")}
+                <a href="${IDVerificationService.get_verify_location('verify_student_reverify')}">${_("Try again.")}</a>
+            </p>
         </li>
     %elif verification_status in ['denied','must_reverify', 'must_retry']:
         <li class="status status-verification is-denied">
