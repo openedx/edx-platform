@@ -54,6 +54,7 @@ SUPPORTED_FIELDS = [
     SupportedFieldType('has_score'),
     SupportedFieldType('weight'),
     SupportedFieldType('show_correctness'),
+    SupportedFieldType('is_discussable'),
     # 'student_view_data'
     SupportedFieldType(StudentViewTransformer.STUDENT_VIEW_DATA, StudentViewTransformer),
     # 'student_view_multi_device'

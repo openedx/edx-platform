@@ -30,8 +30,8 @@ class BlocksAPITransformer(BlockStructureTransformer):
         * StudentViewTransformer must be executed before VideoBlockURLTransformer.
     """
 
-    WRITE_VERSION = 1
-    READ_VERSION = 1
+    WRITE_VERSION = 2
+    READ_VERSION = 2
     STUDENT_VIEW_DATA = 'student_view_data'
     STUDENT_VIEW_MULTI_DEVICE = 'student_view_multi_device'
 
@@ -52,7 +52,15 @@ class BlocksAPITransformer(BlockStructureTransformer):
         transform method.
         """
         # collect basic xblock fields
-        block_structure.request_xblock_fields('graded', 'format', 'display_name', 'category', 'due', 'show_correctness')
+        block_structure.request_xblock_fields(
+            'graded',
+            'format',
+            'display_name',
+            'category',
+            'due',
+            'show_correctness',
+            'is_discussable'
+        )
 
         # collect data from containing transformers
         StudentViewTransformer.collect(block_structure)
