@@ -27,6 +27,7 @@ def update_session_language(request):
             settings.LANGUAGE_COOKIE,
             language,
             domain=settings.SESSION_COOKIE_DOMAIN,
-            max_age=COOKIE_DURATION
+            max_age=COOKIE_DURATION,
+            secure=request.is_secure(),
         )
     return response

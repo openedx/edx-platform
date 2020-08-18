@@ -77,6 +77,7 @@ class LanguagePreferenceMiddleware(object):
                     value=user_pref,
                     domain=settings.SESSION_COOKIE_DOMAIN,
                     max_age=COOKIE_DURATION,
+                    secure=request.is_secure()
                 )
             else:
                 response.delete_cookie(

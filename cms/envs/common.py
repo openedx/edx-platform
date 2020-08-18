@@ -450,6 +450,10 @@ FRONTEND_LOGIN_URL = LOGIN_URL
 FRONTEND_LOGOUT_URL = lambda settings: settings.LMS_ROOT_URL + '/logout'
 derived('FRONTEND_LOGOUT_URL')
 
+# django-session-cookie middleware
+DCS_SESSION_COOKIE_SAMESITE = 'None'
+DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
+
 # List of logout URIs for each IDA that the learner should be logged out of when they logout of
 # Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
 IDA_LOGOUT_URI_LIST = []
@@ -480,6 +484,10 @@ XQUEUE_INTERFACE = {
 
 MIDDLEWARE_CLASSES = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+
+    # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
+    # Override was found here https://github.com/django/django/pull/11894
+    'django_cookies_samesite.middleware.CookiesSameSite',
 
     'crum.CurrentRequestUserMiddleware',
 

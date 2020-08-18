@@ -94,6 +94,7 @@ django-appconf==1.0.2
 django-babel-underscore==0.5.2
 django-babel==0.6.2
 django-classy-tags==0.8.0
+django-cookies-samesite==0.5.1  # via -r requirements/edx/testing.txt
 django-config-models==0.2.2
 django-cors-headers==2.1.0
 django-countries==4.6.1

@@ -39,6 +39,7 @@ Django==1.11.29                    # Web application framework
 django-babel-underscore             # underscore template extractor for django-babel (internationalization utilities)
 django-config-models>=0.2.2         # Configuration models for Django allowing config management with auditing
 django-cors-headers==2.1.0          # Used to allow to configure CORS headers for cross-domain requests
+django-cookies-samesite             # Middleware which allows SameSite=None flag for session and csrf cookies in Django<3.0.5
 django-countries==4.6.1             # Country data for Django forms and model fields
 django-crum                         # Middleware that stores the current request and user in thread local storage
 django-fernet-fields                # via edx-enterprise (should be added to its setup.py)
