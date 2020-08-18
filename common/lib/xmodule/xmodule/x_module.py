@@ -1972,6 +1972,7 @@ class CombinedSystem(object):
         integrate it into a larger whole.
 
         """
+        log.critical('xmodule.CombinedSystem.render: block.display_name=%s', getattr(block, 'display_name', '____'))
         context = context or {}
         if view_name in PREVIEW_VIEWS:
             block = self._get_student_block(block)
