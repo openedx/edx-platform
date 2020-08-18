@@ -1,4 +1,6 @@
-""" Helpers for teams application"""
+"""
+Helpers for teams application
+"""
 from random import choice
 
 from django.conf import settings
@@ -20,7 +22,9 @@ TEAM_BANNER_COLORS = [
 
 
 def serialize(queryset, request, serializer_cls, serializer_ctx, many=True):
-    """ Serialize and paginate objects in a queryset.
+    """
+    Serialize and paginate objects in a queryset.
+
     :param QuerySet queryset: QuerySet of model
     :param HttpRequest request: http request
     :param class serializer_cls: Django Rest Framework Serializer subclass.
@@ -36,7 +40,9 @@ def serialize(queryset, request, serializer_cls, serializer_ctx, many=True):
 
 
 def generate_random_user_icon_color():
-    """ Create random color code form given choices
+    """
+    Create random color code form given choices
+
     :return: Color code i.e. #f44336
     :rtype: string
     """
@@ -44,7 +50,9 @@ def generate_random_user_icon_color():
 
 
 def generate_random_team_banner_color():
-    """ Create random color code form given choices
+    """
+    Create random color code form given choices
+
     :return: Color code i.e. #f44336
     :rtype: string
     """
@@ -52,8 +60,10 @@ def generate_random_team_banner_color():
 
 
 def make_embed_url(team_group_chat, user, topic_url=None):
-    """ Create an embeddable url, for team group chat, to embed into iFrame. First try to make url from topic_url,
-    if it is None then from team_group_chat slug and if both are None then from room id.
+    """
+    Create an embeddable url, for team group chat, to embed into iFrame. First try to make url from topic_url,
+    if it is None then from `team_group_chat` slug and if both are None then from room id.
+
     :param TeamGroupChat team_group_chat: Team group chat object
     :param User user: User object
     :param string topic_url: Topic url extracted from http request
@@ -72,7 +82,9 @@ def make_embed_url(team_group_chat, user, topic_url=None):
 
 
 def get_user_recommended_team(course_key, user):
-    """ Get recommended teams for the user
+    """
+    Get recommended teams for the user
+
     :param CourseKey course_key: Course key object
     :param User user: user object
     :return: List of recommended teams
@@ -86,8 +98,10 @@ def get_user_recommended_team(course_key, user):
 
 
 def get_user_course_with_access(course_id, user):
-    """ Method that wraps the courseware.courses.get_course_with_access to use
-    course_id in string format with it
+    """
+    Method that wraps the `courseware.courses.get_course_with_access` to use
+    `course_id` in string format with it
+
     :param string course_id: Id of a course
     :param User user: User object
     :return: course if user has access in this course
@@ -98,7 +112,9 @@ def get_user_course_with_access(course_id, user):
 
 
 def get_team_topic(course, topic_id):
-    """ Get topic by topic_id from course
+    """
+    Get topic by `topic_id` from course
+
     :param Course course: course object
     :param string topic_id: Topic id
     :return: A valid topic in a course else None

@@ -1,4 +1,6 @@
-""" All the view of teams application"""
+"""
+All the view of teams application
+"""
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -26,8 +28,10 @@ from .serializers import CustomCourseTeamSerializer
 
 @login_required
 def browse_teams(request, course_id):
-    """ The view for listing recommended teams for learners based on their region. This is view also responsible
+    """
+    The view for listing recommended teams for learners based on their region. This is view also responsible
     for listing all the available regions with all the teams
+
     :param HttpRequest request: Http request object
     :param string course_id: Id of a course
     :return: Http response with template and context
@@ -81,7 +85,9 @@ def browse_teams(request, course_id):
 @can_view_teams
 @login_required
 def browse_topic_teams(request, course_id, topic_id):
-    """ The view for listing all existing teams in a specific region
+    """
+    The view for listing all existing teams in a specific region
+
     :param HttpRequest request: Http request object
     :param string course_id: Id of a course
     :param string topic_id: The if of region i.e. AsiaPacific, EuropeWestAsia etc
@@ -123,9 +129,11 @@ def browse_topic_teams(request, course_id, topic_id):
 @can_view_teams
 @login_required
 def create_team(request, course_id, topic_id=None):
-    """ The view for creating new team. If topic id is provided in the link then corresponding region will be auto
+    """
+    The view for creating new team. If topic id is provided in the link then corresponding region will be auto
     selected, otherwise region will be populated and user can select it from page. One user can create only one team
     at a time; user cannot create team if it is member of any other team.
+
     :param HttpRequest request: Http request object
     :param string course_id: Id of a course
     :param string topic_id: The if of region i.e. AsiaPacific, EuropeWestAsia etc
@@ -158,7 +166,9 @@ def create_team(request, course_id, topic_id=None):
 @can_view_teams
 @login_required
 def my_team(request, course_id):
-    """ The view for listing all teams current user is member of
+    """
+    The view for listing all teams current user is member of
+
     :param HttpRequest request: Http request object
     :param string course_id: Id of a course
     :return: Http response with template and context
@@ -186,7 +196,9 @@ def my_team(request, course_id):
 @can_view_teams
 @login_required
 def view_team(request, course_id, team_id):
-    """ The view for presenting team page to learners.
+    """
+    The view for presenting team page to learners.
+
     :param HttpRequest request: Http request object
     :param string course_id: Id of a course
     :param string team_id: Id of team
@@ -242,7 +254,9 @@ def view_team(request, course_id, team_id):
 @can_view_teams
 @login_required
 def update_team(request, course_id, team_id):
-    """ Team admin can update team's name, description, language and country
+    """
+    Team admin can update team's name, description, language and country
+
     :param HttpRequest request: Http request object
     :param string course_id: Id of a course
     :param string team_id: Id of team
@@ -279,7 +293,9 @@ def update_team(request, course_id, team_id):
 @can_view_teams
 @login_required
 def edit_team_memberships(request, course_id, team_id):
-    """ Team admin can edit team membership and remove non-participating members.
+    """
+    Team admin can edit team membership and remove non-participating members.
+
     :param HttpRequest request: Http request object
     :param string course_id: Id of a course
     :param string team_id: Id of team
