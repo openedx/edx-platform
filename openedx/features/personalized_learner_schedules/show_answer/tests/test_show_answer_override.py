@@ -34,34 +34,37 @@ class ShowAnswerFieldOverrideTest(ModuleStoreTestCase):
         field_data_cache = FieldDataCache([], course.id, self.user)
         return get_module(self.user, request, course.location, field_data_cache, course=course)
 
-    # @ddt.data(True, False)
-    # def test_override_enabled_for(self, active):
-    #     with RELATIVE_DATES_FLAG.override(active=active):
-    #         # Instructor paced course will just have the default value
-    #         ip_course = self.setup_course()
-    #         course_module = self.get_course_module(ip_course)
-    #         self.assertEqual(course_module.showanswer, SHOWANSWER.FINISHED)
+    @ddt.data(True, False)
+    def test_override_enabled_for(self, active):
+        with RELATIVE_DATES_FLAG.override(active=active):
+            # Instructor paced course will just have the default value
+            ip_course = self.setup_course()
+            course_module = self.get_course_module(ip_course)
+            self.assertEqual(course_module.showanswer, SHOWANSWER.FINISHED)
 
-    #         sp_course = self.setup_course(self_paced=True)
-    #         course_module = self.get_course_module(sp_course)
-    #         if active:
-    #             self.assertEqual(course_module.showanswer, SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT)
-    #         else:
-    #             self.assertEqual(course_module.showanswer, SHOWANSWER.FINISHED)
+            # This should be updated to not explicitly add in the showanswer so it can test the
+            # default case of never touching showanswer. Reference ticket AA-307 (if that's closed,
+            # this can be updated!)
+            sp_course = self.setup_course(self_paced=True, showanswer=SHOWANSWER.FINISHED)
+            course_module = self.get_course_module(sp_course)
+            if active:
+                self.assertEqual(course_module.showanswer, SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT)
+            else:
+                self.assertEqual(course_module.showanswer, SHOWANSWER.FINISHED)
 
-    # @ddt.data(
-    #     (SHOWANSWER.ATTEMPTED, SHOWANSWER.ATTEMPTED_NO_PAST_DUE),
-    #     (SHOWANSWER.CLOSED, SHOWANSWER.AFTER_ALL_ATTEMPTS),
-    #     (SHOWANSWER.CORRECT_OR_PAST_DUE, SHOWANSWER.ANSWERED),
-    #     (SHOWANSWER.FINISHED, SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT),
-    #     (SHOWANSWER.PAST_DUE, SHOWANSWER.NEVER),
-    #     (SHOWANSWER.NEVER, SHOWANSWER.NEVER),
-    #     (SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS, SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS),
-    #     (SHOWANSWER.ALWAYS, SHOWANSWER.ALWAYS),
-    # )
-    # @ddt.unpack
-    # @RELATIVE_DATES_FLAG.override(active=True)
-    # def test_get(self, initial_value, expected_final_value):
-    #     course = self.setup_course(self_paced=True, showanswer=initial_value)
-    #     course_module = self.get_course_module(course)
-    #     self.assertEqual(course_module.showanswer, expected_final_value)
+    @ddt.data(
+        (SHOWANSWER.ATTEMPTED, SHOWANSWER.ATTEMPTED_NO_PAST_DUE),
+        (SHOWANSWER.CLOSED, SHOWANSWER.AFTER_ALL_ATTEMPTS),
+        (SHOWANSWER.CORRECT_OR_PAST_DUE, SHOWANSWER.ANSWERED),
+        (SHOWANSWER.FINISHED, SHOWANSWER.AFTER_ALL_ATTEMPTS_OR_CORRECT),
+        (SHOWANSWER.PAST_DUE, SHOWANSWER.NEVER),
+        (SHOWANSWER.NEVER, SHOWANSWER.NEVER),
+        (SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS, SHOWANSWER.AFTER_SOME_NUMBER_OF_ATTEMPTS),
+        (SHOWANSWER.ALWAYS, SHOWANSWER.ALWAYS),
+    )
+    @ddt.unpack
+    @RELATIVE_DATES_FLAG.override(active=True)
+    def test_get(self, initial_value, expected_final_value):
+        course = self.setup_course(self_paced=True, showanswer=initial_value)
+        course_module = self.get_course_module(course)
+        self.assertEqual(course_module.showanswer, expected_final_value)
