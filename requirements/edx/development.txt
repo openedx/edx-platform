@@ -134,7 +134,7 @@ enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-unders
 event-tracking==0.3.3     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
-faker==4.1.1              # via -r requirements/edx/testing.txt, factory-boy
+faker==4.1.2              # via -r requirements/edx/testing.txt, factory-boy
 filelock==3.0.12          # via -r requirements/edx/testing.txt, tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 fs-s3fs==0.1.8            # via -r requirements/edx/testing.txt, django-pyfs
@@ -191,7 +191,7 @@ mongoengine==0.20.0       # via -r requirements/edx/testing.txt
 more-itertools==8.4.0     # via -r requirements/edx/testing.txt, pytest, zipp
 mpmath==1.1.0             # via -r requirements/edx/testing.txt, sympy
 mysqlclient==2.0.1        # via -r requirements/edx/testing.txt
-newrelic==5.16.0.145      # via -r requirements/edx/testing.txt, edx-django-utils
+newrelic==5.16.1.146      # via -r requirements/edx/testing.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/testing.txt, chem
 nodeenv==1.4.0            # via -r requirements/edx/testing.txt
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, chem, openedx-calc, scipy
@@ -308,7 +308,7 @@ unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
 urllib3==1.25.10          # via -r requirements/edx/testing.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/testing.txt
-virtualenv==20.0.30       # via -r requirements/edx/testing.txt, tox
+virtualenv==20.0.31       # via -r requirements/edx/testing.txt, tox
 voluptuous==0.11.7        # via -r requirements/edx/testing.txt, ora2
 vulture==1.6              # via -c requirements/edx/../constraints.txt, -r requirements/edx/development.in
 watchdog==0.10.3          # via -r requirements/edx/testing.txt

@@ -30,7 +30,7 @@ requests==2.24.0          # via sphinx
 six==1.15.0               # via edx-sphinx-theme, packaging, stevedore
 smmap==3.0.4              # via gitdb
 snowballstemmer==2.0.0    # via sphinx
-sphinx==3.1.2             # via -r requirements/edx/doc.in, edx-sphinx-theme
+sphinx==3.2.1             # via -r requirements/edx/doc.in, edx-sphinx-theme
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx

@@ -130,7 +130,7 @@ enmerkar==0.7.1           # via -r requirements/edx/base.txt, enmerkar-underscor
 event-tracking==0.3.3     # via -r requirements/edx/base.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
-faker==4.1.1              # via factory-boy
+faker==4.1.2              # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 fs-s3fs==0.1.8            # via -r requirements/edx/base.txt, django-pyfs
@@ -183,7 +183,7 @@ mongoengine==0.20.0       # via -r requirements/edx/base.txt
 more-itertools==8.4.0     # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, pytest, zipp
 mpmath==1.1.0             # via -r requirements/edx/base.txt, sympy
 mysqlclient==2.0.1        # via -r requirements/edx/base.txt
-newrelic==5.16.0.145      # via -r requirements/edx/base.txt, edx-django-utils
+newrelic==5.16.1.146      # via -r requirements/edx/base.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/base.txt, chem
 nodeenv==1.4.0            # via -r requirements/edx/base.txt
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, chem, openedx-calc, scipy
@@ -287,7 +287,7 @@ unidiff==0.6.0            # via -r requirements/edx/testing.in, coverage-pytest-
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.10          # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
 user-util==0.2            # via -r requirements/edx/base.txt
-virtualenv==20.0.30       # via tox
+virtualenv==20.0.31       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.3          # via -r requirements/edx/base.txt
 web-fragments==0.3.2      # via -r requirements/edx/base.txt, crowdsourcehinter-xblock, staff-graded-xblock, xblock, xblock-utils
