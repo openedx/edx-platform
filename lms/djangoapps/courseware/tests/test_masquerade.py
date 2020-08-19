@@ -43,10 +43,6 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
     def setUpClass(cls):
         super(MasqueradeTestCase, cls).setUpClass()
         cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC)})
-        cls.info_page = ItemFactory.create(
-            category="course_info", parent_location=cls.course.location,
-            data="OOGIE BLOOGIE", display_name="updates"
-        )
         cls.chapter = ItemFactory.create(
             parent_location=cls.course.location,
             category="chapter",
