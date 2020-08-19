@@ -8,8 +8,37 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlag, W
 # Videos Namespace
 WAFFLE_NAMESPACE = 'videos'
 
-# Waffle flag telling whether youtube is deprecated.
+"""
+.. toggle_name: videos.deprecate_youtube
+.. toggle_implementation: WaffleFlag
+.. toggle_default: False
+.. toggle_description: Waffle flag telling whether youtube is deprecated. When enabled,
+  videos are no longer uploaded to YouTube as part of the video pipeline.
+.. toggle_category: videos
+.. toggle_use_cases: open_edx
+.. toggle_creation_date: 2018-08-03
+.. toggle_expiration_date: None
+.. toggle_warnings: None
+.. toggle_tickets: https://github.com/edx/edx-platform/pull/18765
+.. toggle_status: supported
+"""
 DEPRECATE_YOUTUBE = 'deprecate_youtube'
+"""
+.. toggle_name: videos.enable_devstack_video_uploads
+.. toggle_implementation: WaffleFlag
+.. toggle_default: False
+.. toggle_description: When enabled, use Multi-Factor Authentication (MFA) for
+  authenticating to AWS. These short-lived access tokens are well suited for
+  development (probably?).
+.. toggle_category: videos
+.. toggle_use_cases: open_edx
+.. toggle_creation_date: 2020-03-12
+.. toggle_expiration_date: None
+.. toggle_warnings: Enabling this feature requires that the ROLE_ARN,
+  MFA_SERIAL_NUMBER, MFA_TOKEN settings are properly defined.
+.. toggle_tickets: https://github.com/edx/edx-platform/pull/23375
+.. toggle_status: supported
+"""
 ENABLE_DEVSTACK_VIDEO_UPLOADS = 'enable_devstack_video_uploads'
 ENABLE_VEM_PIPELINE = 'enable_vem_pipeline'
 

@@ -50,6 +50,19 @@ class VEMPipelineIntegration(ConfigurationModel):
     Manages configuration for connecting to the video encode manager service and using its API.
 
     .. no_pii:
+
+    .. toggle_name: VEMPipelineIntegration.enabled
+    .. toggle_implementation: ConfigurationModel
+    .. toggle_default: False
+    .. toggle_description: Send videos to the Video Encode Manager (VEM) as part of the
+      video pipeline.
+    .. toggle_category: video_pipeline
+    .. toggle_use_cases:  open_edx
+    .. toggle_creation_date: 2020-06-04
+    .. toggle_expiration_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: https://github.com/edx/edx-platform/pull/24093
+    .. toggle_status: supported
     """
     client_name = models.CharField(
         max_length=100,
@@ -80,9 +93,22 @@ class VEMPipelineIntegration(ConfigurationModel):
 @python_2_unicode_compatible
 class VideoUploadsEnabledByDefault(ConfigurationModel):
     """
-    Enables video uploads enabled By default feature across the platform.
+    Enables video uploads across the platform.
 
     .. no_pii:
+
+    .. toggle_name: VideoUploadsEnabledByDefault.enabled_for_all_courses
+    .. toggle_implementation: ConfigurationModel
+    .. toggle_default: False
+    .. toggle_description: Allow video uploads for all courses of the platform. This
+      enables the "Video Uploads" menu in the CMS.
+    .. toggle_category: video_pipeline
+    .. toggle_use_cases:  open_edx
+    .. toggle_creation_date: 2017-11-10
+    .. toggle_expiration_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
+    .. toggle_status: supported
     """
     # this field overrides course-specific settings
     enabled_for_all_courses = models.BooleanField(default=False)
@@ -122,10 +148,22 @@ class VideoUploadsEnabledByDefault(ConfigurationModel):
 @python_2_unicode_compatible
 class CourseVideoUploadsEnabledByDefault(ConfigurationModel):
     """
-    Enables video uploads enabled by default feature for a specific course. Its global feature must be
-    enabled for this to take effect.
+    Enables video uploads for a specific course.
 
     .. no_pii:
+
+    .. toggle_name: CourseVideoUploadsEnabledByDefault.course_id
+    .. toggle_implementation: ConfigurationModel
+    .. toggle_default: False
+    .. toggle_description: Allow video uploads for a specific course. This enables the
+      "Video Uploads" menu in the CMS.
+    .. toggle_category: video_pipeline
+    .. toggle_use_cases:  open_edx
+    .. toggle_creation_date: 2017-11-10
+    .. toggle_expiration_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
+    .. toggle_status: supported
     """
     KEY_FIELDS = ('course_id',)
 
