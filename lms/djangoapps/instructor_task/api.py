@@ -322,7 +322,9 @@ def submit_bulk_course_email(request, course_key, email_id):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_calculate_problem_responses_csv(request, course_key, problem_location):
+def submit_calculate_problem_responses_csv(
+    request, course_key, problem_locations, problem_types_filter=None,
+):
     """
     Submits a task to generate a CSV file containing all student
     answers to a given problem.
@@ -331,7 +333,11 @@ def submit_calculate_problem_responses_csv(request, course_key, problem_location
     """
     task_type = 'problem_responses_csv'
     task_class = calculate_problem_responses_csv
-    task_input = {'problem_location': problem_location, 'user_id': request.user.pk}
+    task_input = {
+        'problem_locations': problem_locations,
+        'problem_types_filter': problem_types_filter,
+        'user_id': request.user.pk,
+    }
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
