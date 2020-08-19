@@ -60,7 +60,7 @@ class DemographicsCollectionModal extends React.Component {
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFTOKEN': Cookies.get('demographics_csrftoken'),
-          'USE-JWT-COOKIE': true
+          'USE-JWT-COOKIE': true,
         },
       })
       data = await response.json();
