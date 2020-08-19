@@ -468,6 +468,23 @@ class CourseTabList(List):
                     yield tab
 
     @classmethod
+    def upgrade_tabs(cls, tabs):
+        """
+        Remove course_info tab, and rename courseware tab to Course if needed
+        """
+        if tabs and len(tabs) > 1:
+            # Reverse them so that course_info is first, and rename courseware to Course
+            if tabs[0].get('type') == 'courseware' and tabs[1].get('type') == 'course_info':
+                tabs[0], tabs[1] = tabs[1], tabs[0]
+                tabs[1]['name'] = _('Course')
+
+            # If course_info tab is present, it should be at index 0. If so, remove it
+            if tabs[0].get('type') == 'course_info':
+                tabs.pop(0)
+
+        return tabs
+
+    @classmethod
     def validate_tabs(cls, tabs):
         """
         Check that the tabs set for the specified course is valid.  If it
@@ -529,6 +546,7 @@ class CourseTabList(List):
         """
         Overrides the from_json method to de-serialize the CourseTab objects from a json-like representation.
         """
+        self.upgrade_tabs(values)
         self.validate_tabs(values)
         tabs = []
         for tab_dict in values:
