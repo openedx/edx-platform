@@ -4,6 +4,7 @@ import get from 'lodash/get';
 import Wizard from './Wizard';
 import Cookies from 'js-cookie';
 import { SelectWithInput } from './SelectWithInput'
+import { MultiselectDropdown } from './MultiselectDropdown';
 
 
 const FIELD_NAMES = {
@@ -17,7 +18,7 @@ const FIELD_NAMES = {
   PARENT_EDUCATION: "parent_education_level",
   // For some reason, ethnicity has the really long property chain to get to the choices
   ETHNICITY_OPTIONS: "user_ethnicity.child.children.ethnicity",
-  ENTHINCITY: "ethnicity",
+  ETHNICITY: "user_ethnicity",
   WORK_STATUS: "work_status",
   WORK_STATUS_DESCRIPTION: "work_status_description",
 }
@@ -31,7 +32,7 @@ class DemographicsCollectionModal extends React.Component {
       error: false,
       loading: true,
       open: true,
-      selected: Object.values(FIELD_NAMES).reduce((acc, current) => ({...acc, [current]: ''}), {}),
+      selected: Object.values(FIELD_NAMES).reduce((acc, current) => ({ ...acc, [current]: '' }), {}),
     }
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -59,20 +60,24 @@ class DemographicsCollectionModal extends React.Component {
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFTOKEN': Cookies.get('demographics_csrftoken'),
-          'USE-JWT-COOKIE': true,
+          'USE-JWT-COOKIE': true
         },
       })
       data = await response.json();
     } catch (error) {
       this.setState(error)
     }
+    if(data[FIELD_NAMES.ETHNICITY]) {
+      data[FIELD_NAMES.ETHNICITY] = this.reduceEthnicityArray(data[FIELD_NAMES.ETHNICITY])
+    }
     await this.setState({ options: options.actions.POST, loading: false, selected: data })
+    
   }
 
   loadOptions(field) {
-    const { choices } = get(this.state.options, field);
-    if (choices) {
-      return choices.map(choice => <option value={choice.value} selected={this.state.selected[field] === choice.value} key={choice.value}>{choice.display_name}</option>);
+    const { choices } = get(this.state.options, field, { choices: [] });
+    if (choices.length) {
+      return choices.map(choice => <option value={choice.value} key={choice.value}>{choice.display_name}</option>);
     }
   }
   //TODO: make actual errors
@@ -102,6 +107,9 @@ class DemographicsCollectionModal extends React.Component {
       console.log(e);
     }
 
+    if(name === 'user_ethnicity')  {
+      return value.reduce((acc, next) => [...acc, next.ethnicity], [])
+    }
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
@@ -121,21 +129,33 @@ class DemographicsCollectionModal extends React.Component {
     }));
   }
 
+  // We need to transform the ethnicity array before we POST or after GET the data to match
+  // from [{ethnicity: 'example}] => to ['example']
+  // the format the UI requires the data to be in.
+  reduceEthnicityArray(ethnicityArray) {
+    return ethnicityArray.map((o) => o.ethnicity);
+  }
 
   render() {
     if (!this.state.open) {
       return null;
     }
     return (
-      <div className="demographics-collection-modal">
+      <div className="demographics-collection-modal d-flex justify-content-center align-items-start">
         {!this.state.loading && !this.state.error &&
-          <Wizard onWizardComplete={() => this.setState({ open: false })} wizardContext={{ ...this.state.selected }}>
+          <Wizard 
+            onWizardComplete={() => this.setState({ open: false })}
+            wizardContext={{ ...this.state.selected, options: this.state.options }}
+          >
             <Wizard.Header>
               {({ currentPage, totalPages }) => (
                 <div>
-                  <h1>Help make edX better for everyone!</h1>
+                  <h2>Help make edX better for everyone!</h2>
                   <p>Thanks for registering with edX! Before getting started, please complete the additional information below to help your fellow learners. Your information will never be sold.</p>
-                  <span className="fa-info-circle" /><a>Why does edX collect this information?</a>
+                  <br/>
+                  <span className="fa-info-circle" />
+                  <a className="pl-3">Why does edX collect this information?</a>
+                  <br/>
                   <p>Part {currentPage} of {totalPages}</p>
                 </div>
               )}
@@ -161,21 +181,29 @@ class DemographicsCollectionModal extends React.Component {
                     inputOnBlur={this.handleSelectChange}
 
                   />
-                  <label htmlFor={FIELD_NAMES.ETHNICITY}>Ethnic background</label>
-                  <select
-                    onChange={this.handleSelectChange}
-                    name={FIELD_NAMES.ETHNICITY}
-                    id={FIELD_NAMES.ETHNICITY}
-                    value={wizardConsumer[FIELD_NAMES.ETHNICITY]}
-                  >
-                    <option>Select all that apply</option>
-                    {
-                      this.loadOptions(FIELD_NAMES.ETHNICITY_OPTIONS)
-                    }
-                  </select>
+                  <MultiselectDropdown
+                    label="Which of the following describes you best?"
+                    emptyLabel="Check all that apply"
+                    options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, { choices: [] }).choices}
+                    selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
+                    onChange={(values) => {
+                      const filteredValues = values.filter(i => i !== 'declined');
+                      this.setState(prevState => ({ selected: { ...prevState.selected, [FIELD_NAMES.ETHNICITY]: filteredValues } }));
+                    }}
+                    onBlur={() => {
+                      const e = {
+                        target: {
+                          name: FIELD_NAMES.ETHNICITY,
+                          value: wizardConsumer[FIELD_NAMES.ETHNICITY].map(ethnicity => ({ ethnicity, value: ethnicity })),
+                        }
+                      }
+                      this.handleSelectChange(e);
+                    }}
+                  />
                   <label htmlFor={FIELD_NAMES.INCOME}>Household income</label>
                   <select
-                    onChange={this.handleInputChange}
+                    onChange={this.handleSelectChange}
+                    className="form-control"
                     name={FIELD_NAMES.INCOME} id={FIELD_NAMES.INCOME}
                     value={wizardConsumer[FIELD_NAMES.INCOME]}
                   >
@@ -192,6 +220,7 @@ class DemographicsCollectionModal extends React.Component {
                 <div className="demographics-form-container">
                   <label htmlFor={FIELD_NAMES.MILITARY}>Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?</label>
                   <select
+                    className="form-control"
                     onChange={this.handleSelectChange}
                     name={FIELD_NAMES.MILITARY}
                     id={FIELD_NAMES.MILITARY}
@@ -210,6 +239,7 @@ class DemographicsCollectionModal extends React.Component {
                 <div className="demographics-form-container">
                   <label htmlFor={FIELD_NAMES.EDUCATION_LEVEL}>Your highest level of education</label>
                   <select
+                    className="form-control"
                     onChange={this.handleSelectChange}
                     name={FIELD_NAMES.EDUCATION_LEVEL}
                     id={FIELD_NAMES.EDUCATION_LEVEL}
@@ -222,6 +252,7 @@ class DemographicsCollectionModal extends React.Component {
                   </select>
                   <label htmlFor={FIELD_NAMES.PARENT_EDUCATION}>What is the highest level of education that any of your parents or guardians have achieved?</label>
                   <select
+                    className="form-control"
                     onChange={this.handleSelectChange}
                     name={FIELD_NAMES.PARENT_EDUCATION}
                     id={FIELD_NAMES.PARENT_EDUCATION}
@@ -258,6 +289,7 @@ class DemographicsCollectionModal extends React.Component {
                   />
                   <label htmlFor={FIELD_NAMES.CURRENT_WORK}>What industry do you currently work in?</label>
                   <select
+                    className="form-control"
                     onChange={this.handleSelectChange}
                     name={FIELD_NAMES.CURRENT_WORK}
                     id={FIELD_NAMES.CURRENT_WORK}
@@ -270,6 +302,7 @@ class DemographicsCollectionModal extends React.Component {
                   </select>
                   <label htmlFor={FIELD_NAMES.FUTURE_WORK}>What industry do you want to work in</label>
                   <select
+                    className="form-control"
                     onChange={this.handleSelectChange}
                     name={FIELD_NAMES.FUTURE_WORK}
                     id={FIELD_NAMES.FUTURE_WORK}

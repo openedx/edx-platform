@@ -30,7 +30,7 @@ class MultiselectDropdown extends React.Component {
   }
 
   findOption(data) {
-    return this.props.options.find((o) => o.value == data || o.label == data);
+    return this.props.options.find((o) => o.value == data || o.display_name == data);
   }
 
   focusButton() {
@@ -81,15 +81,18 @@ class MultiselectDropdown extends React.Component {
     if (this.props.selected.length == 0) {
       return this.props.emptyLabel;
     }
-
-    return this.props.selected.map((value) => {
-      return this.findOption(value).label;
-    }).join(", ")
+    const selectedList = this.props.selected.reduce((selected, next) => {
+      return selected + `, ${this.findOption(next).display_name}`
+    });
+    if(selectedList.length > 60 ){
+      return selectedList.substring(0, 55) + '...'
+    } 
+    return selectedList;
   }
 
   renderUnselect() {
     return this.props.selected.length > 0 && (
-      <button id="unselect-button" onClick={this.handleRemoveAllClick}>x</button>
+      <button id="unselect-button" onClick={this.handleRemoveAllClick}>Clear all</button>
     )
   }
 
@@ -104,7 +107,7 @@ class MultiselectDropdown extends React.Component {
         <div key={index} id={`${option.value}-option-container`} className="option-container">
           <label className="option-label">
             <input id={`${option.value}-option-checkbox`} className="option-checkbox" type="checkbox" value={option.value} checked={checked} onChange={this.handleOptionClick}/>
-            {option.label}
+            {option.display_name}
           </label>
         </div>
       )
@@ -120,13 +123,23 @@ class MultiselectDropdown extends React.Component {
 
   render() {
     return (
-      <div className="multiselect-dropdown">
-        <div id="multiselect-dropdown-label">{this.props.label}</div>
-        <button id="multiselect-dropdown-button" type="button" ref={this.setButtonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
+      <div 
+        className="multiselect-dropdown" 
+        onBlur={() => {
+          this.props.onBlur();
+          // close the dropdown panel when the user blurs the multiselect
+         // this.setState({open: false});
+        }}
+        tabIndex={0}
+      >
+        <label id="multiselect-dropdown-label" htmlFor="multiselect-dropdown">{this.props.label}</label>
+        <div className="form-control" id="multiselect-dropdown-button" ref={this.buttonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
           {this.renderSelected()}
           {this.renderUnselect()}
-        </button>
-        {this.renderMenu()}
+        </div>
+        <div>
+          {this.renderMenu()}
+        </div>
       </div>
     )
   }

@@ -153,10 +153,20 @@ from student.models import CourseEnrollment
     enrolled_in_mb_program = MB_SLUG in enrolled_program_types
     account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
   %>
-  % if getattr(settings, 'ENABLE_DEMOGRAPHICS_COLLECTION', False) and enrolled_in_mb_program:
-    <a href="${account_mfe_url}#demographics">
-      <div
-        class="demographics-banner d-flex justify-content-left align-items-center flex-column flex-lg-row py-1 px-4 mb-2 mb-lg-4">
+  ${static.renderReact(
+    component="DemographicsCollectionModal",
+    id="dashboard-demographics-collection-modal",
+    props={},
+  )}
+  % if display_demographics_banner:
+  <a id="demographics-banner-link" class="btn" href="${account_mfe_url}#demographics-information">
+    <div
+      class="demographics-banner d-flex justify-content-lg-between flex-row py-1 px-2 mb-2 mb-lg-4"
+      role="dialog"
+      aria-modal="false"
+      aria-label="demographics questionnaire pitch"
+    >
+      <div class="d-flex justify-content-left align-items-lg-center flex-column flex-lg-row  w-100">
         <img class="demographics-banner-icon d-none d-lg-inline-block" src="${static.url('edx.org/images/quote_prompt.png')}" alt="" aria-hidden="true">
         <div class="demographics-banner-prompt d-inline-block font-weight-bold text-white py-4 px-2 px-lg-3">
           ${_("Want to make edX better for everyone?")}

@@ -65,10 +65,7 @@ export default class Wizard extends React.Component {
         <div className="wizard-header">
           {this.state.totalPages >= this.state.currentPage && this.renderHeader()}
         </div>
-        <br />
-        <div>
-          {this.renderPage()}
-        </div>
+        {this.renderPage()}
         <div className="wizard-footer">
           <button className={`wizard-button ${finalPage && 'blue'}`} onClick={this.props.onWizardComplete}>{finalPage ? "Return to my dashboard" : "Finish later"}</button>
           <button className="wizard-button blue" hidden={finalPage} onClick={this.handleNext}>Next</button>

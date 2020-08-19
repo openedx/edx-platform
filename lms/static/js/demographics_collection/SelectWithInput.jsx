@@ -17,9 +17,10 @@ export const SelectWithInput = (props) => {
     labelText,
   } = props;
   return (
-    <div>
+    <div className="d-flex flex-column">
       <label htmlFor={selectName}>{labelText}</label>
       <select
+        className="form-control"
         name={selectName}
         id={selectId}
         onChange={selectOnChange}
@@ -29,6 +30,7 @@ export const SelectWithInput = (props) => {
       </select>
       {showInput &&
         <input
+          className="form-control"
           type={inputType}
           name={inputName}
           id={inputId}
