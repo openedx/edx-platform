@@ -127,7 +127,20 @@ FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
-    # Toggles OAuth2 authentication provider
+    """
+    .. toggle_name: ENABLE_OAUTH2_PROVIDER
+    .. toggle_implementation: DjangoSetting
+    .. toggle_default: False
+    .. toggle_description: Enable this feature to allow this Open edX platform to be an
+      OAuth2 authentication provider. This is necessary to enable some other features,
+      such as the REST API for the mobile application.
+    .. toggle_category: admin
+    .. toggle_use_cases: monitored_rollout
+    .. toggle_creation_date: 2014-09-09
+    .. toggle_expiration_date: None
+    .. toggle_status: supported
+    .. toggle_warnings: None
+    """
     'ENABLE_OAUTH2_PROVIDER': False,
 
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
