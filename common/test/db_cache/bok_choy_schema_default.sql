@@ -881,23 +881,10 @@ CREATE TABLE `canvas_canvasenterprisecustomerconfiguration` (
   `canvas_account_id` int(11) DEFAULT NULL,
   `canvas_base_url` varchar(255) DEFAULT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
+  `refresh_token` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `canvas_canvasenterpr_enterprise_customer__b2e73393_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `canvas_canvasglobalconfiguration`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `canvas_canvasglobalconfiguration` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `change_date` datetime(6) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
-  `course_api_path` varchar(255) NOT NULL,
-  `changed_by_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `canvas_canvasglobalc_changed_by_id_822bb703_fk_auth_user` (`changed_by_id`),
-  CONSTRAINT `canvas_canvasglobalc_changed_by_id_822bb703_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `canvas_historicalcanvasenterprisecustomerconfiguration`;
@@ -921,6 +908,7 @@ CREATE TABLE `canvas_historicalcanvasenterprisecustomerconfiguration` (
   `history_type` varchar(1) NOT NULL,
   `enterprise_customer_id` char(32) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
+  `refresh_token` varchar(255) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `canvas_historicalcan_history_user_id_615fc2a2_fk_auth_user` (`history_user_id`),
   KEY `canvas_historicalcanvasente_id_8769e0b6` (`id`),
@@ -2732,7 +2720,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=752 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=755 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
