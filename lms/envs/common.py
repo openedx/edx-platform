@@ -100,12 +100,43 @@ FEATURES = {
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
-    # Set this to True if you want the discussion digest emails enabled automatically for new users.
-    # This will be set on all new account registrations.
-    # It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled, since
-    # subscribers who receive digests in that case will only be able to unsubscribe via links embedded
-    # in their emails, and they will have no way to resubscribe.
+    """
+    .. toggle_name: ENABLE_DISCUSSION_EMAIL_DIGEST
+    .. toggle_implementation: DjangoSetting
+    .. toggle_default: False
+    .. toggle_description: Set this to True if you want the discussion digest emails
+      enabled automatically for new users. This will be set on all new account
+      registrations.
+    .. toggle_category: admin
+    .. toggle_use_cases: open_edx
+    .. toggle_creation_date: 2014-08-19
+    .. toggle_expiration_date: None
+    .. toggle_warnings: It is not recommended to enable this feature if
+      ENABLE_DISCUSSION_HOME_PANEL is not enabled, since subscribers who receive
+      digests in that case will only be able to unsubscribe via links embedded
+      in their emails, and they will have no way to resubscribe.
+    .. toggle_tickets: https://github.com/edx/edx-platform/pull/4891
+    .. toggle_status: supported
+    """
     'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
+
+    """
+    .. toggle_name: ENABLE_UNICODE_USERNAME
+    .. toggle_implementation: DjangoSetting
+    .. toggle_default: False
+    .. toggle_description: Set this to True to allow unicode characters in username.
+      Enabling this will also automatically enable SOCIAL_AUTH_CLEAN_USERNAMES. When
+      this is enabled, usernames will have to match the regular expression defined by
+      USERNAME_REGEX_PARTIAL.
+    .. toggle_category: admin
+    .. toggle_use_cases: open_edx
+    .. toggle_creation_date: 2017-06-27
+    .. toggle_expiration_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: https://github.com/edx/edx-platform/pull/14729
+    .. toggle_status: supported
+    """
+    'ENABLE_UNICODE_USERNAME': False,
 
     'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_LMS_MIGRATION': False,
@@ -208,8 +239,52 @@ FEATURES = {
     # for acceptance and load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
 
-    # Prevent auto auth from creating superusers or modifying existing users
+    """
+    .. toggle_name: RESTRICT_AUTOMATIC_AUTH
+    .. toggle_implementation: DjangoSetting
+    .. toggle_default: True
+    .. toggle_description: Prevent auto auth from creating superusers or modifying
+    existing users. Auto auth is a mechanism where superusers can simply modify
+    attributes of other users by accessing the "/auto_auth url" with the right
+    querystring parameters.
+    .. toggle_category: admin
+    .. toggle_use_cases: open_edx
+    .. toggle_creation_date: 2018-05-07
+    .. toggle_expiration_date: None
+    .. toggle_tickets: https://openedx.atlassian.net/browse/TE-2545
+    .. toggle_status: supported
+    """
     'RESTRICT_AUTOMATIC_AUTH': True,
+
+    """
+    .. toggle_name: ENABLE_LOGIN_MICROFRONTEND
+    .. toggle_implementation: DjangoSetting
+    .. toggle_default: False
+    .. toggle_description: Enable the login micro frontend.
+    .. toggle_category: admin
+    .. toggle_use_cases: open_edx
+    .. toggle_creation_date: 2018-05-07
+    .. toggle_expiration_date: None
+    .. toggle_warnings: The login MFE domain name should be listed in
+      LOGIN_REDIRECT_WHITELIST.
+    .. toggle_status: supported
+    """
+    'ENABLE_LOGIN_MICROFRONTEND': False,
+
+    """
+    .. toggle_name: SKIP_EMAIL_VALIDATION
+    .. toggle_implementation: DjangoSetting
+    .. toggle_default: False
+    .. toggle_description: Turn this on to skip sending emails for user validation.
+      Beware, as this leaves the door open to potential spam abuse.
+    .. toggle_category: admin
+    .. toggle_use_cases: open_edx
+    .. toggle_expiration_date: None
+    .. toggle_warnings: The login MFE domain name should be listed in
+      LOGIN_REDIRECT_WHITELIST.
+    .. toggle_status: supported
+    """
+    'SKIP_EMAIL_VALIDATION': False,
 
     # Toggle the availability of the shopping cart page
     'ENABLE_SHOPPING_CART': False,
@@ -290,6 +365,20 @@ FEATURES = {
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
 
+    """
+    .. toggle_name: ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER
+    .. toggle_implementation: DjangoSetting
+    .. toggle_default: False
+    .. toggle_description: Display the standard footer in the login page. This feature
+      can be overridden by a site-specific configuration.
+    .. toggle_category: admin
+    .. toggle_use_cases: open_edx
+    .. toggle_creation_date: 2016-06-24
+    .. toggle_expiration_date: None
+    .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1320
+    .. toggle_status: supported
+    .. toggle_warnings: None
+    """
     'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER': False,
 
     # Enable organizational email opt-in
@@ -389,7 +478,20 @@ FEATURES = {
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
 
-    # Allow public account creation
+    """
+    .. toggle_name: ALLOW_PUBLIC_ACCOUNT_CREATION
+    .. toggle_implementation: DjangoSetting
+    .. toggle_default: True
+    .. toggle_description: Allow public account creation. If this is disabled, users
+      will no longer have access to the signup page.
+    .. toggle_category: admin
+    .. toggle_use_cases: open_edx
+    .. toggle_creation_date: 2017-04-12
+    .. toggle_expiration_date: None
+    .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
+    .. toggle_status: supported
+    .. toggle_warnings: None
+    """
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
     # Enable footer banner for cookie consent.
@@ -418,8 +520,23 @@ FEATURES = {
     # Whether HTML XBlocks/XModules return HTML content with the Course Blocks API student_view_data
     'ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA': False,
 
-    # Whether to send an email for failed password reset attempts or not. This is mainly useful for notifying users
-    # that they don't have an account associated with email addresses they believe they've registered with.
+    """
+    .. toggle_name: ENABLE_CHANGE_USER_PASSWORD_ADMIN
+    .. toggle_implementation: DjangoSetting
+    .. toggle_default: False
+    .. toggle_description: Whether to send an email for failed password reset attempts
+      or not. This happens when a user asks for a password reset but they don't have an
+      account associated to their email. This is useful for notifying users that they
+      don't have an account associated with email addresses they believe they've
+      registered with. This setting can be overridden by a site-specific configuration.
+    .. toggle_category: admin
+    .. toggle_use_cases: open_edx
+    .. toggle_creation_date: 2017-07-20
+    .. toggle_expiration_date: None
+    .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1832
+    .. toggle_status: supported
+    .. toggle_warnings: None
+    """
     'ENABLE_PASSWORD_RESET_FAILURE_EMAIL': False,
 
     # Sets the default browser support. For more information go to http://browser-update.org/customize.html
