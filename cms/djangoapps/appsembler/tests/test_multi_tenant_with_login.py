@@ -3,7 +3,6 @@ Tests for APPSEMBLER_MULTI_TENANT_EMAILS in Studio login.
 """
 
 from mock import patch
-
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status

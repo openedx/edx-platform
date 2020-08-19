@@ -1,3 +1,6 @@
+import logging
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
@@ -15,7 +18,12 @@ from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissi
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from util.json_request import JsonResponse, expect_json
+from organizations.models import OrganizationCourse, Organization
 from xmodule.modulestore.django import modulestore
+
+
+log = logging.getLogger(__name__)
+
 
 __all__ = ['request_course_creator', 'course_team_handler']
 
@@ -110,8 +118,13 @@ def _course_team_user(request, course_key, email):
         return permissions_error_response
 
     try:
-        user = User.objects.get(email=email)
+        if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+            organization = Organization.objects.get(organizationcourse__course_id=course_key)
+            user = organization.userorganizationmapping_set.get(user__email=email).user
+        else:
+            user = User.objects.get(email=email)
     except Exception:
+        log.exception('Failed finding user by email (%s) for course (%s) team invite.', email, course_key)
         msg = {
             "error": _("Could not find user by email address '{email}'.").format(email=email),
         }
