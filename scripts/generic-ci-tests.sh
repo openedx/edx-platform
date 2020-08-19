@@ -147,7 +147,7 @@ case "$TEST_SUITE" in
         exit $EXIT
         ;;
 
-    "lms-unit"|"cms-unit"|"commonlib-unit")
+    "lms-unit"|"cms-unit"|"commonlib-unit"|"philu-unit")
         $TOX bash scripts/unit-tests.sh
         ;;
 

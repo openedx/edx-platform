@@ -56,8 +56,8 @@ class TestPaverPytestCmd(unittest.TestCase):
 
                 xdist_string = '--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
                                '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
-                               '//chdir="/edx/app/edxapp/edx-platform"' \
-                               .format(processes, ip, django_env_var_cmd)
+                               '//chdir="/edx/app/edxapp/edx-platform"'\
+                    .format(processes, ip, django_env_var_cmd)
                 expected_statement.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
                 expected_statement.append('--rsyncdir {}'.format(rsync_dir))

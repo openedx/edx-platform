@@ -122,10 +122,10 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': "edxtest",
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
+        'NAME': os.environ.get('TEST_DB_NAME', 'edxtest'),
+        'USER': os.environ.get('TEST_DB_USER', 'root'),
+        'PASSWORD': os.environ.get('TEST_DB_PASSWORD', ''),
+        'HOST': os.environ.get('TEST_DB_HOST','edx.devstack.mysql'),
         'PORT': '3306',
         'ATOMIC_REQUESTS': True,
     },
@@ -332,20 +332,14 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
 
-CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
-
-CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
-
-with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
-    AUTH_TOKENS = json.load(auth_file)
-
+##################### PhilU Settings #######################
 NODEBB_RETRY_DELAY = 60
-NODEBB_ENDPOINT = "http://local.philanthropyu.org:4567"
-# replace NODEBB_MASTER_TOKEN with value from your setup
-NODEBB_MASTER_TOKEN = AUTH_TOKENS.get("NODEBB_MASTER_TOKEN")
-MANDRILL_API_KEY = AUTH_TOKENS.get("MANDRILL_API_KEY")
-MAILCHIMP_API_KEY = AUTH_TOKENS.get("MAILCHIMP_API_KEY")
-MAILCHIMP_LEARNERS_LIST_ID = ""
+NODEBB_ENDPOINT = 'http://local.philanthropyu.org:4567'
+NODEBB_MASTER_TOKEN = 'test-master-token-nodebb'
+MANDRILL_API_KEY = 'test_mandrill_api_key_part1-part2-part3'
+MAILCHIMP_API_KEY = os.environ.get('MAILCHIMP_API_KEY')
+MAILCHIMP_LEARNERS_LIST_ID = 'test'
+################## End PhilU Settings #####################
 
 ########################## VIDEO IMAGE STORAGE ############################
 VIDEO_IMAGE_SETTINGS = dict(

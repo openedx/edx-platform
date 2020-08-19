@@ -31,7 +31,11 @@ else:
 
 # Developers can have private requirements, for local copies of github repos,
 # or favorite debugging tools, etc.
-PRIVATE_REQS = 'requirements/philu/base.txt'
+if 'TOXENV' in os.environ:
+    PRIVATE_REQS = 'requirements/philu/testing.txt'
+else:
+    PRIVATE_REQS = 'requirements/philu/base.txt'
+
 if os.path.exists(PRIVATE_REQS):
     PYTHON_REQ_FILES.append(PRIVATE_REQS)
 
