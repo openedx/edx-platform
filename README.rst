@@ -1,3 +1,5 @@
+TESTING
+
 This is the core repository of the Open edX software. It includes the LMS
 (student-facing, delivering courseware), and Studio (course authoring)
 components.
