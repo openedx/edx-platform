@@ -763,9 +763,9 @@ def webpack(options):
     Run a Webpack build.
     """
     settings = getattr(options, 'settings', Env.DEVSTACK_SETTINGS)
-    static_root_lms = Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
-    static_root_cms = Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
-    config_path = Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
+    result = Env.get_django_settings(['STATIC_ROOT', 'WEBPACK_CONFIG_PATH'], "lms", settings=settings)
+    static_root_lms, config_path = result
+    static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
     environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
         node_env="development" if config_path == 'webpack.dev.config.js' else "production",
         static_root_lms=static_root_lms,
@@ -788,13 +788,17 @@ def execute_webpack_watch(settings=None):
     # We only want Webpack to re-run on changes to its own entry points,
     # not all JS files, so we use its own watcher instead of subclassing
     # from Watchdog like the other watchers do.
+
+    result = Env.get_django_settings(["STATIC_ROOT", "WEBPACK_CONFIG_PATH"], "lms", settings=settings)
+    static_root_lms, config_path = result
+    static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
     run_background_process(
         'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'.format(
             options='--watch --config={config_path}'.format(
-                config_path=Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
+                config_path=config_path
             ),
-            static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
-            static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings),
+            static_root_lms=static_root_lms,
+            static_root_cms=static_root_cms,
         )
     )
 
