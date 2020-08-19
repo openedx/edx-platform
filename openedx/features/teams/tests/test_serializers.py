@@ -1,27 +1,23 @@
+"""
+Test class for teams serializer
+"""
 import factory
-
-from django.db.models import signals
 from django.conf import settings
-from django.test.client import RequestFactory
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.db.models import signals
+from django.test.client import RequestFactory
 
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory
-from lms.djangoapps.teams.tests.factories import CourseTeamMembershipFactory
 from lms.djangoapps.onboarding.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from openedx.features.teams.helpers import TEAM_BANNER_COLORS, USER_ICON_COLORS
 from openedx.features.teams.serializers import (
     CustomCourseTeamCreationSerializer,
-    CustomUserMembershipSerializer,
-    CustomCourseTeamSerializer
+    CustomCourseTeamSerializer,
+    CustomUserMembershipSerializer
 )
-from openedx.features.teams.helpers import (
-    USER_ICON_COLORS,
-    TEAM_BANNER_COLORS,
-)
-
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 VALID_COUNTRY = 'LA'
 VALID_LANGUAGE = 'kl'
@@ -34,11 +30,15 @@ INVALID_LANGUAGE_CODE = '{language_code} is not a valid language code'
 
 
 class SerializersTestBaseClass(ModuleStoreTestCase):
-    """ Base class for common steps required for testing serializers """
+    """
+    Base class for common steps required for testing serializers
+    """
 
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def setUp(self):
-        """ create required data for testing serializers in the module """
+        """
+        create required data for testing serializers in the module
+        """
         super(SerializersTestBaseClass, self).setUp()
         org = 'edX'
         course_number = 'CS101'
@@ -66,7 +66,9 @@ class SerializersTestBaseClass(ModuleStoreTestCase):
 
 
 class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
-    """ Tests for the create team serializer."""
+    """
+    Tests for the create team serializer.
+    """
 
     def _get_team_dict_data(self):
         data = self.team.__dict__
@@ -74,7 +76,9 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         return data
 
     def test_case_create_team__with_empty_language_field(self):
-        """ Test that correct error message is thrown when serializing team with empty language field"""
+        """
+        Test that correct error message is thrown when serializing team with empty language field
+        """
         self.team.country = VALID_COUNTRY
         data = self._get_team_dict_data()
         expected_result = {'language': REQUIRED_ERROR_MSG['LANGUAGE']}
@@ -83,7 +87,9 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(serialized_data.errors, expected_result)
 
     def test_case_create_team_with_invalid_language_code(self):
-        """ Test that correct error message is thrown when serializing team with invalid language value"""
+        """
+        Test that correct error message is thrown when serializing team with invalid language value
+        """
         self.team.country = VALID_COUNTRY
         self.team.language = INVALID_LANGUAGE
         data = self._get_team_dict_data()
@@ -93,7 +99,9 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(serialized_data.errors, expected_result)
 
     def test_case_create_team_with_empty_country_field(self):
-        """ Test that correct error message is thrown when serializing team with empty country field"""
+        """
+        Test that correct error message is thrown when serializing team with empty country field
+        """
         self.team.language = VALID_LANGUAGE
         data = self._get_team_dict_data()
         expected_result = {'country': REQUIRED_ERROR_MSG['COUNTRY']}
@@ -102,7 +110,9 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(serialized_data.errors, expected_result)
 
     def test_case_create_team_with_invalid_country_code(self):
-        """ Test that correct error message is thrown when serializing team with invalid country value"""
+        """
+        Test that correct error message is thrown when serializing team with invalid country value
+        """
         self.team.country = INVALID_COUNTRY
         self.team.language = VALID_LANGUAGE
         data = self._get_team_dict_data()
@@ -112,7 +122,8 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(serialized_data.errors, expected_result)
 
     def test_case_create_team_with_empty_language_and_country_fields(self):
-        """ Test that correct error message is thrown when serializing team with both empty language field
+        """
+        Test that correct error message is thrown when serializing team with both empty language field
         and empty country field
         """
         data = self._get_team_dict_data()
@@ -122,7 +133,8 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(serialized_data.errors, expected_result)
 
     def test_case_create_team_with_invalid_language_and_country_fields(self):
-        """ Test that correct error message is thrown when serializing team with both invalid language field
+        """
+        Test that correct error message is thrown when serializing team with both invalid language field
         and invalid country field
         """
         self.team.country = INVALID_COUNTRY
@@ -135,7 +147,9 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(serialized_data.errors, expected_result)
 
     def test_case_create_team_with_valid_language_and_country_fields(self):
-        """ Test that no errors are returned when team has valid language and country values """
+        """
+        Test that no errors are returned when team has valid language and country values
+        """
         self.team.country = VALID_COUNTRY
         self.team.language = VALID_LANGUAGE
         data = self._get_team_dict_data()
@@ -145,7 +159,9 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(serialized_data.errors, expected_result)
 
     def test_case_valid_language_representation(self):
-        """ Test that after serializing team object language is represented correctly in unicode"""
+        """
+        Test that after serializing team object language is represented correctly in unicode
+        """
         self.team.country = VALID_COUNTRY
         self.team.language = VALID_LANGUAGE
         data = self._get_team_dict_data()
@@ -156,11 +172,14 @@ class CreateTeamsSerializerTestCase(SerializersTestBaseClass):
 
 
 class CustomUserMembershipSerializerTestCase(SerializersTestBaseClass):
-    """ Test cases for CustomUserMembershipSerializer """
+    """
+    Test cases for CustomUserMembershipSerializer
+    """
 
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def setUp(self):
-        """ Create required data for testing CustomUserMembershipSerializer.
+        """
+        Create required data for testing CustomUserMembershipSerializer.
         create a new user and join that user in the testing team.
         """
         super(CustomUserMembershipSerializerTestCase, self).setUp()
@@ -168,7 +187,9 @@ class CustomUserMembershipSerializerTestCase(SerializersTestBaseClass):
         self.membership = CourseTeamMembershipFactory.create(team=self.team, user=self.user)
 
     def test_case_validate_profile_color(self):
-        """ Test that correct color is stored in serialized data"""
+        """
+        Test that correct color is stored in serialized data
+        """
         data = CustomUserMembershipSerializer(self.membership, context={
             'expand': [u'team', u'user'],
             'request': RequestFactory().get('/api/team/v0/team_membership')
@@ -176,7 +197,9 @@ class CustomUserMembershipSerializerTestCase(SerializersTestBaseClass):
         self.assertIn(data['profile_color'], USER_ICON_COLORS)
 
     def test_case_validate_natural_last_activity(self):
-        """ Test that last_activity is stored in valid natural format after serializing the data"""
+        """
+        Test that last_activity is stored in valid natural format after serializing the data
+        """
         data = CustomUserMembershipSerializer(self.membership, context={
             'expand': [u'team', u'user'],
             'request': RequestFactory().get('/api/team/v0/team_membership')
@@ -184,7 +207,9 @@ class CustomUserMembershipSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(data['last_activity_natural'], naturaltime(self.membership.last_activity_at))
 
     def test_case_validate_natural_date_joined(self):
-        """ Test that date_joined is stored in valid natural format after serializing the data"""
+        """
+        Test that date_joined is stored in valid natural format after serializing the data
+        """
         data = CustomUserMembershipSerializer(self.membership, context={
             'expand': [u'team', u'user'],
             'request': RequestFactory().get('/api/team/v0/team_membership')
@@ -193,10 +218,14 @@ class CustomUserMembershipSerializerTestCase(SerializersTestBaseClass):
 
 
 class CustomCourseTeamSerializerTestCase(SerializersTestBaseClass):
-    """ Test cases for CustomCourseTeamSerializer """
+    """
+    Test cases for CustomCourseTeamSerializer
+    """
 
     def test_case_validate_team_country(self):
-        """ Test that formatted(full) country name is stored in serialized data"""
+        """
+        Test that formatted(full) country name is stored in serialized data
+        """
         self.team.country = VALID_COUNTRY
         data = CustomCourseTeamSerializer(self.team, context={
             'request': RequestFactory().get('/api/team/v0/team_membership')
@@ -204,7 +233,9 @@ class CustomCourseTeamSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(data['country'], self.team.country.name.format())
 
     def test_case_validate_team_language(self):
-        """ Test that formatted(full) language name is stored in serialized data"""
+        """
+        Test that formatted(full) language name is stored in serialized data
+        """
         self.team.language = VALID_LANGUAGE
         data = CustomCourseTeamSerializer(self.team, context={
             'request': RequestFactory().get('/api/team/v0/team_membership')
@@ -213,7 +244,8 @@ class CustomCourseTeamSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(data['language'], languages[self.team.language])
 
     def test_case_team_with_invalid_language(self):
-        """ Test that language name is stored as it is if the given language code does not exist in valid
+        """
+        Test that language name is stored as it is if the given language code does not exist in valid
         languages list
         """
         self.team.language = INVALID_LANGUAGE
@@ -223,7 +255,9 @@ class CustomCourseTeamSerializerTestCase(SerializersTestBaseClass):
         self.assertEqual(data['language'], self.team.language)
 
     def test_case_validate_team_banner_color(self):
-        """ Test that valid team banner color is stored in serialized data """
+        """
+        Test that valid team banner color is stored in serialized data
+        """
         data = CustomCourseTeamSerializer(self.team, context={
             'request': RequestFactory().get('/api/team/v0/team_membership')
         }).data
