@@ -400,7 +400,7 @@ FEATURES = {
     # .. toggle_category: n/a
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-06-12
-    # .. toggle_expiration_date: 2020-09-01
+    # .. toggle_expiration_date: 2020-12-01
     # .. toggle_warnings: This can be removed once support is removed for deprecated course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     # .. toggle_status: supported
