@@ -119,7 +119,7 @@ edx-rbac==1.3.2           # via -r requirements/edx/base.txt, edx-enterprise
 edx-rest-api-client==5.2.1  # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 edx-search==1.4.1         # via -r requirements/edx/base.txt
 edx-sga==0.11.1           # via -r requirements/edx/base.txt
-edx-submissions==3.1.12   # via -r requirements/edx/base.txt, ora2
+edx-submissions==3.2.0    # via -r requirements/edx/base.txt, ora2
 edx-tincan-py35==0.0.9    # via -r requirements/edx/base.txt, edx-enterprise
 edx-user-state-client==1.2.0  # via -r requirements/edx/base.txt
 edx-when==1.3.0           # via -r requirements/edx/base.txt, edx-proctoring
