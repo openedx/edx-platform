@@ -1,6 +1,6 @@
-import mandrill
 import logging
 
+import mandrill
 from django.conf import settings
 
 log = logging.getLogger(__name__)
@@ -37,6 +37,7 @@ class MandrillClient(object):
     REFERRAL_INITIAL_EMAIL = 'referral-email'
     REFERRAL_FOLLOW_UP_EMAIL = 'referred-learner-follow-up'
     REFERRAL_SOCIAL_IMPACT_TOOLKIT = 'social-impact-toolkit'
+    MINI_COURSE_ENROLMENT = 'mini-course-enrolment'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)

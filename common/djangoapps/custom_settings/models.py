@@ -1,7 +1,8 @@
+import json
+
 from django.db import models
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-import json
 
 
 class CustomSettings(models.Model):
@@ -17,6 +18,7 @@ class CustomSettings(models.Model):
     course_short_id = models.IntegerField(null=False, unique=True)
     seo_tags = models.TextField(null=True, blank=True)
     course_open_date = models.DateTimeField(null=True)
+    is_mini_lesson = models.BooleanField(default=False)
 
     class Meta:
         app_label = 'custom_settings'

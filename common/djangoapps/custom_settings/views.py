@@ -14,8 +14,9 @@ from edxmako.shortcuts import render_to_response
 from util.json_request import JsonResponse, expect_json
 from util.views import require_global_staff
 from xmodule.modulestore.django import modulestore
-from .models import CustomSettings
+
 from .helpers import get_course_open_date_from_settings, validate_course_open_date
+from .models import CustomSettings
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +54,8 @@ def course_custom_settings(request, course_key_string):
                     'tags': settings.tags,
                     'seo_tags': "" if not settings.seo_tags else json.loads(settings.seo_tags),
                     'course_open_date': get_course_open_date_from_settings(settings),
-                    'auto_enroll': settings.auto_enroll
+                    'auto_enroll': settings.auto_enroll,
+                    'is_mini_lesson': settings.is_mini_lesson
                 },
                 'custom_settings_url': reverse('custom_settings', kwargs={'course_key_string': unicode(course_key)}),
             })
@@ -68,6 +70,7 @@ def course_custom_settings(request, course_key_string):
             settings.seo_tags = None if body.get('seo_tags') == "" else json.dumps(body.get('seo_tags'))
             settings.enable_enrollment_email = body.get('enable_enrollment_email')
             settings.auto_enroll = body.get('auto_enroll')
+            settings.is_mini_lesson = body.get('is_mini_lesson')
             settings.save()
             return JsonResponse(body)
 

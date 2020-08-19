@@ -62,7 +62,8 @@ class CustomSettingsTestCase(PhiluThemeMixin, ModuleStoreTestCase):
                 'show_grades': True,
                 'auto_enroll': False,
                 'seo_tags': {u'description': u'test', u'title': u'test'},
-                'course_open_date': '01/01/2020'
+                'course_open_date': '01/01/2020',
+                'is_mini_lesson': False
             },
             'context_course': 'test_value',
             'course_short_id': 200
@@ -83,6 +84,7 @@ class CustomSettingsTestCase(PhiluThemeMixin, ModuleStoreTestCase):
             'seo_tags': {u'description': u'test', u'title': u'test'},
             'auto_enroll': True,
             'enable_enrollment_email': True,
+            'is_mini_lesson': True
         }
         response = self.client.post(
             self.url,
@@ -101,6 +103,7 @@ class CustomSettingsTestCase(PhiluThemeMixin, ModuleStoreTestCase):
         self.assertEqual(custom_settings.seo_tags, '{"description": "test", "title": "test"}')
         self.assertEqual(custom_settings.auto_enroll, True)
         self.assertEqual(custom_settings.enable_enrollment_email, True)
+        self.assertEqual(custom_settings.is_mini_lesson, True)
 
     @patch('custom_settings.views.get_course_and_check_access', Mock())
     def test_course_custom_settings_delete_request(self):
