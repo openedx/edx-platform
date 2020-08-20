@@ -56,7 +56,6 @@ COPY . /edx/app/edx-platform/edx-platform
 
 ENV PATH /edx/app/edx-platform/nodeenv/bin:${PATH}
 ENV PATH ./node_modules/.bin:${PATH}
-ENV CONFIG_ROOT /edx/etc/
 ENV PATH /edx/app/edx-platform/edx-platform/bin:${PATH}
 ENV SETTINGS production
 
