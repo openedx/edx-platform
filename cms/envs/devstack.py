@@ -117,6 +117,8 @@ def should_show_debug_toolbar(request):
 ################################ MILESTONES ################################
 FEATURES['MILESTONES_APP'] = True
 
+########################### ORGANIZATIONS #################################
+FEATURES['ORGANIZATIONS_APP'] = True
 
 ################################ ENTRANCE EXAMS ################################
 FEATURES['ENTRANCE_EXAMS'] = True
