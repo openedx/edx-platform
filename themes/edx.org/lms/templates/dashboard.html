@@ -165,7 +165,7 @@ from student.models import CourseEnrollment
   ${static.renderReact(
     component="DemographicsCollectionModal",
     id="dashboard-demographics-collection-modal",
-    props={},
+    props={"user": user.id},
   )}
   % if display_demographics_banner:
   <a id="demographics-banner-link" class="btn" href="${account_mfe_url}#demographics-information">

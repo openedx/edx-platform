@@ -54,7 +54,7 @@ class DemographicsCollectionModal extends React.Component {
 
     // gather previously answers questions
     try {
-      response = await fetch('http://localhost:18360/demographics/api/v1/demographics/3/', {
+      response = await fetch(`http://localhost:18360/demographics/api/v1/demographics/${this.props.user}/`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -116,7 +116,7 @@ class DemographicsCollectionModal extends React.Component {
     }
 
     try {
-      await fetch('http://localhost:18360/demographics/api/v1/demographics/3/', options)
+      const response = await fetch(`http://localhost:18360/demographics/api/v1/demographics/${this.props.user}/`, options)
     } catch (e) {
       console.log(e);
     }
@@ -205,7 +205,7 @@ class DemographicsCollectionModal extends React.Component {
                     label="Which of the following describes you best?"
                     emptyLabel="Check all that apply"
                     options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, { choices: [] }).choices}
-                    selected={this.state.selected[FIELD_NAMES.ETHNICITY]}
+                    selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
                     onChange={(values) => {
                       const filteredValues = values.filter(i => i !== 'declined');
                       this.setState(prevState => ({ selected: { ...prevState.selected, [FIELD_NAMES.ETHNICITY]: filteredValues } }));
