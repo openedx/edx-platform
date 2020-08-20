@@ -80,7 +80,6 @@ class DemographicsCollectionModal extends React.Component {
       } else {
         document.body.classList.remove('modal-open');
       }
-      console.log('hi')
     }
   }
 
