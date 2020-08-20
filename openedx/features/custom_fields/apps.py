@@ -1,4 +1,4 @@
-""" The module contains thedefault django app config for custom_fields"""
+""" AppConfig of custom_fields app"""
 from django.apps import AppConfig
 
 

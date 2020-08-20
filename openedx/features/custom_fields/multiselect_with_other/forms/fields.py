@@ -1,4 +1,4 @@
-""" This module contains formfield for multi select"""
+""" This module contains formfield for to select multiple options from given choices"""
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -16,8 +16,7 @@ from openedx.features.custom_fields.multiselect_with_other.helpers import (
 
 
 class MultiSelectWithOtherFormField(MultiSelectFormField):
-    """ Form field class to handle other text input field within the multiselect field
-    """
+    """ Form field class to handle other text input field within the multiselect field"""
 
     def __init__(self, other_max_length=None, *args, **kwargs):
         if kwargs.get('choices'):
@@ -39,9 +38,9 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
 
     def validate(self, value):
         """ Validate that the input is a list or tuple.
-        :param value: list of selected choices
-        :type value: list
-        :raise ValidationError: Validation Error
+        :param value: list or tuple of selected choices
+        :type value: list or tuple
+        :raise ValidationError: Raise validation error when required value not provided
         """
         if self.required and not value:
             raise ValidationError(self.error_messages['required'], code='required')
@@ -57,7 +56,8 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
                     )
 
     def to_python(self, value):
-        """ This function filters for the value that is automatically put
+        """
+        This function filters for the value that is automatically put
         into the form payload when other field is selected in usage of
         MultiSelectWithOtherField
         :param value: list of strings
@@ -70,7 +70,8 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
         )
 
     def clean(self, value):
-        """ Return values that are not empty
+        """
+        Return values that are not empty
         :param value: list of selected choices
         :type value: list
         :return: values that are not empty

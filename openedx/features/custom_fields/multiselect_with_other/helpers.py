@@ -1,14 +1,15 @@
-""" This module contains helper functions for multi_select_With_other"""
+""" All helpers for custom_fields app"""
 
 from openedx.features.custom_fields.multiselect_with_other.constants import OTHER_FIELD_CHECKBOX_VALUE
 
 
 def add_other_field_in_choices(choices):
-    """ This function to separate other's value from list of choices
+    """
+    This function is adding other's value to list of choices
     :param choices: list of choices
     :type choices: list
-    :return: list with other field.
-    :rtype: list
+    :return: list, dict or tuple with other field.
+    :rtype: list, dict or tuple
     """
     _choices = choices
 
@@ -28,13 +29,14 @@ def add_other_field_in_choices(choices):
 
 
 def get_other_values(choices, value):
-    """ This function to separate other's value from list of choices
+    """
+    This function to separate other's value from list of choices
     :param choices: list of valid choices
     :param value: list of selected choices including other's value
     :type choices: list
     :type value: list
-    :return: list of other values.
-    :rtype: list
+    :return: list, dict or tuple with other field.
+    :rtype: list, dict or tuple
     """
     choice_values = [choice[0] for choice in choices]
     other_values = [val for val in value if val not in choice_values]
@@ -42,7 +44,8 @@ def get_other_values(choices, value):
 
 
 def filter_other_field_checkbox_value(values):
-    """ This function filters for the value that is automatically put
+    """
+    This function filters for the value that is automatically put
     into the form payload when other field is selected in usage of
     MultiSelectWithOtherField
     :param values: list of strings

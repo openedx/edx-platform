@@ -8,8 +8,7 @@ from openedx.features.custom_fields.multiselect_with_other.helpers import (
 
 
 class CheckboxSelectMultipleWithOther(CheckboxSelectMultiple):
-    """ Widget class to handle other value filed.
-    """
+    """ Widget class to handle other value filed."""
     other_choice = None
     other_option_template_name = 'other_field.html'
 
@@ -29,8 +28,7 @@ class CheckboxSelectMultipleWithOther(CheckboxSelectMultiple):
         return option
 
     def optgroups(self, name, value, attrs=None):
-        """ Return a list of optgroups for this widget.
-        """
+        """ Return a list of optgroups for this widget."""
 
         other_values = get_other_values(self.choices, value)
 
