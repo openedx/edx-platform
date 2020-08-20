@@ -53,3 +53,46 @@ def cursor_paginate_serializer(inner_serializer_class):
 
     PageOfInnerSerializer.__name__ = f'PageOf{inner_serializer_class.__name__}'
     return PageOfInnerSerializer
+
+
+def page_number_paginate_serializer(inner_serializer_class):
+    """
+    Create a page-number-paginated version of a serializer.
+
+    This is hacky workaround for an edx-api-doc-tools issue described here:
+    https://github.com/edx/api-doc-tools/issues/32
+
+    It assumes we are using page-number-style pagination and assumes a specific
+    schema for the pages. It should be removed once we address the underlying issue.
+
+    Arguments:
+        inner_serializer_class (type): A subclass of ``Serializer``.
+
+    Returns: type
+        A subclass of ``Serializer`` to model the schema of a page of a page-number-
+        paginated endpoint.
+    """
+    class PageOfInnerSerializer(serializers.Serializer):
+        """
+        A serializer for a page of a page-number-paginated list of ``inner_serializer_class``.
+        """
+        # pylint: disable=abstract-method
+        count = serializers.IntegerField(
+            help_text="Total number of objects across all pages."
+        )
+        previous = serializers.URLField(
+            required=False,
+            help_text="Link to the previous page or results, or null if this is the first.",
+        )
+        next = serializers.URLField(
+            required=False,
+            help_text="Link to the next page of results, or null if this is the last.",
+        )
+        results = serializers.ListField(
+            child=inner_serializer_class(),
+            help_text="The list of result objects on this page.",
+        )
+
+    PageOfInnerSerializer.__name__ = 'PageOf{}'.format(inner_serializer_class.__name__)
+    return PageOfInnerSerializer
+
