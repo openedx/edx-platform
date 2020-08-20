@@ -822,20 +822,26 @@ def _update_and_import_module(
     # Get to the point where XML import is happening inside the
     # modulestore that is eventually going to store the data.
     # Ticket: https://openedx.atlassian.net/browse/PLAT-1046
-    if block.location.block_type == 'library_content':
-        # if library exists, update source_library_version and children
-        # according to this existing library and library content block.
-        if store.get_library(block.source_library_key):
-            # Update library content block's children on draft branch
-            with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                LibraryToolsService(store, user_id).update_children(
-                    block,
-                    version=block.source_library_version,
-                )
 
-            # Publish it if importing the course for branch setting published_only.
-            if store.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
-                store.publish(block.location, user_id)
+    ## Disabling library content children update during import as we saw it cause
+    ## an issue where the children were recalculated causing learner's to lose their
+    ## current state.
+    ## If this is brought back in, also uncomment the tests in
+    ## cms/djangoapps/contentstore/views/tests/test_import_export.py
+    # if block.location.block_type == 'library_content':
+    #     # if library exists, update source_library_version and children
+    #     # according to this existing library and library content block.
+    #     if store.get_library(block.source_library_key):
+    #         # Update library content block's children on draft branch
+    #         with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
+    #             LibraryToolsService(store, user_id).update_children(
+    #                 block,
+    #                 version=block.source_library_version,
+    #             )
+
+    #         # Publish it if importing the course for branch setting published_only.
+    #         if store.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
+    #             store.publish(block.location, user_id)
 
     return block
 
