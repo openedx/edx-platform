@@ -155,18 +155,32 @@ from student.models import CourseEnrollment
     from openedx.core.djangoapps.enrollments.api import serialize_enrollments
     serialized_course_enrollments = serialize_enrollments(course_enrollments)
     demographics_enabled = getattr(settings, 'ENABLE_DEMOGRAPHICS_COLLECTION', False)
+    demographics_modal_enabled = getattr(settings, 'ENABLE_DEMOGRAPHICS_MODAL', False)
+
+    show_user_demographics_fields = show_user_demographics(
+        user,
+        enrollments=serialized_course_enrollments,
+        entitlements=course_entitlements
+    )
     display_demographics_banner = (
         demographics_enabled and
-        show_user_demographics(user, enrollments=serialized_course_enrollments, entitlements=course_entitlements) and
+        show_user_demographics_fields and
         show_call_to_action_for_user(user)
+    )
+    display_demographics_modal = (
+        demographics_enabled and
+        demographics_modal_enabled and
+        show_user_demographics_fields
     )
     account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
   %>
-  ${static.renderReact(
-    component="DemographicsCollectionModal",
-    id="dashboard-demographics-collection-modal",
-    props={"user": user.id},
-  )}
+  % if display_demographics_modal:
+    ${static.renderReact(
+      component="DemographicsCollectionModal",
+      id="dashboard-demographics-collection-modal",
+      props={"user": user.id},
+    )}
+  % endif
   % if display_demographics_banner:
   <a id="demographics-banner-link" class="btn" href="${account_mfe_url}#demographics-information">
     <div
