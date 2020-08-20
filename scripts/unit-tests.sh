@@ -36,9 +36,9 @@ if [[ -n "$TOXENV" ]]; then
     export NO_PREREQ_INSTALL="True"
 fi
 
-if [[ -n "$XDIST_NUM_TASKS" ]]; then
+if [[ -n "$XDIST_NUM_WORKERS" ]]; then
     bash scripts/xdist/prepare_xdist_nodes.sh
-    PAVER_ARGS="-v --xdist_ip_addresses="$(<pytest_task_ips.txt)""
+    PAVER_ARGS="-v --xdist_ip_addresses="$(<pytest_worker_ips.txt)""
     export SHARD="all"
     if [[ -n "$XDIST_REMOTE_NUM_PROCESSES" ]]; then
         PARALLEL="--processes=$XDIST_REMOTE_NUM_PROCESSES"
@@ -49,6 +49,7 @@ else
     PAVER_ARGS="-v"
     PARALLEL="--processes=-1"
 fi
+
 
 case "${TEST_SUITE}" in
 
@@ -126,4 +127,46 @@ case "${TEST_SUITE}" in
                 ;;
         esac
         ;;
+
+    "philu-unit")
+        philu_apps_list=(
+            "openedx/features/assessment/"
+            "openedx/features/badging/"
+            "openedx/features/classrooms/"
+            "openedx/features/cms/"
+            "openedx/features/course_card/"
+            "openedx/features/custom_fields/"
+            "openedx/features/idea/"
+            "openedx/features/job_board/"
+            "openedx/features/marketplace/"
+            "openedx/features/ondemand_email_preferences/"
+            "openedx/features/partners/"
+            "openedx/features/philu_courseware/"
+            "openedx/features/philu_utils/"
+            "openedx/features/smart_referral/"
+            "openedx/features/specializations/"
+            "openedx/features/student_account/"
+            "openedx/features/student_certificates/"
+            "openedx/features/teams/"
+            "openedx/features/user_leads/"
+            "openedx/feature/xmodules"
+            "common/djangoapps/custom_settings/"
+            "common/djangoapps/mailchimp_pipeline/"
+            "common/djangoapps/nodebb/"
+            "common/djangoapps/philu_commands/"
+            "common/djangoapps/philu_commands/"
+            "common/lib/discovery_client/"
+            "common/lib/mandrill_client/"
+            "common/lib/nodebb_client/"
+            "common/lib/surveygizmo_client/"
+            "common/lib/surveygizmo_client/"
+            "lms/djangoapps/homepage/"
+            "lms/djangoapps/onboarding/"
+            "lms/djangoapps/philu_api/"
+            "lms/djangoapps/philu_overrides/"
+            "lms/djangoapps/student_dashboard/"
+        )
+        philu_apps_str="${philu_apps_list[@]}"
+        paver test_system -s lms -t "${philu_apps_str}" ${PAVER_ARGS} ${PARALLEL} 2> philu-tests.log
+        mv reports/.coverage reports/.coverage.philu
 esac

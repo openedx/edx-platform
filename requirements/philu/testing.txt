@@ -1,0 +1,17 @@
+# TODO: Find replacement of add_or_replace_params method with urllib or some some django builtin package and remove this dependency
+w3lib==1.21.0
+-e git+https://github.com/philanthropy-u/pynodebb.git#egg=pynodebb
+SurveyGizmo==1.2.3
+mandrill==1.0.57
+pyminizip==0.2.1
+channels==1.1.8
+asgi-redis==1.4.3
+imgkit==1.0.1
+pdfkit==0.6.1
+-e git+https://github.com/philanthropy-u/xblock-poll#egg=xblock-poll
+-e git+https://github.com/philanthropy-u/edx-notifications.git@9c602923d0e8a7b512a52bc4d0df5c7043286386#egg=edx-notifications
+django-multiselectfield==0.1.12
+# Downgrading following packages back to edX's versions as 'channels' has upgraded them.
+cryptography==2.4.2
+attrs==17.4.0
+Twisted==16.6.0
