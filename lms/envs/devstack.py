@@ -162,7 +162,7 @@ FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
 ########################### Milestones #################################
 FEATURES['MILESTONES_APP'] = True
 
-########################### Milestones #################################
+########################### Organizations #################################
 FEATURES['ORGANIZATIONS_APP'] = True
 
 ########################### Entrance Exams #################################
