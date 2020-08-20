@@ -42,7 +42,7 @@ RUN apt-get update && \
     python3-dev \
     python3-pip \
     python3.5 \
-    rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -77,7 +77,7 @@ RUN pip install -r requirements/edx/base_not_in_tree.txt
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 # TODO: Shouldn't we use node==12.11.1?
-RUN nodeenv /edx/app/edx-platform/nodeenv --node=8.9.3 --prebuilt
+RUN nodeenv /edx/app/edx-platform/nodeenv --node=12.11.1 --prebuilt
 RUN npm set progress=false && npm install
 
 # Install remaining requirements -- that is, the in-tree ones.
