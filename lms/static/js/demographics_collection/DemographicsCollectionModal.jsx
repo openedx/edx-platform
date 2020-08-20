@@ -31,7 +31,7 @@ class DemographicsCollectionModal extends React.Component {
       options: {},
       error: false,
       loading: true,
-      open: true,
+      open: false,
       selected: Object.values(FIELD_NAMES).reduce((acc, current) => ({ ...acc, [current]: '' }), {}),
     }
     this.handleSelectChange = this.handleSelectChange.bind(this);
@@ -64,14 +64,24 @@ class DemographicsCollectionModal extends React.Component {
         },
       })
       data = await response.json();
+      if(data[FIELD_NAMES.ETHNICITY]) {
+        data[FIELD_NAMES.ETHNICITY] = this.reduceEthnicityArray(data[FIELD_NAMES.ETHNICITY]);
+      }
+      await this.setState({ options: options.actions.POST, loading: false, selected: data, open: true });
     } catch (error) {
       this.setState(error)
     }
-    if(data[FIELD_NAMES.ETHNICITY]) {
-      data[FIELD_NAMES.ETHNICITY] = this.reduceEthnicityArray(data[FIELD_NAMES.ETHNICITY])
+  }
+  
+  componentDidUpdate(prevProps, prevState) {
+    if(prevState.open !== this.state.open) {
+      if(this.state.open) {
+        document.body.classList.add('modal-open');
+      } else {
+        document.body.classList.remove('modal-open');
+      }
+      console.log('hi')
     }
-    await this.setState({ options: options.actions.POST, loading: false, selected: data })
-    
   }
 
   loadOptions(field) {
@@ -137,8 +147,12 @@ class DemographicsCollectionModal extends React.Component {
   }
 
   render() {
-    if (!this.state.open) {
+    if (!this.state.open && !this.state.loading) {
       return null;
+    }
+
+    if(this.state.loading) {
+      <div className="demographics-collection-modal d-flex justify-content-center align-items-start"/>
     }
     return (
       <div className="demographics-collection-modal d-flex justify-content-center align-items-start">
