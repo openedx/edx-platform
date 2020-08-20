@@ -63,11 +63,16 @@ class DemographicsCollectionModal extends React.Component {
           'USE-JWT-COOKIE': true,
         },
       })
+      if(response.status !== 200) {
+        this.setState({ options: options.actions.POST, loading: false, open: true });
+        error = await response.json();
+        throw error;
+      }
       data = await response.json();
       if(data[FIELD_NAMES.ETHNICITY]) {
         data[FIELD_NAMES.ETHNICITY] = this.reduceEthnicityArray(data[FIELD_NAMES.ETHNICITY]);
       }
-      await this.setState({ options: options.actions.POST, loading: false, selected: data, open: true });
+      this.setState({ options: options.actions.POST, loading: false, selected: data, open: true });
     } catch (error) {
       this.setState(error)
     }
@@ -149,6 +154,7 @@ class DemographicsCollectionModal extends React.Component {
     if (!this.state.open && !this.state.loading) {
       return null;
     }
+    console.log(this.state)
 
     if(this.state.loading) {
       <div className="demographics-collection-modal d-flex justify-content-center align-items-start"/>
@@ -183,6 +189,7 @@ class DemographicsCollectionModal extends React.Component {
                     selectOnChange={this.handleSelectChange}
                     labelText={"Gender identity"}
                     options={[
+                      <option value="default">Select gender</option>,
                       this.loadOptions(FIELD_NAMES.GENDER)
                     ]}
                     showInput={wizardConsumer[FIELD_NAMES.GENDER] == "self-describe"}
@@ -198,7 +205,7 @@ class DemographicsCollectionModal extends React.Component {
                     label="Which of the following describes you best?"
                     emptyLabel="Check all that apply"
                     options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, { choices: [] }).choices}
-                    selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
+                    selected={this.state.selected[FIELD_NAMES.ETHNICITY]}
                     onChange={(values) => {
                       const filteredValues = values.filter(i => i !== 'declined');
                       this.setState(prevState => ({ selected: { ...prevState.selected, [FIELD_NAMES.ETHNICITY]: filteredValues } }));
@@ -220,7 +227,7 @@ class DemographicsCollectionModal extends React.Component {
                     name={FIELD_NAMES.INCOME} id={FIELD_NAMES.INCOME}
                     value={wizardConsumer[FIELD_NAMES.INCOME]}
                   >
-                    <option>Select income</option>
+                    <option value="default">Select income</option>
                     {
                       this.loadOptions(FIELD_NAMES.INCOME)
                     }
@@ -239,7 +246,7 @@ class DemographicsCollectionModal extends React.Component {
                     id={FIELD_NAMES.MILITARY}
                     value={wizardConsumer[FIELD_NAMES.MILITARY]}
                   >
-                    <option>Select service branch</option>
+                    <option value="default">Select service branch</option>
                     {
                       this.loadOptions(FIELD_NAMES.MILITARY)
                     }
@@ -271,7 +278,7 @@ class DemographicsCollectionModal extends React.Component {
                     id={FIELD_NAMES.PARENT_EDUCATION}
                     value={wizardConsumer[FIELD_NAMES.PARENT_EDUCATION]}
                   >
-                    <option>Select guardian education</option>
+                    <option value="default">Select guardian education</option>
                     {
                       this.loadOptions(FIELD_NAMES.PARENT_EDUCATION)
                     }
@@ -308,7 +315,7 @@ class DemographicsCollectionModal extends React.Component {
                     id={FIELD_NAMES.CURRENT_WORK}
                     value={wizardConsumer[FIELD_NAMES.CURRENT_WORK]}
                   >
-                    <option>Select current industry</option>
+                    <option value="default">Select current industry</option>
                     {
                       this.loadOptions(FIELD_NAMES.CURRENT_WORK)
                     }
@@ -321,7 +328,7 @@ class DemographicsCollectionModal extends React.Component {
                     id={FIELD_NAMES.FUTURE_WORK}
                     value={wizardConsumer[FIELD_NAMES.FUTURE_WORK]}
                   >
-                    <option>Select prospective industry</option>
+                    <option value="default">Select prospective industry</option>
                     {
                       this.loadOptions(FIELD_NAMES.FUTURE_WORK)
                     }
