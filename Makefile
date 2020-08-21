@@ -111,23 +111,22 @@ split_requirements:
 
 # These make targets currently only build LMS images.
 docker_build:
-	docker build . -f Dockerfile --target lms -t openedx/edx-platform
-	docker build . -f Dockerfile --target lms-newrelic -t openedx/edx-platform:latest-newrelic
-	docker build . -f Dockerfile --target lms-devstack -t openedx/edx-platform:latest-devstack
+	docker build . -f Dockerfile --target lms -t openedx/edx-platform:lms
+	docker build . -f Dockerfile --target lms-newrelic -t openedx/edx-platform:lms-newrelic
+	docker build . -f Dockerfile --target lms-devstack -t openedx/edx-platform:lms-devstack
 
 docker_tag: docker_build
-	docker tag openedx/edx-platform openedx/edx-platform:${GITHUB_SHA}
-	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-newrelic
-	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-devstack
+	docker tag openedx/edx-platform:lms openedx/edx-platform:lms-${GITHUB_SHA}
+	docker tag openedx/edx-platform:lms-newrelic openedx/edx-platform:lms-newrelic-${GITHUB_SHA}
+	docker tag openedx/edx-platform:lms-newrelic openedx/edx-platform:lms-devstack-${GITHUB_SHA}
 
 docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
 
 docker_push: docker_tag docker_auth ## push to docker hub
-	docker push 'openedx/edx-platform:latest'
-	docker push "openedx/edx-platform:${GITHUB_SHA}"
-	docker push 'openedx/edx-platform:latest-newrelic'
-	docker push "openedx/edx-platform:${GITHUB_SHA}-newrelic"
-	docker push 'openedx/edx-platform:latest-devstack'
-	docker push "openedx/edx-platform:${GITHUB_SHA}-devstack"
-
+	docker push 'openedx/edx-platform:lms'
+	docker push "openedx/edx-platform:lms-${GITHUB_SHA}"
+	docker push 'openedx/edx-platform:lms-newrelic'
+	docker push "openedx/edx-platform:lms-newrelic-${GITHUB_SHA}"
+	docker push 'openedx/edx-platform:lms-devstack'
+	docker push "openedx/edx-platform:lms-devstack-${GITHUB_SHA}"
