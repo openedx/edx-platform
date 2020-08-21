@@ -1,10 +1,10 @@
-
 import React from 'react';
 import get from 'lodash/get';
 import Wizard from './Wizard';
 import Cookies from 'js-cookie';
 import { SelectWithInput } from './SelectWithInput'
 import { MultiselectDropdown } from './MultiselectDropdown';
+import AxiosJwtTokenService from '../jwt_auth/AxiosJwtTokenService';
 
 
 const FIELD_NAMES = {
@@ -21,7 +21,7 @@ const FIELD_NAMES = {
   ETHNICITY: "user_ethnicity",
   WORK_STATUS: "work_status",
   WORK_STATUS_DESCRIPTION: "work_status_description",
-}
+};
 
 
 class DemographicsCollectionModal extends React.Component {
@@ -33,10 +33,18 @@ class DemographicsCollectionModal extends React.Component {
       loading: true,
       open: false,
       selected: Object.values(FIELD_NAMES).reduce((acc, current) => ({ ...acc, [current]: '' }), {}),
-    }
+    };
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.loadOptions = this.loadOptions.bind(this);
+
+    // Get JWT token service to ensure the JWT token refreshes if needed
+    const accessToken = this.props.jwtAuthToken;
+    const refreshUrl = `${this.props.lmsRootUrl}/login_refresh`;
+    this.jwtTokenService = new AxiosJwtTokenService(
+      accessToken,
+      refreshUrl,
+    );
   }
 
   async componentDidMount() {
@@ -46,7 +54,7 @@ class DemographicsCollectionModal extends React.Component {
     let data = {};
     // gather options for the demographics selects
     try {
-      optionsResponse = await fetch('http://localhost:18360/demographics/api/v1/demographics/', { method: 'OPTIONS' })
+      optionsResponse = await fetch('http://localhost:18360/demographics/api/v1/demographics/', { method: 'OPTIONS' });
       options = await optionsResponse.json();
     } catch (error) {
       this.setState(error);
@@ -54,6 +62,9 @@ class DemographicsCollectionModal extends React.Component {
 
     // gather previously answers questions
     try {
+      // This call will ensure the JWT token is available for the following calls
+      // to other endpoints.
+      await this.jwtTokenService.getJwtToken();
       response = await fetch(`http://localhost:18360/demographics/api/v1/demographics/${this.props.user}/`, {
         method: 'GET',
         credentials: 'include',
@@ -62,7 +73,7 @@ class DemographicsCollectionModal extends React.Component {
           'X-CSRFTOKEN': Cookies.get('demographics_csrftoken'),
           'USE-JWT-COOKIE': true,
         },
-      })
+      });
       if(response.status !== 200) {
         this.setState({ options: options.actions.POST, loading: false, open: true });
         error = await response.json();
@@ -113,9 +124,10 @@ class DemographicsCollectionModal extends React.Component {
       body: JSON.stringify({
         [name]: value,
       }),
-    }
+    };
 
     try {
+      await this.jwtTokenService.getJwtToken();
       const response = await fetch(`http://localhost:18360/demographics/api/v1/demographics/${this.props.user}/`, options)
     } catch (e) {
       console.log(e);

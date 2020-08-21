@@ -178,7 +178,11 @@ from student.models import CourseEnrollment
     ${static.renderReact(
       component="DemographicsCollectionModal",
       id="dashboard-demographics-collection-modal",
-      props={"user": user.id},
+      props={
+        "user": user.id,
+        "lmsRootUrl": getattr(settings, 'LMS_ROOT_URL', ''),
+        "jwtAuthToken": getattr(settings, 'JWT_AUTH', {}).get('JWT_AUTH_COOKIE_HEADER_PAYLOAD', '')
+      },
     )}
   % endif
   % if display_demographics_banner:
