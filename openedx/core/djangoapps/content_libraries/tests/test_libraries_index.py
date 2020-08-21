@@ -3,9 +3,11 @@ Testing indexing of blockstore based content libraries
 """
 
 from django.conf import settings
+from django.core.management import call_command
 from django.test.utils import override_settings
-from search.search_engine_base import SearchEngine
+from mock import patch
 from opaque_keys.edx.locator import LibraryLocatorV2
+from search.search_engine_base import SearchEngine
 
 from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryNotIndexedException
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
@@ -46,6 +48,24 @@ class ContentLibraryIndexerIndexer(ContentLibrariesRestApiTest):
             self.assertEqual(response['last_published'], None)
             self.assertEqual(response['has_unpublished_changes'], False)
             self.assertEqual(response['has_unpublished_deletes'], False)
+
+    def test_schema_updates(self):
+        """
+        Test that outdated indexes aren't retrieved
+        """
+        result = self._create_library(slug="test-lib-schemaupdates-1", title="Title 1", description="Description")
+        library_key = LibraryLocatorV2.from_string(result['id'])
+
+        ContentLibraryIndexer.get_libraries([library_key])
+
+        with patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SCHEMA_VERSION",
+                   new=1):
+            with self.assertRaises(LibraryNotIndexedException):
+                ContentLibraryIndexer.get_libraries([library_key])
+
+            call_command("reindex_content_library", all=True, quiet=True)
+
+            ContentLibraryIndexer.get_libraries([library_key])
 
     def test_remove_all_libraries(self):
         """

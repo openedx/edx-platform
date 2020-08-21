@@ -39,6 +39,8 @@ class ContentLibraryIndexer:
     INDEX_NAME = "content_library_index"
     LIBRARY_DOCUMENT_TYPE = "content_library"
 
+    SCHEMA_VERSION = 0
+
     @classmethod
     def index_libraries(cls, library_keys):
         """
@@ -60,7 +62,10 @@ class ContentLibraryIndexer:
 
             bundle_metadata = get_bundle(ref.bundle_uuid)
 
+            # NOTE: Increment ContentLibraryIndexer.SCHEMA_VERSION if the following schema is updated to avoid dealing
+            # with outdated indexes which might cause errors due to missing/invalid attributes.
             library_dict = {
+                "schema_version": ContentLibraryIndexer.SCHEMA_VERSION,
                 "id": str(library_key),
                 "uuid": str(bundle_metadata.uuid),
                 "title": bundle_metadata.title,
@@ -84,7 +89,10 @@ class ContentLibraryIndexer:
         library_keys_str = [str(key) for key in library_keys]
         response = searcher.search(
             doc_type=cls.LIBRARY_DOCUMENT_TYPE,
-            field_dictionary={"id": library_keys_str},
+            field_dictionary={
+                "id": library_keys_str,
+                "schema_version": ContentLibraryIndexer.SCHEMA_VERSION
+            },
             size=MAX_SIZE,
         )
 

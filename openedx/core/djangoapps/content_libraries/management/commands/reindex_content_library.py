@@ -1,6 +1,8 @@
 """ Management command to update content libraries' search index """
 
 
+import logging
+
 from textwrap import dedent
 
 from django.core.management import BaseCommand
@@ -43,20 +45,29 @@ class Command(BaseCommand):
             dest='all',
             help='Reindex all libraries'
         )
+        parser.add_argument(
+            '--force',
+            action='store_true',
+            dest='force',
+            help='Run command without user prompt for confirmation'
+        )
         parser.add_argument('library_ids', nargs='*')
 
     def handle(self, *args, **options):
         if options['clear-all']:
-            if query_yes_no(self.CONFIRMATION_PROMPT_CLEAR, default="no"):
+            if options['force'] or query_yes_no(self.CONFIRMATION_PROMPT_CLEAR, default="no"):
+                logging.info("Removing all libraries from the index")
                 ContentLibraryIndexer.remove_all_libraries()
             return
 
         if options['all']:
-            if query_yes_no(self.CONFIRMATION_PROMPT_ALL, default="no"):
+            if options['force'] or query_yes_no(self.CONFIRMATION_PROMPT_ALL, default="no"):
+                logging.info("Indexing all libraries")
                 library_keys = [library.library_key for library in ContentLibrary.objects.all()]
             else:
                 return
         else:
+            logging.info("Indexing libraries: {}".format(options['library_ids']))
             library_keys = list(map(LibraryLocatorV2.from_string, options['library_ids']))
 
         ContentLibraryIndexer.index_libraries(library_keys)
