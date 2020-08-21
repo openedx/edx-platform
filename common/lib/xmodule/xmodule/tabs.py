@@ -471,6 +471,9 @@ class CourseTabList(List):
     def upgrade_tabs(cls, tabs):
         """
         Remove course_info tab, and rename courseware tab to Course if needed
+
+        We are removing the `course_info` tab as part of the removal of the
+        UNIFIED_COURSE_TAB waffle flag in TNL-7061
         """
         if tabs and len(tabs) > 1:
             # Reverse them so that course_info is first, and rename courseware to Course
