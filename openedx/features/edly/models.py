@@ -15,6 +15,7 @@ class EdlyOrganization(TimeStampedModel):
     """
     name = models.CharField(max_length=255)
     slug = models.CharField(max_length=50, unique=True, validators=[EDLY_SLUG_VALIDATOR])
+    enable_all_edly_sub_org_login = models.BooleanField(default=False)
 
     def __str__(self):
         return '{name}: ({slug})'.format(name=self.name, slug=self.slug)

@@ -26,6 +26,8 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.edly.utils import create_user_link_with_edly_sub_organization, user_can_login_on_requested_edly_organization
+from openedx.features.edly.validators import is_edly_user_allowed_to_login
 from student.models import LoginFailures
 from student.views import send_reactivation_email_for_user
 from student.forms import send_password_reset_email_for_user
@@ -34,8 +36,6 @@ import third_party_auth
 from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password
-
-from openedx.features.edly.validators import is_edly_user_allowed_to_login
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -361,7 +361,11 @@ def login_user(request):
             _handle_failed_authentication(user, possibly_authenticated_user)
 
         if not is_edly_user_allowed_to_login(request, possibly_authenticated_user):
-            raise AuthFailedError(_('You are not allowed to login on this site.'))
+            if user_can_login_on_requested_edly_organization(request, possibly_authenticated_user):
+                create_user_link_with_edly_sub_organization(request, possibly_authenticated_user)
+            else:
+                raise AuthFailedError(_('You are not allowed to login on this site.'))
+
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 

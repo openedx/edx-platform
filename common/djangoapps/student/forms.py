@@ -26,7 +26,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from openedx.features.edly.utils import user_belongs_to_edly_organization
+from openedx.features.edly.utils import user_belongs_to_edly_sub_organization
 from student.message_types import AccountRecovery as AccountRecoveryMessage, PasswordReset
 from student.models import AccountRecovery, CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import validate_password
@@ -131,7 +131,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
         user.
         """
         for user in self.users_cache:
-            if user_belongs_to_edly_organization(request, user):
+            if user_belongs_to_edly_sub_organization(request, user):
                 send_password_reset_email_for_user(user, request)
 
 
@@ -182,7 +182,7 @@ class AccountRecoveryForm(PasswordResetFormNoActive):
         user.
         """
         for user in self.users_cache:
-            if user_belongs_to_edly_organization(request, user):
+            if user_belongs_to_edly_sub_organization(request, user):
                 send_account_recovery_email_for_user(user, request, user.account_recovery.secondary_email)
 
 

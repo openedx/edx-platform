@@ -207,7 +207,7 @@ def set_global_course_creator_status(request, user, set_global_creator):
         GlobalCourseCreatorRole(edx_org).remove_users(user)
 
 
-def user_belongs_to_edly_organization(request, user):
+def user_belongs_to_edly_sub_organization(request, user):
     """
     Check if user belongs to the requested URL site.
 
@@ -216,7 +216,7 @@ def user_belongs_to_edly_organization(request, user):
         user (object): User object.
 
     Returns:
-        bool: Returns True if User belongs to Edly Organization Otherwise False.
+        bool: Returns True if User belongs to Edly Sub-organization Otherwise False.
     """
 
     current_site = request.site
@@ -247,3 +247,46 @@ def edly_panel_user_has_edly_org_access(request):
             settings.EDLY_PANEL_USERS_GROUP,
         ]
     ).exists()
+
+
+def user_can_login_on_requested_edly_organization(request, user):
+    """
+    Check if user can login on the requested URL site.
+
+    A user can be linked with only one edly organization (parent
+    organization) but can be linked with its multiple edly sub
+    organizations.
+
+    A user can login on all edly sub organizations given that the parent
+    edly organization has enabled "enable_all_edly_sub_org_login" field.
+
+    Arguments:
+        request: HTTP request object,
+        user (object): User object.
+
+    Returns:
+        bool: Returns True if User can login, False otherwise
+    """
+
+    current_site = request.site
+    try:
+        edly_sub_org = EdlySubOrganization.objects.get(
+            Q(lms_site=current_site) |
+            Q(studio_site=current_site) |
+            Q(preview_site=current_site)
+        )
+    except EdlySubOrganization.DoesNotExist:
+        return False
+
+    if not edly_sub_org.edly_organization.enable_all_edly_sub_org_login:
+        return False
+
+    current_edly_org_slug_of_user = None
+    edly_sub_org_of_user = user.edly_profile.edly_sub_organizations.first()
+    if edly_sub_org_of_user:
+        current_edly_org_slug_of_user = edly_sub_org_of_user.edly_organization.slug
+
+    if current_edly_org_slug_of_user == edly_sub_org.edly_organization.slug:
+        return True
+
+    return False
