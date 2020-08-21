@@ -2,24 +2,23 @@
 """Tests for account creation"""
 
 import json
-from unittest import skipIf, skipUnless
 from datetime import datetime
+from unittest import skipIf, skipUnless
 
 import ddt
 import httpretty
 import mock
 import six
-from six.moves import range
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.cache import cache
 from django.test import TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
-
+from six.moves import range
 from social_django.models import Partial, UserSocialAuth
 
 from openedx.core.djangoapps.site_configuration.helpers import get_value
@@ -32,25 +31,24 @@ from openedx.core.djangoapps.user_api.accounts import (
     EMAIL_MIN_LENGTH,
     NAME_MAX_LENGTH,
     REQUIRED_FIELD_CONFIRM_EMAIL_MSG,
-    USERNAME_MAX_LENGTH,
-    USERNAME_MIN_LENGTH,
     USERNAME_BAD_LENGTH_MSG,
     USERNAME_CONFLICT_MSG,
     USERNAME_INVALID_CHARS_ASCII,
     USERNAME_INVALID_CHARS_UNICODE,
+    USERNAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH
 )
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.accounts.tests import testutils
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
     RetirementTestCase,
     fake_requested_retirement,
-    setup_retirement_states,
+    setup_retirement_states
 )
-from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_constants import SORTED_COUNTRIES
+from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
-from openedx.core.djangoapps.user_authn.views.register import RegistrationValidationThrottle, \
-    REGISTRATION_FAILURE_LOGGING_FLAG
+from openedx.core.djangoapps.user_authn.views.register import REGISTRATION_FAILURE_LOGGING_FLAG
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
@@ -2098,6 +2096,10 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     endpoint_name = 'registration_validation'
     path = reverse(endpoint_name)
 
+    def setUp(self):
+        super(RegistrationValidationViewTests, self).setUp()
+        cache.clear()
+
     def get_validation_decision(self, data):
         response = self.client.post(self.path, data)
         return response.data.get('validation_decisions', {})
@@ -2297,7 +2299,8 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         to enforce limits; that's why this test needs a "real"
         default cache (as opposed to the usual-for-tests DummyCache)
         """
-        for _ in range(RegistrationValidationThrottle().num_requests):
-            self.request_without_auth('post', self.path)
+        for _ in range(int(settings.REGISTRATION_VALIDATION_RATELIMIT.split('/')[0])):
+            response = self.request_without_auth('post', self.path)
+            self.assertNotEqual(response.status_code, 403)
         response = self.request_without_auth('post', self.path)
-        self.assertEqual(response.status_code, 429)
+        self.assertEqual(response.status_code, 403)

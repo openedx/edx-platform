@@ -15,19 +15,20 @@ from django.core.validators import ValidationError
 from django.db import transaction
 from django.dispatch import Signal
 from django.http import HttpResponse, HttpResponseForbidden
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views.decorators.debug import sensitive_post_parameters
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
-from pytz import UTC
-from requests import HTTPError
-from six import text_type
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.views.decorators.debug import sensitive_post_parameters
 from ipware.ip import get_ip
+from pytz import UTC
+from ratelimit.decorators import ratelimit
+from requests import HTTPError
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
+from six import text_type
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
@@ -48,27 +49,27 @@ from openedx.core.djangoapps.user_api.accounts.api import (
     get_username_existence_validation_error,
     get_username_validation_error
 )
-from openedx.core.djangoapps.user_authn.utils import generate_password, is_registration_api_v1
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.utils import generate_password, is_registration_api_v1
 from openedx.core.djangoapps.user_authn.views.registration_form import (
-    get_registration_extension_form,
     AccountCreationForm,
-    RegistrationFormFactory
+    RegistrationFormFactory,
+    get_registration_extension_form
 )
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from student.helpers import (
+    AccountValidationError,
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
-    do_create_account,
-    AccountValidationError,
+    do_create_account
 )
 from student.models import (
     RegistrationCookieConfiguration,
     UserAttribute,
     create_comments_service_user,
     email_exists_or_retired,
-    username_exists_or_retired,
+    username_exists_or_retired
 )
 from student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
@@ -110,6 +111,7 @@ REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'registration'),
     flag_name=u'enable_failure_logging',
 )
+REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 
 
 @transaction.non_atomic_requests
@@ -575,19 +577,6 @@ class RegistrationView(APIView):
             pass
 
 
-class RegistrationValidationThrottle(AnonRateThrottle):
-    """
-    Custom throttle rate for /api/user/v1/validation/registration
-    endpoint's use case.
-    """
-
-    scope = 'registration_validation'
-
-    def get_ident(self, request):
-        client_ip = get_ip(request)
-        return client_ip
-
-
 # pylint: disable=line-too-long
 class RegistrationValidationView(APIView):
     """
@@ -677,7 +666,6 @@ class RegistrationValidationView(APIView):
 
     # This end-point is available to anonymous users, so no authentication is needed.
     authentication_classes = []
-    throttle_classes = (RegistrationValidationThrottle,)
 
     def name_handler(self, request):
         name = request.data.get('name')
@@ -725,6 +713,9 @@ class RegistrationValidationView(APIView):
         "country": country_handler
     }
 
+    @method_decorator(
+        ratelimit(key=REAL_IP_KEY, rate=settings.REGISTRATION_VALIDATION_RATELIMIT, method='POST', block=True)
+    )
     def post(self, request):
         """
         POST /api/user/v1/validation/registration/
