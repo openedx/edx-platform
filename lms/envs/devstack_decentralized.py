@@ -11,8 +11,9 @@ from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 # pylint: enable=unicode-format-string
 #####################################################################
-from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from edx_django_utils.plugins import add_plugins
+
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
