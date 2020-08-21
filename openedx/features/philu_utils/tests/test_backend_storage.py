@@ -7,7 +7,7 @@ from django.core.files.base import ContentFile
 from django.test import TestCase
 
 from common.test.utils import MockS3Mixin
-from openedx.features.philu_utils.backend_storage import CustomS3Storage
+from openedx.features.philu_utils.backend_storage import CustomS3Storage, ScormXblockS3Storage
 
 
 class CustomS3StorageTest(MockS3Mixin, TestCase):
@@ -18,6 +18,7 @@ class CustomS3StorageTest(MockS3Mixin, TestCase):
     def setUp(self):
         super(CustomS3StorageTest, self).setUp()
         self.custom_storage = CustomS3Storage()
+        self.scorm_xblock_storage = ScormXblockS3Storage()
         # create virtual bucket to store images
         connect = connect_s3(aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key)
         connect.create_bucket(self.aws_bucket_name)
@@ -62,3 +63,14 @@ class CustomS3StorageTest(MockS3Mixin, TestCase):
         self.custom_storage.delete(name)
         # assert that file has been deleted from virtual S3 bucket
         self.assertFalse(Key(bucket=self.bucket, name=name).exists())
+
+    def test_scorm_s3_storage_open_file_successfully(self):
+        """
+        Upload file to S3 and assert that it does not exist on S3 or the file is not retrieved correctly.
+        """
+        name = self.scorm_xblock_storage.save('path/img/dummy.txt', ContentFile(b'This is dummy text'))
+        tempfile = self.scorm_xblock_storage.open(name)
+        # asset if file is not retrieved correctly
+        self.assertEquals(tempfile.read(), b'This is dummy text')
+        # assert that file does not exists.
+        self.assertTrue(self.scorm_xblock_storage.exists(name))

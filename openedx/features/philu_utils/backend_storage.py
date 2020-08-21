@@ -1,13 +1,15 @@
 import os
+import tempfile
 from datetime import datetime
 from logging import getLogger
+
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+from django.utils.translation import ugettext_lazy as _
 
 from boto import connect_s3
 from boto.s3.key import Key
 from botocore.exceptions import ClientError
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-from django.utils.translation import ugettext_lazy as _
 
 from .constants import AWS_S3_PATH
 
@@ -99,3 +101,17 @@ class CustomS3Storage(FileSystemStorage):
     def exists(self, name):
         """Do not allow base class to update name in endless loop"""
         return False
+
+
+class ScormXblockS3Storage(CustomS3Storage):
+    def exists(self, name):
+        return super(ScormXblockS3Storage, self)._exists(name)
+
+    def open(self, name, mode='rb'):
+        client = self._s3_client()
+        bucket = client.get_bucket(self.aws_bucket_name)  # get bucket
+        key = bucket.get_key(name)  # get key (the file in s3)
+        fp = tempfile.TemporaryFile()
+        key.get_file(fp)
+        fp.seek(0)
+        return fp
