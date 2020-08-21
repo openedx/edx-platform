@@ -61,32 +61,21 @@ ENV PATH /edx/app/edx-platform/edx-platform/bin:${PATH}
 ENV SETTINGS production
 RUN mkdir -p /edx/etc/
 
-# Distinguish requirements that come from code within edx-platform
-# from external requirements (specifically, those from pip or GitHub).
-# Then, install just external requirements.
-# This way, the cached installations of external requirements are not
-# busted whenever edx-platform code is changed.
-# TODO this is quite a hack and should be done in `make upgrade` probably.
-RUN pip install setuptools==39.0.1 pip==9.0.3
-COPY requirements/ requirements/
-RUN grep -E    "^-e (common|openedx|lms|cms|\.)(/| )" requirements/edx/base.txt > requirements/edx/base_in_tree.txt
-RUN grep -E -v "^-e (common|openedx|lms|cms|\.)(/| )" requirements/edx/base.txt > requirements/edx/base_not_in_tree.txt
-RUN pip install -r requirements/edx/base_not_in_tree.txt
-
-# Copy just JS requirements and install them.
-COPY package.json package.json
-COPY package-lock.json package-lock.json
-# TODO: Shouldn't we use node==12.11.1?
-RUN nodeenv /edx/app/edx-platform/nodeenv --node=12.11.1 --prebuilt
-RUN npm set progress=false && npm install
-
-# Install remaining requirements -- that is, the in-tree ones.
+# Install Python requirements
+RUN pip install pip==20.0.2
 COPY setup.py setup.py
 COPY common common
 COPY openedx openedx
 COPY lms lms
 COPY cms cms
-RUN pip install -r requirements/edx/base_in_tree.txt
+COPY requirements/edx/base.txt requirements/edx/base.txt
+RUN pip install -r requirements/edx/base.txt
+
+# Copy just JS requirements and install them.
+COPY package.json package.json
+COPY package-lock.json package-lock.json
+RUN nodeenv /edx/app/edx-platform/nodeenv --node=12.11.1 --prebuilt
+RUN npm set progress=false && npm install
 
 ENV LMS_CFG /edx/etc/lms.yml
 ENV STUDIO_CFG /edx/etc/studio.yml
