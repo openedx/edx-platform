@@ -1,73 +1,54 @@
+"""
+All helpers for openassessment
+"""
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pytz import utc
+from submissions.models import Submission
+
+from openassessment.assessment.api.staff import STAFF_TYPE
 from openassessment.assessment.models import Assessment, AssessmentPart
 from openassessment.assessment.serializers import rubric_from_dict
 from openassessment.workflow.models import AssessmentWorkflow
-from pytz import utc
-from submissions.api import reset_score, set_score
-from submissions.models import Submission
-
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.url_utils import unquote_slashes
-from openedx.features.philu_utils.utils import get_anonymous_user
 from xmodule.modulestore.django import modulestore
 
-from .constants import (
-    ASSESSMENT_WORKFLOW_WAITING_STATUS,
-    DAYS_TO_WAIT_AUTO_ASSESSMENT,
-    ORA_BLOCK_TYPE
-)
+from .constants import DAYS_TO_WAIT_AUTO_ASSESSMENT, ORA_BLOCK_TYPE
 
 log = getLogger(__name__)
 
 
-def _log_multiple_submissions_info(submissions):
-    if len(submissions) > 1:
-        submission_ids = map(str, [submission.id for submission in submissions])
+def find_and_autoscore_submissions(enrollments, workflows_uuids):
+    """
+    Find ORA submissions corresponding to provided enrollments and workflow uuids. Autoscore all resulting submissions.
+    :param (list) enrollments: All active CourseEnrollment objects for all self paced courses
+    :param (list) workflows_uuids: All AssessmentWorkflow uuids for submissions excluding done and cancelled
+    :return: None
+    """
+    days_to_wait = get_ora_days_to_wait_from_site_configurations()
+    delta_date = datetime.now(utc).date() - timedelta(days=days_to_wait)
+    all_submissions = []
 
-        log.info('Multiple submissions found having ids {ids} in can_auto_score_ora'.format(
-            ids=','.join(submission_ids)
-        ))
+    for enrollment in enrollments:
+        list_of_submissions_to_autoscore = _get_submissions_to_autoscore_by_enrollment(
+            enrollment=enrollment,
+            workflows_uuids=workflows_uuids,
+            delta_date=delta_date
+        )
+        if list_of_submissions_to_autoscore:
+            all_submissions.extend(list_of_submissions_to_autoscore)
 
+    _log_multiple_submissions_info(all_submissions, days_to_wait, delta_date)
 
-def can_auto_score_ora(enrollment, course, block, index_chapter):
-    anonymous_user = get_anonymous_user(enrollment.user, course.id)
-    if not anonymous_user:
-        return False
-    response_submissions = Submission.objects.filter(
-        student_item__student_id=anonymous_user.anonymous_user_id,
-        student_item__item_id=block
-    ).order_by('submitted_at')
-    _log_multiple_submissions_info(response_submissions)
-    response_submission = response_submissions.first()
-    if not response_submission:
-        return False
-    log.info('Submission with id {id} was created at: {created_date}'.format(
-        id=response_submission.id,
-        created_date=response_submission.created_at.date()
-    ))
-    today = datetime.now(utc).date()
-    delta_days = today - enrollment.created.date()
-    response_submission_delta = today - response_submission.created_at.date()
-
-    module_access_days = delta_days.days - (index_chapter * 7)
-    waiting_for_others_submission_exists = AssessmentWorkflow.objects.filter(
-        status=ASSESSMENT_WORKFLOW_WAITING_STATUS,
-        course_id=course.id,
-        item_id=block,
-        submission_uuid=response_submission.uuid
-    ).exists()
-    days_to_wait_auto_assessment = get_ora_days_to_wait_from_site_configurations()
-    return (
-        module_access_days >= days_to_wait_auto_assessment and
-        response_submission_delta.days >= days_to_wait_auto_assessment and
-        waiting_for_others_submission_exists
-    )
+    for submission in all_submissions:
+        autoscore_ora_submission(submission=submission)
 
 
 def get_ora_days_to_wait_from_site_configurations():
@@ -81,35 +62,80 @@ def get_ora_days_to_wait_from_site_configurations():
     )
 
 
-def autoscore_ora(course_id, usage_key, student):
-    anonymous_user_id = student['anonymous_user_id']
+def _get_submissions_to_autoscore_by_enrollment(enrollment, workflows_uuids, delta_date):
+    """
+    Find ORA submissions, for a specific enrollment, which correspond to provided workflow uuids.
+    :param (CourseEnrollment) enrollment: Course enrollment to find submissions from
+    :param (list) workflows_uuids: All AssessmentWorkflow uuids for submissions excluding done and cancelled
+    :param (Date) delta_date: Find submissions before this date
+    :return: All submissions in enrollment matching criteria
+    :rtype: list
+    """
+    course_id = enrollment.course_id
+    anonymous_user_id = enrollment.user.anonymoususerid_set.get(course_id=course_id).anonymous_user_id
+    submissions = []
+
+    all_ora_in_enrolled_course = modulestore().get_items(
+        course_id,
+        qualifiers={'category': ORA_BLOCK_TYPE}
+    )
+
+    for open_assessment in all_ora_in_enrolled_course:
+
+        submission = Submission.objects.filter(
+            student_item__student_id=anonymous_user_id,
+            student_item__item_id=open_assessment.location,
+            status=Submission.ACTIVE,
+            created_at__date__lt=delta_date,
+            uuid__in=list(workflows_uuids)
+        ).order_by('-created_at').first()
+
+        if submission:
+            submissions.append(submission)
+
+    return submissions
+
+
+def _log_multiple_submissions_info(all_submissions, days_to_wait, delta_date):
+    """
+    Log ORA auto scoring status
+    """
+    if all_submissions:
+        log.info('Autoscoring {count} submission(s)'.format(count=len(all_submissions)))
+    else:
+        log.info('No pending open assessment found to autoscore, since last {days} days, from {since_date}'.format(
+            days=days_to_wait, since_date=delta_date, )
+        )
+
+
+def autoscore_ora_submission(submission):
+    """
+    Auto score ORA submission, by Philu bot. Score will appear as awarded by staff (instructor). This function will
+    also mark all requirements of submitter to fulfilled, which means all ORA steps will be marked as completed.
+    :param (Submission) submission: ORA submission model object
+    :return: None
+    """
+    anonymous_user_id = submission.student_item.student_id
+    usage_key = submission.student_item.item_id
+    course_id_str = submission.student_item.course_id
+    course_id = CourseKey.from_string(course_id_str)
+
+    log.info('Started autoscoring submission {uuid} for course {course}'.format(
+        uuid=submission.uuid, course=course_id_str)
+    )
 
     # Find the associated rubric for that course_id & item_id
     rubric_dict = get_rubric_for_course(course_id, usage_key)
 
     rubric = rubric_from_dict(rubric_dict)
-    options_selected, earned, possible = select_options(rubric_dict)
-
-    # Use usage key and student id to get the submission of the user.
-    course_id_str = course_id.to_deprecated_string()
-    submissions = Submission.objects.filter(
-        student_item__course_id=course_id_str,
-        student_item__student_id=anonymous_user_id,
-        student_item__item_id=usage_key,
-        student_item__item_type=ORA_BLOCK_TYPE
-    ).order_by('submitted_at')
-    _log_multiple_submissions_info(submissions)
-    submission = submissions.first()
-    if not submission:
-        log.warn(u"No submission found for user {user_id}".format(user_id=anonymous_user_id))
-        return
+    options_selected = select_options(rubric_dict)[0]
 
     # Create assessments
     assessment = Assessment.create(
         rubric=rubric,
         scorer_id=get_philu_bot(),
         submission_uuid=submission.uuid,
-        score_type='ST'
+        score_type=STAFF_TYPE
     )
     AssessmentPart.create_from_option_names(
         assessment=assessment,
@@ -127,17 +153,34 @@ def autoscore_ora(course_id, usage_key, student):
         )
     )
 
-    reset_score(
-        student_id=anonymous_user_id,
-        course_id=course_id_str,
-        item_id=usage_key
-    )
+    # Mark all requirement of submitter to fulfilled and update status to done,
+    # Rest previous score and auto score ORA as per assessment made by philu bot and selected options
+    assessment_workflow = AssessmentWorkflow.objects.get(submission_uuid=submission.uuid)
+    assessment_workflow.update_from_assessments(assessment_requirements=None, override_submitter_requirements=True)
 
-    set_score(
-        submission_uuid=str(submission.uuid),
-        points_earned=earned,
-        points_possible=possible
-    )
+
+def autoscore_ora(course_id, usage_key, student):
+    """
+    This function is a wrapper function for `autoscore_ora_submission`. It is only used by edx-ora2 command
+    `autoscore_learners` command.
+    :param (string) course_id: Course id
+    :param (string) usage_key: Key for openassessment xBlock
+    :param (dict) student: A dictionary with anonymous user id
+    :return: None
+    """
+    anonymous_user_id = student['anonymous_user_id']
+    course_id_str = course_id.to_deprecated_string()
+    submissions = Submission.objects.filter(
+        student_item__course_id=course_id_str,
+        student_item__student_id=anonymous_user_id,
+        student_item__item_id=usage_key,
+        student_item__item_type=ORA_BLOCK_TYPE
+    ).order_by('submitted_at')
+    submission = submissions.first()
+    if not submission:
+        log.warn(u"No submission found for user {user_id}".format(user_id=anonymous_user_id))
+        return
+    autoscore_ora_submission(submission)
 
 
 def select_options(rubric_dict):
