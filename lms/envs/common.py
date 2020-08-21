@@ -82,18 +82,49 @@ IDA_LOGOUT_URI_LIST = []
 
 # Features
 FEATURES = {
+    # .. toggle_name: DISPLAY_DEBUG_INFO_TO_STAFF
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Add a "Staff Debug" button to course modules for debugging by course staff.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2015-09-04
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
+    # .. toggle_status: supported
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
     'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
 
+    # .. toggle_name: DISABLE_START_DATES
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When True, all courses will be active, regardless of start date.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: ?
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: This will cause ALL courses to be immediately visible.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/17913
+    # .. toggle_status: supported
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
-    'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
+    'DISABLE_START_DATES': False,
 
     # for consistency in user-experience, keep the value of the following 3 settings
     # in sync with the corresponding ones in cms/envs/common.py
     'ENABLE_DISCUSSION_SERVICE': True,
+
+    # .. toggle_name: ENABLE_TEXTBOOK
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Add PDF and HTML textbook tabs to the courseware.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2014-03-27
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
+    # .. toggle_status: supported
     'ENABLE_TEXTBOOK': True,
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
@@ -129,7 +160,17 @@ FEATURES = {
     'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_LMS_MIGRATION': False,
 
-    'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
+    # .. toggle_name: ENABLE_MASQUERADE
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Allow course staff to change to student view of courseware by accessing the /course/{course_id}/masquerade url.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2013-04-13
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: None
+    # .. toggle_status: supported
+    'ENABLE_MASQUERADE': True,
 
     # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
     # .. toggle_implementation: DjangoSetting
@@ -159,8 +200,16 @@ FEATURES = {
     # .. toggle_warnings: None
     'ENABLE_OAUTH2_PROVIDER': False,
 
-    # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
-    # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
+    # .. toggle_name: ENABLE_XBLOCK_VIEW_ENDPOINT
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enable an API endpoint, named "xblock_view", to serve rendered XBlock views. This might be used by external applications. See for instance jquery-xblock (now unmaintained): https://github.com/edx-solutions/jquery-xblock
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2014-03-14
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2968
+    # .. toggle_status: supported
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
 
     # Allows to configure the LMS to provide CORS headers to serve requests from other domains
@@ -268,7 +317,16 @@ FEATURES = {
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
     'ENABLE_PAID_COURSE_REGISTRATION': False,
 
-    # Enable the display of cosmetic course price display (set in course advanced settings)
+    # .. toggle_name: ENABLE_COSMETIC_DISPLAY_PRICE
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enable the display of "cosmetic_display_price", set in a course advanced settings. This cosmetic price is used when there is no registration price associated to the course.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2014-10-10
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6876
+    # .. toggle_status: supported
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
 
     # Automatically approve student identity verification attempts
@@ -311,7 +369,16 @@ FEATURES = {
     # toggle_warnings: None
     'ENABLE_THIRD_PARTY_AUTH': False,
 
-    # Toggle to enable alternate urls for marketing links
+    # .. toggle_name: ENABLE_MKTG_SITE
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Toggle to enable alternate urls for marketing links.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2014-03-24
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: When this is enabled, the MKTG_URLS setting should be defined.
+    # .. toggle_tickets: ?
+    # .. toggle_status: supported
     'ENABLE_MKTG_SITE': False,
 
     # Prevent concurrent logins per user
@@ -322,10 +389,29 @@ FEATURES = {
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
-    # When a user goes to the homepage ('/') the user sees the
-    # courses listed in the announcement dates order - this is default Open edX behavior.
-    # Set to True to change the course sorting behavior by their start dates, latest first.
+    # .. toggle_name: ENABLE_COURSE_SORTING_BY_START_DATE
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When a user goes to the homepage ('/') the user sees the courses listed in the announcement dates order - this is default Open edX behavior. Set to True to change the course sorting behavior by their start dates, latest first.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2015-03-27
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7548
+    # .. toggle_status: supported
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
+
+    # .. toggle_name: ENABLE_COURSE_HOME_REDIRECT
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: When enabled, along with the ENABLE_MKTG_SITE feature toggle, users who attempt to access a course "about" page will be redirected to the course home url. This url might be the course "info" page or the unified course tab (when the UNIFIED_COURSE_TAB_FLAG waffle is enabled).
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2019-01-15
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19604
+    # .. toggle_status: supported
+    'ENABLE_COURSE_HOME_REDIRECT': True,
 
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
@@ -382,13 +468,31 @@ FEATURES = {
     # log all information from cybersource callbacks
     'LOG_POSTPAY_CALLBACKS': True,
 
-    # Toggle platform-wide course licensing
+    # .. toggle_name: LICENSING
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Toggle platform-wide course licensing. The course.license attribute is then used to append license information to the courseware.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2015-05-14
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7315
+    # .. toggle_status: supported
     'LICENSING': False,
 
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 
-    # Course discovery feature
+    # .. toggle_name: ENABLE_COURSE_DISCOVERY
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Add a course search widget to the LMS for searching courses. When this is enabled, the latest courses are no longer displayed on the LMS landing page. Also, an "Explore Courses" item is added to the navbar.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2015-04-23
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: The COURSE_DISCOVERY_MEANINGS setting should be properly defined.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7845
+    # .. toggle_status: supported
     'ENABLE_COURSE_DISCOVERY': False,
 
     # Setting for overriding default filtering facets for Course discovery
@@ -406,7 +510,16 @@ FEATURES = {
     # How many seconds to show the bumper again, default is 7 days:
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
-    # Special Exams, aka Timed and Proctored Exams
+    # .. toggle_name: ENABLE_SPECIAL_EXAMS
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enable to use special exams, aka timed and proctored exams.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: 2015-09-04
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/9744
+    # .. toggle_status: supported
     'ENABLE_SPECIAL_EXAMS': False,
 
     # Enable OpenBadge support. See the BADGR_* settings later in this file.
@@ -426,10 +539,16 @@ FEATURES = {
     # Show the language selector in the footer
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
 
-    # Write new CSM history to the extended table.
-    # This will eventually default to True and may be
-    # removed since all installs should have the separate
-    # extended history table.
+    # .. toggle_name: ENABLE_CSMH_EXTENDED
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Write Courseware Student Module History (CSMH) to the extended table: this logs all student activities to MySQL, in a separate database.
+    # .. toggle_use_cases: ?
+    # .. toggle_creation_date: ?
+    # .. toggle_expiration_date: None
+    # .. toggle_warnings: Even though most Open edX instances run with a separate CSMH database, it may not always be the case. When disabling this feature flag, remember to remove "coursewarehistoryextended" from the INSTALLED_APPS and the "StudentModuleHistoryExtendedRouter" from the DATABASE_ROUTERS.
+    # .. toggle_tickets: None
+    # .. toggle_status: supported
     'ENABLE_CSMH_EXTENDED': True,
 
     # Read from both the CSMH and CSMHE history tables.
@@ -2860,6 +2979,14 @@ DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_
 
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True
+# .. toggle_name: ENABLE_CREDIT_ELIGIBILITY
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: When enabled, it is possible to define a credit eligibility criteria in the CMS. A "Credit
+#   Eligibility" section then appears for those courses in the LMS.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2015-06-17
+# .. toggle_tickets: https://github.com/edx/edx-platform/pull/8550
 FEATURES['ENABLE_CREDIT_ELIGIBILITY'] = ENABLE_CREDIT_ELIGIBILITY
 
 ############# Cross-domain requests #################

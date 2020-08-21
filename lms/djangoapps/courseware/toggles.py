@@ -8,11 +8,10 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNam
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 
-# Waffle flag to redirect to another learner profile experience.
 # .. toggle_name: courseware.courseware_mfe
 # .. toggle_implementation: ExperimentWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Supports staged rollout to students for a new micro-frontend-based implementation of the courseware page.
+# .. toggle_description: Waffle flag to redirect to another learner profile experience. Supports staged rollout to students for a new micro-frontend-based implementation of the courseware page.
 # .. toggle_category: micro-frontend
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2020-01-29
@@ -24,12 +23,10 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', __name__, use_course_aware_bucketing=False
 )
 
-# Waffle flag to display a link for the new learner experience to course teams without redirecting students.
-#
 # .. toggle_name: courseware.microfrontend_course_team_preview
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Supports staged rollout to course teams of a new micro-frontend-based implementation of the courseware page.
+# .. toggle_description: Waffle flag to display a link for the new learner experience to course teams without redirecting students. Supports staged rollout to course teams of a new micro-frontend-based implementation of the courseware page.
 # .. toggle_category: micro-frontend
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2020-03-09

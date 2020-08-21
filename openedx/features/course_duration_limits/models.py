@@ -18,6 +18,21 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
     Configuration to manage the Course Duration Limit facility.
 
     .. no_pii:
+
+    .. toggle_name: CourseDurationLimitConfig.enabled
+    .. toggle_implementation: ConfigurationModel
+    .. toggle_default: False
+    .. toggle_description: When enabled, users will have a limited time to complete and
+      audit the course. The exact duration is given by the "weeks_to_complete" course
+      detail. When enabled, it is necessary to also define the "enabled_as_of" flag:
+      only enrollments created after this date will be affected.
+    .. toggle_category: ?
+    .. toggle_use_cases: ?
+    .. toggle_creation_date: 2018-11-02
+    .. toggle_expiration_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: None
+    .. toggle_status: supported
     """
 
     STACKABLE_FIELDS = ('enabled', 'enabled_as_of')
