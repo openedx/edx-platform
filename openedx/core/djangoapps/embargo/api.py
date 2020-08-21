@@ -10,7 +10,7 @@ import logging
 
 from django.conf import settings
 from django.core.cache import cache
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -197,7 +197,7 @@ def get_embargo_response(request, course_id, user):
 
     """
     redirect_url = redirect_if_blocked(
-        course_id, user=user, ip_address=get_ip(request), url=request.path)
+        course_id, user=user, ip_address=get_client_ip(request)[0], url=request.path)
     if redirect_url:
         return Response(
             status=status.HTTP_403_FORBIDDEN,
