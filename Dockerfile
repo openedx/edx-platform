@@ -52,7 +52,7 @@ ENV LC_ALL en_US.UTF-8
 RUN ln -s /usr/bin/pip3 /usr/bin/pip
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
-WORKDIR /edx/app/edx-platform/edx-platform
+WORKDIR /edx/app/edxapp/edx-platform
 
 ENV PATH /edx/app/edx-platform/nodeenv/bin:${PATH}
 ENV PATH ./node_modules/.bin:${PATH}
