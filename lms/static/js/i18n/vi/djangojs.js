@@ -20,7 +20,6 @@
   django.catalog = django.catalog || {};
   
   var newcatalog = {
-    " Link": "Li\u00ean k\u1ebft",
     " and ": "v\u00e0",
     " learner does not exist in LMS and not added to the exception list": " h\u1ecdc vi\u00ean kh\u00f4ng t\u1ed3n t\u1ea1i trong LMS v\u00e0 kh\u00f4ng \u0111\u01b0\u1ee3c th\u00eam v\u00e0o danh s\u00e1ch kh\u00f4ng h\u1ee3p l\u1ec7",
     " learner is already white listed and not added to the exception list": "\u00a0h\u1ecdc vi\u00ean \u0111\u00e3 \u0111\u01b0\u1ee3c \u0111\u01b0a v\u00e0o danh s\u00e1ch tr\u1eafng v\u00e0 kh\u00f4ng \u0111\u01b0\u1ee3c th\u00eam v\u00e0o danh s\u00e1ch kh\u00f4ng h\u1ee3p l\u1ec7",
@@ -522,7 +521,6 @@
     "Enter the name of the cohort": "Nh\u1eadp t\u00ean c\u1ee7a nh\u00f3m",
     "Enter the page number you'd like to quickly navigate to.": "Nh\u1eadp s\u1ed1 trang b\u1ea1n mu\u1ed1n nhanh ch\u00f3ng \u0111i\u1ec1u h\u01b0\u1edbng \u0111\u1ebfn.",
     "Enter username or email": "Nh\u1eadp t\u00ean \u0111\u0103ng nh\u1eadp ho\u1eb7c email",
-    "Enter your ": "Nh\u1eadp c\u1ee7a b\u1ea1n",
     "Entrance exam attempts is being reset for student '{student_id}'.": "S\u1ed1 l\u1ea7n ki\u1ec3m tra \u0111\u1ea7u v\u00e0o l\u1ea1i \u0111\u00e3 \u0111\u01b0\u1ee3c c\u00e0i \u0111\u1eb7t l\u1ea1i cho h\u1ecdc sinh '{student_id}'.",
     "Entrance exam state is being deleted for student '{student_id}'.": "Tr\u1ea1ng th\u00e1i b\u00e0i ki\u1ec3m tra \u0111\u1ea7u v\u00e0o c\u1ee7a h\u1ecdc vi\u00ean '{student_id}' \u0111ang \u0111\u01b0\u1ee3c x\u00f3a.",
     "Error": "L\u1ed7i",

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-09 20:51+0000\n"
-"PO-Revision-Date: 2020-08-09 20:51:07.247635\n"
+"POT-Creation-Date: 2020-08-23 20:50+0000\n"
+"PO-Revision-Date: 2020-08-23 20:50:13.433680\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6072,6 +6072,10 @@ msgstr "غخع وعسف زث ثرقخممثي هر فاث ذخعقسث"
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must be logged in to see this course"
 msgstr "غخع وعسف زث مخللثي هر فخ سثث فاهس ذخعقسث"
+
+#: lms/djangoapps/courseware/access_response.py
+msgid "Please view your course in the existing experience"
+msgstr "حمثشسث دهثص غخعق ذخعقسث هر فاث ثطهسفهرل ثطحثقهثرذث"
 
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -12312,6 +12316,28 @@ msgstr ""
 "رخص{sronly_span_open} فخ قثفشهر شذذثسس حشسف "
 "{expiration_date}{span_close}{a_close}"
 
+#: openedx/features/course_experience/api/v1/views.py
+msgid "'course_key' is required."
+msgstr "'ذخعقسث_نثغ' هس قثضعهقثي."
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Only 'course_key' is expected."
+msgstr "خرمغ 'ذخعقسث_نثغ' هس ثطحثذفثي."
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "View all dates"
+msgstr "دهثص شمم يشفثس"
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid ""
+"Your due dates have been successfully shifted to help you stay on track."
+msgstr ""
+"غخعق يعث يشفثس اشدث زثثر سعذذثسسبعممغ ساهبفثي فخ اثمح غخع سفشغ خر فقشذن."
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Deadlines successfully reset."
+msgstr "يثشيمهرثس سعذذثسسبعممغ قثسثف."
+
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
@@ -13570,14 +13596,6 @@ msgstr "سثري شر ثوشهم فخ {email}"
 msgid "name"
 msgstr "رشوث"
 
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu"
-msgstr "عسثقوثرع"
-
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu dropdown"
-msgstr "عسثقوثرع يقخحيخصر"
-
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
@@ -14750,6 +14768,10 @@ msgstr ""
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "يشسازخشقي بخق:"
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu"
+msgstr "عسثقوثرع"
 
 #: lms/templates/user_dropdown.html
 msgid "More options"
@@ -18776,10 +18798,6 @@ msgstr ""
 "وخقث فاشر {max_entries} قثسحخرسثس, فقغ لثرثقشفهرل فاث قثحخقف خر ش ذاشحفثق-"
 "زغ-ذاشحفثق, خق حقخزمثو-زغ-حقخزمثو زشسهس, خق ذخرفشذف غخعق سهفث شيوهرهسفقشفخق "
 "فخ هرذقثشسث فاث مهوهف."
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of problem responses"
-msgstr "يخصرمخشي ش ذسد خب حقخزمثو قثسحخرسثس"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Click to list certificates that are issued for this course:"
