@@ -74,6 +74,7 @@ DJFS = {
     'url_root': '/static/djpyfs',
 }
 
+
 def should_show_debug_toolbar(request):
     return False
 
