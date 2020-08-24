@@ -1,27 +1,21 @@
-import base64
-import shutil
 from datetime import datetime
 from importlib import import_module
+from io import BytesIO
 from logging import getLogger
-from tempfile import TemporaryFile
 
 import boto
+import img2pdf
 import requests
 from boto.s3.key import Key
 from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from PIL import Image
 
 from constants import (
+    CERTIFICATE_PDF_NAME,
     COMPLETION_DATE_FORMAT,
     CREDENTIALS_DATE_FORMAT,
-    PAGE_HEIGHT,
-    PAGE_WIDTH,
-    PDFKIT_HTML_STRING,
-    PDFKIT_IMAGE_TAG,
-    PDFKIT_OPTIONS,
     PREVIEW_CERTIFICATE_VERIFICATION_URL,
     SOCIAL_MEDIA_SHARE_URL_FMT,
     TMPDIR,
@@ -170,47 +164,40 @@ def get_philu_certificate_social_context(course, certificate):
     return social_sharing_urls
 
 
-def get_image_and_size_from_url(url):
+def get_pdf_data_by_certificate_uuid(uuid):
     """
-    Download image from url to a temp file, get image dimensions and encode to base64
-    :param url: image url
-    :return: base64 image, image width and image height
+    Get pdf data in bytes from certificate uuid.
+
+    Get certificate image url by uuid load image in a variable and convert it into pdf
+
+    Arguments:
+        uuid: certificate unique id.
+    Returns:
+        Certificate pdf data
     """
-    with requests.get(url, stream=True) as response:
+    image_url = get_certificate_image_url_by_uuid(uuid)
+    with requests.get(image_url, stream=True) as response:
         if response.status_code != 200:
-            raise Exception("Unable to download certificate for url {}".format(url), response.status_code)
+            raise Exception('Unable to download certificate for url {}'.format(image_url), response.status_code)
 
-        with TemporaryFile(dir=TMPDIR) as certificate_image_file:
-            # copy the contents of image request to our temporary file
-            shutil.copyfileobj(response.raw, certificate_image_file)
-            certificate_image_file.seek(0)  # file will be read from beginning
-            image_base64 = base64.b64encode(certificate_image_file.read())
-            image_file = Image.open(certificate_image_file)
-            page_width, page_height = image_file.size
-    return image_base64, page_width, page_height
+        certificate_image = BytesIO(response.content)
+        certificate_pdf_data = img2pdf.convert(certificate_image)
+
+        return certificate_pdf_data
 
 
-def get_pdfkit_options(image_width, image_height):
+def get_certificate_pdf_name(certificate_uuid):
     """
-    Add image width and height in to pdfkit options
-    :param image_width: image width in pixel
-    :param image_height: image height in pixel
-    :return: pdfkit options dict
-    """
-    PDFKIT_OPTIONS[PAGE_HEIGHT] = PDFKIT_OPTIONS[PAGE_HEIGHT].format(image_height)
-    PDFKIT_OPTIONS[PAGE_WIDTH] = PDFKIT_OPTIONS[PAGE_WIDTH].format(image_width)
+    Get certificate PDF name
 
-    return PDFKIT_OPTIONS
-
-
-def get_pdfkit_html(image_base64):
+    Arguments:
+        certificate_uuid: certificate unique id.
+    Returns:
+        Downloadable certificate PDF name
     """
-    Create basic html template with base64 image source. Due to bug in pdfkit, body and html
-    need 0 padding style, otherwise image tag would have sufficed
-    :param image_base64:
-    :return: html
-    """
-    return PDFKIT_HTML_STRING.format(image_tag=PDFKIT_IMAGE_TAG.format(base64_img=image_base64))
+    course_display_name = get_course_display_name_by_uuid(certificate_uuid)
+    course_display_name = course_display_name.replace(' ', '')
+    return CERTIFICATE_PDF_NAME.format(display_name=course_display_name)
 
 
 def _should_hide_border(border, preview_mode):
