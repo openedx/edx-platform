@@ -154,7 +154,7 @@ imagesize==1.2.0          # via sphinx
 importlib-metadata==1.7.0  # via -r requirements/edx/testing.txt, inflect, jsonschema, path, pluggy, pytest, pytest-randomly, tox, virtualenv
 importlib-resources==3.0.0  # via -r requirements/edx/testing.txt, virtualenv
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, jinja2-pluralize
-inflection==0.5.0         # via -r requirements/edx/testing.txt, drf-yasg
+inflection==0.5.1         # via -r requirements/edx/testing.txt, drf-yasg
 iniconfig==1.0.1          # via -r requirements/edx/testing.txt, pytest
 ipaddress==1.0.23         # via -r requirements/edx/testing.txt
 isodate==0.6.0            # via -r requirements/edx/testing.txt, python3-saml
@@ -193,7 +193,7 @@ mpmath==1.1.0             # via -r requirements/edx/testing.txt, sympy
 mysqlclient==2.0.1        # via -r requirements/edx/testing.txt
 newrelic==5.16.1.146      # via -r requirements/edx/testing.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/testing.txt, chem
-nodeenv==1.4.0            # via -r requirements/edx/testing.txt
+nodeenv==1.5.0            # via -r requirements/edx/testing.txt
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==1.0.9       # via -r requirements/edx/testing.txt
