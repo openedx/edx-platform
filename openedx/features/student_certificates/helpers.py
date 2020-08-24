@@ -168,7 +168,7 @@ def get_pdf_data_by_certificate_uuid(uuid):
     """
     Get pdf data in bytes from certificate uuid.
 
-    Get certificate image url by uuid load image in a variable and convert it into pdf
+    Get certificate image url by uuid, load image in a variable and convert it into pdf.
 
     Arguments:
         uuid: certificate unique id.

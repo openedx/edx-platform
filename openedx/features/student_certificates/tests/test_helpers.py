@@ -136,5 +136,5 @@ class GenerateStudentCertificateHelpersTestCase(SharedModuleStoreTestCase):
         """
         course_display_name = CourseOverview.objects.get(id=self.course.id).display_name.replace(' ', '')
         expected_pdf_name = 'PhilanthropyUniversity_{display_name}'.format(display_name=course_display_name)
-        certificate_pdf_name = get_certificate_pdf_name(self.certificate.verify_uuid)
-        self.assertEqual(expected_pdf_name, certificate_pdf_name)
+        actual_pdf_name = get_certificate_pdf_name(self.certificate.verify_uuid)
+        self.assertEqual(expected_pdf_name, actual_pdf_name)
