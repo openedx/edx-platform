@@ -52,12 +52,12 @@ ENV LC_ALL en_US.UTF-8
 RUN ln -s /usr/bin/pip3 /usr/bin/pip
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
-WORKDIR /edx/app/edx-platform/edx-platform
+WORKDIR /edx/app/edxapp/edx-platform
 
-ENV PATH /edx/app/edx-platform/nodeenv/bin:${PATH}
+ENV PATH /edx/app/edxapp/nodeenv/bin:${PATH}
 ENV PATH ./node_modules/.bin:${PATH}
 ENV CONFIG_ROOT /edx/etc/
-ENV PATH /edx/app/edx-platform/edx-platform/bin:${PATH}
+ENV PATH /edx/app/edxapp/edx-platform/bin:${PATH}
 ENV SETTINGS production
 RUN mkdir -p /edx/etc/
 
@@ -74,7 +74,7 @@ RUN pip install -r requirements/edx/base.txt
 # Copy just JS requirements and install them.
 COPY package.json package.json
 COPY package-lock.json package-lock.json
-RUN nodeenv /edx/app/edx-platform/nodeenv --node=12.11.1 --prebuilt
+RUN nodeenv /edx/app/edxapp/nodeenv --node=12.11.1 --prebuilt
 RUN npm set progress=false && npm install
 
 ENV LMS_CFG /edx/etc/lms.yml
@@ -92,11 +92,11 @@ EXPOSE 18000
 FROM base as lms
 ENV SERVICE_VARIANT lms
 ENV DJANGO_SETTINGS_MODULE lms.envs.production
-CMD gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:18000 --max-requests=1000 --access-logfile - lms.wsgi:application
+CMD gunicorn -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:18000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
 FROM lms as lms-newrelic
 RUN pip install newrelic
-CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
+CMD newrelic-admin run-program gunicorn -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
 FROM lms as lms-devstack
 # TODO: This compiles static assets.
@@ -110,11 +110,11 @@ ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
 FROM base as studio
 ENV SERVICE_VARIANT cms
 ENV DJANGO_SETTINGS_MODULE cms.envs.production
-CMD gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
+CMD gunicorn -c /edx/app/edxapp/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
 
 FROM studio as studio-newrelic
 RUN pip install newrelic
-CMD newrelic-admin run-program gunicorn -c /edx/app/edx-platform/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
+CMD newrelic-admin run-program gunicorn -c /edx/app/edxapp/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
 
 FROM studio as studio-devstack
 # TODO: This compiles static assets.
