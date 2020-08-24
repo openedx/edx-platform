@@ -1055,6 +1055,7 @@ def get_problem_responses(request, course_id):
         for problem_location in problem_locations.split(','):
             problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)
     except InvalidKeyError:
+        log.exception("ProblemResponsesError: Location: %s", problem_locations)
         return JsonResponseBadRequest(_("Could not find problem with this location."))
 
     task = task_api.submit_calculate_problem_responses_csv(

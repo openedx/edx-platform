@@ -79,7 +79,7 @@ const createProblemResponsesReportTask = (
     })
     .then(
       json => dispatch(getTaskStatus(taskStatusEndpoint, json.task_id)),
-      () => dispatch(problemResponsesFailure(gettext('Unable to submit request to generate report.'))),
+      err => dispatch(problemResponsesFailure(gettext('Unable to submit request to generate report.'))), // eslint-disable-line no-unused-vars
     );
 };
 
