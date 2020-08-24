@@ -49,6 +49,23 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name
     return report_name, report_path
 
 
+def upload_zip_to_report_store(file, zip_name, course_id, timestamp, config_name='GRADES_DOWNLOAD'):
+    """
+    Upload given file buffer as a zip file using ReportStore.
+    """
+    report_store = ReportStore.from_config(config_name)
+
+    report_name = u"{course_prefix}_{zip_name}_{timestamp_str}.zip".format(
+        course_prefix=course_filename_prefix_generator(course_id),
+        zip_name=zip_name,
+        timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
+    )
+
+    report_store.store(course_id, report_name, file)
+    tracker_emit(zip_name)
+    return report_name
+
+
 def tracker_emit(report_name):
     """
     Emits a 'report.requested' event for the given report.

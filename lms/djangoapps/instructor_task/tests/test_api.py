@@ -27,6 +27,7 @@ from lms.djangoapps.instructor_task.api import (
     submit_delete_entrance_exam_state_for_student,
     submit_delete_problem_state_for_all_students,
     submit_export_ora2_data,
+    submit_export_ora2_submission_files,
     submit_override_score,
     submit_rescore_entrance_exam_for_student,
     submit_rescore_problem_for_all_students,
@@ -36,7 +37,7 @@ from lms.djangoapps.instructor_task.api import (
 )
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from lms.djangoapps.instructor_task.tasks import export_ora2_data
+from lms.djangoapps.instructor_task.tasks import export_ora2_data, export_ora2_submission_files
 from lms.djangoapps.instructor_task.tests.test_base import (
     TEST_COURSE_KEY,
     InstructorTaskCourseTestCase,
@@ -281,6 +282,22 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request, 'export_ora2_data', export_ora2_data, self.course.id, {}, '')
+
+    def test_submit_export_ora2_submission_files(self):
+        request = self.create_task_request(self.instructor)
+
+        with patch('lms.djangoapps.instructor_task.api.submit_task') as mock_submit_task:
+            mock_submit_task.return_value = MagicMock()
+            submit_export_ora2_submission_files(request, self.course.id)
+
+            mock_submit_task.assert_called_once_with(
+                request,
+                'export_ora2_submission_files',
+                export_ora2_submission_files,
+                self.course.id,
+                {},
+                ''
+            )
 
     def test_submit_generate_certs_students(self):
         """

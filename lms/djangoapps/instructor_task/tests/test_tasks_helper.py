@@ -12,8 +12,10 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 import os
 import shutil
 import tempfile
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 from datetime import datetime, timedelta
+from io import BytesIO
+from zipfile import ZipFile
 
 import ddt
 import unicodecsv
@@ -57,7 +59,8 @@ from lms.djangoapps.instructor_task.tasks_helper.grades import (
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
     upload_course_survey_report,
-    upload_ora2_data
+    upload_ora2_data,
+    upload_ora2_submission_files
 )
 from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskCourseTestCase,
@@ -2539,25 +2542,126 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                 self.assertEqual(response, UPDATE_STATUS_FAILED)
 
     def test_report_stores_results(self):
-        with freeze_time('2001-01-01 00:00:00'):
+        with ExitStack() as stack:
+            stack.enter_context(freeze_time('2001-01-01 00:00:00'))
+
+            mock_current_task = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+            )
+            mock_collect_data = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraAggregateData.collect_ora2_data')
+            )
+            mock_store_rows = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store_rows')
+            )
+
+            mock_current_task.return_value = self.current_task
+
             test_header = ['field1', 'field2']
             test_rows = [['row1_field1', 'row1_field2'], ['row2_field1', 'row2_field2']]
 
+            mock_collect_data.return_value = (test_header, test_rows)
+
+            return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
+
+            timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
+            course_id_string = quote(text_type(self.course.id).replace('/', '_'))
+            filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
+
+            self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
+            mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
+
+
+class TestInstructorOra2AttachmentsExport(SharedModuleStoreTestCase):
+    """
+    Tests that ORA2 submission files export works.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super().setUp()
+
+        self.current_task = Mock()
+        self.current_task.update_state = Mock()
+
+    def test_export_fails_if_error_on_collect_step(self):
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
 
             with patch(
-                'lms.djangoapps.instructor_task.tasks_helper.misc.OraAggregateData.collect_ora2_data'
+                'lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.collect_ora2_submission_files'
             ) as mock_collect_data:
-                mock_collect_data.return_value = (test_header, test_rows)
-                with patch(
-                    'lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store_rows'
-                ) as mock_store_rows:
-                    return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
+                mock_collect_data.side_effect = KeyError
 
-                    timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
-                    course_id_string = quote(text_type(self.course.id).replace('/', '_'))
-                    filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)
+                response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
+                self.assertEqual(response, UPDATE_STATUS_FAILED)
 
-                    self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
-                    mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
+    def test_export_fails_if_error_on_create_zip_step(self):
+        with ExitStack() as stack:
+            mock_current_task = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+            )
+            mock_current_task.return_value = self.current_task
+
+            stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.collect_ora2_submission_files')
+            )
+            create_zip_mock = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.create_zip_with_attachments')
+            )
+
+            create_zip_mock.side_effect = KeyError
+
+            response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
+            self.assertEqual(response, UPDATE_STATUS_FAILED)
+
+    def test_export_fails_if_error_on_upload_step(self):
+        with ExitStack() as stack:
+            mock_current_task = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+            )
+            mock_current_task.return_value = self.current_task
+
+            stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.collect_ora2_submission_files')
+            )
+            stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.create_zip_with_attachments')
+            )
+            upload_mock = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.upload_zip_to_report_store')
+            )
+
+            upload_mock.side_effect = KeyError
+
+            response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
+            self.assertEqual(response, UPDATE_STATUS_FAILED)
+
+    def test_task_stores_zip_with_attachments(self):
+        with ExitStack() as stack:
+            mock_current_task = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
+            )
+            mock_collect_files = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.collect_ora2_submission_files')
+            )
+            mock_create_zip = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.tasks_helper.misc.OraDownloadData.create_zip_with_attachments')
+            )
+            mock_store = stack.enter_context(
+                patch('lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store')
+            )
+
+            mock_current_task.return_value = self.current_task
+
+            response = upload_ora2_submission_files(None, None, self.course.id, None, 'compressed')
+
+            mock_collect_files.assert_called_once()
+            mock_create_zip.assert_called_once()
+            mock_store.assert_called_once()
+
+            self.assertEqual(response, UPDATE_STATUS_SUCCEEDED)
