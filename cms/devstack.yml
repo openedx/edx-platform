@@ -96,7 +96,7 @@ CERTIFICATE_TEMPLATE_LANGUAGES:
     en: English
     es: Español
 CERT_QUEUE: certificates
-CMS_BASE: edx.devstack.studio:18010
+CMS_BASE: edx.devstack.studio:8010
 CODE_JAIL:
     limits:
         CPU: 1
@@ -191,7 +191,7 @@ DEFAULT_FILE_STORAGE: django.core.files.storage.FileSystemStorage
 DEFAULT_FROM_EMAIL: registration@example.com
 DEFAULT_JWT_ISSUER:
     AUDIENCE: lms-key
-    ISSUER: http://edx.devstack.lms:18000/oauth2
+    ISSUER: http://edx.devstack.lms:8000/oauth2
     SECRET_KEY: lms-secret
 DEFAULT_MOBILE_AVAILABLE: false
 DEFAULT_SITE_THEME: ''
@@ -230,7 +230,7 @@ EMAIL_HOST_USER: ''
 EMAIL_PORT: 25
 EMAIL_USE_TLS: false
 ENABLE_COMPREHENSIVE_THEMING: false
-ENTERPRISE_API_URL: http://edx.devstack.lms:18000/enterprise/api/v1
+ENTERPRISE_API_URL: http://edx.devstack.lms:8000/enterprise/api/v1
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS: {}
 ENTERPRISE_SERVICE_WORKER_USERNAME: enterprise_worker
 EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST: []
@@ -264,7 +264,7 @@ FEATURES:
     ENABLE_SYSADMIN_DASHBOARD: false
     ENABLE_THIRD_PARTY_AUTH: true
     ENABLE_VIDEO_UPLOAD_PIPELINE: false
-    PREVIEW_LMS_BASE: preview.localhost:18000
+    PREVIEW_LMS_BASE: preview.localhost:8000
     SHOW_FOOTER_LANGUAGE_SELECTOR: false
     SHOW_HEADER_LANGUAGE_SELECTOR: false
 FEEDBACK_SUBMISSION_EMAIL: ''
@@ -299,24 +299,24 @@ JWT_AUTH:
     JWT_AUTH_COOKIE_HEADER_PAYLOAD: edx-jwt-cookie-header-payload
     JWT_AUTH_COOKIE_SIGNATURE: edx-jwt-cookie-signature
     JWT_AUTH_REFRESH_COOKIE: edx-jwt-refresh-cookie
-    JWT_ISSUER: http://edx.devstack.lms:18000/oauth2
+    JWT_ISSUER: http://edx.devstack.lms:8000/oauth2
     JWT_ISSUERS:
     -   AUDIENCE: lms-key
-        ISSUER: http://edx.devstack.lms:18000/oauth2
+        ISSUER: http://edx.devstack.lms:8000/oauth2
         SECRET_KEY: lms-secret
     JWT_PRIVATE_SIGNING_JWK: None
     JWT_PUBLIC_SIGNING_JWK_SET: ''
     JWT_SECRET_KEY: lms-secret
     JWT_SIGNING_ALGORITHM: null
 JWT_EXPIRATION: 30
-JWT_ISSUER: http://edx.devstack.lms:18000/oauth2
+JWT_ISSUER: http://edx.devstack.lms:8000/oauth2
 JWT_PRIVATE_SIGNING_KEY: null
 LANGUAGE_CODE: en
 LANGUAGE_COOKIE: openedx-language-preference
-LEARNER_PORTAL_URL_ROOT: https://learner-portal-edx.devstack.lms:18000
-LMS_BASE: edx.devstack.lms:18000
-LMS_INTERNAL_ROOT_URL: http://edx.devstack.lms:18000
-LMS_ROOT_URL: http://edx.devstack.lms:18000
+LEARNER_PORTAL_URL_ROOT: https://learner-portal-edx.devstack.lms:8000
+LMS_BASE: edx.devstack.lms:8000
+LMS_INTERNAL_ROOT_URL: http://edx.devstack.lms:8000
+LMS_ROOT_URL: http://edx.devstack.lms:8000
 LOCAL_LOGLEVEL: INFO
 LOGGING_ENV: sandbox
 LOGIN_REDIRECT_WHITELIST: []
