@@ -1,4 +1,4 @@
-""" This module contains formfield for to select multiple options from given choices"""
+""" This module contains formfield to select multiple options from given choices"""
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
