@@ -24,7 +24,7 @@ class MultiSelectWithOtherField(MultiSelectField):
     This class is a Django Model field class that supports
     multi select along with other option
     The `other_max_length` parameter is required for this
-    Choice keys can not contain commas and other field can not contain
+    Choice keys cannot contain commas and other field cannot contain
     pipe character i.e. `|`
     """
 
@@ -76,7 +76,7 @@ class MultiSelectWithOtherField(MultiSelectField):
 
     def validate(self, value, model_instance):
         """
-        This function is to validate the input values for multi select field,
+        This function is to validate that the input values for multi select field,
         however we are implementing field with support of other input filed
         we are disabling validations to let other input text(other option)
         pass to the database.
@@ -108,7 +108,7 @@ class MultiSelectWithOtherField(MultiSelectField):
 
     def _check_other_max_length_attribute(self, **kwargs):
         """
-        This function is to validate the MultiSelectWithOtherField has a
+        This function is to validate that the MultiSelectWithOtherField has a
         'other_max_length' attribute.
         :param **kwargs: arguments
         :type **kwargs: dictionary

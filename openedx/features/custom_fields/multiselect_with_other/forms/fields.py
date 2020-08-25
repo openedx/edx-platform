@@ -37,7 +37,8 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
         return len(value) <= self.other_max_length
 
     def validate(self, value):
-        """ Validate that the input is a list or tuple.
+        """
+        Validate that the input is a list or tuple.
         :param value: list or tuple of selected choices
         :type value: list or tuple
         :raise ValidationError: Raise validation error when required value not provided
