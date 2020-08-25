@@ -154,18 +154,11 @@ def get_philu_certificate_social_context(course, certificate):
     custom_settings = get_course_custom_settings(course.id)
     meta_tags = custom_settings.get_course_meta_tags()
 
-    tweet_text = TWITTER_TWEET_TEXT_FMT.format(
-        course_name=course.display_name,
-        base_url=settings.LMS_ROOT_URL,
-        course_url='courses',
-        course_id=course.id,
-        about_url='about')
-
     meta_tags['title'] = TWITTER_META_TITLE_FMT.format(course_name=course.display_name)
 
     social_sharing_urls = get_social_sharing_urls(SOCIAL_MEDIA_SHARE_URL_FMT.format(
         base_url=settings.LMS_ROOT_URL,
-        certificate_uuid=certificate.verify_uuid), meta_tags, tweet_text)
+        certificate_uuid=certificate.verify_uuid), meta_tags)
 
     return social_sharing_urls
 

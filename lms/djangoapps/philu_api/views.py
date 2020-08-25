@@ -24,7 +24,7 @@ from lms.djangoapps.philu_api.helpers import get_encoded_token
 from lms.djangoapps.third_party_surveys.tasks import get_third_party_surveys_task
 from mailchimp_pipeline.tasks import update_enrollments_completions_at_mailchimp
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.badging.models import Badge, UserBadge
+from openedx.features.badging.models import UserBadge
 from openedx.features.partners.helpers import get_partner_from_user, user_has_performance_access
 from philu_overrides.helpers import reactivation_email_for_user_custom
 from student.models import User
@@ -39,7 +39,6 @@ class MailChimpDataSyncAPI(APIView):
         """ Send data shared between platform & community """
         #
         if request.GET.get('task_id'):
-
             res = AsyncResult(request.GET.get('task_id'))
 
             return JsonResponse({
@@ -61,7 +60,6 @@ class ThirdPartyResultDataSyncAPI(APIView):
         """ Get data shared between platform & community """
 
         if request.GET.get('task_id'):
-
             res = AsyncResult(request.GET.get('task_id'))
 
             return JsonResponse({
@@ -78,6 +76,9 @@ class ThirdPartyResultDataSyncAPI(APIView):
 
 
 class PlatformSyncService(APIView):
+    """
+    Platform sync service view
+    """
 
     def get(self, request):
         """ Send data shared between platform & community """
@@ -103,7 +104,7 @@ class PlatformSyncService(APIView):
             "is_admin": user_extended_profile.is_organization_admin,
             "eligible_for_oef": eligible_for_oef(user_extended_profile),
             "help_center": configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
-            "can_access_partner_performance":  user_has_performance_access(user, partner),
+            "can_access_partner_performance": user_has_performance_access(user, partner),
             "partner_performance_url": partner and reverse('partner_performance', args=[partner.slug])
         }, status=status.HTTP_200_OK)
 
@@ -116,7 +117,8 @@ class PlatformSyncService(APIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return JsonResponse({"message": "User does not exist for provided username"}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({"message": "User does not exist for provided username"},
+                                status=status.HTTP_400_BAD_REQUEST)
 
         _id = user.id
 
@@ -151,16 +153,22 @@ class PlatformSyncService(APIView):
             userprofile.save()
 
             return JsonResponse({"message": "user info updated successfully"}, status=status.HTTP_200_OK)
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             return JsonResponse({"message": str(ex.args)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UpdatePromptClickRecord(APIView):
     def post(self, request):
+        """
+        View to update prompt click record
+        @param request: http request object
+        @return:  HttpResponse: 200 on success
+                  HttpResponse: 422 if the request is not valid.
+        """
         user = request.user
         # make sure user is responsible for some organization
-        metric_update_prompt = get_org_metric_update_prompt(request.user)
-        if (metric_update_prompt):
+        metric_update_prompt = get_org_metric_update_prompt(user)
+        if metric_update_prompt:
             click = request.POST.get('click', None)
             if click in dict(MetricUpdatePromptRecord.CLICK_CHOICES):
                 record = MetricUpdatePromptRecord()
@@ -175,6 +183,13 @@ class UpdatePromptClickRecord(APIView):
 @expect_json
 @csrf_exempt
 def assign_user_badge(request):
+    """
+    API to assign badge to user
+    @param request: http request object
+    @return:  HttpResponse: 201 created on success
+              HttpResponse: 409 conflict if unable to assign badge.
+              HttpResponse: 400 in case of exception while assigning.
+    """
     data = json.loads(request.body)
     user_id = data.get('user_id')
     badge_id = data.get('badge_id')
@@ -188,7 +203,7 @@ def assign_user_badge(request):
     try:
         assigned = UserBadge.assign_badge(user_id=user_id, badge_id=badge_id, community_id=community_id)
         return JsonResponse({'success': True}, status=status.HTTP_201_CREATED if assigned else status.HTTP_409_CONFLICT)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         logging.exception(e)
         return JsonResponse({'success': False, 'message': str(e)},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -200,8 +215,8 @@ def get_user_chat(request):
     username = request.user.username
     headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
     response = requests.post(chat_endpoint,
-        data={'_uid': 1, 'username': username},
-        headers=headers)
+                             data={'_uid': 1, 'username': username},
+                             headers=headers)
     return JsonResponse(response.json())
 
 
@@ -211,8 +226,8 @@ def mark_user_chat_read(request):
     username = request.user.username
     headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
     response = requests.patch(chat_endpoint,
-        data={'_uid': 1, 'username': username},
-        headers=headers)
+                              data={'_uid': 1, 'username': username},
+                              headers=headers)
     return JsonResponse(response.json())
 
 
@@ -222,8 +237,8 @@ def get_user_data(request):
     username = request.POST.get("username")
     headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
     response = requests.post(data_endpoint,
-        data={'_uid': 1, 'username': username},
-        headers=headers)
+                             data={'_uid': 1, 'username': username},
+                             headers=headers)
     return JsonResponse(response.json())
 
 
@@ -252,7 +267,7 @@ def send_alquity_fake_confirmation_email(request):
             "course_name": request.META.get('HTTP_COURSE_NAME', '')
         }
         MandrillClient().send_mail(MandrillClient.ALQUITY_FAKE_SUBMIT_CONFIRMATION_TEMPLATE, request.user.email, ctx)
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-except
         logging.exception(ex)
         success = False
     return JsonResponse({'success': success})
@@ -261,6 +276,13 @@ def send_alquity_fake_confirmation_email(request):
 @csrf_exempt
 @require_POST
 def resend_activation_email(request):
+    """
+    API to resend activation email
+    @param request: http request object
+    @return:  HttpResponse: 200 on success
+              HttpResponse: 409 conflict if user account is already activated.
+              HttpResponse: 500 in case of exception.
+    """
     try:
         data = json.loads(request.body)
         user_id = data.get('user_id')
@@ -271,9 +293,9 @@ def resend_activation_email(request):
             activation_response = JsonResponse(data={'email': user.email}, status=status.HTTP_200_OK)
         else:
             # the user's account has already been activated
-            activation_response = JsonResponse(data = {}, status=status.HTTP_409_CONFLICT)
-    except Exception as ex:
+            activation_response = JsonResponse(data={}, status=status.HTTP_409_CONFLICT)
+    except Exception as ex: # pylint: disable=broad-except
         logging.exception(ex)
-        activation_response = JsonResponse(data = {}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        activation_response = JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return activation_response

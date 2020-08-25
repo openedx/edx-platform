@@ -1,3 +1,6 @@
+"""
+Helpers for philu_api application
+"""
 from urllib import urlencode
 
 import jwt
@@ -8,19 +11,19 @@ from custom_settings.models import CustomSettings
 from lms.envs.common import SOCIAL_SHARING_URLS, TWITTER_MESSAGE_FORMAT
 
 
-def get_encoded_token(username, email, id):
-    return jwt.encode({'id': id, 'username': username, 'email': email}, 'secret', algorithm='HS256')
+def get_encoded_token(username, email, _id):
+    return jwt.encode({'id': _id, 'username': username, 'email': email}, 'secret', algorithm='HS256')
 
 
 def get_course_custom_settings(course_key):
     """ Return course custom settings object """
-    if isinstance(course_key, str) or isinstance(course_key, unicode):
+    if isinstance(course_key, (str, unicode)):
         course_key = CourseKey.from_string(course_key)
 
     return CustomSettings.objects.filter(id=course_key).first()
 
 
-def get_social_sharing_urls(course_url, meta_tags, tweet_text=None):
+def get_social_sharing_urls(course_url, meta_tags):
     utm_params = meta_tags['utm_params'].copy()
     course_share_url = '{}?{}'.format(course_url, urlencode(utm_params))
 
@@ -60,6 +63,15 @@ def get_social_sharing_urls(course_url, meta_tags, tweet_text=None):
 
 
 def _compile_social_sharing_url(share_url, course_url, url_param, utm_source, text=None):
+    """
+    Create social sharing url by combining url and parameters
+    @param share_url: social platform url
+    @param course_url: course url
+    @param url_param: url parameters
+    @param utm_source: social platform source i.e. Facebook, LinkedIn, Twitter
+    @param text: url text parameter
+    @return: social sharing url
+    """
     course_url_with_utm = add_or_replace_parameter(course_url, 'utm_source', utm_source)
 
     # Introduced for the email case where the addThis widget is being used
