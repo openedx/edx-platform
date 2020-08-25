@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import pdfkit
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
@@ -8,24 +7,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from certificates import api as certs_api
-from constants import (
-    CERTIFICATE_PDF_NAME,
-    COMPLETION_DATE_FORMAT,
-    COURSE_URL_FMT,
-    PDF_RESPONSE_HEADER,
-    PDFKIT_IMAGE_PATH,
-    TWITTER_META_TITLE_FMT
-)
+from constants import COMPLETION_DATE_FORMAT, COURSE_URL_FMT, PDF_RESPONSE_HEADER, TWITTER_META_TITLE_FMT
 from courseware.courses import get_course
 from edxmako.shortcuts import render_to_response
 from helpers import (
     get_certificate_image_url,
-    get_certificate_image_url_by_uuid,
-    get_course_display_name_by_uuid,
+    get_certificate_pdf_name,
     get_credential_certificates,
-    get_image_and_size_from_url,
-    get_pdfkit_html,
-    get_pdfkit_options,
+    get_pdf_data_by_certificate_uuid,
     get_philu_certificate_social_context
 )
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
@@ -178,27 +167,18 @@ def shared_student_achievements(request, certificate_uuid):
 @ensure_csrf_cookie
 def download_certificate_pdf(request, certificate_uuid):
     """
-    Convert user certificate image on S3 bucket to PDF file and download it for end user
-    :param request: HttpRequest obj
-    :param certificate_uuid: certificate unique id
-    :return: downloadable PDF file
+    Convert user certificate image on S3 bucket to PDF and download it for end user
+    Arguments:
+        request: The HttpRequest object.
+        certificate_uuid: certificate unique id.
+    Returns:
+        Downloadable PDF file.
     """
-
-    certificate_image_url = get_certificate_image_url_by_uuid(certificate_uuid)
-    image_base64, image_width, image_height = get_image_and_size_from_url(certificate_image_url)
-
-    certificate_image_html = get_pdfkit_html(image_base64)
-    pdfkit_options = get_pdfkit_options(image_width, image_height)
-
-    pdf_document_object = pdfkit.from_string(certificate_image_html, PDFKIT_IMAGE_PATH, pdfkit_options)
-
-    course_display_name = get_course_display_name_by_uuid(certificate_uuid)
-    pdf_name = CERTIFICATE_PDF_NAME.format(display_name=course_display_name.replace(' ', ''))
-
-    response_pdf_certificate = HttpResponse(pdf_document_object, content_type='application/pdf')
-    response_pdf_certificate['Content-Disposition'] = PDF_RESPONSE_HEADER.format(certificate_pdf_name=pdf_name)
-
-    return response_pdf_certificate
+    pdf_data = get_pdf_data_by_certificate_uuid(certificate_uuid)
+    pdf_name = get_certificate_pdf_name(certificate_uuid)
+    response = HttpResponse(pdf_data, content_type='application/pdf')
+    response['Content-Disposition'] = PDF_RESPONSE_HEADER.format(certificate_pdf_name=pdf_name)
+    return response
 
 
 def verify_certificate(request, key):

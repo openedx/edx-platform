@@ -1,44 +1,26 @@
 """
 This file contains the test cases for views of the student_certificates app
 """
-
-from datetime import datetime, timedelta
-
 import factory
 import mock
-import pytz
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import signals
 from django.http import Http404, HttpRequest
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from django.utils import timezone
-from pyquery import PyQuery as pq
 
 from certificates.tests.factories import GeneratedCertificateFactory
-from course_modes.tests.factories import CourseModeFactory
 from custom_settings.models import CustomSettings
-from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.onboarding.helpers import get_current_utc_date
-from lms.djangoapps.onboarding.tests.factories import UserFactory
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.theming.models import SiteTheme
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
-from openedx.features.student_certificates.constants import (
-    COURSE_URL_FMT,
-    PDFKIT_IMAGE_PATH,
-    PDFKIT_OPTIONS,
-    TWITTER_META_TITLE_FMT
-)
+from openedx.features.student_certificates.constants import COURSE_URL_FMT, TWITTER_META_TITLE_FMT
 from openedx.features.student_certificates.helpers import get_philu_certificate_social_context
 from openedx.features.student_certificates.views import (
     download_certificate_pdf,
     shared_student_achievements,
     student_certificates
 )
-from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -237,41 +219,19 @@ class GenerateStudentCertificateViewsTestCase(SharedModuleStoreTestCase):
             shared_student_achievements(request, verify_uuid)
 
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
-    @mock.patch('openedx.features.student_certificates.views.get_certificate_image_url_by_uuid')
-    @mock.patch('openedx.features.student_certificates.views.get_image_and_size_from_url')
-    @mock.patch('openedx.features.student_certificates.views.get_pdfkit_html')
-    @mock.patch('openedx.features.student_certificates.views.get_pdfkit_options')
-    @mock.patch('openedx.features.student_certificates.views.pdfkit.from_string')
-    @mock.patch('openedx.features.student_certificates.views.get_course_display_name_by_uuid')
-    def test_download_certificate_pdf(self, mock_get_course_display_name_by_uuid,
-                                      mock_from_string, mock_get_pdfkit_options, mock_get_pdfkit_html,
-                                      mock_get_image_and_size_from_url, mock_get_certificate_image_url_by_uuid):
+    @mock.patch('openedx.features.student_certificates.views.get_pdf_data_by_certificate_uuid')
+    def test_download_certificate_pdf(self, mock_get_pdf_data_by_certificate_uuid):
         """
         Tests the flow of certificate pdf downloading
         """
         certificate_uuid = self.certificate.verify_uuid
 
-        mock_get_certificate_image_url_by_uuid.return_value = 'example.com'
-        mock_get_image_and_size_from_url.return_value = ('image_base64', 50, 50)
-        mock_get_pdfkit_html.return_value = 'certificate_image_html'
-        PDFKIT_OPTIONS['page-height'] = '50px'
-        PDFKIT_OPTIONS['page-width'] = '50px'
-        mock_get_pdfkit_options.return_value = PDFKIT_OPTIONS
-        mock_from_string.return_value = 'pdf_document_object'
-        mock_get_course_display_name_by_uuid.return_value = 'Test Course Name'
+        mock_get_pdf_data_by_certificate_uuid.return_value = 'PDF Bytes data'
 
         request = self.factory.get(reverse('download_certificate_pdf', args=(certificate_uuid, )))
         request.user = self.user
         response = download_certificate_pdf(request, certificate_uuid)
 
-        mock_get_certificate_image_url_by_uuid.assert_called_once_with(certificate_uuid)
-        mock_get_image_and_size_from_url.assert_called_once_with('example.com')
-        mock_get_pdfkit_html.assert_called_once_with('image_base64')
-        mock_get_pdfkit_options.assert_called_once_with(50, 50)
-        mock_from_string.assert_called_once_with('certificate_image_html', PDFKIT_IMAGE_PATH, PDFKIT_OPTIONS)
-        mock_get_course_display_name_by_uuid.assert_called_once_with(certificate_uuid)
+        mock_get_pdf_data_by_certificate_uuid.assert_called_once_with(certificate_uuid)
 
-        self.assertEquals(
-            response.get('Content-Disposition'),
-            'attachment; filename="PhilanthropyUniversity_TestCourseName.pdf"'
-        )
+        self.assertEquals(response.get('Content-Disposition'),'attachment; filename="PhilanthropyUniversity_Run0.pdf"')
