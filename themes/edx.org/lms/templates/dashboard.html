@@ -178,7 +178,11 @@ from student.models import CourseEnrollment
       ${static.renderReact(
         component="DemographicsCollectionBanner",
         id="dashboard-demographics-collection-banner",
-        props={"user": user.id, "bannerLogo": static.url('edx.org/images/quote_prompt.png')},
+        props={
+          "user": user.id,
+          "lmsRootUrl": getattr(settings, 'LMS_ROOT_URL', ''),
+          "jwtAuthToken": getattr(settings, 'JWT_AUTH', {}).get('JWT_AUTH_COOKIE_HEADER_PAYLOAD', '')
+        },
       )}
   % endif
   <section class="my-courses" id="my-courses">
