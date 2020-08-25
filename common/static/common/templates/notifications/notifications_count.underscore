@@ -1,6 +1,6 @@
 <%
 if (count > 0) {
-    count = (count>99)?"99+":count;
+    count = count > 99 ? '99+' : count;
 %>
     <span id="notification-count">
         <%=count %>
