@@ -87,12 +87,11 @@ COPY cms/devstack.yml /edx/etc/studio.yml
 # the requirements cache.
 COPY . .
 
-EXPOSE 18000
-
 FROM base as lms
 ENV SERVICE_VARIANT lms
 ENV DJANGO_SETTINGS_MODULE lms.envs.production
-CMD gunicorn -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:18000 --max-requests=1000 --access-logfile - lms.wsgi:application
+EXPOSE 8000
+CMD gunicorn -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
 
 FROM lms as lms-newrelic
 RUN pip install newrelic
@@ -110,11 +109,12 @@ ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
 FROM base as studio
 ENV SERVICE_VARIANT cms
 ENV DJANGO_SETTINGS_MODULE cms.envs.production
-CMD gunicorn -c /edx/app/edxapp/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
+EXPOSE 8010
+CMD gunicorn -c /edx/app/edxapp/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8010 --max-requests=1000 --access-logfile - cms.wsgi:application
 
 FROM studio as studio-newrelic
 RUN pip install newrelic
-CMD newrelic-admin run-program gunicorn -c /edx/app/edxapp/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - cms.wsgi:application
+CMD newrelic-admin run-program gunicorn -c /edx/app/edxapp/edx-platform/cms/docker_cms_gunicorn.py --name cms --bind=0.0.0.0:8010 --max-requests=1000 --access-logfile - cms.wsgi:application
 
 FROM studio as studio-devstack
 # TODO: This compiles static assets.

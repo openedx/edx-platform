@@ -105,10 +105,6 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
 
-split_requirements:
-	grep -E    "^-e (common|openedx|lms|cms|\.)" requirements/edx/base.txt > requirements/edx/base_in_tree.txt
-	grep -E -v "^-e (common|openedx|lms|cms|\.)(/| )" requirements/edx/base.txt > requirements/edx/base_not_in_tree.txt
-
 # These make targets currently only build LMS images.
 docker_build:
 	docker build . -f Dockerfile --target lms -t openedx/edx-platform

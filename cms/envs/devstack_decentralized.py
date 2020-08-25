@@ -19,7 +19,7 @@ DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = DEBUG
 SITE_NAME = 'localhost:8001'
 HTTPS = 'off'
 
-CMS_BASE = 'localhost:18010'
+CMS_BASE = 'localhost:8010'
 
 ################################ LOGGERS ######################################
 
@@ -42,7 +42,7 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 ################################# LMS INTEGRATION #############################
 
-LMS_BASE = 'localhost:18000'
+LMS_BASE = 'localhost:8000'
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
