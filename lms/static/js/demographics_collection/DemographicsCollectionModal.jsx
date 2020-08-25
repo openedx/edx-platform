@@ -80,6 +80,7 @@ class DemographicsCollectionModal extends React.Component {
 
     // gather previously answers questions
     try {
+      await this.jwtTokenService.getJwtToken();
       response = await fetch(`http://localhost:18360/demographics/api/v1/demographics/${this.props.user}/`, requestOptions);
       // if the user has not yet bee created in the demographics service, we need to make a post to create an entry
       if (response.status !== 200) {
@@ -146,6 +147,7 @@ class DemographicsCollectionModal extends React.Component {
     };
 
     try {
+      await this.jwtTokenService.getJwtToken();
       await fetch(`http://localhost:18360/demographics/api/v1/demographics/${this.props.user}/`, options)
     } catch (error) {
       this.setState({ loading: false, error: true, errorMessage: error });
