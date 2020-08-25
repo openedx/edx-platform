@@ -1,9 +1,9 @@
 import json
-from mock import patch
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase
+from mock import patch
 
 from lms.djangoapps.philu_api.views import assign_user_badge
 

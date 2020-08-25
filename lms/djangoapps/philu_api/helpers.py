@@ -1,10 +1,11 @@
-import jwt
-from custom_settings.models import CustomSettings
-from opaque_keys.edx.keys import CourseKey
 from urllib import urlencode
+
+import jwt
+from opaque_keys.edx.keys import CourseKey
 from w3lib.url import add_or_replace_parameter
 
-from lms.envs.common import (SOCIAL_SHARING_URLS, TWITTER_MESSAGE_FORMAT)
+from custom_settings.models import CustomSettings
+from lms.envs.common import SOCIAL_SHARING_URLS, TWITTER_MESSAGE_FORMAT
 
 
 def get_encoded_token(username, email, id):
