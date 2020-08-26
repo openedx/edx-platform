@@ -176,15 +176,16 @@ class TestLoginWithAccessTokenView(TestCase):
         self.user = UserFactory()
         self.oauth2_client = Client.objects.create(client_type=provider.constants.CONFIDENTIAL)
 
-    def _verify_response(self, access_token, expected_status_code, expected_cookie_name=None):
+    def _verify_response(self, access_token, expected_status_code, expected_cookie_names=None):
         """
         Calls the login_with_access_token endpoint and verifies the response given the expected values.
         """
         url = reverse("login_with_access_token")
         response = self.client.post(url, HTTP_AUTHORIZATION="Bearer {0}".format(access_token))
         self.assertEqual(response.status_code, expected_status_code)
-        if expected_cookie_name:
-            self.assertIn(expected_cookie_name, response.cookies)
+        if expected_cookie_names:
+            for cookie in expected_cookie_names:
+                self.assertIn(cookie, response.cookies)
 
     def _create_dot_access_token(self, grant_type='Client credentials'):
         """
@@ -213,9 +214,16 @@ class TestLoginWithAccessTokenView(TestCase):
 
     def test_dot_password_grant_supported(self):
         access_token = self._create_dot_access_token(grant_type='password')
-
-        self._verify_response(access_token, expected_status_code=204, expected_cookie_name='sessionid')
+        self._verify_response(access_token, expected_status_code=204, expected_cookie_names=['sessionid'])
         self.assertEqual(int(self.client.session['_auth_user_id']), self.user.id)
+
+    def test_expected_cookies_exist(self):
+        access_token = self._create_dot_access_token(grant_type='password')
+        self._verify_response(
+            access_token,
+            expected_status_code=204,
+            expected_cookie_names=['edx-user-info', 'edly-user-info']
+        )
 
     def test_dot_client_credentials_unsupported(self):
         access_token = self._create_dot_access_token()

@@ -29,6 +29,7 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 
@@ -176,4 +177,5 @@ class LoginWithAccessTokenView(APIView):
             })
 
         login(request, request.user)  # login generates and stores the user's cookies in the session
-        return HttpResponse(status=204)  # cookies stored in the session are returned with the response
+        response = HttpResponse(status=204)  # cookies stored in the session are returned with the response
+        return set_logged_in_cookies(request, response, request.user)
