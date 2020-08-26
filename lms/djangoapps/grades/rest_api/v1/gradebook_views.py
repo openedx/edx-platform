@@ -920,6 +920,10 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         )
 
 
+class SubsectionUnavailableToUserException(Exception):
+    pass
+
+
 @view_auth_classes()
 class SubsectionGradeView(GradeViewMixin, APIView):
     """
@@ -1043,6 +1047,8 @@ class SubsectionGradeView(GradeViewMixin, APIView):
                 developer_message='Invalid UserID',
                 error_code='invalid_user_id'
             )
+        success = True
+        err_msg = ""
         override = None
         history = []
         history_record_limit = request.GET.get('history_record_limit')
@@ -1069,14 +1075,18 @@ class SubsectionGradeView(GradeViewMixin, APIView):
         except PersistentSubsectionGrade.DoesNotExist:
             grade_data = self._get_grade_data_for_not_attempted_assignment(user_id, usage_key)
 
-        results = SubsectionGradeResponseSerializer({
+        response_data = {
+            'success': success,
             'original_grade': grade_data,
             'override': override,
             'history': history,
             'subsection_id': usage_key,
             'user_id': user_id,
             'course_id': usage_key.course_key,
-        })
+        }
+        if not success:
+            response_data['error_message'] = err_msg
+        results = SubsectionGradeResponseSerializer(response_data)
         return Response(results.data)
 
     def _get_grade_data_for_not_attempted_assignment(self, user_id, usage_key):

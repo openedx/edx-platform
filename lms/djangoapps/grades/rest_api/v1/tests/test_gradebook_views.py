@@ -1706,6 +1706,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 1.0),
                 ('possible_all', 2.0),
@@ -1733,6 +1734,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 6.0),
                 ('possible_all', 12.0),
@@ -1770,6 +1772,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 6.0),
                 ('possible_all', 12.0),
@@ -1827,6 +1830,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 6.0),
                 ('possible_all', 12.0),
@@ -1928,6 +1932,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             self.get_url(subsection_id=self.usage_key, user_id=other_user.id)
         )
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 0.0),
                 ('possible_all', 0.0),
