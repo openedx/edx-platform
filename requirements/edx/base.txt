@@ -50,7 +50,7 @@ decorator==4.4.2          # via pycontracts
 defusedxml==0.6.0         # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
 django-appconf==1.0.4     # via -r requirements/edx/base.in, django-statici18n
 django-celery==3.3.1      # via -r requirements/edx/base.in, edx-bulk-grades
-django-classy-tags==1.0.0  # via django-sekizai
+django-classy-tags==2.0.0  # via django-sekizai
 django-config-models==2.0.2  # via -r requirements/edx/base.in, edx-enterprise
 django-cookies-samesite==0.6.6  # via -r requirements/edx/base.in
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
@@ -72,7 +72,7 @@ django-pyfs==2.2          # via -r requirements/edx/base.in
 git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-ratelimit-backend==2.0.1a5  # via -r requirements/edx/github.in
 django-ratelimit==3.0.1   # via -r requirements/edx/base.in
 django-require==1.0.11    # via -r requirements/edx/base.in
-django-sekizai==1.1.0     # via -r requirements/edx/base.in, django-wiki
+django-sekizai==2.0.0     # via -r requirements/edx/base.in, django-wiki
 django-ses==0.8.14        # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 django-simple-history==2.11.0  # via -r requirements/edx/base.in, edx-enterprise, edx-organizations, ora2
 django-splash==0.2.9      # via -r requirements/edx/base.in
@@ -216,7 +216,7 @@ scipy==1.4.1              # via -c requirements/edx/../constraints.txt, chem, op
 semantic-version==2.8.5   # via edx-drf-extensions
 shapely==1.7.1            # via -r requirements/edx/base.in
 simplejson==3.17.2        # via -r requirements/edx/base.in, sailthru-client, super-csv, xblock-utils
-six==1.15.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, chem, crowdsourcehinter-xblock, cryptography, django-classy-tags, django-countries, django-sekizai, django-simple-history, django-statici18n, django-wiki, drf-yasg, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, openedx-calc, packaging, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
+six==1.15.0               # via -r requirements/edx/../edx-sandbox/shared.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, analytics-python, bleach, chem, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, django-statici18n, django-wiki, drf-yasg, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, event-tracking, fs, fs-s3fs, help-tokens, html5lib, isodate, libsass, mock, openedx-calc, packaging, paver, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, social-auth-app-django, social-auth-core, stevedore, xblock
 slumber==0.7.1            # via edx-bulk-grades, edx-enterprise, edx-rest-api-client
 social-auth-app-django==4.0.0  # via -r requirements/edx/base.in
 social-auth-core==3.3.3   # via -r requirements/edx/base.in, social-auth-app-django
