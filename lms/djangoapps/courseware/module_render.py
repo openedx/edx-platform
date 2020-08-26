@@ -394,7 +394,6 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     )
 
 
-@beeline.traced(name="lms.courseware.module_render.get_module_system_for_user")
 def get_module_system_for_user(
         user,
         student_data,  # TODO  # pylint: disable=too-many-statements
@@ -460,7 +459,6 @@ def get_module_system_for_user(
         'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
     }
 
-    @beeline.traced(name="lms.courseware.module_render.inner_get_module")
     def inner_get_module(descriptor):
         """
         Delegate to get_module_for_descriptor_internal() with all values except `descriptor` set.
@@ -811,7 +809,6 @@ def get_module_system_for_user(
 
 # TODO: Find all the places that this method is called and figure out how to
 # get a loaded course passed into it
-@beeline.traced(name="lms.courseware.module_render.get_module_for_descriptor_internal")
 def get_module_for_descriptor_internal(user, descriptor, student_data, course_id,  # pylint: disable=invalid-name
                                        track_function, xqueue_callback_url_prefix, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
