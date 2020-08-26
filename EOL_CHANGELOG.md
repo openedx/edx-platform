@@ -1,0 +1,8 @@
+# Changelog EOL
+
+### 26/08/2020 Send email with *reply_to* attribute at instructor view
+- New attribute on model *CourseEmail* (lms/djangoapps/bulk_email/models.py)
+- Add *reply_to* attribute into *EmailMultiAlternatives()* (lms/djangoapps/bulk_email/tasks.py)
+- Create *CourseEmail* with *reply_to* attribute from POST data (lms/djangoapps/instructor/views/api.py)
+- Get *reply_to* value from the instructor view and send it by POST method (lms/static/js/instructor_dashboard/send_email.js)
+- New tests (lms/djangoapps/bulk_email/tests/test_models_eol.py & lms/djangoapps/instructor/tests/test_api_eol.py)

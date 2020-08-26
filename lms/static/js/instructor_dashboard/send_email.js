@@ -36,6 +36,9 @@
 
     this.SendEmail = (function() {
         function SendEmail($container) {
+            /*
+            * Attribute: reply_to is a customization from Eol Open edX
+            */
             var sendemail = this;
             this.$container = $container;
             this.$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
@@ -43,6 +46,7 @@
             this.$cohort_targets = this.$send_to.filter('[value^="cohort:"]');
             this.$course_mode_targets = this.$send_to.filter('[value^="track:"]');
             this.$subject = this.$container.find("input[name='subject']");
+            this.$reply_to = this.$container.find("input[name='reply_to']");
             this.$btn_send = this.$container.find("input[name='send']");
             this.$task_response = this.$container.find('.request-response');
             this.$request_response_error = this.$container.find('.request-response-error');
@@ -56,8 +60,9 @@
             this.$email_messages_wrapper = this.$container.find('.email-messages-wrapper');
             this.$btn_send.click(function() {
                 var body, confirmMessage, displayTarget, fullConfirmMessage, message,
-                    sendData, subject, successMessage, target, targets, validation, i, len;
+                    sendData, subject, reply_to, successMessage, target, targets, validation, i, len;
                 subject = sendemail.$subject.val();
+                reply_to = sendemail.$reply_to.val();
                 body = sendemail.$emailEditor.save().data;
                 targets = [];
                 sendemail.$send_to.filter(':checked').each(function() {
@@ -108,6 +113,7 @@
                             action: 'send',
                             send_to: JSON.stringify(targets),
                             subject: subject,
+                            reply_to: reply_to,
                             message: body
                         };
                         return $.ajax({

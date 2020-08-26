@@ -2198,6 +2198,7 @@ def send_email(request, course_id):
        lms/djangoapps/bulk_email/models.py
     - 'subject' specifies email's subject
     - 'message' specifies email's content
+    - 'reply_to' specifies what email should be reply to (customization from Eol Open edX)
     """
     course_id = CourseKey.from_string(course_id)
 
@@ -2208,6 +2209,7 @@ def send_email(request, course_id):
     targets = json.loads(request.POST.get("send_to"))
     subject = request.POST.get("subject")
     message = request.POST.get("message")
+    reply_to = request.POST.get("reply_to") if 'reply_to' in request.POST else None
 
     # allow two branding points to come from Site Configuration: which CourseEmailTemplate should be used
     # and what the 'from' field in the email should be
@@ -2241,7 +2243,8 @@ def send_email(request, course_id):
             targets,
             subject, message,
             template_name=template_name,
-            from_addr=from_addr
+            from_addr=from_addr,
+            reply_to=reply_to
         )
     except ValueError as err:
         log.exception(u'Cannot create course email for course %s requested by user %s for targets %s',

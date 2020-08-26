@@ -255,6 +255,8 @@ class CourseEmail(Email):
     targets = models.ManyToManyField(Target)
     template_name = models.CharField(null=True, max_length=255)
     from_addr = models.CharField(null=True, max_length=255)
+    # customization from Eol Open edX
+    reply_to = models.CharField(null=True, max_length=255)
 
     def __str__(self):
         return self.subject
@@ -262,7 +264,7 @@ class CourseEmail(Email):
     @classmethod
     def create(
             cls, course_id, sender, targets, subject, html_message,
-            text_message=None, template_name=None, from_addr=None):
+            text_message=None, template_name=None, from_addr=None, reply_to=None):
         """
         Create an instance of CourseEmail.
         """
@@ -304,6 +306,7 @@ class CourseEmail(Email):
             text_message=text_message,
             template_name=template_name,
             from_addr=from_addr,
+            reply_to=reply_to,
         )
         course_email.save()  # Must exist in db before setting M2M relationship values
         course_email.targets.add(*new_targets)
