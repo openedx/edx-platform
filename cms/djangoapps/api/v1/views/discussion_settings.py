@@ -1,7 +1,6 @@
 """Api endpoint to fetch & update discussion related settings"""
 
 
-
 from django.core.exceptions import PermissionDenied
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
