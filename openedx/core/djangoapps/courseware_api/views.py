@@ -11,7 +11,9 @@ from django.conf import settings
 from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -332,7 +334,10 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         """
         Return response to a GET request.
         """
-        usage_key = UsageKey.from_string(usage_key_string)
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+        except InvalidKeyError:
+            raise NotFound("Invalid usage key: '{}'.".format(usage_key_string))
 
         sequence, _ = get_module_by_usage_id(
             self.request,
