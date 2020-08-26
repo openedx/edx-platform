@@ -553,6 +553,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                 plaintext_msg,
                 from_addr,
                 [email],
+                reply_to=[course_email.reply_to if course_email.reply_to else from_addr], # customization from Eol Open edX
                 connection=connection
             )
             email_msg.attach_alternative(html_msg, 'text/html')
