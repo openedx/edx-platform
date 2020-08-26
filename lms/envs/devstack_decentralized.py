@@ -1,6 +1,5 @@
 """
-TODO hack for decentralized devstack spike.
-It'd better to just follow OEP-45 and just feed a devstack.yml file to production.py.
+Settings file for decentralized devstack
 """
 
 # Silence noisy logs
