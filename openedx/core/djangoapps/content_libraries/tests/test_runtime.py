@@ -19,6 +19,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_METADATA_URL,
 )
 from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
+from openedx.core.djangoapps.content_libraries.constants import COMPLEX
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
 from openedx.core.lib import blockstore_api
@@ -46,6 +47,7 @@ class ContentLibraryContentTestMixin(object):
         )
         cls.library = library_api.create_library(
             collection_uuid=cls.collection.uuid,
+            library_type=COMPLEX,
             org=cls.organization,
             slug=cls.__name__,
             title=(cls.__name__ + " Test Lib"),
@@ -83,6 +85,7 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
             slug="idolx",
             title=("Identical OLX Test Lib 2"),
             description="",
+            library_type=COMPLEX,
             allow_public_learning=True,
             allow_public_read=False,
         )
@@ -176,6 +179,8 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
     state for XBlocks when learners access blocks directly in a library context,
     if the library allows direct learning.
     """
+
+    multi_db = True
 
     @XBlock.register_temp_plugin(UserStateTestBlock, UserStateTestBlock.BLOCK_TYPE)
     def test_default_values(self):

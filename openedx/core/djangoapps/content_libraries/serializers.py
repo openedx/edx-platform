@@ -5,6 +5,7 @@ Serializers for the content libraries REST API
 from django.core.validators import validate_unicode_slug
 from rest_framework import serializers
 
+from openedx.core.djangoapps.content_libraries.constants import LIBRARY_TYPES, COMPLEX
 from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 from openedx.core.lib import blockstore_api
 
@@ -21,6 +22,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     # begins with 'lib:'. (The numeric ID of the ContentLibrary object in MySQL
     # is not exposed via this API.)
     id = serializers.CharField(source="key", read_only=True)
+    type = serializers.ChoiceField(choices=LIBRARY_TYPES, default=COMPLEX)
     org = serializers.SlugField(source="key.org")
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
     bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
@@ -45,6 +47,7 @@ class ContentLibraryUpdateSerializer(serializers.Serializer):
     description = serializers.CharField()
     allow_public_learning = serializers.BooleanField()
     allow_public_read = serializers.BooleanField()
+    type = serializers.ChoiceField(choices=LIBRARY_TYPES)
 
 
 class ContentLibraryPermissionLevelSerializer(serializers.Serializer):
@@ -73,6 +76,15 @@ class ContentLibraryPermissionSerializer(ContentLibraryPermissionLevelSerializer
     email = serializers.EmailField(source="user.email", read_only=True, default=None)
     username = serializers.CharField(source="user.username", read_only=True, default=None)
     group_name = serializers.CharField(source="group.name", allow_null=True, allow_blank=False, default=None)
+
+
+class ContentLibraryFilterSerializer(serializers.Serializer):
+    """
+    Serializer for filtering library listings.
+    """
+    text_search = serializers.CharField(default=None, required=False)
+    org = serializers.CharField(default=None, required=False)
+    type = serializers.ChoiceField(choices=LIBRARY_TYPES, default=None, required=False)
 
 
 class LibraryXBlockMetadataSerializer(serializers.Serializer):

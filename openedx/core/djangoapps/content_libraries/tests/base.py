@@ -16,6 +16,7 @@ from search.search_engine_base import SearchEngine
 
 from student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.libraries_index import MAX_SIZE
+from openedx.core.djangoapps.content_libraries.constants import COMPLEX
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
 
@@ -166,7 +167,7 @@ class ContentLibrariesRestApiTest(APITestCase):
         yield
         self.client = old_client  # pylint: disable=attribute-defined-outside-init
 
-    def _create_library(self, slug, title, description="", org=None, expect_response=200):
+    def _create_library(self, slug, title, description="", org=None, library_type=COMPLEX, expect_response=200):
         """ Create a library """
         if org is None:
             org = self.organization.short_name
@@ -175,6 +176,7 @@ class ContentLibrariesRestApiTest(APITestCase):
             "slug": slug,
             "title": title,
             "description": description,
+            "type": library_type,
             "collection_uuid": str(self.collection.uuid),
         }, expect_response)
 
@@ -252,6 +254,10 @@ class ContentLibrariesRestApiTest(APITestCase):
             return self._api('delete', url, None, expect_response)
         else:
             return self._api('put', url, {"access_level": access_level}, expect_response)
+
+    def _get_library_block_types(self, lib_key, expect_response=200):
+        """ Get the list of permitted XBlocks for this library """
+        return self._api('get', URL_LIB_BLOCK_TYPES.format(lib_key=lib_key), None, expect_response)
 
     def _get_library_blocks(self, lib_key, query_params_dict=None, expect_response=200):
         """ Get the list of XBlocks in the library """
