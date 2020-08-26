@@ -1952,3 +1952,19 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_get_override_for_unreleased_block(self):
+        self.login_course_staff()
+        unreleased_subsection = ItemFactory.create(
+            parent_location=self.chapter_1.location,
+            category='sequential',
+            graded=True,
+            start=datetime(2999, 1, 1, tzinfo=UTC),  # arbitrary future date
+            display_name='Unreleased Section',
+        )
+
+        with self.assertRaises(ValueError):
+            resp = self.client.get(
+                self.get_url(subsection_id=unreleased_subsection.location)
+            )
