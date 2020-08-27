@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db.models import Case, Exists, F, OuterRef, When, Q
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
@@ -1107,7 +1108,7 @@ class SubsectionGradeView(GradeViewMixin, APIView):
         course_structure = get_course_blocks(student, usage_key)
         if usage_key not in course_structure:
             raise SubsectionUnavailableToUserException(
-                "Cannot override subsection grade: subsection is not available for target user."
+                _("Cannot override subsection grade: subsection is not available for target user.")
             )
         subsection_grade_factory = SubsectionGradeFactory(student, course_structure=course_structure)
         grade = subsection_grade_factory.create(course_structure[usage_key], read_only=True, force_calculate=True)
