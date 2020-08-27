@@ -18,7 +18,11 @@ jobs:
       - name: Test eol changes
         run: |
           cd .github/test
-          docker-compose run lms /openedx/edx-platform/.github/test/tests.sh
+          docker-compose run lms /openedx/edx-platform/.github/test/tests.sh lms/djangoapps/instructor_task/tests/test_tasks_helper.py && docker-compose down -v
+          docker-compose run lms /openedx/edx-platform/.github/test/tests.sh lms/djangoapps/instructor_analytics/tests/test_basic.py  && docker-compose down -v
+          docker-compose run lms /openedx/edx-platform/.github/test/tests.sh lms/djangoapps/certificates/tests/test_webview_views.py && docker-compose down -v
+          docker-compose run lms /openedx/edx-platform/.github/test/tests.sh lms/djangoapps/bulk_email/tests/ && docker-compose down -v
+          docker-compose run lms /openedx/edx-platform/.github/test/tests.sh lms/djangoapps/instructor/tests/ && docker-compose down -v
 
       - name: Push to juniper
         if: github.ref == 'refs/heads/eol/juniper.master'
