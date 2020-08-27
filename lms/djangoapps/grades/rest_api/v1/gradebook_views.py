@@ -1108,7 +1108,7 @@ class SubsectionGradeView(GradeViewMixin, APIView):
         course_structure = get_course_blocks(student, usage_key)
         if usage_key not in course_structure:
             raise SubsectionUnavailableToUserException(
-                _("Cannot override subsection grade: subsection is not available for target user.")
+                _("Cannot override subsection grade: subsection is not available for target learner.")
             )
         subsection_grade_factory = SubsectionGradeFactory(student, course_structure=course_structure)
         grade = subsection_grade_factory.create(course_structure[usage_key], read_only=True, force_calculate=True)

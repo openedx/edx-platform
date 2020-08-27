@@ -1975,7 +1975,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
 
         expected_data = {
             'success': False,
-            'error_message': "Cannot override subsection grade: subsection is not available for target user.",
+            'error_message': "Cannot override subsection grade: subsection is not available for target learner.",
             'original_grade': OrderedDict([
                 ('earned_all', 0.0),
                 ('possible_all', 0.0),
