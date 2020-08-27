@@ -39,7 +39,7 @@ ENV NO_PYTHON_UNINSTALL 1
 RUN pip install pip==20.0.2 \
   && pip install --src ../venv/src -r requirements/edx/base.txt \
   && pip install boto==2.40.0 \
-  && pip install -e git+https://github.com/eol-uchile/edx-s3-compatibility@02399a43c7c3e3bef2041bf9ac997c8820be7e7c#egg=edx_s3_compatiblity
+  && pip install -e git+https://github.com/eol-uchile/edx-s3-compatibility@ad317969c073f8348da719cdda7b430bcfafb706#egg=edx_s3_compatiblity
 
 # Remove the original versions of ora2 and edx-sga
 RUN pip uninstall -y ora2 edx-sga
