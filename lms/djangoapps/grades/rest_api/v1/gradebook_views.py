@@ -1073,7 +1073,17 @@ class SubsectionGradeView(GradeViewMixin, APIView):
                 'possible_graded': original_grade.possible_graded,
             }
         except PersistentSubsectionGrade.DoesNotExist:
-            grade_data = self._get_grade_data_for_not_attempted_assignment(user_id, usage_key)
+            try:
+                grade_data = self._get_grade_data_for_not_attempted_assignment(user_id, usage_key)
+            except SubsectionUnavailableToUserException as exc:
+                success = False
+                err_msg = str(exc)
+                grade_data = {
+                    'earned_all': 0,
+                    'possible_all': 0,
+                    'earned_graded': 0,
+                    'possible_graded': 0,
+                }
 
         response_data = {
             'success': success,
@@ -1095,6 +1105,10 @@ class SubsectionGradeView(GradeViewMixin, APIView):
         """
         student = get_user_model().objects.get(id=user_id)
         course_structure = get_course_blocks(student, usage_key)
+        if usage_key not in course_structure:
+            raise SubsectionUnavailableToUserException(
+                "Cannot override subsection grade: subsection is not available for target user."
+            )
         subsection_grade_factory = SubsectionGradeFactory(student, course_structure=course_structure)
         grade = subsection_grade_factory.create(course_structure[usage_key], read_only=True, force_calculate=True)
         grade_data = {

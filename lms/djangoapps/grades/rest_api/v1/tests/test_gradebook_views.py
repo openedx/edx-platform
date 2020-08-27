@@ -1969,7 +1969,23 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             display_name='Unreleased Section',
         )
 
-        with self.assertRaises(ValueError):
-            resp = self.client.get(
-                self.get_url(subsection_id=unreleased_subsection.location)
-            )
+        resp = self.client.get(
+            self.get_url(subsection_id=unreleased_subsection.location)
+        )
+
+        expected_data = {
+            'success': False,
+            'error_message': "Cannot override subsection grade: subsection is not available for target user.",
+            'original_grade': OrderedDict([
+                ('earned_all', 0.0),
+                ('possible_all', 0.0),
+                ('earned_graded', 0.0),
+                ('possible_graded', 0.0)
+            ]),
+            'user_id': self.user_id,
+            'override': None,
+            'course_id': text_type(self.usage_key.course_key),
+            'subsection_id': text_type(unreleased_subsection.location),
+            'history': []
+        }
+        self.assertEqual(expected_data, resp.data)
