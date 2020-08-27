@@ -450,6 +450,7 @@ def _update_organization_context(context, course):
     """
     partner_long_name, organization_logo = None, None
     partner_short_name = course.display_organization if course.display_organization else course.org
+    partner_short_name_overridden = True if course.display_organization else False
     organizations = organization_api.get_course_organizations(course_id=course.id)
     if organizations:
         #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
@@ -460,6 +461,7 @@ def _update_organization_context(context, course):
 
     context['organization_long_name'] = partner_long_name
     context['organization_short_name'] = partner_short_name
+    context['partner_short_name_overridden'] = partner_short_name_overridden
     context['accomplishment_copy_course_org'] = partner_short_name
     context['organization_logo'] = organization_logo
 
