@@ -3613,6 +3613,12 @@ ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 ENTERPRISE_CUSTOMER_SUCCESS_EMAIL = "customersuccess@edx.org"
 ENTERPRISE_INTEGRATIONS_EMAIL = "enterprise-integrations@edx.org"
 
+
+# The setting key maps to the channel code (e.g. 'SAP' for success factors), Channel code is defined as
+# part of django model of each integrated channel in edx-enterprise.
+# The absence of a key/value pair translates to NO LIMIT on the number of "chunks" transmitted per cycle.
+INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
+
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # These default settings are utilized by the LMS when interacting with the service,
