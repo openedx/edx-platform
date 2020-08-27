@@ -11,7 +11,7 @@ class UserDemographics(TimeStampedModel):
     A Users Demographics platform related data in support of the Demographics
     IDA and features
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     show_call_to_action = models.BooleanField(default=True)
     history = HistoricalRecords(app='demographics')
 
