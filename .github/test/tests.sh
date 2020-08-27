@@ -11,12 +11,8 @@ pip3 install -e git+https://github.com/edx/edx-ora2.git@2.7.6#egg=ora2==2.7.6
 
 # Task Helper modifications for uchileedxlogin package
 ## Test before installing the package
-DJANGO_SETTINGS_MODULE=lms.envs.test EDXAPP_TEST_MONGO_HOST=mongodb pytest \
-	lms/djangoapps/instructor_task/tests/test_tasks_helper.py \
-	lms/djangoapps/instructor_analytics/tests/test_basic.py \
-	lms/djangoapps/certificates/tests/test_webview_views.py \
-	lms/djangoapps/bulk_email/tests/ \
-	lms/djangoapps/instructor/tests/
+DJANGO_SETTINGS_MODULE=lms.envs.test EDXAPP_TEST_MONGO_HOST=mongodb pytest $1
+
 #DJANGO_SETTINGS_MODULE=lms.envs.test EDXAPP_TEST_MONGO_HOST=mongodb pytest lms/djangoapps/bulk_email/tests/ lms/djangoapps/instructor/tests/
 #DJANGO_SETTINGS_MODULE=lms.envs.test EDXAPP_TEST_MONGO_HOST=mongodb pytest lms/djangoapps/bulk_email/tests/test_models_eol.py lms/djangoapps/instructor/tests/test_api_eol.py
 ## Test after installing the package
