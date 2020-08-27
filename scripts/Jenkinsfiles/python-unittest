@@ -60,6 +60,7 @@ pipeline {
         XDIST_WORKER_SECURITY_GROUP = credentials('XDIST_WORKER_SECURITY_GROUP')
         THEME_USER_PASSWORD = credentials('philu-theme-user-password')
         MAILCHIMP_API_KEY = credentials('MAILCHIMP_API_KEY')
+        MANDRILL_API_KEY = credentials('MANDRILL_API_KEY')
     }
     stages {
         stage('Mark build as pending on Github') {
@@ -107,6 +108,7 @@ pipeline {
                 XDIST_WORKER_SECURITY_GROUP = credentials('XDIST_WORKER_SECURITY_GROUP')
                 THEME_USER_PASSWORD = credentials('philu-theme-user-password')
                 MAILCHIMP_API_KEY = credentials('MAILCHIMP_API_KEY')
+                MANDRILL_API_KEY = credentials('MANDRILL_API_KEY')
             }
             steps {
                 script {

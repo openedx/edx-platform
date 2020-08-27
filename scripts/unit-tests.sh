@@ -149,7 +149,8 @@ case "${TEST_SUITE}" in
             "openedx/features/student_certificates/"
             "openedx/features/teams/"
             "openedx/features/user_leads/"
-            "openedx/feature/xmodules"
+            # TODO: Uncomment once xmodules tests start running with paver -v --processes
+            # "openedx/feature/xmodules"
             "common/djangoapps/custom_settings/"
             "common/djangoapps/mailchimp_pipeline/"
             "common/djangoapps/nodebb/"

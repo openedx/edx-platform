@@ -336,7 +336,7 @@ SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
 NODEBB_RETRY_DELAY = 60
 NODEBB_ENDPOINT = 'http://local.philanthropyu.org:4567'
 NODEBB_MASTER_TOKEN = 'test-master-token-nodebb'
-MANDRILL_API_KEY = 'test_mandrill_api_key_part1-part2-part3'
+MANDRILL_API_KEY = os.environ.get('MANDRILL_API_KEY')
 MAILCHIMP_API_KEY = os.environ.get('MAILCHIMP_API_KEY')
 MAILCHIMP_LEARNERS_LIST_ID = 'test'
 ################## End PhilU Settings #####################
