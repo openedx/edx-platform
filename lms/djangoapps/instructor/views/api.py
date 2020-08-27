@@ -166,6 +166,8 @@ def common_exceptions_400(func):
         except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
             message = six.text_type(err)
 
+        log.exception("ProblemResponsesCommonException: Message: %s", message)
+
         if use_json:
             return JsonResponseBadRequest(message)
         else:
