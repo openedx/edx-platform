@@ -1,23 +1,25 @@
 """Api endpoint to fetch & update discussion related settings"""
 
 
-from django.core.exceptions import PermissionDenied
+from django.conf import settings
+from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import status
+from rest_framework import permissions, status, viewsets
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 
+from contentstore.views.course import get_course_and_check_access
 from models.settings.course_metadata import CourseMetadata
-from student.auth import has_studio_read_access
 from xmodule.modulestore.django import modulestore
 
 
-@api_view(['GET', 'POST', 'PUT'])
-@authentication_classes([SessionAuthentication, JwtAuthentication])
-def discussion_settings_handler(request, course_key_string):
-    """Returns discussion related settings on GET & update on POST or PUT request."""
+class DiscussionSettingsViewSet(viewsets.GenericViewSet):
+    """Endpoint to Serve & Update discussion related settings"""
+
+    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    lookup_value_regex = settings.COURSE_KEY_REGEX
+    permission_classes = (permissions.IsAdminUser,)
 
     # relavent keys for discussion related settings
     discussion_settings_keys = [
@@ -28,23 +30,53 @@ def discussion_settings_handler(request, course_key_string):
         'allow_anonymous'
     ]
 
-    course_key = CourseKey.from_string(course_key_string)
+    def get_object(self):
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
 
-    # check if user has permission
-    if not has_studio_read_access(request.user, course_key):
-        raise PermissionDenied()
+        assert lookup_url_kwarg in self.kwargs, (
+            u'Expected view %s to be called with a URL keyword argument '
+            u'named "%s". Fix your URL conf, or set the `.lookup_field` '
+            'attribute on the view correctly.' %
+            (self.__class__.__name__, lookup_url_kwarg)
+        )
 
-    with modulestore().bulk_operations(course_key):
-        course_module = modulestore().get_course(course_key)
+        course_key = CourseKey.from_string(self.kwargs[lookup_url_kwarg])
 
-        if request.method == 'GET':
-            advanced_dict = CourseMetadata.fetch(course_module)
-            # filter out only discussion related settings
-            discussion_dict = {key: advanced_dict[key] for key in discussion_settings_keys}
-            return Response(discussion_dict)
-        else:
-            # from request, filter keys that are related to discussion settings
-            discussion_dict = {key: request.data[key] for key in discussion_settings_keys if key in request.data}
+        if course_key:
+            return course_key
+
+        raise Http404
+
+    def get_course_module(self):
+        course_key = self.get_object()
+        return get_course_and_check_access(course_key, self.request.user)
+
+    def _filter_discussion_settings(self, from_dict):
+        """Helper method to filter out only discussion related keys from given dictionary"""
+
+        return {key: from_dict[key] for key in self.discussion_settings_keys if key in from_dict}
+
+    def _get_discussion_settings(self, course_module):
+        """Find discussion settings from a course"""
+
+        advanced_settings = CourseMetadata.fetch(course_module)
+        return self._filter_discussion_settings(advanced_settings)
+
+    def retrieve(self, request, *args, **kwargs):
+        """Return all discussion related settings for a course"""
+
+        course_module = self.get_course_module()
+        return Response(self._get_discussion_settings(course_module))
+
+    def update(self, request, *args, **kwargs):
+        """Update discussion settings"""
+
+        course_key = self.get_object()
+        with modulestore().bulk_operations(course_key):
+            course_module = self.get_course_module()
+
+            # make sure only discussion related settings are updated
+            discussion_dict = self._filter_discussion_settings(request.data)
             is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
                 course_module,
                 discussion_dict,
@@ -53,7 +85,7 @@ def discussion_settings_handler(request, course_key_string):
             if is_valid:
                 # now update mongo
                 modulestore().update_item(course_module, request.user.id)
-                updated_discussion_settings = {key: updated_data[key] for key in discussion_settings_keys}
+                updated_discussion_settings = self._filter_discussion_settings(updated_data)
                 return Response(updated_discussion_settings)
             else:
                 return Response({'errors': errors}, status.HTTP_400_BAD_REQUEST)

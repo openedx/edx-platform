@@ -13,6 +13,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 @ddt
 class DiscussionSettingsTests(ModuleStoreTestCase):
+    """Test class for testing fetch & update of api:v1:discussion_settings endpoint."""
 
     discussion_settings_keys = [
         'discussion_blackouts',
@@ -31,8 +32,8 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
 
     def _get_discussion_settings_url(self):
         course_key = 'edX/test_course_key/Test_Course'
-        return reverse('api:v1:discussion_settings', kwargs={
-            'course_key_string': course_key
+        return reverse('api:v1:discussion_settings-detail', kwargs={
+            'pk': course_key
         })
 
     def test_fetch_discussion_settings(self):
@@ -52,17 +53,17 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
         ({'allow_anonymous': 2}, status.HTTP_400_BAD_REQUEST),  # invalid format
     )
     @unpack
-    def test_update_discussion_settings(self, data, status_code):
+    def test_update_discussion_settings(self, test_data, status_code):
         """Test if the endpoint updates data correctly"""
         url = self._get_discussion_settings_url()
-        resp = self.client.post(url, data, format='json')
+        resp = self.client.put(url, test_data, format='json')
         assert resp.status_code == status_code
 
         discussion_settings = resp.json()
 
         # only check updated value if status code is 200
         if status_code == status.HTTP_200_OK:
-            for key, val in data.items():
+            for key, val in test_data.items():
                 assert discussion_settings[key]['value'] == val['value']
         else:
             assert "errors" in discussion_settings
@@ -71,4 +72,4 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
         url = self._get_discussion_settings_url()
         client = APIClient()
         resp = client.get(url)
-        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
