@@ -1,11 +1,11 @@
-""" All helpers for custom_fields app"""
+"""All helpers for custom_fields app"""
 
 from openedx.features.custom_fields.multiselect_with_other.constants import OTHER_FIELD_CHECKBOX_VALUE
 
 
 def add_other_field_in_choices(choices):
     """
-    This function is adding other's value to list of choices
+    This adds other option in multi select choices
     :param choices: list of choices
     :type choices: list
     :return: list, dict or tuple with other field.

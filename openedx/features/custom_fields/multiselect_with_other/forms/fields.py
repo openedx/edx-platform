@@ -1,4 +1,4 @@
-""" This module contains formfield to select multiple options from given choices"""
+"""This module contains MultiSelect form field with other option"""
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -16,7 +16,7 @@ from openedx.features.custom_fields.multiselect_with_other.helpers import (
 
 
 class MultiSelectWithOtherFormField(MultiSelectFormField):
-    """ Form field class to handle other text input field within the multiselect field"""
+    """ FormField for multiselect with other option"""
 
     def __init__(self, other_max_length=None, *args, **kwargs):
         if kwargs.get('choices'):
@@ -38,7 +38,8 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
 
     def validate(self, value):
         """
-        Validate that the input is a list or tuple.
+        Validates the MultiSelectWithOtherFormField like
+        required and other field if other option is selected
         :param value: list or tuple of selected choices
         :type value: list or tuple
         :raise ValidationError: Raise validation error when required value not provided

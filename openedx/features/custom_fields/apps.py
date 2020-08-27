@@ -1,4 +1,4 @@
-""" AppConfig of custom_fields app"""
+"""AppConfig of custom_fields app"""
 from django.apps import AppConfig
 
 

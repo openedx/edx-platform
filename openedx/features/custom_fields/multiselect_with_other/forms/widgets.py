@@ -1,4 +1,4 @@
-""" This module implements functionality to handle widgets"""
+"""This module implements the Radio and Checkbox widgets for MultiSelectWithOther field"""
 from django.forms.widgets import CheckboxSelectMultiple
 
 from openedx.features.custom_fields.multiselect_with_other.helpers import (
@@ -8,7 +8,7 @@ from openedx.features.custom_fields.multiselect_with_other.helpers import (
 
 
 class CheckboxSelectMultipleWithOther(CheckboxSelectMultiple):
-    """ Widget class to handle other value filed."""
+    """ Implements checkbox widget for MultiSelectWithOther field"""
     other_choice = None
     other_option_template_name = 'other_field.html'
 
@@ -46,6 +46,8 @@ class CheckboxSelectMultipleWithOther(CheckboxSelectMultiple):
 
 
 class RadioSelectWithOther(CheckboxSelectMultipleWithOther):
+    """ Implements radio select widget for MultiSelectWithOther field"""
+    
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super(RadioSelectWithOther, self).create_option(name, value, label, selected, index, subindex, attrs)
 
