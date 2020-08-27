@@ -26,13 +26,15 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     CoursewareMicrofrontendDisabledAccessError,
 )
-from lms.djangoapps.courseware.courses import check_course_access, get_course_by_id
+from lms.djangoapps.courseware.courses import check_course_access, get_course_by_id, get_course_with_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND
+from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND, course_completion_is_active
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.views.views import get_cert_data
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -67,6 +69,7 @@ class CoursewareMeta:
         )
         self.is_staff = has_access(user, 'staff', self.overview).has_access
         self.course_masquerade = course_masquerade
+        self.request = request
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
@@ -208,6 +211,25 @@ class CoursewareMeta:
             'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(self.enrollment_object),
         }
 
+    @property
+    def user_has_passing_grade(self):
+        course = get_course_by_id(self.course_key)
+        user_grade = CourseGradeFactory().read(self.request.user, course).percent
+
+        return user_grade >= course.lowest_passing_grade
+
+    @property
+    def course_completion_is_active(self):
+        return course_completion_is_active(self.course_key)
+
+    @property
+    def certificate_data(self):
+        course = get_course_by_id(self.course_key)
+        enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(self.request.user, self.course_key)
+        course_grade = CourseGradeFactory().read(self.request.user, course)
+
+        return get_cert_data(self.request.user, course, enrollment_mode, course_grade)
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
@@ -252,6 +274,10 @@ class CoursewareInformation(RetrieveAPIView):
         * can_load_course: Whether the user can view the course (AccessResponse object)
         * is_staff: Whether the effective user has staff access to the course
         * original_user_is_staff: Whether the original user has staff access to the course
+        * user_has_passing_grade: Whether or not users grade is equal to or above the courses minimum passing grade
+        * course_completion_is_active: Flag for the learning mfe on whether or not the course completion page should
+          display
+        * certificate_data: data regarding the users certificate for the given course
 
     **Parameters:**
 
