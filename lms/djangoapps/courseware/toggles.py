@@ -11,12 +11,14 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 # .. toggle_name: courseware.courseware_mfe
 # .. toggle_implementation: ExperimentWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Waffle flag to redirect to another learner profile experience. Supports staged rollout to students for a new micro-frontend-based implementation of the courseware page.
+# .. toggle_description: Waffle flag to redirect to another learner profile experience. Supports staged rollout to
+#   students for a new micro-frontend-based implementation of the courseware page.
 # .. toggle_category: micro-frontend
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2020-01-29
 # .. toggle_expiration_date: 2020-12-31
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
+#   ENABLE_COURSEWARE_MICROFRONTEND.
 # .. toggle_tickets: TNL-7000
 # .. toggle_status: supported
 REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
@@ -26,12 +28,15 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
 # .. toggle_name: courseware.microfrontend_course_team_preview
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Waffle flag to display a link for the new learner experience to course teams without redirecting students. Supports staged rollout to course teams of a new micro-frontend-based implementation of the courseware page.
+# .. toggle_description: Waffle flag to display a link for the new learner experience to course teams without
+#   redirecting students. Supports staged rollout to course teams of a new micro-frontend-based implementation of the
+#   courseware page.
 # .. toggle_category: micro-frontend
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2020-03-09
 # .. toggle_expiration_date: 2020-12-31
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
+#   ENABLE_COURSEWARE_MICROFRONTEND.
 # .. toggle_tickets: TNL-6982
 # .. toggle_status: supported
 COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(

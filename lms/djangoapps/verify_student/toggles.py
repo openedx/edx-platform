@@ -11,7 +11,8 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='verify_student')
 # .. toggle_name: verify_student.use_new_email_templates
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Supports staged rollout to students for a new email templates implementation for ID verification.
+# .. toggle_description: Supports staged rollout to students for a new email templates
+#   implementation for ID verification.
 # .. toggle_category: verify student
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2020-06-25

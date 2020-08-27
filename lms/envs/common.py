@@ -85,7 +85,8 @@ FEATURES = {
     # .. toggle_name: DISPLAY_DEBUG_INFO_TO_STAFF
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
-    # .. toggle_description: Add a "Staff Debug" button to course modules for debugging by course staff.
+    # .. toggle_description: Add a "Staff Debug" button to course modules for debugging
+    #   by course staff.
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: 2015-09-04
     # .. toggle_expiration_date: None
@@ -100,7 +101,8 @@ FEATURES = {
     # .. toggle_name: DISABLE_START_DATES
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: When True, all courses will be active, regardless of start date.
+    # .. toggle_description: When True, all courses will be active, regardless of start
+    #   date.
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: ?
     # .. toggle_expiration_date: None
@@ -134,12 +136,17 @@ FEATURES = {
     # .. toggle_name: ENABLE_DISCUSSION_EMAIL_DIGEST
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Set this to True if you want the discussion digest emails enabled automatically for new users. This will be set on all new account registrations.
+    # .. toggle_description: Set this to True if you want the discussion digest emails
+    #   enabled automatically for new users. This will be set on all new account
+    #   registrations.
     # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-08-19
     # .. toggle_expiration_date: None
-    # .. toggle_warnings: It is not recommended to enable this feature if ENABLE_DISCUSSION_HOME_PANEL is not enabled, since subscribers who receive digests in that case will only be able to unsubscribe via links embedded in their emails, and they will have no way to resubscribe.
+    # .. toggle_warnings: It is not recommended to enable this feature if
+    #   ENABLE_DISCUSSION_HOME_PANEL is not enabled, since subscribers who receive
+    #   digests in that case will only be able to unsubscribe via links embedded in
+    #   their emails, and they will have no way to resubscribe.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/4891
     # .. toggle_status: supported
     'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
@@ -147,7 +154,9 @@ FEATURES = {
     # toggle_name: ENABLE_UNICODE_USERNAME
     # toggle_implementation: DjangoSetting
     # toggle_default: False
-    # toggle_description: Set this to True to allow unicode characters in username. Enabling this will also automatically enable SOCIAL_AUTH_CLEAN_USERNAMES. When this is enabled, usernames will have to match the regular expression defined by USERNAME_REGEX_PARTIAL.
+    # toggle_description: Set this to True to allow unicode characters in username. Enabling this will also
+    #   automatically enable SOCIAL_AUTH_CLEAN_USERNAMES. When this is enabled, usernames will have to match the
+    #   regular expression defined by USERNAME_REGEX_PARTIAL.
     # toggle_category: admin
     # toggle_use_cases: open_edx
     # toggle_creation_date: 2017-06-27
@@ -163,7 +172,8 @@ FEATURES = {
     # .. toggle_name: ENABLE_MASQUERADE
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
-    # .. toggle_description: Allow course staff to change to student view of courseware by accessing the /course/{course_id}/masquerade url.
+    # .. toggle_description: Allow course staff to change to student view of courseware by accessing the
+    #   /course/{course_id}/masquerade url.
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: 2013-04-13
     # .. toggle_expiration_date: None
@@ -175,7 +185,8 @@ FEATURES = {
     # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for deleting and loading courses, for seeing log of git imports of courseware.
+    # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for
+    #   deleting and loading courses, for seeing log of git imports of courseware.
     # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-12-12
@@ -203,7 +214,9 @@ FEATURES = {
     # .. toggle_name: ENABLE_XBLOCK_VIEW_ENDPOINT
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Enable an API endpoint, named "xblock_view", to serve rendered XBlock views. This might be used by external applications. See for instance jquery-xblock (now unmaintained): https://github.com/edx-solutions/jquery-xblock
+    # .. toggle_description: Enable an API endpoint, named "xblock_view", to serve rendered XBlock views. This might be
+    #   used by external applications. See for instance jquery-xblock (now unmaintained):
+    #   https://github.com/edx-solutions/jquery-xblock
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: 2014-03-14
     # .. toggle_expiration_date: None
@@ -212,13 +225,15 @@ FEATURES = {
     # .. toggle_status: supported
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
 
-    # Allows to configure the LMS to provide CORS headers to serve requests from other domains
+    # Allows to configure the LMS to provide CORS headers to serve requests from other
+    # domains
     'ENABLE_CORS_HEADERS': False,
 
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     'COURSES_ARE_BROWSABLE': True,
 
-    # Set to hide the courses list on the Learner Dashboard if they are not enrolled in any courses yet.
+    # Set to hide the courses list on the Learner Dashboard if they are not enrolled in
+    # any courses yet.
     'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
 
     # Give a UI to show a student's submission history in a problem by the
@@ -258,7 +273,8 @@ FEATURES = {
     # .. toggle_name: DISABLE_HONOR_CERTIFICATES
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Set to True to disable honor certificates. Typically used when your installation only allows verified certificates, like courses.edx.org.
+    # .. toggle_description: Set to True to disable honor certificates. Typically used when your installation only
+    #   allows verified certificates, like courses.edx.org.
     # .. toggle_category: certificates
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-05-14
@@ -276,7 +292,10 @@ FEATURES = {
     # .. toggle_name: RESTRICT_AUTOMATIC_AUTH
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
-    # .. toggle_description: Prevent auto auth from creating superusers or modifying existing users. Auto auth is a mechanism where superusers can simply modify attributes of other users by accessing the "/auto_auth url" with the right querystring parameters.
+    # .. toggle_description: Prevent auto auth from creating superusers or modifying existing users. Auto auth is a
+    #   mechanism where superusers can simply modify attributes of other users by accessing the "/auto_auth url" with
+    #   the right
+    #   querystring parameters.
     # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-05-07
@@ -300,7 +319,8 @@ FEATURES = {
     # toggle_name: SKIP_EMAIL_VALIDATION
     # toggle_implementation: DjangoSetting
     # toggle_default: False
-    # toggle_description: Turn this on to skip sending emails for user validation. Beware, as this leaves the door open to potential spam abuse.
+    # toggle_description: Turn this on to skip sending emails for user validation.
+    #   Beware, as this leaves the door open to potential spam abuse.
     # toggle_category: admin
     # toggle_use_cases: open_edx
     # toggle_expiration_date: None
@@ -320,7 +340,8 @@ FEATURES = {
     # .. toggle_name: ENABLE_COSMETIC_DISPLAY_PRICE
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Enable the display of "cosmetic_display_price", set in a course advanced settings. This cosmetic price is used when there is no registration price associated to the course.
+    # .. toggle_description: Enable the display of "cosmetic_display_price", set in a course advanced settings. This
+    #   cosmetic price is used when there is no registration price associated to the course.
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: 2014-10-10
     # .. toggle_expiration_date: None
@@ -360,7 +381,10 @@ FEATURES = {
     # toggle_name: ENABLE_THIRD_PARTY_AUTH
     # toggle_implementation: DjangoSetting
     # toggle_default: False
-    # toggle_description: Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to run migrations if you enable this; we don't create tables by default. This feature can be enabled on a per-site basis. When enabling this feature, remember to define the allowed authentication backends with the AUTHENTICATION_BACKENDS setting.
+    # toggle_description: Turn on third-party auth. Disabled for now because full mplementations are not yet available.
+    #   Remember to run migrations if you enable this; we don't create tables by default. This feature can be enabled
+    #   on a per-site basis. When enabling this feature, remember to define the allowed authentication backends with
+    #   the AUTHENTICATION_BACKENDS setting.
     # toggle_category: admin
     # toggle_use_cases: open_edx
     # toggle_creation_date: 2014-09-15
@@ -392,7 +416,9 @@ FEATURES = {
     # .. toggle_name: ENABLE_COURSE_SORTING_BY_START_DATE
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
-    # .. toggle_description: When a user goes to the homepage ('/') the user sees the courses listed in the announcement dates order - this is default Open edX behavior. Set to True to change the course sorting behavior by their start dates, latest first.
+    # .. toggle_description: When a user goes to the homepage ('/') the user sees the courses listed in the
+    #   announcement dates order - this is default Open edX behavior. Set to True to change the course sorting behavior
+    #   by their start dates, latest first.
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: 2015-03-27
     # .. toggle_expiration_date: None
@@ -404,7 +430,9 @@ FEATURES = {
     # .. toggle_name: ENABLE_COURSE_HOME_REDIRECT
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
-    # .. toggle_description: When enabled, along with the ENABLE_MKTG_SITE feature toggle, users who attempt to access a course "about" page will be redirected to the course home url. This url might be the course "info" page or the unified course tab (when the UNIFIED_COURSE_TAB_FLAG waffle is enabled).
+    # .. toggle_description: When enabled, along with the ENABLE_MKTG_SITE feature toggle, users who attempt to access a
+    #   course "about" page will be redirected to the course home url. This url might be the course "info" page or the
+    #   unified course tab (when the UNIFIED_COURSE_TAB_FLAG waffle is enabled).
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: 2019-01-15
     # .. toggle_expiration_date: None
@@ -420,7 +448,8 @@ FEATURES = {
     # .. toggle_name: ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Display the standard footer in the login page. This feature can be overridden by a site-specific configuration.
+    # .. toggle_description: Display the standard footer in the login page. This feature can be overridden by a site-
+    #   specific configuration.
     # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2016-06-24
@@ -471,7 +500,8 @@ FEATURES = {
     # .. toggle_name: LICENSING
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Toggle platform-wide course licensing. The course.license attribute is then used to append license information to the courseware.
+    # .. toggle_description: Toggle platform-wide course licensing. The course.license attribute is then used to append
+    #   license information to the courseware.
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: 2015-05-14
     # .. toggle_expiration_date: None
@@ -486,7 +516,9 @@ FEATURES = {
     # .. toggle_name: ENABLE_COURSE_DISCOVERY
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Add a course search widget to the LMS for searching courses. When this is enabled, the latest courses are no longer displayed on the LMS landing page. Also, an "Explore Courses" item is added to the navbar.
+    # .. toggle_description: Add a course search widget to the LMS for searching courses. When this is enabled, the
+    #   latest courses are no longer displayed on the LMS landing page. Also, an "Explore Courses" item is added to the
+    #   navbar.
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: 2015-04-23
     # .. toggle_expiration_date: None
@@ -542,11 +574,14 @@ FEATURES = {
     # .. toggle_name: ENABLE_CSMH_EXTENDED
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
-    # .. toggle_description: Write Courseware Student Module History (CSMH) to the extended table: this logs all student activities to MySQL, in a separate database.
+    # .. toggle_description: Write Courseware Student Module History (CSMH) to the extended table: this logs all
+    #   student activities to MySQL, in a separate database.
     # .. toggle_use_cases: ?
     # .. toggle_creation_date: ?
     # .. toggle_expiration_date: None
-    # .. toggle_warnings: Even though most Open edX instances run with a separate CSMH database, it may not always be the case. When disabling this feature flag, remember to remove "coursewarehistoryextended" from the INSTALLED_APPS and the "StudentModuleHistoryExtendedRouter" from the DATABASE_ROUTERS.
+    # .. toggle_warnings: Even though most Open edX instances run with a separate CSMH database, it may not always be
+    #   the case. When disabling this feature flag, remember to remove "coursewarehistoryextended" from the
+    #   INSTALLED_APPS and the "StudentModuleHistoryExtendedRouter" from the DATABASE_ROUTERS.
     # .. toggle_tickets: None
     # .. toggle_status: supported
     'ENABLE_CSMH_EXTENDED': True,
@@ -563,7 +598,8 @@ FEATURES = {
     # .. toggle_name: ALLOW_PUBLIC_ACCOUNT_CREATION
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
-    # .. toggle_description: Allow public account creation. If this is disabled, users will no longer have access to the signup page.
+    # .. toggle_description: Allow public account creation. If this is disabled, users will no longer have access to
+    #   the signup page.
     # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-04-12
@@ -602,7 +638,10 @@ FEATURES = {
     # .. toggle_name: ENABLE_CHANGE_USER_PASSWORD_ADMIN
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Whether to send an email for failed password reset attempts or not. This happens when a user asks for a password reset but they don't have an account associated to their email. This is useful for notifying users that they don't have an account associated with email addresses they believe they've registered with. This setting can be overridden by a site-specific configuration.
+    # .. toggle_description: Whether to send an email for failed password reset attempts or not. This happens when a
+    #   user asks for a password reset but they don't have an account associated to their email. This is useful for
+    #   notifying users that they don't have an account associated with email addresses they believe they've registered
+    #   with. This setting can be overridden by a site-specific configuration.
     # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-07-20
@@ -625,7 +664,8 @@ FEATURES = {
     # .. toggle_name: ENABLE_CHANGE_USER_PASSWORD_ADMIN
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by default because enabling allows a method to bypass password policy.
+    # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by
+    #   default because enabling allows a method to bypass password policy.
     # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
@@ -638,14 +678,16 @@ FEATURES = {
     # .. toggle_name: ENABLE_COURSEWARE_MICROFRONTEND
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Set to True to enable the Courseware MFE at the platform level for global staff (see REDIRECT_TO_COURSEWARE_MICROFRONTEND for course rollout)
+    # .. toggle_description: Set to True to enable the Courseware MFE at the platform level for global staff (see
+    #   REDIRECT_TO_COURSEWARE_MICROFRONTEND for course rollout)
     # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-03-05
     # .. toggle_expiration_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/23317'
     # .. toggle_status: supported
-    # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for rollout.
+    # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for
+    #   rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
 
     # .. toggle_name: ENABLE_LOGISTRATION_MICROFRONTEND
@@ -680,8 +722,8 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
-    #      discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
-    #      file metadata in staff assessments.
+    #   discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
+    #  file metadata in staff assessments.
     # .. toggle_category: ora
     # .. toggle_use_cases: graceful_degradation
     # .. toggle_creation_date: 2020-03-03
@@ -695,7 +737,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
-    #      discoverable.  If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
+    #   discoverable.  If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
     # .. toggle_category: ora
     # .. toggle_use_cases: graceful_degradation
     # .. toggle_creation_date: 2020-03-03
@@ -708,7 +750,8 @@ FEATURES = {
     # .. toggle_name: ENABLE_ORA_USERNAMES_ON_DATA_EXPORT
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Set to True to add deanonymized usernames to ORA data report.
+    # .. toggle_description: Set to True to add deanonymized usernames to ORA data
+    #   report.
     # .. toggle_category: ora
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-06-11

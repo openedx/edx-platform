@@ -381,7 +381,8 @@ def _get_waffle_flag_custom_metrics_set():
     # .. toggle_name: WAFFLE_FLAG_CUSTOM_METRICS
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: A list of waffle flag to track with custom metrics having values of (True, False, or Both).
+    # .. toggle_description: A list of waffle flag to track with custom metrics having
+    #   values of (True, False, or Both).
     # .. toggle_category: monitoring
     # .. toggle_use_cases: opt_in
     # .. toggle_creation_date: 2020-06-17

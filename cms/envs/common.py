@@ -337,7 +337,8 @@ FEATURES = {
     # .. toggle_name: ENABLE_CHANGE_USER_PASSWORD_ADMIN
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by default because enabling allows a method to bypass password policy.
+    # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by
+    #   default because enabling allows a method to bypass password policy.
     # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
@@ -366,8 +367,8 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
-    #      discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
-    #      file metadata in staff assessments.
+    #   discoverable. If enabled, will iterate through all possible file key suffixes up to the max for displaying file
+    #   metadata in staff assessments.
     # .. toggle_category: ora
     # .. toggle_use_cases: graceful_degradation
     # .. toggle_creation_date: 2020-03-03
@@ -381,7 +382,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
-    #      discoverable.  If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
+    #   discoverable. If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
     # .. toggle_category: ora
     # .. toggle_use_cases: graceful_degradation
     # .. toggle_creation_date: 2020-03-03
@@ -403,7 +404,8 @@ FEATURES = {
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-06-12
     # .. toggle_expiration_date: 2020-12-01
-    # .. toggle_warnings: This can be removed once support is removed for deprecated course keys.
+    # .. toggle_warnings: This can be removed once support is removed for deprecated
+    #   course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     # .. toggle_status: supported
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
@@ -418,7 +420,8 @@ FEATURES = {
     # .. toggle_expiration_date: 2020-12-31
     # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
     # .. toggle_status: supported
-    # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
+    # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
+    #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
     'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
 }
 
