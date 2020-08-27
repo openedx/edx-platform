@@ -214,9 +214,11 @@ def get_user_chat(request):
     chat_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/chats'
     username = request.user.username
     headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
-    response = requests.post(chat_endpoint,
-                             data={'_uid': 1, 'username': username},
-                             headers=headers)
+    response = requests.post(
+        chat_endpoint,
+        data={'_uid': 1, 'username': username},
+        headers=headers
+    )
     return JsonResponse(response.json())
 
 
@@ -225,9 +227,11 @@ def mark_user_chat_read(request):
     chat_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/chats'
     username = request.user.username
     headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
-    response = requests.patch(chat_endpoint,
-                              data={'_uid': 1, 'username': username},
-                              headers=headers)
+    response = requests.patch(
+        chat_endpoint,
+        data={'_uid': 1, 'username': username},
+        headers=headers
+    )
     return JsonResponse(response.json())
 
 
@@ -236,9 +240,11 @@ def get_user_data(request):
     data_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/data'
     username = request.POST.get("username")
     headers = {'Authorization': 'Bearer ' + settings.NODEBB_MASTER_TOKEN}
-    response = requests.post(data_endpoint,
-                             data={'_uid': 1, 'username': username},
-                             headers=headers)
+    response = requests.post(
+        data_endpoint,
+        data={'_uid': 1, 'username': username},
+        headers=headers
+    )
     return JsonResponse(response.json())
 
 
@@ -294,7 +300,7 @@ def resend_activation_email(request):
         else:
             # the user's account has already been activated
             activation_response = JsonResponse(data={}, status=status.HTTP_409_CONFLICT)
-    except Exception as ex: # pylint: disable=broad-except
+    except Exception as ex:  # pylint: disable=broad-except
         logging.exception(ex)
         activation_response = JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
