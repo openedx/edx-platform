@@ -1967,6 +1967,11 @@ ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 # The default value of this needs to be a 16 character string
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 
+# The setting key maps to the channel code (e.g. 'SAP' for success factors), Channel code is defined as
+# part of django model of each integrated channel in edx-enterprise.
+# The absence of a key/value pair translates to NO LIMIT on the number of "chunks" transmitted per cycle.
+INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
+
 BASE_COOKIE_DOMAIN = 'localhost'
 
 # This limits the type of roles that are submittable via the `student` app's manual enrollment
