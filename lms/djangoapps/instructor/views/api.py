@@ -166,8 +166,6 @@ def common_exceptions_400(func):
         except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
             message = six.text_type(err)
 
-        log.exception("ProblemResponsesCommonException: Message: %s", message)
-
         if use_json:
             return JsonResponseBadRequest(message)
         else:
@@ -1057,7 +1055,6 @@ def get_problem_responses(request, course_id):
         for problem_location in problem_locations.split(','):
             problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)
     except InvalidKeyError:
-        log.exception("ProblemResponsesError: Location: %s", problem_locations)
         return JsonResponseBadRequest(_("Could not find problem with this location."))
 
     task = task_api.submit_calculate_problem_responses_csv(
