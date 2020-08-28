@@ -28,6 +28,7 @@ export default class Main extends React.Component {
     this.props.createProblemResponsesReportTask(
       this.props.problemResponsesEndpoint,
       this.props.taskStatusEndpoint,
+      this.props.reportDownloadEndpoint,
       this.props.selectedBlock,
     );
   }
@@ -71,6 +72,7 @@ Main.propTypes = {
   onSelectBlock: PropTypes.func.isRequired,
   selectedBlock: PropTypes.string,
   taskStatusEndpoint: PropTypes.string.isRequired,
+  reportDownloadEndpoint: PropTypes.string.isRequired,
 };
 
 Main.defaultProps = {

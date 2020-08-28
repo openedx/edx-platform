@@ -1,5 +1,5 @@
 /* global gettext */
-import { fetchTaskStatus, initiateProblemResponsesRequest } from '../api/client';
+import { fetchDownloadsList, fetchTaskStatus, initiateProblemResponsesRequest } from '../api/client';
 import {
   REPORT_GENERATION_ERROR,
   REPORT_GENERATION_REQUEST,
@@ -7,12 +7,12 @@ import {
   REPORT_GENERATION_REFRESH_STATUS,
 } from './constants';
 
-const taskStatusSuccess = (succeeded, inProgress, reportPath, reportName) => ({
+const taskStatusSuccess = (succeeded, inProgress, reportName, downloadsData) => ({
   type: REPORT_GENERATION_SUCCESS,
   succeeded,
   inProgress,
-  reportPath,
   reportName,
+  downloadsData,
 });
 
 const problemResponsesRequest = blockId => ({
@@ -30,8 +30,8 @@ const problemResponsesRefreshStatus = timeout => ({
   timeout,
 });
 
-const getTaskStatus = (endpoint, taskId) => dispatch =>
-  fetchTaskStatus(endpoint, taskId)
+const getTaskStatus = (taskStatusEndpoint, reportDownloadEndpoint, taskId) => dispatch =>
+  fetchTaskStatus(taskStatusEndpoint, taskId)
     .then((response) => {
       if (response.ok) {
         return response.json();
@@ -41,20 +41,27 @@ const getTaskStatus = (endpoint, taskId) => dispatch =>
     .then(
       (statusData) => {
         if (statusData.in_progress) {
-          const timeout = setTimeout(() => dispatch(getTaskStatus(endpoint, taskId)), 2000);
+          const timeout = setTimeout(
+            () => dispatch(getTaskStatus(taskStatusEndpoint, reportDownloadEndpoint, taskId)),
+            2000,
+          );
           return dispatch(problemResponsesRefreshStatus(timeout));
         }
         if (statusData.task_state === 'SUCCESS') {
           const taskProgress = statusData.task_progress;
-          const reportPath = taskProgress && taskProgress.report_path;
           const reportName = taskProgress && taskProgress.report_name;
-          return dispatch(
-            taskStatusSuccess(
-              true,
-              statusData.in_progress,
-              reportPath,
-              reportName,
-            ),
+          return fetchDownloadsList(reportDownloadEndpoint, reportName)
+          .then(response => response.json())
+          .then(
+            data => dispatch(
+                taskStatusSuccess(
+                  true,
+                  statusData.in_progress,
+                  reportName,
+                  data.downloads,
+                ),
+              ),
+            () => dispatch(problemResponsesFailure(gettext('There was an error generating the report link.'))),
           );
         }
         return dispatch(problemResponsesFailure(gettext('There was an error generating your report.')));
@@ -67,6 +74,7 @@ const getTaskStatus = (endpoint, taskId) => dispatch =>
 const createProblemResponsesReportTask = (
   problemResponsesEndpoint,
   taskStatusEndpoint,
+  reportDownloadEndpoint,
   blockId,
 ) => (dispatch) => {
   dispatch(problemResponsesRequest(blockId));
@@ -78,7 +86,7 @@ const createProblemResponsesReportTask = (
       throw new Error(response);
     })
     .then(
-      json => dispatch(getTaskStatus(taskStatusEndpoint, json.task_id)),
+      json => dispatch(getTaskStatus(taskStatusEndpoint, reportDownloadEndpoint, json.task_id)),
       () => dispatch(problemResponsesFailure(gettext('Unable to submit request to generate report.'))),
     );
 };

@@ -1010,11 +1010,10 @@ class ProblemResponses(object):
 
         # Perform the upload
         csv_name = cls._generate_upload_file_name(problem_locations, filter_types)
-        report_name, report_path = upload_csv_to_report_store(rows, csv_name, course_id, start_date)
+        report_name = upload_csv_to_report_store(rows, csv_name, course_id, start_date)
         current_step = {
             'step': 'CSV uploaded',
             'report_name': report_name,
-            'report_path': report_path,
         }
 
         return task_progress.update_task_state(extra_meta=current_step)
