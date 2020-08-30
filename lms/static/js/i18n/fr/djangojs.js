@@ -79,7 +79,6 @@
     "\n    You did not satisfy the following prerequisites:\n    ": "\nVous n'avez pas satisfait les pr\u00e9requis suivants:",
     "\n    You did not satisfy the requirements for taking this exam with proctoring, and are not eligible for credit. See your <a href=\"%(progress_page_url)s\">Progress</a> page for a list of requirements and your status for each.\n    ": "\n    Vous n'avez pas satisfait les exigences pour suivre cet examen surveill\u00e9, vous n'\u00eates pas \u00e9ligible \u00e0 des cr\u00e9dits. Voir l'onglet <a href=\"%(progress_page_url)s\">Progression</a> pour la liste et le statut de chaque exigence.\n    ",
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": " A ce stade vous devez suivre les <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">r\u00e9gles de surveillance</a> pour satisfaire les revues de votre examen surveill\u00e9. ",
-    " Link": "Lien",
     " Your Proctoring Session Has Started ": "Votre session d'examen surveill\u00e9 a d\u00e9marr\u00e9",
     " and ": "et",
     " and {num_of_minutes} minute": "et {num_of_minutes} minute",
