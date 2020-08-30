@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-23 20:50+0000\n"
-"PO-Revision-Date: 2020-08-23 20:50:13.433680\n"
+"POT-Creation-Date: 2020-08-30 20:49+0000\n"
+"PO-Revision-Date: 2020-08-30 20:49:39.838611\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8453,6 +8453,12 @@ msgid "ORA data"
 msgstr "ÖRÀ dätä Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Attachments archive is being created."
+msgstr ""
+"Àttäçhménts ärçhïvé ïs ßéïng çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "grade"
 msgstr "grädé Ⱡ'σяєм ιρѕ#"
@@ -8967,6 +8973,10 @@ msgstr "çértïfïçätés générätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
 msgstr "çöhörtéd Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "compressed"
+msgstr "çömprésséd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No status information available"
@@ -21637,6 +21647,19 @@ msgstr "Généräté Prößlém Grädé Répört Ⱡ'σяєм ιρѕυм ∂σł
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
 msgstr "Généräté ÖRÀ Dätä Répört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Click to generate a ZIP file that contains all submission texts and "
+"attachments."
+msgstr ""
+"Çlïçk tö généräté ä ZÌP fïlé thät çöntäïns äll süßmïssïön téxts änd "
+"ättäçhménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Submission Files Archive"
+msgstr ""
+"Généräté Süßmïssïön Fïlés Àrçhïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"

@@ -95,7 +95,6 @@
     "\n    You have not completed the prerequisites for this exam. All requirements must be satisfied before you can take this proctored exam and be eligible for credit. See your <a href=\"%(progress_page_url)s\">Progress</a> page for a list of requirements in the order that they must be completed.\n    ": "\nNo cumpli\u00f3 los requisitos para hacer este examen con supervisi\u00f3n. Es necesario cumplir todos los requisitos para poder tomar este examen supervisado y ser elegible para cr\u00e9dito. Revise su <a href=\"%(progress_page_url)s\">p\u00e1gina de progreso</a> para una lista de los requisitos y el orden en que se tiene que cumplir cada uno.",
     " ${price} {currency} )": " ${price} {currency} )",
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": "A partir de este momento, debe seguir las <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">reglas de supervisi\u00f3n online</a> para aprobar la revisi\u00f3n de la supervisi\u00f3n para su examen.",
-    " Link": "Enlace",
     " Member": [
       "Miembro",
       "Miembros"
@@ -781,7 +780,6 @@
     "Enter the page number you'd like to quickly navigate to.": "Introduzca el n\u00famero de p\u00e1gina al cual le gustar\u00eda dirigirse",
     "Enter the username or email address of each learner that you want to add as an exception.": "Ingrese el nombre de usuario y correo electr\u00f3nico de cada estudiante que quiere agregar como excepci\u00f3n ",
     "Enter username or email": "Ingresa el nombre de usuario o el correo electr\u00f3nico.",
-    "Enter your ": "Ingrese su",
     "Entrance exam attempts is being reset for student '{student_id}'.": "Intentos para ex\u00e1men de ingreso esta siendo reiniciado para el estudiante '{student_id}'",
     "Entrance exam state is being deleted for student '{student_id}'.": "El estado del examen de ingreso est\u00e1 siendo borrado para el estudiante '{student_id}'.",
     "Error": "Error",

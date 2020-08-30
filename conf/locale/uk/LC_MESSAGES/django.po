@@ -122,7 +122,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-23 20:42+0000\n"
+"POT-Creation-Date: 2020-08-30 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -7372,6 +7372,10 @@ msgid "ORA data"
 msgstr "Дані ORA"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Attachments archive is being created."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "grade"
 msgstr "оцінка"
@@ -7820,6 +7824,10 @@ msgstr "створено сертифікатів"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
 msgstr "розподілено по групах"
+
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "compressed"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No status information available"
@@ -18130,6 +18138,16 @@ msgstr "Створити звіт успішності по завданням, 
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Click to generate a ZIP file that contains all submission texts and "
+"attachments."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Submission Files Archive"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html

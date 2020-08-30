@@ -18,6 +18,7 @@
 # Grzegorz Kozlowski <donderon@gmail.com>, 2014
 # Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
+# Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
 # jakubfajkowski <j.fajkowski@stud.elka.pw.edu.pl>, 2016
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Mateusz <blue90pl@gmail.com>, 2014
@@ -97,7 +98,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-16 20:43+0000\n"
+"POT-Creation-Date: 2020-08-23 20:42+0000\n"
 "PO-Revision-Date: 2020-08-20 11:18+0000\n"
 "Last-Translator: Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
@@ -5084,12 +5085,14 @@ msgstr ""
 "społecznościowych."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid " Link"
-msgstr "Odnośnik"
+msgid "{platform_display_name} Link"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Enter your "
-msgstr "Wprowadź swój"
+msgid ""
+"Enter your {platform_display_name} username or the URL to your "
+"{platform_display_name} page. Delete the URL to remove the link."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js

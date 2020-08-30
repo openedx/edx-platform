@@ -95,7 +95,6 @@
     "\n    You have not completed the prerequisites for this exam. All requirements must be satisfied before you can take this proctored exam and be eligible for credit. See your <a href=\"%(progress_page_url)s\">Progress</a> page for a list of requirements in the order that they must be completed.\n    ": "\n   Sie haben die Voraussetzungen f\u00fcr diese Pr\u00fcfung. Alle Anforderungen m\u00fcssen befriedigend sein, bevor Sie diese beaufsichtigte Pr\u00fcfung machen k\u00f6nnen und einen Credit daf\u00fcr erhlten. Schauen Sie sich Ihren <a href=\"%(progress_page_url)s\">Kursfortschritt</a> an, um zu kontrollieren, ob Sie alle Anforderungen bestehen. \n    ",
     " ${price} {currency} )": " ${price} {currency} )",
     " From this point in time, you must follow the <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online proctoring rules</a> to pass the proctoring review for your exam. ": " Von jetzt an m\u00fcssen Sie den <a href=\"%(link_urls.online_proctoring_rules)s\" target=\"_blank\">online Beaufsichtigungsregeln</a> folgen, um damit Ihre Pr\u00fcfung zugelassen wird.",
-    " Link": " Link",
     " Member": [
       "Mitglied",
       "Mitglieder"
@@ -784,7 +783,6 @@
     "Enter the page number you'd like to quickly navigate to.": "Geben Sie die Seitennummer ein zu welcher Sie schnell navigieren m\u00f6chten.",
     "Enter the username or email address of each learner that you want to add as an exception.": "Geben Sie in die Eingabefelder den Benutzername oder die E-Mail Adresse des jeweiligen Teilnehmers ein, welchen Sie zur Ausnahmeliste hinzuf\u00fcgen m\u00f6chten.",
     "Enter username or email": "Benutzernamen oder E-Mail-Adresse eingeben",
-    "Enter your ": "Angeben Ihrer",
     "Entrance exam attempts is being reset for student '{student_id}'.": "Pr\u00fcfungsversuche werden zur\u00fcckgesetzt f\u00fcr folgende Teilnehmer: '{student_id}'.",
     "Entrance exam state is being deleted for student '{student_id}'.": "Pr\u00fcfungsstatus wurde gel\u00f6scht von dem Teilnehmer: '{student_id}'.",
     "Error": "Fehler",
