@@ -38,7 +38,7 @@ define([
         },
 
         render: function(model) {
-            this.$el.html(this.template({
+            var template = this.template({
                 itemCategoryDisplayName: this.itemCategoryDisplayName,
                 newItemMessage: this.newItemMessage,
                 emptyMessage: this.emptyMessage,
@@ -46,7 +46,8 @@ define([
                 isEditing: model && model.get('editing'),
                 canCreateNewItem: this.canCreateItem(this.collection),
                 restrictEditing: this.restrictEditing
-            }));
+            });
+            edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.HTML(template));
 
             this.collection.each(function(model) {
                 this.$(this.listContainerCss).append(

@@ -1,5 +1,7 @@
-define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'jquery.form'],
-    function($, _, gettext, BaseModal) {
+define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'edx-ui-toolkit/js/utils/html-utils',
+    'jquery.form'],
+    function($, _, gettext, BaseModal, HtmlUtils) {
+        'use strict';
         var UploadDialog = BaseModal.extend({
             events: _.extend({}, BaseModal.prototype.events, {
                 'change input[type=file]': 'selectFile',
@@ -42,7 +44,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'jquery
                 // a blank input to prompt the user to upload a different (valid) file.
                 if (selectedFile && isValid) {
                     $(oldInput).removeClass('error');
-                    this.$('input[type=file]').replaceWith(oldInput);
+                    this.$('input[type=file]').replaceWith(HtmlUtils.ensureHtml(oldInput).toString());
                     this.$('.action-upload').removeClass('disabled');
                 } else {
                     this.$('.action-upload').addClass('disabled');
@@ -53,7 +55,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'jquery
             getContentHtml: function() {
                 return this.template({
                     url: this.options.url || CMS.URL.UPLOAD_ASSET,
-                    message: this.model.escape('message'),
+                    message: this.model.get('message'),
                     selectedFile: this.model.get('selectedFile'),
                     uploading: this.model.get('uploading'),
                     uploadedBytes: this.model.get('uploadedBytes'),
