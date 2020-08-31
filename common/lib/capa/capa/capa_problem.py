@@ -190,7 +190,17 @@ class LoncapaProblem(object):
             problem_text = problem_text.encode('utf-8')
         self.tree = etree.XML(problem_text)
 
-        self.make_xml_compatible(self.tree)
+        try:
+            self.make_xml_compatible(self.tree)
+        except Exception:
+            capa_module = self.capa_module
+            log.exception(
+                "CAPAProblemError: %s, id:%s, data: %s",
+                capa_module.display_name,
+                self.problem_id,
+                capa_module.data
+            )
+            raise
 
         # handle any <include file="foo"> tags
         self._process_includes()
