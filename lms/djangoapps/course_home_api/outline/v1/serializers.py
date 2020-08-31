@@ -2,9 +2,10 @@
 Outline Tab Serializers.
 """
 
+from django.utils.translation import ngettext
 from rest_framework import serializers
+
 from lms.djangoapps.course_home_api.dates.v1.serializers import DateSummarySerializer
-from rest_framework.reverse import reverse
 
 
 class CourseBlockSerializer(serializers.Serializer):
@@ -13,21 +14,45 @@ class CourseBlockSerializer(serializers.Serializer):
     """
     blocks = serializers.SerializerMethodField()
 
-    def get_blocks(self, blocks):
-        return {
-            str(block_key): {
-                'id': str(block_key),
-                'type': block_key.category,
-                'display_name': blocks.get_xblock_field(block_key, 'display_name', block_key.category),
-                'lms_web_url': reverse(
-                    'jump_to',
-                    kwargs={'course_id': str(block_key.course_key), 'location': str(block_key)},
-                    request=self.context['request'],
-                ),
-                'children': [str(child_key) for child_key in blocks.get_children(block_key)],
-            }
-            for block_key in blocks
+    def get_blocks(self, block):
+        block_key = block['id']
+        block_type = block['type']
+        children = block.get('children', []) if block_type != 'sequential' else []  # Don't descend past sequential
+        description = block.get('format')
+        display_name = block['display_name']
+        enable_links = self.context.get('enable_links')
+        graded = block.get('graded')
+        icon = None
+        num_graded_problems = block.get('num_graded_problems', 0)
+        scored = block.get('scored')
+
+        if num_graded_problems and block_type == 'sequential':
+            questions = ngettext('({number} Question)', '({number} Questions)', num_graded_problems)
+            display_name += ' ' + questions.format(number=num_graded_problems)
+
+        if graded and scored:
+            icon = 'fa-pencil-square-o'
+
+        if 'special_exam_info' in block:
+            description = block['special_exam_info'].get('short_description')
+            icon = block['special_exam_info'].get('suggested_icon', 'fa-pencil-square-o')
+
+        serialized = {
+            block_key: {
+                'children': [child['id'] for child in children],
+                'complete': block.get('complete', False),
+                'description': description,
+                'display_name': display_name,
+                'due': block.get('due'),
+                'icon': icon,
+                'id': block_key,
+                'lms_web_url': block['lms_web_url'] if enable_links else None,
+                'type': block_type,
+            },
         }
+        for child in children:
+            serialized.update(self.get_blocks(child))
+        return serialized
 
 
 class CourseGoalSerializer(serializers.Serializer):
