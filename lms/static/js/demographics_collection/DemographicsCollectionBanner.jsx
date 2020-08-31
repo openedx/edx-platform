@@ -1,3 +1,4 @@
+/* global gettext */
 import React from 'react';
 import { DemographicsCollectionModal } from './DemographicsCollectionModal';
 
@@ -23,11 +24,11 @@ export class DemographicsCollectionBanner extends React.Component {
             <div className="d-flex justify-content-left align-items-lg-center flex-column flex-lg-row  w-100">
               <img className="demographics-banner-icon d-none d-lg-inline-block" src={this.props.bannerLogo} alt="" aria-hidden="true" />
               <div className="demographics-banner-prompt d-inline-block font-weight-bold text-white mr-4 py-3 px-2 px-lg-3">
-                Want to make edX better for everyone?
+                {gettext('Want to make edX better for everyone?')}
               </div>
               <button className="demographics-banner-btn d-flex align-items-center bg-white font-weight-bold border-0 py-2 px-3 mx-2 mb-3 m-lg-0 shadow justify-content-center">
                 <span className="fa fa-thumbs-up px-2" aria-hidden="true"></span>
-                Get started
+                {gettext('Get started')}
               </button>
             </div>
             <div className="demographics-dismiss-container md-flex justify-content-right align-self-start align-self-lg-center  ml-lg-auto">
