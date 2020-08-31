@@ -1,3 +1,4 @@
+/* global gettext */
 import React from 'react';
 import get from 'lodash/get';
 import Wizard from './Wizard';
@@ -5,7 +6,7 @@ import Cookies from 'js-cookie';
 import { SelectWithInput } from './SelectWithInput'
 import { MultiselectDropdown } from './MultiselectDropdown';
 import AxiosJwtTokenService from '../jwt_auth/AxiosJwtTokenService';
-
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 const FIELD_NAMES = {
   CURRENT_WORK: "current_work_sector",
@@ -200,27 +201,43 @@ class DemographicsCollectionModal extends React.Component {
           <Wizard.Header>
             {({ currentPage, totalPages }) => (
               <div>
-                <h2>Help make edX better for everyone!</h2>
-                <p>Thanks for registering with edX! Before getting started, please complete the additional information below to help your fellow learners. Your information will never be sold.</p>
+                <h2>
+                  {gettext('Help make edX better for everyone!')}
+                </h2>
+                <p>
+                  {gettext('Thanks for registering with edX! Before getting started, please complete the additional information below to help your fellow learners. Your information will never be sold.')}
+                </p>
                 <br />
                 <span className="fa-info-circle" />
-                <a className="pl-3">Why does edX collect this information?</a>
+                <a className="pl-3">
+                  {gettext('Why does edX collect this information?')}
+                </a>
                 <br />
-                <p>Part {currentPage} of {totalPages}</p>
+                <p>
+                  {StringUtils.interpolate(
+                      gettext('Part {currentPage} of {totalPages}'),
+                        { 
+                          currentPage: currentPage,
+                          totalPages: totalPages
+                        }
+                    )
+                  }
+                </p>
               </div>
             )}
           </Wizard.Header>
           <Wizard.Page>
             {({ wizardConsumer }) =>
               <div className="demographics-form-container">
+                {/* Gender Identity */}
                 <SelectWithInput
                   selectName={FIELD_NAMES.GENDER}
                   selectId={FIELD_NAMES.GENDER}
                   selectValue={wizardConsumer[FIELD_NAMES.GENDER]}
                   selectOnChange={this.handleSelectChange}
-                  labelText={"Gender identity"}
+                  labelText={gettext("What is your gender identity?")}
                   options={[
-                    <option value="default" key="default">Select gender</option>,
+                    <option value="default" key="default">{gettext("Select gender")}</option>,
                     this.loadOptions(FIELD_NAMES.GENDER)
                   ]}
                   showInput={wizardConsumer[FIELD_NAMES.GENDER] == "self-describe"}
@@ -230,11 +247,11 @@ class DemographicsCollectionModal extends React.Component {
                   inputValue={wizardConsumer[FIELD_NAMES.GENDER_DESCRIPTION]}
                   inputOnChange={this.handleInputChange}
                   inputOnBlur={this.handleSelectChange}
-
                 />
+                {/* Ethnicity */}
                 <MultiselectDropdown
-                  label="Which of the following describes you best?"
-                  emptyLabel="Check all that apply"
+                  label={gettext("Which of the following describes you best?")}
+                  emptyLabel={gettext("Check all that apply")}
                   options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, { choices: [] }).choices}
                   selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
                   onChange={(values) => {
@@ -251,14 +268,17 @@ class DemographicsCollectionModal extends React.Component {
                     this.handleSelectChange(e);
                   }}
                 />
-                <label htmlFor={FIELD_NAMES.INCOME}>Household income</label>
+                {/* Family Income */}
+                <label htmlFor={FIELD_NAMES.INCOME}>
+                  {gettext("What was the total combined income, during the last 12 months, of all members of your family? ")}
+                </label>
                 <select
                   onChange={this.handleSelectChange}
                   className="form-control"
                   name={FIELD_NAMES.INCOME} id={FIELD_NAMES.INCOME}
                   value={wizardConsumer[FIELD_NAMES.INCOME]}
                 >
-                  <option value="default">Select income</option>
+                  <option value="default">{gettext("Select income")}</option>
                   {
                     this.loadOptions(FIELD_NAMES.INCOME)
                   }
@@ -269,7 +289,10 @@ class DemographicsCollectionModal extends React.Component {
           <Wizard.Page>
             {({ wizardConsumer }) =>
               <div className="demographics-form-container">
-                <label htmlFor={FIELD_NAMES.MILITARY}>Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?</label>
+                {/* Military History */}
+                <label htmlFor={FIELD_NAMES.MILITARY}>
+                  {gettext("Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?")}
+                </label>
                 <select
                   className="form-control"
                   onChange={this.handleSelectChange}
@@ -277,7 +300,7 @@ class DemographicsCollectionModal extends React.Component {
                   id={FIELD_NAMES.MILITARY}
                   value={wizardConsumer[FIELD_NAMES.MILITARY]}
                 >
-                  <option value="default">Select service branch</option>
+                  <option value="default">{gettext("Select military status")}</option>
                   {
                     this.loadOptions(FIELD_NAMES.MILITARY)
                   }
@@ -288,7 +311,10 @@ class DemographicsCollectionModal extends React.Component {
           <Wizard.Page>
             {({ wizardConsumer }) =>
               <div className="demographics-form-container">
-                <label htmlFor={FIELD_NAMES.EDUCATION_LEVEL}>Your highest level of education</label>
+                {/* Learner Education Level */}
+                <label htmlFor={FIELD_NAMES.EDUCATION_LEVEL}>
+                  {gettext("What is the highest level of education that you have achieved so far?")}
+                </label>
                 <select
                   className="form-control"
                   onChange={this.handleSelectChange}
@@ -296,12 +322,15 @@ class DemographicsCollectionModal extends React.Component {
                   id={FIELD_NAMES.EDUCATION_LEVEL}
                   value={wizardConsumer[FIELD_NAMES.EDUCATION_LEVEL]}
                 >
-                  <option>Select level of education</option>
+                  <option>{gettext("Select level of education")}</option>
                   {
                     this.loadOptions(FIELD_NAMES.EDUCATION_LEVEL)
                   }
                 </select>
-                <label htmlFor={FIELD_NAMES.PARENT_EDUCATION}>What is the highest level of education that any of your parents or guardians have achieved?</label>
+                {/* Parent/Guardian Education Level */}
+                <label htmlFor={FIELD_NAMES.PARENT_EDUCATION}>
+                  {gettext("What is the highest level of education that any of your parents or guardians have achieved?")}
+                </label>
                 <select
                   className="form-control"
                   onChange={this.handleSelectChange}
@@ -309,7 +338,7 @@ class DemographicsCollectionModal extends React.Component {
                   id={FIELD_NAMES.PARENT_EDUCATION}
                   value={wizardConsumer[FIELD_NAMES.PARENT_EDUCATION]}
                 >
-                  <option value="default">Select guardian education</option>
+                  <option value="default">{gettext("Select guardian education")}</option>
                   {
                     this.loadOptions(FIELD_NAMES.PARENT_EDUCATION)
                   }
@@ -320,12 +349,13 @@ class DemographicsCollectionModal extends React.Component {
           <Wizard.Page>
             {({ wizardConsumer }) =>
               <div className="demographics-form-container">
+                {/* Employment Status */}
                 <SelectWithInput
                   selectName={FIELD_NAMES.WORK_STATUS}
                   selectId={FIELD_NAMES.WORK_STATUS}
                   selectValue={wizardConsumer[FIELD_NAMES.WORK_STATUS]}
                   selectOnChange={this.handleSelectChange}
-                  labelText={"Employment status"}
+                  labelText={"What is your current employment status?"}
                   options={[
                     this.loadOptions(FIELD_NAMES.WORK_STATUS)
                   ]}
@@ -338,7 +368,10 @@ class DemographicsCollectionModal extends React.Component {
                   inputOnBlur={this.handleSelectChange}
 
                 />
-                <label htmlFor={FIELD_NAMES.CURRENT_WORK}>What industry do you currently work in?</label>
+                {/* Current Work Industry */}
+                <label htmlFor={FIELD_NAMES.CURRENT_WORK}>
+                  {gettext("What industry do you currently work in?")}
+                </label>
                 <select
                   className="form-control"
                   onChange={this.handleSelectChange}
@@ -346,12 +379,15 @@ class DemographicsCollectionModal extends React.Component {
                   id={FIELD_NAMES.CURRENT_WORK}
                   value={wizardConsumer[FIELD_NAMES.CURRENT_WORK]}
                 >
-                  <option value="default">Select current industry</option>
+                  <option value="default">{gettext("Select current industry")}</option>
                   {
                     this.loadOptions(FIELD_NAMES.CURRENT_WORK)
                   }
                 </select>
-                <label htmlFor={FIELD_NAMES.FUTURE_WORK}>What industry do you want to work in</label>
+                {/* Future Work Industry */}
+                <label htmlFor={FIELD_NAMES.FUTURE_WORK}>
+                  {gettext("What industry do you want to work in?")}
+                </label>
                 <select
                   className="form-control"
                   onChange={this.handleSelectChange}
@@ -359,7 +395,7 @@ class DemographicsCollectionModal extends React.Component {
                   id={FIELD_NAMES.FUTURE_WORK}
                   value={wizardConsumer[FIELD_NAMES.FUTURE_WORK]}
                 >
-                  <option value="default">Select prospective industry</option>
+                  <option value="default">{gettext("Select prospective industry")}</option>
                   {
                     this.loadOptions(FIELD_NAMES.FUTURE_WORK)
                   }
@@ -368,11 +404,13 @@ class DemographicsCollectionModal extends React.Component {
             }
           </Wizard.Page>
           <Wizard.Closer>
-            <h3>Thank you! You’re helping make edX better for everyone.</h3>
+            <h3>
+              {gettext("Thank you! You’re helping make edX better for everyone.")}
+            </h3>
           </Wizard.Closer>
           <Wizard.ErrorPage>
             <div>
-              {this.state.error.length ? this.state.error : "something went wrong"}
+              {this.state.error.length ? this.state.error : gettext("something went wrong")}
             </div>
           </Wizard.ErrorPage>
         </Wizard>
