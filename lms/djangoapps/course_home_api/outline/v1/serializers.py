@@ -7,21 +7,6 @@ from lms.djangoapps.course_home_api.dates.v1.serializers import DateSummarySeria
 from rest_framework.reverse import reverse
 
 
-class CourseToolSerializer(serializers.Serializer):
-    """
-    Serializer for Course Tool Objects
-    """
-    analytics_id = serializers.CharField()
-    title = serializers.CharField()
-    url = serializers.SerializerMethodField()
-
-    def get_url(self, tool):
-        course_key = self.context.get('course_key')
-        url = tool.url(course_key)
-        request = self.context.get('request')
-        return request.build_absolute_uri(url)
-
-
 class CourseBlockSerializer(serializers.Serializer):
     """
     Serializer for Course Block Objects
@@ -45,6 +30,29 @@ class CourseBlockSerializer(serializers.Serializer):
         }
 
 
+class CourseGoalSerializer(serializers.Serializer):
+    """
+    Serializer for Course Goal data
+    """
+    goal_options = serializers.ListField()
+    selected_goal = serializers.DictField()
+
+
+class CourseToolSerializer(serializers.Serializer):
+    """
+    Serializer for Course Tool Objects
+    """
+    analytics_id = serializers.CharField()
+    title = serializers.CharField()
+    url = serializers.SerializerMethodField()
+
+    def get_url(self, tool):
+        course_key = self.context.get('course_key')
+        url = tool.url(course_key)
+        request = self.context.get('request')
+        return request.build_absolute_uri(url)
+
+
 class DatesWidgetSerializer(serializers.Serializer):
     """
     Serializer for Dates Widget data
@@ -63,6 +71,9 @@ class EnrollAlertSerializer(serializers.Serializer):
 
 
 class ResumeCourseSerializer(serializers.Serializer):
+    """
+    Serializer for resume course data
+    """
     has_visited_course = serializers.BooleanField()
     url = serializers.URLField()
 
@@ -73,6 +84,7 @@ class OutlineTabSerializer(serializers.Serializer):
     """
     course_blocks = CourseBlockSerializer()
     course_expired_html = serializers.CharField()
+    course_goals = CourseGoalSerializer()
     course_tools = CourseToolSerializer(many=True)
     dates_widget = DatesWidgetSerializer()
     enroll_alert = EnrollAlertSerializer()

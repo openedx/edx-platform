@@ -11,7 +11,7 @@ from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_OUTLINE_TAB
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, ENABLE_COURSE_GOALS
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
@@ -27,6 +27,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         super().setUp()
         self.url = reverse('course-home-outline-tab', args=[self.course.id])
 
+    @ENABLE_COURSE_GOALS.override(active=True)
     @COURSE_HOME_MICROFRONTEND.override(active=True)
     @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
     @ddt.data(CourseMode.AUDIT, CourseMode.VERIFIED)
@@ -34,6 +35,16 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+        course_goals = response.data.get('course_goals')
+        goal_options = course_goals['goal_options']
+        if enrollment_mode == CourseMode.VERIFIED:
+            self.assertEqual(goal_options, [])
+        else:
+            self.assertGreater(len(goal_options), 0)
+
+            selected_goal = course_goals['selected_goal']
+            self.assertIsNone(selected_goal)
 
         course_tools = response.data.get('course_tools')
         self.assertTrue(course_tools)
@@ -55,6 +66,9 @@ class OutlineTabTestViews(BaseCourseHomeTests):
     def test_get_authenticated_user_not_enrolled(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+        course_goals = response.data.get('course_goals')
+        self.assertEqual(course_goals['goal_options'], [])
 
         course_tools = response.data.get('course_tools')
         self.assertEqual(len(course_tools), 0)
@@ -170,3 +184,24 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             html = '<div>Course expired HTML</div>'
             gen_html.return_value = html
             self.assertEqual(self.client.get(self.url).data['course_expired_html'], html)
+
+    @ENABLE_COURSE_GOALS.override(active=True)
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    def test_post_course_goal(self):
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+
+        post_data = {
+            'course_id': self.course.id,
+            'goal_key': 'certify'
+        }
+        post_course_goal_response = self.client.post(reverse('course-home-save-course-goal'), post_data)
+        self.assertEqual(post_course_goal_response.status_code, 200)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        course_goals = response.data.get('course_goals')
+        selected_goal = course_goals['selected_goal']
+        self.assertIsNotNone(selected_goal)
+        self.assertEqual(selected_goal['key'], 'certify')
