@@ -21,7 +21,7 @@ export class DemographicsCollectionBanner extends React.Component {
             aria-label="demographics questionnaire pitch"
           >
             <div className="d-flex justify-content-left align-items-lg-center flex-column flex-lg-row  w-100">
-              <img className="demographics-banner-icon d-none d-lg-inline-block" src={`http://edx.org${this.props.bannerLogo}`} alt="" aria-hidden="true" />
+              <img className="demographics-banner-icon d-none d-lg-inline-block" src={this.props.bannerLogo} alt="" aria-hidden="true" />
               <div className="demographics-banner-prompt d-inline-block font-weight-bold text-white mr-4 py-3 px-2 px-lg-3">
                 Want to make edX better for everyone?
               </div>

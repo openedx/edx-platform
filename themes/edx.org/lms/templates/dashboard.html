@@ -149,6 +149,7 @@ from student.models import CourseEnrollment
 <section class="dashboard" id="dashboard-main">
 <main class="main-container" id="main" aria-label="Content" tabindex="-1">
   <%
+    from django.contrib.staticfiles.storage import staticfiles_storage
     from openedx.core.djangoapps.demographics.api.status import (
         show_user_demographics, show_call_to_action_for_user
     )
@@ -173,6 +174,7 @@ from student.models import CourseEnrollment
         show_user_demographics_fields
     )
     account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
+    bannerLogoPath = staticfiles_storage.url('edx.org/images/quote_prompt.png')
   %>
   % if display_demographics_banner:
       ${static.renderReact(
@@ -181,7 +183,8 @@ from student.models import CourseEnrollment
         props={
           "user": user.id,
           "lmsRootUrl": getattr(settings, 'LMS_ROOT_URL', ''),
-          "jwtAuthToken": getattr(settings, 'JWT_AUTH', {}).get('JWT_AUTH_COOKIE_HEADER_PAYLOAD', '')
+          "jwtAuthToken": getattr(settings, 'JWT_AUTH', {}).get('JWT_AUTH_COOKIE_HEADER_PAYLOAD', ''),
+          "bannerLogo": bannerLogoPath
         },
       )}
   % endif
