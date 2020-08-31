@@ -12,17 +12,23 @@ from openedx.core.djangolib.markup import HTML
   <h2 class="hd hd-2 unit-title">${unit_title}</h2>
 % endif
 
-% if due:
-  <%
-  data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection_format)
-  %>
+% if has_assignments and due:
+  % if subsection_format:
+    <%
+    data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection_format)
+    %>
+  % else:
+    <%
+    data_string = _("Due {date}")
+    %>
+  % endif
   <div class="vert-due-date">
     <div class="localized-datetime" data-datetime="${due}" data-string="${data_string}" data-timezone="${user_timezone}"></div>
     % if completed:
       <div class="pill completed">${_('Completed')}</div>
     % elif past_due:
       <div class="pill past-due">${_('Past Due')}</div>
-    %endif
+    % endif
   </div>
 % endif
 
