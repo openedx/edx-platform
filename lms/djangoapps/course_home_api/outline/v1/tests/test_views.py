@@ -2,7 +2,10 @@
 Tests for Outline Tab API in the Course Home API
 """
 
+from datetime import datetime
+
 import ddt
+from django.conf import settings
 from django.urls import reverse
 from mock import patch
 
@@ -15,6 +18,7 @@ from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_F
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt
@@ -205,3 +209,78 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         selected_goal = course_goals['selected_goal']
         self.assertIsNotNone(selected_goal)
         self.assertEqual(selected_goal['key'], 'certify')
+
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+    @patch('lms.djangoapps.course_api.blocks.transformers.milestones.get_attempt_status_summary')
+    def test_proctored_exam(self, mock_summary):
+        course = CourseFactory.create(
+            org='edX',
+            course='900',
+            run='test_run',
+            enable_proctored_exams=True,
+            proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
+        )
+        chapter = ItemFactory.create(parent=course, category='chapter', display_name='Test Section')
+        sequence = ItemFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name='Test Proctored Exam',
+            graded=True,
+            is_time_limited=True,
+            default_time_limit_minutes=10,
+            is_proctored_exam=True,
+            is_practice_exam=True,
+            due=datetime.now(),
+            exam_review_rules='allow_use_of_paper',
+            hide_after_due=False,
+            is_onboarding_exam=False,
+        )
+        mock_summary.return_value = {
+            'short_description': 'My Exam',
+            'suggested_icon': 'fa-foo-bar',
+        }
+        url = reverse('course-home-outline-tab', args=[course.id])
+
+        CourseEnrollment.enroll(self.user, course.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        exam_data = response.data['course_blocks']['blocks'][str(sequence.location)]
+        self.assertFalse(exam_data['complete'])
+        self.assertEqual(exam_data['description'], 'My Exam')
+        self.assertEqual(exam_data['display_name'], 'Test Proctored Exam')
+        self.assertIsNotNone(exam_data['due'])
+        self.assertEqual(exam_data['icon'], 'fa-foo-bar')
+
+    @COURSE_HOME_MICROFRONTEND.override(active=True)
+    @COURSE_HOME_MICROFRONTEND_OUTLINE_TAB.override(active=True)
+    def test_assignment(self):
+        course = CourseFactory.create()
+        with self.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequential = ItemFactory.create(display_name='Test', category='sequential', graded=True, has_score=True,
+                                            parent_location=chapter.location)
+            problem1 = ItemFactory.create(category='problem', graded=True, has_score=True,
+                                          parent_location=sequential.location)
+            problem2 = ItemFactory.create(category='problem', graded=True, has_score=True,
+                                          parent_location=sequential.location)
+            sequential2 = ItemFactory.create(display_name='Ungraded', category='sequential',
+                                             parent_location=chapter.location)
+        course.children = [chapter]
+        chapter.children = [sequential, sequential2]
+        sequential.children = [problem1, problem2]
+        url = reverse('course-home-outline-tab', args=[course.id])
+
+        CourseEnrollment.enroll(self.user, course.id)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        exam_data = response.data['course_blocks']['blocks'][str(sequential.location)]
+        self.assertEqual(exam_data['display_name'], 'Test (2 Questions)')
+        self.assertEqual(exam_data['icon'], 'fa-pencil-square-o')
+
+        ungraded_data = response.data['course_blocks']['blocks'][str(sequential2.location)]
+        self.assertEqual(ungraded_data['display_name'], 'Ungraded')
+        self.assertIsNone(ungraded_data['icon'])
