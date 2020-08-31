@@ -136,7 +136,6 @@ python3-saml
 pyuca                               # For more accurate sorting of translated country names in django-countries
 recommender-xblock                  # https://github.com/edx/RecommenderXBlock
 rest-condition                      # DRF's recommendation for supporting complex permissions
-rfc6266-parser                      # Used to generate Content-Disposition headers.
 social-auth-core
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database
