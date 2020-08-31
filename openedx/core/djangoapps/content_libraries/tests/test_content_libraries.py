@@ -500,8 +500,6 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             lib_id = lib["id"]
             block_data = self._add_block_to_library(lib_id, "unit", "unit1")
             # Second block should throw error
-            with self.assertRaises(BlockLimitReachedError):
-                self._add_block_to_library(lib_id, "problem", "problem1")
+            self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
             # Also check that limit applies to child blocks too
-            with self.assertRaises(BlockLimitReachedError):
-                self._add_block_to_library(lib_id, "html", "html1", parent_block=block_data["id"])
+            self._add_block_to_library(lib_id, "html", "html1", parent_block=block_data['id'], expect_response=400)

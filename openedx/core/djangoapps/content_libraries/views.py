@@ -60,6 +60,9 @@ def convert_exceptions(fn):
         except api.InvalidNameError as exc:
             log.exception(str(exc))
             raise ValidationError(str(exc))
+        except api.BlockLimitReachedError as exc:
+            log.exception(str(exc))
+            raise ValidationError(str(exc))
     return wrapped_fn
 
 
