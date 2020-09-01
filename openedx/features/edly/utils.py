@@ -290,3 +290,26 @@ def user_can_login_on_requested_edly_organization(request, user):
         return True
 
     return False
+
+
+def filter_courses_based_on_org(request, all_courses):
+    """
+    Filter courses based on the requested URL site.
+
+    Most of our LMS based roles are not organization based we would
+    need to filter courses manually based on org of current site.
+
+    Arguments:
+        request: HTTP request object,
+        all_courses (iterator): Iterator object.
+
+    Returns:
+        list: Returns List of courses filtered based on current site organization.
+    """
+
+    edly_user_info_cookie = request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME, None)
+    edx_org = get_edx_org_from_cookie(edly_user_info_cookie)
+
+    filtered_courses = [course for course in list(all_courses) if course.org == edx_org]
+
+    return filtered_courses

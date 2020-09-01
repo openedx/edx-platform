@@ -31,7 +31,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
-from openedx.features.edly.utils import get_edx_org_from_cookie, get_enabled_organizations
+from openedx.features.edly.utils import filter_courses_based_on_org, get_edx_org_from_cookie, get_enabled_organizations
 from six import text_type
 
 from contentstore.course_group_config import (
@@ -514,6 +514,7 @@ def _accessible_courses_list_from_groups(request):
     staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
     site_courses = UserBasedRole(request.user, GlobalCourseCreatorRole.ROLE).courses_with_role()
     all_courses = filter(filter_ccx, instructor_courses | staff_courses | site_courses)
+    all_courses = filter_courses_based_on_org(request, all_courses)
     courses_list = []
     course_keys = {}
 

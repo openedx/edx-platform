@@ -33,13 +33,19 @@ from openedx.features.edly.utils import (
     user_has_edly_organization_access,
     user_belongs_to_edly_sub_organization,
     user_can_login_on_requested_edly_organization,
+    filter_courses_based_on_org,
 )
+from organizations.tests.factories import OrganizationFactory
 from student import auth
 from student.roles import (
     CourseCreatorRole,
     GlobalCourseCreatorRole,
 )
 from student.tests.factories import UserFactory, GroupFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
 
 def mock_render_to_string(template_name, context):
     """
@@ -47,7 +53,8 @@ def mock_render_to_string(template_name, context):
     """
     return str((template_name, context))
 
-class UtilsTests(TestCase):
+
+class UtilsTests(ModuleStoreTestCase):
     """
     Tests for utility methods.
     """
@@ -297,3 +304,34 @@ class UtilsTests(TestCase):
         edly_panel_user_group = GroupFactory(name=settings.EDLY_PANEL_USERS_GROUP)
         self.request.user.groups.add(edly_panel_user_group)
         assert edly_panel_user_has_edly_org_access(self.request)
+
+    def test_filter_courses_based_on_org(self):
+        """
+        Test course are filtered properly on current site organization.
+        """
+        edx_org_1 = OrganizationFactory()
+        edx_org_2 = OrganizationFactory()
+        courses_of_org_1 = CourseFactory.create_batch(2, org=edx_org_1.short_name)
+        CourseFactory.create(org=edx_org_2.short_name)
+
+        assert len(modulestore().get_courses()) == 3
+
+        EdlySubOrganizationFactory(
+            edx_organization=edx_org_1,
+            lms_site=self.request.site,
+            studio_site=self.request.site
+        )
+        create_user_link_with_edly_sub_organization(self.request, self.request.user)
+        response = cookies_api.set_logged_in_edly_cookies(
+            self.request, HttpResponse(),
+            self.user,
+            cookie_settings(self.request)
+        )
+        self._copy_cookies_to_request(response, self.request)
+
+        filtered_courses = filter_courses_based_on_org(self.request, courses_of_org_1)
+        assert len(filtered_courses) == 2
+
+        edx_orgs_of_filterd_courses = [course.org for course in filtered_courses]
+        for org in edx_orgs_of_filterd_courses:
+            assert org == edx_org_1.short_name
