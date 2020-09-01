@@ -158,7 +158,7 @@ mongoengine==0.20.0       # via -r requirements/edx/base.in
 more-itertools==8.5.0     # via -r requirements/edx/paver.txt, zipp
 mpmath==1.1.0             # via sympy
 mysqlclient==2.0.1        # via -r requirements/edx/base.in
-newrelic==5.16.2.147      # via -r requirements/edx/base.in, edx-django-utils
+newrelic==5.18.0.148      # via -r requirements/edx/base.in, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/../edx-sandbox/shared.txt, chem
 nodeenv==1.5.0            # via -r requirements/edx/base.in
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, chem, openedx-calc, scipy
