@@ -114,7 +114,7 @@ docker_build:
 docker_tag: docker_build
 	docker tag openedx/edx-platform openedx/edx-platform:${GITHUB_SHA}
 	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-newrelic
-	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-devstack
+	docker tag openedx/edx-platform:latest-devstack openedx/edx-platform:${GITHUB_SHA}-devstack
 
 docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
