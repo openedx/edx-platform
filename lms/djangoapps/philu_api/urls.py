@@ -1,12 +1,22 @@
 """
  API urls to communicate with nodeBB
 """
+
 from django.conf.urls import url
 
-from lms.djangoapps.philu_api.views import PlatformSyncService, \
-    get_user_chat, mark_user_chat_read, get_user_data, MailChimpDataSyncAPI, \
-    ThirdPartyResultDataSyncAPI, download_pdf_file, send_alquity_fake_confirmation_email, \
-    UpdatePromptClickRecord, assign_user_badge, resend_activation_email
+from lms.djangoapps.philu_api.views import (
+    MailChimpDataSyncAPI,
+    PlatformSyncService,
+    ThirdPartyResultDataSyncAPI,
+    UpdatePromptClickRecord,
+    assign_user_badge,
+    download_pdf_file,
+    get_user_chat,
+    get_user_data,
+    mark_user_chat_read,
+    resend_activation_email,
+    send_alquity_fake_confirmation_email
+)
 
 urlpatterns = [
     url(r'platform/sync/service/', PlatformSyncService.as_view(), name='get_shared_data'),
