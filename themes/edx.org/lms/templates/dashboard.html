@@ -209,6 +209,7 @@ from student.models import CourseEnrollment
         props={
           "user": user.id,
           "lmsRootUrl": getattr(settings, 'LMS_ROOT_URL', ''),
+          "demographicsBaseUrl": getattr(settings, 'DEMOGRAPHICS_BASE_URL', ''),
           "jwtAuthToken": getattr(settings, 'JWT_AUTH', {}).get('JWT_AUTH_COOKIE_HEADER_PAYLOAD', ''),
           "bannerLogo": bannerLogoPath
         },

@@ -21,11 +21,11 @@ class MultiselectDropdown extends React.Component {
     this.handleOptionClick = this.handleOptionClick.bind(this);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     document.addEventListener("keydown", this.handleKeydown, false);
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     document.removeEventListener("keydown", this.handleKeydown, false);
   }
 
@@ -81,12 +81,12 @@ class MultiselectDropdown extends React.Component {
     if (this.props.selected.length == 0) {
       return this.props.emptyLabel;
     }
-    const selectedList = this.props.selected.reduce((selected, next) => {
-      return selected + `, ${this.findOption(next).display_name}`
-    });
-    if(selectedList.length > 60 ){
+    const selectedList = this.props.selected
+      .map(selected => this.findOption(selected).display_name)
+      .join(', ');
+    if (selectedList.length > 60) {
       return selectedList.substring(0, 55) + '...'
-    } 
+    }
     return selectedList;
   }
 
@@ -106,7 +106,7 @@ class MultiselectDropdown extends React.Component {
       return (
         <div key={index} id={`${option.value}-option-container`} className="option-container">
           <label className="option-label">
-            <input id={`${option.value}-option-checkbox`} className="option-checkbox" type="checkbox" value={option.value} checked={checked} onChange={this.handleOptionClick}/>
+            <input id={`${option.value}-option-checkbox`} className="option-checkbox" type="checkbox" value={option.value} checked={checked} onChange={this.handleOptionClick} />
             {option.display_name}
           </label>
         </div>
@@ -123,8 +123,8 @@ class MultiselectDropdown extends React.Component {
 
   render() {
     return (
-      <div 
-        className="multiselect-dropdown" 
+      <div
+        className="multiselect-dropdown"
         onBlur={() => {
           this.props.onBlur();
         }}

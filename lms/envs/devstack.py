@@ -414,6 +414,7 @@ DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
 ENABLE_DEMOGRAPHICS_COLLECTION = True
 ENABLE_DEMOGRAPHICS_MODAL = True
+DEMOGRAPHICS_BASE_URL = "http://localhost:18360"
 #####################################################################
 # See if the developer has any local overrides.
 if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
