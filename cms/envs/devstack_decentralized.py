@@ -158,7 +158,7 @@ IDA_LOGOUT_URI_LIST = [
 ]
 
 ############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
+BLOCKSTORE_API_URL = "http://blockstore.local.edx.org:18250/api/v1/"
 
 #####################################################################
 

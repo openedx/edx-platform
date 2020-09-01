@@ -207,17 +207,17 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBack
 
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
-ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
+ECOMMERCE_API_URL = 'http://ecommerce.local.edx.org:18130/api/v2'
 
 ############## Comments CONFIGURATION SETTINGS ###############
-COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
+COMMENTS_SERVICE_URL = 'http://forum.local.edx.org:4567'
 
 ############## Credentials CONFIGURATION SETTINGS ###############
-CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://credentials.local.edx.org:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
 ############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
+BLOCKSTORE_API_URL = "http://blockstore.local.edx.org:18250/api/v1/"
 
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
@@ -278,7 +278,7 @@ MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-EDXNOTES_INTERNAL_API = 'http://edx.devstack.edxnotesapi:18120/api/v1'
+EDXNOTES_INTERNAL_API = 'http://edxnotesapi.local.edx.org:18120/api/v1'
 EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
 
 ############## Settings for Microfrontends  #########################
@@ -334,7 +334,7 @@ ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
-COURSE_CATALOG_URL_ROOT = 'http://edx.devstack.discovery:18381'
+COURSE_CATALOG_URL_ROOT = 'http://discovery.local.edx.org:18381'
 COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
 
 SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", SYSTEM_WIDE_ROLE_CLASSES)
