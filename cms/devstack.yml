@@ -37,47 +37,47 @@ CACHES:
         KEY_FUNCTION: util.memcache.safe_key
         KEY_PREFIX: celery
         LOCATION:
-        - edx.devstack.memcached:11211
+        - memcached.local.edx.org:11211
         TIMEOUT: '7200'
     configuration:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
         KEY_FUNCTION: util.memcache.safe_key
         KEY_PREFIX: 1001c6274ca4
         LOCATION:
-        - edx.devstack.memcached:11211
+        - memcached.local.edx.org:11211
     course_structure_cache:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
         KEY_FUNCTION: util.memcache.safe_key
         KEY_PREFIX: course_structure
         LOCATION:
-        - edx.devstack.memcached:11211
+        - memcached.local.edx.org:11211
         TIMEOUT: '7200'
     default:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
         KEY_FUNCTION: util.memcache.safe_key
         KEY_PREFIX: default
         LOCATION:
-        - edx.devstack.memcached:11211
+        - memcached.local.edx.org:11211
         VERSION: '1'
     general:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
         KEY_FUNCTION: util.memcache.safe_key
         KEY_PREFIX: general
         LOCATION:
-        - edx.devstack.memcached:11211
+        - memcached.local.edx.org:11211
     mongo_metadata_inheritance:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
         KEY_FUNCTION: util.memcache.safe_key
         KEY_PREFIX: mongo_metadata_inheritance
         LOCATION:
-        - edx.devstack.memcached:11211
+        - memcached.local.edx.org:11211
         TIMEOUT: 300
     staticfiles:
         BACKEND: django.core.cache.backends.memcached.MemcachedCache
         KEY_FUNCTION: util.memcache.safe_key
         KEY_PREFIX: 1001c6274ca4_general
         LOCATION:
-        - edx.devstack.memcached:11211
+        - memcached.local.edx.org:11211
 CAS_ATTRIBUTE_CALLBACK: ''
 CAS_EXTRA_LOGIN_PARAMS: ''
 CAS_SERVER_URL: ''
@@ -96,7 +96,7 @@ CERTIFICATE_TEMPLATE_LANGUAGES:
     en: English
     es: Español
 CERT_QUEUE: certificates
-CMS_BASE: edx.devstack.studio:8010
+CMS_BASE: studio.local.edx.org:8010
 CODE_JAIL:
     limits:
         CPU: 1
@@ -120,7 +120,7 @@ CONTENTSTORE:
         connectTimeoutMS: 2000
         db: edxapp
         host:
-        - edx.devstack.mongo
+        - mongo.local.edx.org
         password: password
         port: 27017
         read_preference: PRIMARY
@@ -133,7 +133,7 @@ CONTENTSTORE:
         auth_source: ''
         db: edxapp
         host:
-        - edx.devstack.mongo
+        - mongo.local.edx.org
         password: password
         port: 27017
         ssl: false
@@ -160,7 +160,7 @@ DATABASES:
         ATOMIC_REQUESTS: true
         CONN_MAX_AGE: 0
         ENGINE: django.db.backends.mysql
-        HOST: edx.devstack.mysql
+        HOST: mysql.local.edx.org
         NAME: edxapp
         OPTIONS: {}
         PASSWORD: password
@@ -169,7 +169,7 @@ DATABASES:
     read_replica:
         CONN_MAX_AGE: 0
         ENGINE: django.db.backends.mysql
-        HOST: edx.devstack.mysql
+        HOST: mysql.local.edx.org
         NAME: edxapp
         OPTIONS: {}
         PASSWORD: password
@@ -178,7 +178,7 @@ DATABASES:
     student_module_history:
         CONN_MAX_AGE: 0
         ENGINE: django.db.backends.mysql
-        HOST: edx.devstack.mysql
+        HOST: mysql.local.edx.org
         NAME: edxapp_csmh
         OPTIONS: {}
         PASSWORD: password
@@ -191,7 +191,7 @@ DEFAULT_FILE_STORAGE: django.core.files.storage.FileSystemStorage
 DEFAULT_FROM_EMAIL: registration@example.com
 DEFAULT_JWT_ISSUER:
     AUDIENCE: lms-key
-    ISSUER: http://edx.devstack.lms:8000/oauth2
+    ISSUER: http://lms.local.edx.org:8000/oauth2
     SECRET_KEY: lms-secret
 DEFAULT_MOBILE_AVAILABLE: false
 DEFAULT_SITE_THEME: ''
@@ -206,7 +206,7 @@ DOC_STORE_CONFIG:
     connectTimeoutMS: 2000
     db: edxapp
     host:
-    - edx.devstack.mongo
+    - mongo.local.edx.org
     password: password
     port: 27017
     read_preference: PRIMARY
@@ -220,7 +220,7 @@ ECOMMERCE_PUBLIC_URL_ROOT: http://localhost:8002
 EDXMKTG_USER_INFO_COOKIE_NAME: edx-user-info
 EDX_PLATFORM_REVISION: master
 ELASTIC_SEARCH_CONFIG:
--   host: edx.devstack.elasticsearch
+-   host: elasticsearch.local.edx.org
     port: 9200
     use_ssl: false
 EMAIL_BACKEND: django.core.mail.backends.smtp.EmailBackend
@@ -230,7 +230,7 @@ EMAIL_HOST_USER: ''
 EMAIL_PORT: 25
 EMAIL_USE_TLS: false
 ENABLE_COMPREHENSIVE_THEMING: false
-ENTERPRISE_API_URL: http://edx.devstack.lms:8000/enterprise/api/v1
+ENTERPRISE_API_URL: http://lms.local.edx.org:8000/enterprise/api/v1
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS: {}
 ENTERPRISE_SERVICE_WORKER_USERNAME: enterprise_worker
 EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST: []
@@ -299,24 +299,24 @@ JWT_AUTH:
     JWT_AUTH_COOKIE_HEADER_PAYLOAD: edx-jwt-cookie-header-payload
     JWT_AUTH_COOKIE_SIGNATURE: edx-jwt-cookie-signature
     JWT_AUTH_REFRESH_COOKIE: edx-jwt-refresh-cookie
-    JWT_ISSUER: http://edx.devstack.lms:8000/oauth2
+    JWT_ISSUER: http://lms.local.edx.org:8000/oauth2
     JWT_ISSUERS:
     -   AUDIENCE: lms-key
-        ISSUER: http://edx.devstack.lms:8000/oauth2
+        ISSUER: http://lms.local.edx.org:8000/oauth2
         SECRET_KEY: lms-secret
     JWT_PRIVATE_SIGNING_JWK: None
     JWT_PUBLIC_SIGNING_JWK_SET: ''
     JWT_SECRET_KEY: lms-secret
     JWT_SIGNING_ALGORITHM: null
 JWT_EXPIRATION: 30
-JWT_ISSUER: http://edx.devstack.lms:8000/oauth2
+JWT_ISSUER: http://lms.local.edx.org:8000/oauth2
 JWT_PRIVATE_SIGNING_KEY: null
 LANGUAGE_CODE: en
 LANGUAGE_COOKIE: openedx-language-preference
-LEARNER_PORTAL_URL_ROOT: https://learner-portal-edx.devstack.lms:8000
-LMS_BASE: edx.devstack.lms:8000
-LMS_INTERNAL_ROOT_URL: http://edx.devstack.lms:8000
-LMS_ROOT_URL: http://edx.devstack.lms:8000
+LEARNER_PORTAL_URL_ROOT: https://learner-portal-lms.local.edx.org:8000
+LMS_BASE: lms.local.edx.org:8000
+LMS_INTERNAL_ROOT_URL: http://lms.local.edx.org:8000
+LMS_ROOT_URL: http://lms.local.edx.org:8000
 LOCAL_LOGLEVEL: INFO
 LOGGING_ENV: sandbox
 LOGIN_REDIRECT_WHITELIST: []
@@ -341,7 +341,7 @@ MODULESTORE:
                     connectTimeoutMS: 2000
                     db: edxapp
                     host:
-                    - edx.devstack.mongo
+                    - mongo.local.edx.org
                     password: password
                     port: 27017
                     read_preference: PRIMARY
@@ -361,7 +361,7 @@ MODULESTORE:
                     connectTimeoutMS: 2000
                     db: edxapp
                     host:
-                    - edx.devstack.mongo
+                    - mongo.local.edx.org
                     password: password
                     port: 27017
                     read_preference: PRIMARY
@@ -484,7 +484,7 @@ XQUEUE_INTERFACE:
     django_auth:
         password: password
         username: lms
-    url: http://edx.devstack.xqueue:18040
+    url: http://xqueue.local.edx.org:18040
 X_FRAME_OPTIONS: DENY
 YOUTUBE_API_KEY: PUT_YOUR_API_KEY_HERE
 ZENDESK_API_KEY: ''
