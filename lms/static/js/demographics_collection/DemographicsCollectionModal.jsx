@@ -65,7 +65,7 @@ class DemographicsCollectionModal extends React.Component {
 
     // gather options for the demographics selects
     try {
-      optionsResponse = await fetch('http://localhost:18360/demographics/api/v1/demographics/', { method: 'OPTIONS' })
+      optionsResponse = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, { method: 'OPTIONS' })
       // this should only fail if demographics is down
       if (optionsResponse.status !== 200) {
         let error = await optionsResponse.json().detail;
@@ -81,7 +81,7 @@ class DemographicsCollectionModal extends React.Component {
     // gather previously answers questions
     try {
       await this.jwtTokenService.getJwtToken();
-      response = await fetch(`http://localhost:18360/demographics/api/v1/demographics/${this.props.user}/`, requestOptions);
+      response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, requestOptions);
       // if the user has not yet bee created in the demographics service, we need to make a post to create an entry
       if (response.status !== 200) {
         // we get a 404 if the user resource does not exist in demographics, which is expected.
@@ -91,7 +91,7 @@ class DemographicsCollectionModal extends React.Component {
             requestOptions.body = JSON.stringify({
               user: this.props.user,
             });
-            response = await fetch(`http://localhost:18360/demographics/api/v1/demographics/`, requestOptions);
+            response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, requestOptions);
             // A 201 is a created success message. if we don't get a 201, throw an error.
             if(response.status !== 201) {
               const error = await response.json();
@@ -148,7 +148,7 @@ class DemographicsCollectionModal extends React.Component {
 
     try {
       await this.jwtTokenService.getJwtToken();
-      await fetch(`http://localhost:18360/demographics/api/v1/demographics/${this.props.user}/`, options)
+      await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, options)
     } catch (error) {
       this.setState({ loading: false, error: true, errorMessage: error });
     }
