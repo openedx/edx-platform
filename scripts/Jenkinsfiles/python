@@ -50,7 +50,7 @@ def xdist_git_refspec() {
 }
 
 pipeline {
-    agent { label "jenkins-worker" }
+    agent { label "juniper-worker" }
     options {
         sendSplunkConsoleLog()
         timestamps()
@@ -94,7 +94,7 @@ pipeline {
         stage('Run Tests') {
             parallel {
                 stage("lms-unit") {
-                    agent { label "jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "lms-unit"
                         XDIST_NUM_WORKERS = 10
@@ -114,7 +114,7 @@ pipeline {
                     }
                 }
                 stage("cms-unit") {
-                    agent { label "jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "cms-unit"
                         XDIST_NUM_WORKERS = 3
@@ -134,7 +134,7 @@ pipeline {
                     }
                 }
                 stage("commonlib-unit") {
-                    agent { label "jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "commonlib-unit"
                         XDIST_NUM_WORKERS = 3

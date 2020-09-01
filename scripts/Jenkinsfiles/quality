@@ -41,7 +41,7 @@ def qualityTestCleanup() {
 }
 
 pipeline {
-    agent { label "jenkins-worker" }
+    agent { label "juniper-worker" }
     options {
         sendSplunkConsoleLog()
         timestamps()
@@ -75,7 +75,7 @@ pipeline {
             parallel {
                 stage("commonlib pylint") {
                     // "pylint common" requires 5.5 GB of RAM, so use js-worker (8 GB) instead of jenkins-worker (4 GB)
-                    agent { label "js-worker" }
+                    agent { label "juniper-js-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 1
@@ -94,7 +94,7 @@ pipeline {
                     }
                 }
                 stage("lms pylint") {
-                    agent { label "jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 2
@@ -113,7 +113,7 @@ pipeline {
                     }
                 }
                 stage("cms/openedx/pavelib pylint") {
-                    agent { label "jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 3
@@ -132,7 +132,7 @@ pipeline {
                     }
                 }
                 stage("Other quality checks") {
-                    agent { label "jenkins-worker" }
+                    agent { label "juniper-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 4
