@@ -1,13 +1,14 @@
 import logging
 
 from crum import get_current_request
-from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from lms.djangoapps.course_home_api.utils import is_request_from_learning_mfe
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+from openedx.features.course_experience.utils import dates_banner_should_display
 
 log = logging.getLogger(__name__)
 
@@ -25,14 +26,20 @@ class PersonalizedLearnerScheduleCallToAction:
         Look at CallToActionService docstring to see what will be returned.
         """
         ctas = []
-
-        # Some checks to disable PLS calls to action until these environments (mobile and MFE) support them natively
         request = get_current_request()
-        is_mobile_app = request and is_request_from_mobile_app(request)
-        is_learning_mfe = request and is_request_from_learning_mfe(request)
-        if is_mobile_app:
+
+        course_key = xblock.scope_ids.usage_id.context_key
+        missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
+        # Not showing in the missed_gated_content case because those learners are not eligible
+        # to shift due dates.
+        if not missed_deadlines or missed_gated_content:
             return []
 
+        # Some checks to disable PLS calls to action until these environments (mobile and MFE) support them natively
+        if request and is_request_from_mobile_app(request):
+            return []
+
+        is_learning_mfe = request and is_request_from_learning_mfe(request)
         if category == self.CAPA_SUBMIT_DISABLED:
             # xblock is a capa problem, and the submit button is disabled. Check if it's because of a personalized
             # schedule due date being missed, and if so, we can offer to shift it.
