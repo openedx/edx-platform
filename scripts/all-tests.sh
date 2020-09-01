@@ -22,6 +22,7 @@ doCheckVars() {
 
     elif [ -n "$JENKINS_HOME" ] ; then
         source scripts/jenkins-common.sh
+        source scripts/clone-theme.sh
         SCRIPT_TO_RUN=scripts/generic-ci-tests.sh
     fi
 }
