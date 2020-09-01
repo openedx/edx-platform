@@ -30,7 +30,7 @@ class CourseBlockSerializer(serializers.Serializer):
         }
 
 
-class CourseGoalSerializer(serializers.Serializer):
+class CourseGoalsSerializer(serializers.Serializer):
     """
     Serializer for Course Goal data
     """
@@ -84,7 +84,7 @@ class OutlineTabSerializer(serializers.Serializer):
     """
     course_blocks = CourseBlockSerializer()
     course_expired_html = serializers.CharField()
-    course_goals = CourseGoalSerializer()
+    course_goals = CourseGoalsSerializer()
     course_tools = CourseToolSerializer(many=True)
     dates_widget = DatesWidgetSerializer()
     enroll_alert = EnrollAlertSerializer()
