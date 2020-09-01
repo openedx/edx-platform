@@ -37,6 +37,7 @@ class DemographicsCollectionModal extends React.Component {
       selected: Object.values(FIELD_NAMES).reduce((acc, current) => ({ ...acc, [current]: '' }), {}),
     };
     this.handleSelectChange = this.handleSelectChange.bind(this);
+    this.handleMultiselectChange = this.handleMultiselectChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.loadOptions = this.loadOptions.bind(this);
 
@@ -94,11 +95,11 @@ class DemographicsCollectionModal extends React.Component {
             });
             response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, requestOptions);
             // A 201 is a created success message. if we don't get a 201, throw an error.
-            if(response.status !== 201) {
+            if (response.status !== 201) {
               const error = await response.json();
               throw error.detail;
             }
-          } catch(error) {
+          } catch (error) {
             this.setState({ loading: false, error: true, errorMessage: error });
           }
         } else {
@@ -121,6 +122,7 @@ class DemographicsCollectionModal extends React.Component {
   }
 
   componentWillUnmount() {
+    // remove the class to allow the dashboard content to scroll
     document.body.classList.remove('modal-open');
   }
 
@@ -163,6 +165,23 @@ class DemographicsCollectionModal extends React.Component {
         [name]: value,
       }
     }));
+  }
+
+  handleMultiselectChange(values) {
+    const decline = values.find(i => i === 'declined');
+    this.setState(({ selected: { [FIELD_NAMES.ETHNICITY]: prevSelected } }) => {
+      console.log(prevSelected)
+      // decline was previously selected
+      if (prevSelected.find(i => i === 'declined')) {
+        return { selected: { [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined') } }
+        // decline was just selected
+      } else if (decline) {
+        return { selected: { [FIELD_NAMES.ETHNICITY]: [decline] } }
+        // anything else was selected
+      } else {
+        return { selected: { [FIELD_NAMES.ETHNICITY]: values } }
+      }
+    });
   }
 
   handleInputChange(e) {
@@ -254,11 +273,10 @@ class DemographicsCollectionModal extends React.Component {
                   emptyLabel={gettext("Check all that apply")}
                   options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, { choices: [] }).choices}
                   selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
-                  onChange={(values) => {
-                    const filteredValues = values.filter(i => i !== 'declined');
-                    this.setState(prevState => ({ selected: { ...prevState.selected, [FIELD_NAMES.ETHNICITY]: filteredValues } }));
-                  }}
+                  onChange={this.handleMultiselectChange}
                   onBlur={() => {
+                    // we create a fake "event", and then use it to call our normal selection handler function that
+                    // is used by the other dropdowns.
                     const e = {
                       target: {
                         name: FIELD_NAMES.ETHNICITY,
