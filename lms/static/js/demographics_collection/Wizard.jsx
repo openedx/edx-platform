@@ -1,3 +1,4 @@
+/* global gettext */
 import React from 'react';
 import isFunction from 'lodash/isFunction';
 
@@ -68,7 +69,7 @@ export default class Wizard extends React.Component {
           {errorPage.props.children}
         </div>
         <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
-          <button className="wizard-button blue" onClick={this.props.onWizardComplete}>Close</button>
+          <button className="wizard-button blue" onClick={this.props.onWizardComplete}>{gettext("Close")}</button>
         </div>
       </div>
     )
@@ -87,8 +88,8 @@ export default class Wizard extends React.Component {
         </div>
         {this.renderPage()}
         <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
-          <button className={`wizard-button ${finalPage && 'blue'}`} onClick={this.props.onWizardComplete}>{finalPage ? "Return to my dashboard" : "Finish later"}</button>
-          <button className="wizard-button blue" hidden={finalPage} onClick={this.handleNext}>Next</button>
+          <button className={`wizard-button ${finalPage && 'blue'}`} onClick={this.props.onWizardComplete}>{finalPage ? gettext("Return to my dashboard") : gettext("Finish later")}</button>
+          <button className="wizard-button blue" hidden={finalPage} onClick={this.handleNext}>{gettext("Next")}</button>
         </div>
       </div>
     );
