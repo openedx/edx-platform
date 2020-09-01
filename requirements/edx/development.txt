@@ -56,7 +56,7 @@ cssutils==1.0.2           # via -r requirements/edx/testing.txt, pynliner
 ddt==1.4.1                # via -r requirements/edx/testing.txt, xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via -r requirements/edx/testing.txt, pycontracts
 defusedxml==0.6.0         # via -r requirements/edx/testing.txt, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
-diff-cover==3.0.1         # via -r requirements/edx/testing.txt
+diff-cover==4.0.0         # via -r requirements/edx/testing.txt
 distlib==0.3.1            # via -r requirements/edx/testing.txt, virtualenv
 django-appconf==1.0.4     # via -r requirements/edx/testing.txt, django-statici18n
 django-celery==3.3.1      # via -r requirements/edx/testing.txt, edx-bulk-grades
@@ -190,7 +190,7 @@ mongoengine==0.20.0       # via -r requirements/edx/testing.txt
 more-itertools==8.5.0     # via -r requirements/edx/testing.txt, pytest, zipp
 mpmath==1.1.0             # via -r requirements/edx/testing.txt, sympy
 mysqlclient==2.0.1        # via -r requirements/edx/testing.txt
-newrelic==5.16.2.147      # via -r requirements/edx/testing.txt, edx-django-utils
+newrelic==5.18.0.148      # via -r requirements/edx/testing.txt, edx-django-utils
 nltk==3.5                 # via -r requirements/edx/testing.txt, chem
 nodeenv==1.5.0            # via -r requirements/edx/testing.txt
 numpy==1.18.5             # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, chem, openedx-calc, scipy
@@ -269,7 +269,7 @@ semantic-version==2.8.5   # via -r requirements/edx/testing.txt, edx-drf-extensi
 shapely==1.7.1            # via -r requirements/edx/testing.txt
 simplejson==3.17.2        # via -r requirements/edx/testing.txt, sailthru-client, super-csv, xblock-utils
 singledispatch==3.4.0.3   # via -r requirements/edx/testing.txt
-six==1.15.0               # via -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, analytics-python, astroid, bleach, bok-choy, chem, crowdsourcehinter-xblock, cryptography, diff-cover, django-countries, django-simple-history, django-statici18n, django-wiki, drf-yasg, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, edx-sphinx-theme, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, jsonschema, libsass, mock, openedx-calc, packaging, pathlib2, paver, pip-tools, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, sphinxcontrib-httpdomain, stevedore, tox, transifex-client, virtualenv, xblock
+six==1.15.0               # via -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, analytics-python, astroid, bleach, bok-choy, chem, crowdsourcehinter-xblock, cryptography, django-countries, django-simple-history, django-statici18n, django-wiki, drf-yasg, edx-ace, edx-bulk-grades, edx-ccx-keys, edx-django-release-util, edx-drf-extensions, edx-enterprise, edx-i18n-tools, edx-lint, edx-milestones, edx-opaque-keys, edx-rbac, edx-search, edx-sphinx-theme, event-tracking, freezegun, fs, fs-s3fs, help-tokens, html5lib, httpretty, isodate, jsonschema, libsass, mock, openedx-calc, packaging, pathlib2, paver, pip-tools, pycontracts, pyjwkest, python-dateutil, python-memcached, python-swiftclient, singledispatch, social-auth-app-django, social-auth-core, sphinxcontrib-httpdomain, stevedore, tox, transifex-client, virtualenv, xblock
 slumber==0.7.1            # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-enterprise, edx-rest-api-client
 smmap==3.0.4              # via -r requirements/edx/testing.txt, gitdb
 snowballstemmer==2.0.0    # via sphinx
