@@ -50,6 +50,7 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
     @data(
         ({'allow_anonymous': {'value': False}}, status.HTTP_200_OK),
         ({'allow_anonymous': {'value': False}}, status.HTTP_200_OK),
+        ({'discussion_blackouts': {'value': [["2015-09-15", "2015-09-21"]]}}, status.HTTP_200_OK),
         ({'allow_anonymous': 2}, status.HTTP_400_BAD_REQUEST),  # invalid format
     )
     @unpack
@@ -66,7 +67,8 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
             for key, val in test_data.items():
                 assert discussion_settings[key]['value'] == val['value']
         else:
-            assert "errors" in discussion_settings
+            # should be a dictionary of errors
+            assert isinstance(discussion_settings, dict)
 
     def test_unauthenticated_user(self):
         url = self._get_discussion_settings_url()
