@@ -5,13 +5,12 @@ from django.conf import settings
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
 from contentstore.views.course import get_course_and_check_access
 from models.settings.course_metadata import CourseMetadata
-from xmodule.modulestore.django import modulestore
 
 from ..serializers.discussion_settings import DiscussionSettingsSerializer
 
@@ -49,8 +48,8 @@ class DiscussionSettingsViewSet(viewsets.GenericViewSet):
         course_module = self.get_course_module()
         return CourseMetadata.fetch(course_module)
 
-    def get_serializer_context(self, *args, **kwargs):
-        context = super().get_serializer_context(*args, **kwargs)
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
         context['course_key'] = self.get_object()
         context['course_module'] = self.get_course_module()
         context['user'] = self.request.user

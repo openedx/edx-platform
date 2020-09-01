@@ -52,17 +52,17 @@ class DiscussionSettingsSerializer(serializers.Serializer):
         value_field_cls=blackout_date_range_field
     )
 
-    def validate(self, data):
+    def validate(self, attrs):
         is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
             self.context['course_module'],
-            data,
+            attrs,
             user=self.context['user'],
         )
         if not is_valid:
             raise serializers.ValidationError(errors)
-        else:
-            return updated_data
 
-    def save(self):
+        return updated_data
+
+    def save(self, **kwargs):
         with modulestore().bulk_operations(self.context['course_key']):
             modulestore().update_item(self.context['course_module'], self.context['user'].id)
