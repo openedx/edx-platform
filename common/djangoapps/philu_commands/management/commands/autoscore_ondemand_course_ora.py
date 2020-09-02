@@ -26,19 +26,15 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        course_ids = CourseOverview.objects.filter(self_paced=True).values_list('id', flat=True)
+        self_paced_course_ids = CourseOverview.objects.filter(self_paced=True).values_list('id', flat=True)
 
-        # Get unfinished assessment workflows uuids
-        workflows_uuids = AssessmentWorkflow.objects.filter(course_id__in=course_ids).values_list(
+        submission_uuids = AssessmentWorkflow.objects.filter(course_id__in=self_paced_course_ids).values_list(
             'submission_uuid', flat=True).exclude(status__in=['done', 'cancelled'])
 
-        if not workflows_uuids:
+        if not submission_uuids:
             log.info('No pending open assessment found to autoscore. No ORA in progress')
-            return  # nothing to auto-score
+            return
 
-        enrollments = CourseEnrollment.objects.filter(course_id__in=course_ids, is_active=True)
+        enrollments = CourseEnrollment.objects.filter(course_id__in=self_paced_course_ids, is_active=True)
 
-        find_and_autoscore_submissions(
-            enrollments=enrollments,
-            workflows_uuids=workflows_uuids
-        )
+        find_and_autoscore_submissions(enrollments=enrollments, submission_uuids=submission_uuids)

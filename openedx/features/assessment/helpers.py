@@ -25,48 +25,38 @@ from .constants import DAYS_TO_WAIT_AUTO_ASSESSMENT, ORA_BLOCK_TYPE
 log = getLogger(__name__)
 
 
-def find_and_autoscore_submissions(enrollments, workflows_uuids):
+def find_and_autoscore_submissions(enrollments, submission_uuids):
     """
-    Find ORA submissions corresponding to provided enrollments and workflow uuids. Autoscore all resulting submissions.
+    Find ORA submissions corresponding to provided enrollments and submission uuids. Autoscore all resulting
+    submissions.
     :param (list) enrollments: All active CourseEnrollment objects for all self paced courses
-    :param (list) workflows_uuids: All AssessmentWorkflow uuids for submissions excluding done and cancelled
+    :param (list) submission_uuids: All AssessmentWorkflow uuids for submissions excluding done and cancelled
     :return: None
     """
-    days_to_wait = get_ora_days_to_wait_from_site_configurations()
+    days_to_wait = configuration_helpers.get_value('DAYS_TO_WAIT_AUTO_ASSESSMENT', DAYS_TO_WAIT_AUTO_ASSESSMENT)
     delta_date = datetime.now(utc).date() - timedelta(days=days_to_wait)
-    all_submissions = []
+    submissions_to_autoscore = []
 
     for enrollment in enrollments:
-        list_of_submissions_to_autoscore = _get_submissions_to_autoscore_by_enrollment(
+        submissions_to_autoscore_by_enrollment = _get_submissions_to_autoscore_by_enrollment(
             enrollment=enrollment,
-            workflows_uuids=workflows_uuids,
+            submission_uuids=submission_uuids,
             delta_date=delta_date
         )
-        if list_of_submissions_to_autoscore:
-            all_submissions.extend(list_of_submissions_to_autoscore)
+        if submissions_to_autoscore_by_enrollment:
+            submissions_to_autoscore.extend(submissions_to_autoscore_by_enrollment)
 
-    _log_multiple_submissions_info(all_submissions, days_to_wait, delta_date)
+    _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta_date)
 
-    for submission in all_submissions:
+    for submission in submissions_to_autoscore:
         autoscore_ora_submission(submission=submission)
 
 
-def get_ora_days_to_wait_from_site_configurations():
+def _get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuids, delta_date):
     """
-    This function returns the maximum number of day to wait in-order to auto score ora. This value is fetched from
-    site configuration, with a hardcoded default value from constants.
-    """
-    return configuration_helpers.get_value(
-        'DAYS_TO_WAIT_AUTO_ASSESSMENT',
-        DAYS_TO_WAIT_AUTO_ASSESSMENT
-    )
-
-
-def _get_submissions_to_autoscore_by_enrollment(enrollment, workflows_uuids, delta_date):
-    """
-    Find ORA submissions, for a specific enrollment, which correspond to provided workflow uuids.
+    Find ORA submissions, for a specific enrollment, which correspond to provided submission uuids.
     :param (CourseEnrollment) enrollment: Course enrollment to find submissions from
-    :param (list) workflows_uuids: All AssessmentWorkflow uuids for submissions excluding done and cancelled
+    :param (list) submission_uuids: All AssessmentWorkflow uuids for submissions excluding done and cancelled
     :param (Date) delta_date: Find submissions before this date
     :return: All submissions in enrollment matching criteria
     :rtype: list
@@ -87,7 +77,7 @@ def _get_submissions_to_autoscore_by_enrollment(enrollment, workflows_uuids, del
             student_item__item_id=open_assessment.location,
             status=Submission.ACTIVE,
             created_at__date__lt=delta_date,
-            uuid__in=list(workflows_uuids)
+            uuid__in=list(submission_uuids)
         ).order_by('-created_at').first()
 
         if submission:
@@ -96,12 +86,12 @@ def _get_submissions_to_autoscore_by_enrollment(enrollment, workflows_uuids, del
     return submissions
 
 
-def _log_multiple_submissions_info(all_submissions, days_to_wait, delta_date):
+def _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta_date):
     """
     Log ORA auto scoring status
     """
-    if all_submissions:
-        log.info('Autoscoring {count} submission(s)'.format(count=len(all_submissions)))
+    if submissions_to_autoscore:
+        log.info('Autoscoring {count} submission(s)'.format(count=len(submissions_to_autoscore)))
     else:
         log.info('No pending open assessment found to autoscore, since last {days} days, from {since_date}'.format(
             days=days_to_wait, since_date=delta_date, )
@@ -178,7 +168,7 @@ def autoscore_ora(course_id, usage_key, student):
     ).order_by('submitted_at')
     submission = submissions.first()
     if not submission:
-        log.warn(u"No submission found for user {user_id}".format(user_id=anonymous_user_id))
+        log.warn(u'No submission found for user {user_id}'.format(user_id=anonymous_user_id))
         return
     autoscore_ora_submission(submission)
 
