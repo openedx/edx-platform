@@ -36,11 +36,12 @@
         max-height: 767px;
       }
     }
-      .wizard-header {
-        .fa-info-circle {
-          color: #23419f;
-        }
+
+    .wizard-header {
+      .fa-info-circle {
+        color: #23419f;
       }
+    }
 
       .form-control {
         display: block;
@@ -108,21 +109,41 @@
         padding: 0;
       }
     }
-  
 
   .demographics-banner {
     background-color: #23419f;
     border-radius: 12px;
+
     @media (min-width: 1200px) {
       height: 64px;
     }
+
+    .demographics-dismiss-container {
+      margin-left: -40px;
+
+      .demographics-dismiss-btn {
+        font-size: 20px;
+        border: none;
+
+        &:hover,
+        &:active,
+        &:focus {
+          background-image: none;
+          background-color: #23419f;
+          box-shadow: none;
+        }
+      }
+    }
+
     .demographics-banner-icon {
       height: 140px;
     }
+
     .demographics-banner-prompt {
       font-size: 24px;
       line-height: 24px;
     }
+
     .demographics-banner-btn {
       color: #23419f;
       border-radius: 20px;
