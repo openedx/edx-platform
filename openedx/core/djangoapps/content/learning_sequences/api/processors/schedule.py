@@ -1,10 +1,12 @@
 import logging
 from collections import defaultdict, OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from edx_when.api import get_dates_for_course
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from student.auth import user_has_role
+from student.roles import CourseBetaTesterRole
 
 from ...data import ScheduleData, ScheduleItemData, UserCourseOutlineData
 from .base import OutlineProcessor
@@ -36,6 +38,7 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         self.keys_to_schedule_fields = defaultdict(dict)
         self._course_start = None
         self._course_end = None
+        self._is_beta_tester = False
 
     def load_data(self):
         """Pull dates information from edx-when."""
@@ -49,6 +52,7 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         course_usage_key = self.course_key.make_usage_key('course', 'course')
         self._course_start = self.keys_to_schedule_fields[course_usage_key].get('start')
         self._course_end = self.keys_to_schedule_fields[course_usage_key].get('end')
+        self._is_beta_tester = user_has_role(self.user, CourseBetaTesterRole(self.course_key))
 
     def inaccessible_sequences(self, full_course_outline):
         """
@@ -57,8 +61,13 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         Sequences are inaccessible, regardless of the individual Sequence start
         dates.
         """
+        if self._is_beta_tester and full_course_outline.days_early_for_beta is not None:
+            start_offset = timedelta(days=full_course_outline.days_early_for_beta)
+        else:
+            start_offset = timedelta(days=0)
+
         # If the course hasn't started at all, then everything is inaccessible.
-        if self._course_start is None or self.at_time < self._course_start:
+        if self._course_start is None or self.at_time < self._course_start - start_offset:
             return set(full_course_outline.sequences)
 
         self_paced = full_course_outline.self_paced
@@ -66,6 +75,8 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         inaccessible = set()
         for section in full_course_outline.sections:
             section_start = self.keys_to_schedule_fields[section.usage_key].get('start')
+            if section_start is not None:
+                section_start -= start_offset
             if section_start and self.at_time < section_start:
                 # If the section hasn't started yet, all the sequences it
                 # contains are inaccessible, regardless of the start value for
@@ -74,6 +85,8 @@ class ScheduleOutlineProcessor(OutlineProcessor):
             else:
                 for seq in section.sequences:
                     seq_start = self.keys_to_schedule_fields[seq.usage_key].get('start')
+                    if seq_start is not None:
+                        seq_start -= start_offset
                     if seq_start and self.at_time < seq_start:
                         inaccessible.add(seq.usage_key)
                         continue
@@ -110,12 +123,22 @@ class ScheduleOutlineProcessor(OutlineProcessor):
         course_usage_key = self.course_key.make_usage_key('course', 'course')
         course_start = self.keys_to_schedule_fields[course_usage_key].get('start')
         course_end = self.keys_to_schedule_fields[course_usage_key].get('end')
+        days_early_for_beta = pruned_course_outline.days_early_for_beta
+
+        if days_early_for_beta is not None and self._is_beta_tester:
+            start_offset = timedelta(days=days_early_for_beta)
+        else:
+            start_offset = timedelta(days=0)
+        if course_start is not None:
+            course_start -= start_offset
 
         sequences = {}
         sections = {}
         for section in pruned_course_outline.sections:
             section_dict = self.keys_to_schedule_fields[section.usage_key]
             section_start = section_dict.get('start')
+            if section_start is not None:
+                section_start -= start_offset
             section_effective_start = _effective_start(course_start, section_start)
             section_due = section_dict.get('due')
 
@@ -129,6 +152,8 @@ class ScheduleOutlineProcessor(OutlineProcessor):
             for seq in section.sequences:
                 seq_dict = self.keys_to_schedule_fields[seq.usage_key]
                 seq_start = seq_dict.get('start')
+                if seq_start is not None:
+                    seq_start -= start_offset
                 seq_due = seq_dict.get('due')
                 sequences[seq.usage_key] = ScheduleItemData(
                     usage_key=seq.usage_key,

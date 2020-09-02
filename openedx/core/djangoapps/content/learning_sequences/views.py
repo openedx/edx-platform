@@ -70,6 +70,7 @@ class CourseOutlineView(APIView):
                 "title": user_course_outline.title,
                 "published_at": user_course_outline.published_at,
                 "published_version": user_course_outline.published_version,
+                "days_early_for_beta": user_course_outline.days_early_for_beta,
                 "self_paced": user_course_outline.self_paced,
 
                 # Who and when this request was generated for (we can eventually

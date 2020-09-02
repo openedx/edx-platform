@@ -10,9 +10,13 @@ from edx_when.api import set_dates_for_course
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 
+from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from student.auth import user_has_role
+from student.models import CourseEnrollment
+from student.roles import CourseBetaTesterRole
 
 from ...data import (
     CourseLearningSequenceData, CourseOutlineData, CourseSectionData, VisibilityData, CourseVisibility
@@ -42,6 +46,7 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
             title="Roundtrip Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2015",
+            days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [2, 2]),
             self_paced=False,
             course_visibility=CourseVisibility.PRIVATE
@@ -117,6 +122,7 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
 
     @classmethod
     def setUpTestData(cls):
+        course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
         # Users...
         cls.global_staff = User.objects.create_user(
             'global_staff', email='gstaff@example.com', is_staff=True
@@ -124,15 +130,17 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
         cls.student = User.objects.create_user(
             'student', email='student@example.com', is_staff=False
         )
+        cls.beta_tester = BetaTesterFactory(course_key=course_key)
         cls.anonymous_user = AnonymousUser()
 
         # Seed with data
-        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
+        cls.course_key = course_key
         cls.simple_outline = CourseOutlineData(
             course_key=cls.course_key,
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
+            days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [2, 1, 3]),
             self_paced=False,
             course_visibility=CourseVisibility.PRIVATE
@@ -140,19 +148,30 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
         replace_course_outline(cls.simple_outline)
 
         # Enroll student in the course
-        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
+        CourseEnrollment.enroll(user=cls.student, course_key=cls.course_key, mode="audit")
+        # Enroll beta tester in the course
+        CourseEnrollment.enroll(user=cls.beta_tester, course_key=cls.course_key, mode="audit")
 
     def test_simple_outline(self):
         """This outline is the same for everyone."""
         at_time = datetime(2020, 5, 21, tzinfo=timezone.utc)
+        beta_tester_outline = get_user_course_outline(
+            self.course_key, self.beta_tester, at_time
+        )
         student_outline = get_user_course_outline(
             self.course_key, self.student, at_time
         )
         global_staff_outline = get_user_course_outline(
             self.course_key, self.global_staff, at_time
         )
+        assert beta_tester_outline.sections == global_staff_outline.sections
         assert student_outline.sections == global_staff_outline.sections
         assert student_outline.at_time == at_time
+
+        beta_tester_outline_details = get_user_course_outline_details(
+            self.course_key, self.beta_tester, at_time
+        )
+        assert beta_tester_outline_details.outline == beta_tester_outline
 
         student_outline_details = get_user_course_outline_details(
             self.course_key, self.student, at_time
@@ -177,6 +196,7 @@ class ScheduleTestCase(CacheIsolationTestCase):
 
     @classmethod
     def setUpTestData(cls):
+        course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
         # Users...
         cls.global_staff = User.objects.create_user(
             'global_staff', email='gstaff@example.com', is_staff=True
@@ -184,9 +204,10 @@ class ScheduleTestCase(CacheIsolationTestCase):
         cls.student = User.objects.create_user(
             'student', email='student@example.com', is_staff=False
         )
+        cls.beta_tester = BetaTesterFactory(course_key=course_key)
         cls.anonymous_user = AnonymousUser()
 
-        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
+        cls.course_key = course_key
 
         # The UsageKeys we're going to set up for date tests.
         cls.section_key = cls.course_key.make_usage_key('chapter', 'ch1')
@@ -256,6 +277,7 @@ class ScheduleTestCase(CacheIsolationTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
+            days_early_for_beta=None,
             course_visibility=CourseVisibility.PRIVATE,
             sections=[
                 CourseSectionData(
@@ -291,17 +313,22 @@ class ScheduleTestCase(CacheIsolationTestCase):
                     ]
                 )
             ],
-            self_paced=False
+            self_paced=False,
         )
         replace_course_outline(cls.outline)
 
         # Enroll student in the course
         cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
+        # Enroll beta tester in the course
+        cls.beta_tester.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
+        assert user_has_role(cls.beta_tester, CourseBetaTesterRole(cls.course_key))
+        assert cls.outline.days_early_for_beta is None
 
     def get_details(self, at_time):
         staff_details = get_user_course_outline_details(self.course_key, self.global_staff, at_time)
         student_details = get_user_course_outline_details(self.course_key, self.student, at_time)
-        return staff_details, student_details
+        beta_tester_details = get_user_course_outline_details(self.course_key, self.beta_tester, at_time)
+        return staff_details, student_details, beta_tester_details
 
     def get_sequence_keys(self, exclude=None):
         if exclude is None:
@@ -311,20 +338,43 @@ class ScheduleTestCase(CacheIsolationTestCase):
         return [key for key in self.all_seq_keys if key not in exclude]
 
     def test_before_course_starts(self):
-        staff_details, student_details = self.get_details(
+        staff_details, student_details, beta_tester_details = self.get_details(
             datetime(2020, 5, 9, tzinfo=timezone.utc)
         )
         # Staff can always access all sequences
         assert len(staff_details.outline.accessible_sequences) == 5
         # Student can access nothing
         assert len(student_details.outline.accessible_sequences) == 0
+        # Beta tester can access nothing
+        assert len(beta_tester_details.outline.accessible_sequences) == 0
 
         # Everyone can see everything
         assert len(staff_details.outline.sequences) == 5
         assert len(student_details.outline.sequences) == 5
+        assert len(beta_tester_details.outline.sequences) == 5
+
+    def test_course_beta_access(self):
+        course_outline = attr.evolve(self.outline, days_early_for_beta=6)
+        assert course_outline.days_early_for_beta is not None
+        replace_course_outline(course_outline)
+
+        staff_details, student_details, beta_tester_details = self.get_details(
+            datetime(2020, 5, 9, tzinfo=timezone.utc)
+        )
+        # Staff can always access all sequences
+        assert len(staff_details.outline.accessible_sequences) == 5
+        # Student can access nothing
+        assert len(student_details.outline.accessible_sequences) == 0
+        # Beta tester can access some
+        assert len(beta_tester_details.outline.accessible_sequences) == 4
+
+        # Everyone can see everything
+        assert len(staff_details.outline.sequences) == 5
+        assert len(student_details.outline.sequences) == 5
+        assert len(beta_tester_details.outline.sequences) == 5
 
     def test_before_section_starts(self):
-        staff_details, student_details = self.get_details(
+        staff_details, student_details, beta_tester_details = self.get_details(
             datetime(2020, 5, 14, tzinfo=timezone.utc)
         )
         # Staff can always access all sequences
@@ -338,8 +388,33 @@ class ScheduleTestCase(CacheIsolationTestCase):
         assert before_seq_sched_item_data.start == datetime(2020, 5, 14, tzinfo=timezone.utc)
         assert before_seq_sched_item_data.effective_start == datetime(2020, 5, 15, tzinfo=timezone.utc)
 
+        # Beta tester can access nothing
+        assert len(beta_tester_details.outline.accessible_sequences) == 0
+
+    def test_section_beta_access(self):
+        course_outline = attr.evolve(self.outline, days_early_for_beta=1)
+        assert course_outline.days_early_for_beta is not None
+        replace_course_outline(course_outline)
+
+        staff_details, student_details, beta_tester_details = self.get_details(
+            datetime(2020, 5, 14, tzinfo=timezone.utc)
+        )
+        # Staff can always access all sequences
+        assert len(staff_details.outline.accessible_sequences) == 5
+
+        # Student can access nothing -- even though one of the sequences is set
+        # to start on 2020-05-14, it's not available because the section hasn't
+        # started yet.
+        assert len(student_details.outline.accessible_sequences) == 0
+        before_seq_sched_item_data = student_details.schedule.sequences[self.seq_before_key]
+        assert before_seq_sched_item_data.start == datetime(2020, 5, 14, tzinfo=timezone.utc)
+        assert before_seq_sched_item_data.effective_start == datetime(2020, 5, 15, tzinfo=timezone.utc)
+
+        # Beta tester can access some
+        assert len(beta_tester_details.outline.accessible_sequences) == 4
+
     def test_at_section_start(self):
-        staff_details, student_details = self.get_details(
+        staff_details, student_details, beta_tester_details = self.get_details(
             datetime(2020, 5, 15, tzinfo=timezone.utc)
         )
         # Staff can always access all sequences
@@ -352,8 +427,32 @@ class ScheduleTestCase(CacheIsolationTestCase):
         for key in self.get_sequence_keys(exclude=[self.seq_after_key]):
             assert key in student_details.outline.accessible_sequences
 
+        # Beta tester can access same as student
+        assert len(beta_tester_details.outline.accessible_sequences) == 4
+
+    def test_at_beta_section_start(self):
+        course_outline = attr.evolve(self.outline, days_early_for_beta=1)
+        assert course_outline.days_early_for_beta is not None
+        replace_course_outline(course_outline)
+
+        staff_details, student_details, beta_tester_details = self.get_details(
+            datetime(2020, 5, 15, tzinfo=timezone.utc)
+        )
+        # Staff can always access all sequences
+        assert len(staff_details.outline.accessible_sequences) == 5
+
+        # Student can access all sequences except the one that starts after this
+        # datetime (self.seq_after_key)
+        assert len(student_details.outline.accessible_sequences) == 4
+        assert self.seq_after_key not in student_details.outline.accessible_sequences
+        for key in self.get_sequence_keys(exclude=[self.seq_after_key]):
+            assert key in student_details.outline.accessible_sequences
+
+        # Beta tester can access all
+        assert len(beta_tester_details.outline.accessible_sequences) == 5
+
     def test_is_due_and_before_due(self):
-        staff_details, student_details = self.get_details(
+        staff_details, student_details, beta_tester_details = self.get_details(
             datetime(2020, 5, 16, tzinfo=timezone.utc)
         )
         # Staff can always access all sequences
@@ -367,8 +466,11 @@ class ScheduleTestCase(CacheIsolationTestCase):
         seq_due_sched_item_data = student_details.schedule.sequences[self.seq_due_key]
         assert seq_due_sched_item_data.due == datetime(2020, 5, 20, tzinfo=timezone.utc)
 
+        # Beta tester can access some
+        assert len(beta_tester_details.outline.accessible_sequences) == 5
+
     def test_is_due_and_after_due(self):
-        staff_details, student_details = self.get_details(
+        staff_details, student_details, beta_tester_details = self.get_details(
             datetime(2020, 5, 21, tzinfo=timezone.utc)
         )
         # Staff can always access all sequences
@@ -381,6 +483,9 @@ class ScheduleTestCase(CacheIsolationTestCase):
         assert self.seq_due_key in student_details.outline.sequences
         for key in self.get_sequence_keys(exclude=[self.seq_due_key]):
             assert key in student_details.outline.accessible_sequences
+
+        # Beta tester can access same as student
+        assert len(beta_tester_details.outline.accessible_sequences) == 4
 
 
 class SelfPacedCourseOutlineTestCase(CacheIsolationTestCase):
@@ -439,6 +544,7 @@ class SelfPacedCourseOutlineTestCase(CacheIsolationTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
+            days_early_for_beta=None,
             course_visibility=CourseVisibility.PRIVATE,
             sections=[
                 CourseSectionData(
@@ -528,6 +634,7 @@ class VisbilityTestCase(CacheIsolationTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
+            days_early_for_beta=None,
             course_visibility=CourseVisibility.PRIVATE,
             sections=[
                 CourseSectionData(
@@ -610,6 +717,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
+            days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [2, 1, 3]),
             self_paced=False,
             course_visibility=CourseVisibility.PRIVATE

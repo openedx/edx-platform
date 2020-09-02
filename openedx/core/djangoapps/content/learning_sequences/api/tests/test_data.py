@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from unittest import TestCase
 
+import pytest
 from opaque_keys.edx.keys import CourseKey
 import attr
 
@@ -31,6 +32,7 @@ class TestCourseOutlineData(TestCase):
             title="Exciting Test Course!",
             published_at=datetime(2020, 5, 19, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2014",
+            days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [3, 2]),
             self_paced=False,
             course_visibility=CourseVisibility.PRIVATE
@@ -102,6 +104,26 @@ class TestCourseOutlineData(TestCase):
         seq_key_to_remove = self.course_key.make_usage_key('sequential', 'not_here')
         new_outline = self.course_outline.remove({seq_key_to_remove})
         assert new_outline == self.course_outline
+
+    def test_days_early_for_beta(self):
+        """
+        Check that days_early_for_beta exists, can be set, and validates correctly.
+        """
+        assert self.course_outline.days_early_for_beta is None
+        new_outline = attr.evolve(
+            self.course_outline,
+            days_early_for_beta=5
+        )
+        assert new_outline is not None
+        assert new_outline != self.course_outline
+        assert new_outline.days_early_for_beta == 5
+
+        with pytest.raises(ValueError) as error:
+            attr.evolve(self.course_outline, days_early_for_beta=-1)
+        assert error.match(
+            "Provided value -1 for days_early_for_beta is invalid. The value must be positive or zero. "
+            "A positive value will shift back the starting date for Beta users by that many days."
+        )
 
 
 def generate_sections(course_key, num_sequences):

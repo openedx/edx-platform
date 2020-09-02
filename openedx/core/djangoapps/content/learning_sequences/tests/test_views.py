@@ -44,6 +44,7 @@ class CourseOutlineViewTest(CacheIsolationTestCase, APITestCase):
             title="Views Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
+            days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [2, 2]),
             self_paced=False,
             course_visibility=CourseVisibility.PUBLIC
