@@ -83,7 +83,7 @@ export default class Wizard extends React.Component {
     }
     return (
       <div className="wizard-container">
-        <div className="mb-3">
+        <div className="wizard-header mb-4">
           {this.state.totalPages >= this.state.currentPage && this.renderHeader()}
         </div>
         {this.renderPage()}

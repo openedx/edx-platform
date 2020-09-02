@@ -220,28 +220,28 @@ class DemographicsCollectionModal extends React.Component {
           <Wizard.Header>
             {({ currentPage, totalPages }) => (
               <div>
-                <h2>
+                <p className="font-weight-light">
+                  {StringUtils.interpolate(
+                      gettext('Section {currentPage} of {totalPages}'),
+                        {
+                          currentPage: currentPage,
+                          totalPages: totalPages
+                        }
+                      )
+                  }
+                </p>
+                <h2 className="mb-1 mt-4 font-weight-bold text-secondary">
                   {gettext('Help make edX better for everyone!')}
                 </h2>
                 <p>
-                  {gettext('Thanks for registering with edX! Before getting started, please complete the additional information below to help your fellow learners. Your information will never be sold.')}
+                  {gettext('Welcome to edX! Before you get started, please take a few minutes to fill-in the additional information below to help us understand a bit more about your background. You can always edit this information later in Account Settings.')}
                 </p>
                 <br />
-                <span className="fa-info-circle" />
+                <span className="fa fa-info-circle" />
                 <a className="pl-3">
                   {gettext('Why does edX collect this information?')}
                 </a>
                 <br />
-                <p>
-                  {StringUtils.interpolate(
-                      gettext('Part {currentPage} of {totalPages}'),
-                        { 
-                          currentPage: currentPage,
-                          totalPages: totalPages
-                        }
-                    )
-                  }
-                </p>
               </div>
             )}
           </Wizard.Header>
