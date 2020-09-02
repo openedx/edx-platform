@@ -130,7 +130,7 @@ def _assert_block_is_gated(block, is_gated, user, course, request_factory, has_u
             assert 'content-paywall' not in content
 
     fake_request = request_factory.get('')
-    with patch('lms.djangoapps.course_api.blocks.api.is_request_from_mobile_app', return_value=True):
+    with patch('lms.djangoapps.course_api.blocks.api.is_request_from_mobile_app', return_value=False):
         requested_fields = ['display_name', 'block_id', 'student_view_url', 'student_view_data']
         blocks = get_blocks(fake_request, course.location, user=user, requested_fields=requested_fields, student_view_data=['html'])
         course_api_block = blocks['blocks'][str(block.location)]
