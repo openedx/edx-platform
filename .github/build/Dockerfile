@@ -20,6 +20,8 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+# https://github.com/pypa/setuptools/issues/2352 , https://setuptools.readthedocs.io/en/latest/history.html#v50-0-0
+ENV SETUPTOOLS_USE_DISTUTILS stdlib
 
 # Dockerize will be useful to wait for mysql DB availability
 ARG DOCKERIZE_VERSION=v0.6.1
