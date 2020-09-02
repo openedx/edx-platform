@@ -2543,7 +2543,7 @@ CREATE TABLE `demographics_userdemographics` (
   `show_call_to_action` tinyint(1) NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `demographics_userdemographics_user_id_e435d5d5_fk_auth_user_id` (`user_id`),
+  UNIQUE KEY `demographics_userdemographics_user_id_e435d5d5_uniq` (`user_id`),
   CONSTRAINT `demographics_userdemographics_user_id_e435d5d5_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2720,7 +2720,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=757 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=760 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4231,6 +4231,7 @@ CREATE TABLE `learning_sequences_coursecontext` (
   `learning_context_id` bigint(20) NOT NULL,
   `course_visibility` varchar(32) NOT NULL,
   `self_paced` tinyint(1) NOT NULL,
+  `days_early_for_beta` double DEFAULT NULL,
   PRIMARY KEY (`learning_context_id`),
   CONSTRAINT `learning_sequences_c_learning_context_id_fe16b41d_fk_learning_` FOREIGN KEY (`learning_context_id`) REFERENCES `learning_sequences_learningcontext` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
