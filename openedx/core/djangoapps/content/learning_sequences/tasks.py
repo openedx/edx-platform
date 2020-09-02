@@ -72,6 +72,7 @@ def get_outline_from_modulestore(course_key):
             published_at=course.subtree_edited_on,
             published_version=str(course.course_version),  # .course_version is a BSON obj
             sections=sections_data,
+            self_paced=course.self_paced,
             course_visibility=CourseVisibility(course.course_visibility),
         )
     return course_outline_data

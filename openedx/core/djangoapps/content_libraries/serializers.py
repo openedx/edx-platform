@@ -8,6 +8,8 @@ from rest_framework import serializers
 from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 from openedx.core.lib import blockstore_api
 
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+
 
 class ContentLibraryMetadataSerializer(serializers.Serializer):
     """
@@ -25,7 +27,9 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     collection_uuid = serializers.UUIDField(format='hex_verbose', write_only=True)
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
+    num_blocks = serializers.IntegerField(read_only=True)
     version = serializers.IntegerField(read_only=True)
+    last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
     allow_public_learning = serializers.BooleanField(default=False)
     allow_public_read = serializers.BooleanField(default=False)
     has_unpublished_changes = serializers.BooleanField(read_only=True)

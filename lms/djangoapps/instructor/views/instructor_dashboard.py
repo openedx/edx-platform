@@ -65,7 +65,6 @@ from xmodule.tabs import CourseTab
 
 from .tools import get_units_with_due_date, title_or_url
 from .. import permissions
-from ..toggles import data_download_v2_is_enabled
 
 log = logging.getLogger(__name__)
 
@@ -601,9 +600,9 @@ def _section_data_download(course, access):
         settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
         course.enable_proctored_exams
     )
-    section_key = 'data_download_2' if data_download_v2_is_enabled(course_key) else 'data_download'
+
     section_data = {
-        'section_key': section_key,
+        'section_key': 'data_download',
         'section_display_name': _('Data Download'),
         'access': access,
         'show_generate_proctored_exam_report_button': show_proctored_report_button,
@@ -629,6 +628,9 @@ def _section_data_download(course, access):
             'get_course_survey_results', kwargs={'course_id': six.text_type(course_key)}
         ),
         'export_ora2_data_url': reverse('export_ora2_data', kwargs={'course_id': six.text_type(course_key)}),
+        'export_ora2_submission_files_url': reverse(
+            'export_ora2_submission_files', kwargs={'course_id': six.text_type(course_key)}
+        ),
     }
     if not access.get('data_researcher'):
         section_data['is_hidden'] = True

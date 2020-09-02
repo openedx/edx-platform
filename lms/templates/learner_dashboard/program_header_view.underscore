@@ -1,6 +1,7 @@
 <div class="program-details-header">
     <div class="meta-info grid-container">
         <% if (logo) { %>
+            <% // xss-lint: disable=underscore-not-escaped %>
             <span aria-label="<%- gettext(programData.type) %>" class="<%- programData.type.toLowerCase() %> program-details-icon"><%= logo %></span>
         <% } %>
         <h2 class="hd-1 program-title"><%- programData.title %></h2>

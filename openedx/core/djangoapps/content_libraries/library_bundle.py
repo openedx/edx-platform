@@ -2,6 +2,7 @@
 Helper code for working with Blockstore bundles that contain OLX
 """
 
+import dateutil.parser
 import logging
 
 from django.utils.lru_cache import lru_cache
@@ -348,6 +349,23 @@ class LibraryBundle(object):
             for f in get_bundle_files_cached(self.bundle_uuid, draft_name=self.draft_name)
             if f.path.startswith(path_prefix)
         ]
+
+    def get_last_published_time(self):
+        """
+        Return the timestamp when the current library was last published. If the
+        current draft has never been published, return 0.
+        """
+        cache_key = ("last_published_time", )
+        usages_found = self.cache.get(cache_key)
+        if usages_found is not None:
+            return usages_found
+        version = get_bundle_version_number(self.bundle_uuid)
+        if version == 0:
+            return None
+        created_at_str = blockstore_api.get_bundle_version(self.bundle_uuid, version)['snapshot']['created_at']
+        last_published_time = dateutil.parser.parse(created_at_str)
+        self.cache.set(cache_key, last_published_time)
+        return last_published_time
 
     @staticmethod
     def olx_prefix(definition_key):

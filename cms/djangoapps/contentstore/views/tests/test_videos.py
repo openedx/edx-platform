@@ -1541,9 +1541,10 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response["Content-Disposition"],
-            u"attachment; filename={course}_video_urls.csv".format(course=self.course.id.course)
+            u"attachment; filename=\"{course}_video_urls.csv\"".format(course=self.course.id.course)
         )
-        response_reader = StringIO(response.content.decode('utf-8') if six.PY3 else response.content)
+        response_content = b"".join(response.streaming_content)
+        response_reader = StringIO(response_content.decode('utf-8') if six.PY3 else response_content)
         reader = csv.DictReader(response_reader, dialect=csv.excel)
         self.assertEqual(
             reader.fieldnames,
@@ -1605,5 +1606,5 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response["Content-Disposition"],
-            u"attachment; filename=video_urls.csv; filename*=utf-8''n%C3%B3n-%C3%A4scii_video_urls.csv"
+            u"attachment; filename*=utf-8''n%C3%B3n-%C3%A4scii_video_urls.csv"
         )

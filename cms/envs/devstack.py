@@ -117,6 +117,8 @@ def should_show_debug_toolbar(request):
 ################################ MILESTONES ################################
 FEATURES['MILESTONES_APP'] = True
 
+########################### ORGANIZATIONS #################################
+FEATURES['ORGANIZATIONS_APP'] = True
 
 ################################ ENTRANCE EXAMS ################################
 FEATURES['ENTRANCE_EXAMS'] = True
@@ -129,6 +131,7 @@ XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 ################################ SEARCH INDEX ################################
 FEATURES['ENABLE_COURSEWARE_INDEX'] = False
 FEATURES['ENABLE_LIBRARY_INDEX'] = False
+FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 ################################ COURSE DISCUSSIONS ###########################

@@ -22,7 +22,6 @@
   var newcatalog = {
     "\n          Start my exam\n        ": "\n          Hasi azterketa\n        ",
     " ${price} {currency} )": " ${price} {currency} )",
-    " Link": "Esteka",
     " and ": "eta",
     " and {num_of_minutes} minute": "eta {num_of_minutes} minutu",
     " and {num_of_minutes} minutes": " eta {num_of_minutes} minutu",
@@ -485,7 +484,6 @@
     "Enter the enrollment code.": "Idatzi matrikulatzeko kodea.",
     "Enter the name of the cohort": "Idatzi kohortearen izena",
     "Enter username or email": "Idatzi erabiltzaile-izena edo e-posta",
-    "Enter your ": "Idatzi",
     "Entrance exam state is being deleted for student '{student_id}'.": "Sarrera-azterketaren egoera ezabatzen ari da ikasle honentzat: '{student_id}'.",
     "Error": "Errorea",
     "Error adding user": "Errorea erabiltzailea gehitzean",

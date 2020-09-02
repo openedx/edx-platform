@@ -59,7 +59,7 @@
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
-# Caner Başaran <basaran.caner@protonmail.com>, 2014
+# Caner Başaran <basaran.caner@gmail.com>, 2014
 # Emrah Emirtekin <eemirtekin@gmail.com>, 2015-2016
 # emreusta <emreusta7@gmail.com>, 2014
 # Fatih Murat Topaloğlu <fmt344@gmail.com>, 2016
@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-09 20:43+0000\n"
+"POT-Creation-Date: 2020-08-30 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -6075,6 +6075,10 @@ msgstr ""
 msgid "You must be logged in to see this course"
 msgstr ""
 
+#: lms/djangoapps/courseware/access_response.py
+msgid "Please view your course in the existing experience"
+msgstr ""
+
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
@@ -7277,6 +7281,10 @@ msgid "ORA data"
 msgstr "ORA verisi"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Attachments archive is being created."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "grade"
 msgstr "puanlama"
@@ -7716,6 +7724,10 @@ msgstr "oluşturulan sertifikalar"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
 msgstr "topluluğa alındı"
+
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "compressed"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No status information available"
@@ -12184,6 +12196,27 @@ msgid ""
 "{expiration_date}{span_close}{a_close}"
 msgstr ""
 
+#: openedx/features/course_experience/api/v1/views.py
+msgid "'course_key' is required."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Only 'course_key' is expected."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "View all dates"
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid ""
+"Your due dates have been successfully shifted to help you stay on track."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Deadlines successfully reset."
+msgstr ""
+
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
@@ -13412,14 +13445,6 @@ msgstr "{email}'e e-posta gönder"
 msgid "name"
 msgstr "isim"
 
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu"
-msgstr "Kullanıcı menüsü"
-
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu dropdown"
-msgstr "Kullanıcı açılır menüsü"
-
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
@@ -14559,6 +14584,10 @@ msgstr ""
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "Panel:"
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu"
+msgstr "Kullanıcı menüsü"
 
 #: lms/templates/user_dropdown.html
 msgid "More options"
@@ -18295,10 +18324,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of problem responses"
-msgstr "Sorun tepkilerinin CSV sini indirin."
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Click to list certificates that are issued for this course:"
 msgstr "Bu ders için verilen sertifikalar listelemek için tıklayın:"
 
@@ -18339,6 +18364,16 @@ msgstr "Problem not raporu oluşturun"
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
 msgstr "ORA Veri Raporu Oluştur"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Click to generate a ZIP file that contains all submission texts and "
+"attachments."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Submission Files Archive"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"

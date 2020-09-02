@@ -15,6 +15,7 @@
 # Hrehory <grzegorz.gwardys@gmail.com>, 2015-2016
 # Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
+# Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Magdalena Jarosińska <m.jarosinska@stud.elka.pw.edu.pl>, 2015-2016
 # Mateusz <blue90pl@gmail.com>, 2014
@@ -107,6 +108,7 @@
 # Maciej Kolankowski <maciej@eduprojekt.org>, 2014
 # Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
+# Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
 # mateusz2238 <mateusz2238@outlook.com>, 2014
 # Mateusz <blue90pl@gmail.com>, 2014
 # AlinaG <musicalpreschool@hotmail.com>, 2014
@@ -126,7 +128,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-02 20:43+0000\n"
+"POT-Creation-Date: 2020-08-23 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Polish (https://www.transifex.com/open-edx/teams/6205/pl/)\n"
@@ -2279,8 +2281,8 @@ msgid "Answered"
 msgstr "Odpowiedziano"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Attempted"
-msgstr "Podjęto próbę"
+msgid "Attempted or Past Due"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Closed"
@@ -2297,6 +2299,18 @@ msgstr "Prawidłowo lub po terminie"
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "After Some Number of Attempts"
 msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "After All Attempts"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "After All Attempts or Correct"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Attempted"
+msgstr "Podjęto próbę"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Show Answer: Number of Attempts"
@@ -4238,12 +4252,9 @@ msgstr ""
 msgid ""
 "Specify when the Show Answer button appears for each problem. Valid values "
 "are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
-"\"past_due\", \"correct_or_past_due\", and \"never\"."
+"\"past_due\", \"correct_or_past_due\", \"after_all_attempts\", "
+"\"after_all_attempts_or_correct\", \"attempted_no_past_due\", and \"never\"."
 msgstr ""
-"Określ kiedy ma się pojawiać przycisk \"Pokaż odpowiedź\" dla każdego "
-"pytania. Możliwe opcje to: \"always\", \"answered\", \"attempted\", "
-"\"closed\", \"finished\", \"past_due\", \"correct_or_past_due\", i "
-"\"never\"."
 
 #. Translators: DO NOT translate the words in quotes here, they are
 #. specific words for the acceptable values.
@@ -6178,6 +6189,10 @@ msgstr ""
 msgid "You must be logged in to see this course"
 msgstr ""
 
+#: lms/djangoapps/courseware/access_response.py
+msgid "Please view your course in the existing experience"
+msgstr ""
+
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
@@ -6418,7 +6433,7 @@ msgstr ""
 #: lms/djangoapps/courseware/masquerade.py
 #, python-brace-format
 msgid ""
-"There is no user with the username or email address u\"{user_identifier}\" "
+"There is no user with the username or email address \"{user_identifier}\" "
 "enrolled in this course."
 msgstr ""
 
@@ -11868,10 +11883,6 @@ msgstr ""
 msgid "Username created for VEM Integration, e.g. vem_service_user."
 msgstr ""
 
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "Percentage of courses allowed to use VEM pipeline"
-msgstr ""
-
 #: openedx/core/djangoapps/waffle_utils/models.py
 msgid "Force On"
 msgstr "Automat: włączony"
@@ -12100,6 +12111,27 @@ msgid ""
 "{expiration_date}{span_close}{a_close}"
 msgstr ""
 
+#: openedx/features/course_experience/api/v1/views.py
+msgid "'course_key' is required."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Only 'course_key' is expected."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "View all dates"
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid ""
+"Your due dates have been successfully shifted to help you stay on track."
+msgstr ""
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Deadlines successfully reset."
+msgstr ""
+
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
@@ -12274,6 +12306,18 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Continue"
 msgstr "Kontynuuj"
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#: lms/templates/dates_banner.html
+msgid "Shift due dates"
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+msgid ""
+"To participate in this assignment, the suggested schedule for your course "
+"needs updating. Don’t worry, we’ll shift all the due dates for you and you "
+"won’t lose any of your progress."
+msgstr ""
 
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
@@ -13299,14 +13343,6 @@ msgstr "Wyślij e-mail na {email}"
 msgid "name"
 msgstr "nazwa"
 
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu"
-msgstr "Menu użytkownika"
-
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu dropdown"
-msgstr "Rozwijane menu"
-
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
@@ -13581,10 +13617,6 @@ msgid ""
 "To keep yourself on track, you can update this schedule and shift the past "
 "due assignments into the future. Don't worry—you won't lose any of the "
 "progress you've made when you shift your due dates."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid "Shift due dates"
 msgstr ""
 
 #: lms/templates/dates_banner.html
@@ -14466,6 +14498,10 @@ msgstr ""
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "Pulpit dla:"
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu"
+msgstr "Menu użytkownika"
 
 #: lms/templates/user_dropdown.html
 msgid "More options"
@@ -17698,21 +17734,6 @@ msgstr "Dziękujemy za zapisanie się na kurs:"
 msgid "We hope you enjoy the course."
 msgstr "Życzymy przyjemnej nauki."
 
-#: lms/templates/enrollment/course_enrollment_message.html
-msgid ""
-"{platform_name} is a nonprofit bringing high-quality education to everyone, "
-"everywhere. Your help allows us to continuously improve the learning "
-"experience for millions and make a better future one learner at a time."
-msgstr ""
-"{platform_name} jest przedsięwzięciem non-profit polegającym na umożliwieniu"
-" każdej zainteresowanej osobie bezpłatnego dostępu do wysokiej jakości "
-"edukacji. Możesz nam pomóc w systematycznym udoskonalaniu naszej platformy i"
-" zapewnianiu lepszej przyszłości osobom uczącym się za naszym pośrednictwem."
-
-#: lms/templates/enrollment/course_enrollment_message.html
-msgid "Donation Actions"
-msgstr "Opcje darowizny"
-
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Financial Assistance Application"
 msgstr "Program wsparcia finansowego"
@@ -18228,10 +18249,6 @@ msgid ""
 "by-chapter, or problem-by-problem basis, or contact your site administrator "
 "to increase the limit."
 msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of problem responses"
-msgstr "Pobierz plik CSV z listą odpowiedzi na ćwiczenie"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Click to list certificates that are issued for this course:"

@@ -104,6 +104,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             'due': self.due,
             'completed': completed,
             'past_due': past_due,
+            'has_assignments': completed is not None,
             'subsection_format': context.get('format', ''),
             'vertical_banner_ctas': vertical_banner_ctas,
         }

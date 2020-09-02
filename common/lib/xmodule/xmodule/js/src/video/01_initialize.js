@@ -232,34 +232,6 @@ function(VideoPlayer, i18n, moment, _) {
         firstScriptTag.parentNode.insertBefore(scriptTag, firstScriptTag);
     }
 
-    // function _configureCaptions(state)
-    //     Configure displaying of captions.
-    //
-    //     Option
-    //         this.config.showCaptions = true | false
-    //
-    //     Defines whether or not captions are shown on first viewing.
-    //
-    //     Option
-    //          this.hideCaptions = true | false
-    //
-    //     represents the user's choice of having the subtitles shown or
-    //     hidden. This choice is stored in cookies.
-    function _configureCaptions(state) {
-        if (state.config.showCaptions) {
-            state.hideCaptions = ($.cookie('hide_captions') === 'true');
-        } else {
-            state.hideCaptions = true;
-
-            $.cookie('hide_captions', state.hideCaptions, {
-                expires: 3650,
-                path: '/'
-            });
-
-            state.el.addClass('closed');
-        }
-    }
-
     // function _parseYouTubeIDs(state)
     //     The function parse YouTube stream ID's.
     //     @return
@@ -333,7 +305,6 @@ function(VideoPlayer, i18n, moment, _) {
     }
 
     function _setConfigurations(state) {
-        _configureCaptions(state);
         state.setPlayerMode(state.config.mode);
         // Possible value are: 'visible', 'hiding', and 'invisible'.
         state.controlState = 'visible';

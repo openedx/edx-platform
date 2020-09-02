@@ -149,6 +149,7 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'calculate_grades_csv',
     'change_due_date',
     'export_ora2_data',
+    'export_ora2_submission_files',
     'get_grading_config',
     'get_problem_responses',
     'get_proctored_exam_results',
@@ -428,6 +429,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_proctored_exam_results', {}),
             ('get_problem_responses', {}),
             ('export_ora2_data', {}),
+            ('export_ora2_submission_files', {}),
             ('rescore_problem',
              {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
             ('override_problem_score',
@@ -2870,6 +2872,32 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         already_running_status = generate_already_running_error_message(task_type)
 
         with patch('lms.djangoapps.instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
+            mock_submit_ora2_task.side_effect = AlreadyRunningError(already_running_status)
+            response = self.client.post(url, {})
+
+        self.assertContains(response, already_running_status, status_code=400)
+
+    def test_get_ora2_submission_files_success(self):
+        url = reverse('export_ora2_submission_files', kwargs={'course_id': text_type(self.course.id)})
+
+        with patch(
+            'lms.djangoapps.instructor_task.api.submit_export_ora2_submission_files'
+        ) as mock_submit_ora2_task:
+            mock_submit_ora2_task.return_value = True
+            response = self.client.post(url, {})
+
+        success_status = 'Attachments archive is being created.'
+
+        self.assertContains(response, success_status)
+
+    def test_get_ora2_submission_files_already_running(self):
+        url = reverse('export_ora2_submission_files', kwargs={'course_id': text_type(self.course.id)})
+        task_type = 'export_ora2_submission_files'
+        already_running_status = generate_already_running_error_message(task_type)
+
+        with patch(
+            'lms.djangoapps.instructor_task.api.submit_export_ora2_submission_files'
+        ) as mock_submit_ora2_task:
             mock_submit_ora2_task.side_effect = AlreadyRunningError(already_running_status)
             response = self.client.post(url, {})
 

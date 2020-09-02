@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-09 20:51+0000\n"
-"PO-Revision-Date: 2020-08-09 20:51:07.247635\n"
+"POT-Creation-Date: 2020-08-30 20:49+0000\n"
+"PO-Revision-Date: 2020-08-30 20:49:39.838611\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -7076,6 +7076,12 @@ msgstr ""
 "Ýöü müst ßé löggéd ïn tö séé thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#: lms/djangoapps/courseware/access_response.py
+msgid "Please view your course in the existing experience"
+msgstr ""
+"Pléäsé vïéw ýöür çöürsé ïn thé éxïstïng éxpérïénçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
 #: lms/djangoapps/courseware/course_tools.py
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade to Verified"
@@ -8447,6 +8453,12 @@ msgid "ORA data"
 msgstr "ÖRÀ dätä Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Attachments archive is being created."
+msgstr ""
+"Àttäçhménts ärçhïvé ïs ßéïng çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "grade"
 msgstr "grädé Ⱡ'σяєм ιρѕ#"
@@ -8961,6 +8973,10 @@ msgstr "çértïfïçätés générätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
 msgstr "çöhörtéd Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "compressed"
+msgstr "çömprésséd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No status information available"
@@ -14266,6 +14282,29 @@ msgstr ""
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι"
 " σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łα#"
 
+#: openedx/features/course_experience/api/v1/views.py
+msgid "'course_key' is required."
+msgstr "'çöürsé_kéý' ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Only 'course_key' is expected."
+msgstr "Önlý 'çöürsé_kéý' ïs éxpéçtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "View all dates"
+msgstr "Vïéw äll dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid ""
+"Your due dates have been successfully shifted to help you stay on track."
+msgstr ""
+"Ýöür düé dätés hävé ßéén süççéssfüllý shïftéd tö hélp ýöü stäý ön träçk. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: openedx/features/course_experience/api/v1/views.py
+msgid "Deadlines successfully reset."
+msgstr "Déädlïnés süççéssfüllý rését. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
 #: lms/templates/api_admin/terms_of_service.html
@@ -15682,14 +15721,6 @@ msgstr "Sénd än émäïl tö {email} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 msgid "name"
 msgstr "nämé Ⱡ'σяєм ι#"
 
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu"
-msgstr "Ûsérménü Ⱡ'σяєм ιρѕυм ∂#"
-
-#: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-msgid "Usermenu dropdown"
-msgstr "Ûsérménü dröpdöwn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
@@ -16998,6 +17029,10 @@ msgstr ""
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "Däshßöärd för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/user_dropdown.html
+msgid "Usermenu"
+msgstr "Ûsérménü Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/user_dropdown.html
 msgid "More options"
@@ -21566,11 +21601,6 @@ msgstr ""
 "νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυg#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of problem responses"
-msgstr ""
-"Döwnlöäd ä ÇSV öf prößlém réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Click to list certificates that are issued for this course:"
 msgstr ""
 "Çlïçk tö lïst çértïfïçätés thät äré ïssüéd för thïs çöürsé: Ⱡ'σяєм ιρѕυм "
@@ -21617,6 +21647,19 @@ msgstr "Généräté Prößlém Grädé Répört Ⱡ'σяєм ιρѕυм ∂σł
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
 msgstr "Généräté ÖRÀ Dätä Répört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Click to generate a ZIP file that contains all submission texts and "
+"attachments."
+msgstr ""
+"Çlïçk tö généräté ä ZÌP fïlé thät çöntäïns äll süßmïssïön téxts änd "
+"ättäçhménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Submission Files Archive"
+msgstr ""
+"Généräté Süßmïssïön Fïlés Àrçhïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports Available for Download"

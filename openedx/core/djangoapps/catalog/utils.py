@@ -23,6 +23,7 @@ from openedx.core.djangoapps.catalog.cache import (
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
@@ -159,6 +160,29 @@ def get_programs_by_type(site, program_type):
     if not uuids:
         logger.warning(text_type(
             'Failed to get program UUIDs from cache for site {} and type {}'.format(site.id, program_type)
+        ))
+    return get_programs_by_uuids(uuids)
+
+
+def get_programs_by_type_slug(site, program_type_slug):
+    """
+    Keyword Arguments:
+        site (Site): The corresponding Site object to fetch programs for.
+        program_type_slug (string): The type slug that matching programs must have.
+
+    Returns:
+        A list of programs for the given site with the given type slug.
+
+    Slugs are a consistent identifier whereas type (used in `get_programs_by_type`)
+    may be translated.
+    """
+    program_type_slug_cache_key = PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL.format(
+        site_id=site.id, program_slug=program_type_slug
+    )
+    uuids = cache.get(program_type_slug_cache_key, [])
+    if not uuids:
+        logger.warning(text_type(
+            'Failed to get program UUIDs from cache for site {} and type slug {}'.format(site.id, program_type_slug)
         ))
     return get_programs_by_uuids(uuids)
 
@@ -553,9 +577,7 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
             # User is enrolled in the course so we should include it in the list of enrollable sessions always
             # this will ensure it is available for the UI
             enrollable_sessions.append(course_run)
-        elif (course_run.get('status') == COURSE_PUBLISHED and not
-                is_enrolled_in_mode and
-                is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
+        elif not is_enrolled_in_mode and is_course_run_entitlement_fulfillable(course_id, entitlement, search_time):
             enrollable_sessions.append(course_run)
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))

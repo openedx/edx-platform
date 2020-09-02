@@ -22,16 +22,17 @@ from pytz import utc
 from requests.exceptions import ConnectionError, Timeout
 from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 
+from course_modes.api import get_paid_modes_for_course
 from course_modes.models import CourseMode
 from entitlements.api import get_active_entitlement_list_for_user
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
+from openedx.core.djangoapps.catalog.api import get_programs_by_type
 from openedx.core.djangoapps.catalog.utils import (
     get_fulfillable_course_runs_for_entitlement,
     get_programs,
-    get_programs_by_type
 )
 from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -901,9 +902,9 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                     self.instructors.append(instructor)
 
 
-def is_user_enrolled_in_program_type(user, program_type, paid_modes=False, enrollments=None, entitlements=None):
+def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes=False, enrollments=None, entitlements=None):
     """
-    This method will Look at the learners Enrollments and Entitlements to determine
+    This method will look at the learners Enrollments and Entitlements to determine
     if a learner is enrolled in a Program of the given type.
 
     NOTE: This method relies on the Program Cache right now. The goal is to move away from this
@@ -911,15 +912,20 @@ def is_user_enrolled_in_program_type(user, program_type, paid_modes=False, enrol
 
     Arguments:
         user (User): The user we are looking for.
-        program_type (String): The Program type we are looking for.
+        program_type_slug (str): The slug of the Program type we are looking for.
         paid_modes (bool): Request if the user is enrolled in a Program in a paid mode, False by default.
+        enrollments (List[Dict]): Takes a serialized list of CourseEnrollments linked to the user
+        entitlements (List[CourseEntitlement]): Take a list of CourseEntitlement objects linked to the user
+
+        NOTE: Both enrollments and entitlements will be collected if they are not passed in. They are available
+        as parameters in case they were already collected, to save duplicate queries in high traffic areas.
 
     Returns:
-        bool: True is the user is enrolled in programs of the requested Type
+        bool: True is the user is enrolled in programs of the requested type
     """
     course_runs = set()
     course_uuids = set()
-    programs = get_programs_by_type(Site.objects.get_current(), program_type)
+    programs = get_programs_by_type(Site.objects.get_current(), program_type_slug)
     if not programs:
         return False
 
@@ -941,7 +947,7 @@ def is_user_enrolled_in_program_type(user, program_type, paid_modes=False, enrol
         course_run_id = enrollment['course_details']['course_id']
         if paid_modes:
             course_run_key = CourseKey.from_string(course_run_id)
-            paid_modes = [mode.slug for mode in CourseMode.paid_modes_for_course(course_run_key)]
+            paid_modes = [mode.slug for mode in get_paid_modes_for_course(course_run_key)]
             if enrollment['mode'] in paid_modes and course_run_id in course_runs:
                 return True
         elif course_run_id in course_runs:

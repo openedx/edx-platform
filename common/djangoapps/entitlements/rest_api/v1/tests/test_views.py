@@ -970,23 +970,22 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.enrollment_course_run is not None
 
     @patch("entitlements.rest_api.v1.views.get_course_runs_for_course")
-    def test_enrollment_closed_upgrade_open(self, mock_get_course_runs):
+    def test_already_enrolled_course_ended(self, mock_get_course_runs):
         """
-        Test that user can still select a session while course enrollment
-        is closed and upgrade deadline is in future.
+        Test that already enrolled user can still select a session while
+        course has ended but upgrade deadline is in future.
         """
         course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
         mock_get_course_runs.return_value = self.return_values
 
         # Setup enrollment period to be in the past
         utc_now = datetime.now(UTC)
-        self.course.enrollment_start = utc_now - timedelta(days=15)
-        self.course.enrollment_end = utc_now - timedelta(days=1)
+        self.course.start = utc_now - timedelta(days=15)
+        self.course.end = utc_now - timedelta(days=1)
         self.course = self.update_course(self.course, self.user.id)
         CourseOverview.update_select_courses([self.course.id], force_update=True)
 
-        assert CourseEnrollment.is_enrollment_closed(self.user, self.course)
-        assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.id, mode=CourseMode.AUDIT)
 
         url = reverse(
             self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
@@ -1005,6 +1004,8 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
 
         assert response.status_code == 201
         assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+        (enrolled_mode, is_active) = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        assert is_active and (enrolled_mode == course_entitlement.mode)
         assert course_entitlement.enrollment_course_run is not None
 
     @patch("entitlements.rest_api.v1.views.get_course_runs_for_course")

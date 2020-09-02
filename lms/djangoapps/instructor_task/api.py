@@ -35,6 +35,7 @@ from lms.djangoapps.instructor_task.tasks import (
     course_survey_report_csv,
     delete_problem_state,
     export_ora2_data,
+    export_ora2_submission_files,
     generate_certificates,
     override_problem_score,
     proctored_exam_results_csv,
@@ -322,7 +323,9 @@ def submit_bulk_course_email(request, course_key, email_id):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_calculate_problem_responses_csv(request, course_key, problem_location):
+def submit_calculate_problem_responses_csv(
+    request, course_key, problem_locations, problem_types_filter=None,
+):
     """
     Submits a task to generate a CSV file containing all student
     answers to a given problem.
@@ -331,7 +334,11 @@ def submit_calculate_problem_responses_csv(request, course_key, problem_location
     """
     task_type = 'problem_responses_csv'
     task_class = calculate_problem_responses_csv
-    task_input = {'problem_location': problem_location, 'user_id': request.user.pk}
+    task_input = {
+        'problem_locations': problem_locations,
+        'problem_types_filter': problem_types_filter,
+        'user_id': request.user.pk,
+    }
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
@@ -438,6 +445,19 @@ def submit_export_ora2_data(request, course_key):
     """
     task_type = 'export_ora2_data'
     task_class = export_ora2_data
+    task_input = {}
+    task_key = ''
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_export_ora2_submission_files(request, course_key):
+    """
+    Submits a task to download and compress all submissions
+    files (texts, attachments) for given course.
+    """
+    task_type = 'export_ora2_submission_files'
+    task_class = export_ora2_submission_files
     task_input = {}
     task_key = ''
 

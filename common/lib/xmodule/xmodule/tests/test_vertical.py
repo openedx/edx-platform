@@ -168,6 +168,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         else:
             self.assert_bookmark_info(self.assertNotIn, html)
         if context:
+            self.assertIn("'has_assignments': True", html)
             self.assertIn("'subsection_format': '{}'".format(context['format']), html)
             self.assertIn("'completed': {}".format(completion_value == 1), html)
             self.assertIn("'past_due': {}".format(self.vertical.due < now), html)
@@ -187,9 +188,11 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
 
         html = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context).content
         if has_score:
+            self.assertIn("'has_assignments': True", html)
             self.assertIn("'completed': False", html)
             self.assertIn("'past_due': True", html)
         else:
+            self.assertIn("'has_assignments': False", html)
             self.assertIn("'completed': None", html)
             self.assertIn("'past_due': False", html)
 

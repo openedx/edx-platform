@@ -144,6 +144,18 @@ def delete_collection(collection_uuid):
     api_request('delete', api_url('collections', str(collection_uuid)))
 
 
+def get_bundles(uuids=None):
+    """
+    Get the details of all bundles
+    """
+    if uuids is None:
+        uuids = []
+    version_url = api_url('bundles') + '?uuid=' + ','.join(map(str, uuids))
+    response = api_request('get', version_url)
+    # build bundle from response, convert map object to list and return
+    return [_bundle_from_response(item) for item in response]
+
+
 def get_bundle(bundle_uuid):
     """
     Retrieve metadata about the specified bundle
@@ -248,14 +260,23 @@ def delete_draft(draft_uuid):
     api_request('delete', api_url('drafts', str(draft_uuid)))
 
 
+def get_bundle_version(bundle_uuid, version_number):
+    """
+    Get the details of the specified bundle version
+    """
+    if version_number == 0:
+        return None
+    version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
+    return api_request('get', version_url)
+
+
 def get_bundle_version_files(bundle_uuid, version_number):
     """
     Get a list of the files in the specified bundle version
     """
     if version_number == 0:
         return []
-    version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
-    version_info = api_request('get', version_url)
+    version_info = get_bundle_version(bundle_uuid, version_number)
     return [BundleFile(path=path, **file_metadata) for path, file_metadata in version_info["snapshot"]["files"].items()]
 
 
@@ -265,8 +286,7 @@ def get_bundle_version_links(bundle_uuid, version_number):
     """
     if version_number == 0:
         return {}
-    version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
-    version_info = api_request('get', version_url)
+    version_info = get_bundle_version(bundle_uuid, version_number)
     return {
         name: LinkDetails(
             name=name,

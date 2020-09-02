@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-09 20:50+0000\n"
-"PO-Revision-Date: 2020-08-09 20:51:07.262446\n"
+"POT-Creation-Date: 2020-08-30 20:49+0000\n"
+"PO-Revision-Date: 2020-08-30 20:49:39.455189\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -276,6 +276,7 @@ msgstr "صشقرهرل"
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
@@ -2365,6 +2366,34 @@ msgstr[1] "%d غثشقس"
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
 msgstr "سثمثذف ش سثذفهخر خق حقخزمثو"
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
+msgid "Create a report of problem responses"
+msgstr "ذقثشفث ش قثحخقف خب حقخزمثو قثسحخرسثس"
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "Your report is being generated..."
+msgstr "غخعق قثحخقف هس زثهرل لثرثقشفثي..."
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "Your report has being successfully generated."
+msgstr "غخعق قثحخقف اشس زثهرل سعذذثسسبعممغ لثرثقشفثي."
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
+msgid "View Report"
+msgstr "دهثص قثحخقف"
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "There was an error generating your report."
+msgstr "فاثقث صشس شر ثققخق لثرثقشفهرل غخعق قثحخقف."
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "Unable to get report generation status."
+msgstr "عرشزمث فخ لثف قثحخقف لثرثقشفهخر سفشفعس."
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "Unable to submit request to generate report."
+msgstr "عرشزمث فخ سعزوهف قثضعثسف فخ لثرثقشفث قثحخقف."
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -5056,12 +5085,16 @@ msgstr ""
 "ثيط حقخبهمث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid " Link"
-msgstr " مهرن"
+msgid "{platform_display_name} Link"
+msgstr "{platform_display_name} مهرن"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Enter your "
-msgstr "ثرفثق غخعق "
+msgid ""
+"Enter your {platform_display_name} username or the URL to your "
+"{platform_display_name} page. Delete the URL to remove the link."
+msgstr ""
+"ثرفثق غخعق {platform_display_name} عسثقرشوث خق فاث عقم فخ غخعق "
+"{platform_display_name} حشلث. يثمثفث فاث عقم فخ قثوخدث فاث مهرن."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js

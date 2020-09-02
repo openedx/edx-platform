@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from edx_django_utils import monitoring as monitoring_utils
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.exceptions import APIException, ParseError
@@ -17,22 +18,23 @@ from rest_framework.response import Response
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from course_modes.models import CourseMode
-from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
-from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
+from lms.djangoapps.course_goals.api import (add_course_goal, get_course_goal, get_course_goal_text,
+                                             has_course_goal_permission, valid_course_goals_ordered)
 from lms.djangoapps.course_home_api.outline.v1.serializers import OutlineTabSerializer
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active, course_home_mfe_outline_tab_is_active
+from lms.djangoapps.course_home_api.toggles import (course_home_mfe_dates_tab_is_active,
+                                                    course_home_mfe_outline_tab_is_active)
 from lms.djangoapps.course_home_api.utils import get_microfrontend_url
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
-from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
 from openedx.features.course_duration_limits.access import generate_course_expired_message
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, LATEST_UPDATE_FLAG
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.course_experience.utils import get_course_outline_block_tree
 from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
 from openedx.features.course_experience.views.welcome_message import PREFERENCE_KEY, WelcomeMessageFragmentView
 from openedx.features.discounts.utils import generate_offer_html
@@ -45,6 +47,12 @@ class UnableToDismissWelcomeMessage(APIException):
     status_code = 400
     default_detail = 'Unable to dismiss welcome message.'
     default_code = 'unable_to_dismiss_welcome_message'
+
+
+class UnableToSaveCourseGoal(APIException):
+    status_code = 400
+    default_detail = 'Unable to save course goal'
+    default_code = 'unable_to_save_course_goal'
 
 
 class OutlineTabView(RetrieveAPIView):
@@ -73,6 +81,11 @@ class OutlineTabView(RetrieveAPIView):
                     xBlock on the web LMS.
                 children: (list) If the block has child blocks, a list of IDs of
                     the child blocks.
+        course_goals:
+            goal_options: (list) A list of goals where each goal is represented as a tuple (goal_key, goal_string)
+            selected_goal:
+                key: (str) The unique id given to the user's selected goal.
+                text: (str) The display text for the user's selected goal.
         course_tools: List of serialized Course Tool objects. Each serialization has the following fields:
             analytics_id: (str) The unique id given to the tool.
             title: (str) The display title of the tool.
@@ -177,13 +190,7 @@ class OutlineTabView(RetrieveAPIView):
         if course_home_mfe_dates_tab_is_active(course.id):
             dates_tab_link = get_microfrontend_url(course_key=course.id, view_name='dates')
 
-        transformers = BlockStructureTransformers()
-        transformers += get_course_block_access_transformers(request.user)
-        transformers += [
-            BlocksAPITransformer(None, None, depth=3),
-        ]
-
-        course_blocks = get_course_blocks(request.user, course_usage_key, transformers, include_completion=True)
+        course_blocks = get_course_outline_block_tree(request, course_key_string, request.user if is_enrolled else None)
 
         has_visited_course = False
         try:
@@ -209,9 +216,32 @@ class OutlineTabView(RetrieveAPIView):
             'user_timezone': user_timezone,
         }
 
+        # Only show the set course goal message for enrolled, unverified
+        # users in a course that allows for verified statuses.
+        is_already_verified = CourseEnrollment.is_enrolled_as_verified(request.user, course_key)
+        if (not is_already_verified and
+                has_course_goal_permission(request, course_key_string, {'is_enrolled': is_enrolled})):
+            course_goals = {
+                'goal_options': valid_course_goals_ordered(include_unsure=True),
+                'selected_goal': None
+            }
+
+            selected_goal = get_course_goal(request.user, course_key)
+            if selected_goal:
+                course_goals['selected_goal'] = {
+                    'key': selected_goal.goal_key,
+                    'text': get_course_goal_text(selected_goal.goal_key),
+                }
+        else:
+            course_goals = {
+                'goal_options': [],
+                'selected_goal': None
+            }
+
         data = {
             'course_blocks': course_blocks,
             'course_expired_html': course_expired_html,
+            'course_goals': course_goals,
             'course_tools': course_tools,
             'dates_widget': dates_widget,
             'enroll_alert': enroll_alert,
@@ -222,6 +252,7 @@ class OutlineTabView(RetrieveAPIView):
         }
         context = self.get_serializer_context()
         context['course_key'] = course_key
+        context['enable_links'] = show_enrolled or allow_public
         serializer = self.get_serializer_class()(data, context=context)
 
         return Response(serializer.data)
@@ -233,7 +264,7 @@ class OutlineTabView(RetrieveAPIView):
 def dismiss_welcome_message(request):
     course_id = request.data.get('course_id', None)
 
-    # If body doesnt contain 'course_id', return 400 to client.
+    # If body doesn't contain 'course_id', return 400 to client.
     if not course_id:
         raise ParseError(_("'course_id' is required."))
 
@@ -247,3 +278,29 @@ def dismiss_welcome_message(request):
         return Response({'message': _('Welcome message successfully dismissed.')})
     except Exception:
         raise UnableToDismissWelcomeMessage
+
+
+# Another version of this endpoint exists in ../course_goals/views.py
+@api_view(['POST'])
+@authentication_classes((JwtAuthentication, SessionAuthenticationAllowInactiveUser,))
+@permission_classes((IsAuthenticated,))
+def save_course_goal(request):
+    course_id = request.data.get('course_id', None)
+    goal_key = request.data.get('goal_key', None)
+
+    # If body doesn't contain 'course_id', return 400 to client.
+    if not course_id:
+        raise ParseError(_("'course_id' is required."))
+
+    # If body doesn't contain 'goal', return 400 to client.
+    if not goal_key:
+        raise ParseError(_("'goal_key' is required."))
+
+    try:
+        add_course_goal(request.user, course_id, goal_key)
+        return Response({
+            'header': _('Your course goal has been successfully set.'),
+            'message': _('Course goal updated successfully.'),
+        })
+    except Exception:
+        raise UnableToSaveCourseGoal

@@ -254,8 +254,11 @@ FEATURES = {
     # Enable the courseware search functionality
     'ENABLE_COURSEWARE_INDEX': False,
 
-    # Enable content libraries search functionality
+    # Enable content libraries (modulestore) search functionality
     'ENABLE_LIBRARY_INDEX': False,
+
+    # Enable content libraries (blockstore) indexing
+    'ENABLE_CONTENT_LIBRARY_INDEX': False,
 
     # Enable course reruns, which will always use the split modulestore
     'ALLOW_COURSE_RERUNS': True,
@@ -400,7 +403,7 @@ FEATURES = {
     # .. toggle_category: n/a
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-06-12
-    # .. toggle_expiration_date: 2020-09-01
+    # .. toggle_expiration_date: 2020-12-01
     # .. toggle_warnings: This can be removed once support is removed for deprecated course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     # .. toggle_status: supported
@@ -1964,6 +1967,11 @@ ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 # The default value of this needs to be a 16 character string
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 
+# The setting key maps to the channel code (e.g. 'SAP' for success factors), Channel code is defined as
+# part of django model of each integrated channel in edx-enterprise.
+# The absence of a key/value pair translates to NO LIMIT on the number of "chunks" transmitted per cycle.
+INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
+
 BASE_COOKIE_DOMAIN = 'localhost'
 
 # This limits the type of roles that are submittable via the `student` app's manual enrollment
@@ -2286,6 +2294,9 @@ DISABLE_DEPRECATED_SIGNUP_URL = False
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = '100/5m'
+
+##### REGISTRATION RATE LIMIT SETTINGS #####
+REGISTRATION_VALIDATION_RATELIMIT = '30/7d'
 
 ##### PASSWORD RESET RATE LIMIT SETTINGS #####
 PASSWORD_RESET_IP_RATE = '1/m'

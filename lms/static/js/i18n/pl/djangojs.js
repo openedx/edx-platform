@@ -21,7 +21,6 @@
   
   var newcatalog = {
     " ${price} {currency} )": " ${price} {currency} )",
-    " Link": "Odno\u015bnik",
     " and ": "i",
     " learner does not exist in LMS and not added to the exception list": "student nie figuruje w LMS i nie zostanie dodany do listy wyj\u0105tk\u00f3w",
     " learner is already white listed and not added to the exception list": "student znajduje si\u0119 ju\u017c na bia\u0142ej li\u015bcie i nie zosta\u0142 dodany do listy wyj\u0105tk\u00f3w",
@@ -498,7 +497,6 @@
     "Enter the page number you'd like to quickly navigate to.": "Podaj numer strony do kt\u00f3rej chcesz si\u0119 przenie\u015b\u0107.",
     "Enter the username or email address of each learner that you want to add as an exception.": "Wprowad\u017a nazw\u0119 u\u017cytkownika lub adres e-mail ka\u017cdego studenta, kt\u00f3rego chcesz doda\u0107 do listy wyj\u0105tk\u00f3w.",
     "Enter username or email": "Wprowad\u017a nazw\u0119 u\u017cytkownika lub adres e-mail",
-    "Enter your ": "Wprowad\u017a sw\u00f3j",
     "Entrance exam attempts is being reset for student '{student_id}'.": "Podej\u015bcia do egzaminu wst\u0119pnego s\u0105 resetowane dla studenta '{student_id}'.",
     "Entrance exam state is being deleted for student '{student_id}'.": "Stan egzaminu wst\u0119pnego dla studenta '{student_id}' jest usuwany.",
     "Error": "B\u0142\u0105d",

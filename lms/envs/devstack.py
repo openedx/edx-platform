@@ -162,7 +162,7 @@ FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
 ########################### Milestones #################################
 FEATURES['MILESTONES_APP'] = True
 
-########################### Milestones #################################
+########################### Organizations #################################
 FEATURES['ORGANIZATIONS_APP'] = True
 
 ########################### Entrance Exams #################################
@@ -275,8 +275,20 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
 
 LOGIN_REDIRECT_WHITELIST = [
     CMS_BASE,
-    ENTERPRISE_LEARNER_PORTAL_NETLOC,
-    ENTERPRISE_ADMIN_PORTAL_NETLOC,
+    # Allow redirection to all micro-frontends.
+    # Please add your MFE if is not already listed here.
+    # Note: For this to work, the MFE must set BASE_URL in its .env.development to:
+    #   BASE_URL=http://localhost:$PORT
+    # as opposed to:
+    #   BASE_URL=localhost:$PORT
+    'localhost:1976',  # frontend-app-program-console
+    'localhost:1994',  # frontend-app-gradebook
+    'localhost:2000',  # frontend-app-learning
+    'localhost:2001',  # frontend-app-course-authoring
+    'localhost:3001',  # frontend-app-library-authoring
+    'localhost:18400',  # frontend-app-publisher
+    ENTERPRISE_LEARNER_PORTAL_NETLOC,  # frontend-app-learner-portal-enterprise
+    ENTERPRISE_ADMIN_PORTAL_NETLOC,  # frontend-app-admin-portal
 ]
 
 ###################### JWTs ######################
