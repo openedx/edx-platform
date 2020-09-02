@@ -20,7 +20,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.lib.url_utils import unquote_slashes
 from xmodule.modulestore.django import modulestore
 
-from .constants import DAYS_TO_WAIT_AUTO_ASSESSMENT, ORA_BLOCK_TYPE
+from .constants import DAYS_TO_WAIT_AUTO_ASSESSMENT, NO_PENDING_ORA, ORA_BLOCK_TYPE
 
 log = getLogger(__name__)
 
@@ -93,9 +93,7 @@ def _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta
     if submissions_to_autoscore:
         log.info('Autoscoring {count} submission(s)'.format(count=len(submissions_to_autoscore)))
     else:
-        log.info('No pending open assessment found to autoscore, since last {days} days, from {since_date}'.format(
-            days=days_to_wait, since_date=delta_date, )
-        )
+        log.info(NO_PENDING_ORA.format(days=days_to_wait, since_date=delta_date))
 
 
 def autoscore_ora_submission(submission):
@@ -108,14 +106,13 @@ def autoscore_ora_submission(submission):
     anonymous_user_id = submission.student_item.student_id
     usage_key = submission.student_item.item_id
     course_id_str = submission.student_item.course_id
-    course_id = CourseKey.from_string(course_id_str)
 
     log.info('Started autoscoring submission {uuid} for course {course}'.format(
         uuid=submission.uuid, course=course_id_str)
     )
 
-    # Find the associated rubric for that course_id & item_id
-    rubric_dict = get_rubric_for_course(course_id, usage_key)
+    # Find the associated rubric
+    rubric_dict = get_rubric_from_ora(usage_key)
 
     rubric = rubric_from_dict(rubric_dict)
     options_selected = select_options(rubric_dict)[0]
@@ -200,10 +197,7 @@ def select_options(rubric_dict):
     return options_selected, points_earned, points_possible
 
 
-def get_rubric_for_course(course_id, usage_key):
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id.to_deprecated_string())
-    usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_key))
-
+def get_rubric_from_ora(usage_key):
     instance = modulestore().get_item(usage_key)
     return {
         'prompts': instance.prompts,
