@@ -430,6 +430,19 @@ FEATURES = {
     # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
 
+    # .. toggle_name: ENABLE_LOGISTRATION_MICROFRONTEND
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the logistration.
+    # .. toggle_category: micro-frontend
+    # .. toggle_use_cases: incremental_release, open_edx
+    # .. toggle_creation_date: 2020-09-08
+    # .. toggle_expiration_date: None
+    # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
+    # .. toggle_status: supported
+    # .. toggle_warnings: Also set settings.ACCOUNT_MICROFRONTEND_URL and set REDIRECT_TO_ACCOUNT_MICROFRONTEND for rollout.
+    'ENABLE_LOGISTRATION_MICROFRONTEND': False,
+
     ### ORA Feature Flags ###
 
     # .. toggle_name: ENABLE_ORA_TEAM_SUBMISSIONS
