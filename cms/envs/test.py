@@ -21,7 +21,6 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.lib.derived import derive_settings
-from util.db import NoOpMigrationModules
 
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 

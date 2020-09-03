@@ -34,7 +34,6 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 
 from .common import *
 
-from util.db import NoOpMigrationModules  # pylint: disable=wrong-import-order
 from util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
 
 # This patch disables the commit_on_success decorator during tests
