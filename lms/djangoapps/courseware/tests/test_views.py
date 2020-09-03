@@ -907,21 +907,11 @@ class ViewsTestCase(BaseViewsTestCase):
     def test_bypass_course_info(self):
         course_id = six.text_type(self.course_key)
 
-        self.assertFalse(self.course.bypass_home)
-
         response = self.client.get(reverse('info', args=[course_id]))
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
-
-        self.course.bypass_home = True
-        self.store.update_item(self.course, self.user.id)
-        self.assertTrue(self.course.bypass_home)
-
-        response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
-
-        self.assertRedirects(response, reverse('courseware', args=[course_id]), fetch_redirect_response=False)
 
         response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER='foo')
         self.assertEqual(response.status_code, 200)
