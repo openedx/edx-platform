@@ -1,6 +1,7 @@
 <%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
 
 <%!
+import datetime
 import six
 
 from django.conf import settings
@@ -117,19 +118,23 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 course_date = None
             else:
                 format = 'shortDate'
+                dashboard_start_display = course_overview.dashboard_start_display
                 if course_overview.has_ended():
                     container_string = _("Ended - {date}")
                     course_date = course_overview.end
                 elif course_overview.has_started():
                     container_string = _("Started - {date}")
-                    course_date = enrollment_date or course_overview.dashboard_start_display
+                    if enrollment_date and isinstance(dashboard_start_display, datetime.datetime):
+                      course_date = max(enrollment_date, dashboard_start_display)
+                    else:
+                      course_date = enrollment_date or dashboard_start_display
                 elif course_overview.starts_within(days=5):
                     container_string = _("Starts - {date}")
-                    course_date = course_overview.dashboard_start_display
+                    course_date = dashboard_start_display
                     format = 'defaultFormat'
                 else: ## hasn't started yet
                     container_string = _("Starts - {date}")
-                    course_date = course_overview.dashboard_start_display
+                    course_date = dashboard_start_display
                 endif
             endif
           %>
