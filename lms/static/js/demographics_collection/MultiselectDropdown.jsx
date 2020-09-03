@@ -114,7 +114,7 @@ class MultiselectDropdown extends React.Component {
     })
 
     return (
-      <fieldset id="multiselect-dropdown-fieldset">
+      <fieldset id="multiselect-dropdown-fieldset" disabled={this.props.disabled}>
         <legend className="sr-only">{this.props.label}</legend>
         {options}
       </fieldset>
@@ -123,17 +123,19 @@ class MultiselectDropdown extends React.Component {
 
   render() {
     return (
-      <div
-        className="multiselect-dropdown"
-        onBlur={() => {
-          this.props.onBlur();
-        }}
-        tabIndex={0}
-      >
+      <div className="multiselect-dropdown">
         <label id="multiselect-dropdown-label" htmlFor="multiselect-dropdown">{this.props.label}</label>
-        <div className="form-control" id="multiselect-dropdown-button" ref={this.buttonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
+        <div 
+          className="form-control d-flex" 
+          tabIndex={0}
+          onBlur={() => {
+          this.props.onBlur();
+          }}
+        >
+        <button className="multiselect-dropdown-button" disabled={this.props.disabled} id="multiselect-dropdown-button" ref={this.buttonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
           {this.renderSelected()}
-          {this.renderUnselect()}
+        </button>
+        {this.renderUnselect()}
         </div>
         <div>
           {this.renderMenu()}
