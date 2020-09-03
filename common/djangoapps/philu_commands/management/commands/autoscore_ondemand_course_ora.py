@@ -34,4 +34,4 @@ class Command(BaseCommand):
 
         enrollments = CourseEnrollment.objects.filter(course_id__in=ondemand_course_ids, is_active=True)
 
-        find_and_autoscore_submissions(enrollments=enrollments, submission_uuids=submission_uuids)
+        find_and_autoscore_submissions(list(enrollments), list(submission_uuids))

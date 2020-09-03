@@ -7,8 +7,6 @@ from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import utc
 from submissions.models import Submission
 
@@ -17,7 +15,6 @@ from openassessment.assessment.models import Assessment, AssessmentPart
 from openassessment.assessment.serializers import rubric_from_dict
 from openassessment.workflow.models import AssessmentWorkflow
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.lib.url_utils import unquote_slashes
 from xmodule.modulestore.django import modulestore
 
 from .constants import DAYS_TO_WAIT_AUTO_ASSESSMENT, NO_PENDING_ORA, ORA_BLOCK_TYPE
@@ -29,9 +26,13 @@ def find_and_autoscore_submissions(enrollments, submission_uuids):
     """
     Find ORA submissions corresponding to provided enrollments and submission uuids. Autoscore all resulting
     submissions.
-    :param (list) enrollments: All active CourseEnrollment objects for all self paced courses
-    :param (list) submission_uuids: All AssessmentWorkflow uuids for submissions excluding done and cancelled
-    :return: None
+
+    Args:
+        enrollments (list): All active CourseEnrollment objects for all self paced courses
+        submission_uuids (list): All AssessmentWorkflow uuids for submissions excluding done and cancelled
+
+    Returns:
+        None
     """
     days_to_wait = configuration_helpers.get_value('DAYS_TO_WAIT_AUTO_ASSESSMENT', DAYS_TO_WAIT_AUTO_ASSESSMENT)
     delta_date = datetime.now(utc).date() - timedelta(days=days_to_wait)
@@ -55,11 +56,14 @@ def find_and_autoscore_submissions(enrollments, submission_uuids):
 def _get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuids, delta_date):
     """
     Find ORA submissions, for a specific enrollment, which correspond to provided submission uuids.
-    :param (CourseEnrollment) enrollment: Course enrollment to find submissions from
-    :param (list) submission_uuids: All AssessmentWorkflow uuids for submissions excluding done and cancelled
-    :param (Date) delta_date: Find submissions before this date
-    :return: All submissions in enrollment matching criteria
-    :rtype: list
+
+    Args:
+        enrollment (CourseEnrollment): Course enrollment to find submissions from
+        submission_uuids (list): All AssessmentWorkflow uuids for submissions excluding done and cancelled
+        delta_date (Date): Find submissions before this date
+
+    Returns:
+        list: All submissions in enrollment matching criteria
     """
     course_id = enrollment.course_id
     anonymous_user_id = enrollment.user.anonymoususerid_set.get(course_id=course_id).anonymous_user_id
@@ -108,8 +112,12 @@ def autoscore_ora_submission(submission):
     """
     Auto score ORA submission, by Philu bot. Score will appear as awarded by staff (instructor). This function will
     also mark all requirements of submitter to fulfilled, which means all ORA steps will be marked as completed.
-    :param (Submission) submission: ORA submission model object
-    :return: None
+
+    Args:
+        submission (Submission): ORA submission model object
+
+    Returns:
+        None
     """
     anonymous_user_id = submission.student_item.student_id
     usage_key = submission.student_item.item_id
@@ -158,10 +166,14 @@ def autoscore_ora(course_id, usage_key, student):
     """
     This function is a wrapper function for `autoscore_ora_submission`. It is only used by edx-ora2 command
     `autoscore_learners` command.
-    :param (string) course_id: Course id
-    :param (string) usage_key: Key for openassessment xBlock
-    :param (dict) student: A dictionary with anonymous user id
-    :return: None
+
+    Args:
+        course_id (string): Course id
+        usage_key (string): Key for openassessment xBlock
+        student (dict): A dictionary with anonymous user id
+
+    Returns:
+        None
     """
     anonymous_user_id = student['anonymous_user_id']
     course_id_str = course_id.to_deprecated_string()
@@ -179,6 +191,15 @@ def autoscore_ora(course_id, usage_key, student):
 
 
 def select_options(rubric_dict):
+    """
+    Auto calculate total possible points, earned points and auto select selected options.
+
+    Args:
+        rubric_dict (dict): A dict with prompts and rubric criteria
+
+    Returns:
+        tuple: selected options, points earned and points possible
+    """
     criteria = rubric_dict['criteria']
     options_selected = {}
     points_earned = 0
@@ -206,6 +227,15 @@ def select_options(rubric_dict):
 
 
 def get_rubric_from_ora(usage_key):
+    """
+    Get rubric from ORA xblock
+
+    Args:
+        usage_key (UsageKey): UsageKey of the block.
+
+    Returns:
+        dict: A dict with prompts and rubric criteria
+    """
     instance = modulestore().get_item(usage_key)
     return {
         'prompts': instance.prompts,
@@ -214,7 +244,12 @@ def get_rubric_from_ora(usage_key):
 
 
 def get_philu_bot():
-    # Check if bot user exist
+    """
+    Get or create user for Philu bot
+
+    Returns:
+        string: A hash as an scorer id for Philu bot
+    """
     philu_bot, _ = User.objects.get_or_create(
         username='philubot',
         defaults={
@@ -225,10 +260,10 @@ def get_philu_bot():
         }
     )
 
-    # Create anonymized id for the bot
-    hasher = hashlib.md5()
-    hasher.update(settings.SECRET_KEY)
-    hasher.update(unicode(philu_bot.id))
-    digest = hasher.hexdigest()
+    # Create anonymize id for the bot
+    hash_lib = hashlib.md5()
+    hash_lib.update(settings.SECRET_KEY)
+    hash_lib.update(unicode(philu_bot.id))
+    digest = hash_lib.hexdigest()
 
     return digest

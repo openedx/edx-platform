@@ -1,4 +1,6 @@
-""" Test Factories. """
+"""
+Factories for open assessment models
+"""
 import datetime
 from uuid import uuid4
 
@@ -8,7 +10,10 @@ from submissions.models import StudentItem, Submission
 
 
 class StudentItemFactory(DjangoModelFactory):
-    """ A Factory for the StudentItem model. """
+    """
+    A Factory for the StudentItem model.
+    """
+
     class Meta:
         model = StudentItem
 
@@ -19,7 +24,10 @@ class StudentItemFactory(DjangoModelFactory):
 
 
 class SubmissionFactory(DjangoModelFactory):
-    """ A factory for the Submission model. """
+    """
+    A factory for the Submission model.
+    """
+
     class Meta:
         model = Submission
 
