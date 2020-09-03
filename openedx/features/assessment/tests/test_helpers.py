@@ -13,12 +13,12 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from pytz import UTC
 from submissions.models import Score
 
-from openassessment.assessment.models import Assessment, AssessmentPart
+from openassessment.assessment.models import Assessment
 from openassessment.workflow import api as workflow_api
 from openassessment.workflow.models import AssessmentWorkflow
 from openedx.features.assessment import helpers
 from openedx.features.assessment.constants import NO_PENDING_ORA
-from openedx.features.assessment.tests.factories import StudentItemFactory, SubmissionFactory
+from openedx.features.assessment.tests.factories import SubmissionFactory
 from openedx.features.philu_utils.tests.mixins import CourseAssessmentMixin
 from student.tests.factories import AnonymousUserIdFactory, CourseEnrollmentFactory
 from xmodule.modulestore.django import modulestore
@@ -133,7 +133,9 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
             canceled_one_submission=True
         )
 
-        submissions = helpers._get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuid, delta_date)
+        submissions = helpers._get_submissions_to_autoscore_by_enrollment(  # pylint: disable=protected-access
+            enrollment, submission_uuid, delta_date
+        )
 
         if submission_date < delta_date:
             self.assertEqual(expected_submissions, submissions)
@@ -151,7 +153,7 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
             exclude_submissions=True
         )
 
-        submissions = helpers._get_submissions_to_autoscore_by_enrollment(
+        submissions = helpers._get_submissions_to_autoscore_by_enrollment(  # pylint: disable=protected-access
             enrollment, [], datetime(2020, 1, 1, tzinfo=UTC).date()
         )
 
@@ -171,7 +173,7 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
         enrollment = CourseEnrollmentFactory(course_id=course.id)
         AnonymousUserIdFactory(course_id=course.id, user=enrollment.user)
 
-        submissions = helpers._get_submissions_to_autoscore_by_enrollment(
+        submissions = helpers._get_submissions_to_autoscore_by_enrollment(  # pylint: disable=protected-access
             enrollment, [], datetime(2020, 1, 1, tzinfo=UTC).date()
         )
 
@@ -220,7 +222,9 @@ class AssessmentHelperTestCases(TestCase):
         submissions_to_autoscore = SubmissionFactory.create_batch(2)
         expected_logged_message = 'Autoscoring {count} submission(s)'.format(count=len(submissions_to_autoscore))
 
-        helpers._log_multiple_submissions_info(submissions_to_autoscore, days_to_wait=mock.ANY, delta_date=mock.ANY)
+        helpers._log_multiple_submissions_info(  # pylint: disable=protected-access
+            submissions_to_autoscore, days_to_wait=mock.ANY, delta_date=mock.ANY
+        )
 
         assert mock_log_info.called_with(expected_logged_message)
 
@@ -230,8 +234,12 @@ class AssessmentHelperTestCases(TestCase):
         Verify logs when there is no submission to autoscore
         """
         delta_date = datetime(2020, 1, 1).date()
-        helpers._log_multiple_submissions_info(submissions_to_autoscore=[], days_to_wait=3, delta_date=delta_date)
         expected_logged_message = NO_PENDING_ORA.format(days=3, since_date=delta_date)
+
+        helpers._log_multiple_submissions_info(  # pylint: disable=protected-access
+            submissions_to_autoscore=[], days_to_wait=3, delta_date=delta_date
+        )
+
         assert mock_log_info.called_with(expected_logged_message)
 
     @mock.patch('openedx.features.assessment.helpers.autoscore_ora_submission')

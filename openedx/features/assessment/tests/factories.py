@@ -14,7 +14,7 @@ class StudentItemFactory(DjangoModelFactory):
     A Factory for the StudentItem model.
     """
 
-    class Meta:
+    class Meta(object):
         model = StudentItem
 
     student_id = factory.Faker('sha1')
@@ -28,7 +28,7 @@ class SubmissionFactory(DjangoModelFactory):
     A factory for the Submission model.
     """
 
-    class Meta:
+    class Meta(object):
         model = Submission
 
     uuid = factory.LazyFunction(uuid4)

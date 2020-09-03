@@ -61,4 +61,4 @@ class CourseAssessmentMixin(object):
             return
 
         category = unit if category == 'vertical' else COURSE_CHILD_STRUCTURE[category]
-        self.create_course_children(store, child_object, category, unit)
+        self._create_course_children(store, child_object, category, unit)
