@@ -458,6 +458,16 @@ FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.8"
 
+####################### ELASTICSEARCH TESTS #######################
+# Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
+ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(
+    'EDXAPP_ENABLE_ELASTICSEARCH_FOR_TESTS', 'no').lower() in ('true', 'yes', '1')
+
+TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
+    'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
+TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch')
+TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
+
 ######### custom courses #########
 INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
 FEATURES['CUSTOM_COURSES_EDX'] = True
