@@ -18,6 +18,7 @@
         <li class="note-comment">
             <p class="note-comment-title"><%- gettext("You commented...") %></p>
             <p class="note-comment-p">
+                <% // xss-lint: disable=underscore-not-escaped %>
                 <%= interpolate_text(_.escape(text), {
                     elasticsearch_highlight_start: '<span class="note-highlight">',
                     elasticsearch_highlight_end: '</span>'
@@ -32,7 +33,7 @@
     <div class="wrapper-reference-content">
         <p class="reference-title"><%- gettext("Noted in:") %></p>
         <% if (unit.url) { %>
-          <a class="reference-meta reference-unit-link" href="<%= unit.url %>#<%= id %>"><%- unit.display_name %></a>
+          <a class="reference-meta reference-unit-link" href="<%- unit.url %>#<%- id %>"><%- unit.display_name %></a>
         <% } else { %>
           <span class="reference-meta"><%- unit.display_name %></span>
         <% } %>
@@ -44,6 +45,7 @@
             <p class="reference-title"><%- gettext("Tags:") %></p>
             <% for (var i = 0; i < tags.length; i++) { %>
                 <span class="reference-meta reference-tags">
+                    <% // xss-lint: disable=underscore-not-escaped %>
                     <%= interpolate_text(_.escape(tags[i]), {
                         elasticsearch_highlight_start: '<span class="note-highlight">',
                         elasticsearch_highlight_end: '</span>'
