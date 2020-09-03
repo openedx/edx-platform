@@ -12,7 +12,7 @@
             <td> <%- is_registration_code_valid %> </td>
             <td>
                 <% _.each(actions, function(action){ %>
-                    <a class="registration_code_action_link" data-registration-code="<%= action.registration_code %>" data-action-type="<%= action.action_type %>" href="#" data-endpoint="<%= action.action_url %>">
+                    <a class="registration_code_action_link" data-registration-code="<%- action.registration_code %>" data-action-type="<%- action.action_type %>" href="#" data-endpoint="<%- action.action_url %>">
                         <%- action.action_name %>
                     </a>
                 <% }); %>
