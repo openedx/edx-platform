@@ -29,7 +29,7 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
             var collection = this.model.collection,
                 index = collection.indexOf(this.model);
 
-            this.$el.html(_.template(groupEditTemplate)({
+            edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.template(groupEditTemplate)({
                 name: this.model.get('name'),
                 allocation: this.getAllocation(),
                 index: index,
