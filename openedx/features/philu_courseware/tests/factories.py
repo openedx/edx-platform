@@ -1,8 +1,8 @@
 import factory
 from opaque_keys.edx.keys import UsageKey
 
-from openedx.features.philu_courseware.models import CompetencyAssessmentRecord
-from student.tests.factories import UserFactory
+from openedx.features.philu_courseware.models import CompetencyAssessmentRecord, CourseEnrollmentMeta
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class CompetencyAssessmentRecordFactory(factory.django.DjangoModelFactory):
@@ -20,3 +20,10 @@ class CompetencyAssessmentRecordFactory(factory.django.DjangoModelFactory):
     score = '1'
     user = factory.SubFactory(UserFactory)
     question_number = 1
+
+
+class CourseEnrollmentMetaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CourseEnrollmentMeta
+
+    course_enrollment = factory.SubFactory(CourseEnrollmentFactory)
