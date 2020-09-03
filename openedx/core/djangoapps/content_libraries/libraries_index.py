@@ -39,6 +39,11 @@ class ContentLibraryIndexer:
 
     INDEX_NAME = "content_library_index"
     LIBRARY_DOCUMENT_TYPE = "content_library"
+    SEARCH_KWARGS = {
+        # Set this to True or 'wait_for' if immediate refresh is required after any update.
+        # See elastic docs for more information.
+        'refresh': False
+    }
 
     SCHEMA_VERSION = 0
 
@@ -84,8 +89,7 @@ class ContentLibraryIndexer:
                 },
             }
             library_dicts.append(library_dict)
-
-        return searcher.index(cls.LIBRARY_DOCUMENT_TYPE, library_dicts)
+        return searcher.index(cls.LIBRARY_DOCUMENT_TYPE, library_dicts, **cls.SEARCH_KWARGS)
 
     @classmethod
     def get_libraries(cls, library_keys, text_search=None):
@@ -144,7 +148,7 @@ class ContentLibraryIndexer:
         """
         searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
         ids_str = [str(key) for key in library_keys]
-        searcher.remove(cls.LIBRARY_DOCUMENT_TYPE, ids_str)
+        searcher.remove(cls.LIBRARY_DOCUMENT_TYPE, ids_str, **cls.SEARCH_KWARGS)
 
     @classmethod
     def remove_all_libraries(cls):
@@ -154,7 +158,7 @@ class ContentLibraryIndexer:
         searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
         response = searcher.search(doc_type=cls.LIBRARY_DOCUMENT_TYPE, filter_dictionary={}, size=MAX_SIZE)
         ids = [result["data"]["id"] for result in response["results"]]
-        searcher.remove(cls.LIBRARY_DOCUMENT_TYPE, ids)
+        searcher.remove(cls.LIBRARY_DOCUMENT_TYPE, ids, **cls.SEARCH_KWARGS)
 
     @classmethod
     def indexing_is_enabled(cls):
@@ -198,6 +202,7 @@ def build_elastic_query(library_keys_str, text_search):
     """
     # Remove reserved characters (and ") from the text to prevent unexpected errors.
     text_search_normalised = text_search.translate(text_search.maketrans('', '', RESERVED_CHARACTERS + '"'))
+    text_search_normalised = text_search.replace('-',' ')
     # Wrap with asterix to enable partial matches
     text_search_normalised = "*{}*".format(text_search_normalised)
     return {

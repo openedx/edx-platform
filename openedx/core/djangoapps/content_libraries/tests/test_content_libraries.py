@@ -12,12 +12,13 @@ from django.test.utils import override_settings
 from mock import patch
 from organizations.models import Organization
 
-from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
+from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest, elasticsearch_test
 from openedx.core.djangoapps.content_libraries.api import BlockLimitReachedError
 from student.tests.factories import UserFactory
 
 
 @ddt.ddt
+@elasticsearch_test
 class ContentLibrariesTest(ContentLibrariesRestApiTest):
     """
     General tests for Blockstore-based Content Libraries
@@ -89,7 +90,6 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
 
     @ddt.data(True, False)
     @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootPagination.page_size", new=2)
-    @override_settings(SEARCH_ENGINE="search.tests.mock_search_engine.MockSearchEngine")
     def test_list_library(self, is_indexing_enabled):
         """
         Test the /libraries API and its pagination
@@ -105,7 +105,8 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
 
             result = self._list_libraries()
             self.assertEqual(len(result), 2)
-            self.assertEqual(result[0], lib1)
+            self.assertIn(lib1, result)
+            self.assertIn(lib2, result)
             result = self._list_libraries({'pagination': 'true'})
             self.assertEqual(len(result['results']), 2)
             self.assertEqual(result['next'], None)

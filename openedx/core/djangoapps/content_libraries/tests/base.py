@@ -4,10 +4,12 @@ Tests for Blockstore-based Content Libraries
 """
 from contextlib import contextmanager
 from io import BytesIO
+from mock import patch
 from urllib.parse import urlencode
 import unittest
 
 from django.conf import settings
+from django.test.utils import override_settings
 from organizations.models import Organization
 from rest_framework.test import APITestCase, APIClient
 
@@ -40,6 +42,26 @@ URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'
 
 # Decorator for tests that require blockstore
 requires_blockstore = unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+
+
+def elasticsearch_test(func):
+    """
+    Decorator for tests which connect to elasticsearch when needed
+    """
+    # This is disabled by default. Set to True if the elasticsearch engine is needed to test parts of code.
+    if settings.ENABLE_ELASTICSEARCH_FOR_TESTS:
+        func = override_settings(SEARCH_ENGINE="search.elastic.ElasticSearchEngine")(func)
+        func = override_settings(ELASTIC_SEARCH_CONFIG=[{
+            'use_ssl': settings.TEST_ELASTICSEARCH_USE_SSL,
+            'host': settings.TEST_ELASTICSEARCH_HOST,
+            'port': settings.TEST_ELASTICSEARCH_PORT,
+        }])(func)
+        func = patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SEARCH_KWARGS", new={
+            'refresh': 'wait_for'
+        })(func)
+        return func
+    else:
+        return patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SEARCH_KWARGS", new={})(func)
 
 
 @requires_blockstore

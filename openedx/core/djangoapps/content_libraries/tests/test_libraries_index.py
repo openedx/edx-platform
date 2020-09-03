@@ -10,16 +10,17 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from search.search_engine_base import SearchEngine
 
 from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryNotIndexedException
-from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
+from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest, elasticsearch_test
 
 
 @override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': True})
-@override_settings(SEARCH_ENGINE="search.tests.mock_search_engine.MockSearchEngine")
+@elasticsearch_test
 class ContentLibraryIndexerIndexer(ContentLibrariesRestApiTest):
     """
     Tests the operation of ContentLibraryIndexer
     """
 
+    @elasticsearch_test
     def setUp(self):
         super().setUp()
         ContentLibraryIndexer.remove_all_libraries()
@@ -31,9 +32,6 @@ class ContentLibraryIndexerIndexer(ContentLibrariesRestApiTest):
         """
         result1 = self._create_library(slug="test-lib-index-1", title="Title 1", description="Description")
         result2 = self._create_library(slug="test-lib-index-2", title="Title 2", description="Description")
-
-        response = self.searcher.search(doc_type=ContentLibraryIndexer.LIBRARY_DOCUMENT_TYPE, filter_dictionary={})
-        self.assertEqual(response['total'], 2)
 
         for result in [result1, result2]:
             library_key = LibraryLocatorV2.from_string(result['id'])
@@ -71,15 +69,16 @@ class ContentLibraryIndexerIndexer(ContentLibrariesRestApiTest):
         """
         Test if remove_all_libraries() deletes all libraries
         """
-        self._create_library(slug="test-lib-rm-all-1", title="Title 1", description="Description")
-        self._create_library(slug="test-lib-rm-all-2", title="Title 2", description="Description")
+        lib1 = self._create_library(slug="test-lib-rm-all-1", title="Title 1", description="Description")
+        lib2 = self._create_library(slug="test-lib-rm-all-2", title="Title 1", description="Description")
+        library_key1 = LibraryLocatorV2.from_string(lib1['id'])
+        library_key2 = LibraryLocatorV2.from_string(lib2['id'])
 
-        response = self.searcher.search(doc_type=ContentLibraryIndexer.LIBRARY_DOCUMENT_TYPE, filter_dictionary={})
-        self.assertEqual(response['total'], 2)
+        ContentLibraryIndexer.get_libraries([library_key1, library_key2])
 
         ContentLibraryIndexer.remove_all_libraries()
-        response = self.searcher.search(doc_type=ContentLibraryIndexer.LIBRARY_DOCUMENT_TYPE, filter_dictionary={})
-        self.assertEqual(response['total'], 0)
+        with self.assertRaises(LibraryNotIndexedException):
+            ContentLibraryIndexer.get_libraries([library_key1, library_key2])
 
     def test_update_libraries(self):
         """
