@@ -154,7 +154,6 @@ class DemographicsCollectionModal extends React.Component {
       await this.jwtTokenService.getJwtToken();
       await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, options)
     } catch (error) {
-      console.log(error);
       this.setState({ loading: false, fieldError: true, errorMessage: error });
     }
 
