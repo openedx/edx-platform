@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='CourseEnrollmentMeta',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('program_uuid', models.UUIDField(null=True, verbose_name='Program UUID')),
+                ('program_uuid', models.UUIDField(blank=True, null=True, verbose_name='Program UUID')),
                 ('course_enrollment', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='course_enrollment_meta', related_query_name='course_enrollment_meta', to='student.CourseEnrollment')),
             ],
         ),

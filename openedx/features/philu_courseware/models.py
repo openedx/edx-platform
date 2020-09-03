@@ -110,4 +110,4 @@ class CompetencyAssessmentRecord(TimeStampedModel):
 class CourseEnrollmentMeta(models.Model):
     course_enrollment = models.OneToOneField(CourseEnrollment, related_name='course_enrollment_meta',
                                              related_query_name='course_enrollment_meta', on_delete=models.CASCADE)
-    program_uuid = models.UUIDField(null=True, verbose_name=_('Program UUID'))
+    program_uuid = models.UUIDField(null=True, blank=True, verbose_name=_('Program UUID'))
