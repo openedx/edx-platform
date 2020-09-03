@@ -154,14 +154,7 @@ class CourseEnrollmentFactory(DjangoModelFactory):
                 course_overview = CourseOverviewFactory(**course_kwargs)
             kwargs['course'] = course_overview
 
-        course_enrollment = manager.create(*args, **kwargs)
-
-        if course_enrollment is not None and 'created' in kwargs:
-            # Let factory add created datetime
-            course_enrollment.created = kwargs['created']
-            course_enrollment.save()
-
-        return course_enrollment
+        return manager.create(*args, **kwargs)
 
 
 class CourseAccessRoleFactory(DjangoModelFactory):

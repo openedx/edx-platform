@@ -89,6 +89,14 @@ def _get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuids, de
 def _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta_date):
     """
     Log ORA auto scoring status
+
+    Args:
+        submissions_to_autoscore (list):  List of ORA submission
+        days_to_wait (int): No of days to wait to autoscore ORA
+        delta_date (Date): Submission to autoscore submissions before this date
+
+    Returns:
+        None
     """
     if submissions_to_autoscore:
         log.info('Autoscoring {count} submission(s)'.format(count=len(submissions_to_autoscore)))
@@ -141,7 +149,7 @@ def autoscore_ora_submission(submission):
     )
 
     # Mark all requirement of submitter to fulfilled and update status to done,
-    # Rest previous score and auto score ORA as per assessment made by philu bot and selected options
+    # Reset previous score and auto score ORA as per assessment made by philu bot and selected options
     assessment_workflow = AssessmentWorkflow.objects.get(submission_uuid=submission.uuid)
     assessment_workflow.update_from_assessments(assessment_requirements=None, override_submitter_requirements=True)
 
