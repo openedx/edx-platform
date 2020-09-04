@@ -923,6 +923,25 @@ def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes=False, 
     Returns:
         bool: True is the user is enrolled in programs of the requested type
     """
+    # NOTE: Used to debug production issue on 9/4/20.
+    if getattr(settings, "DEBUG_PROGRAM_ENROLLMENT_TYPE", False):
+        log.info(
+            """
+                is_user_enrolled_in_program_type called with the following parameters:
+                    User: {},
+                    program_type_slug: {},
+                    paid_modes: {},
+                    enrollments: {},
+                    entitlements: {}
+            """.format(
+                user.id,
+                program_type_slug,
+                str(paid_modes),
+                str(enrollments),
+                str(entitlements)
+            )
+        )
+
     course_runs = set()
     course_uuids = set()
     programs = get_programs_by_type(Site.objects.get_current(), program_type_slug)
@@ -940,6 +959,13 @@ def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes=False, 
     student_entitlements = entitlements if entitlements is not None else get_active_entitlement_list_for_user(user)
     for entitlement in student_entitlements:
         if str(entitlement.course_uuid) in course_uuids:
+            if getattr(settings, "DEBUG_PROGRAM_ENROLLMENT_TYPE", False):
+                # NOTE: Used to debug production issue on 9/4/20.
+                log.info("User {} has an entitlement for course {} which is in a {} program".format(
+                    str(user.id),
+                    str(entitlement.course_uuid),
+                    str(program_type_slug)
+                ))
             return True
 
     student_enrollments = enrollments if enrollments is not None else get_enrollments(user.username)
@@ -949,7 +975,23 @@ def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes=False, 
             course_run_key = CourseKey.from_string(course_run_id)
             paid_modes = [mode.slug for mode in get_paid_modes_for_course(course_run_key)]
             if enrollment['mode'] in paid_modes and course_run_id in course_runs:
+                if getattr(settings, "DEBUG_PROGRAM_ENROLLMENT_TYPE", False):
+                    # NOTE: Used to debug production issue on 9/4/20.
+                    log.info("User {} has an enrollment mode of {} for course {} which is in a {} program and has {} paid modes".format(
+                        str(user.id),
+                        str(enrollment['mode']),
+                        str(course_run_id),
+                        str(program_type_slug),
+                        str(paid_modes)
+                    ))
                 return True
         elif course_run_id in course_runs:
+            if getattr(settings, "DEBUG_PROGRAM_ENROLLMENT_TYPE", False):
+                # NOTE: Used to debug production issue on 9/4/20.
+                log.info("User {} is enrolled in course {} which is in a {} program".format(
+                    str(user.id),
+                    str(course_run_id),
+                    str(program_type_slug)
+                ))
             return True
     return False
