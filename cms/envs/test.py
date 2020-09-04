@@ -183,7 +183,7 @@ BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', '
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 
@@ -308,3 +308,7 @@ PROCTORING_SETTINGS = {}
 LOGISTRATION_RATELIMIT_RATE = '5/5m'
 
 REGISTRATION_VALIDATION_RATELIMIT = '5/minute'
+
+
+BROKER_URL='memory://localhost/'
+BROKER_BACKEND='memory'
