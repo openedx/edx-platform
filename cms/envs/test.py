@@ -183,9 +183,14 @@ BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', '
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
+# test_status_cancel in cms/cms_user_tasks/test.py is failing without this
+# @override_setting for BROKER_URL is not working in testcase
+# https://github.com/celery/celery/blob/v4.4.7/celery/app/control.py#L478
+BROKER_URL = 'memory://localhost/'
 
 ########################### Server Ports ###################################
 
