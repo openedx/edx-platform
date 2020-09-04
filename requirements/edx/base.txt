@@ -49,7 +49,7 @@ ddt==1.4.1                # via xblock-drag-and-drop-v2, xblock-poll
 decorator==4.4.2          # via pycontracts
 defusedxml==0.6.0         # via -r requirements/edx/base.in, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
 django-appconf==1.0.4     # via -r requirements/edx/base.in, django-statici18n
-django-celery==3.3.1      # via -r requirements/edx/base.in, edx-bulk-grades
+django-celery==3.3.1      # via -r requirements/edx/base.in
 django-classy-tags==2.0.0  # via django-sekizai
 django-config-models==2.0.2  # via -r requirements/edx/base.in, edx-enterprise
 django-cookies-samesite==0.6.6  # via -r requirements/edx/base.in
@@ -91,7 +91,7 @@ drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, edx-api-
 edx-ace==0.1.15           # via -r requirements/edx/base.in
 edx-analytics-data-api-client==0.16.1  # via -r requirements/edx/base.in
 edx-api-doc-tools==1.3.1  # via -r requirements/edx/base.in
-edx-bulk-grades==0.7.0    # via -r requirements/edx/base.in, staff-graded-xblock
+edx-bulk-grades==0.8.0    # via -r requirements/edx/base.in, staff-graded-xblock
 edx-ccx-keys==1.1.0       # via -r requirements/edx/base.in
 edx-celeryutils==0.5.2    # via -r requirements/edx/base.in, super-csv
 edx-completion==3.2.4     # via -r requirements/edx/base.in
@@ -206,7 +206,7 @@ requests-oauthlib==1.3.0  # via -r requirements/edx/base.in, social-auth-core
 requests==2.24.0          # via -r requirements/edx/paver.txt, analytics-python, coreapi, django-oauth-toolkit, edx-analytics-data-api-client, edx-bulk-grades, edx-drf-extensions, edx-enterprise, edx-rest-api-client, geoip2, mailsnake, pyjwkest, python-swiftclient, requests-oauthlib, sailthru-client, slumber, social-auth-core
 rest-condition==1.0.3     # via -r requirements/edx/base.in, edx-drf-extensions
 ruamel.yaml.clib==0.2.0   # via ruamel.yaml
-ruamel.yaml==0.16.10      # via drf-yasg
+ruamel.yaml==0.16.11      # via drf-yasg
 rules==2.2                # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 s3transfer==0.1.13        # via boto3
 sailthru-client==2.2.3    # via -r requirements/edx/base.in, edx-ace
