@@ -64,12 +64,8 @@ class DiscussionSettingsSerializer(serializers.Serializer):  # pylint: disable=a
 
     def save(self, **kwargs):
         data_to_save = {key: {'value': val} for key, val in self.validated_data.items()}
-        is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
+        CourseMetadata.update_from_json(
             self.context['course_module'],
             data_to_save,
             user=self.context['user'],
         )
-        if not is_valid:
-            raise serializers.ValidationError(errors)
-
-        modulestore().update_item(self.context['course_module'], self.context['user'].id)
