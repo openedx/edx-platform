@@ -58,7 +58,7 @@ defusedxml==0.6.0         # via -r requirements/edx/base.txt, djangorestframewor
 diff-cover==4.0.0         # via -r requirements/edx/coverage.txt
 distlib==0.3.1            # via virtualenv
 django-appconf==1.0.4     # via -r requirements/edx/base.txt, django-statici18n
-django-celery==3.3.1      # via -r requirements/edx/base.txt, edx-bulk-grades
+django-celery==3.3.1      # via -r requirements/edx/base.txt
 django-classy-tags==2.0.0  # via -r requirements/edx/base.txt, django-sekizai
 django-config-models==2.0.2  # via -r requirements/edx/base.txt, edx-enterprise
 django-cookies-samesite==0.6.6  # via -r requirements/edx/base.txt
@@ -99,7 +99,7 @@ drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, -r requi
 edx-ace==0.1.15           # via -r requirements/edx/base.txt
 edx-analytics-data-api-client==0.16.1  # via -r requirements/edx/base.txt
 edx-api-doc-tools==1.3.1  # via -r requirements/edx/base.txt
-edx-bulk-grades==0.7.0    # via -r requirements/edx/base.txt, staff-graded-xblock
+edx-bulk-grades==0.8.0    # via -r requirements/edx/base.txt, staff-graded-xblock
 edx-ccx-keys==1.1.0       # via -r requirements/edx/base.txt
 edx-celeryutils==0.5.2    # via -r requirements/edx/base.txt, super-csv
 edx-completion==3.2.4     # via -r requirements/edx/base.txt
@@ -138,7 +138,7 @@ fs==2.0.18                # via -r requirements/edx/base.txt, django-pyfs, fs-s3
 future==0.18.2            # via -r requirements/edx/base.txt, django-ses, edx-celeryutils, edx-enterprise, pycontracts, pyjwkest
 geoip2==3.0.0             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 gitdb==4.0.5              # via gitpython
-gitpython==3.1.7          # via transifex-client
+gitpython==3.1.8          # via transifex-client
 glob2==0.7                # via -r requirements/edx/base.txt
 gunicorn==20.0.4          # via -r requirements/edx/base.txt
 help-tokens==1.1.2        # via -r requirements/edx/base.txt
@@ -248,7 +248,7 @@ requests-oauthlib==1.3.0  # via -r requirements/edx/base.txt, social-auth-core
 requests==2.24.0          # via -r requirements/edx/base.txt, analytics-python, coreapi, django-oauth-toolkit, edx-analytics-data-api-client, edx-bulk-grades, edx-drf-extensions, edx-enterprise, edx-rest-api-client, geoip2, mailsnake, pyjwkest, python-swiftclient, requests-oauthlib, sailthru-client, slumber, social-auth-core, transifex-client
 rest-condition==1.0.3     # via -r requirements/edx/base.txt, edx-drf-extensions
 ruamel.yaml.clib==0.2.0   # via -r requirements/edx/base.txt, ruamel.yaml
-ruamel.yaml==0.16.10      # via -r requirements/edx/base.txt, drf-yasg
+ruamel.yaml==0.16.11      # via -r requirements/edx/base.txt, drf-yasg
 rules==2.2                # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 s3transfer==0.1.13        # via -r requirements/edx/base.txt, boto3
 sailthru-client==2.2.3    # via -r requirements/edx/base.txt, edx-ace
