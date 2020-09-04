@@ -64,7 +64,6 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'djcelery',
     'django_sites_extensions',
     'openedx.core.djangoapps.django_comment_common',
     'openedx.core.djangoapps.video_config',

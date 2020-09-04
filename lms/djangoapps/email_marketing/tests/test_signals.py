@@ -302,7 +302,7 @@ class EmailMarketingTests(TestCase):
         """
         update_email_marketing_config(enabled=False)
 
-        update_user.delay(self.user.username)
+        update_user.delay(self.user.username, self.user.email)
         self.assertFalse(mock_log_error.called)
         self.assertFalse(mock_sailthru.called)
 
@@ -634,7 +634,7 @@ class SailthruTests(TestCase):
         site_dict = {'id': white_label_site.id, 'domain': white_label_site.domain, 'name': white_label_site.name}
         with patch('email_marketing.signals._get_current_site') as mock_site_info:
             mock_site_info.return_value = site_dict
-            update_sailthru(None, self.user, 'audit', self.course_id)
+            update_sailthru(None, self.user, 'audit', str(self.course_id))
             self.assertFalse(mock_sailthru_purchase.called)
             self.assertFalse(mock_sailthru_api_post.called)
             self.assertFalse(mock_sailthru_api_get.called)
@@ -663,5 +663,5 @@ class SailthruTests(TestCase):
         """
         switch.return_value = True
         self.user.email = u'tèst@edx.org'
-        update_sailthru(None, self.user, 'audit', self.course_id)
+        update_sailthru(None, self.user, 'audit', str(self.course_id))
         self.assertTrue(mock_sailthru_purchase.called)

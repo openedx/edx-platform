@@ -8,10 +8,8 @@
 # pin when possible.  Writing an issue against the offending project and
 # linking to it here is good.
 
-# We're not ready for Celery 4 yet, but 3.1.25+ are forward-compatible with it.
-# As of this writing, there's a 3.1.26.post2 with a very important bugfix
-# (although it is advertised in the changelog as 3.1.26.)
-celery>=3.1.25,<4.0.0
+# celery 5.0 has dropped python3.5 support.
+celery<5.0
 
 # Stay on the latest LTS release of Django
 Django<2.3
