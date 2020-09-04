@@ -10,7 +10,7 @@ from nodebb.models import DiscussionCommunity
 
 class DiscussionCommunityMembership(TimeStampedModel):
     """
-    A class to associated user with community
+    A class to associate user with community
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     community = models.ForeignKey(DiscussionCommunity, on_delete=models.CASCADE)

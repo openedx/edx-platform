@@ -9,6 +9,6 @@ from django.apps import AppConfig
 
 class ClassroomsConfig(AppConfig):
     """
-    A Default Config class for classrooms application
+    A default configurations for classrooms application
     """
     name = u'openedx.features.classrooms'
