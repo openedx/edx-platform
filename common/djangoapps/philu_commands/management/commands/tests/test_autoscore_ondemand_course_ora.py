@@ -14,7 +14,7 @@ from student.tests.factories import AnonymousUserIdFactory, CourseEnrollmentFact
 @pytest.fixture(
     params=['on_demand_active_enrollments', 'on_demand_inactive_enrollments', 'instructor_paced_enrollments']
 )
-def expected_enrollments(request):
+def expected_enrollments(request, mute_signals):
     """
     A fixture for testing autoscore ORA command. It create test data regarding courses and user enrollment.
     """
@@ -78,7 +78,7 @@ def test_autoscore_ondemand_course_ora_successfully(mock_log_info, mock_autoscor
 @pytest.mark.django_db
 @mock.patch('philu_commands.management.commands.autoscore_ondemand_course_ora.find_and_autoscore_submissions')
 @mock.patch('philu_commands.management.commands.autoscore_ondemand_course_ora.log.info')
-def test_autoscore_ondemand_course_ora_no_ora_submission(mock_log_info, mock_autoscore_submissions):
+def test_autoscore_ondemand_course_ora_no_ora_submission(mock_log_info, mock_autoscore_submissions, mute_signals):
     """
     Verify that command exists without auto scoring any ORA, if there is no pending ORA submission.
     """

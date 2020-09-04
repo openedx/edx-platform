@@ -3,10 +3,12 @@ Test Assessment Helpers.
 """
 from datetime import datetime, timedelta
 
+import factory
 import mock
 import pytest
 from ddt import data, ddt, unpack
 from django.contrib.auth.models import User
+from django.db.models import signals
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
@@ -54,6 +56,7 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
             qualifiers={'category': 'openassessment'}
         )
 
+    @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def _create_enrollment_submission(self, submission_date, course_id, canceled_one_submission=False,
                                       exclude_submissions=False):
         """
