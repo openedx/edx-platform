@@ -3,7 +3,7 @@ Python API for Demographics Status
 """
 
 from openedx.features.enterprise_support.utils import is_enterprise_learner
-from openedx.core.djangoapps.programs.utils import is_user_enrolled_in_program_type
+from openedx.core.djangoapps.programs.api import is_user_enrolled_in_program_type
 from openedx.core.djangoapps.demographics.models import UserDemographics
 
 
