@@ -17,8 +17,6 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
 
     discussion_settings_keys = [
         'discussion_blackouts',
-        'discussion_link',
-        'discussion_sort_alpha',
         'allow_anonymous_to_peers',
         'allow_anonymous'
     ]
@@ -48,9 +46,12 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
             assert key in discussion_settings
 
     @data(
-        ({'allow_anonymous': {'value': False}}, status.HTTP_200_OK),
-        ({'allow_anonymous': {'value': False}}, status.HTTP_200_OK),
-        ({'discussion_blackouts': {'value': [["2015-09-15", "2015-09-21"]]}}, status.HTTP_200_OK),
+        ({'allow_anonymous': False}, status.HTTP_200_OK),
+        ({'allow_anonymous': True}, status.HTTP_200_OK),
+        ({'discussion_blackouts': [["2015-09-15", "2015-09-21"]]}, status.HTTP_200_OK),
+        ({'discussion_blackouts': [["2015-09-15T04:24", "2015-09-21T11:12"]]}, status.HTTP_200_OK),
+        ({'discussion_blackouts': [["2015-09-21", "2015-09-15"]]}, status.HTTP_400_BAD_REQUEST),
+        ({'discussion_blackouts': [["Invalid Date", "Should Throw Error"]]}, status.HTTP_400_BAD_REQUEST),
         ({'allow_anonymous': 2}, status.HTTP_400_BAD_REQUEST),  # invalid format
     )
     @unpack
@@ -65,7 +66,7 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
         # only check updated value if status code is 200
         if status_code == status.HTTP_200_OK:
             for key, val in test_data.items():
-                assert discussion_settings[key]['value'] == val['value']
+                assert discussion_settings[key] == val
         else:
             # should be a dictionary of errors
             assert isinstance(discussion_settings, dict)

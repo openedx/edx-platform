@@ -46,7 +46,7 @@ class DiscussionSettingsViewSet(viewsets.GenericViewSet):
 
     def get_settings(self):
         course_module = self.get_course_module()
-        return CourseMetadata.fetch(course_module)
+        return {key: val['value'] for key, val in CourseMetadata.fetch(course_module).items()}
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
