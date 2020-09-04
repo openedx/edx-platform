@@ -71,6 +71,24 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
             # should be a dictionary of errors
             assert isinstance(discussion_settings, dict)
 
+    def test_persistance(self):
+        url = self._get_discussion_settings_url()
+        resp = self.client.get(url)
+        discussion_settings = resp.json()
+
+        # initially should be empty
+        self.assertEqual(discussion_settings['discussion_blackouts'], [])
+
+        # update with new value
+        updated_value = [["2015-09-15", "2015-09-21"]]
+        self.client.put(url, {'discussion_blackouts': updated_value}, format='json')
+
+        # new get request should return new values
+        resp = self.client.get(url)
+        discussion_settings = resp.json()
+
+        self.assertEqual(discussion_settings['discussion_blackouts'], updated_value)
+
     def test_unauthenticated_user(self):
         url = self._get_discussion_settings_url()
         client = APIClient()
