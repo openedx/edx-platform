@@ -1,7 +1,10 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import UsageKeyField
+
+from student.models import CourseEnrollment
 
 from .constants import (
     COMPETENCY_ASSESSMENT_DEFAULT_PROBLEMS_COUNT,
@@ -102,3 +105,9 @@ class CompetencyAssessmentRecord(TimeStampedModel):
             attempt=self.attempt,
             question_number=self.question_number
         )
+
+
+class CourseEnrollmentMeta(models.Model):
+    course_enrollment = models.OneToOneField(CourseEnrollment, related_name='course_enrollment_meta',
+                                             related_query_name='course_enrollment_meta', on_delete=models.CASCADE)
+    program_uuid = models.UUIDField(null=True, blank=True, verbose_name=_('Program UUID'))
