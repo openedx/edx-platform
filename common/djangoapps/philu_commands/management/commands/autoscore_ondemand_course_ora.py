@@ -18,9 +18,8 @@ class Command(BaseCommand):
     Auto Score ORA assessment for on demand course
     """
     help = """
-    Auto score ORA assessment for on demand course, if learner has completed step 1 i.e. ORA submission, a certain
-    number of days days ago. This value for number of days is configurable from site configurations model though its
-    default value is 3 days.
+    Auto score ORA assessment of on demand course, if learner has submitted ORA a certain number of days ago. Number
+    of days are configurable from site configurations model though its default value is 3 days.
     """
 
     def handle(self, *args, **options):
