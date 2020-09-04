@@ -15,7 +15,7 @@ from rest_framework.test import APITestCase
 from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomer
 from enterprise.constants import ENTERPRISE_ADMIN_ROLE, ENTERPRISE_LEARNER_ROLE
 from third_party_auth.tests.samlutils import set_jwt_cookie
-from third_party_auth.models import SAMLProviderConfig
+from third_party_auth.models import SAMLProviderConfig, SAMLConfiguration
 from third_party_auth.tests import testutil
 from third_party_auth.utils import convert_saml_slug_provider_id
 
@@ -26,12 +26,16 @@ SINGLE_PROVIDER_CONFIG = {
     'name': 'name-of-config',
     'enabled': 'true',
     'slug': 'test-slug',
-    'country': 'https://example.customer.com/countrycode'
+    'country': 'https://example.customer.com/countrycode',
 }
 
 SINGLE_PROVIDER_CONFIG_2 = copy.copy(SINGLE_PROVIDER_CONFIG)
 SINGLE_PROVIDER_CONFIG_2['name'] = 'name-of-config-2'
 SINGLE_PROVIDER_CONFIG_2['slug'] = 'test-slug-2'
+
+SINGLE_PROVIDER_CONFIG_3 = copy.copy(SINGLE_PROVIDER_CONFIG)
+SINGLE_PROVIDER_CONFIG_3['name'] = 'name-of-config-3'
+SINGLE_PROVIDER_CONFIG_3['slug'] = 'test-slug-3'
 
 ENTERPRISE_ID = str(uuid4())
 ENTERPRISE_ID_NON_EXISTENT = str(uuid4())
@@ -59,6 +63,11 @@ class SAMLProviderConfigTests(APITestCase):
             metadata_source=SINGLE_PROVIDER_CONFIG['metadata_source'],
             slug=SINGLE_PROVIDER_CONFIG['slug'],
             country=SINGLE_PROVIDER_CONFIG['country'],
+        )
+        cls.samlconfiguration, _ = SAMLConfiguration.objects.get_or_create(
+            enabled=True,
+            site=cls.site,
+            slug='edxSideTest',
         )
 
     def setUp(self):
@@ -233,3 +242,18 @@ class SAMLProviderConfigTests(APITestCase):
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_ADMIN_ROLE, ENTERPRISE_ID_NON_EXISTENT)])
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_one_config_with_samlconfiguration(self):
+        """
+        POST auth/saml/v0/provider_config/ -d data
+        """
+        url = reverse('saml_provider_config-list')
+        data = copy.copy(SINGLE_PROVIDER_CONFIG_3)
+        data['enterprise_customer_uuid'] = ENTERPRISE_ID
+        data['saml_config_id'] = self.samlconfiguration.id
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        provider_config = SAMLProviderConfig.objects.get(slug=SINGLE_PROVIDER_CONFIG_3['slug'])
+        self.assertEqual(provider_config.saml_configuration, self.samlconfiguration)
