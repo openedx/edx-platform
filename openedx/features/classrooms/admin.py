@@ -1,9 +1,15 @@
+"""
+Admin file for classrooms application
+"""
 from django.contrib import admin
 
-from models import DiscussionCommunityMembership
+from .models import DiscussionCommunityMembership
 
 
 class DiscussionCommunityMembershipAdmin(admin.ModelAdmin):
+    """
+    A Admin class for discussion community membership
+    """
     list_display = ('user', 'community', 'get_course')
     raw_id_fields = ('user',)
 
