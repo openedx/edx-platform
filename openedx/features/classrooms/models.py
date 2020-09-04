@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
-from nodebb.models import DiscussionCommunity
 from model_utils.models import TimeStampedModel
+
+from nodebb.models import DiscussionCommunity
 
 
 class DiscussionCommunityMembership(TimeStampedModel):
