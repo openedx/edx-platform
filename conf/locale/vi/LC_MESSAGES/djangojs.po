@@ -112,7 +112,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-30 20:42+0000\n"
+"POT-Creation-Date: 2020-09-06 20:42+0000\n"
 "PO-Revision-Date: 2020-07-13 07:44+0000\n"
 "Last-Translator: Le Minh Tri <trilm@hihexa.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
@@ -7754,6 +7754,18 @@ msgid "Mark Exam As Completed"
 msgstr "Đánh dấu bài thi đã hoàn thành"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr "Kết thúc bài thi của tôi"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
 msgstr ""
 
@@ -7769,18 +7781,6 @@ msgstr ""
 msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Exam timer and end exam button"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "End My Exam"
-msgstr "Kết thúc bài thi của tôi"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
 msgstr ""
 
 #: lms/templates/discovery/course_card.underscore

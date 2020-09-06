@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-30 20:49+0000\n"
-"PO-Revision-Date: 2020-08-30 20:49:39.455189\n"
+"POT-Creation-Date: 2020-09-06 20:49+0000\n"
+"PO-Revision-Date: 2020-09-06 20:50:06.021014\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -7839,6 +7839,18 @@ msgid "Mark Exam As Completed"
 msgstr "وشقن ثطشو شس ذخوحمثفثي"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr "ثطشو فهوثق شري ثري ثطشو زعففخر"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr "ثري وغ ثطشو"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr "اهيث فهوثق"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
 msgstr "غخع شقث فشنهرل \"{exam_link}\" شس {exam_type}. "
 
@@ -7857,18 +7869,6 @@ msgid ""
 msgstr ""
 "فخ قثذثهدث ذقثيهف بخق حقخزمثوس, غخع وعسف سثمثذف \"سعزوهف\" بخق ثشذا حقخزمثو "
 "زثبخقث غخع سثمثذف \"ثري وغ ثطشو\"."
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Exam timer and end exam button"
-msgstr "ثطشو فهوثق شري ثري ثطشو زعففخر"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "End My Exam"
-msgstr "ثري وغ ثطشو"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr "اهيث فهوثق"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"

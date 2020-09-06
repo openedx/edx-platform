@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-30 20:49+0000\n"
-"PO-Revision-Date: 2020-08-30 20:49:39.838611\n"
+"POT-Creation-Date: 2020-09-06 20:50+0000\n"
+"PO-Revision-Date: 2020-09-06 20:50:05.824757\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -4097,18 +4097,6 @@ msgstr ""
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ησ#"
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Bypass Course Home"
-msgstr "Býpäss Çöürsé Hömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Bypass the course home tab when students arrive from the dashboard, sending "
-"them directly to course content."
-msgstr ""
-"Býpäss thé çöürsé hömé täß whén stüdénts ärrïvé fröm thé däshßöärd, séndïng "
-"thém dïréçtlý tö çöürsé çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Subsection Prerequisites"
 msgstr "Énäßlé Süßséçtïön Préréqüïsïtés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -6988,6 +6976,14 @@ msgstr "Éxplöré thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 msgid "Not sure yet"
 msgstr "Nöt süré ýét Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
+#: lms/djangoapps/course_home_api/outline/v1/serializers.py
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#, python-brace-format
+msgid "({number} Question)"
+msgid_plural "({number} Questions)"
+msgstr[0] "({number} Qüéstïön) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+msgstr[1] "({number} Qüéstïöns) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
 #: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid ""
 "Please contact your degree administrator or edX Support if you have "
@@ -7009,6 +7005,21 @@ msgid "Welcome message successfully dismissed."
 msgstr ""
 "Wélçömé méssägé süççéssfüllý dïsmïsséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "'goal_key' is required."
+msgstr "'göäl_kéý' ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "Your course goal has been successfully set."
+msgstr ""
+"Ýöür çöürsé göäl häs ßéén süççéssfüllý sét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "Course goal updated successfully."
+msgstr ""
+"Çöürsé göäl üpdätéd süççéssfüllý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
@@ -17090,6 +17101,10 @@ msgstr ""
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} düé {{date}} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
+#: lms/templates/vert_module.html
+msgid "Due {date}"
+msgstr "Düé {date} Ⱡ'σяєм ιρѕυм #"
+
 #: lms/templates/video.html
 msgid "Loading video player"
 msgstr "Löädïng vïdéö pläýér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -23998,12 +24013,6 @@ msgstr "Ûpgrädé ({price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Expand All"
 msgstr "Éxpänd Àll Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "({number} Question)"
-msgid_plural "({number} Questions)"
-msgstr[0] "({number} Qüéstïön) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-msgstr[1] "({number} Qüéstïöns) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
