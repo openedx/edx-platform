@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-30 20:49+0000\n"
-"PO-Revision-Date: 2020-08-30 20:49:39.455189\n"
+"POT-Creation-Date: 2020-09-06 20:49+0000\n"
+"PO-Revision-Date: 2020-09-06 20:50:06.021014\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8788,6 +8788,18 @@ msgid "Mark Exam As Completed"
 msgstr "Märk Éxäm Às Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr "Éxäm tïmér änd énd éxäm ßüttön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr "Énd Mý Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr "Hïdé Tïmér Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
 msgstr ""
 "Ýöü äré täkïng \"{exam_link}\" äs {exam_type}.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
@@ -8810,18 +8822,6 @@ msgid ""
 msgstr ""
 "Tö réçéïvé çrédït för prößléms, ýöü müst séléçt \"Süßmït\" för éäçh prößlém "
 "ßéföré ýöü séléçt \"Énd Mý Éxäm\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Exam timer and end exam button"
-msgstr "Éxäm tïmér änd énd éxäm ßüttön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "End My Exam"
-msgstr "Énd Mý Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr "Hïdé Tïmér Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"

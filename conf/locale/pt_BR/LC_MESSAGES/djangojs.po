@@ -105,6 +105,7 @@
 # Caio Kalil Gragnani <caio.gragnani@gmail.com>, 2015
 # Cleomir Waiczyk <w.cleomir@gmail.com>, 2015
 # Daniel Linhares <danielinhares@gmail.com>, 2014
+# Danilo L. <hello@danilo.cc>, 2020
 # Deusilene Sousa Matos <deusymatos@gmail.com>, 2015
 # Diego Rabatone Oliveira <transifex@diraol.eng.br>, 2015
 # Douglas Reginatto <dreginatto@yahoo.com.br>, 2016
@@ -242,7 +243,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-23 20:42+0000\n"
+"POT-Creation-Date: 2020-08-30 20:42+0000\n"
 "PO-Revision-Date: 2020-06-14 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"

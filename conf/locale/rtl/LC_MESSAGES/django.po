@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-30 20:49+0000\n"
-"PO-Revision-Date: 2020-08-30 20:49:39.838611\n"
+"POT-Creation-Date: 2020-09-06 20:50+0000\n"
+"PO-Revision-Date: 2020-09-06 20:50:05.824757\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3539,18 +3539,6 @@ msgstr ""
 " ذخعقسث شف شرغ قشفث زثبخقث فاث ذخعقسث ثريس."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Bypass Course Home"
-msgstr "زغحشسس ذخعقسث اخوث"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Bypass the course home tab when students arrive from the dashboard, sending "
-"them directly to course content."
-msgstr ""
-"زغحشسس فاث ذخعقسث اخوث فشز صاثر سفعيثرفس شققهدث بقخو فاث يشسازخشقي, سثريهرل "
-"فاثو يهقثذفمغ فخ ذخعقسث ذخرفثرف."
-
-#: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable Subsection Prerequisites"
 msgstr "ثرشزمث سعزسثذفهخر حقثقثضعهسهفثس"
 
@@ -5999,6 +5987,14 @@ msgstr "ثطحمخقث فاث ذخعقسث"
 msgid "Not sure yet"
 msgstr "رخف سعقث غثف"
 
+#: lms/djangoapps/course_home_api/outline/v1/serializers.py
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+#, python-brace-format
+msgid "({number} Question)"
+msgid_plural "({number} Questions)"
+msgstr[0] "({number} ضعثسفهخر)"
+msgstr[1] "({number} ضعثسفهخرس)"
+
 #: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid ""
 "Please contact your degree administrator or edX Support if you have "
@@ -6018,6 +6014,18 @@ msgstr "خرمغ 'ذخعقسث_هي' هس ثطحثذفثي."
 #: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid "Welcome message successfully dismissed."
 msgstr "صثمذخوث وثسسشلث سعذذثسسبعممغ يهسوهسسثي."
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "'goal_key' is required."
+msgstr "'لخشم_نثغ' هس قثضعهقثي."
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "Your course goal has been successfully set."
+msgstr "غخعق ذخعقسث لخشم اشس زثثر سعذذثسسبعممغ سثف."
+
+#: lms/djangoapps/course_home_api/outline/v1/views.py
+msgid "Course goal updated successfully."
+msgstr "ذخعقسث لخشم عحيشفثي سعذذثسسبعممغ."
 
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
@@ -14827,6 +14835,10 @@ msgstr ""
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} يعث {{date}}"
 
+#: lms/templates/vert_module.html
+msgid "Due {date}"
+msgstr "يعث {date}"
+
 #: lms/templates/video.html
 msgid "Loading video player"
 msgstr "مخشيهرل دهيثخ حمشغثق"
@@ -20943,12 +20955,6 @@ msgstr "عحلقشيث ({price})"
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Expand All"
 msgstr "ثطحشري شمم"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
-msgid "({number} Question)"
-msgid_plural "({number} Questions)"
-msgstr[0] "({number} ضعثسفهخر)"
-msgstr[1] "({number} ضعثسفهخرس)"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
