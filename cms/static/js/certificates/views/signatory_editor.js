@@ -11,12 +11,11 @@ define([
     'common/js/components/views/feedback_notification',
     'js/models/uploads',
     'js/views/uploads',
-    'text!templates/signatory-editor.underscore',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'text!templates/signatory-editor.underscore'
 ],
 function($, _, Backbone, gettext,
           TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog,
-          signatoryEditorTemplate, HtmlUtils) {
+          signatoryEditorTemplate) {
     'use strict';
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
@@ -79,7 +78,7 @@ function($, _, Backbone, gettext,
                 is_editing_all_collections: this.isEditingAllCollections,
                 total_saved_signatories: this.getTotalSignatoriesOnServer()
             });
-            return HtmlUtils.setHtml(this.$el, HtmlUtils.template(signatoryEditorTemplate)(attributes));
+            return $(this.el).html(_.template(signatoryEditorTemplate)(attributes));
         },
 
         setSignatoryName: function(event) {
@@ -128,9 +127,10 @@ function($, _, Backbone, gettext,
 
         deleteItem: function(event) {
             // Remove the specified model from the collection
+            if (event && event.preventDefault) { event.preventDefault(); }
             var model = this.model;
             var self = this;
-            var titleTextTemplate = _.template(gettext('Delete "<%- signatoryName %>" from the list of signatories?'));
+            var titleTextTemplate = _.template(gettext('Delete "<%= signatoryName %>" from the list of signatories?'));
             var confirm = new PromptView.Warning({
                 title: titleTextTemplate({signatoryName: model.get('name')}),
                 message: gettext('This action cannot be undone.'),
@@ -148,9 +148,9 @@ function($, _, Backbone, gettext,
                                 deleting.show();
                                 model.destroy({
                                     wait: true,
-                                    success: function(model2) {
+                                    success: function(model) {
                                         deleting.hide();
-                                        self.eventAgg.trigger('onSignatoryRemoved', model2);
+                                        self.eventAgg.trigger('onSignatoryRemoved', model);
                                     }
                                 });
                             }
@@ -165,20 +165,18 @@ function($, _, Backbone, gettext,
                     }
                 }
             });
-            if (event && event.preventDefault) { event.preventDefault(); }
             confirm.show();
         },
 
         uploadSignatureImage: function(event) {
-            var upload, self, modal;
             event.preventDefault();
-            upload = new FileUploadModel({
+            var upload = new FileUploadModel({
                 title: gettext('Upload signature image.'),
                 message: gettext('Image must be in PNG format.'),
                 mimeTypes: ['image/png']
             });
-            self = this;
-            modal = new FileUploadDialog({
+            var self = this;
+            var modal = new FileUploadDialog({
                 model: upload,
                 onSuccess: function(response) {
                     self.model.set('signature_image_path', response.asset.url);
@@ -194,13 +192,12 @@ function($, _, Backbone, gettext,
         */
         toggleValidationErrorMessage: function(modelAttribute) {
             var selector = 'div.add-signatory-' + modelAttribute;
-            var errorMessage;
             if (!this.model.isValid() && _.has(this.model.validationError, modelAttribute)) {
                 // Show the error message if it is not exist before.
                 if (!$(selector).hasClass('error')) {
-                    errorMessage = this.model.validationError[modelAttribute];
+                    var errorMessage = this.model.validationError[modelAttribute];
                     $(selector).addClass('error');
-                    $(selector).append(HtmlUtils.joinHtml(HtmlUtils.HTML("<span class='message-error'>"), errorMessage, HtmlUtils.HTML('</span>')).toString()); // eslint-disable-line max-len
+                    $(selector).append("<span class='message-error'>" + errorMessage + '</span>');
                 }
             } else {
                 // Remove the error message.
