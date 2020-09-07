@@ -1451,14 +1451,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Get a list of dicts with start and end fields with datetime values from
         the discussion_blackouts setting
         """
-
-        blackout_dates = self.discussion_blackouts
         try:
-            return validate_blackout_datetimes(blackout_dates)
+            return validate_blackout_datetimes(self.discussion_blackouts)
         except (TypeError, ValueError):
             log.info(
                 "Error parsing discussion_blackouts %s for course %s",
-                blackout_dates,
+                self.discussion_blackouts,
                 self.id
             )
             return []
