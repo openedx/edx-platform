@@ -1052,6 +1052,25 @@ class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-me
     """
 
 
+def validate_blackout_datetimes(blackout_dates):
+    """
+    Validates list of blackout dates.
+    """
+    date_proxy = Date()
+    if blackout_dates and type(blackout_dates[0]) not in (list, tuple):
+        blackout_dates = [blackout_dates]
+
+    ret = [
+        {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
+        for start, end
+        in [blackout_date for blackout_date in blackout_dates if blackout_date]
+    ]
+    for blackout in ret:
+        if not blackout["start"] or not blackout["end"]:
+            raise ValueError
+    return ret
+
+
 class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     """
     The descriptor for the course XModule
@@ -1434,20 +1453,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """
 
         blackout_dates = self.discussion_blackouts
-        date_proxy = Date()
-        if blackout_dates and type(blackout_dates[0]) not in (list, tuple):
-            blackout_dates = [blackout_dates]
-
         try:
-            ret = [
-                {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
-                for start, end
-                in [blackout_date for blackout_date in blackout_dates if blackout_date]
-            ]
-            for blackout in ret:
-                if not blackout["start"] or not blackout["end"]:
-                    raise ValueError
-            return ret
+            return validate_blackout_datetimes(blackout_dates)
         except (TypeError, ValueError):
             log.info(
                 "Error parsing discussion_blackouts %s for course %s",

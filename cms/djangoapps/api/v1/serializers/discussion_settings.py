@@ -1,49 +1,22 @@
 """ Discussion settings serializers. """
 
 
-from datetime import datetime
-
-from django.utils.dateparse import parse_date, parse_datetime
 from rest_framework import serializers
 
 from models.settings.course_metadata import CourseMetadata
-from xmodule.modulestore.django import modulestore
+from common.lib.xmodule.xmodule.course_module import validate_blackout_datetimes
 
 
-def to_datetime(val, timepart):
+def blackout_date_range_validator(blackout_dates):
     """
-    Converts a given string to a datetime object. If the string only
-    contains date part, than additional timepart param used to build
-    datetime object. Raises ValueError if unable to parse given string.
-    """
-
-    parsed_val = parse_datetime(val)
-    if not parsed_val:
-        parsed_val = parse_date(val)
-        if parsed_val:
-            parsed_val = datetime.combine(parsed_val, timepart)
-        else:
-            raise ValueError('Invalid date')
-    return parsed_val
-
-
-def blackout_date_range_validator(value):
-    """
-    Given two date/datetime string, checks if those are valid dates
-    and if 2nd date/datetime is larger than 1st date/datetime. Doesn't
-    perform any transformation though, returns ``value`` as is if valid,
+    Given two datetime object, checks if 2nd date/datetime is larger than
+    1st date/datetime. returns ``value`` as is if valid,
     else raises ``serializers.ValidationError``.
     """
-
-    [from_date, to_date] = value
     try:
-        from_date = to_datetime(from_date, datetime.min.time())
-        to_date = to_datetime(to_date, datetime.max.time())
-        if from_date >= to_date:
-            raise serializers.ValidationError('Invalid Date Range')
-    except Exception:
-        raise serializers.ValidationError('Invalid Date')
-    return value
+        return validate_blackout_datetimes(blackout_dates)
+    except (TypeError, ValueError):
+        raise serializers.ValidationError("Invalid blackout dates")
 
 
 class DiscussionSettingsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -56,11 +29,9 @@ class DiscussionSettingsSerializer(serializers.Serializer):  # pylint: disable=a
     allow_anonymous = serializers.BooleanField()
     discussion_blackouts = serializers.ListField(
         child=serializers.ListField(
-            child=serializers.CharField(),
-            max_length=2,
-            min_length=2,
-            validators=(blackout_date_range_validator,)
+            child=serializers.CharField()
         ),
+        validators=(blackout_date_range_validator,)
     )
 
     def save(self, **kwargs):

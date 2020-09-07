@@ -3,24 +3,24 @@
 
 from django.conf import settings
 from django.http import Http404
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import permissions, viewsets
-from rest_framework.authentication import SessionAuthentication
+from rest_framework import viewsets
 from rest_framework.response import Response
 
-from contentstore.views.course import get_course_and_check_access
+from cms.djangoapps.contentstore.api.views.utils import course_author_access_required
 from models.settings.course_metadata import CourseMetadata
+from openedx.core.lib.api.view_utils import view_auth_classes
+from xmodule.modulestore.django import modulestore
 
 from ..serializers.discussion_settings import DiscussionSettingsSerializer
 
 
+@view_auth_classes()
 class DiscussionSettingsViewSet(viewsets.GenericViewSet):
     """Endpoint to Serve & Update discussion related settings"""
 
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    lookup_field = 'course_id'
     lookup_value_regex = settings.COURSE_KEY_REGEX
-    permission_classes = (permissions.IsAdminUser,)
     serializer_class = DiscussionSettingsSerializer
 
     def get_object(self):
@@ -42,7 +42,7 @@ class DiscussionSettingsViewSet(viewsets.GenericViewSet):
 
     def get_course_module(self):
         course_key = self.get_object()
-        return get_course_and_check_access(course_key, self.request.user)
+        return modulestore().get_course(course_key)
 
     def get_settings(self):
         course_module = self.get_course_module()
@@ -55,6 +55,7 @@ class DiscussionSettingsViewSet(viewsets.GenericViewSet):
         context['user'] = self.request.user
         return context
 
+    @course_author_access_required
     def retrieve(self, request, *args, **kwargs):
         """Return all discussion related settings for a course"""
 
@@ -62,6 +63,7 @@ class DiscussionSettingsViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(settings_dict)
         return Response(serializer.data)
 
+    @course_author_access_required
     def update(self, request, *args, **kwargs):
         """Update discussion settings from request"""
 

@@ -31,7 +31,7 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
     def _get_discussion_settings_url(self):
         course_key = 'edX/test_course_key/Test_Course'
         return reverse('api:v1:discussion_settings-detail', kwargs={
-            'pk': course_key
+            'course_id': course_key
         })
 
     def test_fetch_discussion_settings(self):
@@ -49,9 +49,10 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
         ({'allow_anonymous': False}, status.HTTP_200_OK),
         ({'allow_anonymous': True}, status.HTTP_200_OK),
         ({'discussion_blackouts': [["2015-09-15", "2015-09-21"]]}, status.HTTP_200_OK),
-        ({'discussion_blackouts': [["2015-09-15T04:24", "2015-09-21T11:12"]]}, status.HTTP_200_OK),
-        ({'discussion_blackouts': [["2015-09-21", "2015-09-15"]]}, status.HTTP_400_BAD_REQUEST),
+        ({'discussion_blackouts': [["2015-09-15"]]}, status.HTTP_400_BAD_REQUEST),
+        ({'discussion_blackouts': [["2015-09-15T04:24:00Z", "2015-09-21T11:12:00Z"]]}, status.HTTP_200_OK),
         ({'discussion_blackouts': [["Invalid Date", "Should Throw Error"]]}, status.HTTP_400_BAD_REQUEST),
+        ({'discussion_blackouts': [["2015-09-15"]]}, status.HTTP_400_BAD_REQUEST),
         ({'allow_anonymous': 2}, status.HTTP_400_BAD_REQUEST),  # invalid format
     )
     @unpack
@@ -80,7 +81,7 @@ class DiscussionSettingsTests(ModuleStoreTestCase):
         self.assertEqual(discussion_settings['discussion_blackouts'], [])
 
         # update with new value
-        updated_value = [["2015-09-15", "2015-09-21"]]
+        updated_value = [["2015-09-15T04:24:00Z", "2015-09-21T11:12:00Z"]]
         self.client.put(url, {'discussion_blackouts': updated_value}, format='json')
 
         # new get request should return new values
