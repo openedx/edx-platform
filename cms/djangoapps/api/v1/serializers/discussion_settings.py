@@ -26,6 +26,7 @@ def to_datetime(val, timepart):
             raise ValueError('Invalid date')
     return parsed_val
 
+
 def blackout_date_range_validator(value):
     """
     Given two date/datetime string, checks if those are valid dates
