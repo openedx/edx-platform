@@ -354,7 +354,7 @@ def _section_certificates(course):
                 kwargs={'course_id': course.id}
             ),
             'list_instructor_tasks_url': reverse(
-                'list_instructor_tasks',
+                'api_instructor:list_instructor_tasks',
                 kwargs={'course_id': course.id}
             ),
         }
@@ -414,7 +414,10 @@ def _section_course_info(course, access):
         'start_date': course.start,
         'end_date': course.end,
         'num_sections': len(course.children),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': str(course_key)}),
+        'list_instructor_tasks_url': reverse(
+            'api_instructor:list_instructor_tasks',
+            kwargs={'course_id': str(course_key)}
+        ),
     }
 
     if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
@@ -563,7 +566,10 @@ def _section_student_admin(course, access):
             'mark_student_can_skip_entrance_exam',
             kwargs={'course_id': str(course_key)},
         ),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': str(course_key)}),
+        'list_instructor_tasks_url': reverse(
+            'api_instructor:list_instructor_tasks',
+            kwargs={'course_id': str(course_key)}
+        ),
         'list_entrace_exam_instructor_tasks_url': reverse(
             'list_entrance_exam_instructor_tasks',
             kwargs={'course_id': str(course_key)}
@@ -607,9 +613,12 @@ def _section_data_download(course, access):
         'section_display_name': _('Data Download'),
         'access': access,
         'show_generate_proctored_exam_report_button': show_proctored_report_button,
-        'get_problem_responses_url': reverse('get_problem_responses', kwargs={'course_id': str(course_key)}),
-        'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': str(course_key)}),
-        'get_students_features_url': reverse('get_students_features', kwargs={'course_id': str(course_key)}),
+        'get_problem_responses_url': reverse(
+            'api_instructor:get_problem_responses',
+            kwargs={'course_id': str(course_key)}
+        ),
+        'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': six.text_type(course_key)}),
+        'get_students_features_url': reverse('get_students_features', kwargs={'course_id': six.text_type(course_key)}),
         'get_issued_certificates_url': reverse(
             'get_issued_certificates', kwargs={'course_id': str(course_key)}
         ),
@@ -620,11 +629,17 @@ def _section_data_download(course, access):
         'list_proctored_results_url': reverse(
             'get_proctored_exam_results', kwargs={'course_id': str(course_key)}
         ),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': str(course_key)}),
-        'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': str(course_key)}),
-        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': str(course_key)}),
-        'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': str(course_key)}),
-        'course_has_survey': True if course.course_survey_name else False,  # lint-amnesty, pylint: disable=simplifiable-if-expression
+        'list_instructor_tasks_url': reverse(
+            'api_instructor:list_instructor_tasks',
+            kwargs={'course_id': str(course_key)}
+        ),
+        'list_report_downloads_url': reverse(
+            'api_instructor:list_report_downloads',
+            kwargs={'course_id': str(course_key)}
+        ),
+        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': six.text_type(course_key)}),
+        'problem_grade_report_url': reverse('problem_grade_report', kwargs={'course_id': six.text_type(course_key)}),
+        'course_has_survey': True if course.course_survey_name else False,
         'course_survey_results_url': reverse(
             'get_course_survey_results', kwargs={'course_id': str(course_key)}
         ),
@@ -686,7 +701,7 @@ def _section_send_email(course, access):
         'course_modes': course_modes,
         'default_cohort_name': DEFAULT_COHORT_NAME,
         'list_instructor_tasks_url': reverse(
-            'list_instructor_tasks', kwargs={'course_id': str(course_key)}
+            'api_instructor:list_instructor_tasks', kwargs={'course_id': str(course_key)}
         ),
         'email_background_tasks_url': reverse(
             'list_background_email_tasks', kwargs={'course_id': str(course_key)}

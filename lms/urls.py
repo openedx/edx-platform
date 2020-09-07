@@ -545,6 +545,9 @@ urlpatterns += [
         name='set_course_mode_price',
     ),
 
+    # Instructor API (accessible via OAuth)
+    url(r'^api/instructor/', include('lms.djangoapps.instructor.urls', namespace='api_instructor')),
+
     # Discussions Management
     url(
         r'^courses/{}/discussions/settings$'.format(

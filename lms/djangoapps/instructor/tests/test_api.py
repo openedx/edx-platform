@@ -86,6 +86,7 @@ from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.teams_config import TeamsConfig
@@ -132,7 +133,7 @@ REPORTS_DATA = (
     },
     {
         'report_type': 'problem responses',
-        'instructor_api_endpoint': 'get_problem_responses',
+        'instructor_api_endpoint': 'api_instructor:get_problem_responses',
         'task_api_endpoint': 'lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv',
         'extra_instructor_api_kwargs': {},
     }
@@ -152,7 +153,7 @@ INSTRUCTOR_POST_ENDPOINTS = {
     'export_ora2_submission_files',
     'export_ora2_summary',
     'get_grading_config',
-    'get_problem_responses',
+    'api_instructor:get_problem_responses',
     'get_proctored_exam_results',
     'get_student_enrollment_status',
     'get_student_progress_url',
@@ -163,8 +164,8 @@ INSTRUCTOR_POST_ENDPOINTS = {
     'list_email_content',
     'list_entrance_exam_instructor_tasks',
     'list_forum_members',
-    'list_instructor_tasks',
-    'list_report_downloads',
+    'api_instructor:list_instructor_tasks',
+    'api_instructor:list_report_downloads',
     'mark_student_can_skip_entrance_exam',
     'modify_access',
     'register_and_enroll_students',
@@ -413,14 +414,14 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
              {'unique_student_identifier': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
             ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
             ('send_email', {'send_to': '["staff"]', 'subject': 'test', 'message': 'asdf'}),
-            ('list_instructor_tasks', {}),
+            ('api_instructor:list_instructor_tasks', {}),
             ('list_background_email_tasks', {}),
-            ('list_report_downloads', {}),
+            ('api_instructor:list_report_downloads', {}),
             ('calculate_grades_csv', {}),
             ('get_students_features', {}),
             ('get_students_who_may_enroll', {}),
             ('get_proctored_exam_results', {}),
-            ('get_problem_responses', {}),
+            ('api_instructor:get_problem_responses', {}),
             ('export_ora2_data', {}),
             ('export_ora2_submission_files', {}),
             ('export_ora2_summary', {}),
@@ -498,7 +499,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         mock_problem_key.course_key = self.course.id
         with patch.object(UsageKey, 'from_string') as patched_method:
             patched_method.return_value = mock_problem_key
-            self._access_endpoint('get_problem_responses', {}, 200, msg)
+            self._access_endpoint('api_instructor:get_problem_responses', {}, 200, msg)
 
     def test_staff_level(self):
         """
@@ -518,7 +519,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             # TODO: make these work
             if endpoint in ['update_forum_role_membership', 'list_forum_members']:
                 continue
-            elif endpoint == 'get_problem_responses':
+            elif endpoint == 'api_instructor:get_problem_responses':
                 self._access_problem_responses_endpoint(
                     "Staff member should be allowed to access endpoint " + endpoint
                 )
@@ -555,7 +556,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             # TODO: make these work
             if endpoint in ['update_forum_role_membership']:
                 continue
-            elif endpoint == 'get_problem_responses':
+            elif endpoint == 'api_instructor:get_problem_responses':
                 self._access_problem_responses_endpoint(
                     "Instructor should be allowed to access endpoint " + endpoint
                 )
@@ -2493,7 +2494,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         message when users submit an invalid problem location.
         """
         url = reverse(
-            'get_problem_responses',
+            'api_instructor:get_problem_responses',
             kwargs={'course_id': str(self.course.id)}
         )
         problem_location = ''
@@ -2528,7 +2529,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         message if CSV generation was started successfully.
         """
         url = reverse(
-            'get_problem_responses',
+            'api_instructor:get_problem_responses',
             kwargs={'course_id': str(self.course.id)}
         )
         problem_location = ''
@@ -2548,7 +2549,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         message if CSV generation is already in progress.
         """
         url = reverse(
-            'get_problem_responses',
+            'api_instructor:get_problem_responses',
             kwargs={'course_id': str(self.course.id)}
         )
         task_type = 'problem_responses_csv'
@@ -2739,7 +2740,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         """
         ex_status = 503
         ex_reason = 'Slow Down'
-        url = reverse('list_report_downloads', kwargs={'course_id': str(self.course.id)})
+        url = reverse('api_instructor:list_report_downloads', kwargs={'course_id': str(self.course.id)})
         with patch('storages.backends.s3boto.S3BotoStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
             response = self.client.post(url, {})
         mock_error.assert_called_with(
@@ -2753,7 +2754,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         assert res_json == {'downloads': []}
 
     def test_list_report_downloads(self):
-        url = reverse('list_report_downloads', kwargs={'course_id': str(self.course.id)})
+        url = reverse('api_instructor:list_report_downloads', kwargs={'course_id': str(self.course.id)})
         with patch('lms.djangoapps.instructor_task.models.DjangoStorageReportStore.links_for') as mock_links_for:
             mock_links_for.return_value = [
                 ('mock_file_name_1', 'https://1.mock.url'),
@@ -3539,7 +3540,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
     def test_list_instructor_tasks_running(self, act):
         """ Test list of all running tasks. """
         act.return_value = self.tasks
-        url = reverse('list_instructor_tasks', kwargs={'course_id': str(self.course.id)})
+        url = reverse('api_instructor:list_instructor_tasks', kwargs={'course_id': str(self.course.id)})
         mock_factory = MockCompletionInfo()
         with patch(
             'lms.djangoapps.instructor.views.instructor_task_helpers.get_task_completion_info'
@@ -3581,7 +3582,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
     def test_list_instructor_tasks_problem(self, act):
         """ Test list task history for problem. """
         act.return_value = self.tasks
-        url = reverse('list_instructor_tasks', kwargs={'course_id': str(self.course.id)})
+        url = reverse('api_instructor:list_instructor_tasks', kwargs={'course_id': str(self.course.id)})
         mock_factory = MockCompletionInfo()
         with patch(
             'lms.djangoapps.instructor.views.instructor_task_helpers.get_task_completion_info'
@@ -3604,7 +3605,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
     def test_list_instructor_tasks_problem_student(self, act):
         """ Test list task history for problem AND student. """
         act.return_value = self.tasks
-        url = reverse('list_instructor_tasks', kwargs={'course_id': str(self.course.id)})
+        url = reverse('api_instructor:list_instructor_tasks', kwargs={'course_id': str(self.course.id)})
         mock_factory = MockCompletionInfo()
         with patch(
             'lms.djangoapps.instructor.views.instructor_task_helpers.get_task_completion_info'
@@ -3624,6 +3625,88 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
             self.assertDictEqual(exp_task, act_task)
 
         assert actual_tasks == expected_tasks
+
+
+class TestInstructorAPIOAuth(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test instructor API OAuth endpoint support.
+    """
+    password = 'password'
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestInstructorAPIOAuth, cls).setUpClass()
+        cls.course = CourseFactory.create(
+            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
+        )
+
+    def setUp(self):
+        super().setUp()
+        self.staff = GlobalStaffFactory()
+
+    @patch('lms.djangoapps.instructor_task.api.get_running_instructor_tasks')
+    def test_list_instructor_tasks_oauth(self, act):
+        """
+        Test if list_instructor_tasks endpoints supports OAuth
+        """
+        act.return_value = []
+        url = reverse('api_instructor:list_instructor_tasks', kwargs={'course_id': text_type(self.course.id)})
+        # OAuth Client
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(
+            user=self.staff,
+            application=oauth_client
+        ).token
+        headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
+        }
+        mock_factory = MockCompletionInfo()
+        with patch(
+            'lms.djangoapps.instructor_task.views.get_task_completion_info'
+        ) as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.post(url, {}, **headers)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_problem_responses_oauth(self):
+        """
+        Test whether get_problem_responses allows access via OAuth
+        """
+        url = reverse('api_instructor:get_problem_responses', kwargs={'course_id': text_type(self.course.id)})
+        problem_location = ''
+
+        # OAuth Client
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(
+            user=self.staff,
+            application=oauth_client
+        ).token
+        headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
+        }
+
+        response = self.client.post(url, {'problem_location': problem_location}, **headers)
+        # Http error 400 means Bad request, but our user was authorized
+        self.assertEqual(response.status_code, 400)
+
+    def test_list_report_downloads_oauth(self):
+        """
+        Test whether list_report_downloads allows access via OAuth
+        """
+        url = reverse('api_instructor:list_report_downloads', kwargs={'course_id': text_type(self.course.id)})
+
+        # OAuth Client
+        oauth_client = ApplicationFactory.create()
+        access_token = AccessTokenFactory.create(
+            user=self.staff,
+            application=oauth_client
+        ).token
+        headers = {
+            'HTTP_AUTHORIZATION': 'Bearer ' + access_token
+        }
+
+        response = self.client.post(url, {}, **headers)
+        self.assertEqual(response.status_code, 200)
 
 
 @patch('lms.djangoapps.instructor_task.api.get_instructor_task_history', autospec=True)

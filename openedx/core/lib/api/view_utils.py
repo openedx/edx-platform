@@ -110,9 +110,16 @@ class ExpandableFieldViewMixin(object):
         return result
 
 
-def view_auth_classes(is_user=False, is_authenticated=True):
+def view_auth_classes(is_user=False, is_authenticated=True, additional_permission_classes=None):
     """
     Function and class decorator that abstracts the authentication and permission checks for api views.
+
+    Parameters
+        is_user (bool): Requires the requesting user to be present in the URL
+        is_authenticated (bool): Requires the requesting user to be authenticated
+        additional_permission_classes (tuple[BasePermission]):
+            Tuple of classes deriving from rest_framework.permissions.BasePermission
+            that should additionally be required of users
     """
     def _decorator(func_or_class):
         """
@@ -129,6 +136,8 @@ def view_auth_classes(is_user=False, is_authenticated=True):
             func_or_class.permission_classes += (IsAuthenticated,)
         if is_user:
             func_or_class.permission_classes += (IsUserInUrl,)
+        if additional_permission_classes:
+            func_or_class.permission_classes += additional_permission_classes
         return func_or_class
     return _decorator
 
