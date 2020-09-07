@@ -22,11 +22,7 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
         showError = function(containerElSelector, error) {
             var errorWrapperElSelector, errorHtml;
             errorWrapperElSelector = containerElSelector + ' .wrapper-error';
-            errorHtml = HtmlUtils.joinHtml(
-                HtmlUtils.HTML('<div class="error" aria-live="polite" id="course-id-error">'),
-                error,
-                HtmlUtils.HTML('</div>')
-            );
+            errorHtml = '<div class="error" aria-live="polite" id="course-id-error">' + error + '</div>';
             HtmlUtils.setHtml($(errorWrapperElSelector), HtmlUtils.HTML(errorHtml));
             $(errorWrapperElSelector).css('display', 'inline-block');
             $(errorWrapperElSelector).fadeOut(5000);

@@ -11,11 +11,10 @@ define([
     'js/views/baseview',
     'js/certificates/views/signatory_editor',
     'text!templates/signatory-details.underscore',
-    'text!templates/signatory-actions.underscore',
-    'edx-ui-toolkit/js/utils/html-utils'
+    'text!templates/signatory-actions.underscore'
 ],
 function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView,
-          signatoryDetailsTemplate, signatoryActionsTemplate, HtmlUtils) {
+          signatoryDetailsTemplate, signatoryActionsTemplate) {
     'use strict';
     var SignatoryDetailsView = BaseView.extend({
         tagName: 'div',
@@ -53,20 +52,20 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
         editSignatory: function(event) {
             // Retrieve the edit view for this model
             if (event && event.preventDefault) { event.preventDefault(); }
-            this.$el.html(HtmlUtils.HTML(this.edit_view.render()).toString());
-            this.$el.append(HtmlUtils.template(signatoryActionsTemplate)().toString());
+            this.$el.html(this.edit_view.render());
+            $(_.template(signatoryActionsTemplate)()).appendTo(this.el);
             this.edit_view.delegateEvents();
             this.delegateEvents();
         },
 
         saveSignatoryData: function(event) {
             // Persist the data for this model
-            var certificate = this.model.get('certificate');
-            var self = this;
             if (event && event.preventDefault) { event.preventDefault(); }
+            var certificate = this.model.get('certificate');
             if (!certificate.isValid()) {
                 return;
             }
+            var self = this;
             ViewUtils.runOperationShowingMessage(
                 gettext('Saving'),
                 function() {
@@ -95,7 +94,7 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
             var attributes = $.extend({}, this.model.attributes, {
                 signatory_number: this.model.collection.indexOf(this.model) + 1
             });
-            return HtmlUtils.setHtml(this.$el, HtmlUtils.template(signatoryDetailsTemplate)(attributes));
+            return $(this.el).html(_.template(signatoryDetailsTemplate)(attributes));
         }
     });
     return SignatoryDetailsView;
