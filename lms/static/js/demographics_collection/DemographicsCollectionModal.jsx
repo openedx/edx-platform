@@ -30,7 +30,10 @@ class DemographicsCollectionModal extends React.Component {
     super(props);
     this.state = {
       options: {},
+      // a general error something goes really wrong
       error: false,
+      // an error for when a specific demographics question fails to save
+      fieldError: false,
       errorMessage: '',
       loading: true,
       open: this.props.open,
@@ -75,8 +78,6 @@ class DemographicsCollectionModal extends React.Component {
       }
       options = await optionsResponse.json();
     } catch (error) {
-      //TODO: Possibly create an error message here to expose to the user
-      console.log(error)
       this.setState({ loading: false, error: true, errorMessage: error });
     }
 
@@ -153,7 +154,7 @@ class DemographicsCollectionModal extends React.Component {
       await this.jwtTokenService.getJwtToken();
       await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, options)
     } catch (error) {
-      this.setState({ loading: false, error: true, errorMessage: error });
+      this.setState({ loading: false, fieldError: true, errorMessage: error });
     }
 
     if (name === 'user_ethnicity') {
@@ -170,7 +171,6 @@ class DemographicsCollectionModal extends React.Component {
   handleMultiselectChange(values) {
     const decline = values.find(i => i === 'declined');
     this.setState(({ selected: { [FIELD_NAMES.ETHNICITY]: prevSelected } }) => {
-      console.log(prevSelected)
       // decline was previously selected
       if (prevSelected.find(i => i === 'declined')) {
         return { selected: { [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined') } }
@@ -205,11 +205,8 @@ class DemographicsCollectionModal extends React.Component {
 
   render() {
     if (this.state.loading) {
-      console.log("loading")
       return <div className="demographics-collection-modal d-flex justify-content-center align-items-start" />
     }
-
-    console.log('something', this.state.error)
     return (
       <div className="demographics-collection-modal d-flex justify-content-center align-items-start">
         <Wizard
@@ -243,6 +240,17 @@ class DemographicsCollectionModal extends React.Component {
                   {gettext('Why does edX collect this information?')}
                 </a>
                 <br />
+                <p>
+                  {StringUtils.interpolate(
+                      gettext('Part {currentPage} of {totalPages}'),
+                        { 
+                          currentPage: currentPage,
+                          totalPages: totalPages
+                        }
+                    )
+                  }
+                </p>
+                {this.state.fieldError && <p className="field-error">Something went wrong</p>}
               </div>
             )}
           </Wizard.Header>
@@ -267,6 +275,7 @@ class DemographicsCollectionModal extends React.Component {
                   inputValue={wizardConsumer[FIELD_NAMES.GENDER_DESCRIPTION]}
                   inputOnChange={this.handleInputChange}
                   inputOnBlur={this.handleSelectChange}
+                  disabled={this.state.fieldError}
                 />
                 {/* Ethnicity */}
                 <MultiselectDropdown
@@ -275,6 +284,7 @@ class DemographicsCollectionModal extends React.Component {
                   options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, { choices: [] }).choices}
                   selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
                   onChange={this.handleMultiselectChange}
+                  disabled={this.state.fieldError}
                   onBlur={() => {
                     // we create a fake "event", and then use it to call our normal selection handler function that
                     // is used by the other dropdowns.
@@ -296,6 +306,7 @@ class DemographicsCollectionModal extends React.Component {
                   className="form-control"
                   name={FIELD_NAMES.INCOME} id={FIELD_NAMES.INCOME}
                   value={wizardConsumer[FIELD_NAMES.INCOME]}
+                  disabled={this.state.fieldError}
                 >
                   <option value="default">{gettext("Select income")}</option>
                   {
@@ -318,6 +329,7 @@ class DemographicsCollectionModal extends React.Component {
                   name={FIELD_NAMES.MILITARY}
                   id={FIELD_NAMES.MILITARY}
                   value={wizardConsumer[FIELD_NAMES.MILITARY]}
+                  disabled={this.state.fieldError}
                 >
                   <option value="default">{gettext("Select military status")}</option>
                   {
@@ -340,6 +352,7 @@ class DemographicsCollectionModal extends React.Component {
                   name={FIELD_NAMES.EDUCATION_LEVEL}
                   id={FIELD_NAMES.EDUCATION_LEVEL}
                   value={wizardConsumer[FIELD_NAMES.EDUCATION_LEVEL]}
+                  disabled={this.state.fieldError}
                 >
                   <option>{gettext("Select level of education")}</option>
                   {
@@ -356,6 +369,7 @@ class DemographicsCollectionModal extends React.Component {
                   name={FIELD_NAMES.PARENT_EDUCATION}
                   id={FIELD_NAMES.PARENT_EDUCATION}
                   value={wizardConsumer[FIELD_NAMES.PARENT_EDUCATION]}
+                  disabled={this.state.fieldError}
                 >
                   <option value="default">{gettext("Select guardian education")}</option>
                   {
@@ -385,7 +399,7 @@ class DemographicsCollectionModal extends React.Component {
                   inputValue={wizardConsumer[FIELD_NAMES.WORK_STATUS_DESCRIPTION]}
                   inputOnChange={this.handleInputChange}
                   inputOnBlur={this.handleSelectChange}
-
+                  disabled={this.state.fieldError}
                 />
                 {/* Current Work Industry */}
                 <label htmlFor={FIELD_NAMES.CURRENT_WORK}>
@@ -397,6 +411,7 @@ class DemographicsCollectionModal extends React.Component {
                   name={FIELD_NAMES.CURRENT_WORK}
                   id={FIELD_NAMES.CURRENT_WORK}
                   value={wizardConsumer[FIELD_NAMES.CURRENT_WORK]}
+                  disabled={this.state.fieldError}
                 >
                   <option value="default">{gettext("Select current industry")}</option>
                   {
@@ -413,6 +428,7 @@ class DemographicsCollectionModal extends React.Component {
                   name={FIELD_NAMES.FUTURE_WORK}
                   id={FIELD_NAMES.FUTURE_WORK}
                   value={wizardConsumer[FIELD_NAMES.FUTURE_WORK]}
+                  disabled={this.state.fieldError}
                 >
                   <option value="default">{gettext("Select prospective industry")}</option>
                   {

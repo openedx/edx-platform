@@ -77,7 +77,6 @@ export default class Wizard extends React.Component {
 
   render() {
     const finalPage = this.state.pages.length === this.state.currentPage;
-    console.log(this.props.error)
     if(this.props.error) {
       return this.renderError();
     }

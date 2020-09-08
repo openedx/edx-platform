@@ -30,10 +30,17 @@
       width: 100%;
       height: 100%;
       overflow-y: scroll;
+      &::-webkit-scrollbar {
+        display: none;
+      }
       @include media-breakpoint-up(md) {
         max-width: 575px;
         height: 65%;
         max-height: 767px;
+      }
+
+      .field-error {
+        color: #C32D3A;
       }
     }
 
@@ -45,7 +52,6 @@
 
       .form-control {
         display: block;
-        height: calc(1.5em + .75rem + 2px);
         padding: .375rem .75rem;
         font-size: 1rem;
         font-weight: 400;
@@ -56,6 +62,11 @@
         border: 1px solid #b9babe;
         border-radius: .3rem;
         margin-bottom: 8px;
+        &:disabled {
+          border-color: #b9babe;
+          background-color: #f9f9f9;
+          color: #686B73;
+        }
       }
 
       .wizard-button {
@@ -81,6 +92,30 @@
           padding-bottom: 100px;
         }
       }
+
+      .multiselect-dropdown-button {
+        background: none;
+        border: none;
+        box-shadow: none;
+        text-shadow: none;
+        font-family: Helvetica;
+        display: block;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #2d323e;
+        padding: 0;
+        flex: 1;
+        text-align: left;
+        &:disabled {
+          border-color: #b9babe;
+          background-color: #f9f9f9;
+        }
+        button {
+          &:disabled {
+            color: #686B73;
+          }
+        }
+      }
     }
     .demographics-form-container {
       display: flex;
@@ -96,6 +131,7 @@
         font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
         margin-bottom: 8px;
       }
+
       #unselect-button {
         border: none;
         background: none;
