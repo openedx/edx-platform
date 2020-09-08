@@ -18,6 +18,7 @@ import third_party_auth
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
+from openedx.core.djangoapps.user_api.accounts.toggles import should_redirect_to_logistration_mircrofrontend
 from openedx.core.djangoapps.user_api.accounts.utils import (
     is_multiple_user_enterprises_feature_enabled,
     is_secondary_email_feature_enabled
@@ -180,6 +181,15 @@ def login_and_registration_form(request, initial_mode="login"):
                     initial_mode = "hinted_login"
         except (KeyError, ValueError, IndexError) as ex:
             log.exception(u"Unknown tpa_hint provider: %s", ex)
+
+    # Redirect to logistration MFE if it is enabled
+    if should_redirect_to_logistration_mircrofrontend():
+        query_params = request.GET.urlencode()
+        url_path = '/{}{}'.format(
+            initial_mode,
+            '?' + query_params if query_params else ''
+        )
+        return redirect(settings.ACCOUNT_MICROFRONTEND_URL + url_path)
 
     # Account activation message
     account_activation_messages = [

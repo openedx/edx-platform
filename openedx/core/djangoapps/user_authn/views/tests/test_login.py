@@ -27,6 +27,7 @@ from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordWarning
 )
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
+from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ACCOUNT_MICROFRONTEND
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.views.login import (
     AllowedAuthUser,
@@ -36,6 +37,7 @@ from openedx.core.djangoapps.user_authn.views.login import (
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.api.test_utils import ApiTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
@@ -81,7 +83,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
 
     FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
-    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGIN_MICROFRONTEND'] = True
+    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGISTRATION_MICROFRONTEND'] = True
 
     @ddt.data(
         # Default redirect is dashboard.
@@ -146,17 +148,22 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
     @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
     @skip_unless_lms
     def test_login_success_with_redirect(self, next_url, course_id, expected_redirect):
+        site_domain = 'example.org'
+        self.set_up_site(site_domain, {'ENABLE_ACCOUNT_MICROFRONTEND': True})
         post_params = {}
+
         if next_url:
             post_params['next'] = next_url
         if course_id:
             post_params['course_id'] = course_id
-        response, _ = self._login_response(
-            self.user_email,
-            self.password,
-            extra_post_params=post_params,
-            HTTP_ACCEPT='*/*',
-        )
+
+        with override_waffle_flag(REDIRECT_TO_ACCOUNT_MICROFRONTEND, active=True):
+            response, _ = self._login_response(
+                self.user_email,
+                self.password,
+                extra_post_params=post_params,
+                HTTP_ACCEPT='*/*',
+            )
         self._assert_response(response, success=True)
         self._assert_redirect_url(response, expected_redirect)
 

@@ -31,6 +31,7 @@ from rest_framework.views import APIView
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.accounts.toggles import should_redirect_to_logistration_mircrofrontend
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
 from openedx.core.djangoapps.user_authn.cookies import refresh_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
@@ -479,7 +480,7 @@ def login_user(request):
         if is_user_third_party_authenticated:
             running_pipeline = pipeline.get(request)
             redirect_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
-        elif settings.FEATURES.get('ENABLE_LOGIN_MICROFRONTEND'):
+        elif should_redirect_to_logistration_mircrofrontend():
             redirect_url = get_next_url_for_login_page(request)
 
         response = JsonResponse({
