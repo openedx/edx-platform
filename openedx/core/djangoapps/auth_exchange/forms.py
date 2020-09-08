@@ -188,7 +188,7 @@ class AccessTokenExchangeForm(forms.Form):
         except (HTTPError, AuthException):
             pass
         # check if user is disabled
-        if user and not user.has_usable_password():
+        if isinstance(user, User) and not user.has_usable_password():
             self.request.social_strategy.clean_partial_pipeline(access_token)
             raise OAuthValidationError(
                 {
