@@ -210,6 +210,7 @@ from student.models import CourseEnrollment
           "user": user.id,
           "lmsRootUrl": getattr(settings, 'LMS_ROOT_URL', ''),
           "demographicsBaseUrl": getattr(settings, 'DEMOGRAPHICS_BASE_URL', ''),
+          "marketingSiteBaseUrl": getattr(settings, 'MKTG_URLS', {}).get('ROOT', ''),
           "jwtAuthToken": getattr(settings, 'JWT_AUTH', {}).get('JWT_AUTH_COOKIE_HEADER_PAYLOAD', ''),
           "bannerLogo": bannerLogoPath
         },

@@ -36,11 +36,12 @@
         max-height: 767px;
       }
     }
-      .wizard-header {
-        .fa-info-circle {
-          color: #23419f;
-        }
+
+    .wizard-header {
+      .fa-info-circle {
+        color: #23419f;
       }
+    }
 
       .form-control {
         display: block;
@@ -78,6 +79,58 @@
       .wizard-footer {
         @include media-breakpoint-down(md) {
           padding-bottom: 100px;
+        }
+      }
+    }
+    .demographics-form-container {
+      display: flex;
+      flex-direction: column;
+      label {
+        font-size: 15px;
+        font-weight: bold;
+        font-stretch: normal;
+        font-style: normal;
+        line-height: 1.25;
+        letter-spacing: normal;
+        color: #424751;
+        font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+        margin-bottom: 8px;
+      }
+      #unselect-button {
+        border: none;
+        background: none;
+        color: #000663;
+        box-shadow: none;
+        text-shadow: none;
+        font-size: 12px;
+        float: right;
+        text-decoration: underline;
+        font-family: Helvetica;
+        padding: 0;
+      }
+    }
+
+  .demographics-banner {
+    background-color: #23419f;
+    border-radius: 12px;
+
+    @media (min-width: 1200px) {
+      height: 64px;
+    }
+
+    .demographics-dismiss-container {
+      margin-left: -40px;
+
+      .demographics-dismiss-btn {
+        font-size: 20px;
+        border: none;
+
+        &:hover,
+        &:active,
+        &:focus {
+          background-image: none;
+          background-color: #23419f;
+          box-shadow: none;
         }
       }
     }
