@@ -1,11 +1,10 @@
-
 .modal-open {
   overflow: hidden !important;
 }
 
 .dashboard {
   .demographics-collection-modal {
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     position: fixed;
     width: 100%;
     height: 100%;
@@ -15,7 +14,7 @@
     top: 0;
     left: 0;
 
-    @include media-breakpoint-down(md)  {
+    @include media-breakpoint-down(md) {
       padding-top: 0;
     }
 
@@ -40,7 +39,7 @@
       }
 
       .field-error {
-        color: #C32D3A;
+        color: #c32d3a;
       }
     }
 
@@ -50,101 +49,101 @@
       }
     }
 
-      .form-control {
-        display: block;
-        padding: .375rem .75rem;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5;
-        color: #2d323e;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 1px solid #b9babe;
-        border-radius: .3rem;
-        margin-bottom: 8px;
-        &:disabled {
-          border-color: #b9babe;
-          background-color: #f9f9f9;
-          color: #686B73;
-        }
+    .form-control {
+      display: block;
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #2d323e;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #b9babe;
+      border-radius: 0.3rem;
+      margin-bottom: 8px;
+      &:disabled {
+        border-color: #b9babe;
+        background-color: #f9f9f9;
+        color: #686b73;
       }
+    }
 
-      .wizard-button {
-        height: 45px;
-        border-radius: 22.5px;
-        font: normal 16px "Open Sans";
-        border: solid 1px #23419f;
-        background-color: #ffffff;
-        background-image: none;
-        color: #23419f;
-        text-shadow: none;
-        letter-spacing: normal;
-        margin: 5px 0 5px 0;
+    .wizard-button {
+      height: 45px;
+      border-radius: 22.5px;
+      font: normal 16px "Open Sans";
+      border: solid 1px #23419f;
+      background-color: #ffffff;
+      background-image: none;
+      color: #23419f;
+      text-shadow: none;
+      letter-spacing: normal;
+      margin: 5px 0 5px 0;
 
-        &.blue {
-          background-color: #23419f;
-          color: #ffffff;
-          border: none;
-        }
-      }
-      .wizard-footer {
-        @include media-breakpoint-down(md) {
-          padding-bottom: 100px;
-        }
-      }
-
-      .multiselect-dropdown-button {
-        background: none;
+      &.blue {
+        background-color: #23419f;
+        color: #ffffff;
         border: none;
-        box-shadow: none;
-        text-shadow: none;
-        font-family: Helvetica;
-        display: block;
-        font-size: 1rem;
-        line-height: 1.5;
-        color: #2d323e;
-        padding: 0;
-        flex: 1;
-        text-align: left;
+      }
+    }
+    .wizard-footer {
+      @include media-breakpoint-down(md) {
+        padding-bottom: 100px;
+      }
+    }
+
+    .multiselect-dropdown-button {
+      background: none;
+      border: none;
+      box-shadow: none;
+      text-shadow: none;
+      font-family: Helvetica;
+      display: block;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #2d323e;
+      padding: 0;
+      flex: 1;
+      text-align: left;
+      &:disabled {
+        border-color: #b9babe;
+        background-color: #f9f9f9;
+      }
+      button {
         &:disabled {
-          border-color: #b9babe;
-          background-color: #f9f9f9;
-        }
-        button {
-          &:disabled {
-            color: #686B73;
-          }
+          color: #686b73;
         }
       }
     }
-    .demographics-form-container {
-      display: flex;
-      flex-direction: column;
-      label {
-        font-size: 15px;
-        font-weight: bold;
-        font-stretch: normal;
-        font-style: normal;
-        line-height: 1.25;
-        letter-spacing: normal;
-        color: #424751;
-        font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
-        margin-bottom: 8px;
-      }
-
-      #unselect-button {
-        border: none;
-        background: none;
-        color: #000663;
-        box-shadow: none;
-        text-shadow: none;
-        font-size: 12px;
-        float: right;
-        text-decoration: underline;
-        font-family: Helvetica;
-        padding: 0;
-      }
+  }
+  .demographics-form-container {
+    display: flex;
+    flex-direction: column;
+    label {
+      font-size: 15px;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.25;
+      letter-spacing: normal;
+      color: #424751;
+      font-family: "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+      margin-bottom: 8px;
     }
+
+    #unselect-button {
+      border: none;
+      background: none;
+      color: #000663;
+      box-shadow: none;
+      text-shadow: none;
+      font-size: 12px;
+      float: right;
+      text-decoration: underline;
+      font-family: Helvetica;
+      padding: 0;
+    }
+  }
 
   .demographics-banner {
     background-color: #23419f;
@@ -197,63 +196,61 @@
         padding: 0;
       }
     }
-  
 
-  .demographics-banner {
-    background-color: #23419f;
-    border-radius: 12px;
-    @media (min-width: 1200px) {
-      height: 64px;
-    }
-    .demographics-banner-icon {
-      height: 140px;
-    }
-    .demographics-banner-prompt {
-      font-size: 24px;
-      line-height: 24px;
-    }
-    .demographics-banner-btn {
-      color: #23419f;
-      border-radius: 20px;
-      font-size: 14px;
-      min-width: 150px;
-      /* Below are to override the overly-broad `button` selectors in lms/static/sass/shared/_forms.scss */
-      box-shadow: unset;
-      text-shadow: unset;
-      font: unset;
-      letter-spacing: unset;
-      background-image: unset;
-
-      .fa-thumbs-up {
+    .demographics-banner {
+      background-color: #23419f;
+      border-radius: 12px;
+      @media (min-width: 1200px) {
+        height: 64px;
+      }
+      .demographics-banner-icon {
+        height: 140px;
+      }
+      .demographics-banner-prompt {
         font-size: 24px;
+        line-height: 24px;
+      }
+      .demographics-banner-btn {
+        color: #23419f;
+        border-radius: 20px;
+        font-size: 14px;
+        min-width: 150px;
+        /* Below are to override the overly-broad `button` selectors in lms/static/sass/shared/_forms.scss */
+        box-shadow: unset;
+        text-shadow: unset;
+        font: unset;
+        letter-spacing: unset;
+        background-image: unset;
+
+        .fa-thumbs-up {
+          font-size: 24px;
+        }
       }
     }
-  }
-  .side-container {
-    .wrapper-coaching {
-      border: 1px solid $gray-500;
-      margin-bottom: $baseline * 0.5;
+    .side-container {
+      .wrapper-coaching {
+        border: 1px solid $gray-500;
+        margin-bottom: $baseline * 0.5;
 
-      .coaching-signup {
-        padding: 20px;
+        .coaching-signup {
+          padding: 20px;
 
-        .coaching-prompt {
-          font-size: 20px;
-          line-height: 28px;
-          font-weight: bold;
-        }
+          .coaching-prompt {
+            font-size: 20px;
+            line-height: 28px;
+            font-weight: bold;
+          }
 
-
-        .coaching-link .btn-neutral {
-          display: block;
-          text-align: center;
-          margin: 20px 20px 0;
-          border-radius: 20px;
-          padding: 10px;
-          border: 1px solid theme-color('primary');
+          .coaching-link .btn-neutral {
+            display: block;
+            text-align: center;
+            margin: 20px 20px 0;
+            border-radius: 20px;
+            padding: 10px;
+            border: 1px solid theme-color("primary");
+          }
         }
       }
     }
   }
 }
-
