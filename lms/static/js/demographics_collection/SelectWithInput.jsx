@@ -15,6 +15,7 @@ export const SelectWithInput = (props) => {
     showInput,
     inputOnBlur,
     labelText,
+    disabled,
   } = props;
   return (
     <div className="d-flex flex-column">
@@ -25,6 +26,7 @@ export const SelectWithInput = (props) => {
         id={selectId}
         onChange={selectOnChange}
         value={selectValue}
+        disabled={disabled}
       >
         {options}
       </select>
@@ -37,6 +39,7 @@ export const SelectWithInput = (props) => {
           onChange={inputOnChange}
           onBlur={inputOnBlur}
           value={inputValue}
+          disabled={disabled}
         />
       }
     </div>
