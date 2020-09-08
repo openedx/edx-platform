@@ -3938,3 +3938,11 @@ SUPPORT_HOW_TO_UNENROLL_LINK = ''
 
 ######################## Setting for content libraries ########################
 MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
+
+######################## Setting for django-countries ########################
+# django-countries provides an option to make the desired countries come up in
+# selection forms, if left empty countries will come up in ascending order as before.
+# This accepts a list of ISO3166-1 two letter country code, For example,
+# COUNTRIES_FIRST = ['SA', 'BH', 'QA'] will display these countries on top of the list
+# https://github.com/SmileyChris/django-countries#show-certain-countries-first
+COUNTRIES_FIRST = []
