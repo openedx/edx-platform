@@ -82,7 +82,7 @@ define([
         },
 
         render: function() {
-            edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.template(licenseSelectorTemplate)({
+            this.$el.html(_.template(licenseSelectorTemplate)({
                 model: this.model.attributes,
                 licenseString: this.model.toString() || '',
                 licenseInfo: this.licenseInfo,

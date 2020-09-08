@@ -1,9 +1,9 @@
 /*
  Code for editing users and assigning roles within a course or library team context.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/views/feedback_prompt',
-    'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils'],
-    function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
+define(['jquery', 'underscore', 'gettext', 'js/views/baseview',
+    'common/js/components/views/feedback_prompt', 'common/js/components/utils/view_utils'],
+    function($, _, gettext, BaseView, PromptView, ViewUtils) {
         'use strict';
         var default_messages = {
             defaults: {
@@ -157,7 +157,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                         viewHelpers: viewHelpers
                     };
 
-                    this.$userList.append(HtmlUtils.HTML(templateFn(template_data)).toString());
+                    this.$userList.append(templateFn(template_data));
                 }
             },
 
