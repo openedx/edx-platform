@@ -1706,6 +1706,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 1.0),
                 ('possible_all', 2.0),
@@ -1733,6 +1734,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 6.0),
                 ('possible_all', 12.0),
@@ -1770,6 +1772,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 6.0),
                 ('possible_all', 12.0),
@@ -1827,6 +1830,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 6.0),
                 ('possible_all', 12.0),
@@ -1928,6 +1932,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             self.get_url(subsection_id=self.usage_key, user_id=other_user.id)
         )
         expected_data = {
+            'success': True,
             'original_grade': OrderedDict([
                 ('earned_all', 0.0),
                 ('possible_all', 0.0),
@@ -1952,3 +1957,35 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
         )
 
         self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_get_override_for_unreleased_block(self):
+        self.login_course_staff()
+        unreleased_subsection = ItemFactory.create(
+            parent_location=self.chapter_1.location,
+            category='sequential',
+            graded=True,
+            start=datetime(2999, 1, 1, tzinfo=UTC),  # arbitrary future date
+            display_name='Unreleased Section',
+        )
+
+        resp = self.client.get(
+            self.get_url(subsection_id=unreleased_subsection.location)
+        )
+
+        expected_data = {
+            'success': False,
+            'error_message': "Cannot override subsection grade: subsection is not available for target learner.",
+            'original_grade': OrderedDict([
+                ('earned_all', 0.0),
+                ('possible_all', 0.0),
+                ('earned_graded', 0.0),
+                ('possible_graded', 0.0)
+            ]),
+            'user_id': self.user_id,
+            'override': None,
+            'course_id': text_type(self.usage_key.course_key),
+            'subsection_id': text_type(unreleased_subsection.location),
+            'history': []
+        }
+        self.assertEqual(expected_data, resp.data)
