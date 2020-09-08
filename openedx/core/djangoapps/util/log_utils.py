@@ -12,6 +12,7 @@ from logging import Filter
 from crum import get_current_request
 from crum import get_current_user
 
+
 class UserIdFilter(Filter):
     def filter(self, record):
         user = get_current_user()
