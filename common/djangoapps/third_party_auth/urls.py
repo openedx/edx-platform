@@ -18,5 +18,6 @@ urlpatterns = [
     url(r'^auth/idp_redirect/(?P<provider_slug>[\w-]+)', IdPRedirectView.as_view(), name="idp_redirect"),
     url(r'^auth/', include('social_django.urls', namespace='social')),
     url(r'^auth/saml/v0/', include('third_party_auth.samlproviderconfig.urls')),
-    url(r'^auth/saml/v0/', include('third_party_auth.samlproviderdata.urls'))
+    url(r'^auth/saml/v0/', include('third_party_auth.samlproviderdata.urls')),
+    url(r'^auth/saml/v0/', include('third_party_auth.saml_configuration.urls')),
 ]

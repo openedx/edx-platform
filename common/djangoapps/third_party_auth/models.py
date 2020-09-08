@@ -457,6 +457,14 @@ class SAMLConfiguration(ConfigurationModel):
             "Valid keys that can be set here include: SECURITY_CONFIG and SP_EXTRA"
         ),
     )
+    is_public = models.BooleanField(
+        default=False,
+        verbose_name=u"Allow customers to see and use this SAML configuration",
+        help_text=(
+            u"When checked, customers will be able to choose this SAML Configuration "
+            "in the admin portal."
+        ),
+    )
 
     class Meta(object):
         app_label = "third_party_auth"
