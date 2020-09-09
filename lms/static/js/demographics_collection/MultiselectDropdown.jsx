@@ -128,7 +128,6 @@ class MultiselectDropdown extends React.Component {
         tabIndex={0}
         ref={this.setMultiselectRef}
         onBlur={e => {
-          console.log(e.currentTarget, e.relatedTarget)
           if(!e.currentTarget.contains(e.relatedTarget)) {
             this.props.onBlur(e);
             this.setState({open: false})
