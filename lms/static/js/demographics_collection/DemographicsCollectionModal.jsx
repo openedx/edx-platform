@@ -250,7 +250,7 @@ class DemographicsCollectionModal extends React.Component {
                     )
                   }
                 </p>
-                {this.state.fieldError && <p className="field-error">Something went wrong</p>}
+                {this.state.fieldError && <p className="field-error">An error occurred while attempting to retrieve or save the information below. Please try again later.</p>}
               </div>
             )}
           </Wizard.Header>
