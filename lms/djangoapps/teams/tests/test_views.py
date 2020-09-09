@@ -2227,7 +2227,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('student_masters', 404, None),
         ('staff', 200, {'student_on_team_1_private_set_1', 'student_on_team_2_private_set_1'})
     )
-    def test_access_filter_teamset(self, user, expected_response, expected_users):
+    def test_access_filter_private_teamset(self, user, expected_response, expected_users):
         memberships = self.get_membership_list(
             expected_response,
             {
@@ -2239,6 +2239,46 @@ class TestListMembershipAPI(TeamAPITestCase):
         if expected_response == 200:
             returned_users = {membership['user']['username'] for membership in memberships['results']}
             self.assertEqual(returned_users, expected_users)
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_unenrolled', 404, 404, {}),
+        ('student_enrolled_not_on_team', 404, 200, {'student_enrolled'}),
+        ('student_enrolled', 404, 200, {'student_enrolled'}),
+        ('student_masters', 404, 200, {'student_masters'}),
+        ('staff', 404, 200, {'student_enrolled', 'student_masters'})
+    )
+    def test_access_filter_open_teamset(
+        self,
+        user,
+        expected_response_no_teams,
+        expected_response_teams,
+        expected_usernames,
+    ):
+        # topic_3 has no teams
+        self.assertFalse(CourseTeam.objects.filter(topic_id='topic_3').exists())
+        self.get_membership_list(
+            expected_response_no_teams,
+            {
+                'teamset_id': 'topic_3',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+
+        # topic_0 has teams
+        self.assertTrue(CourseTeam.objects.filter(topic_id='topic_0').exists())
+        memberships = self.get_membership_list(
+            expected_response_teams,
+            {
+                'teamset_id': 'topic_0',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+        if expected_response_teams == 200:
+            returned_users = {membership['user']['username'] for membership in memberships['results']}
+            self.assertEqual(returned_users, expected_usernames)
 
 
 @ddt.ddt
