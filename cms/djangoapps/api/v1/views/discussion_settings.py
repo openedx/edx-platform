@@ -9,14 +9,14 @@ from rest_framework.response import Response
 
 from cms.djangoapps.contentstore.api.views.utils import course_author_access_required
 from models.settings.course_metadata import CourseMetadata
-from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
 
 from ..serializers.discussion_settings import DiscussionSettingsSerializer
 
 
 @view_auth_classes()
-class DiscussionSettingsViewSet(viewsets.GenericViewSet):
+class DiscussionSettingsViewSet(DeveloperErrorViewMixin, viewsets.GenericViewSet):
     """Endpoint to Serve & Update discussion related settings"""
 
     lookup_field = 'course_id'
