@@ -285,6 +285,26 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
                 assert not CourseEnrollmentAllowed.objects.filter(
                     email=rec['identifier']).exists()
 
+    def test_enroll_learner_in_two_courses(self):
+        """
+        Enroll a learner in two courses in a single call.
+        """
+        new_users_email = 'alpha@example.com'
+        payload = {
+            'action': 'enroll',
+            'auto_enroll': True,
+            # Enroll both of the registered users and new ones
+            'identifiers': [new_users_email],
+            'email_learners': True,
+            'courses': [str(co.id) for co in self.my_course_overviews],
+        }
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': payload,
+        })
+        results = response.data['results']
+        assert CourseEnrollmentAllowed.objects.count() == len(self.my_course_overviews)
+        assert len(results) == len(self.my_course_overviews), 'Ensure result from all courses are returned'
+
     def test_enroll_with_other_site_course(self):
 
         reg_users = [UserFactory(), UserFactory()]
