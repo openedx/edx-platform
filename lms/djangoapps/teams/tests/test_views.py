@@ -327,6 +327,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     'type': u'private_managed'
                 }
             )
+            base_topics.append(
+                {
+                    'id': 'private_topic_no_teams',
+                    'name': 'private_topic_no_teams_name',
+                    'description': u'Description for topic private_topic_no_teams.',
+                    'type': u'private_managed'
+                }
+            )
             teams_configuration_1 = TeamsConfig({
                 'topics': base_topics,
                 'max_team_size': 5
@@ -1730,8 +1738,8 @@ class TestListTopicsAPI(TeamAPITestCase):
         ('student_inactive', 401, None),
         ('student_unenrolled', 403, None),
         ('student_enrolled', 200, 4),
-        ('staff', 200, 6),
-        ('course_staff', 200, 6),
+        ('staff', 200, 7),
+        ('course_staff', 200, 7),
         ('community_ta', 200, 4),
     )
     @ddt.unpack
@@ -1868,13 +1876,13 @@ class TestListTopicsAPI(TeamAPITestCase):
         ('student_on_team_1_private_set_1', 1),
         ('student_on_team_2_private_set_1', 1),
         ('student_masters', 0),
-        ('staff', 2)
+        ('staff', 3)
     )
     def test_teamset_type(self, requesting_user, expected_private_teamsets):
         """
         As different users, request course_1's list of topics, and see what private_managed teamsets are returned
 
-        Staff should be able to see both teamsets, and anyone enrolled in a private teamset should see that and
+        Staff should be able to see all teamsets, and anyone enrolled in a private teamset should see that and
         only that teamset
         """
         topics = self.get_topics_list(
