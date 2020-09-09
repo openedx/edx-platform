@@ -18,7 +18,7 @@ from django.contrib.auth import authenticate, load_backend, login as django_logi
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, MultipleObjectsReturned
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.core.validators import ValidationError, validate_email
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
@@ -177,13 +177,28 @@ def _get_user_by_email(request):
                 current_org = get_current_organization()
                 return current_org.userorganizationmapping_set.get(user__email=email).user
             else:
-                from student.roles import CourseCreatorRole  # Avoid import errors.
+                from student import roles as user_roles  # Avoid import errors.
                 return User.objects.get(
-                    courseaccessrole__role=CourseCreatorRole.ROLE,
+                    courseaccessrole__role__in=[
+                        user_roles.CourseCreatorRole.ROLE,
+                        user_roles.CourseInstructorRole.ROLE,
+                        user_roles.CourseStaffRole.ROLE,
+                    ],
                     email=email,
                 )
         except (UserOrganizationMapping.DoesNotExist, User.DoesNotExist):
             _log_failed_get_user_by_email(email)
+        except MultipleObjectsReturned:
+            log.exception(
+                u'Studio Multi-Tenant Emails error: More than one user were found with the same email. '
+                u'Please change to a different email on either one of the accounts: {email}'.format(
+                    email='' if settings.FEATURES['SQUELCH_PII_IN_LOGS'] else email,
+                )
+            )
+            # Raise the exception again.
+            # Not very friendly but allows us to identify properly if enough issues were reported
+            # instead of a silent error
+            raise
     else:
         try:
             return User.objects.get(email=email)
@@ -326,7 +341,13 @@ def _handle_failed_authentication(user):
         else:
             AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(user.email))
 
-    raise AuthFailedError(_('Email or password is incorrect.'))
+    if not _is_in_lms() and settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+        # Side effect of MTE: Only course staff and course creator can access Studio.
+        message = _('Email or password is incorrect. '
+                    'Please ensure that you are a course staff in order to use Studio.')
+    else:
+        message = _('Email or password is incorrect.')
+    raise AuthFailedError(message)
 
 
 def _handle_successful_authentication_and_login(user, request):
