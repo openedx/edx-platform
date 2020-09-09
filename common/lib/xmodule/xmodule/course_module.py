@@ -1068,6 +1068,8 @@ def validate_blackout_datetimes(blackout_dates):
     for blackout in ret:
         if not blackout["start"] or not blackout["end"]:
             raise ValueError
+        if blackout["start"] > blackout["end"]:
+            raise ValueError
     return ret
 
 
