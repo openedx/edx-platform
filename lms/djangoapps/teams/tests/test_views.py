@@ -2235,7 +2235,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('student_masters', 404, None),
         ('staff', 200, {'student_on_team_1_private_set_1', 'student_on_team_2_private_set_1'})
     )
-    def test_access_filter_private_teamset(self, user, expected_response, expected_users):
+    def test_access_filter_teamset__private_teamset(self, user, expected_response, expected_users):
         memberships = self.get_membership_list(
             expected_response,
             {
@@ -2250,13 +2250,35 @@ class TestListMembershipAPI(TeamAPITestCase):
 
     @ddt.unpack
     @ddt.data(
+        ('student_enrolled', 404),
+        ('student_on_team_1_private_set_1', 404),
+        ('student_on_team_2_private_set_1', 404),
+        ('student_masters', 404),
+        ('staff', 200)
+    )
+    def test_access_filter_teamset__private_teamset__no_teams(self, user, expected_response):
+        """
+        private_topic_no_teams has no teams in it, but staff should still get a 200 when
+        requesting teamset memberships
+        """
+        self.get_membership_list(
+            expected_response,
+            {
+                'teamset_id': 'private_topic_no_teams',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+
+    @ddt.unpack
+    @ddt.data(
         ('student_unenrolled', 404, {}),
         ('student_enrolled_not_on_team', 200, {'student_enrolled'}),
         ('student_enrolled', 200, {'student_enrolled'}),
         ('student_masters', 200, {'student_masters'}),
         ('staff', 200, {'student_enrolled', 'student_masters'})
     )
-    def test_access_filter_open_teamset(self, user, expected_response, expected_usernames):
+    def test_access_filter_teamset__open_teamset(self, user, expected_response, expected_usernames):
         # topic_3 has no teams
         self.assertFalse(CourseTeam.objects.filter(topic_id='topic_3').exists())
         memberships = self.get_membership_list(

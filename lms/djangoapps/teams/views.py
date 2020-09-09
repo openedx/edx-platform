@@ -1360,15 +1360,18 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             teamset_teams = CourseTeam.objects.filter(course_id=requested_course_key, topic_id=teamset_id)
-            teams_with_access = [
-                team for team in teamset_teams
-                if has_specific_team_access(request.user, team)
-            ]
-            if teamset.is_private_managed and not teams_with_access:
-                return Response(
-                    build_api_error(ugettext_noop("No teamset found in given course with given id")),
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            if has_course_staff_privileges(request.user, requested_course_key):
+                teams_with_access = list(teamset_teams)
+            else:
+                teams_with_access = [
+                    team for team in teamset_teams
+                    if has_specific_team_access(request.user, team)
+                ]
+                if teamset.is_private_managed and not teams_with_access:
+                    return Response(
+                        build_api_error(ugettext_noop("No teamset found in given course with given id")),
+                        status=status.HTTP_404_NOT_FOUND
+                    )
             team_ids = [team.team_id for team in teams_with_access]
 
         if 'username' in request.query_params:
