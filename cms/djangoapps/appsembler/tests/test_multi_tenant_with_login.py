@@ -110,6 +110,39 @@ class MultiTenantStudioLoginTestCase(TestCase):
         assert response.status_code == status.HTTP_200_OK, response.content
         assert response.json()['success'], response.content
 
+    def test_login_for_course_staff_but_learner_on_another_site(self):
+        """
+        Test the login for a learner in a site but a staff in another.
+
+        When APPSEMBLER_MULTI_TENANT_EMAILS feature when enabled in Studio
+        """
+        # Add a learner with the same email.
+        _learner_2 = UserFactory.create(email=self.EMAIL, password='another_password')
+
+        CourseAccessRole.objects.create(user=self.customer, role=CourseStaffRole.ROLE)
+        response = self.client.post(self.url, {
+            'email': self.EMAIL,
+            'password': self.PASSWORD,
+        })
+        assert response.status_code == status.HTTP_200_OK, response.content
+        assert response.json()['success'], response.content
+
+    def test_login_for_course_staff_in_two_courses(self):
+        """
+        Test the login for a course staff for two courses.
+
+        When APPSEMBLER_MULTI_TENANT_EMAILS feature when enabled in Studio.
+        This is created to fix a Django ORM weirdness with MultipleObjectsReturned.
+        """
+        CourseAccessRole.objects.create(user=self.customer, role=CourseStaffRole.ROLE)
+        CourseAccessRole.objects.create(user=self.customer, role=CourseInstructorRole.ROLE)
+        response = self.client.post(self.url, {
+            'email': self.EMAIL,
+            'password': self.PASSWORD,
+        })
+        assert response.status_code == status.HTTP_200_OK, response.content
+        assert response.json()['success'], response.content
+
     def test_failed_login(self):
         """
         Test a failed login when the APPSEMBLER_MULTI_TENANT_EMAILS feature in Studio.
