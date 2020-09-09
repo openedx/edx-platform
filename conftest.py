@@ -45,7 +45,7 @@ def mute_signals(request):
 
     restore = {}
     for signal in signals:
-        # Temporally remove the signal's receivers (a.k.a attached functions)
+        # Temporarily remove the signal's receivers (a.k.a attached functions)
         restore[signal] = signal.receivers
         signal.receivers = []
 

@@ -248,7 +248,7 @@ def get_philu_bot():
     Get or create user for Philu bot
 
     Returns:
-        string: A hash as an scorer id for Philu bot
+        string: A hash as a scorer id for Philu bot
     """
     philu_bot, _ = User.objects.get_or_create(
         username='philubot',

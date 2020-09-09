@@ -3,10 +3,9 @@ Mixins for unit tests
 """
 import time
 
-from xmodule.modulestore.tests.factories import ItemFactory
-
 from openedx.core.djangolib.testing.philu_utils import clear_philu_theme, configure_philu_theme
-from openedx.features.philu_utils.constants import COURSE_CHILD_STRUCTURE
+from openedx.features.philu_utils.course import get_course_structure
+from xmodule.modulestore.tests.factories import ItemFactory
 
 
 class PhiluThemeMixin(object):
@@ -27,7 +26,7 @@ class PhiluThemeMixin(object):
 
 class CourseAssessmentMixin(object):
     """
-    Base open assessment testcase class, with common methods to create courses dynamic, including ORA.
+    Base open assessment testcase class, with common methods to create course dynamically.
     """
 
     def create_course_chapter_with_specific_xblocks(self, store, course, xblock_types):
@@ -57,8 +56,9 @@ class CourseAssessmentMixin(object):
             publish_item=True,
         )
 
-        if category not in COURSE_CHILD_STRUCTURE:
+        course_structure = get_course_structure()
+        if category not in course_structure:
             return
 
-        category = unit if category == 'vertical' else COURSE_CHILD_STRUCTURE[category]
+        category = unit if category == 'vertical' else course_structure[category]
         self._create_course_children(store, child_object, category, unit)

@@ -60,7 +60,7 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
     def _create_enrollment_submission(self, submission_date, course_id, canceled_one_submission=False,
                                       exclude_submissions=False):
         """
-        A helper function for tests, which create course enrollment, and perform submission for ORAs in course.
+        A helper function for tests, which creates course enrollment, and performs submission for ORAs in course.
         """
         enrollment = CourseEnrollmentFactory(course_id=course_id)
         anonymous_user = AnonymousUserIdFactory(course_id=course_id, user=enrollment.user)
