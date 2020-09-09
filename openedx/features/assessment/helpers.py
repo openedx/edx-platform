@@ -15,6 +15,7 @@ from openassessment.assessment.models import Assessment, AssessmentPart
 from openassessment.assessment.serializers import rubric_from_dict
 from openassessment.workflow.models import AssessmentWorkflow
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.philu_utils.utils import get_anonymous_user
 from xmodule.modulestore.django import modulestore
 
 from .constants import DAYS_TO_WAIT_AUTO_ASSESSMENT, NO_PENDING_ORA, ORA_BLOCK_TYPE
@@ -66,7 +67,15 @@ def _get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuids, de
         list: All submissions in enrollment matching criteria
     """
     course_id = enrollment.course_id
-    anonymous_user_id = enrollment.user.anonymoususerid_set.get(course_id=course_id).anonymous_user_id
+    anonymous_user = get_anonymous_user(enrollment.user, course_id)
+
+    if not anonymous_user:
+        # TODO If AnonymousUserId model have more than one anonymous user ids against a combination of user and course
+        #  then do not auto score. Ideally AnonymousUserId must have a unique combination of user and course. This is a
+        #  temporary fix to avoid crash.
+        return
+
+    anonymous_user_id = anonymous_user.anonymous_user_id
     submissions = []
 
     all_ora_in_enrolled_course = modulestore().get_items(
