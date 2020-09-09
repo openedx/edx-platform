@@ -108,6 +108,18 @@ class mock_create_refund(mock_ecommerce_api_endpoint):
         return '/refunds/'
 
 
+class mock_payment_processors(mock_ecommerce_api_endpoint):
+    """
+    Mocks calls to E-Commerce API payment processors method.
+    """
+
+    default_response = ['foo', 'bar']
+    method = httpretty.GET
+
+    def get_path(self):
+        return "/payment/processors/"
+
+
 class mock_process_refund(mock_ecommerce_api_endpoint):
     """ Mocks calls to E-Commerce API client refund process method. """
 

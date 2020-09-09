@@ -19,9 +19,7 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-from django.utils.translation import ugettext as _
 from mock import Mock, patch
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from six.moves import zip
 from waffle.testutils import override_switch
@@ -31,6 +29,7 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
+from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
@@ -54,6 +53,20 @@ def mock_render_to_response(*args, **kwargs):
 render_mock = Mock(side_effect=mock_render_to_response)
 
 PAYMENT_DATA_KEYS = {'payment_processor_name', 'payment_page_url', 'payment_form_data'}
+
+
+def _mock_payment_processors():
+    """
+    Mock out the payment processors endpoint, since we don't run ecommerce for unit tests here.
+    Used in tests where ``mock_payment_processors`` can't be easily used, for example the whole
+    test is an httpretty context or the mock may or may not be called depending on ddt parameters.
+    """
+    httpretty.register_uri(
+        httpretty.GET,
+        "{}/payment/processors/".format(TEST_API_URL),
+        body=json.dumps(['foo', 'bar']),
+        content_type="application/json",
+    )
 
 
 class StartView(TestCase):
@@ -135,12 +148,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         """Verify user gets redirected to ecommerce checkout when ecommerce checkout is enabled."""
         sku = 'TESTSKU'
         # When passing a SKU ecommerce api gets called.
-        httpretty.register_uri(
-            httpretty.GET,
-            "{}/payment/processors/".format(TEST_API_URL),
-            body=json.dumps(['foo', 'bar']),
-            content_type="application/json",
-        )
+        _mock_payment_processors()
         configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
         checkout_page = configuration.basket_checkout_page
         checkout_page += "?utm_source=test"
@@ -842,15 +850,24 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         }
         session.save()
 
-    def _get_page(self, url_name, course_key, expected_status_code=200, skip_first_step=False):
+    @httpretty.activate
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
+    def _get_page(self, url_name, course_key, expected_status_code=200, skip_first_step=False, assert_headers=False):
         """Retrieve one of the verification pages. """
         url = reverse(url_name, kwargs={"course_id": six.text_type(course_key)})
 
         if skip_first_step:
             url += "?skip-first-step=1"
 
+        _mock_payment_processors()
         response = self.client.get(url)
         self.assertEqual(response.status_code, expected_status_code)
+
+        if assert_headers:
+            # ensure the mock api call was made.  NOTE: the following line
+            # approximates the check - if the headers were empty it means
+            # there was no last request.
+            self.assertNotEqual(httpretty.last_request().headers, {})
         return response
 
     def _assert_displayed_mode(self, response, expected_mode):
@@ -937,17 +954,20 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
     def _assert_redirects_to_start_flow(self, response, course_id):
         """Check that the page redirects to the start of the payment/verification flow. """
         url = reverse('verify_student_start_flow', kwargs={'course_id': six.text_type(course_id)})
-        self.assertRedirects(response, url)
+        with mock_payment_processors():
+            self.assertRedirects(response, url)
 
     def _assert_redirects_to_verify_start(self, response, course_id, status_code=302):
         """Check that the page redirects to the "verify later" part of the flow. """
         url = reverse('verify_student_verify_now', kwargs={'course_id': six.text_type(course_id)})
-        self.assertRedirects(response, url, status_code)
+        with mock_payment_processors():
+            self.assertRedirects(response, url, status_code)
 
     def _assert_redirects_to_upgrade(self, response, course_id):
         """Check that the page redirects to the "upgrade" part of the flow. """
         url = reverse('verify_student_upgrade_and_verify', kwargs={'course_id': six.text_type(course_id)})
-        self.assertRedirects(response, url)
+        with mock_payment_processors():
+            self.assertRedirects(response, url)
 
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_course_upgrade_page_with_unicode_and_special_values_in_display_name(self, payment_flow):
@@ -968,8 +988,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
         self.assertEqual(response_dict['course_name'], mode_display_name)
 
-    @httpretty.activate
-    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_processors_api(self, payment_flow):
         """
@@ -982,21 +1000,9 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         course = self._create_course("verified", sku='nonempty-sku')
         self._enroll(course.id)
 
-        # mock out the payment processors endpoint
-        httpretty.register_uri(
-            httpretty.GET,
-            "{}/payment/processors/".format(TEST_API_URL),
-            body=json.dumps(['foo', 'bar']),
-            content_type="application/json",
-        )
         # make the server request
-        response = self._get_page(payment_flow, course.id)
+        response = self._get_page(payment_flow, course.id, assert_headers=True)
         self.assertEqual(response.status_code, 200)
-
-        # ensure the mock api call was made.  NOTE: the following line
-        # approximates the check - if the headers were empty it means
-        # there was no last request.
-        self.assertNotEqual(httpretty.last_request().headers, {})
 
 
 class CheckoutTestMixin(object):
@@ -1536,7 +1542,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
     @patch('sailthru.sailthru_client.SailthruClient.send')
-    def test_passed_status_template(self, mock_sailthru_send, mock_log_error):
+    def test_passed_status_template(self, _mock_sailthru_send, _mock_log_error):
         """
         Test for verification passed.
         """
@@ -1611,7 +1617,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
     @patch('sailthru.sailthru_client.SailthruClient.send')
-    def test_failed_status_template(self, mock_sailthru_send, mock_log_error):
+    def test_failed_status_template(self, _mock_sailthru_send, _mock_log_error):
         """
         Test for failed verification.
         """
@@ -1738,7 +1744,7 @@ class TestReverifyView(TestVerificationBase):
         """
 
         # User has submitted a verification attempt, but Software Secure has not yet responded
-        attempt = self.create_and_submit_attempt_for_user(self.user)
+        self.create_and_submit_attempt_for_user(self.user)
 
         # Can re-verify because an attempt has already been submitted.
         self._assert_can_reverify()
