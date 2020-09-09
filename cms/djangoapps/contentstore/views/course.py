@@ -1341,13 +1341,22 @@ def advanced_settings_handler(request, course_key_string):
 
             course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
 
+            # gather any errors in the currently stored settings. Those related to proctoring will
+            # be rendered in the html view.
+            is_valid, errors, data = CourseMetadata.validate_and_update_from_json(
+                course_module,
+                advanced_dict,
+                user=request.user,
+            )
+            proctoring_errors = [err for err in errors if err.get('key') in ('proctoring_provider', 'proctoring_escalation_email')]
+
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
                 'advanced_dict': advanced_dict,
                 'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
                 'publisher_enabled': publisher_enabled,
                 'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
-
+                'proctoring_errors': proctoring_errors
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
