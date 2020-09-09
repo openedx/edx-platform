@@ -179,12 +179,12 @@ def _get_user_by_email(request):
             else:
                 from student import roles as user_roles  # Avoid import errors.
                 return User.objects.get(
-                    courseaccessrole__role__in=[
+                    email=email,
+                    pk__in=CourseAccessRole.objects.filter(role__in=[
                         user_roles.CourseCreatorRole.ROLE,
                         user_roles.CourseInstructorRole.ROLE,
                         user_roles.CourseStaffRole.ROLE,
-                    ],
-                    email=email,
+                    ]).values('user_id'),
                 )
         except (UserOrganizationMapping.DoesNotExist, User.DoesNotExist):
             _log_failed_get_user_by_email(email)
