@@ -45,7 +45,7 @@ def enrollment_learners_context(course_id, identifiers):
     :return: iterator of tuples
         (
             user: User: The User object if found,
-            identifier: string: The dentifier as-is,
+            identifier: string: The identifier as-is -- which is either a username or an email,
             email: string: Learner email by the identifier,
             language: string: Learner language,
         )
