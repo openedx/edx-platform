@@ -48,7 +48,7 @@ class MultiTenantStudioLoginTestCase(TestCase):
             'password': self.PASSWORD,
         })
         assert response.status_code == status.HTTP_200_OK, response.content
-        assert response.json()['success']
+        assert response.json()['success'], response.content
 
     def test_login_no_course_creator(self):
         """
@@ -59,8 +59,8 @@ class MultiTenantStudioLoginTestCase(TestCase):
             'password': self.PASSWORD,
         })
         assert response.status_code == status.HTTP_200_OK, response.content
-        assert not response.json()['success']
-        assert response.json()['value'] == self.FAILURE_MESSAGE
+        assert not response.json()['success'], response.content
+        assert response.json()['value'] == self.FAILURE_MESSAGE, response.content
 
     @ddt.data(CourseStaffRole.ROLE, CourseInstructorRole.ROLE)
     def test_login_for_course_staff(self, course_role_name):
@@ -153,5 +153,5 @@ class MultiTenantStudioLoginTestCase(TestCase):
             'password': 'wrong_password',
         })
         assert response.status_code == status.HTTP_200_OK, response.content
-        assert not response.json()['success']
+        assert not response.json()['success'], response.content
         assert response.json()['value'] == self.FAILURE_MESSAGE
