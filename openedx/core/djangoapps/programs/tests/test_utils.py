@@ -4,6 +4,7 @@
 import datetime
 import json
 import uuid
+from collections import namedtuple
 from copy import deepcopy
 
 import ddt
@@ -1603,7 +1604,40 @@ class TestProgramEnrollment(SharedModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.AUDIT)
         mock_get_programs_by_type.return_value = [self.program]
         self.assertFalse(
-            is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS, paid_modes=True)
+            is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS, paid_modes_only=True)
+        )
+
+    # NEW CODE HERE
+    @mock.patch('openedx.core.djangoapps.programs.utils.get_paid_modes_for_course')
+    def test_user_enrolled_in_paid_only_with_no_matching_paid_course_modes(self, mock_get_paid_modes_for_course, mock_get_programs_by_type):
+        second_program = ProgramFactory(type=self.MICROBACHELORS)
+        second_catalog_course_run = second_program['courses'][0]['course_runs'][0]
+        second_course_key = CourseKey.from_string(second_catalog_course_run['key'])
+        second_course_run = ModuleStoreCourseFactory.create(
+            org=second_course_key.org,
+            number=second_course_key.course,
+            run=second_course_key.run,
+            modulestore=self.store,
+        )
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course_run.id, mode=CourseMode.AUDIT)
+        CourseEnrollmentFactory.create(user=self.user, course_id=second_course_run.id, mode=CourseMode.AUDIT)
+
+        mock_get_programs_by_type.return_value = [self.program, second_program]
+
+        # While most of a programs courses would likely come with a paid mode, if the course in question is now expired,
+        # then get_paid_modes_for_course would return an empty list. Even with no paid modes, if we request paid modes only
+        # we should return False
+        mock_get_paid_modes_for_course.return_value = []
+        # raise Exception((mock_get_programs_by_type, mock_get_paid_modes_for_course))
+        self.assertFalse(
+            is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS, paid_modes_only=True)
+        )
+
+        # We should continue to return false even if they do contain paid modes
+        Mode = namedtuple('Mode', ['slug'])
+        # mock_get_paid_modes_for_course.return_value = [Mode(CourseMode.VERIFIED)]
+        self.assertFalse(
+            is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS, paid_modes_only=True)
         )
 
     def test_user_with_entitlement_no_enrollment(self, mock_get_programs_by_type):
