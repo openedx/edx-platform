@@ -10,7 +10,7 @@ from nodebb.models import DiscussionCommunity
 
 class DiscussionCommunityMembership(TimeStampedModel):
     """
-    A class to associate user with community
+    Class to associate user with community
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     community = models.ForeignKey(DiscussionCommunity, on_delete=models.CASCADE)
@@ -19,4 +19,4 @@ class DiscussionCommunityMembership(TimeStampedModel):
         unique_together = (("user", "community"),)
 
     def __unicode__(self):
-        return u"<DiscussionCommunityMembership: {user} >".format(user=self.user)
+        return u'<DiscussionCommunityMembership: {user} >'.format(user=self.user)
