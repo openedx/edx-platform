@@ -4,13 +4,13 @@
 from django.conf import settings
 from django.http import Http404
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import viewsets
-from rest_framework.response import Response
 
 from cms.djangoapps.contentstore.api.views.utils import course_author_access_required
+from lms.djangoapps.courseware.courses import get_course_by_id
 from models.settings.course_metadata import CourseMetadata
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from xmodule.modulestore.django import modulestore
+from rest_framework import viewsets
+from rest_framework.response import Response
 
 from ..serializers.discussion_settings import DiscussionSettingsSerializer
 
@@ -42,7 +42,7 @@ class DiscussionSettingsViewSet(DeveloperErrorViewMixin, viewsets.GenericViewSet
 
     def get_course_module(self):
         course_key = self.get_object()
-        return modulestore().get_course(course_key)
+        return get_course_by_id(course_key)
 
     def get_settings(self):
         course_module = self.get_course_module()
