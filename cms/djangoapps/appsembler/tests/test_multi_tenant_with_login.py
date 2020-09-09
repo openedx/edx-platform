@@ -26,12 +26,12 @@ class MultiTenantStudioLoginTestCase(TestCase):
         super(MultiTenantStudioLoginTestCase, self).setUp()
         self.url = reverse('login_post')  # CMS login endpoint.
         self.customer = UserFactory.create(email=self.EMAIL, password=self.PASSWORD)
-        CourseAccessRole.objects.create(user=self.customer, role=CourseCreatorRole.ROLE)
 
-    def test_login(self):
+    def test_login_with_course_creator_role(self):
         """
-        Test the APPSEMBLER_MULTI_TENANT_EMAILS feature when enabled in Studio.
+        Test the APPSEMBLER_MULTI_TENANT_EMAILS feature when enabled in Studio for CourseCreatorRole.
         """
+        CourseAccessRole.objects.create(user=self.customer, role=CourseCreatorRole.ROLE)
         response = self.client.post(self.url, {
             'email': self.EMAIL,
             'password': self.PASSWORD,
@@ -43,7 +43,6 @@ class MultiTenantStudioLoginTestCase(TestCase):
         """
         Test that users without CourseCreatorRole cannot login into Studio.
         """
-        CourseAccessRole.objects.filter(user=self.customer).delete()  # Remove CourseCreatorRole
         response = self.client.post(self.url, {
             'email': self.EMAIL,
             'password': self.PASSWORD,
@@ -56,6 +55,7 @@ class MultiTenantStudioLoginTestCase(TestCase):
         """
         Test a failed login when the APPSEMBLER_MULTI_TENANT_EMAILS feature in Studio.
         """
+        CourseAccessRole.objects.create(user=self.customer, role=CourseCreatorRole.ROLE)
         response = self.client.post(self.url, {
             'email': self.EMAIL,
             'password': 'wrong_password',
