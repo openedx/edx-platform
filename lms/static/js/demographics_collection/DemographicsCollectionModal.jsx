@@ -250,7 +250,7 @@ class DemographicsCollectionModal extends React.Component {
                     )
                   }
                 </p>
-                {this.state.fieldError && <p className="field-error">{gettext("An error occurred while attempting to retrieve or save the information below. Please try again later")}</p>}
+                {this.state.fieldError && <p className="field-error">{gettext("An error occurred while attempting to retrieve or save the information below. Please try again later.")}</p>}
               </div>
             )}
           </Wizard.Header>
@@ -445,7 +445,7 @@ class DemographicsCollectionModal extends React.Component {
           </Wizard.Closer>
           <Wizard.ErrorPage>
             <div>
-              {this.state.error.length ? this.state.error : gettext("An error occurred while attempting to retrieve or save the information below. Please try again later")}
+              {this.state.error.length ? this.state.error : gettext("An error occurred while attempting to retrieve or save the information below. Please try again later.")}
             </div>
           </Wizard.ErrorPage>
         </Wizard>
