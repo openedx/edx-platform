@@ -1364,7 +1364,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                 team for team in teamset_teams
                 if has_specific_team_access(request.user, team)
             ]
-            if not teams_with_access:
+            if teamset.is_private_managed and not teams_with_access:
                 return Response(
                     build_api_error(ugettext_noop("No teamset found in given course with given id")),
                     status=status.HTTP_404_NOT_FOUND
