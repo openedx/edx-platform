@@ -31,17 +31,17 @@ from student.models import CourseEnrollment
 from track import segment
 
 
-# .. feature_toggle_name: experiments.mobile_upsell_rev934
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Toggle mobile upsell enabled
-# .. feature_toggle_category: experiments
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2019-09-05
-# .. feature_toggle_expiration_date: None
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: REV-934
-# .. feature_toggle_status: supported
+# .. toggle_name: experiments.mobile_upsell_rev934
+# .. toggle_type: flag
+# .. toggle_default: False
+# .. toggle_description: Toggle mobile upsell enabled
+# .. toggle_category: experiments
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2019-09-05
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
+# .. toggle_tickets: REV-934
+# .. toggle_status: supported
 MOBILE_UPSELL_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'experiments'),
     flag_name=u'mobile_upsell_rev934',

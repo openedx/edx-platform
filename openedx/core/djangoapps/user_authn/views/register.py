@@ -96,17 +96,17 @@ REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 REGISTER_USER = Signal(providing_args=["user", "registration"])
 
 
-# .. feature_toggle_name: registration.enable_failure_logging
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Enable verbose logging of registration failure messages
-# .. feature_toggle_category: registration
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2020-04-30
-# .. feature_toggle_expiration_date: 2020-06-01
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: None
-# .. feature_toggle_status: supported
+# .. toggle_name: registration.enable_failure_logging
+# .. toggle_type: flag
+# .. toggle_default: False
+# .. toggle_description: Enable verbose logging of registration failure messages
+# .. toggle_category: registration
+# .. toggle_use_cases: monitored_rollout
+# .. toggle_creation_date: 2020-04-30
+# .. toggle_expiration_date: 2020-06-01
+# .. toggle_warnings: None
+# .. toggle_tickets: None
+# .. toggle_status: supported
 REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'registration'),
     flag_name=u'enable_failure_logging',
