@@ -116,6 +116,15 @@
       }
     }
   }
+  .demographics-modal-closer {
+    h3 {
+      font-size: 28px;
+    }
+    i {
+      font-size: 67px;
+      color: #30a171;
+    }
+  }
   .demographics-form-container {
     display: flex;
     flex-direction: column;
