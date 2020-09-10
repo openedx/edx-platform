@@ -7,6 +7,7 @@ from logging import getLogger
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import utc
 from submissions.models import Submission
 
@@ -15,6 +16,7 @@ from openassessment.assessment.models import Assessment, AssessmentPart
 from openassessment.assessment.serializers import rubric_from_dict
 from openassessment.workflow.models import AssessmentWorkflow
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.url_utils import unquote_slashes
 from openedx.features.philu_utils.utils import get_anonymous_user
 from xmodule.modulestore.django import modulestore
 
@@ -47,6 +49,9 @@ def find_and_autoscore_submissions(enrollments, submission_uuids):
         )
         if submissions_to_autoscore_by_enrollment:
             submissions_to_autoscore.extend(submissions_to_autoscore_by_enrollment)
+            log.info('Found {count} submission(s) for course enrollment {id}'.format(
+                count=len(submissions_to_autoscore_by_enrollment), id=enrollment.id)
+            )
 
     _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta_date)
 
@@ -87,7 +92,7 @@ def _get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuids, de
 
         submission = Submission.objects.filter(
             student_item__student_id=anonymous_user_id,
-            student_item__item_id=open_assessment.location,
+            student_item__item_id=unicode(open_assessment.location),
             status=Submission.ACTIVE,
             created_at__date__lt=delta_date,
             uuid__in=list(submission_uuids)
@@ -137,7 +142,7 @@ def autoscore_ora_submission(submission):
     )
 
     # Find the associated rubric
-    rubric_dict = get_rubric_from_ora(usage_key)
+    rubric_dict = get_rubric_from_ora(course_id_str, usage_key)
 
     rubric = rubric_from_dict(rubric_dict)
     options_selected = select_options(rubric_dict)[0]
@@ -235,16 +240,19 @@ def select_options(rubric_dict):
     return options_selected, points_earned, points_possible
 
 
-def get_rubric_from_ora(usage_key):
+def get_rubric_from_ora(course_id, usage_key):
     """
     Get rubric from ORA xblock
 
     Args:
-        usage_key (UsageKey): UsageKey of the block.
+        course_id (string): Course id.
+        usage_key (string): UsageKey of the block.
 
     Returns:
         dict: A dict with prompts and rubric criteria
     """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_key))
     instance = modulestore().get_item(usage_key)
     return {
         'prompts': instance.prompts,

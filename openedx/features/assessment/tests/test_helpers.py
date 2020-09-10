@@ -11,7 +11,6 @@ from django.contrib.auth.models import User
 from django.db.models import signals
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import BlockUsageLocator
 from pytz import UTC
 from submissions.models import Score
 
@@ -75,7 +74,7 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
             submission = SubmissionFactory(
                 student_item__student_id=anonymous_user.anonymous_user_id,
                 student_item__course_id=course_id,
-                student_item__item_id=open_assessment.location,
+                student_item__item_id=unicode(open_assessment.location),
                 created_at=submission_date,
             )
             submissions.append(submission)
@@ -189,11 +188,10 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
         is marked to done.
         """
         mock_select_options.return_value = {'Ideas': 'Fair', 'Content': 'Fair'}, 4, 6
-        block_usage_locator = BlockUsageLocator.from_string(unicode(self.all_ora_in_course[0].location))
         submission = SubmissionFactory(
             student_item__student_id='student_1',
             student_item__course_id=self.source_course.id.to_deprecated_string(),
-            student_item__item_id=block_usage_locator
+            student_item__item_id=unicode(self.all_ora_in_course[0].location)
         )
         uuid = submission.uuid
         workflow_api.create_workflow(uuid, ["training", "peer", "self"])
@@ -208,6 +206,27 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
         self.assertIsNotNone(assessment_workflow)
         self.assertEqual(assessment_workflow.status, 'done')
         self.assertIsNotNone(score_by_bot)
+
+    @mock.patch('openedx.features.assessment.helpers.modulestore')
+    def test_get_rubric_from_ora(self, mock_modulestore):
+        """
+        Test rubric for course
+        """
+        mock_get_item = mock_modulestore().get_item()
+        mock_get_item.prompts.return_value = 'mock prompts'
+        mock_get_item.rubric_criteria.return_value = 'mock criteria'
+        expected_rubric_dict = {
+            'prompts': mock_get_item.prompts,
+            'criteria': mock_get_item.rubric_criteria
+        }
+
+        # Find the associated rubric for that course_id & item_id
+        actual_rubric_dict = helpers.get_rubric_from_ora(
+            self.source_course.id.to_deprecated_string(),
+            unicode(self.all_ora_in_course[0].location)
+        )
+
+        self.assertEqual(expected_rubric_dict, actual_rubric_dict)
 
 
 @ddt
@@ -296,21 +315,3 @@ class AssessmentHelperTestCases(TestCase):
         helpers.get_philu_bot()
 
         self.assertTrue(User.objects.filter(username=PHILU_BOT_NAME).exists())
-
-    @mock.patch('openedx.features.assessment.helpers.modulestore')
-    def test_get_rubric_from_ora(self, mock_modulestore):
-        """
-        Test rubric for course
-        """
-        mock_get_item = mock_modulestore().get_item()
-        mock_get_item.prompts.return_value = 'mock prompts'
-        mock_get_item.rubric_criteria.return_value = 'mock criteria'
-        expected_rubric_dict = {
-            'prompts': mock_get_item.prompts,
-            'criteria': mock_get_item.rubric_criteria
-        }
-
-        # Find the associated rubric for that course_id & item_id
-        actual_rubric_dict = helpers.get_rubric_from_ora(mock.ANY)
-
-        self.assertEqual(expected_rubric_dict, actual_rubric_dict)
