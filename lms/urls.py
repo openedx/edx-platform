@@ -666,6 +666,15 @@ urlpatterns += [
         ),
         include('openedx.features.portfolio_project.urls'),
     ),
+
+    # Subscriptions
+    url(
+        r'^api/subscriptions/',
+        include(
+            'openedx.features.subscriptions.api.v1.urls',
+            namespace='subscriptions_api',
+        )
+    ),
 ]
 
 if settings.FEATURES.get('ENABLE_TEAMS'):
