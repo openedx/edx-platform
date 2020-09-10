@@ -43,7 +43,7 @@ chardet==3.0.4            # via -r requirements/edx/testing.txt, pdfminer.six, p
 chem==1.2.0               # via -r requirements/edx/testing.txt
 click-log==0.3.2          # via -r requirements/edx/testing.txt, edx-lint
 click==7.1.2              # via -r requirements/edx/development.in, -r requirements/edx/pip-tools.txt, -r requirements/edx/testing.txt, click-log, code-annotations, edx-lint, nltk, pip-tools, user-util
-code-annotations==0.6.0   # via -r requirements/edx/testing.txt, edx-enterprise
+code-annotations==0.7.0   # via -r requirements/edx/testing.txt, edx-enterprise
 contextlib2==0.6.0.post1  # via -r requirements/edx/testing.txt
 coreapi==2.3.3            # via -r requirements/edx/testing.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/testing.txt, coreapi, drf-yasg
@@ -110,7 +110,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/testing.txt
 edx-django-utils==3.8.0   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.7.8     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
+edx-enterprise==3.8.0     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.5.2           # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
