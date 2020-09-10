@@ -28,7 +28,7 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
     .. toggle_category: ?
     .. toggle_use_cases: ?
     .. toggle_creation_date: 2018-11-02
-    .. toggle_expiration_date: None
+    .. toggle_target_removal_date: None
     .. toggle_warnings: None
     .. toggle_tickets: None
     """

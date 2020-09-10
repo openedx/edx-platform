@@ -341,7 +341,7 @@ FEATURES = {
     #   default because enabling allows a method to bypass password policy.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
-    # .. toggle_expiration_date: None
+    # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
     # .. toggle_warnings: None
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
@@ -354,7 +354,7 @@ FEATURES = {
     # .. toggle_description: Set to True to enable team-based ORA submissions.
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-03-03
-    # .. toggle_expiration_date: None
+    # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
     # .. toggle_warnings: None
     'ENABLE_ORA_TEAM_SUBMISSIONS': False,
@@ -367,7 +367,7 @@ FEATURES = {
     #   metadata in staff assessments.
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-03-03
-    # .. toggle_expiration_date: None
+    # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
     # .. toggle_warnings: None
     'ENABLE_ORA_ALL_FILE_URLS': False,
@@ -379,7 +379,7 @@ FEATURES = {
     #   discoverable. If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-03-03
-    # .. toggle_expiration_date: None
+    # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
     # .. toggle_warnings: None
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
@@ -394,7 +394,7 @@ FEATURES = {
     #        eg: '2020-09-01'
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-06-12
-    # .. toggle_expiration_date: 2020-12-01
+    # .. toggle_target_removal_date: 2020-12-01
     # .. toggle_warnings: This can be removed once support is removed for deprecated
     #   course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
@@ -406,7 +406,7 @@ FEATURES = {
     # .. toggle_description: Set to True to enable the Library Authoring MFE
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-06-20
-    # .. toggle_expiration_date: 2020-12-31
+    # .. toggle_target_removal_date: 2020-12-31
     # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
     # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
     #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
@@ -2263,7 +2263,7 @@ EDXAPP_PARSE_KEYS = {}
 # .. toggle_description: Toggle for removing the deprecated /signin url.
 # .. toggle_use_cases: incremental_release
 # .. toggle_creation_date: 2019-12-02
-# .. toggle_expiration_date: 2020-06-01
+# .. toggle_target_removal_date: 2020-06-01
 # .. toggle_warnings: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
 DISABLE_DEPRECATED_SIGNIN_URL = False
@@ -2274,7 +2274,7 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_description: Toggle for removing the deprecated /signup url.
 # .. toggle_use_cases: incremental_release
 # .. toggle_creation_date: 2019-12-02
-# .. toggle_expiration_date: 2020-06-01
+# .. toggle_target_removal_date: 2020-06-01
 # .. toggle_warnings: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
 DISABLE_DEPRECATED_SIGNUP_URL = False

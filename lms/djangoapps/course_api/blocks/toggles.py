@@ -14,7 +14,7 @@ COURSE_BLOCKS_API_NAMESPACE = WaffleFlagNamespace(name=u'course_blocks_api')
 # .. toggle_description: Waffle flag to hide access denial messages in the course blocks.
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: ??
-# .. toggle_expiration_date: None
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: ??
 HIDE_ACCESS_DENIALS_FLAG = WaffleFlag(

@@ -488,7 +488,7 @@ class BulkEmailFlag(ConfigurationModel):
     .. toggle_category: bulk email
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2016-05-05
-    .. toggle_expiration_date: None
+    .. toggle_target_removal_date: None
     .. toggle_warnings: None
     .. toggle_tickets: None
     """

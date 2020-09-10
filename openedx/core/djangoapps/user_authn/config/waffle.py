@@ -15,7 +15,7 @@ _WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_pre
 #   ins to the Django admin dashboard at "/admin".
 # .. toggle_use_cases: incremental_release
 # .. toggle_creation_date: 2019-11-20
-# .. toggle_expiration_date: 2020-01-31
+# .. toggle_target_removal_date: 2020-01-31
 # .. toggle_warnings: Requires THIRD_PARTY_AUTH_ONLY_DOMAIN to also be set.
 # .. toggle_tickets: ENT-2461
 ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = WaffleSwitch(

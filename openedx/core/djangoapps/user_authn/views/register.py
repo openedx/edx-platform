@@ -102,7 +102,7 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 # .. toggle_description: Enable verbose logging of registration failure messages
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-04-30
-# .. toggle_expiration_date: 2020-06-01
+# .. toggle_target_removal_date: 2020-06-01
 # .. toggle_warnings: None
 # .. toggle_tickets: None
 REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag(

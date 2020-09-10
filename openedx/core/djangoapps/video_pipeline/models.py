@@ -59,7 +59,7 @@ class VEMPipelineIntegration(ConfigurationModel):
     .. toggle_category: video_pipeline
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2020-06-04
-    .. toggle_expiration_date: None
+    .. toggle_target_removal_date: None
     .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/24093
     """
@@ -104,7 +104,7 @@ class VideoUploadsEnabledByDefault(ConfigurationModel):
     .. toggle_category: video_pipeline
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2017-11-10
-    .. toggle_expiration_date: None
+    .. toggle_target_removal_date: None
     .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
     """
@@ -158,7 +158,7 @@ class CourseVideoUploadsEnabledByDefault(ConfigurationModel):
     .. toggle_category: video_pipeline
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2017-11-10
-    .. toggle_expiration_date: None
+    .. toggle_target_removal_date: None
     .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
     """

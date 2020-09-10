@@ -15,7 +15,7 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='verify_student')
 #   implementation for ID verification.
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2020-06-25
-# .. toggle_expiration_date: n/a
+# .. toggle_target_removal_date: n/a
 # .. toggle_warnings: n/a
 # .. toggle_tickets: PROD-1639
 USE_NEW_EMAIL_TEMPLATES = WaffleFlag(
@@ -36,7 +36,7 @@ def use_new_templates_for_id_verification_emails():
 # .. toggle_description: Supports staged rollout to students for the new IDV flow.
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2020-07-09
-# .. toggle_expiration_date: n/a
+# .. toggle_target_removal_date: n/a
 # .. toggle_warnings: n/a
 # .. toggle_tickets: MST-318
 REDIRECT_TO_IDV_MICROFRONTEND = WaffleFlag(

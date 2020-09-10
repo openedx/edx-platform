@@ -92,7 +92,7 @@ COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_acce
 # .. toggle_description: Used with our integration with CourseTalk to display reviews for a course.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2017-06-19
-# .. toggle_expiration_date: ???
+# .. toggle_target_removal_date: ???
 # .. toggle_warnings: We are no longer integrating with CourseTalk, so this probably should be deprecated and the code
 #   for reviews should be removed.
 # .. toggle_tickets: DEPR-48
@@ -105,7 +105,7 @@ SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_t
 # .. toggle_description: Used to determine whether or not to use course goals for the particular course.
 # .. toggle_use_cases: opt_out, temporary
 # .. toggle_creation_date: 2017-09-11
-# .. toggle_expiration_date: ???
+# .. toggle_target_removal_date: ???
 # .. toggle_warnings: N/A
 # .. toggle_tickets: N/A
 ENABLE_COURSE_GOALS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_course_goals', __name__)
@@ -123,7 +123,7 @@ UPGRADE_DEADLINE_MESSAGE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'upgrade_dead
 # .. toggle_description: Used to switch between 'welcome message' and 'latest update' on the course home page.
 # .. toggle_use_cases: opt_out
 # .. toggle_creation_date: 2017-09-11
-# .. toggle_expiration_date: ???
+# .. toggle_target_removal_date: ???
 # .. toggle_warnings: This is meant to be configured using waffle_utils course override only. Either do not create the
 #   actual waffle flag, or be sure to unset the flag even for Superusers.
 # .. toggle_tickets: N/A

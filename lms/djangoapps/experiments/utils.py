@@ -40,7 +40,7 @@ experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 # .. toggle_description: Toggle for adding the current course's program information to user metadata
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-2-25
-# .. toggle_expiration_date: None
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-63, REVEM-198
 PROGRAM_INFO_FLAG = WaffleFlag(
@@ -55,7 +55,7 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 # .. toggle_description: Toggle for adding info about each course to the dashboard metadata
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-3-28
-# .. toggle_expiration_date: None
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-118
 DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace, u'add_dashboard_info', __name__)
@@ -68,7 +68,7 @@ DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace, u'add_dashboard_info', _
 # .. toggle_description: Make sure upsell tracking JS works as expected.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-7-7
-# .. toggle_expiration_date: None
+# .. toggle_target_removal_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REV-1205
 UPSELL_TRACKING_FLAG = WaffleFlag(

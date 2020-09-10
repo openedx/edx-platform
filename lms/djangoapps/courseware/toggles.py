@@ -15,7 +15,7 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 #   students for a new micro-frontend-based implementation of the courseware page.
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2020-01-29
-# .. toggle_expiration_date: 2020-12-31
+# .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   ENABLE_COURSEWARE_MICROFRONTEND.
 # .. toggle_tickets: TNL-7000
@@ -31,7 +31,7 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
 #   courseware page.
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2020-03-09
-# .. toggle_expiration_date: 2020-12-31
+# .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   ENABLE_COURSEWARE_MICROFRONTEND.
 # .. toggle_tickets: TNL-6982
