@@ -439,9 +439,12 @@ class DemographicsCollectionModal extends React.Component {
             }
           </Wizard.Page>
           <Wizard.Closer>
-            <h3>
-              {gettext("Thank you! You’re helping make edX better for everyone.")}
-            </h3>
+            <div className="demographics-modal-closer m-sm-0">
+            <i class="fa fa-check" aria-hidden="true"></i>
+              <h3>
+                {gettext("Thank you! You’re helping make edX better for everyone.")}
+              </h3>
+            </div>
           </Wizard.Closer>
           <Wizard.ErrorPage>
             <div>
