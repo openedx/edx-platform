@@ -327,6 +327,14 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                     'type': u'private_managed'
                 }
             )
+            base_topics.append(
+                {
+                    'id': 'private_topic_no_teams',
+                    'name': 'private_topic_no_teams_name',
+                    'description': u'Description for topic private_topic_no_teams.',
+                    'type': u'private_managed'
+                }
+            )
             teams_configuration_1 = TeamsConfig({
                 'topics': base_topics,
                 'max_team_size': 5
@@ -1730,8 +1738,8 @@ class TestListTopicsAPI(TeamAPITestCase):
         ('student_inactive', 401, None),
         ('student_unenrolled', 403, None),
         ('student_enrolled', 200, 4),
-        ('staff', 200, 6),
-        ('course_staff', 200, 6),
+        ('staff', 200, 7),
+        ('course_staff', 200, 7),
         ('community_ta', 200, 4),
     )
     @ddt.unpack
@@ -1868,13 +1876,13 @@ class TestListTopicsAPI(TeamAPITestCase):
         ('student_on_team_1_private_set_1', 1),
         ('student_on_team_2_private_set_1', 1),
         ('student_masters', 0),
-        ('staff', 2)
+        ('staff', 3)
     )
     def test_teamset_type(self, requesting_user, expected_private_teamsets):
         """
         As different users, request course_1's list of topics, and see what private_managed teamsets are returned
 
-        Staff should be able to see both teamsets, and anyone enrolled in a private teamset should see that and
+        Staff should be able to see all teamsets, and anyone enrolled in a private teamset should see that and
         only that teamset
         """
         topics = self.get_topics_list(
@@ -2227,7 +2235,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         ('student_masters', 404, None),
         ('staff', 200, {'student_on_team_1_private_set_1', 'student_on_team_2_private_set_1'})
     )
-    def test_access_filter_teamset(self, user, expected_response, expected_users):
+    def test_access_filter_teamset__private_teamset(self, user, expected_response, expected_users):
         memberships = self.get_membership_list(
             expected_response,
             {
@@ -2239,6 +2247,64 @@ class TestListMembershipAPI(TeamAPITestCase):
         if expected_response == 200:
             returned_users = {membership['user']['username'] for membership in memberships['results']}
             self.assertEqual(returned_users, expected_users)
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_enrolled', 404),
+        ('student_on_team_1_private_set_1', 404),
+        ('student_on_team_2_private_set_1', 404),
+        ('student_masters', 404),
+        ('staff', 200)
+    )
+    def test_access_filter_teamset__private_teamset__no_teams(self, user, expected_response):
+        """
+        private_topic_no_teams has no teams in it, but staff should still get a 200 when
+        requesting teamset memberships
+        """
+        self.get_membership_list(
+            expected_response,
+            {
+                'teamset_id': 'private_topic_no_teams',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+
+    @ddt.unpack
+    @ddt.data(
+        ('student_unenrolled', 404, {}),
+        ('student_enrolled_not_on_team', 200, {'student_enrolled'}),
+        ('student_enrolled', 200, {'student_enrolled'}),
+        ('student_masters', 200, {'student_masters'}),
+        ('staff', 200, {'student_enrolled', 'student_masters'})
+    )
+    def test_access_filter_teamset__open_teamset(self, user, expected_response, expected_usernames):
+        # topic_3 has no teams
+        self.assertFalse(CourseTeam.objects.filter(topic_id='topic_3').exists())
+        memberships = self.get_membership_list(
+            expected_response,
+            {
+                'teamset_id': 'topic_3',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+        if expected_response == 200:
+            self.assertEqual(memberships['count'], 0)
+
+        # topic_0 has teams
+        self.assertTrue(CourseTeam.objects.filter(topic_id='topic_0').exists())
+        memberships = self.get_membership_list(
+            expected_response,
+            {
+                'teamset_id': 'topic_0',
+                'course_id': str(self.test_course_1.id),
+            },
+            user=user
+        )
+        if expected_response == 200:
+            returned_users = {membership['user']['username'] for membership in memberships['results']}
+            self.assertEqual(returned_users, expected_usernames)
 
 
 @ddt.ddt
