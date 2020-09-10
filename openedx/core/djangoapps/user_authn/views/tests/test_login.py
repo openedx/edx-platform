@@ -236,8 +236,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user_email,
             self.password
         )
-        self._assert_response(response, success=False,
-                              value="In order to sign in, you need to activate your account.")
+        self._assert_response(response, success=False, error_code="inactive-user")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
@@ -253,7 +252,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user_email,
             self.password,
         )
-        self._assert_response(response, success=False, value=self.ACTIVATE_ACCOUNT_WARNING)
+        self._assert_response(response, success=False, error_code="inactive-user")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
 
     @patch('openedx.core.djangoapps.user_authn.views.login._log_and_raise_inactive_user_auth_error')
@@ -595,7 +594,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             result = self.client.post(self.url, post_params, **extra)
         return result, mock_audit_log
 
-    def _assert_response(self, response, success=None, value=None, status_code=None):
+    def _assert_response(self, response, success=None, value=None, status_code=None, error_code=None):
         """
         Assert that the response has the expected status code and returned a valid
         JSON-parseable dict.
@@ -617,6 +616,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
         if success is not None:
             self.assertEqual(response_dict['success'], success)
+
+        if error_code is not None:
+            self.assertEqual(response_dict['error_code'], error_code)
 
         if value is not None:
             msg = (u"'%s' did not contain '%s'" %

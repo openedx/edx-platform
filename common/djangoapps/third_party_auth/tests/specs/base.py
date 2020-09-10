@@ -126,7 +126,7 @@ class HelperMixin(object):
         self.assertEqual(400, response.status_code)
         payload = json.loads(response.content.decode('utf-8'))
         self.assertFalse(payload.get('success'))
-        self.assertIn('In order to sign in, you need to activate your account.', payload.get('value'))
+        self.assertIn('inactive-user', payload.get('error_code'))
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
