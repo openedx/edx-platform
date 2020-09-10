@@ -26,6 +26,7 @@ def waffle_flags():
         COURSE_DETAIL_UPDATE_CERTIFICATE_DATE: CourseWaffleFlag(
             waffle_namespace=COURSE_DETAIL_WAFFLE_NAMESPACE,
             flag_name=COURSE_DETAIL_UPDATE_CERTIFICATE_DATE,
+            module_name=__name__,
         )
     }
 

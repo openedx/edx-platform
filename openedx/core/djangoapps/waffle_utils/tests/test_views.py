@@ -12,7 +12,7 @@ from ..views import ToggleStateView
 from ..testutils import override_waffle_flag
 
 TEST_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace('test')
-TEST_WAFFLE_FLAG = WaffleFlag(TEST_WAFFLE_FLAG_NAMESPACE, 'flag')
+TEST_WAFFLE_FLAG = WaffleFlag(TEST_WAFFLE_FLAG_NAMESPACE, 'flag', __name__)
 
 
 # TODO: Missing coverage for:

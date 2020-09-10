@@ -11,9 +11,9 @@ namespace.  For example::
    WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='my_namespace')
 
    # Use CourseWaffleFlag when you are in the context of a course.
-   SOME_COURSE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_course_feature')
+   SOME_COURSE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_course_feature', __name__)
    # Use WaffleFlag when outside the context of a course.
-   SOME_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_feature')
+   SOME_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_feature', __name__)
 
 You can check these flags in code using the following::
 
@@ -188,18 +188,20 @@ class WaffleSwitch(object):
     # use a WeakSet so these instances can be garbage collected if need be
     _class_instances = WeakSet()
 
-    def __init__(self, waffle_namespace, switch_name):
+    def __init__(self, waffle_namespace, switch_name, module_name=None):
         """
         Arguments:
             waffle_namespace (WaffleSwitchNamespace | String): Namespace for this switch.
             switch_name (String): The name of the switch (without namespacing).
+            module_name (String): The name of the module where the flag is created. This should be ``__name__`` in most
+            cases.
         """
         if isinstance(waffle_namespace, six.string_types):
             waffle_namespace = WaffleSwitchNamespace(name=waffle_namespace)
 
         self.waffle_namespace = waffle_namespace
         self.switch_name = switch_name
-        self._module_name = _get_instance_module_name(self)
+        self._module_name = module_name or ""
         self._class_instances.add(self)
 
     @classmethod
@@ -400,14 +402,15 @@ class WaffleFlag(object):
     # use a WeakSet so these instances can be garbage collected if need be
     _class_instances = WeakSet()
 
-    def __init__(self, waffle_namespace, flag_name):
+    def __init__(self, waffle_namespace, flag_name, module_name=None):
         """
         Initializes the waffle flag instance.
 
         Arguments:
             waffle_namespace (WaffleFlagNamespace | String): Namespace for this flag.
             flag_name (String): The name of the flag (without namespacing).
-
+            module_name (String): The name of the module where the flag is created. This should be ``__name__`` in most
+            cases.
         """
         if isinstance(waffle_namespace, six.string_types):
             waffle_namespace = WaffleFlagNamespace(name=waffle_namespace)
@@ -415,7 +418,7 @@ class WaffleFlag(object):
         self.waffle_namespace = waffle_namespace
         self.waffle_namespace = waffle_namespace
         self.flag_name = flag_name
-        self._module_name = _get_instance_module_name(self)
+        self._module_name = module_name or ""
         self._class_instances.add(self)
 
     @classmethod
@@ -516,43 +519,3 @@ class CourseWaffleFlag(WaffleFlag):
             self.flag_name,
             check_before_waffle_callback=self._get_course_override_callback(course_key),
         )
-
-
-def _get_instance_module_name(instance_object):
-    """
-    Returns the module in which the passed instance object was defined.
-
-    This must be called from the ``__init__`` method of the instance class.
-    """
-    try:
-        stack = traceback.extract_stack()
-        # Example: 'openedx.core.djangoapps.waffle_utils'
-        instance_class_module = instance_object.__class__.__module__
-        # Example: 'openedx/core/djangoapps/waffle_utils'
-        class_module_as_path = instance_class_module.replace('.', '/')
-        module_string_index = -1
-        # start searching at -2, because -1 starts in this function.
-        # search up the stack to max of -10, because the class hierarchy
-        # shouldn't be that deep.
-        for stack_index in range(-2, -10, -1):
-            # Example: '/edx/app/edxapp/edx-platform/openedx/core/djangoapps/waffle_utils/__init__.py'
-            class_file_name = stack[stack_index].filename
-            if module_string_index == -1:
-                module_string_index = class_file_name.find(class_module_as_path)
-            if stack[stack_index].name != '__init__':
-                # assumes the instance is being defined as soon as we are
-                # no longer in any __init__ method of the class hierarchy.
-                break
-        # Example: '/edx/app/edxapp/edx-platform/openedx/core/djangoapps/programs/__init__.py'
-        instance_file_name = stack[stack_index].filename
-        # Example: 'openedx/core/djangoapps/programs/__init__.py'
-        instance_module_name = instance_file_name[module_string_index:]
-        # Example: 'openedx.core.djangoapps.programs.__init__.py'
-        instance_module_name = instance_module_name.replace('/', '.')
-        # Example: 'openedx.core.djangoapps.programs.__init__'
-        instance_module_name = re.sub(r'\.py$', '', instance_module_name)
-        # Example: 'openedx.core.djangoapps.programs'
-        instance_module_name = re.sub(r'\.__init__$', '', instance_module_name)
-        return instance_module_name
-    except Exception:  # pylint: disable=broad-except
-        return 'error.parsing.module'

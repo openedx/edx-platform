@@ -110,6 +110,7 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'registration'),
     flag_name=u'enable_failure_logging',
+    module_name=__name__,
 )
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 

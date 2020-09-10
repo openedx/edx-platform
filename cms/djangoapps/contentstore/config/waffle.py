@@ -36,11 +36,13 @@ def waffle_flags():
 ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name=u'enable_checklists_quality',
+    module_name=__name__,
 )
 
 SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name=u'show_review_rules',
+    module_name=__name__,
 )
 
 # Waffle flag to redirect to the library authoring MFE.
@@ -58,4 +60,5 @@ SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(
 REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = WaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name='library_authoring_mfe',
+    module_name=__name__,
 )

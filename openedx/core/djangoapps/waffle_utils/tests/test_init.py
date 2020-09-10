@@ -37,7 +37,7 @@ class TestCourseWaffleFlag(TestCase):
     TEST_COURSE_KEY = CourseKey.from_string("edX/DemoX/Demo_Course")
     TEST_COURSE_2_KEY = CourseKey.from_string("edX/DemoX/Demo_Course_2")
     TEST_NAMESPACE = WaffleFlagNamespace(NAMESPACE_NAME)
-    TEST_COURSE_FLAG = CourseWaffleFlag(TEST_NAMESPACE, FLAG_NAME)
+    TEST_COURSE_FLAG = CourseWaffleFlag(TEST_NAMESPACE, FLAG_NAME, __name__)
 
     def setUp(self):
         super(TestCourseWaffleFlag, self).setUp()
@@ -101,6 +101,7 @@ class TestCourseWaffleFlag(TestCase):
         test_course_flag = CourseWaffleFlag(
             self.TEST_NAMESPACE,
             self.FLAG_NAME,
+            __name__,
         )
 
         with patch(
@@ -134,6 +135,7 @@ class TestCourseWaffleFlag(TestCase):
         test_course_flag = CourseWaffleFlag(
             self.TEST_NAMESPACE,
             self.FLAG_NAME,
+            __name__,
         )
         self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), False)
 
@@ -145,6 +147,7 @@ class TestCourseWaffleFlag(TestCase):
         test_course_flag = CourseWaffleFlag(
             self.TEST_NAMESPACE,
             self.FLAG_NAME,
+            __name__,
         )
         with override_flag(self.NAMESPACED_FLAG_NAME, active=True):
             self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), True)
@@ -161,9 +164,9 @@ class TestCourseWaffleFlag(TestCase):
                 'openedx.core.djangoapps.waffle_utils._WAFFLE_FLAG_CUSTOM_METRIC_SET',
                 _get_waffle_flag_custom_metrics_set(),
             ):
-                test_course_flag = CourseWaffleFlag(self.TEST_NAMESPACE, self.FLAG_NAME)
+                test_course_flag = CourseWaffleFlag(self.TEST_NAMESPACE, self.FLAG_NAME, __name__)
                 test_course_flag.is_enabled(self.TEST_COURSE_KEY)
-                test_course_flag_2 = CourseWaffleFlag(self.TEST_NAMESPACE, self.FLAG_2_NAME)
+                test_course_flag_2 = CourseWaffleFlag(self.TEST_NAMESPACE, self.FLAG_2_NAME, __name__)
                 test_course_flag_2.is_enabled(self.TEST_COURSE_KEY)
 
         self.assertEqual(mock_set_custom_metric.call_count, data['expected_count'])
@@ -186,7 +189,7 @@ class TestWaffleSwitch(TestCase):
     NAMESPACE_NAME = "test_namespace"
     WAFFLE_SWITCH_NAME = "test_switch_name"
     TEST_NAMESPACE = WaffleSwitchNamespace(NAMESPACE_NAME)
-    WAFFLE_SWITCH = WaffleSwitch(TEST_NAMESPACE, WAFFLE_SWITCH_NAME)
+    WAFFLE_SWITCH = WaffleSwitch(TEST_NAMESPACE, WAFFLE_SWITCH_NAME, __name__)
 
     def test_namespaced_switch_name(self):
         """

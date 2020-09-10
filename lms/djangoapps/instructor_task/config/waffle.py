@@ -25,10 +25,12 @@ def waffle_flags():
         GENERATE_PROBLEM_GRADE_REPORT_VERIFIED_ONLY: CourseWaffleFlag(
             waffle_namespace=INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE,
             flag_name=GENERATE_PROBLEM_GRADE_REPORT_VERIFIED_ONLY,
+            module_name=__name__,
         ),
         GENERATE_COURSE_GRADE_REPORT_VERIFIED_ONLY: CourseWaffleFlag(
             waffle_namespace=INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE,
             flag_name=GENERATE_COURSE_GRADE_REPORT_VERIFIED_ONLY,
+            module_name=__name__,
         ),
     }
 

@@ -24,7 +24,7 @@ class OverrideWaffleFlagTests(TestCase):
 
     TEST_COURSE_KEY = CourseKey.from_string("edX/DemoX/Demo_Course")
     TEST_NAMESPACE = WaffleFlagNamespace(NAMESPACE_NAME)
-    TEST_COURSE_FLAG = CourseWaffleFlag(TEST_NAMESPACE, FLAG_NAME)
+    TEST_COURSE_FLAG = CourseWaffleFlag(TEST_NAMESPACE, FLAG_NAME, __name__)
 
     def setUp(self):
         super(OverrideWaffleFlagTests, self).setUp()

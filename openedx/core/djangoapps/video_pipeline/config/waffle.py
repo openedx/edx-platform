@@ -22,14 +22,17 @@ def waffle_flags():
     return {
         DEPRECATE_YOUTUBE: CourseWaffleFlag(
             waffle_namespace=namespace,
-            flag_name=DEPRECATE_YOUTUBE
+            flag_name=DEPRECATE_YOUTUBE,
+            module_name=__name__,
         ),
         ENABLE_DEVSTACK_VIDEO_UPLOADS: WaffleFlag(
             waffle_namespace=namespace,
             flag_name=ENABLE_DEVSTACK_VIDEO_UPLOADS,
+            module_name=__name__,
         ),
         ENABLE_VEM_PIPELINE: CourseWaffleFlag(
             waffle_namespace=namespace,
             flag_name=ENABLE_VEM_PIPELINE,
+            module_name=__name__,
         )
     }

@@ -53,7 +53,7 @@ User = get_user_model()  # pylint:disable=invalid-name
 # This switch exists because the CourseEnrollment admin views make DB queries that impact performance.
 # In a large enough deployment of Open edX, this is enough to cause a site outage.
 # See https://openedx.atlassian.net/browse/OPS-2943
-COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin')
+COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin', __name__)
 
 
 class _Check(object):

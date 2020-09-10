@@ -7,11 +7,11 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNam
 
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='course_home')
 
-COURSE_HOME_MICROFRONTEND = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_home_mfe')
+COURSE_HOME_MICROFRONTEND = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_home_mfe', __name__)
 
-COURSE_HOME_MICROFRONTEND_DATES_TAB = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_home_mfe_dates_tab')
+COURSE_HOME_MICROFRONTEND_DATES_TAB = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_home_mfe_dates_tab', __name__)
 
-COURSE_HOME_MICROFRONTEND_OUTLINE_TAB = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_home_mfe_outline_tab')
+COURSE_HOME_MICROFRONTEND_OUTLINE_TAB = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'course_home_mfe_outline_tab', __name__)
 
 
 def course_home_mfe_dates_tab_is_active(course_key):
