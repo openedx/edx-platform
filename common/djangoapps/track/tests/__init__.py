@@ -6,7 +6,7 @@ from datetime import datetime
 from django.test import TestCase
 from django.test.utils import override_settings
 from eventtracking import tracker
-from eventtracking.django import DjangoTracker
+from eventtracking.django.django_tracker import DjangoTracker
 from freezegun import freeze_time
 from pytz import UTC
 
