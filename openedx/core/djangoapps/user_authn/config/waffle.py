@@ -18,7 +18,6 @@ _WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_pre
 # .. toggle_expiration_date: 2020-01-31
 # .. toggle_warnings: Requires THIRD_PARTY_AUTH_ONLY_DOMAIN to also be set.
 # .. toggle_tickets: ENT-2461
-# .. toggle_status: supported
 ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = WaffleSwitch(
     _WAFFLE_SWITCH_NAMESPACE,
     'enable_login_using_thirdparty_auth_only',

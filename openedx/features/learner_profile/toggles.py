@@ -20,7 +20,6 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='learner_profile')
 # .. toggle_expiration_date: 2020-12-31
 # .. toggle_warnings: Also set settings.PROFILE_MICROFRONTEND_URL and site's ENABLE_PROFILE_MICROFRONTEND.
 # .. toggle_tickets: DEPR-17
-# .. toggle_status: supported
 REDIRECT_TO_PROFILE_MICROFRONTEND = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'redirect_to_microfrontend', __name__)
 
 

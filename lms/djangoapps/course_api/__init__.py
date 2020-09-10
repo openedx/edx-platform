@@ -15,7 +15,6 @@ WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name='course_list_api_rate_limit
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/LEARNER-5527
-# .. toggle_status: supported
 USE_RATE_LIMIT_2_FOR_COURSE_LIST_API = WaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'rate_limit_2', __name__)
 # .. toggle_name: course_list_api_rate_limit.rate_limit_10
 # .. toggle_implementation: WaffleSwitch
@@ -27,5 +26,4 @@ USE_RATE_LIMIT_2_FOR_COURSE_LIST_API = WaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'ra
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/LEARNER-5527
-# .. toggle_status: supported
 USE_RATE_LIMIT_10_FOR_COURSE_LIST_API = WaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'rate_limit_10', __name__)

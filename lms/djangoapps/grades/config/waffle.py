@@ -20,7 +20,6 @@ WAFFLE_NAMESPACE = u'grades'
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2017-04-11
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14771
-# .. toggle_status: supported
 # .. toggle_warnings: This requires the PersistentGradesEnabledFlag to be enabled.
 ASSUME_ZERO_GRADE_IF_ABSENT = u'assume_zero_grade_if_absent'
 # .. toggle_name: grades.disable_regrade_on_policy_change
@@ -30,7 +29,6 @@ ASSUME_ZERO_GRADE_IF_ABSENT = u'assume_zero_grade_if_absent'
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2017-08-03
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15733
-# .. toggle_status: supported
 DISABLE_REGRADE_ON_POLICY_CHANGE = u'disable_regrade_on_policy_change'
 
 # Course Flags
@@ -43,7 +41,6 @@ DISABLE_REGRADE_ON_POLICY_CHANGE = u'disable_regrade_on_policy_change'
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2019-05-29
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/20719
-# .. toggle_status: supported
 REJECTED_EXAM_OVERRIDES_GRADE = u'rejected_exam_overrides_grade'
 # .. toggle_name: grades.rejected_exam_overrides_grade
 # .. toggle_implementation: CourseWaffleFlag
@@ -53,7 +50,6 @@ REJECTED_EXAM_OVERRIDES_GRADE = u'rejected_exam_overrides_grade'
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-10-01
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19026
-# .. toggle_status: supported
 ENFORCE_FREEZE_GRADE_AFTER_COURSE_END = u'enforce_freeze_grade_after_course_end'
 
 # .. toggle_name: grades.writable_gradebook
@@ -65,7 +61,6 @@ ENFORCE_FREEZE_GRADE_AFTER_COURSE_END = u'enforce_freeze_grade_after_course_end'
 # .. toggle_creation_date: 2018-10-03
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19054
 # .. toggle_warnings: Enabling this requires that the `WRITABLE_GRADEBOOK_URL` setting be properly defined.
-# .. toggle_status: supported
 WRITABLE_GRADEBOOK = u'writable_gradebook'
 
 # .. toggle_name: grades.bulk_management
@@ -76,7 +71,6 @@ WRITABLE_GRADEBOOK = u'writable_gradebook'
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2019-08-20
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/21389
-# .. toggle_status: supported
 BULK_MANAGEMENT = u'bulk_management'
 
 

@@ -19,7 +19,6 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   ENABLE_COURSEWARE_MICROFRONTEND.
 # .. toggle_tickets: TNL-7000
-# .. toggle_status: supported
 REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', __name__, use_course_aware_bucketing=False
 )
@@ -36,7 +35,6 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
 #   ENABLE_COURSEWARE_MICROFRONTEND.
 # .. toggle_tickets: TNL-6982
-# .. toggle_status: supported
 COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_team_preview', __name__
 )

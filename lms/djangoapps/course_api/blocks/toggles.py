@@ -17,7 +17,6 @@ COURSE_BLOCKS_API_NAMESPACE = WaffleFlagNamespace(name=u'course_blocks_api')
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: ??
-# .. toggle_status: supported
 HIDE_ACCESS_DENIALS_FLAG = WaffleFlag(
     waffle_namespace=COURSE_BLOCKS_API_NAMESPACE,
     flag_name=u'hide_access_denials',

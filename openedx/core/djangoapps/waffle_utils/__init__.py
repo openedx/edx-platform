@@ -387,7 +387,6 @@ def _get_waffle_flag_custom_metrics_set():
     # .. toggle_creation_date: 2020-06-17
     # .. toggle_expiration_date: None
     # .. toggle_tickets: None
-    # .. toggle_status: supported
     # .. toggle_warnings: Intent is for temporary research (1 day - several weeks) of a flag's usage.
 _WAFFLE_FLAG_CUSTOM_METRICS = 'WAFFLE_FLAG_CUSTOM_METRICS'
 

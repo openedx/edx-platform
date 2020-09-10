@@ -343,7 +343,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-02-21
     # .. toggle_expiration_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
@@ -357,7 +356,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_TEAM_SUBMISSIONS': False,
 
@@ -371,7 +369,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_ALL_FILE_URLS': False,
 
@@ -384,7 +381,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 
@@ -402,7 +398,6 @@ FEATURES = {
     # .. toggle_warnings: This can be removed once support is removed for deprecated
     #   course keys.
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
-    # .. toggle_status: supported
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
 
     # .. toggle_name: ENABLE_LIBRARY_AUTHORING_MICROFRONTEND
@@ -413,7 +408,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-06-20
     # .. toggle_expiration_date: 2020-12-31
     # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
-    # .. toggle_status: supported
     # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
     #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
     'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
@@ -2272,7 +2266,6 @@ EDXAPP_PARSE_KEYS = {}
 # .. toggle_expiration_date: 2020-06-01
 # .. toggle_warnings: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
-# .. toggle_status: supported
 DISABLE_DEPRECATED_SIGNIN_URL = False
 
 # .. toggle_name: DISABLE_DEPRECATED_SIGNUP_URL
@@ -2284,7 +2277,6 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_expiration_date: 2020-06-01
 # .. toggle_warnings: This url can be removed once it no longer has any real traffic.
 # .. toggle_tickets: ARCH-1253
-# .. toggle_status: supported
 DISABLE_DEPRECATED_SIGNUP_URL = False
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####

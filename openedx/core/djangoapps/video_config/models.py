@@ -35,7 +35,6 @@ class HLSPlaybackEnabledFlag(ConfigurationModel):
     .. toggle_expiration_date: None
     .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/14924
-    .. toggle_status: supported
     """
     # this field overrides course-specific settings
     enabled_for_all_courses = BooleanField(default=False)
@@ -90,7 +89,6 @@ class CourseHLSPlaybackEnabledFlag(ConfigurationModel):
     .. toggle_expiration_date: None
     .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/14924
-    .. toggle_status: supported
     """
     KEY_FIELDS = ('course_id',)
 

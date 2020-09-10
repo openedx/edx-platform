@@ -18,7 +18,6 @@ WAFFLE_NAMESPACE = 'videos'
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/18765
-# .. toggle_status: supported
 DEPRECATE_YOUTUBE = 'deprecate_youtube'
 # .. toggle_name: videos.enable_devstack_video_uploads
 # .. toggle_implementation: WaffleFlag
@@ -32,7 +31,6 @@ DEPRECATE_YOUTUBE = 'deprecate_youtube'
 # .. toggle_warnings: Enabling this feature requires that the ROLE_ARN,
 #   MFA_SERIAL_NUMBER, MFA_TOKEN settings are properly defined.
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/23375
-# .. toggle_status: supported
 ENABLE_DEVSTACK_VIDEO_UPLOADS = 'enable_devstack_video_uploads'
 ENABLE_VEM_PIPELINE = 'enable_vem_pipeline'
 

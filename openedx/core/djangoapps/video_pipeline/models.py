@@ -62,7 +62,6 @@ class VEMPipelineIntegration(ConfigurationModel):
     .. toggle_expiration_date: None
     .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/24093
-    .. toggle_status: supported
     """
     client_name = models.CharField(
         max_length=100,
@@ -108,7 +107,6 @@ class VideoUploadsEnabledByDefault(ConfigurationModel):
     .. toggle_expiration_date: None
     .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
-    .. toggle_status: supported
     """
     # this field overrides course-specific settings
     enabled_for_all_courses = models.BooleanField(default=False)
@@ -163,7 +161,6 @@ class CourseVideoUploadsEnabledByDefault(ConfigurationModel):
     .. toggle_expiration_date: None
     .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
-    .. toggle_status: supported
     """
     KEY_FIELDS = ('course_id',)
 

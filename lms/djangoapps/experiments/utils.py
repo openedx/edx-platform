@@ -43,7 +43,6 @@ experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-63, REVEM-198
-# .. toggle_status: supported
 PROGRAM_INFO_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_programs',
@@ -59,7 +58,6 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REVEM-118
-# .. toggle_status: supported
 DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace, u'add_dashboard_info', __name__)
 # TODO END: clean up as part of REVEM-199 (End)
 
@@ -73,7 +71,6 @@ DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace, u'add_dashboard_info', _
 # .. toggle_expiration_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: REV-1205
-# .. toggle_status: supported
 UPSELL_TRACKING_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_upsell_tracking',

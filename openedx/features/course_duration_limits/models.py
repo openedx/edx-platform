@@ -31,7 +31,6 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
     .. toggle_expiration_date: None
     .. toggle_warnings: None
     .. toggle_tickets: None
-    .. toggle_status: supported
     """
 
     STACKABLE_FIELDS = ('enabled', 'enabled_as_of')

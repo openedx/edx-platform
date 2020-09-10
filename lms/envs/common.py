@@ -92,7 +92,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
-    # .. toggle_status: supported
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
@@ -108,7 +107,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: This will cause ALL courses to be immediately visible.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/17913
-    # .. toggle_status: supported
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
     'DISABLE_START_DATES': False,
@@ -126,7 +124,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
-    # .. toggle_status: supported
     'ENABLE_TEXTBOOK': True,
 
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
@@ -147,7 +144,6 @@ FEATURES = {
     #   digests in that case will only be able to unsubscribe via links embedded in
     #   their emails, and they will have no way to resubscribe.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/4891
-    # .. toggle_status: supported
     'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
 
     # toggle_name: ENABLE_UNICODE_USERNAME
@@ -178,20 +174,19 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: None
     # .. toggle_tickets: None
-    # .. toggle_status: supported
     'ENABLE_MASQUERADE': True,
 
     # .. toggle_name: ENABLE_SYSADMIN_DASHBOARD
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for
-    #   deleting and loading courses, for seeing log of git imports of courseware.
+    #   deleting and loading courses, for seeing log of git imports of courseware. Note that some views are not
+    #   performant when there are more than 100 courses.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-12-12
     # .. toggle_expiration_date: None
-    # .. toggle_warnings: some views are not performant when there are more than 100 courses
+    # .. toggle_warnings: This feature is not supported anymore.
     # .. toggle_tickets: None
-    # .. toggle_status: unsupported
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
@@ -204,7 +199,6 @@ FEATURES = {
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2014-09-09
     # .. toggle_expiration_date: None
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_OAUTH2_PROVIDER': False,
 
@@ -219,7 +213,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2968
-    # .. toggle_status: supported
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
 
     # Allows to configure the LMS to provide CORS headers to serve requests from other
@@ -276,7 +269,6 @@ FEATURES = {
     # .. toggle_creation_date: 2019-05-14
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/PROD-269
-    # .. toggle_status: supported
     # .. toggle_warnings: ???
     'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
 
@@ -296,7 +288,6 @@ FEATURES = {
     # .. toggle_creation_date: 2018-05-07
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/TE-2545
-    # .. toggle_status: supported
     'RESTRICT_AUTOMATIC_AUTH': True,
 
     # toggle_name: ENABLE_LOGIN_MICROFRONTEND
@@ -342,7 +333,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6876
-    # .. toggle_status: supported
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
 
     # Automatically approve student identity verification attempts
@@ -397,7 +387,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: When this is enabled, the MKTG_URLS setting should be defined.
     # .. toggle_tickets: ?
-    # .. toggle_status: supported
     'ENABLE_MKTG_SITE': False,
 
     # Prevent concurrent logins per user
@@ -419,7 +408,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7548
-    # .. toggle_status: supported
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
 
     # .. toggle_name: ENABLE_COURSE_HOME_REDIRECT
@@ -433,7 +421,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19604
-    # .. toggle_status: supported
     'ENABLE_COURSE_HOME_REDIRECT': True,
 
     # Expose Mobile REST API. Note that if you use this, you must also set
@@ -449,7 +436,6 @@ FEATURES = {
     # .. toggle_creation_date: 2016-06-24
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1320
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER': False,
 
@@ -501,7 +487,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7315
-    # .. toggle_status: supported
     'LICENSING': False,
 
     # Certificates Web/HTML Views
@@ -518,7 +503,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: The COURSE_DISCOVERY_MEANINGS setting should be properly defined.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7845
-    # .. toggle_status: supported
     'ENABLE_COURSE_DISCOVERY': False,
 
     # Setting for overriding default filtering facets for Course discovery
@@ -545,7 +529,6 @@ FEATURES = {
     # .. toggle_expiration_date: None
     # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/9744
-    # .. toggle_status: supported
     'ENABLE_SPECIAL_EXAMS': False,
 
     # Enable OpenBadge support. See the BADGR_* settings later in this file.
@@ -577,7 +560,6 @@ FEATURES = {
     #   the case. When disabling this feature flag, remember to remove "coursewarehistoryextended" from the
     #   INSTALLED_APPS and the "StudentModuleHistoryExtendedRouter" from the DATABASE_ROUTERS.
     # .. toggle_tickets: None
-    # .. toggle_status: supported
     'ENABLE_CSMH_EXTENDED': True,
 
     # Read from both the CSMH and CSMHE history tables.
@@ -598,7 +580,6 @@ FEATURES = {
     # .. toggle_creation_date: 2017-04-12
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
@@ -639,7 +620,6 @@ FEATURES = {
     # .. toggle_creation_date: 2017-07-20
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/OSPR-1832
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_PASSWORD_RESET_FAILURE_EMAIL': False,
 
@@ -662,7 +642,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-02-21
     # .. toggle_expiration_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
@@ -675,7 +654,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-05
     # .. toggle_expiration_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/23317'
-    # .. toggle_status: supported
     # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and see REDIRECT_TO_COURSEWARE_MICROFRONTEND for
     #   rollout.
     'ENABLE_COURSEWARE_MICROFRONTEND': False,
@@ -688,7 +666,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-09-08
     # .. toggle_expiration_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
-    # .. toggle_status: supported
     # .. toggle_warnings: Also set settings.ACCOUNT_MICROFRONTEND_URL and set REDIRECT_TO_ACCOUNT_MICROFRONTEND for rollout.
     'ENABLE_LOGISTRATION_MICROFRONTEND': False,
 
@@ -702,7 +679,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_TEAM_SUBMISSIONS': False,
 
@@ -716,7 +692,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_ALL_FILE_URLS': False,
 
@@ -729,7 +704,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 
@@ -742,7 +716,6 @@ FEATURES = {
     # .. toggle_creation_date: 2020-06-11
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/TNL-7273
-    # .. toggle_status: supported
     # .. toggle_warnings: None
     'ENABLE_ORA_USERNAMES_ON_DATA_EXPORT': False,
 }

@@ -18,7 +18,6 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='verify_student')
 # .. toggle_expiration_date: n/a
 # .. toggle_warnings: n/a
 # .. toggle_tickets: PROD-1639
-# .. toggle_status: supported
 USE_NEW_EMAIL_TEMPLATES = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='use_new_email_templates',
@@ -40,7 +39,6 @@ def use_new_templates_for_id_verification_emails():
 # .. toggle_expiration_date: n/a
 # .. toggle_warnings: n/a
 # .. toggle_tickets: MST-318
-# .. toggle_status: supported
 REDIRECT_TO_IDV_MICROFRONTEND = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='redirect_to_idv_microfrontend',

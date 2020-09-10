@@ -96,7 +96,6 @@ COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_acce
 # .. toggle_warnings: We are no longer integrating with CourseTalk, so this probably should be deprecated and the code
 #   for reviews should be removed.
 # .. toggle_tickets: DEPR-48
-# .. toggle_status: unsupported
 SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_tool', __name__)
 
 # Waffle flag to enable the setting of course goals.
@@ -109,7 +108,6 @@ SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_t
 # .. toggle_expiration_date: ???
 # .. toggle_warnings: N/A
 # .. toggle_tickets: N/A
-# .. toggle_status: supported
 ENABLE_COURSE_GOALS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_course_goals', __name__)
 
 # Waffle flag to control the display of the hero
@@ -129,7 +127,6 @@ UPGRADE_DEADLINE_MESSAGE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'upgrade_dead
 # .. toggle_warnings: This is meant to be configured using waffle_utils course override only. Either do not create the
 #   actual waffle flag, or be sure to unset the flag even for Superusers.
 # .. toggle_tickets: N/A
-# .. toggle_status: supported
 LATEST_UPDATE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'latest_update', __name__)
 
 # Waffle flag to enable anonymous access to a course

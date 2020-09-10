@@ -491,7 +491,6 @@ class BulkEmailFlag(ConfigurationModel):
     .. toggle_expiration_date: None
     .. toggle_warnings: None
     .. toggle_tickets: None
-    .. toggle_status: supported
     """
     # boolean field 'enabled' inherited from parent ConfigurationModel
     require_course_email_auth = models.BooleanField(default=True)

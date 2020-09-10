@@ -55,7 +55,6 @@ SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(
 # .. toggle_expiration_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and ENABLE_LIBRARY_AUTHORING_MICROFRONTEND.
 # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
-# .. toggle_status: supported
 REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = WaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name='library_authoring_mfe',
