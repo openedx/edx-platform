@@ -1423,30 +1423,6 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('proctoring_provider', test_model)
         self.assertIn('proctoring_escalation_email', test_model)
 
-    @override_settings(
-        PROCTORING_BACKENDS={
-            'DEFAULT': 'test_proctoring_provider',
-            'proctortrack': {}
-        }
-    )
-    def test_validate_update_escalation_email_not_requirement_disabled(self):
-        """
-        Tests the escalation email is not required if 'ENABLED_EXAM_SETTINGS_HTML_VIEW'
-        setting is not set to True
-        """
-        json_data = {
-            "proctoring_provider": {"value": 'proctortrack'},
-        }
-        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
-            self.course,
-            json_data,
-            user=self.user
-        )
-        self.assertTrue(did_validate)
-        self.assertEqual(len(errors), 0)
-        self.assertIn('proctoring_provider', test_model)
-        self.assertIn('proctoring_escalation_email', test_model)
-
     def test_create_zendesk_tickets_present_for_edx_staff(self):
         """
         Tests that create zendesk tickets field is not filtered out when the user is an edX staff member.
