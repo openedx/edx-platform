@@ -28,7 +28,11 @@ class SessionInactivityTimeout(object):
             #Can't log out if not logged in
             return
 
-        timeout_in_seconds = getattr(settings, "SESSION_INACTIVITY_TIMEOUT_IN_SECONDS", None)
+        from openedx.core.djangoapps.site_configuration import (  # Appsembler: Avoid import errors
+            helpers as configuration_helpers,
+        )
+        setting_key = 'SESSION_INACTIVITY_TIMEOUT_IN_SECONDS'
+        timeout_in_seconds = configuration_helpers.get_value(setting_key, getattr(settings, setting_key, None))
 
         # Do we have this feature enabled?
         if timeout_in_seconds:

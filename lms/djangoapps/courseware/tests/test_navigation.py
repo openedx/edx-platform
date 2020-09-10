@@ -12,6 +12,7 @@ from six import text_type
 
 from courseware.tests.factories import GlobalStaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from student.tests.factories import UserFactory
@@ -154,6 +155,32 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # then wait a bit and see if we get timed out
         time.sleep(2)
 
+        resp = self.client.get(reverse('dashboard'))
+
+        # re-request, and we should get a redirect to login page
+        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=' + reverse('dashboard'))
+
+    @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=20)  # High timeout.
+    @with_site_configuration(configuration={
+        'SESSION_INACTIVITY_TIMEOUT_IN_SECONDS': 1,  # But customized via SiteConfiguration.
+    })
+    def test_inactive_session_timeout_site_configuration(self):
+        """
+        Verify that an inactive session times out and redirects to the
+        login page and it's customizable via SiteConfiguration.
+
+        TODO: This is custom work by Appsembler and an upstream candidate.
+              Issue: https://github.com/appsembler/edx-platform/issues/684
+        """
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+
+        # make sure we can access courseware immediately
+        resp = self.client.get(reverse('dashboard'))
+        self.assertEquals(resp.status_code, 200)
+
+        # then wait a bit and see if we get timed out
+        time.sleep(2)
         resp = self.client.get(reverse('dashboard'))
 
         # re-request, and we should get a redirect to login page
