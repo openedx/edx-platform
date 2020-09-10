@@ -139,7 +139,6 @@ FEATURES = {
     # .. toggle_description: Set this to True if you want the discussion digest emails
     #   enabled automatically for new users. This will be set on all new account
     #   registrations.
-    # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-08-19
     # .. toggle_expiration_date: None
@@ -187,7 +186,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for
     #   deleting and loading courses, for seeing log of git imports of courseware.
-    # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-12-12
     # .. toggle_expiration_date: None
@@ -203,7 +201,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Enable this feature to allow this Open edX platform to be an OAuth2 authentication
     #   provider. This is necessary to enable some other features, such as the REST API for the mobile application.
-    # .. toggle_category: admin
     # .. toggle_use_cases: monitored_rollout
     # .. toggle_creation_date: 2014-09-09
     # .. toggle_expiration_date: None
@@ -275,7 +272,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Set to True to disable honor certificates. Typically used when your installation only
     #   allows verified certificates, like courses.edx.org.
-    # .. toggle_category: certificates
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-05-14
     # .. toggle_expiration_date: None
@@ -296,7 +292,6 @@ FEATURES = {
     #   mechanism where superusers can simply modify attributes of other users by accessing the "/auto_auth url" with
     #   the right
     #   querystring parameters.
-    # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-05-07
     # .. toggle_expiration_date: None
@@ -450,7 +445,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Display the standard footer in the login page. This feature can be overridden by a site-
     #   specific configuration.
-    # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2016-06-24
     # .. toggle_expiration_date: None
@@ -600,7 +594,6 @@ FEATURES = {
     # .. toggle_default: True
     # .. toggle_description: Allow public account creation. If this is disabled, users will no longer have access to
     #   the signup page.
-    # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-04-12
     # .. toggle_expiration_date: None
@@ -642,7 +635,6 @@ FEATURES = {
     #   user asks for a password reset but they don't have an account associated to their email. This is useful for
     #   notifying users that they don't have an account associated with email addresses they believe they've registered
     #   with. This setting can be overridden by a site-specific configuration.
-    # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-07-20
     # .. toggle_expiration_date: None
@@ -666,7 +658,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by
     #   default because enabling allows a method to bypass password policy.
-    # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
     # .. toggle_expiration_date: None
@@ -680,7 +671,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable the Courseware MFE at the platform level for global staff (see
     #   REDIRECT_TO_COURSEWARE_MICROFRONTEND for course rollout)
-    # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-03-05
     # .. toggle_expiration_date: None
@@ -694,7 +684,6 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the logistration.
-    # .. toggle_category: micro-frontend
     # .. toggle_use_cases: incremental_release, open_edx
     # .. toggle_creation_date: 2020-09-08
     # .. toggle_expiration_date: None
@@ -709,7 +698,6 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable team-based ORA submissions.
-    # .. toggle_category: ora
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
@@ -724,7 +712,6 @@ FEATURES = {
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
     #   discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
     #  file metadata in staff assessments.
-    # .. toggle_category: ora
     # .. toggle_use_cases: graceful_degradation
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
@@ -738,7 +725,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
     #   discoverable.  If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
-    # .. toggle_category: ora
     # .. toggle_use_cases: graceful_degradation
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
@@ -752,7 +738,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Set to True to add deanonymized usernames to ORA data
     #   report.
-    # .. toggle_category: ora
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-06-11
     # .. toggle_expiration_date: None

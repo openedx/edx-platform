@@ -339,7 +339,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable changing a user password through django admin. This is disabled by
     #   default because enabling allows a method to bypass password policy.
-    # .. toggle_category: admin
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
     # .. toggle_expiration_date: None
@@ -354,7 +353,6 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable team-based ORA submissions.
-    # .. toggle_category: ora
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
@@ -369,7 +367,6 @@ FEATURES = {
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
     #   discoverable. If enabled, will iterate through all possible file key suffixes up to the max for displaying file
     #   metadata in staff assessments.
-    # .. toggle_category: ora
     # .. toggle_use_cases: graceful_degradation
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
@@ -383,7 +380,6 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
     #   discoverable. If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
-    # .. toggle_category: ora
     # .. toggle_use_cases: graceful_degradation
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
@@ -400,7 +396,6 @@ FEATURES = {
     #      To disable, set to False.
     #      To enable with a custom support deadline, set to an ISO-8601 date string:
     #        eg: '2020-09-01'
-    # .. toggle_category: n/a
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-06-12
     # .. toggle_expiration_date: 2020-12-01
@@ -414,7 +409,6 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable the Library Authoring MFE
-    # .. toggle_category: micro-frontend
     # .. toggle_use_cases: incremental_release
     # .. toggle_creation_date: 2020-06-20
     # .. toggle_expiration_date: 2020-12-31
@@ -2273,7 +2267,6 @@ EDXAPP_PARSE_KEYS = {}
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: Toggle for removing the deprecated /signin url.
-# .. toggle_category: n/a
 # .. toggle_use_cases: incremental_release
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_expiration_date: 2020-06-01
@@ -2286,7 +2279,6 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: Toggle for removing the deprecated /signup url.
-# .. toggle_category: n/a
 # .. toggle_use_cases: incremental_release
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_expiration_date: 2020-06-01

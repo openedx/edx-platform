@@ -90,7 +90,6 @@ COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_acce
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Used with our integration with CourseTalk to display reviews for a course.
-# .. toggle_category: course_experience
 # .. toggle_use_cases: monitored_rollout
 # .. toggle_creation_date: 2017-06-19
 # .. toggle_expiration_date: ???
@@ -105,7 +104,6 @@ SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_t
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Used to determine whether or not to use course goals for the particular course.
-# .. toggle_category: course_experience
 # .. toggle_use_cases: opt_out, monitored_rollout
 # .. toggle_creation_date: 2017-09-11
 # .. toggle_expiration_date: ???
@@ -125,7 +123,6 @@ UPGRADE_DEADLINE_MESSAGE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'upgrade_dead
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Used to switch between 'welcome message' and 'latest update' on the course home page.
-# .. toggle_category: course_experience
 # .. toggle_use_cases: opt_out
 # .. toggle_creation_date: 2017-09-11
 # .. toggle_expiration_date: ???

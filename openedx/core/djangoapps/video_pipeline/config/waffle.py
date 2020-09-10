@@ -13,7 +13,6 @@ WAFFLE_NAMESPACE = 'videos'
 # .. toggle_default: False
 # .. toggle_description: Waffle flag telling whether youtube is deprecated. When
 #   enabled, videos are no longer uploaded to YouTube as part of the video pipeline.
-# .. toggle_category: videos
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-08-03
 # .. toggle_expiration_date: None
@@ -27,7 +26,6 @@ DEPRECATE_YOUTUBE = 'deprecate_youtube'
 # .. toggle_description: When enabled, use Multi-Factor Authentication (MFA) for
 #   authenticating to AWS. These short-lived access tokens are well suited for
 #   development (probably?).
-# .. toggle_category: videos
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-03-12
 # .. toggle_expiration_date: None

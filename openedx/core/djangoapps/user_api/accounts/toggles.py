@@ -11,7 +11,6 @@ from openedx.core.djangoapps.waffle_utils import WaffleFlag
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the order history page.
-# .. toggle_category: micro-frontend
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2019-04-11
 # .. toggle_expiration_date: 2020-12-31
@@ -33,7 +32,6 @@ def should_redirect_to_order_history_microfrontend():
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the account page.
-# .. toggle_category: micro-frontend
 # .. toggle_use_cases: incremental_release, open_edx
 # .. toggle_creation_date: 2019-04-30
 # .. toggle_expiration_date: 2020-12-31

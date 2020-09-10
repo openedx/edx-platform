@@ -9,7 +9,6 @@ from django.conf import settings
 # .. toggle_description: Settings for forums/discussions to on/off daily digest
 #   feature. Set this to True if you want to enable users to subscribe and unsubscribe
 #   for daily digest. This setting enables deprecation of daily digest.
-# .. toggle_category: discussion
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-03-09
 # .. toggle_expiration_date: None

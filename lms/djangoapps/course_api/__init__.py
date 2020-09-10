@@ -10,7 +10,6 @@ WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name='course_list_api_rate_limit
 # .. toggle_default: False
 # .. toggle_description: Waffle switch to enable the throttling of 2 requests/minute to the course API. For staff
 #   users, this limit is 10 requests/minute.
-# .. toggle_category: course_api
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-06-12
 # .. toggle_expiration_date: None
@@ -23,7 +22,6 @@ USE_RATE_LIMIT_2_FOR_COURSE_LIST_API = WaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'ra
 # .. toggle_default: False
 # .. toggle_description: Waffle switch to enable the throttling of 10 requests/minute to the course API. For staff
 #   users, this limit is 20 requests/minute.
-# .. toggle_category: course_api
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-06-12
 # .. toggle_expiration_date: None

@@ -13,7 +13,6 @@ _WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_pre
 # .. toggle_default: False
 # .. toggle_description: When enabled, users must be sign in using their allowed domain SSO account. This includes sign-
 #   ins to the Django admin dashboard at "/admin".
-# .. toggle_category: authn
 # .. toggle_use_cases: incremental_release
 # .. toggle_creation_date: 2019-11-20
 # .. toggle_expiration_date: 2020-01-31
