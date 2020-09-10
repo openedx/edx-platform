@@ -236,10 +236,10 @@ class Env:
             SERVICE_VARIANT = 'lms'
 
     @classmethod
-    def get_django_setting(cls, django_setting, system, settings=None):
+    def get_django_settings(cls, django_settings, system, settings=None):
         """
         Interrogate Django environment for specific settings values
-        :param django_setting: the django setting to get
+        :param django_settings: list of django settings values to get
         :param system: the django app to use when asking for the setting (lms | cms)
         :param settings: the settings file to use when asking for the value
         :return: unicode value of the django setting
@@ -249,21 +249,24 @@ class Env:
         log_dir = os.path.dirname(cls.PRINT_SETTINGS_LOG_FILE)
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
+        settings_length = len(django_settings)
+        django_settings = ' '.join(django_settings)  # parse_known_args makes a list again
         try:
             value = sh(
                 django_cmd(
                     system,
                     settings,
-                    "print_setting {django_setting} 2>{log_file}".format(
-                        django_setting=django_setting,
+                    "print_setting {django_settings} 2>{log_file}".format(
+                        django_settings=django_settings,
                         log_file=cls.PRINT_SETTINGS_LOG_FILE
                     )
                 ),
                 capture=True
             )
-            return str(value).strip()
+            # else for cases where values are not found & sh returns one None value
+            return tuple(str(value).splitlines()) if value else tuple(None for _ in range(settings_length))
         except BuildFailure:
-            print("Unable to print the value of the {} setting:".format(django_setting))
+            print("Unable to print the value of the {} setting:".format(django_settings))
             with open(cls.PRINT_SETTINGS_LOG_FILE, 'r') as f:
                 print(f.read())
             sys.exit(1)
