@@ -319,6 +319,7 @@ class DatesTab(EnrolledTab):
     type = "dates"
     title = ugettext_noop(
         "Dates")  # We don't have the user in this context, so we don't want to translate it at this level.
+    priority = 50
     view_name = "dates"
     is_dynamic = True
 
@@ -374,6 +375,12 @@ def get_course_tab_list(user, course):
 
     # Add in any dynamic tabs, i.e. those that are not persisted
     course_tab_list += _get_dynamic_tabs(course, user)
+    # Sorting here because although the CourseTabPluginManager.get_tab_types function
+    # does do sorting on priority, we only use it for getting the dynamic tabs.
+    # We can't switch this function to just use the CourseTabPluginManager without
+    # further investigation since CourseTabList.iterate_displayable returns
+    # Static Tabs that are not returned by the CourseTabPluginManager.
+    course_tab_list.sort(key=lambda tab: tab.priority or float('inf'))
     return course_tab_list
 
 
