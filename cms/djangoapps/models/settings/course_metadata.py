@@ -248,7 +248,7 @@ class CourseMetadata(object):
                 did_validate = False
                 errors.append({'key': key, 'message': text_type(err), 'model': model})
 
-        proctoring_errors = cls._validate_proctoring_settings(descriptor, filtered_dict, user)
+        proctoring_errors = cls.validate_proctoring_settings(descriptor, filtered_dict, user)
         if proctoring_errors:
             errors = errors + proctoring_errors
             did_validate = False
@@ -273,7 +273,7 @@ class CourseMetadata(object):
         return cls.fetch(descriptor)
 
     @classmethod
-    def _validate_proctoring_settings(cls, descriptor, settings_dict, user):
+    def validate_proctoring_settings(cls, descriptor, settings_dict, user):
         """
         Verify proctoring settings
 
@@ -299,35 +299,33 @@ class CourseMetadata(object):
             errors.append({'key': 'proctoring_provider', 'message': message, 'model': proctoring_provider_model})
 
         # Require a valid escalation email if Proctortrack is chosen as the proctoring provider
-        # This requirement will be disabled until release of the new exam settings view
-        if settings.FEATURES.get('ENABLE_EXAM_SETTINGS_HTML_VIEW'):
-            escalation_email_model = settings_dict.get('proctoring_escalation_email')
-            if escalation_email_model:
-                escalation_email = escalation_email_model.get('value')
-            else:
-                escalation_email = descriptor.proctoring_escalation_email
+        escalation_email_model = settings_dict.get('proctoring_escalation_email')
+        if escalation_email_model:
+            escalation_email = escalation_email_model.get('value')
+        else:
+            escalation_email = descriptor.proctoring_escalation_email
 
-            missing_escalation_email_msg = 'Provider \'{provider}\' requires an exam escalation contact.'
-            if proctoring_provider_model and proctoring_provider_model.get('value') == 'proctortrack':
-                if not escalation_email:
-                    message = missing_escalation_email_msg.format(provider=proctoring_provider_model.get('value'))
-                    errors.append({
-                        'key': 'proctoring_provider',
-                        'message': message,
-                        'model': proctoring_provider_model
-                    })
+        missing_escalation_email_msg = 'Provider \'{provider}\' requires an exam escalation contact.'
+        if proctoring_provider_model and proctoring_provider_model.get('value') == 'proctortrack':
+            if not escalation_email:
+                message = missing_escalation_email_msg.format(provider=proctoring_provider_model.get('value'))
+                errors.append({
+                    'key': 'proctoring_provider',
+                    'message': message,
+                    'model': proctoring_provider_model
+                })
 
-            if (
-                escalation_email_model and not proctoring_provider_model and
-                descriptor.proctoring_provider == 'proctortrack'
-            ):
-                if not escalation_email:
-                    message = missing_escalation_email_msg.format(provider=descriptor.proctoring_provider)
-                    errors.append({
-                        'key': 'proctoring_escalation_email',
-                        'message': message,
-                        'model': escalation_email_model
-                    })
+        if (
+            escalation_email_model and not proctoring_provider_model and
+            descriptor.proctoring_provider == 'proctortrack'
+        ):
+            if not escalation_email:
+                message = missing_escalation_email_msg.format(provider=descriptor.proctoring_provider)
+                errors.append({
+                    'key': 'proctoring_escalation_email',
+                    'message': message,
+                    'model': escalation_email_model
+                })
 
         return errors
 
