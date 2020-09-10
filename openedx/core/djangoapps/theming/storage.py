@@ -10,7 +10,7 @@ import re
 
 from django.conf import settings
 from django.contrib.staticfiles.finders import find
-from django.contrib.staticfiles.storage import CachedFilesMixin, StaticFilesStorage
+from django.contrib.staticfiles.storage import ManifestFilesMixin, StaticFilesStorage
 from django.utils._os import safe_join
 from django.utils.six.moves.urllib.parse import (  # pylint: disable=no-name-in-module, import-error
     unquote,
@@ -110,10 +110,10 @@ class ThemeStorage(ThemeMixin, StaticFilesStorage):
     pass
 
 
-class ThemeCachedFilesMixin(CachedFilesMixin):
+class ThemeManifestFilesMixin(ManifestFilesMixin):
     """
-    Comprehensive theme aware CachedFilesMixin.
-    Main purpose of subclassing CachedFilesMixin is to override the following methods.
+    Comprehensive theme aware ManifestFilesMixin.
+    Main purpose of subclassing ManifestFilesMixin is to override the following methods.
     1 - _url
     2 - url_converter
 
@@ -177,11 +177,11 @@ class ThemeCachedFilesMixin(CachedFilesMixin):
         See the class docstring for more info.
         """
         processed_asset_name = self._processed_asset_name(name)
-        return super(ThemeCachedFilesMixin, self)._url(hashed_name_func, processed_asset_name, force, hashed_files)
+        return super(ThemeManifestFilesMixin, self)._url(hashed_name_func, processed_asset_name, force, hashed_files)
 
     def url_converter(self, name, hashed_files, template=None):
         """
-        This is an override of url_converter from CachedFilesMixin.
+        This is an override of url_converter from ManifestFilesMixin.
         It changes one line near the end of the method (see the NOTE) in order
         to return absolute urls instead of relative urls.  This behavior is
         necessary for theme overrides, as we get 404 on assets with relative

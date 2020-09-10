@@ -74,7 +74,7 @@ XBLOCK_CLASSES = [
 
 def write_module_styles(output_root):
     """Write all registered XModule css, sass, and scss files to output root."""
-    return _write_styles('.xmodule_display', output_root, _list_modules(), 'get_preview_view_css')
+    return _write_styles('.xmodule_display', output_root, sorted(_list_modules(), key=str), 'get_preview_view_css')
 
 
 def write_module_js(output_root):
@@ -152,7 +152,8 @@ def _write_styles(selector, output_root, classes, css_attribute):
         "@import 'bourbon/bourbon';",
         "@import 'lms/theme/variables';",
     ]
-    for class_, fragment_names in css_imports.items():
+    for class_, fragment_names in sorted(css_imports.items()):
+        fragment_names = sorted(fragment_names)
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
             class_=class_, selector=selector
         ))
