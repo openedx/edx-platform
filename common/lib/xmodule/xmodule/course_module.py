@@ -1057,7 +1057,7 @@ def validate_blackout_datetimes(blackout_dates):
     Validates list of blackout dates.
     """
     date_proxy = Date()
-    if blackout_dates and type(blackout_dates[0]) not in (list, tuple):  # noqa
+    if blackout_dates and type(blackout_dates[0]) not in (list, tuple):  # pylint: disable=C0123
         blackout_dates = [blackout_dates]
 
     ret = [
