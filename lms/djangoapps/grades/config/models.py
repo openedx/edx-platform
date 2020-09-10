@@ -33,7 +33,7 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
        created individually for each course. Alternatively, the PersistentGradesEnabledFlag.enabled_for_all_courses
        waffle flag or the PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS feature flag can be set to True to enable this
        feature for all courses.
-    .. toggle_use_cases: monitored_rollout
+    .. toggle_use_cases: temporary
     .. toggle_creation_date: 2016-08-26
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/13329
     .. toggle_status: supported

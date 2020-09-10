@@ -201,7 +201,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Enable this feature to allow this Open edX platform to be an OAuth2 authentication
     #   provider. This is necessary to enable some other features, such as the REST API for the mobile application.
-    # .. toggle_use_cases: monitored_rollout
+    # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2014-09-09
     # .. toggle_expiration_date: None
     # .. toggle_status: supported
@@ -712,7 +712,7 @@ FEATURES = {
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
     #   discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
     #  file metadata in staff assessments.
-    # .. toggle_use_cases: graceful_degradation
+    # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
@@ -725,7 +725,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
     #   discoverable.  If enabled, will pull file metadata from StudentModule.state for display in staff assessments.
-    # .. toggle_use_cases: graceful_degradation
+    # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_expiration_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951

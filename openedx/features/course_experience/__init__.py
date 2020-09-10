@@ -90,7 +90,7 @@ COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_acce
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Used with our integration with CourseTalk to display reviews for a course.
-# .. toggle_use_cases: monitored_rollout
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2017-06-19
 # .. toggle_expiration_date: ???
 # .. toggle_warnings: We are no longer integrating with CourseTalk, so this probably should be deprecated and the code
@@ -104,7 +104,7 @@ SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_t
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Used to determine whether or not to use course goals for the particular course.
-# .. toggle_use_cases: opt_out, monitored_rollout
+# .. toggle_use_cases: opt_out, temporary
 # .. toggle_creation_date: 2017-09-11
 # .. toggle_expiration_date: ???
 # .. toggle_warnings: N/A
