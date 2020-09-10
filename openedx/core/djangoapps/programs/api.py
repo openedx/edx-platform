@@ -5,8 +5,7 @@ Python APIs exposed by the Programs app to other in-process apps.
 from .utils import is_user_enrolled_in_program_type as _is_user_enrolled_in_program_type
 
 
-# `paid_modes` is deprecated in favor of `paid_modes_only`, but we need to expand and contract to prevent breakage.
-def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes=False, paid_modes_only=False, enrollments=None, entitlements=None):
+def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes_only=False, enrollments=None, entitlements=None):
     """
     This method will look at the learners Enrollments and Entitlements to determine
     if a learner is enrolled in a Program of the given type.
@@ -31,7 +30,7 @@ def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes=False, 
     return _is_user_enrolled_in_program_type(
         user,
         program_type_slug,
-        paid_modes_only=(paid_modes or paid_modes_only),
+        paid_modes_only=paid_modes_only,
         enrollments=enrollments,
         entitlements=entitlements
     )
