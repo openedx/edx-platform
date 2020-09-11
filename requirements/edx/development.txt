@@ -36,7 +36,7 @@ boto3==1.4.8              # via -r requirements/edx/testing.txt, fs-s3fs
 boto==2.39.0              # via -r requirements/edx/testing.txt, django-ses, edxval, ora2
 botocore==1.8.17          # via -r requirements/edx/testing.txt, boto3, s3transfer
 bridgekeeper==0.9         # via -r requirements/edx/testing.txt
-celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-celery, django-user-tasks, edx-celeryutils, edx-enterprise
+celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-celery, django-user-tasks, edx-celeryutils, edx-enterprise, event-tracking
 certifi==2020.6.20        # via -r requirements/edx/testing.txt, requests
 cffi==1.14.2              # via -r requirements/edx/testing.txt, cryptography
 chardet==3.0.4            # via -r requirements/edx/testing.txt, pdfminer.six, pysrt, requests
@@ -131,7 +131,7 @@ edxval==1.4.2             # via -r requirements/edx/testing.txt
 elasticsearch==1.9.0      # via -r requirements/edx/testing.txt, edx-search
 enmerkar-underscore==1.0.0  # via -r requirements/edx/testing.txt
 enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-underscore
-event-tracking==0.3.3     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
+event-tracking==1.0.0     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 faker==4.1.2              # via -r requirements/edx/testing.txt, factory-boy
