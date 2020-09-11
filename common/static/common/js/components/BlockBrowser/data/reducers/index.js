@@ -27,7 +27,7 @@ export const blocks = (state = {}, action) => {
   }
 };
 
-export const selectedBlock = (state = null, action) => {
+export const selectedBlock = (state = '', action) => {
   switch (action.type) {
     case courseBlocksActions.SELECT_BLOCK:
       return action.blockId;

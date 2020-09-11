@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux'; // eslint-disable-line
 import { blocks, selectedBlock, rootBlock } from 'BlockBrowser/data/reducers'; // eslint-disable-line
+import blockBrowserActions from 'BlockBrowser/data/actions/constants'; // eslint-disable-line
 import {
   REPORT_GENERATION_ERROR,
   REPORT_GENERATION_SUCCESS,
@@ -25,7 +26,7 @@ export const reportStatus = (state = initialState, action) => {
         ...state,
         inProgress: action.inProgress,
         succeeded: action.succeeded,
-        reportPath: action.reportPath,
+        reportPath: action.downloadsData && action.downloadsData[0].url,
         reportName: action.reportName,
         error: null,
       };
@@ -33,6 +34,8 @@ export const reportStatus = (state = initialState, action) => {
       return { ...state, error: action.error, succeeded: false };
     case REPORT_GENERATION_REFRESH_STATUS:
       return { ...state, timeout: action.timeout };
+    case blockBrowserActions.SELECT_BLOCK:
+      return initialState;
     default:
       return state;
   }
