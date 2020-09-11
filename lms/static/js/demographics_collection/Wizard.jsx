@@ -91,7 +91,6 @@ export default class Wizard extends React.Component {
    * course dashboard.
    */ 
   async wizardComplete() {
-    // if learner is on the final page then we dismiss
     if (this.onFinalPage()) {
       this.props.dismissBanner();
     }
