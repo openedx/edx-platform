@@ -3,8 +3,8 @@ Site Configuration
 
 These are the site configuration flags that affect Credentials features.
 
-ENABLE_CREDENTIALS_RECORDS
---------------------------
+ENABLE_LEARNER_RECORDS
+----------------------
 
 Controls whether the LMS integrates with the Learner Records feature in Credentials. Specifically, this turns on some web buttons that link to a learner's record on the Credentials IDA and enables some data being passed to Credentials related to those records.
 
