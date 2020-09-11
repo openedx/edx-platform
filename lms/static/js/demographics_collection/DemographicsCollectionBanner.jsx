@@ -15,10 +15,20 @@ export class DemographicsCollectionBanner extends React.Component {
     this.dismissBanner = this.dismissBanner.bind(this);
   }
 
+  /**
+   * Utility function that controls hiding the CTA from the Course Dashboard where appropriate.
+   * This can be called one of two ways - when a user clicks the "dismiss" button on the CTA
+   * itself, or when the learner completes all of the questions within the modal.
+   * 
+   * The dismiss button itself is nested inside of an <a>, so we need to call stopPropagation()
+   * here to prevent the Modal from _also_ opening when the Dismiss button is clicked.
+   */
   async dismissBanner(e) {
-    // The dismiss button is nested inside an <a>, so we need to call stopPropogation here to
-    // prevent the Modal from also opening when the Dismiss button is clicked
-    e.stopPropagation();
+    // Since this function also doubles as a callback in the Modal, we check if e is null/undefined
+    // before calling stopPropagation()
+    if (e) {
+      e.stopPropagation();
+    }
 
     const requestOptions = {
       method: 'PATCH',
@@ -73,6 +83,7 @@ export class DemographicsCollectionBanner extends React.Component {
                 user={this.props.user}
                 open={this.state.modalOpen}
                 closeModal={() => this.setState({ modalOpen: false })}
+                dismissBanner={this.dismissBanner}
               />
             }
           </div>

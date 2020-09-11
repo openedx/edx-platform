@@ -17,6 +17,8 @@ export default class Wizard extends React.Component {
       pages: [],
       wizardContext: {},
     }
+
+    this.wizardComplete = this.wizardComplete.bind(this);
   }
 
   componentDidMount() {
@@ -75,8 +77,29 @@ export default class Wizard extends React.Component {
     )
   }
 
+  /**
+   * Utility method that helps determine if the learner is on the final page of the modal.
+   */
+  onFinalPage() {
+    return this.state.pages.length === this.state.currentPage;
+  }
+
+  /**
+   * Utility method for closing the modal and returning the learner back to the Course Dashboard. 
+   * If a learner is on the final page of the modal, meaning they have answered all of the
+   * questions, clicking the "Return to my dashboard" button will also dismiss the CTA from the
+   * course dashboard.
+   */ 
+  async wizardComplete() {
+    if (this.onFinalPage()) {
+      this.props.dismissBanner();
+    }
+    
+    this.props.onWizardComplete();
+  }
+
   render() {
-    const finalPage = this.state.pages.length === this.state.currentPage;
+    const finalPage = this.onFinalPage();
     if(this.props.error) {
       return this.renderError();
     }
@@ -87,7 +110,7 @@ export default class Wizard extends React.Component {
         </div>
         {this.renderPage()}
         <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
-          <button className={`wizard-button ${finalPage && 'blue'}`} onClick={this.props.onWizardComplete}>{finalPage ? gettext("Return to my dashboard") : gettext("Finish later")}</button>
+          <button className={`wizard-button ${finalPage && 'blue'}`} onClick={this.wizardComplete}>{finalPage ? gettext("Return to my dashboard") : gettext("Finish later")}</button>
           <button className="wizard-button blue" hidden={finalPage} onClick={this.handleNext}>{gettext("Next")}</button>
         </div>
       </div>

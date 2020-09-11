@@ -202,7 +202,6 @@ class DemographicsCollectionModal extends React.Component {
     return ethnicityArray.map((o) => o.ethnicity);
   }
 
-
   render() {
     if (this.state.loading) {
       return <div className="demographics-collection-modal d-flex justify-content-center align-items-start" />
@@ -211,6 +210,7 @@ class DemographicsCollectionModal extends React.Component {
       <div className="demographics-collection-modal d-flex justify-content-center align-items-start">
         <Wizard
           onWizardComplete={this.props.closeModal}
+          dismissBanner={this.props.dismissBanner}
           wizardContext={{ ...this.state.selected, options: this.state.options }}
           error={this.state.error}
         >
@@ -219,12 +219,12 @@ class DemographicsCollectionModal extends React.Component {
               <div>
                 <p className="font-weight-light">
                   {StringUtils.interpolate(
-                    gettext('Section {currentPage} of {totalPages}'),
-                    {
-                      currentPage: currentPage,
-                      totalPages: totalPages
-                    }
-                  )
+                      gettext('Section {currentPage} of {totalPages}'),
+                        {
+                          currentPage: currentPage,
+                          totalPages: totalPages
+                        }
+                      )
                   }
                 </p>
                 <h2 className="mb-1 mt-4 font-weight-bold text-secondary">
@@ -240,6 +240,16 @@ class DemographicsCollectionModal extends React.Component {
                   {gettext('Why does edX collect this information?')}
                 </a>
                 <br />
+                <p>
+                  {StringUtils.interpolate(
+                      gettext('Part {currentPage} of {totalPages}'),
+                        { 
+                          currentPage: currentPage,
+                          totalPages: totalPages
+                        }
+                    )
+                  }
+                </p>
                 {this.state.fieldError && <p className="field-error">{gettext("An error occurred while attempting to retrieve or save the information below. Please try again later.")}</p>}
               </div>
             )}
@@ -430,7 +440,7 @@ class DemographicsCollectionModal extends React.Component {
           </Wizard.Page>
           <Wizard.Closer>
             <div className="demographics-modal-closer m-sm-0">
-              <i class="fa fa-check" aria-hidden="true"></i>
+            <i class="fa fa-check" aria-hidden="true"></i>
               <h3>
                 {gettext("Thank you! You’re helping make edX better for everyone.")}
               </h3>
