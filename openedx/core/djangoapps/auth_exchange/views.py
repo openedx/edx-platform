@@ -98,7 +98,8 @@ class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
         """
         Return an error response consisting of the errors in the form
         """
-        return Response(status=400, data=form_errors, **kwargs)
+        error_code = form_errors.get('error_code', 400)
+        return Response(status=error_code, data=form_errors, **kwargs)
 
 
 class LoginWithAccessTokenView(APIView):
