@@ -89,15 +89,18 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
 
     @mock.patch('openedx.features.assessment.helpers.autoscore_ora_submission')
     @mock.patch('openedx.features.assessment.helpers._log_multiple_submissions_info')
+    @mock.patch('openedx.features.assessment.helpers.datetime')
     @mock.patch('openedx.features.assessment.helpers._get_submissions_to_autoscore_by_enrollment')
     @mock.patch('openedx.features.assessment.helpers.configuration_helpers.get_value')
     def test_find_and_autoscore_submissions_successfully(self, mock_get_value, mock_get_submissions_by_enrollment,
-                                                         mock_log_multiple_submissions_info,
+                                                         mock_datetime, mock_log_multiple_submissions_info,
                                                          mock_autoscore_ora_submission):
         """
         Verify that all ORA submissions corresponded to provided enrollments and submission uuids. Also check autoscore
         function called for each resulting submission.
         """
+        datetime_now = datetime.now(UTC)
+        mock_datetime.now.return_value = datetime_now
         mock_get_value.return_value = 3
         enrollment1, submissions1, uuid_list_1 = self._create_enrollment_submission(
             datetime(2019, 12, 30, tzinfo=UTC).date(),
@@ -111,11 +114,11 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
         enrollment = [enrollment1, enrollment2, ]
         submissions = submissions1 + submissions2
         submission_uuids = uuid_list_1 + uuid_list_2
-        delta_date = datetime.now(UTC).date() - timedelta(days=3)
+        delta_datetime = datetime_now - timedelta(days=3)
 
         helpers.find_and_autoscore_submissions(enrollment, submission_uuids)
 
-        mock_log_multiple_submissions_info.assert_called_once_with(submissions, 3, delta_date)
+        mock_log_multiple_submissions_info.assert_called_once_with(submissions, 3, delta_datetime)
         self.assertEqual(mock_autoscore_ora_submission.call_count, len(submissions))
 
     @data(
@@ -245,7 +248,7 @@ class AssessmentHelperTestCases(TestCase):
         expected_logged_message = 'Autoscoring {count} submission(s)'.format(count=len(submissions_to_autoscore))
 
         helpers._log_multiple_submissions_info(  # pylint: disable=protected-access
-            submissions_to_autoscore, days_to_wait=mock.ANY, delta_date=mock.ANY
+            submissions_to_autoscore, days_to_wait=mock.ANY, delta_datetime=mock.ANY
         )
 
         assert mock_log_info.called_with(expected_logged_message)
@@ -255,11 +258,11 @@ class AssessmentHelperTestCases(TestCase):
         """
         Verify logs when there is no submission to autoscore
         """
-        delta_date = datetime(2020, 1, 1).date()
-        expected_logged_message = NO_PENDING_ORA.format(days=3, since_date=delta_date)
+        delta_datetime = datetime(2020, 1, 1)
+        expected_logged_message = NO_PENDING_ORA.format(days=3, since=delta_datetime)
 
         helpers._log_multiple_submissions_info(  # pylint: disable=protected-access
-            submissions_to_autoscore=[], days_to_wait=3, delta_date=delta_date
+            submissions_to_autoscore=[], days_to_wait=3, delta_datetime=delta_datetime
         )
 
         assert mock_log_info.called_with(expected_logged_message)

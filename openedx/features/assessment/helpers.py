@@ -38,14 +38,14 @@ def find_and_autoscore_submissions(enrollments, submission_uuids):
         None
     """
     days_to_wait = configuration_helpers.get_value('DAYS_TO_WAIT_AUTO_ASSESSMENT', DAYS_TO_WAIT_AUTO_ASSESSMENT)
-    delta_date = datetime.now(utc).date() - timedelta(days=days_to_wait)
+    delta_datetime = datetime.now(utc) - timedelta(days=days_to_wait)
     submissions_to_autoscore = []
 
     for enrollment in enrollments:
         submissions_to_autoscore_by_enrollment = _get_submissions_to_autoscore_by_enrollment(
             enrollment=enrollment,
             submission_uuids=submission_uuids,
-            delta_date=delta_date
+            delta_datetime=delta_datetime
         )
         if submissions_to_autoscore_by_enrollment:
             submissions_to_autoscore.extend(submissions_to_autoscore_by_enrollment)
@@ -53,20 +53,20 @@ def find_and_autoscore_submissions(enrollments, submission_uuids):
                 count=len(submissions_to_autoscore_by_enrollment), id=enrollment.id)
             )
 
-    _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta_date)
+    _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta_datetime)
 
     for submission in submissions_to_autoscore:
         autoscore_ora_submission(submission=submission)
 
 
-def _get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuids, delta_date):
+def _get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuids, delta_datetime):
     """
     Find ORA submissions, for a specific enrollment, which correspond to provided submission uuids.
 
     Args:
         enrollment (CourseEnrollment): Course enrollment to find submissions from
         submission_uuids (list): All AssessmentWorkflow uuids for submissions excluding done and cancelled
-        delta_date (Date): Find submissions before this date
+        delta_datetime (DateTime): Find submissions before this date
 
     Returns:
         list: All submissions in enrollment matching criteria
@@ -94,7 +94,7 @@ def _get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuids, de
             student_item__student_id=anonymous_user_id,
             student_item__item_id=unicode(open_assessment.location),
             status=Submission.ACTIVE,
-            created_at__date__lt=delta_date,
+            created_at__lt=delta_datetime,
             uuid__in=list(submission_uuids)
         ).order_by('-created_at').first()
 
@@ -104,14 +104,14 @@ def _get_submissions_to_autoscore_by_enrollment(enrollment, submission_uuids, de
     return submissions
 
 
-def _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta_date):
+def _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta_datetime):
     """
     Log ORA auto scoring status
 
     Args:
         submissions_to_autoscore (list):  List of ORA submission
         days_to_wait (int): No of days to wait to autoscore ORA
-        delta_date (Date): Submission to autoscore submissions before this date
+        delta_datetime (DateTime): Submission to autoscore submissions before this date
 
     Returns:
         None
@@ -119,7 +119,7 @@ def _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta
     if submissions_to_autoscore:
         log.info('Autoscoring {count} submission(s)'.format(count=len(submissions_to_autoscore)))
     else:
-        log.info(NO_PENDING_ORA.format(days=days_to_wait, since_date=delta_date))
+        log.info(NO_PENDING_ORA.format(days=days_to_wait, since=delta_datetime))
 
 
 def autoscore_ora_submission(submission):
