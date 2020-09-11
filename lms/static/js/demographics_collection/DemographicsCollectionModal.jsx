@@ -146,7 +146,7 @@ class DemographicsCollectionModal extends React.Component {
         'USE-JWT-COOKIE': true
       },
       body: JSON.stringify({
-        [name]: value,
+        [name]: value === "default" ? null : value,
       }),
     };
 
@@ -170,16 +170,16 @@ class DemographicsCollectionModal extends React.Component {
 
   handleMultiselectChange(values) {
     const decline = values.find(i => i === 'declined');
-    this.setState(({ selected: { [FIELD_NAMES.ETHNICITY]: prevSelected } }) => {
+    this.setState(({ selected }) => {
       // decline was previously selected
-      if (prevSelected.find(i => i === 'declined')) {
-        return { selected: { [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined') } }
+      if (selected[FIELD_NAMES.ETHNICITY].find(i => i === 'declined')) {
+        return { selected: { ...selected, [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined') } }
         // decline was just selected
       } else if (decline) {
-        return { selected: { [FIELD_NAMES.ETHNICITY]: [decline] } }
+        return { selected: { ...selected, [FIELD_NAMES.ETHNICITY]: [decline] } }
         // anything else was selected
       } else {
-        return { selected: { [FIELD_NAMES.ETHNICITY]: values } }
+        return { selected: { ...selected, [FIELD_NAMES.ETHNICITY]: values } }
       }
     });
   }
@@ -219,12 +219,12 @@ class DemographicsCollectionModal extends React.Component {
               <div>
                 <p className="font-weight-light">
                   {StringUtils.interpolate(
-                      gettext('Section {currentPage} of {totalPages}'),
-                        {
-                          currentPage: currentPage,
-                          totalPages: totalPages
-                        }
-                      )
+                    gettext('Section {currentPage} of {totalPages}'),
+                    {
+                      currentPage: currentPage,
+                      totalPages: totalPages
+                    }
+                  )
                   }
                 </p>
                 <h2 className="mb-1 mt-4 font-weight-bold text-secondary">
@@ -240,16 +240,6 @@ class DemographicsCollectionModal extends React.Component {
                   {gettext('Why does edX collect this information?')}
                 </a>
                 <br />
-                <p>
-                  {StringUtils.interpolate(
-                      gettext('Part {currentPage} of {totalPages}'),
-                        { 
-                          currentPage: currentPage,
-                          totalPages: totalPages
-                        }
-                    )
-                  }
-                </p>
                 {this.state.fieldError && <p className="field-error">{gettext("An error occurred while attempting to retrieve or save the information below. Please try again later.")}</p>}
               </div>
             )}
@@ -354,7 +344,7 @@ class DemographicsCollectionModal extends React.Component {
                   value={wizardConsumer[FIELD_NAMES.EDUCATION_LEVEL]}
                   disabled={this.state.fieldError}
                 >
-                  <option>{gettext("Select level of education")}</option>
+                  <option value="default">{gettext("Select level of education")}</option>
                   {
                     this.loadOptions(FIELD_NAMES.EDUCATION_LEVEL)
                   }
@@ -440,7 +430,7 @@ class DemographicsCollectionModal extends React.Component {
           </Wizard.Page>
           <Wizard.Closer>
             <div className="demographics-modal-closer m-sm-0">
-            <i class="fa fa-check" aria-hidden="true"></i>
+              <i class="fa fa-check" aria-hidden="true"></i>
               <h3>
                 {gettext("Thank you! You’re helping make edX better for everyone.")}
               </h3>
