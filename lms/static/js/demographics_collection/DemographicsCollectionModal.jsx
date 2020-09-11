@@ -240,16 +240,6 @@ class DemographicsCollectionModal extends React.Component {
                   {gettext('Why does edX collect this information?')}
                 </a>
                 <br />
-                <p>
-                  {StringUtils.interpolate(
-                      gettext('Part {currentPage} of {totalPages}'),
-                        { 
-                          currentPage: currentPage,
-                          totalPages: totalPages
-                        }
-                    )
-                  }
-                </p>
                 {this.state.fieldError && <p className="field-error">{gettext("An error occurred while attempting to retrieve or save the information below. Please try again later.")}</p>}
               </div>
             )}
