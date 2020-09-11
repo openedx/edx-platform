@@ -1,3 +1,4 @@
+/* global gettext */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -93,7 +94,7 @@ class MultiselectDropdown extends React.Component {
 
   renderUnselect() {
     return this.props.selected.length > 0 && (
-      <button id="unselect-button" onClick={this.handleRemoveAllClick}>Clear all</button>
+      <button id="unselect-button" onClick={this.handleRemoveAllClick}>{gettext("Clear all")}</button>
     )
   }
 
