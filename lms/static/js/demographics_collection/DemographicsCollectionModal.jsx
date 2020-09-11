@@ -146,7 +146,7 @@ class DemographicsCollectionModal extends React.Component {
         'USE-JWT-COOKIE': true
       },
       body: JSON.stringify({
-        [name]: value,
+        [name]: value === "default" ? null : value,
       }),
     };
 
@@ -170,16 +170,16 @@ class DemographicsCollectionModal extends React.Component {
 
   handleMultiselectChange(values) {
     const decline = values.find(i => i === 'declined');
-    this.setState(({ selected: { [FIELD_NAMES.ETHNICITY]: prevSelected } }) => {
+    this.setState(({ selected }) => {
       // decline was previously selected
-      if (prevSelected.find(i => i === 'declined')) {
-        return { selected: { [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined') } }
+      if (selected[FIELD_NAMES.ETHNICITY].find(i => i === 'declined')) {
+        return { selected: { ...selected, [FIELD_NAMES.ETHNICITY]: values.filter(value => value !== 'declined') } }
         // decline was just selected
       } else if (decline) {
-        return { selected: { [FIELD_NAMES.ETHNICITY]: [decline] } }
+        return { selected: { ...selected, [FIELD_NAMES.ETHNICITY]: [decline] } }
         // anything else was selected
       } else {
-        return { selected: { [FIELD_NAMES.ETHNICITY]: values } }
+        return { selected: { ...selected, [FIELD_NAMES.ETHNICITY]: values } }
       }
     });
   }
@@ -354,7 +354,7 @@ class DemographicsCollectionModal extends React.Component {
                   value={wizardConsumer[FIELD_NAMES.EDUCATION_LEVEL]}
                   disabled={this.state.fieldError}
                 >
-                  <option>{gettext("Select level of education")}</option>
+                  <option value="default">{gettext("Select level of education")}</option>
                   {
                     this.loadOptions(FIELD_NAMES.EDUCATION_LEVEL)
                   }

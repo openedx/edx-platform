@@ -40,6 +40,7 @@ export const SelectWithInput = (props) => {
           onBlur={inputOnBlur}
           value={inputValue}
           disabled={disabled}
+          maxLength={255}
         />
       }
     </div>
