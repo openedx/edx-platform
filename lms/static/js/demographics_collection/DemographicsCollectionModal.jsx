@@ -202,7 +202,6 @@ class DemographicsCollectionModal extends React.Component {
     return ethnicityArray.map((o) => o.ethnicity);
   }
 
-
   render() {
     if (this.state.loading) {
       return <div className="demographics-collection-modal d-flex justify-content-center align-items-start" />
@@ -211,6 +210,7 @@ class DemographicsCollectionModal extends React.Component {
       <div className="demographics-collection-modal d-flex justify-content-center align-items-start">
         <Wizard
           onWizardComplete={this.props.closeModal}
+          dismissBanner={this.props.dismissBanner}
           wizardContext={{ ...this.state.selected, options: this.state.options }}
           error={this.state.error}
         >
