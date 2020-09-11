@@ -358,7 +358,7 @@ class CommentsServiceMockMixin:
         """
         actual_params = dict(httpretty_request.querystring)
         actual_params.pop("request_id")  # request_id is random
-        assert actual_params == expected_params
+        assert actual_params == expected_params, f"""[\n\t{actual_params} \n\t{expected_params}\n]"""
 
     def assert_last_query_params(self, expected_params):
         """
@@ -388,6 +388,7 @@ class CommentsServiceMockMixin:
             "raw_body": "Test body",
             "rendered_body": "<p>Test body</p>",
             "abuse_flagged": False,
+            "abuse_flagged_count": None,
             "voted": False,
             "vote_count": 0,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
@@ -438,6 +439,7 @@ def make_minimal_cs_thread(overrides=None):
         "pinned": False,
         "closed": False,
         "abuse_flaggers": [],
+        "abuse_flagged_count": None,
         "votes": {"up_count": 0},
         "comments_count": 0,
         "unread_comments_count": 0,
