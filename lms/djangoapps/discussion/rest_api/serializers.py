@@ -207,6 +207,7 @@ class ThreadSerializer(_ContentSerializer):
         source="thread_type",
         choices=[(val, val) for val in ["discussion", "question"]]
     )
+    count_flags = serializers.IntegerField(required=False)
     title = serializers.CharField(validators=[validate_not_blank])
     pinned = serializers.SerializerMethodField(read_only=True)
     closed = serializers.BooleanField(read_only=True)
@@ -324,6 +325,7 @@ class CommentSerializer(_ContentSerializer):
     endorsed_at = serializers.SerializerMethodField()
     child_count = serializers.IntegerField(read_only=True)
     children = serializers.SerializerMethodField(required=False)
+    abuse_flagged_any_user = serializers.SerializerMethodField()
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
 
@@ -388,6 +390,13 @@ class CommentSerializer(_ContentSerializer):
             data["parent_id"] = None
 
         return data
+
+    def get_abuse_flagged_any_user(self, obj):
+        """
+        Returns a boolean indicating whether any user has flagged the
+        content as abusive.
+        """
+        return len(obj.get("abuse_flaggers", [])) > 0
 
     def validate(self, attrs):
         """
