@@ -744,14 +744,6 @@ def student_dashboard(request):
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
 
-    # Collect all program types the user is enrolled in
-    enrolled_program_types = []
-    if getattr(settings, 'ENABLE_DEMOGRAPHICS_COLLECTION', False):
-        enrolled_program_types = {
-            _program.get('type_attrs', {}).get('slug')
-            for _program in meter.engaged_programs
-            if _program.get('type_attrs', {}).get('slug') is not None
-        }
     context = {
         'urls': urls,
         'programs_data': programs_data,
@@ -802,7 +794,6 @@ def student_dashboard(request):
         'recovery_email_activation_message': recovery_email_activation_message,
         'enterprise_learner_portal_enabled_message': enterprise_learner_portal_enabled_message,
         'show_load_all_courses_link': show_load_all_courses_link(user, course_limit, course_enrollments),
-        'enrolled_program_types': enrolled_program_types,
         # TODO START: clean up as part of REVEM-199 (START)
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
