@@ -341,7 +341,6 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                     email_learners = serializer.data.get('email_learners')
                     identifiers = serializer.data.get('identifiers')
                     auto_enroll = serializer.data.get('auto_enroll')
-                    # results = []  # Start with an empty array
                     for course_id in serializer.data.get('courses'):
                         course_key = as_course_key(course_id)
                         if email_learners:
@@ -350,7 +349,6 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                                                             secure=request.is_secure())
                         else:
                             email_params = {}
-                        # results.append(enroll_learners_in_course(...))  # Append results from each course
                         results = enroll_learners_in_course(course_id=course_key,
                                                             identifiers=identifiers,
                                                             enroll_func=partial(enroll_email,
