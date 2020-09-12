@@ -99,6 +99,17 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 raise AssertionError("assertTabInactive failed: " + tabname + " active")
         return
 
+    def session_timeout_prep(self):
+        """
+        Prep for SESSION_INACTIVITY_TIMEOUT_IN_SECONDS feature.
+        """
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+
+        # make sure we can access courseware immediately
+        resp = self.client.get(reverse('dashboard'))
+        self.assertEquals(resp.status_code, 200)
+
     # TODO: LEARNER-71: Do we need to adjust or remove this test?
     @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
     def test_chrome_settings(self):
@@ -145,19 +156,10 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         Verify that an inactive session times out and redirects to the
         login page
         """
-        email, password = self.STUDENT_INFO[0]
-        self.login(email, password)
-
-        # make sure we can access courseware immediately
-        resp = self.client.get(reverse('dashboard'))
-        self.assertEquals(resp.status_code, 200)
-
-        # then wait a bit and see if we get timed out
-        time.sleep(2)
-
-        resp = self.client.get(reverse('dashboard'))
-
+        self.session_timeout_prep()
+        time.sleep(2)  # then wait a bit and see if we get timed out
         # re-request, and we should get a redirect to login page
+        resp = self.client.get(reverse('dashboard'))
         self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=' + reverse('dashboard'))
 
     @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=20)  # High timeout.
@@ -172,18 +174,30 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         TODO: This is custom work by Appsembler and an upstream candidate.
               Issue: https://github.com/appsembler/edx-platform/issues/684
         """
-        email, password = self.STUDENT_INFO[0]
-        self.login(email, password)
-
-        # make sure we can access courseware immediately
-        resp = self.client.get(reverse('dashboard'))
-        self.assertEquals(resp.status_code, 200)
-
-        # then wait a bit and see if we get timed out
-        time.sleep(2)
-        resp = self.client.get(reverse('dashboard'))
-
+        self.session_timeout_prep()
+        time.sleep(2)  # then wait a bit and see if we get timed out
         # re-request, and we should get a redirect to login page
+        resp = self.client.get(reverse('dashboard'))
+        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=' + reverse('dashboard'))
+
+    @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1)  # Low timeout.
+    @with_site_configuration(configuration={
+        'SESSION_INACTIVITY_TIMEOUT_IN_SECONDS': '',  # Put a falsy value to fallback.
+    })
+    def test_inactive_session_timeout_site_configuration_fallback(self):
+        """
+        Verify that an inactive session times out and redirects to the
+        login page and it's customizable via SiteConfiguration with fallback to
+        the settings.SESSION_INACTIVITY_TIMEOUT_IN_SECONDS for falsy values.
+
+        Why? AMC sends falsy values so this helps to uncomplicates AMC.
+
+        TODO: This is custom work by Appsembler and an upstream candidate.
+              Issue: https://github.com/appsembler/edx-platform/issues/684
+        """
+        self.session_timeout_prep()
+        time.sleep(2)  # then wait a bit and see if we get timed out
+        resp = self.client.get(reverse('dashboard'))  # re-request
         self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=' + reverse('dashboard'))
 
     def test_redirects_first_time(self):
