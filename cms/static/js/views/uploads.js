@@ -33,7 +33,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'edx-ui
             renderContents: function() {
                 var isValid = this.model.isValid(),
                     selectedFile = this.model.get('selectedFile'),
-                    oldInput = this.$('input[type=file]').get(0);
+                    oldInput = this.$('input[type=file]');
                 BaseModal.prototype.renderContents.call(this);
                 // Ideally, we'd like to tell the browser to pre-populate the
                 // <input type="file"> with the selectedFile if we have one -- but
@@ -44,7 +44,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'edx-ui
                 // a blank input to prompt the user to upload a different (valid) file.
                 if (selectedFile && isValid) {
                     $(oldInput).removeClass('error');
-                    this.$('input[type=file]').replaceWith(HtmlUtils.ensureHtml(oldInput).toString());
+                    this.$('input[type=file]').replaceWith(HtmlUtils.HTML(oldInput).toString());
                     this.$('.action-upload').removeClass('disabled');
                 } else {
                     this.$('.action-upload').addClass('disabled');
