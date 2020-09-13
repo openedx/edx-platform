@@ -500,9 +500,9 @@ def get_thread_list(
         topic_id_list=None,
         text_search=None,
         following=False,
-        author=False,
+        author=None,
         post_type=None,
-        flagged=False,
+        flagged=None,
         view=None,
         order_by="last_activity_at",
         order_direction="desc",
@@ -575,10 +575,8 @@ def get_thread_list(
         "sort_key": cc_map.get(order_by),
         "author": author,
         "flagged": flagged,
+        "post_type": post_type,
     }
-
-    if post_type:
-        query_params["post_type"] = post_type
 
     if view:
         if view in ["unread", "unanswered"]:
