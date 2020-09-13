@@ -716,6 +716,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "read": True,
                 "created_at": "2015-04-28T00:00:00Z",
                 "updated_at": "2015-04-28T11:11:11Z",
+                "count_flags": 0,
             }),
             self.expected_thread_data({
                 "id": "test_thread_id_1",
@@ -733,12 +734,13 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "updated_at": "2015-04-28T00:33:33Z",
                 "comment_list_url": None,
                 "endorsed_comment_list_url": (
-                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=True"
+                    "http://testserver/api/discussion/v1/comments/?endorsed=True&thread_id=test_thread_id_1"
                 ),
                 "non_endorsed_comment_list_url": (
-                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
+                    "http://testserver/api/discussion/v1/comments/?endorsed=False&thread_id=test_thread_id_1"
                 ),
                 "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+                "count_flags": 0,
             }),
         ]
 
@@ -837,6 +839,105 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "per_page": ["10"],
             "text": ["test search string"],
         })
+
+    @ddt.data(True, False, None)
+    def test_author(self, author_boolean):
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
+        expected_result.update({"text_search_rewrite": None})
+
+        self.register_get_threads_response([], page=1, num_pages=0)
+        self.assertEqual(
+            get_thread_list(
+                self.request,
+                self.course.id,
+                page=1,
+                page_size=10,
+                author=author_boolean,
+            ).data,
+            expected_result
+        )
+
+        expected_last_query_params = {
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
+            "sort_key": ["activity"],
+            "page": ["1"],
+            "per_page": ["10"],
+            "author": [str(author_boolean)],
+        }
+
+        if author_boolean == None:
+            del expected_last_query_params["author"]
+
+        self.assert_last_query_params(expected_last_query_params)
+
+    @ddt.data('question', 'discussion', None)
+    def test_post_type(self, post_type):
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
+        expected_result.update({"text_search_rewrite": None})
+
+        self.register_get_threads_response([], page=1, num_pages=0)
+        self.assertEqual(
+            get_thread_list(
+                self.request,
+                self.course.id,
+                page=1,
+                page_size=10,
+                post_type=post_type,
+            ).data,
+            expected_result
+        )
+
+        expected_last_query_params = {
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
+            "sort_key": ["activity"],
+            "page": ["1"],
+            "per_page": ["10"],
+            "post_type": [post_type],
+        }
+
+        if post_type == None:
+            del expected_last_query_params["post_type"]
+
+        self.assert_last_query_params(expected_last_query_params)
+
+    @ddt.data(True, False, None)
+    def test_flagged(self, flagged_boolean):
+        expected_result = make_paginated_api_response(
+            results=[], count=0, num_pages=0, next_link=None, previous_link=None
+        )
+        expected_result.update({"text_search_rewrite": None})
+
+        self.register_get_threads_response([], page=1, num_pages=0)
+        self.assertEqual(
+            get_thread_list(
+                self.request,
+                self.course.id,
+                page=1,
+                page_size=10,
+                flagged=flagged_boolean,
+            ).data,
+            expected_result
+        )
+
+        expected_last_query_params = {
+            "user_id": [six.text_type(self.user.id)],
+            "course_id": [six.text_type(self.course.id)],
+            "sort_key": ["activity"],
+            "page": ["1"],
+            "per_page": ["10"],
+            "flagged": [str(flagged_boolean)],
+        }
+
+        if flagged_boolean == None:
+            del expected_last_query_params["flagged"]
+
+        self.assert_last_query_params(expected_last_query_params)
 
     def test_following(self):
         self.register_subscribed_threads_response(self.user, [], page=1, num_pages=0)
@@ -1227,6 +1328,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "endorsed_by_label": None,
                 "endorsed_at": None,
                 "abuse_flagged": False,
+                "abuse_flagged_any_user": False,
                 "voted": False,
                 "vote_count": 4,
                 "editable_fields": ["abuse_flagged", "voted"],
@@ -1248,6 +1350,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "endorsed_by_label": None,
                 "endorsed_at": None,
                 "abuse_flagged": True,
+                "abuse_flagged_any_user": True,
                 "voted": False,
                 "vote_count": 7,
                 "editable_fields": ["abuse_flagged", "voted"],
@@ -1799,6 +1902,7 @@ class CreateCommentTest(
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": False,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -2457,6 +2561,7 @@ class UpdateCommentTest(
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": False,
             "voted": False,
             "vote_count": 0,
             "children": [],

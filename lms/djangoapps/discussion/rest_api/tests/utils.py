@@ -18,7 +18,6 @@ from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 
-
 def _get_thread_callback(thread_data):
     """
     Get a callback function that will return POST/PUT data overridden by
@@ -381,6 +380,7 @@ class CommentsServiceMockMixin(object):
         """
         Returns expected thread data in API response
         """
+        # TODO: Try to see if we can add count_flags here. Currently create_thread removes count_flags
         response_data = {
             "author": self.user.username,
             "author_label": None,
@@ -439,6 +439,7 @@ def make_minimal_cs_thread(overrides=None):
         "pinned": False,
         "closed": False,
         "abuse_flaggers": [],
+        "count_flags": 0,
         "votes": {"up_count": 0},
         "comments_count": 0,
         "unread_comments_count": 0,

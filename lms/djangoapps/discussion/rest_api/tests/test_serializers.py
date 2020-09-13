@@ -187,6 +187,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "unread_comment_count": 3,
             "pinned": True,
             "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "count_flags": 0,
         })
         self.assertEqual(self.serialize(thread), expected)
 
@@ -307,6 +308,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": False,
             "voted": False,
             "vote_count": 4,
             "children": [],

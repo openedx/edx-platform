@@ -90,7 +90,8 @@ class CourseView(DeveloperErrorViewMixin, APIView):
             * end: The ISO 8601 timestamp for the end of the blackout period
 
         * thread_list_url: The URL of the list of all threads in the course.
-
+            # Question for Kshitij (Remove before merging)
+            # test_api.py::GetCourseTest.test_basic also tests for following_thread_list_url which is not specified in this docstring, should i update it?
         * topics_url: The URL of the topic listing for the course.
     """
     def get(self, request, course_id):

@@ -551,6 +551,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "voted": True,
             "author": self.author.username,
             "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "count_flags": 0,
         })]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
         response = self.client.get(self.url, {"course_id": text_type(self.course.id), "following": ""})
@@ -1143,6 +1144,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": False,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -1533,6 +1535,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": False,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -1623,6 +1626,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": False,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -1690,6 +1694,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             response_data,
             self.expected_response_data({
                 "abuse_flagged": value,
+                "abuse_flagged_any_user": False,
                 "editable_fields": ["abuse_flagged"],
             })
         )
@@ -1820,6 +1825,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "voted": False,
             "vote_count": 0,
             "abuse_flagged": False,
+            "abuse_flagged_any_user": False,
             "editable_fields": ["abuse_flagged", "raw_body", "voted"],
             "child_count": 0,
         }

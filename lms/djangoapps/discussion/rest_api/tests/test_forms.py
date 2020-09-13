@@ -68,6 +68,9 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "topic_id": set(),
                 "text_search": "",
                 "following": None,
+                "author": None,
+                "post_type": "",
+                "flagged": None,
                 "view": "",
                 "order_by": "last_activity_at",
                 "order_direction": "desc",
@@ -102,6 +105,45 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     def test_empty_topic_id(self):
         self.form_data.setlist("topic_id", ["", "not empty"])
         self.assert_error("topic_id", "This field cannot be empty.")
+
+    # ToDo: Make tests for post_type: discussions or question is okay, blank is okay(? not sure about this), invalid value is not okay
+
+    @ddt.data("discussion", "question")
+    def test_post_type(self, value):
+        self.form_data["post_type"] = value
+        self.assert_field_value("post_type", value)
+
+    def test_post_type_invalid(self):
+        self.form_data["post_type"] = "invalid-option"
+        self.assert_error("post_type", "Select a valid choice. invalid-option is not one of the available choices.")
+
+    @ddt.data("True", "true", 1, True)
+    def test_author_true(self, value):
+        self.form_data["author"] = value
+        self.assert_field_value("author", True)
+
+    @ddt.data("False", "false", 0, False)
+    def test_author_false(self, value):
+        self.form_data["author"] = value
+        self.assert_error("author", "The value of the 'author' parameter must be true.")
+
+    def test_invalid_author(self):
+        self.form_data["author"] = "invalid-boolean"
+        self.assert_error("author", "Invalid Boolean Value.")
+
+    @ddt.data("True", "true", 1, True)
+    def test_flagged_true(self, value):
+        self.form_data["flagged"] = value
+        self.assert_field_value("flagged", True)
+
+    @ddt.data("False", "false", 0, False)
+    def test_flagged_false(self, value):
+        self.form_data["flagged"] = value
+        self.assert_error("flagged", "The value of the 'flagged' parameter must be true.")
+
+    def test_invalid_flagged(self):
+        self.form_data["flagged"] = "invalid-boolean"
+        self.assert_error("flagged", "Invalid Boolean Value.")
 
     @ddt.data("True", "true", 1, True)
     def test_following_true(self, value):
