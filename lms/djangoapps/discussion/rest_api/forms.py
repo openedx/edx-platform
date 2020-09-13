@@ -83,6 +83,22 @@ class ThreadListGetForm(_PaginationForm):
         except InvalidKeyError:
             raise ValidationError(u"'{}' is not a valid course id".format(value))
 
+    def clean_author(self):
+        """Validate author"""
+        value = self.cleaned_data["author"]
+        if value is False:
+            raise ValidationError("The value of the 'author' parameter must be true.")
+        else:
+            return value
+
+    def clean_flagged(self):
+        """Validate flagged"""
+        value = self.cleaned_data["flagged"]
+        if value is False:
+            raise ValidationError("The value of the 'flagged' parameter must be true.")
+        else:
+            return value
+
     def clean_following(self):
         """Validate following"""
         value = self.cleaned_data["following"]
