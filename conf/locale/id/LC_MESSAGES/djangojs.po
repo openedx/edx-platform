@@ -81,7 +81,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-30 20:42+0000\n"
+"POT-Creation-Date: 2020-09-06 20:42+0000\n"
 "PO-Revision-Date: 2020-06-14 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
@@ -7733,6 +7733,18 @@ msgid "Mark Exam As Completed"
 msgstr "Tandai Ujian Sebagai Selesai"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr "Timer ujian dan tombol akhiri ujian"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr "Akhiri Ujian Saya"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr "Sembunyikan Timer"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
 msgstr "Anda mengambil \"{exam_link}\" sebagai {exam_type}. "
 
@@ -7751,18 +7763,6 @@ msgid ""
 msgstr ""
 "Untuk menerima kredit untuk permasalahan, Anda harus memilih \"Kirim\" untuk"
 " setiap permasalahan sebelum Anda memilih \"Akhiri Ujian Saya\"."
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Exam timer and end exam button"
-msgstr "Timer ujian dan tombol akhiri ujian"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "End My Exam"
-msgstr "Akhiri Ujian Saya"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr "Sembunyikan Timer"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
