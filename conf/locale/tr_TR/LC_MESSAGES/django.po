@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-06 20:42+0000\n"
+"POT-Creation-Date: 2020-09-13 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -609,8 +609,8 @@ msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {support_email}"
 msgstr ""
-"Hesabınız engellendi. Bu durumda bir hata olduğunu düşünüyorsanız, "
-"{support_email} adresiyle iletişime geçiniz."
+"Hesabınız devre dışı bırakılmış. Bunun hatayla yapıldığını düşünüyorsanız, "
+"lütfen {support_email} adresiyle iletişime geçiniz"
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
@@ -675,7 +675,7 @@ msgstr "{course_name} eğitimi için {platform_name} Etik Kurallar Sertifikası"
 #: common/djangoapps/student/models.py
 #, python-brace-format
 msgid "{platform_name} Verified Certificate for {course_name}"
-msgstr "{course_name} için {platform_name} Onaylı Sertifika"
+msgstr "{course_name} dersi için {platform_name} Onaylı Sertifika"
 
 #: common/djangoapps/student/models.py
 #, python-brace-format
@@ -707,7 +707,7 @@ msgstr "{platform_name} {course_name} için Sertifika"
 
 #: common/djangoapps/student/models.py
 msgid "The ISO 639-1 language code for this language."
-msgstr "Bu dil için dil kodu ISO 639-1."
+msgstr "Bu dil için ISO 639-1 dil kodu."
 
 #: common/djangoapps/student/models.py
 msgid "Namespace of enrollment attribute"
@@ -785,7 +785,7 @@ msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
-msgstr "ve"
+msgstr " ve "
 
 #: common/djangoapps/student/views/dashboard.py
 msgid "Photos are mismatched"
@@ -876,7 +876,7 @@ msgstr "Kayıtlanılamadı"
 
 #: common/djangoapps/student/views/management.py
 msgid "You are not enrolled in this course"
-msgstr "Bu ders için kaydolmadınız "
+msgstr "Bu derse kaydolmadınız "
 
 #: common/djangoapps/student/views/management.py
 msgid "Your certificate prevents you from unenrolling from this course"
@@ -6094,7 +6094,7 @@ msgstr "Onaylanmışa Yükselt"
 
 #: lms/djangoapps/courseware/course_tools.py
 msgid "Financial Assistance"
-msgstr ""
+msgstr "Mâli Yardım"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Assignment"
@@ -6102,19 +6102,19 @@ msgstr "Görev"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Open Response Assessment"
-msgstr ""
+msgstr "Açık Yanıt Değerlendirmesi"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
-msgstr ""
+msgstr "Öz Değerlendirme"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Peer Assessment"
-msgstr ""
+msgstr "Akran Değerlendirmesi"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Staff Assessment"
-msgstr ""
+msgstr "Personel Değerlendirmesi"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
@@ -6967,6 +6967,12 @@ msgid ""
 msgstr ""
 "Çerez değerlerini Sailthru'dan çekerken beklenecek saniye cinsinden "
 "süre/gecikme."
+
+#: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
+msgid ""
+"Cannot override subsection grade: subsection is not available for target "
+"learner."
+msgstr ""
 
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
@@ -11599,20 +11605,12 @@ msgstr "Hesap oluşturmaya izin verilmiyor."
 #, python-brace-format
 msgid ""
 "You've successfully signed in to your {provider_name} account, but this "
-"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
-" your {platform_name} username and password to sign in to {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
-" yet, click {register_label_strong} at the top of the page."
+"account isn't linked with your {platform_name} account yet.Use your "
+"{platform_name} username and password to sign in to {platform_name} below, "
+"and then link your {platform_name} account with {provider_name} from your "
+"dashboard.If you don't have an account on {platform_name} yet, click "
+"{register_label_strong} at the top of the page."
 msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "Kayıt Ol"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "There was an error receiving your login information. Please email us."
@@ -11625,15 +11623,6 @@ msgid ""
 "To protect your account, it’s been temporarily locked. Try again in "
 "{locked_out_period} minutes.{li_start}To be on the safe side, you can reset "
 "your password {link_start}here{link_end} before you try again."
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"In order to sign in, you need to activate your account.{blank_lines}We just "
-"sent an activation link to {email_strong}. If you do not receive an email, "
-"check your spam folders or {link_start}contact {platform_name} "
-"Support{link_end}."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -17956,6 +17945,13 @@ msgstr "Nasıl Çalışır"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "Okullar"
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "Kayıt Ol"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"

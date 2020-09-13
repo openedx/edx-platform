@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-08-30 20:42+0000\n"
+"POT-Creation-Date: 2020-09-06 20:42+0000\n"
 "PO-Revision-Date: 2020-07-20 16:32+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
@@ -8159,6 +8159,18 @@ msgid "Mark Exam As Completed"
 msgstr "Markiere Prüfung als vollständig"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr "Zeitschaltuhr und Taste zum Beenden der Prüfung"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr "Beende meine Prüfung"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
+msgstr "Timer verbergen"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
 msgstr "Sie führen \"{exam_link}\" als {exam_type} durch. "
 
@@ -8179,18 +8191,6 @@ msgid ""
 msgstr ""
 "Um Credits für Probleme zu erhalten, müssen Sie für jedes Problem \"Senden\""
 " auswählen, bevor Sie \"Meine Prüfung beenden\" wählen."
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Exam timer and end exam button"
-msgstr "Zeitschaltuhr und Taste zum Beenden der Prüfung"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "End My Exam"
-msgstr "Beende meine Prüfung"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr "Timer verbergen"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"

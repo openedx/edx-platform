@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-06 20:50+0000\n"
-"PO-Revision-Date: 2020-09-06 20:50:05.824757\n"
+"POT-Creation-Date: 2020-09-13 20:50+0000\n"
+"PO-Revision-Date: 2020-09-13 20:50:15.788352\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6970,6 +6970,14 @@ msgstr ""
 "فاث رعوزثق خب سثذخريس فخ يثمشغ/فهوثخعف صشهف فخ لثف ذخخنهث دشمعثس بقخو "
 "سشهمفاقع."
 
+#: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
+msgid ""
+"Cannot override subsection grade: subsection is not available for target "
+"learner."
+msgstr ""
+"ذشررخف خدثققهيث سعزسثذفهخر لقشيث: سعزسثذفهخر هس رخف شدشهمشزمث بخق فشقلثف "
+"مثشقرثق."
+
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
@@ -11686,26 +11694,18 @@ msgstr "شذذخعرف ذقثشفهخر رخف شممخصثي."
 #, python-brace-format
 msgid ""
 "You've successfully signed in to your {provider_name} account, but this "
-"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
-" your {platform_name} username and password to sign in to {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
-" yet, click {register_label_strong} at the top of the page."
+"account isn't linked with your {platform_name} account yet.Use your "
+"{platform_name} username and password to sign in to {platform_name} below, "
+"and then link your {platform_name} account with {provider_name} from your "
+"dashboard.If you don't have an account on {platform_name} yet, click "
+"{register_label_strong} at the top of the page."
 msgstr ""
 "غخع'دث سعذذثسسبعممغ سهلرثي هر فخ غخعق {provider_name} شذذخعرف, زعف فاهس "
-"شذذخعرف هسر'ف مهرنثي صهفا غخعق {platform_name} شذذخعرف غثف. {blank_lines}عسث"
-" غخعق {platform_name} عسثقرشوث شري حشسسصخقي فخ سهلر هر فخ {platform_name} "
-"زثمخص, شري فاثر مهرن غخعق {platform_name} شذذخعرف صهفا {provider_name} بقخو "
-"غخعق يشسازخشقي. {blank_lines}هب غخع يخر'ف اشدث شر شذذخعرف خر {platform_name}"
-" غثف, ذمهذن {register_label_strong} شف فاث فخح خب فاث حشلث."
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "قثلهسفثق"
+"شذذخعرف هسر'ف مهرنثي صهفا غخعق {platform_name} شذذخعرف غثف.عسث غخعق "
+"{platform_name} عسثقرشوث شري حشسسصخقي فخ سهلر هر فخ {platform_name} زثمخص, "
+"شري فاثر مهرن غخعق {platform_name} شذذخعرف صهفا {provider_name} بقخو غخعق "
+"يشسازخشقي.هب غخع يخر'ف اشدث شر شذذخعرف خر {platform_name} غثف, ذمهذن "
+"{register_label_strong} شف فاث فخح خب فاث حشلث."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "There was an error receiving your login information. Please email us."
@@ -11721,19 +11721,6 @@ msgstr ""
 "فخ حقخفثذف غخعق شذذخعرف, هف’س زثثر فثوحخقشقهمغ مخذنثي. فقغ شلشهر هر "
 "{locked_out_period} وهرعفثس.{li_start}فخ زث خر فاث سشبث سهيث, غخع ذشر قثسثف "
 "غخعق حشسسصخقي {link_start}اثقث{link_end} زثبخقث غخع فقغ شلشهر."
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"In order to sign in, you need to activate your account.{blank_lines}We just "
-"sent an activation link to {email_strong}. If you do not receive an email, "
-"check your spam folders or {link_start}contact {platform_name} "
-"Support{link_end}."
-msgstr ""
-"هر خقيثق فخ سهلر هر, غخع رثثي فخ شذفهدشفث غخعق شذذخعرف.{blank_lines}صث تعسف "
-"سثرف شر شذفهدشفهخر مهرن فخ {email_strong}. هب غخع يخ رخف قثذثهدث شر ثوشهم, "
-"ذاثذن غخعق سحشو بخميثقس خق {link_start}ذخرفشذف {platform_name} "
-"سعححخقف{link_end}."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
@@ -18436,6 +18423,13 @@ msgstr "اخص هف صخقنس"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "سذاخخمس"
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "قثلهسفثق"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"

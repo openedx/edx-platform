@@ -20,6 +20,7 @@
 # Maryna Holovnova <MGG-2008@yandex.ru>, 2014
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Natalia Vynogradenko <tannaha@gmail.com>, 2017-2018
+# Oleg Kozlovskyi <roomaroom@gmail.com>, 2020
 # olexiim <olexiim@gmail.com>, 2014-2016
 # Olga Filipova <chudaol@gmail.com>, 2015-2016
 # Olga Filipova <olga.filipova@feedzai.com>, 2016,2018
@@ -98,7 +99,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-06 20:42+0000\n"
+"POT-Creation-Date: 2020-09-13 20:42+0000\n"
 "PO-Revision-Date: 2020-06-14 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)\n"
@@ -2432,6 +2433,10 @@ msgstr ""
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 msgid "View Report"
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "There was an error generating the report link."
 msgstr ""
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
@@ -4925,6 +4930,15 @@ msgstr ""
 "Сталася помилка. Оновіть сторінку та перевірте ваше інтернет з'єднання."
 
 #: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"In order to sign in, you need to activate your "
+"account.{line_break}{line_break}We just sent an activation link to "
+"{strong_start} {email} {strong_end}. If  you do not receive an email, check "
+"your spam folders or  {anchorStart}contact {platform_name} "
+"Support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
 msgid "An unexpected error has occurred."
 msgstr ""
 
@@ -6082,6 +6096,10 @@ msgstr "Завантажити інший файл"
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Adding"
 msgstr "Додавання"
+
+#: cms/static/js/views/container.js
+msgid "{startTag}{requestToken}{endTag}{selector}"
+msgstr ""
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
