@@ -47,7 +47,7 @@ code-annotations==0.7.0   # via -r requirements/edx/testing.txt, edx-enterprise
 contextlib2==0.6.0.post1  # via -r requirements/edx/testing.txt
 coreapi==2.3.3            # via -r requirements/edx/testing.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/testing.txt, coreapi, drf-yasg
-coverage==5.2.1           # via -r requirements/edx/testing.txt, pytest-cov
+coverage==5.3             # via -r requirements/edx/testing.txt, pytest-cov
 git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.txt
 crowdsourcehinter-xblock==0.6  # via -r requirements/edx/testing.txt
 cryptography==3.1         # via -r requirements/edx/testing.txt, django-fernet-fields, edx-enterprise, pdfminer.six, pyjwt, social-auth-core
@@ -218,7 +218,7 @@ pycontracts==1.8.12       # via -r requirements/edx/testing.txt, edx-user-state-
 pycountry==20.7.3         # via -r requirements/edx/testing.txt
 pycparser==2.20           # via -r requirements/edx/testing.txt, cffi
 pycryptodomex==3.9.8      # via -r requirements/edx/testing.txt, edx-proctoring, lti-consumer-xblock, pyjwkest
-pygments==2.6.1           # via -r requirements/edx/testing.txt, diff-cover, sphinx
+pygments==2.7.0           # via -r requirements/edx/testing.txt, diff-cover, sphinx
 pyjwkest==1.4.2           # via -r requirements/edx/testing.txt, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/testing.txt, drf-jwt, edx-rest-api-client, social-auth-core
 pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
@@ -229,7 +229,7 @@ pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requi
 pynliner==0.8.0           # via -r requirements/edx/testing.txt
 pyparsing==2.4.7          # via -r requirements/edx/testing.txt, chem, openedx-calc, packaging, pycontracts
 pyquery==1.4.1            # via -r requirements/edx/testing.txt
-pyrsistent==0.16.0        # via jsonschema
+pyrsistent==0.17.3        # via jsonschema
 pysrt==1.1.2              # via -r requirements/edx/testing.txt, edxval
 pytest-attrib==0.1.3      # via -r requirements/edx/testing.txt
 pytest-cov==2.10.1        # via -r requirements/edx/testing.txt
@@ -239,12 +239,12 @@ pytest-json-report==1.2.1  # via -r requirements/edx/testing.txt
 pytest-metadata==1.8.0    # via -r requirements/edx/testing.txt, pytest-json-report
 pytest-randomly==3.4.1    # via -r requirements/edx/testing.txt
 pytest-xdist[psutil]==2.1.0  # via -r requirements/edx/testing.txt
-pytest==6.0.1             # via -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
+pytest==6.0.2             # via -r requirements/edx/testing.txt, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-proctoring, faker, freezegun, icalendar, ora2, xblock
 python-levenshtein==0.12.0  # via -r requirements/edx/testing.txt
 python-memcached==1.59    # via -r requirements/edx/testing.txt
 python-slugify==4.0.1     # via -r requirements/edx/testing.txt, code-annotations, transifex-client
-python-swiftclient==3.10.0  # via -r requirements/edx/testing.txt, ora2
+python-swiftclient==3.10.1  # via -r requirements/edx/testing.txt, ora2
 python3-openid==3.2.0 ; python_version >= "3"  # via -r requirements/edx/testing.txt, social-auth-core
 python3-saml==1.9.0       # via -r requirements/edx/testing.txt
 pytz==2020.1              # via -r requirements/edx/testing.txt, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, xblock
@@ -297,7 +297,7 @@ text-unidecode==1.3       # via -r requirements/edx/testing.txt, faker, python-s
 toml==0.10.1              # via -r requirements/edx/testing.txt, pytest, tox
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
 tox==3.20.0               # via -r requirements/edx/testing.txt, tox-battery
-tqdm==4.48.2              # via -r requirements/edx/testing.txt, nltk
+tqdm==4.49.0              # via -r requirements/edx/testing.txt, nltk
 transifex-client==0.13.11  # via -r requirements/edx/testing.txt
 typed-ast==1.4.1          # via -r requirements/edx/testing.txt, astroid
 ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-samesite
