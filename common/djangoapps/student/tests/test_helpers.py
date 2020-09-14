@@ -127,7 +127,7 @@ class TestLoginHelper(TestCase):
             validate_login()
 
     @patch('student.helpers.get_redirect_to', Mock(return_value=None))
-    def test_custom_tahoe_site_redirect(self):
+    def test_custom_tahoe_site_redirect_lms(self):
         """
         Allow site admins to customize the default after-login URL.
 
