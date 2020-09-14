@@ -27,7 +27,7 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
 
         self.other_max_length = other_max_length
         self.error_messages.update(
-            dict(invalid_length=_( # pylint: disable=no-member
+            dict(invalid_length=_(  # pylint: disable=no-member
                 'Other field value, maximum allowed length violation. Allowed limit is upto {other_max_length}'
                 ' characters.').format(
                 other_max_length=other_max_length)))
