@@ -285,7 +285,9 @@ def get_next_url_for_login_page(request):
     redirect_to = get_redirect_to(request)
     if not redirect_to:
         try:
-            redirect_to = reverse('dashboard')
+            default_redirect_to = reverse('dashboard')
+            site_redirect_to = configuration_helpers.get_value('LOGIN_REDIRECT_URL', reverse('dashboard'))
+            redirect_to = site_redirect_to or default_redirect_to  # Falsy site config values should not be used
         except NoReverseMatch:
             redirect_to = reverse('home')
 
