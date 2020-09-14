@@ -1,5 +1,4 @@
 """This module contains MultiSelect form field with other option"""
-# pylint: disable=E1101
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectFormField
@@ -28,7 +27,7 @@ class MultiSelectWithOtherFormField(MultiSelectFormField):
 
         self.other_max_length = other_max_length
         self.error_messages.update(
-            dict(invalid_length=_(
+            dict(invalid_length=_( # pylint: disable=no-member
                 'Other field value, maximum allowed length violation. Allowed limit is upto {other_max_length}'
                 ' characters.').format(
                 other_max_length=other_max_length)))
