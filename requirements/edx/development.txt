@@ -110,7 +110,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/testing.txt
 edx-django-utils==3.8.0   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.1.2  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.8.2     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
+edx-enterprise==3.8.4     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
 edx-lint==1.5.2           # via -r requirements/edx/testing.txt
 edx-milestones==0.3.0     # via -r requirements/edx/testing.txt
@@ -134,7 +134,7 @@ enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-unders
 event-tracking==1.0.0     # via -r requirements/edx/testing.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
-faker==4.1.2              # via -r requirements/edx/testing.txt, factory-boy
+faker==4.1.3              # via -r requirements/edx/testing.txt, factory-boy
 filelock==3.0.12          # via -r requirements/edx/testing.txt, tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 fs-s3fs==0.1.8            # via -r requirements/edx/testing.txt, django-pyfs
