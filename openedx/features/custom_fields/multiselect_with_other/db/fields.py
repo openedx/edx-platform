@@ -144,5 +144,5 @@ class MultiSelectWithOtherField(MultiSelectField):
 
     def check(self, **kwargs):
         errors = super(MultiSelectWithOtherField, self).check(**kwargs)
-        errors.extend(self._check_other_max_length_attribute(**kwargs))
+        errors.extend(self._check_other_max_length_attribute())
         return errors
