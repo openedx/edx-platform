@@ -181,7 +181,7 @@ pycontracts==1.8.12       # via -r requirements/edx/base.in, edx-user-state-clie
 pycountry==20.7.3         # via -r requirements/edx/base.in
 pycparser==2.20           # via -r requirements/edx/../edx-sandbox/shared.txt, cffi
 pycryptodomex==3.9.8      # via -r requirements/edx/base.in, edx-proctoring, lti-consumer-xblock, pyjwkest
-pygments==2.6.1           # via -r requirements/edx/base.in
+pygments==2.7.0           # via -r requirements/edx/base.in
 pyjwkest==1.4.2           # via -r requirements/edx/base.in, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.in, drf-jwt, edx-rest-api-client, social-auth-core
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
@@ -192,7 +192,7 @@ python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requi
 python-levenshtein==0.12.0  # via -r requirements/edx/base.in
 python-memcached==1.59    # via -r requirements/edx/paver.txt
 python-slugify==4.0.1     # via code-annotations
-python-swiftclient==3.10.0  # via ora2
+python-swiftclient==3.10.1  # via ora2
 python3-openid==3.2.0 ; python_version >= "3"  # via -r requirements/edx/base.in, social-auth-core
 python3-saml==1.9.0       # via -r requirements/edx/base.in
 pytz==2020.1              # via -r requirements/edx/base.in, babel, capa, celery, django, django-ses, edx-completion, edx-enterprise, edx-proctoring, edx-submissions, edx-tincan-py35, event-tracking, fs, icalendar, ora2, xblock
@@ -228,7 +228,7 @@ super-csv==0.9.9          # via -r requirements/edx/base.in, edx-bulk-grades
 sympy==1.6.2              # via symmath
 testfixtures==6.14.2      # via edx-enterprise
 text-unidecode==1.3       # via python-slugify
-tqdm==4.48.2              # via -r requirements/edx/../edx-sandbox/shared.txt, nltk
+tqdm==4.49.0              # via -r requirements/edx/../edx-sandbox/shared.txt, nltk
 ua-parser==0.10.0         # via django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/base.in, edx-enterprise
 uritemplate==3.0.1        # via coreapi, drf-yasg
