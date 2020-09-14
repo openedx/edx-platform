@@ -64,6 +64,7 @@ def edly_app_context(request):  # pylint: disable=unused-argument
             'nav_menu_url': marketing_link('NAV_MENU'),
             'zendesk_widget_url': marketing_link('ZENDESK-WIDGET'),
             'footer_url': marketing_link('FOOTER'),
+            'gtm_id': configuration_helpers.get_value('GTM_ID'),
         }
     )
 
