@@ -341,9 +341,7 @@ FEATURES = {
     #   default because enabling allows a method to bypass password policy.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
-    # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
-    # .. toggle_warnings: None
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
     ### ORA Feature Flags ###
@@ -352,11 +350,11 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable team-based ORA submissions.
-    # .. toggle_use_cases: incremental_release
+    # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warnings: None
+    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_TEAM_SUBMISSIONS': False,
 
     # .. toggle_name: ENABLE_ORA_ALL_FILE_URLS
@@ -369,7 +367,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warnings: None
+    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_ALL_FILE_URLS': False,
 
     # .. toggle_name: ENABLE_ORA_USER_STATE_UPLOAD_DATA
@@ -381,7 +379,7 @@ FEATURES = {
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warnings: None
+    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
     'ENABLE_ORA_USER_STATE_UPLOAD_DATA': False,
 
     # .. toggle_name: DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO
@@ -392,7 +390,7 @@ FEATURES = {
     #      To disable, set to False.
     #      To enable with a custom support deadline, set to an ISO-8601 date string:
     #        eg: '2020-09-01'
-    # .. toggle_use_cases: incremental_release
+    # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-06-12
     # .. toggle_target_removal_date: 2020-12-01
     # .. toggle_warnings: This can be removed once support is removed for deprecated
@@ -404,7 +402,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable the Library Authoring MFE
-    # .. toggle_use_cases: incremental_release
+    # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-06-20
     # .. toggle_target_removal_date: 2020-12-31
     # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/COMM/pages/1545011241/BD-14+Blockstore+Powered+Content+Libraries+Taxonomies
@@ -2261,7 +2259,7 @@ EDXAPP_PARSE_KEYS = {}
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: Toggle for removing the deprecated /signin url.
-# .. toggle_use_cases: incremental_release
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_target_removal_date: 2020-06-01
 # .. toggle_warnings: This url can be removed once it no longer has any real traffic.
@@ -2272,7 +2270,7 @@ DISABLE_DEPRECATED_SIGNIN_URL = False
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
 # .. toggle_description: Toggle for removing the deprecated /signup url.
-# .. toggle_use_cases: incremental_release
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-12-02
 # .. toggle_target_removal_date: 2020-06-01
 # .. toggle_warnings: This url can be removed once it no longer has any real traffic.

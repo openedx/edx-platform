@@ -15,7 +15,7 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='learner_profile')
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the profile page.
-# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2019-02-19
 # .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warnings: Also set settings.PROFILE_MICROFRONTEND_URL and site's ENABLE_PROFILE_MICROFRONTEND.

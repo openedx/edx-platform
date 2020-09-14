@@ -13,7 +13,7 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to redirect to another learner profile experience. Supports staged rollout to
 #   students for a new micro-frontend-based implementation of the courseware page.
-# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-01-29
 # .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
@@ -29,7 +29,7 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
 # .. toggle_description: Waffle flag to display a link for the new learner experience to course teams without
 #   redirecting students. Supports staged rollout to course teams of a new micro-frontend-based implementation of the
 #   courseware page.
-# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-03-09
 # .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and

@@ -35,13 +35,11 @@ from track import segment
 # .. toggle_type: flag
 # .. toggle_default: False
 # .. toggle_description: Toggle mobile upsell enabled
-# .. toggle_category: experiments
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-09-05
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: None
 # .. toggle_tickets: REV-934
-# .. toggle_status: supported
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 MOBILE_UPSELL_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'experiments'),
     flag_name=u'mobile_upsell_rev934',

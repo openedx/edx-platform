@@ -30,13 +30,11 @@ from track import segment
 # .. toggle_type: flag
 # .. toggle_default: False
 # .. toggle_description: Toggle discounts always being disabled
-# .. toggle_category: discounts
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-4-16
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: None
 # .. toggle_tickets: REVEM-282
-# .. toggle_status: supported
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'discounts'),
     flag_name=u'enable_discounting',

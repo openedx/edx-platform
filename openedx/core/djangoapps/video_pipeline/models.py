@@ -56,11 +56,8 @@ class VEMPipelineIntegration(ConfigurationModel):
     .. toggle_default: False
     .. toggle_description: Send videos to the Video Encode Manager (VEM) as part of the
       video pipeline.
-    .. toggle_category: video_pipeline
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2020-06-04
-    .. toggle_target_removal_date: None
-    .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/24093
     """
     client_name = models.CharField(
@@ -101,11 +98,8 @@ class VideoUploadsEnabledByDefault(ConfigurationModel):
     .. toggle_default: False
     .. toggle_description: Allow video uploads for all courses of the platform. This
       enables the "Video Uploads" menu in the CMS.
-    .. toggle_category: video_pipeline
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2017-11-10
-    .. toggle_target_removal_date: None
-    .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
     """
     # this field overrides course-specific settings
@@ -155,11 +149,8 @@ class CourseVideoUploadsEnabledByDefault(ConfigurationModel):
     .. toggle_default: False
     .. toggle_description: Allow video uploads for a specific course. This enables the
       "Video Uploads" menu in the CMS.
-    .. toggle_category: video_pipeline
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2017-11-10
-    .. toggle_target_removal_date: None
-    .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
     """
     KEY_FIELDS = ('course_id',)

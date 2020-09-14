@@ -50,7 +50,7 @@ SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggles the new micro-frontend-based implementation of the library authoring experience.
-# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-08-03
 # .. toggle_target_removal_date: 2020-12-31
 # .. toggle_warnings: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and ENABLE_LIBRARY_AUTHORING_MICROFRONTEND.

@@ -13,10 +13,10 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='verify_student')
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout to students for a new email templates
 #   implementation for ID verification.
-# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-06-25
-# .. toggle_target_removal_date: n/a
-# .. toggle_warnings: n/a
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 # .. toggle_tickets: PROD-1639
 USE_NEW_EMAIL_TEMPLATES = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
@@ -34,10 +34,10 @@ def use_new_templates_for_id_verification_emails():
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout to students for the new IDV flow.
-# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2020-07-09
-# .. toggle_target_removal_date: n/a
-# .. toggle_warnings: n/a
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 # .. toggle_tickets: MST-318
 REDIRECT_TO_IDV_MICROFRONTEND = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,

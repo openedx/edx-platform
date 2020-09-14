@@ -103,8 +103,7 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-04-30
 # .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warnings: None
-# .. toggle_tickets: None
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'registration'),
     flag_name=u'enable_failure_logging',
