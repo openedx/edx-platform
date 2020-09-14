@@ -47,7 +47,7 @@ class CheckboxSelectMultipleWithOther(CheckboxSelectMultiple):
 
 class RadioSelectWithOther(CheckboxSelectMultipleWithOther):
     """ Implements radio select widget for MultiSelectWithOther field"""
-    
+
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super(RadioSelectWithOther, self).create_option(name, value, label, selected, index, subindex, attrs)
 

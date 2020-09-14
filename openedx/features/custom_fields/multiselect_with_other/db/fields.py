@@ -116,12 +116,10 @@ class MultiSelectWithOtherField(MultiSelectField):
                 return MSFList(choices, list(value))
         return MSFList(choices, [])
 
-    def _check_other_max_length_attribute(self, **kwargs):
+    def _check_other_max_length_attribute(self):
         """
         Validates `other_max_length` field
         'other_max_length' attribute.
-        :param **kwargs: arguments
-        :type **kwargs: dictionary
         :return: list of errors
         :rtype: list
          """

@@ -1,5 +1,5 @@
 """This module contains MultiSelect form field with other option"""
-
+# pylint: disable=E1101
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from multiselectfield import MultiSelectFormField
