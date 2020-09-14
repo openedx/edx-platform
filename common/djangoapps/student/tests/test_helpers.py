@@ -11,6 +11,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.utils import http
 from mock import patch
+from mock import Mock
 from testfixtures import LogCapture
 
 from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
@@ -124,6 +125,26 @@ class TestLoginHelper(TestCase):
 
         with with_site_configuration_context(configuration=dict(THIRD_PARTY_AUTH_HINT=tpa_hint)):
             validate_login()
+
+    @patch('student.helpers.get_redirect_to', Mock(return_value=None))
+    def test_custom_tahoe_site_redirect(self):
+        """
+        Allow site admins to customize the default after-login URL.
+
+        Appsembler: This is specific to Tahoe and mostly not suitable for contribution to upstream.
+        """
+        request = Mock(GET={})
+        assert '/dashboard' == get_next_url_for_login_page(request), 'Default should be /dashboard'
+
+        with with_site_configuration_context(configuration={
+            'LOGIN_REDIRECT_URL': '/about'
+        }):
+            assert '/about' == get_next_url_for_login_page(request), 'Custom redirect should be used'
+
+        with with_site_configuration_context(configuration={
+            'LOGIN_REDIRECT_URL': ''  # Falsy or empty URLs should not be used
+        }):
+            assert '/dashboard' == get_next_url_for_login_page(request), 'Falsy url should default to dashboard'
 
 
 class TestDestroyOAuthTokensHelper(TestCase):
