@@ -37,11 +37,7 @@ export default class Wizard extends React.Component {
   }
 
   findSubComponentByType(type) {
-    return React.Children.map(this.props.children, child => {
-      if(child.type.name === type) {
-        return child;
-      }
-    })
+    return React.Children.toArray(this.props.children).filter(child => child.type.name === type)
   }
 
   // this needs to handle the case of no provided header
