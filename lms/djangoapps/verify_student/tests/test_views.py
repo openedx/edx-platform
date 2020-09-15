@@ -372,60 +372,23 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         response = self._get_page('verify_student_verify_now', course.id)
         self._assert_user_details(response, self.user.profile.name)
 
-    @ddt.data(
-        "verify_student_verify_now",
-        "verify_student_payment_confirmation"
-    )
     def test_verify_now_not_enrolled(self, page_name):
         course = self._create_course("verified")
-        response = self._get_page(page_name, course.id, expected_status_code=302)
+        response = self._get_page("verify_student_verify_now", course.id, expected_status_code=302)
         self._assert_redirects_to_start_flow(response, course.id)
 
-    @ddt.data(
-        "verify_student_verify_now",
-        "verify_student_payment_confirmation"
-    )
     def test_verify_now_unenrolled(self, page_name):
         course = self._create_course("verified")
         self._enroll(course.id, "verified")
         self._unenroll(course.id)
-        response = self._get_page(page_name, course.id, expected_status_code=302)
+        response = self._get_page("verify_student_verify_now", course.id, expected_status_code=302)
         self._assert_redirects_to_start_flow(response, course.id)
 
-    @ddt.data(
-        "verify_student_verify_now",
-        "verify_student_payment_confirmation"
-    )
     def test_verify_now_not_paid(self, page_name):
         course = self._create_course("verified")
         self._enroll(course.id)
-        response = self._get_page(page_name, course.id, expected_status_code=302)
+        response = self._get_page("verify_student_verify_now", course.id, expected_status_code=302)
         self._assert_redirects_to_upgrade(response, course.id)
-
-    def test_payment_confirmation(self):
-        course = self._create_course("verified")
-        self._enroll(course.id, "verified")
-        response = self._get_page('verify_student_payment_confirmation', course.id)
-
-        self._assert_messaging(response, PayAndVerifyView.PAYMENT_CONFIRMATION_MSG)
-
-        self.assert_no_xss(response, '<script>alert("XSS")</script>')
-
-        # Expect that *all* steps are displayed,
-        # but we start at the payment confirmation step
-        self._assert_steps_displayed(
-            response,
-            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
-            PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
-        )
-
-        # These will be hidden from the user anyway since they're starting
-        # after the payment step.  We're already including the payment
-        # steps, so it's easier to include these as well.
-        self._assert_requirements_displayed(response, [
-            PayAndVerifyView.PHOTO_ID_REQ,
-            PayAndVerifyView.WEBCAM_REQ,
-        ])
 
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_payment_cannot_skip(self, payment_flow):
@@ -452,64 +415,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
             response,
             PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
             PayAndVerifyView.MAKE_PAYMENT_STEP,
-        )
-
-    def test_payment_confirmation_already_verified(self):
-        course = self._create_course("verified")
-        self._enroll(course.id, "verified")
-        self._set_verification_status("submitted")
-
-        response = self._get_page('verify_student_payment_confirmation', course.id)
-
-        # Other pages would redirect to the dashboard at this point,
-        # because the user has paid and verified.  However, we want
-        # the user to see the confirmation page even if there
-        # isn't anything for them to do here except return
-        # to the dashboard.
-        self._assert_steps_displayed(
-            response,
-            PayAndVerifyView.PAYMENT_STEPS,
-            PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
-        )
-
-    def test_payment_confirmation_already_verified_skip_first_step(self):
-        course = self._create_course("verified")
-        self._enroll(course.id, "verified")
-        self._set_verification_status("submitted")
-
-        response = self._get_page(
-            'verify_student_payment_confirmation',
-            course.id,
-            skip_first_step=True
-        )
-
-        # There are no other steps, so stay on the
-        # payment confirmation step
-        self._assert_steps_displayed(
-            response,
-            PayAndVerifyView.PAYMENT_STEPS,
-            PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
-        )
-
-    @ddt.data(
-        (YESTERDAY, True),
-        (TOMORROW, False)
-    )
-    @ddt.unpack
-    def test_payment_confirmation_course_details(self, course_start, show_courseware_url):
-        course = self._create_course("verified", course_start=self.DATES[course_start])
-        self._enroll(course.id, "verified")
-        response = self._get_page('verify_student_payment_confirmation', course.id)
-
-        courseware_url = (
-            reverse("course_root", kwargs={'course_id': six.text_type(course.id)})
-            if show_courseware_url else ""
-        )
-        self._assert_course_details(
-            response,
-            six.text_type(course.id),
-            course.display_name,
-            courseware_url
         )
 
     @ddt.data("verified", "professional")
