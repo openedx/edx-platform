@@ -20,5 +20,7 @@ _WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_pre
 # .. toggle_tickets: ENT-2461
 # .. toggle_status: supported
 ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = WaffleSwitch(
-    _WAFFLE_SWITCH_NAMESPACE, 'enable_login_using_thirdparty_auth_only'
+    _WAFFLE_SWITCH_NAMESPACE,
+    'enable_login_using_thirdparty_auth_only',
+    __name__
 )

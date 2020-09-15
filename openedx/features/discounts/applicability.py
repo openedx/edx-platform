@@ -40,6 +40,7 @@ from track import segment
 DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'discounts'),
     flag_name=u'enable_discounting',
+    module_name=__name__,
 )
 
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'

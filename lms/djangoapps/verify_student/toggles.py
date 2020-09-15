@@ -22,6 +22,7 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='verify_student')
 USE_NEW_EMAIL_TEMPLATES = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='use_new_email_templates',
+    module_name=__name__,
 )
 
 
@@ -44,6 +45,7 @@ def use_new_templates_for_id_verification_emails():
 REDIRECT_TO_IDV_MICROFRONTEND = WaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='redirect_to_idv_microfrontend',
+    module_name=__name__,
 )
 
 

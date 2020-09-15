@@ -16,4 +16,7 @@ PROGRAMS_WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name='programs')
 
 # This is meant to be enabled until https://openedx.atlassian.net/browse/LEARNER-5573 needs to be resolved
 ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER = WaffleSwitch(
-    PROGRAMS_WAFFLE_SWITCH_NAMESPACE, 'always_calculate_program_price_as_anonymous_user')
+    PROGRAMS_WAFFLE_SWITCH_NAMESPACE,
+    'always_calculate_program_price_as_anonymous_user',
+    __name__
+)

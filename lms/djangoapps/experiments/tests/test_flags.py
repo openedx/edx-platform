@@ -37,7 +37,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
         self.addCleanup(set_current_request, None)
         set_current_request(self.request)
 
-        self.flag = ExperimentWaffleFlag('experiments', 'test', num_buckets=2, experiment_id=0)
+        self.flag = ExperimentWaffleFlag('experiments', 'test', __name__, num_buckets=2, experiment_id=0)
         self.key = CourseKey.from_string('a/b/c')
 
         bucket_patch = patch('experiments.flags.stable_bucketing_hash_group', return_value=1)
@@ -104,7 +104,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     def test_forcing_bucket(self, active, expected_bucket):
-        bucket_flag = CourseWaffleFlag('experiments', 'test.0')
+        bucket_flag = CourseWaffleFlag('experiments', 'test.0', __name__)
         with bucket_flag.override(active=active):
             self.assertEqual(self.get_bucket(), expected_bucket)
 
@@ -163,14 +163,14 @@ class ExperimentWaffleFlagCourseAwarenessTest(SharedModuleStoreTestCase):
     ExperimentWaffleFlag class.
     """
     course_aware_flag = ExperimentWaffleFlag(
-        'exp', 'aware', num_buckets=20, use_course_aware_bucketing=True,
+        'exp', 'aware', __name__, num_buckets=20, use_course_aware_bucketing=True,
     )
-    course_aware_subflag = CourseWaffleFlag('exp', 'aware.1')
+    course_aware_subflag = CourseWaffleFlag('exp', 'aware.1', __name__)
 
     course_unaware_flag = ExperimentWaffleFlag(
-        'exp', 'unaware', num_buckets=20, use_course_aware_bucketing=False,
+        'exp', 'unaware', __name__, num_buckets=20, use_course_aware_bucketing=False,
     )
-    course_unaware_subflag = CourseWaffleFlag('exp', 'unaware.1')
+    course_unaware_subflag = CourseWaffleFlag('exp', 'unaware.1', __name__)
 
     course_key_1 = CourseKey.from_string("x/y/1")
     course_key_2 = CourseKey.from_string("x/y/22")

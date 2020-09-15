@@ -21,7 +21,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.waffle_utils import WaffleFlag
 from student.helpers import get_next_url_for_login_page
 
-ENTERPRISE_HEADER_LINKS = WaffleFlag('enterprise', 'enterprise_header_links')
+ENTERPRISE_HEADER_LINKS = WaffleFlag('enterprise', 'enterprise_header_links', __name__)
 
 
 def get_data_consent_share_cache_key(user_id, course_id):

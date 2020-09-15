@@ -2,7 +2,6 @@
 Toggles for courseware in-course experience.
 """
 
-from django.conf import settings
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 
@@ -22,7 +21,7 @@ WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='courseware')
 # .. toggle_tickets: TNL-7000
 # .. toggle_status: supported
 REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', use_course_aware_bucketing=False
+    WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', __name__, use_course_aware_bucketing=False
 )
 
 # Waffle flag to display a link for the new learner experience to course teams without redirecting students.
@@ -38,4 +37,6 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
 # .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
 # .. toggle_tickets: TNL-6982
 # .. toggle_status: supported
-COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_team_preview')
+COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_team_preview', __name__
+)

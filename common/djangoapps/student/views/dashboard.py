@@ -640,7 +640,7 @@ def student_dashboard(request):
     inverted_programs = meter.invert_programs()
 
     urls, programs_data = {}, {}
-    bundles_on_dashboard_flag = WaffleFlag(experiments_namespace, u'bundles_on_dashboard')
+    bundles_on_dashboard_flag = WaffleFlag(experiments_namespace, u'bundles_on_dashboard', __name__)
 
     # TODO: Delete this code and the relevant HTML code after testing LEARNER-3072 is complete
     if bundles_on_dashboard_flag.is_enabled() and inverted_programs and list(inverted_programs.items()):

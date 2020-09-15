@@ -66,16 +66,17 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             self,
             waffle_namespace,
             flag_name,
+            module_name,
             num_buckets=2,
             experiment_id=None,
             use_course_aware_bucketing=True,
             **kwargs
     ):
-        super().__init__(waffle_namespace, flag_name, **kwargs)
+        super().__init__(waffle_namespace, flag_name, module_name, **kwargs)
         self.num_buckets = num_buckets
         self.experiment_id = experiment_id
         self.bucket_flags = [
-            CourseWaffleFlag(waffle_namespace, '{}.{}'.format(flag_name, bucket))
+            CourseWaffleFlag(waffle_namespace, '{}.{}'.format(flag_name, bucket), module_name)
             for bucket in range(num_buckets)
         ]
         self.use_course_aware_bucketing = use_course_aware_bucketing

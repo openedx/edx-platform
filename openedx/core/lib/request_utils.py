@@ -23,7 +23,7 @@ except ImportError:
 COURSE_REGEX = re.compile(r'^(.*?/courses/)(?!v[0-9]+/[^/]+){}'.format(settings.COURSE_ID_PATTERN))
 
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='request_utils')
-CAPTURE_COOKIE_SIZES = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'capture_cookie_sizes')
+CAPTURE_COOKIE_SIZES = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'capture_cookie_sizes', __name__)
 log = logging.getLogger(__name__)
 
 
