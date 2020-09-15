@@ -22,10 +22,10 @@ export default class Wizard extends React.Component {
   }
 
   componentDidMount() {
-    const pages = this.findSubComponentByType('Page');
+    const pages = this.findSubComponentByType(Wizard.Page.name);
     const totalPages = pages.length;
     const wizardContext = this.props.wizardContext;
-    const closer = this.findSubComponentByType('Closer')[0];
+    const closer = this.findSubComponentByType(Wizard.Closer.name)[0];
     pages.push(closer);
     this.setState({ pages, totalPages, wizardContext });
   }
@@ -37,19 +37,23 @@ export default class Wizard extends React.Component {
   }
 
   findSubComponentByType(type) {
-    return this.props.children.filter((child) => child.type.name === type)
+    return React.Children.map(this.props.children, child => {
+      if(child.type.name === type) {
+        return child;
+      }
+    })
   }
 
   // this needs to handle the case of no provided header
   renderHeader() {
-    const header = this.findSubComponentByType('Header')[0];
+    const header = this.findSubComponentByType(Wizard.Header.name)[0];
     return header.props.children({ currentPage: this.state.currentPage, totalPages: this.state.totalPages })
   }
 
   renderPage() {
     if (this.state.totalPages) {
       const page = this.state.pages[this.state.currentPage - 1];
-      if(page.type.name === 'Closer') {
+      if(page.type.name === Wizard.Closer.name) {
         return page.props.children;
       }
 
@@ -64,7 +68,7 @@ export default class Wizard extends React.Component {
 
   // this needs to handle the case of no provided errorPage
   renderError() {
-    const errorPage = this.findSubComponentByType('ErrorPage')[0];
+    const errorPage = this.findSubComponentByType(Wizard.ErrorPage.name)[0];
     return (
       <div className="wizard-container">
         <div className="wizard-header">
