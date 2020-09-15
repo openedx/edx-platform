@@ -116,15 +116,13 @@ Problem Scores
 * *weighted_possible* (*a.k.a. max_grade*).  The weighted_possible value is the maximum possible score that is achievable on the problem post-weight-computation.
 * *weighted_earned* (*a.k.a. grade*). The weighted_earned value is the learner's score computed from the learner's response to the problem. The process for computing this score can be classified into the following types:
 
- - **automatically scored, synchronously** at the time of submission, such as for most Capa-based problems
+  - **automatically scored, synchronously** at the time of submission, such as for most Capa-based problems
+  - **automatically scored, asynchronously** via an `external grader service <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/external_graders.html>`_
+  - **manually scored**, such as for `Open Response Assessments <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html>`_, where the calculation requires human input from either
  
- - **automatically scored, asynchronously** via an `external grader service <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/external_graders.html>`_
- 
- - **manually scored**, such as for `Open Response Assessments <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html>`_, where the calculation requires human input from either
- 
-   - a single course staff (staff assessment)
-   - a number of peers (peer assessment)
-   - the self learner (self assessment)
+    * a single course staff (staff assessment)
+    * a number of peers (peer assessment)
+    * the self learner (self assessment)
    
 .. image:: images/background_problem_score.png
 
