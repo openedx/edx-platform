@@ -572,9 +572,8 @@ def get_course_assignments(course_key, user, include_access=False):
                         'start': block_data.get_xblock_field(descendent, 'submission_start'),
                         'required': True
                     }]
-                    valid_assessments = block_data.get_xblock_field(descendent, 'valid_assessments')
-                    print(valid_assessments)
 
+                    valid_assessments = block_data.get_xblock_field(descendent, 'valid_assessments')
                     if valid_assessments:
                         all_assessments.extend(valid_assessments)
 

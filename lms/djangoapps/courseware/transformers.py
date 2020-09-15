@@ -21,7 +21,7 @@ class OpenAssessmentDateTransformer(FilteringTransformerMixin, BlockStructureTra
         Unique identifier for the transformer's class;
         same identifier used in setup.py.
         """
-        return "content_type_gate"
+        return 'open_assessment_transformer'
 
     @classmethod
     def collect(cls, block_structure):
