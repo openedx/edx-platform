@@ -15,7 +15,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     FilteringTransformerMixin
 )
 from track import contexts
-from xmodule.library_content_module import LibraryContentModule
+from xmodule.library_content_module import LibraryContentBlock
 from xmodule.modulestore.django import modulestore
 
 from ..utils import get_student_module_as_dict
@@ -99,7 +99,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 
                 # Update selected
                 previous_count = len(selected)
-                block_keys = LibraryContentModule.make_selection(selected, library_children, max_count, mode)
+                block_keys = LibraryContentBlock.make_selection(selected, library_children, max_count, mode)
                 selected = block_keys['selected']
 
                 # Save back any changes
@@ -175,7 +175,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             with tracker.get_tracker().context(full_event_name, context):
                 tracker.emit(full_event_name, event_data)
 
-        LibraryContentModule.publish_selected_children_events(
+        LibraryContentBlock.publish_selected_children_events(
             block_keys,
             format_block_keys,
             publish_event,

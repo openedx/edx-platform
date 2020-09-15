@@ -279,7 +279,7 @@ class StudioPermissionsService(object):
 
     Deprecated. To be replaced by a more general authorization service.
 
-    Only used by LibraryContentDescriptor (and library_tools.py).
+    Only used by LibraryContentBlock (and library_tools.py).
     """
     def __init__(self, user):
         self._user = user
@@ -305,7 +305,7 @@ class StudioEditModuleRuntime(object):
 
     def service(self, block, service_name):
         """
-        This block is not bound to a user but some blocks (LibraryContentModule) may need
+        This block is not bound to a user but some blocks (LibraryContentBlock) may need
         user-specific services to check for permissions, etc.
         If we return None here, CombinedSystem will load services from the descriptor runtime.
         """

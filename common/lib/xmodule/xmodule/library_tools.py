@@ -1,5 +1,5 @@
 """
-XBlock runtime services for LibraryContentModule
+XBlock runtime services for LibraryContentBlock
 """
 import hashlib
 
@@ -27,7 +27,7 @@ def normalize_key_for_search(library_key):
 
 class LibraryToolsService(object):
     """
-    Service that allows LibraryContentModule to interact with libraries in the
+    Service that allows LibraryContentBlock to interact with libraries in the
     modulestore.
     """
     def __init__(self, modulestore, user_id):
@@ -137,7 +137,7 @@ class LibraryToolsService(object):
 
     def update_children(self, dest_block, user_perms=None, version=None):
         """
-        This method is to be used when the library that a LibraryContentModule
+        This method is to be used when the library that a LibraryContentBlock
         references has been updated. It will re-fetch all matching blocks from
         the libraries, and copy them as children of dest_block. The children
         will be given new block_ids, but the definition ID used should be the

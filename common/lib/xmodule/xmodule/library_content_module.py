@@ -24,12 +24,21 @@ from xblock.core import XBlock
 from xblock.fields import Integer, List, Scope, String
 
 from capa.responsetypes import registry
-from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
+from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.studio_editable import StudioEditableBlock
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.x_module import STUDENT_VIEW, XModule
+from xmodule.xml_module import XmlMixin
+from xmodule.x_module import (
+    HTMLSnippet,
+    ResourceTemplates,
+    shim_xmodule_js,
+    STUDENT_VIEW,
+    XModuleMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+)
 
-from .mako_module import MakoModuleDescriptor
-from .xml_module import XmlDescriptor
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -59,17 +68,57 @@ def _get_capa_types():
     ], key=lambda item: item.get('display_name'))
 
 
-class LibraryContentFields(object):
+@XBlock.wants('library_tools')  # Only needed in studio
+@XBlock.wants('studio_user_permissions')  # Only available in studio
+@XBlock.wants('user')
+class LibraryContentBlock(
+    MakoTemplateBlockBase,
+    XmlMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+    StudioEditableBlock,
+):
     """
-    Fields for the LibraryContentModule.
+    An XBlock whose children are chosen dynamically from a content library.
+    Can be used to create randomized assessments among other things.
 
-    Separated out for now because they need to be added to the module and the
-    descriptor.
+    Note: technically, all matching blocks from the content library are added
+    as children of this block, but only a subset of those children are shown to
+    any particular student.
     """
+    # pylint: disable=abstract-method
+    has_children = True
+    has_author_view = True
+
+    resources_dir = 'assets/library_content'
+
+    preview_view_js = {
+        'js': [],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    preview_view_css = {
+        'scss': [],
+    }
+
+    mako_template = 'widgets/metadata-edit.html'
+    studio_js_module_name = "VerticalDescriptor"
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/vertical/edit.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    studio_view_css = {
+        'scss': [],
+    }
+
+    show_in_read_only_mode = True
+
     completion_mode = XBlockCompletionMode.AGGREGATOR
-    # Please note the display_name of each field below is used in
-    # common/test/acceptance/pages/studio/library.py:StudioLibraryContentXBlockEditModal
-    # to locate input elements - keep synchronized
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
@@ -117,7 +166,6 @@ class LibraryContentFields(object):
         default=[],
         scope=Scope.user_state,
     )
-    has_children = True
 
     @property
     def source_library_key(self):
@@ -125,19 +173,6 @@ class LibraryContentFields(object):
         Convenience method to get the library ID as a LibraryLocator and not just a string
         """
         return LibraryLocator.from_string(self.source_library_id)
-
-
-#pylint: disable=abstract-method
-@XBlock.wants('library_tools')  # Only needed in studio
-class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
-    """
-    An XBlock whose children are chosen dynamically from a content library.
-    Can be used to create randomized assessments among other things.
-
-    Note: technically, all matching blocks from the content library are added
-    as children of this block, but only a subset of those children are shown to
-    any particular student.
-    """
 
     @classmethod
     def make_selection(cls, selected, children, max_count, mode):
@@ -341,12 +376,6 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         }))
         return fragment
 
-    def validate(self):
-        """
-        Validates the state of this Library Content Module Instance.
-        """
-        return self.descriptor.validate()
-
     def author_view(self, context):
         """
         Renders the Studio views.
@@ -375,37 +404,33 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         fragment.initialize_js('LibraryContentAuthorView')
         return fragment
 
+    def studio_view(self, _context):
+        """
+        Return the studio view.
+        """
+        fragment = Fragment(
+            self.system.render_template(self.mako_template, self.get_context())
+        )
+        add_webpack_to_fragment(fragment, 'LibraryContentBlockStudio')
+        shim_xmodule_js(fragment, self.studio_js_module_name)
+        return fragment
+
     def get_child_descriptors(self):
         """
         Return only the subset of our children relevant to the current student.
         """
         return list(self._get_selected_child_blocks())
 
-
-@XBlock.wants('user')
-@XBlock.wants('library_tools')  # Only needed in studio
-@XBlock.wants('studio_user_permissions')  # Only available in studio
-class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDescriptor, StudioEditableDescriptor):
-    """
-    Descriptor class for LibraryContentModule XBlock.
-    """
-
-    resources_dir = 'assets/library_content'
-
-    module_class = LibraryContentModule
-    mako_template = 'widgets/metadata-edit.html'
-    js = {'js': [resource_string(__name__, 'js/src/vertical/edit.js')]}
-    js_module_name = "VerticalDescriptor"
-
-    show_in_read_only_mode = True
-
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(LibraryContentDescriptor, self).non_editable_metadata_fields
+        non_editable_fields = super().non_editable_metadata_fields
         # The only supported mode is currently 'random'.
         # Add the mode field to non_editable_metadata_fields so that it doesn't
         # render in the edit form.
-        non_editable_fields.extend([LibraryContentFields.mode, LibraryContentFields.source_library_version])
+        non_editable_fields.extend([
+            LibraryContentBlock.mode,
+            LibraryContentBlock.source_library_version,
+        ])
         return non_editable_fields
 
     @lazy
@@ -525,7 +550,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         is the override of the general XBlock method, and it will also ask
         its superclass to validate.
         """
-        validation = super(LibraryContentDescriptor, self).validate()
+        validation = super().validate()
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
         library_tools = self.runtime.service(self, "library_tools")
@@ -636,7 +661,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         This overwrites the get_content_titles method included in x_module by default.
         """
         titles = []
-        for child in self._xmodule.get_child_descriptors():
+        for child in self.get_child_descriptors():
             titles.extend(child.get_content_titles())
         return titles
 
