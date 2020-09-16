@@ -95,7 +95,9 @@ class DemographicsCollectionModal extends React.Component {
             requestOptions.body = JSON.stringify({
               user: this.props.user,
             });
-            response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, requestOptions);
+            const postUrl = `${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`;
+            requestOptions.headers['X-CSRFToken'] = await this.csrfTokenService.getCsrfToken(url);
+            response = await fetch(postUrl, requestOptions);
             // A 201 is a created success message. if we don't get a 201, throw an error.
             if (response.status !== 201) {
               const error = await response.json();
