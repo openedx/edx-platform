@@ -1,5 +1,7 @@
-import pytz
 from datetime import datetime
+
+import pytz
+
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 DATE_FORMAT = "%m/%d/%Y"
