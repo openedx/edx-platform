@@ -81,6 +81,7 @@ class OutlineTabView(RetrieveAPIView):
                     xBlock on the web LMS.
                 children: (list) If the block has child blocks, a list of IDs of
                     the child blocks.
+                resume_block: (bool) Whether the block is the resume block
         course_goals:
             goal_options: (list) A list of goals where each goal is represented as a tuple (goal_key, goal_string)
             selected_goal:
