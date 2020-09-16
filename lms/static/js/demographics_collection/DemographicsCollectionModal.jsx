@@ -7,6 +7,7 @@ import { SelectWithInput } from './SelectWithInput'
 import { MultiselectDropdown } from './MultiselectDropdown';
 import AxiosJwtTokenService from '../jwt_auth/AxiosJwtTokenService';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+import AxiosCsrfTokenService from '../jwt_auth/AxiosCsrfTokenService';
 
 const FIELD_NAMES = {
   CURRENT_WORK: "current_work_sector",
@@ -51,6 +52,7 @@ class DemographicsCollectionModal extends React.Component {
       accessToken,
       refreshUrl,
     );
+    this.csrfTokenService = new AxiosCsrfTokenService(this.props.csrfTokenPath)
   }
 
   async componentDidMount() {
@@ -59,7 +61,6 @@ class DemographicsCollectionModal extends React.Component {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFTOKEN': Cookies.get('demographics_csrftoken'),
         'USE-JWT-COOKIE': true
       },
     };
@@ -135,6 +136,7 @@ class DemographicsCollectionModal extends React.Component {
   }
 
   async handleSelectChange(e) {
+    const url = `${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`;
     const name = e.target.name;
     const value = e.target.value;
     const options = {
@@ -142,7 +144,6 @@ class DemographicsCollectionModal extends React.Component {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFTOKEN': Cookies.get('demographics_csrftoken'),
         'USE-JWT-COOKIE': true
       },
       body: JSON.stringify({
@@ -152,7 +153,8 @@ class DemographicsCollectionModal extends React.Component {
 
     try {
       await this.jwtTokenService.getJwtToken();
-      await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, options)
+      options.headers['X-CSRFToken'] = await this.csrfTokenService.getCsrfToken(url);
+      await fetch(url, options)
     } catch (error) {
       this.setState({ loading: false, fieldError: true, errorMessage: error });
     }

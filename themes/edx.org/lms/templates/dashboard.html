@@ -212,6 +212,7 @@ from student.models import CourseEnrollment
           "demographicsBaseUrl": getattr(settings, 'DEMOGRAPHICS_BASE_URL', ''),
           "marketingSiteBaseUrl": getattr(settings, 'MKTG_URLS', {}).get('ROOT', ''),
           "jwtAuthToken": getattr(settings, 'JWT_AUTH', {}).get('JWT_AUTH_COOKIE_HEADER_PAYLOAD', ''),
+          "csrfTokenPath": getattr(settings, 'DEMOGRAPHICS_CSRF_TOKEN_API_PATH', ''),
           "bannerLogo": bannerLogoPath
         },
       )}
