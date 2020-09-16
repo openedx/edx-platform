@@ -68,7 +68,7 @@ class DemographicsCollectionModal extends React.Component {
     let optionsResponse = {};
     let response = {};
     let data = {};
-    
+
     // gather options for the demographics selects
     try {
       optionsResponse = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, { method: 'OPTIONS' })
