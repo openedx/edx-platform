@@ -284,7 +284,7 @@ unicodecsv==0.14.1        # via -r requirements/edx/base.txt, edx-enterprise
 unidiff==0.6.0            # via -r requirements/edx/testing.in, coverage-pytest-plugin
 uritemplate==3.0.1        # via -r requirements/edx/base.txt, coreapi, drf-yasg
 urllib3==1.25.10          # via -r requirements/edx/base.txt, elasticsearch, geoip2, requests, selenium, transifex-client
-user-util==0.2            # via -r requirements/edx/base.txt
+user-util==0.3.1          # via -r requirements/edx/base.txt
 virtualenv==20.0.31       # via tox
 voluptuous==0.11.7        # via -r requirements/edx/base.txt, ora2
 watchdog==0.10.3          # via -r requirements/edx/base.txt

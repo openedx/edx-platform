@@ -34,14 +34,14 @@ class ProgramEnrollmentRetireSignalTests(ModuleStoreTestCase):
     Test the _listen_for_lms_retire signal
     """
 
-    def create_enrollment_and_history(self, user=None):
+    def create_enrollment_and_history(self, user=None, external_user_key='defaultExternalKey'):
         """
         Create ProgramEnrollment and several History entries
         """
         if user:
-            enrollment = ProgramEnrollmentFactory(user=user)
+            enrollment = ProgramEnrollmentFactory(user=user, external_user_key=external_user_key)
         else:
-            enrollment = ProgramEnrollmentFactory()
+            enrollment = ProgramEnrollmentFactory(external_user_key=external_user_key)
         for status in ['pending', 'suspended', 'canceled', 'enrolled']:
             enrollment.status = status
             enrollment.save()
@@ -52,9 +52,11 @@ class ProgramEnrollmentRetireSignalTests(ModuleStoreTestCase):
         Assert that for the enrollment and all histories, external key is None
         """
         enrollment.refresh_from_db()
-        self.assertIsNone(enrollment.external_user_key)
+        self.assertIsNotNone(enrollment.external_user_key)
+        self.assertTrue(enrollment.external_user_key.startswith('retired_external_key'))
         for history_record in enrollment.historical_records.all():
-            self.assertIsNone(history_record.external_user_key)
+            self.assertIsNotNone(history_record.external_user_key)
+            self.assertTrue(history_record.external_user_key.startswith('retired_external_key'))
 
     def test_retire_enrollment(self):
         """
