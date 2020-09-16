@@ -5,7 +5,12 @@ Serializers for the content libraries REST API
 from django.core.validators import validate_unicode_slug
 from rest_framework import serializers
 
-from openedx.core.djangoapps.content_libraries.constants import LIBRARY_TYPES, COMPLEX
+from openedx.core.djangoapps.content_libraries.constants import (
+    LIBRARY_TYPES,
+    COMPLEX,
+    ALL_RIGHTS_RESERVED,
+    LICENSE_OPTIONS,
+)
 from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 from openedx.core.lib import blockstore_api
 
@@ -36,6 +41,7 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     allow_public_read = serializers.BooleanField(default=False)
     has_unpublished_changes = serializers.BooleanField(read_only=True)
     has_unpublished_deletes = serializers.BooleanField(read_only=True)
+    license = serializers.ChoiceField(choices=LICENSE_OPTIONS, default=ALL_RIGHTS_RESERVED)
 
 
 class ContentLibraryUpdateSerializer(serializers.Serializer):
@@ -48,6 +54,7 @@ class ContentLibraryUpdateSerializer(serializers.Serializer):
     allow_public_learning = serializers.BooleanField()
     allow_public_read = serializers.BooleanField()
     type = serializers.ChoiceField(choices=LIBRARY_TYPES)
+    license = serializers.ChoiceField(choices=LICENSE_OPTIONS)
 
 
 class ContentLibraryPermissionLevelSerializer(serializers.Serializer):

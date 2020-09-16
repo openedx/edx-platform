@@ -152,8 +152,10 @@ class LibraryRootView(APIView):
         serializer = ContentLibraryMetadataSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
-        # Converting this over because using the reserved name 'type' would shadow the built-in definition elsewhere.
+        # Converting this over because using the reserved names 'type' and 'license' would shadow the built-in
+        # definitions elsewhere.
         data['library_type'] = data.pop('type')
+        data['library_license'] = data.pop('license')
         # Get the organization short_name out of the "key.org" pseudo-field that the serializer added:
         org_name = data["key"]["org"]
         # Move "slug" out of the "key.slug" pseudo-field that the serializer added:
@@ -196,8 +198,11 @@ class LibraryDetailsView(APIView):
         serializer = ContentLibraryUpdateSerializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
+        # Prevent ourselves from shadowing global names.
         if 'type' in data:
             data['library_type'] = data.pop('type')
+        if 'license' in data:
+            data['library_license'] = data.pop('license')
         try:
             api.update_library(key, **data)
         except api.IncompatibleTypesError as err:

@@ -147,6 +147,7 @@ class ContentLibraryMetadata:
     # Allow any user with Studio access to view this library's content in
     # Studio, use it in their courses, and copy content out of this library.
     allow_public_read = attr.ib(False)
+    license = attr.ib("")
 
 
 class AccessLevel:
@@ -307,6 +308,7 @@ def get_metadata_from_index(queryset, text_search=None):
             last_published=metadata[i].get('last_published'),
             has_unpublished_changes=metadata[i].get('has_unpublished_changes'),
             has_unpublished_deletes=metadata[i].get('has_unpublished_deletes'),
+            license=lib.license,
         )
         for i, lib in enumerate(queryset)
         if metadata[i] is not None
@@ -357,11 +359,13 @@ def get_library(library_key):
         allow_public_read=ref.allow_public_read,
         has_unpublished_changes=has_unpublished_changes,
         has_unpublished_deletes=has_unpublished_deletes,
+        license=ref.license,
     )
 
 
 def create_library(
     collection_uuid, library_type, org, slug, title, description, allow_public_learning, allow_public_read,
+    library_license,
 ):
     """
     Create a new content library.
@@ -399,6 +403,7 @@ def create_library(
             bundle_uuid=bundle.uuid,
             allow_public_learning=allow_public_learning,
             allow_public_read=allow_public_read,
+            license=library_license,
         )
     except IntegrityError:
         delete_bundle(bundle.uuid)
@@ -415,6 +420,7 @@ def create_library(
         last_published=None,
         allow_public_learning=ref.allow_public_learning,
         allow_public_read=ref.allow_public_read,
+        license=library_license,
     )
 
 
@@ -490,9 +496,10 @@ def update_library(
     allow_public_learning=None,
     allow_public_read=None,
     library_type=None,
+    library_license=None,
 ):
     """
-    Update a library's title or description.
+    Update a library's metadata
     (Slug cannot be changed as it would break IDs throughout the system.)
 
     A value of None means "don't change".
@@ -522,6 +529,9 @@ def update_library(
                     )
         ref.type = library_type
 
+        changed = True
+    if library_license is not None:
+        ref.license = library_license
         changed = True
     if changed:
         ref.save()

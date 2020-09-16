@@ -19,7 +19,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_METADATA_URL,
 )
 from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX
+from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED, CC_4_BY
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
@@ -55,6 +55,7 @@ class ContentLibraryContentTestMixin(object):
             description="",
             allow_public_learning=True,
             allow_public_read=False,
+            library_license=ALL_RIGHTS_RESERVED,
         )
 
 
@@ -89,6 +90,7 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
             library_type=COMPLEX,
             allow_public_learning=True,
             allow_public_read=False,
+            library_license=CC_4_BY,
         )
         unit_block2_key = library_api.create_library_block(library2.key, "unit", "u1").usage_key
         library_api.create_library_block_child(unit_block2_key, "problem", "p1")
