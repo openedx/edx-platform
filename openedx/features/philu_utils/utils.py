@@ -34,6 +34,6 @@ def get_anonymous_user(user, course_id):
         from student.models import AnonymousUserId
         return AnonymousUserId.objects.get(user=user, course_id=course_id)
     except AnonymousUserId.DoesNotExist:
-        log.info('Anonymous Id does not exist for User: {user}'.format(user=user))
+        log.info('Anonymous Id does not exist for User: {user} & Course: {course}'.format(user=user, course=course_id))
     except AnonymousUserId.MultipleObjectsReturned:
-        log.info('Multiple Anonymous Ids for User: {user}'.format(user=user))
+        log.info('Multiple Anonymous Ids for User: {user} & Course: {course}'.format(user=user, course=course_id))

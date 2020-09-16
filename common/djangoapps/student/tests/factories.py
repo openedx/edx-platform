@@ -215,7 +215,12 @@ class AccountRecoveryFactory(DjangoModelFactory):
 
 
 class AnonymousUserIdFactory(DjangoModelFactory):
+    """
+    A Factory for the AnonymousUserId model.
+    """
+
     class Meta:
         model = AnonymousUserId
 
+    anonymous_user_id = factory.Faker('pystr', max_chars=32)
     user = factory.SubFactory(UserFactory)
