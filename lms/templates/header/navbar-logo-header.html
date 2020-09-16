@@ -8,15 +8,14 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from lms.djangoapps.ccx.overrides import get_current_ccx
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name, get_enterprise_learner_portals
+from openedx.features.enterprise_support.utils import get_enterprise_learner_generic_name, get_enterprise_learner_portal
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
 %>
 
 <%
-enterprise_customer_links = get_enterprise_learner_portals(request)
-enterprise_customer_link = enterprise_customer_links[0] if enterprise_customer_links else None # Only want to show the first link
+enterprise_customer_link = get_enterprise_learner_portal(request)
 %>
 
 <h1 class="header-logo">
