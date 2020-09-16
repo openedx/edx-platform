@@ -1328,61 +1328,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
         self._assert_404(reverse('billing_details', args=[]))
 
-    def test_upgrade_postpay_callback_emits_ga_event(self):
-        # Enroll as honor in the course with the current user.
-
-        CourseEnrollment.enroll(self.user, self.course_key)
-
-        # add verified mode
-        CourseMode.objects.create(
-            course_id=self.verified_course_key,
-            mode_slug="verified",
-            mode_display_name="verified cert",
-            min_price=self.cost
-        )
-
-        # Purchase a verified certificate
-        self.cart = Order.get_cart_for_user(self.user)
-        CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'verified')
-        self.cart.start_purchase()
-
-        self.login_user()
-        # setting the attempting upgrade session value.
-        session = self.client.session
-        session['attempting_upgrade'] = True
-        session.save()
-
-        ordered_params = OrderedDict([
-            ('amount', self.cost),
-            ('currency', 'usd'),
-            ('transaction_type', 'sale'),
-            ('orderNumber', str(self.cart.id)),
-            ('access_key', '123456789'),
-            ('merchantID', 'edx'),
-            ('djch', '012345678912'),
-            ('orderPage_version', 2),
-            ('orderPage_serialNumber', '1234567890'),
-            ('profile_id', "00000001"),
-            ('reference_number', str(self.cart.id)),
-            ('locale', 'en'),
-            ('signed_date_time', '2014-08-18T13:59:31Z'),
-        ])
-
-        resp_params = PaymentFakeView.response_post_params(sign(ordered_params))
-        self.assertTrue(self.client.session.get('attempting_upgrade'))
-        url = reverse('shoppingcart.views.postpay_callback')
-        self.client.post(url, resp_params, follow=True)
-        self.assertFalse(self.client.session.get('attempting_upgrade'))
-
-        self.mock_tracker.emit.assert_any_call(
-            'edx.course.enrollment.upgrade.succeeded',
-            {
-                'user_id': self.user.id,
-                'course_id': text_type(self.verified_course_key),
-                'mode': 'verified'
-            }
-        )
-
 
 class ReceiptRedirectTest(SharedModuleStoreTestCase):
     """Test special-case redirect from the receipt page. """
@@ -1413,41 +1358,6 @@ class ReceiptRedirectTest(SharedModuleStoreTestCase):
             username=self.user.username,
             password=self.PASSWORD
         )
-
-    def test_postpay_callback_redirect_to_verify_student(self):
-        # Create other carts first
-        # This ensures that the order ID and order item IDs do not match
-        Order.get_cart_for_user(self.user).start_purchase()
-        Order.get_cart_for_user(self.user).start_purchase()
-        Order.get_cart_for_user(self.user).start_purchase()
-
-        # Purchase a verified certificate
-        self.cart = Order.get_cart_for_user(self.user)
-        CertificateItem.add_to_order(
-            self.cart,
-            self.course_key,
-            self.COST,
-            'verified'
-        )
-        self.cart.start_purchase()
-
-        # Simulate hitting the post-pay callback
-        with patch('lms.djangoapps.shoppingcart.views.process_postpay_callback') as mock_process:
-            mock_process.return_value = {'success': True, 'order': self.cart}
-            url = reverse('shoppingcart.views.postpay_callback')
-            resp = self.client.post(url, follow=True)
-
-        # Expect to be redirected to the payment confirmation
-        # page in the verify_student app
-        redirect_url = reverse(
-            'verify_student_payment_confirmation',
-            kwargs={'course_id': six.text_type(self.course_key)}
-        )
-        redirect_url += '?payment-order-num={order_num}'.format(
-            order_num=self.cart.id
-        )
-        self.assertIn(redirect_url, resp.redirect_chain[0][0])
-
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):

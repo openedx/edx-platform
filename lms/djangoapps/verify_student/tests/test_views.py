@@ -87,12 +87,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
     PASSWORD = "test_password"
 
     NOW = now()
-    YESTERDAY = 'yesterday'
-    TOMORROW = 'tomorrow'
     NEXT_YEAR = 'next_year'
     DATES = {
-        YESTERDAY: NOW - timedelta(days=1),
-        TOMORROW: NOW + timedelta(days=1),
         NEXT_YEAR: NOW + timedelta(days=360),
         None: None,
     }
@@ -372,19 +368,19 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         response = self._get_page('verify_student_verify_now', course.id)
         self._assert_user_details(response, self.user.profile.name)
 
-    def test_verify_now_not_enrolled(self, page_name):
+    def test_verify_now_not_enrolled(self):
         course = self._create_course("verified")
         response = self._get_page("verify_student_verify_now", course.id, expected_status_code=302)
         self._assert_redirects_to_start_flow(response, course.id)
 
-    def test_verify_now_unenrolled(self, page_name):
+    def test_verify_now_unenrolled(self):
         course = self._create_course("verified")
         self._enroll(course.id, "verified")
         self._unenroll(course.id)
         response = self._get_page("verify_student_verify_now", course.id, expected_status_code=302)
         self._assert_redirects_to_start_flow(response, course.id)
 
-    def test_verify_now_not_paid(self, page_name):
+    def test_verify_now_not_paid(self):
         course = self._create_course("verified")
         self._enroll(course.id)
         response = self._get_page("verify_student_verify_now", course.id, expected_status_code=302)
