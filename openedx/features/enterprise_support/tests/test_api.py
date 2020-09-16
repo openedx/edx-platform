@@ -172,13 +172,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
     def test_consent_needed_for_course(self, mock_get_enterprise_learner_data):
         user = UserFactory(username='janedoe')
-        request = mock.MagicMock(
-            user=user,
-            site=SiteFactory(domain="example.com"),
-            session={},
-            COOKIES={},
-            GET={},
-        )
+        request = mock.MagicMock(session={}, user=user, site=SiteFactory(domain="example.com"))
         ec_uuid = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
         course_id = 'fake-course'
         mock_get_enterprise_learner_data.return_value = self.get_mock_enterprise_learner_results()
@@ -272,55 +266,28 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # the third-party auth pipeline has no `provider_id`.
         mock_registry.get_from_pipeline.return_value.provider_id = None
         self.mock_get_enterprise_customer('real-ent-uuid', {'real': 'enterprisecustomer'}, 200)
-        mock_request = mock.MagicMock(
-            GET={'enterprise_customer': 'real-ent-uuid'},
-            COOKIES={},
-            session={},
-            user=self.user
+        enterprise_customer = enterprise_customer_for_request(
+            mock.MagicMock(GET={'enterprise_customer': 'real-ent-uuid'}, user=self.user)
         )
-        enterprise_customer = enterprise_customer_for_request(mock_request)
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
         # Verify that the method `enterprise_customer_for_request` returns
         # expected enterprise customer against the requesting user even if
         # the third-party auth pipeline has no `provider_id` but there is
         # enterprise customer UUID in the cookie.
-        mock_request = mock.MagicMock(
-            GET={},
-            COOKIES={settings.ENTERPRISE_CUSTOMER_COOKIE_NAME: 'real-ent-uuid'},
-            session={},
-            user=self.user
+        enterprise_customer = enterprise_customer_for_request(
+            mock.MagicMock(GET={}, COOKIES={settings.ENTERPRISE_CUSTOMER_COOKIE_NAME: 'real-ent-uuid'}, user=self.user)
         )
-        enterprise_customer = enterprise_customer_for_request(mock_request)
-        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
-
-        # Verify that the method `enterprise_customer_for_request` returns
-        # expected enterprise customer against the requesting user if
-        # data is cached only in the request session
-        mock_registry.get_from_pipeline.return_value.provider_id = None
-        self.mock_get_enterprise_customer('real-ent-uuid', {'real': 'enterprisecustomer'}, 200)
-        mock_request = mock.MagicMock(
-            GET={},
-            COOKIES={},
-            session={'enterprise_customer': {'real': 'enterprisecustomer'}},
-            user=self.user
-        )
-        enterprise_customer = enterprise_customer_for_request(mock_request)
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
         # Verify that we can still get enterprise customer from enterprise
         # learner API even if we are unable to get it from preferred sources,
         # e.g. url query parameters, third-party auth pipeline, enterprise
-        # cookie, or session.
+        # cookie.
         mock_get_enterprise_learner_data.return_value = [{'enterprise_customer': {'uuid': 'real-ent-uuid'}}]
-        mock_request = mock.MagicMock(
-            GET={},
-            COOKIES={},
-            session={},
-            user=self.user,
-            site=1
+        enterprise_customer = enterprise_customer_for_request(
+            mock.MagicMock(GET={}, COOKIES={}, user=self.user, site=1)
         )
-        enterprise_customer = enterprise_customer_for_request(mock_request)
         self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
     def test_enterprise_customer_for_request_with_session(self):
@@ -345,13 +312,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
                 'openedx.features.enterprise_support.api.enterprise_customer_from_api',
                 return_value=enterprise_data
         ) as mock_enterprise_customer_from_api, mock.patch(
-                'openedx.features.enterprise_support.api.enterprise_customer_from_session',
+                'openedx.features.enterprise_support.api.enterprise_customer_from_cache',
                 return_value=enterprise_data
-        ) as mock_enterprise_customer_from_session:
+        ) as mock_enterprise_customer_from_cache:
             enterprise_customer = enterprise_customer_for_request(dummy_request)
             self.assertEqual(enterprise_customer, enterprise_data)
             self.assertEqual(mock_enterprise_customer_from_api.called, False)
-            self.assertEqual(mock_enterprise_customer_from_session.called, True)
+            self.assertEqual(mock_enterprise_customer_from_cache.called, True)
 
         # Verify enterprise customer data fetched from session for subsequent calls
         # with unauthenticated user in SAML case
@@ -361,13 +328,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             'openedx.features.enterprise_support.api.enterprise_customer_from_api',
             return_value=enterprise_data
         ) as mock_enterprise_customer_from_api, mock.patch(
-            'openedx.features.enterprise_support.api.enterprise_customer_from_session',
+            'openedx.features.enterprise_support.api.enterprise_customer_from_cache',
             return_value=enterprise_data
-        ) as mock_enterprise_customer_from_session:
+        ) as mock_enterprise_customer_from_cache:
             enterprise_customer = enterprise_customer_for_request(dummy_request)
             self.assertEqual(enterprise_customer, enterprise_data)
             self.assertEqual(mock_enterprise_customer_from_api.called, False)
-            self.assertEqual(mock_enterprise_customer_from_session.called, True)
+            self.assertEqual(mock_enterprise_customer_from_cache.called, True)
 
     def check_data_sharing_consent(self, consent_required=False, consent_url=None):
         """
