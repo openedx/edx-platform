@@ -10,6 +10,7 @@ from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
+from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
 from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomer
 from social_django.models import UserSocialAuth
 
@@ -293,40 +294,75 @@ def _get_sync_learner_profile_data(enterprise_customer):
     return False
 
 
-def get_enterprise_learner_portals(request):
+def get_enterprise_learner_portal(request):
     """
-    Gets the formatted portal names and slugs that can be used
-    to generate links for enabled enterprise Learner Portals.
+    Gets the formatted portal name and slug that can be used
+    to generate a link for an enabled enterprise Learner Portal.
 
-    Caches and returns results in/from the user's request session if provided.
+    Caches and returns result in/from the user's request session if provided.
     """
     # Prevent a circular import.
-    from openedx.features.enterprise_support.api import enterprise_enabled
+    from openedx.features.enterprise_support.api import enterprise_enabled, enterprise_customer_uuid_for_request
 
     user = request.user
     # Only cache this if a learner is authenticated (AnonymousUser exists and should not be tracked)
+
+    learner_portal_session_key = 'enterprise_learner_portal'
+
     if enterprise_enabled() and ENTERPRISE_HEADER_LINKS.is_enabled() and user and user.id:
         # If the key exists return that value
-        if 'enterprise_learner_portals' in request.session:
-            return json.loads(request.session['enterprise_learner_portals'])
-        # Ordering is important, this is consistent with how we decide on which
-        # enterprise_customer is the selected one for an enterprise_customer
-        enterprise_learner_portals = [{
-            'name': enterprise_customer_user.enterprise_customer.name,
-            'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url if
-            enterprise_customer_user.enterprise_customer.branding_configuration else None,
-        } for enterprise_customer_user in EnterpriseCustomerUser.objects.filter(
-            user_id=user.id, enterprise_customer__enable_learner_portal=True
-        ).prefetch_related(
-            'enterprise_customer', 'enterprise_customer__branding_configuration'
-        ).order_by('-enterprise_customer__active', '-modified')]
+        if learner_portal_session_key in request.session:
+            return json.loads(request.session[learner_portal_session_key])
+
+        kwargs = {
+            'user_id': user.id,
+            'enterprise_customer__enable_learner_portal': True,
+        }
+        enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
+        if enterprise_customer_uuid:
+            kwargs['enterprise_customer__uuid'] = enterprise_customer_uuid
+
+        queryset = EnterpriseCustomerUser.objects.filter(**kwargs).prefetch_related(
+            'enterprise_customer',
+            'enterprise_customer__branding_configuration',
+        )
+
+        if not enterprise_customer_uuid:
+            # If the request doesn't help us know which Enterprise Customer UUID to select with,
+            # order by the most recently activated/modified customers,
+            # so that when we select the first result of the query as the preferred
+            # customer, it's the most recently active one.
+            queryset = queryset.order_by('-enterprise_customer__active', '-modified')
+
+        preferred_enterprise_customer_user = queryset.first()
+        if not preferred_enterprise_customer_user:
+            return None
+
+        enterprise_customer = preferred_enterprise_customer_user.enterprise_customer
+        learner_portal_data = {
+            'name': enterprise_customer.name,
+            'slug': enterprise_customer.slug,
+            'logo': enterprise_branding_configuration(enterprise_customer).get('logo'),
+        }
 
         # Cache the result in the user's request session
-        request.session['enterprise_learner_portals'] = json.dumps(enterprise_learner_portals)
-
-        return enterprise_learner_portals
+        request.session[learner_portal_session_key] = json.dumps(learner_portal_data)
+        return learner_portal_data
     return None
+
+
+def enterprise_branding_configuration(enterprise_customer_obj):
+    """
+    Given an instance of ``EnterpriseCustomer``, returns a related
+    branding_configuration serialized dictionary if it exists, otherwise an empty dictionary.
+    """
+    # We can use hasattr() on one-to-one relationships to avoid exception-catching:
+    # https://docs.djangoproject.com/en/2.2/topics/db/examples/one_to_one/
+    if not hasattr(enterprise_customer_obj, 'branding_configuration'):
+        return {}
+
+    branding_config = enterprise_customer_obj.branding_configuration
+    return EnterpriseCustomerBrandingConfigurationSerializer(branding_config).data
 
 
 def get_enterprise_learner_generic_name(request):
