@@ -24,6 +24,7 @@ const FIELD_NAMES = {
   WORK_STATUS_DESCRIPTION: "work_status_description",
 };
 
+const DEMOGRAPHICS_CSRF_TOKEN = 'demographics_csrftoken';
 
 class DemographicsCollectionModal extends React.Component {
   constructor(props) {
@@ -59,7 +60,7 @@ class DemographicsCollectionModal extends React.Component {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFTOKEN': Cookies.get('demographics_csrftoken'),
+        'X-CSRFToken': Cookies.get(DEMOGRAPHICS_CSRF_TOKEN),
         'USE-JWT-COOKIE': true
       },
     };
@@ -142,7 +143,7 @@ class DemographicsCollectionModal extends React.Component {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFTOKEN': Cookies.get('demographics_csrftoken'),
+        'X-CSRFToken': Cookies.get(DEMOGRAPHICS_CSRF_TOKEN),
         'USE-JWT-COOKIE': true
       },
       body: JSON.stringify({
