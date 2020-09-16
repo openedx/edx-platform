@@ -1,3 +1,6 @@
+"""
+All helpers for custom settings app
+"""
 from datetime import datetime
 
 import pytz
@@ -9,23 +12,29 @@ DATE_FORMAT = "%m/%d/%Y"
 
 def get_course_open_date_from_settings(settings):
     """
-    :param settings:
-    :return course open date:
+    Get course open date from settings, if exists, in MM/DD/YYY format else return empty string
+
+    Args:
+        settings (CustomSettings): Custom settings model object
+
+    Returns:
+        string: Date in MM/DD/YYYY format or empty string
     """
-    return "" if not settings.course_open_date else settings.course_open_date.strftime(DATE_FORMAT)
+    return '' if not settings.course_open_date else settings.course_open_date.strftime(DATE_FORMAT)
 
 
 def validate_course_open_date(settings, course_open_date):
-
     """
-    this method compares course start date and course open date
-    and make sure that course open date is greater than start date
-    :param settings:
-    :param course_open_date:
-    :return:
-        validated course open date or none
-    """
+    This method compares course start date and course open date and make sure that course open date is greater
+    than start date
 
+    Args:
+        settings (CustomSettings): Custom settings model object
+        course_open_date (Date): Course open date
+
+    Returns:
+        Date: Validated course open date or None
+    """
     if course_open_date:
         if isinstance(datetime.strptime(course_open_date, DATE_FORMAT), datetime):
             course_open_date = datetime.strptime(course_open_date, DATE_FORMAT)

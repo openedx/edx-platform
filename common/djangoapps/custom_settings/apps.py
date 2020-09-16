@@ -1,3 +1,6 @@
+"""
+Custom settings app configurations
+"""
 from django.apps import AppConfig
 
 
@@ -8,4 +11,4 @@ class CustomSettingsConfig(AppConfig):
         """
         Connect signal handlers.
         """
-        import custom_settings.signals.handlers
+        import custom_settings.signals.handlers  # pylint: disable=unused-variable

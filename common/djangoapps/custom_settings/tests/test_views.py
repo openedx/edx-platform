@@ -1,3 +1,6 @@
+"""
+All unit test for views in custom settings app
+"""
 from datetime import datetime
 from json import dumps
 
@@ -16,6 +19,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class CustomSettingsTestCase(PhiluThemeMixin, ModuleStoreTestCase):
+    """
+    Unit tests for custom settings app views
+    """
 
     def setUp(self):
         super(CustomSettingsTestCase, self).setUp()

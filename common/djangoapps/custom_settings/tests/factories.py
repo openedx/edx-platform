@@ -1,3 +1,6 @@
+"""
+All factories for custom settings app models
+"""
 import factory
 from factory.django import DjangoModelFactory
 from faker.providers import internet
@@ -9,6 +12,10 @@ factory.Faker.add_provider(internet)
 
 
 class CustomSettingsFactory(DjangoModelFactory):
+    """
+    Model factory for CustomSettings model
+    """
+
     class Meta(object):
         model = CustomSettings
         django_get_or_create = ('course_short_id',)
