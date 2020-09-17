@@ -1,3 +1,5 @@
+"""This module contains django models for MultiSelect form field with other option"""
+
 from django.core import exceptions, checks
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
@@ -19,11 +21,10 @@ class OtherMultiSelectFieldList(MSFList):
 
 class MultiSelectWithOtherField(MultiSelectField):
     """
-        This class is a Django Model field class that supports
-        multi select along with other option
-        The `other_max_length` parameter is required for this
-        Choice keys can not contain commas and other field can not contain
-        pipe character i.e. `|`
+    This django model field supports multi select options
+    along with other option, It requires `other_max_length`
+    for other field length. Choices keys cannot contain commas
+    and other option field cannot contain pipe character i.e. `|`
     """
 
     def __init__(self, other_max_length=None, *args, **kwargs):
@@ -81,13 +82,25 @@ class MultiSelectWithOtherField(MultiSelectField):
 
         :param value: list of all selected choice with other text.
         :param model_instance: current model instance for with it is saving data.
-        :return: None
+        :type value: list
+        :type model_instance: MultiSelectWithOtherField
         """
         for opt_select in value:
             if self.other_delimiter in opt_select:
                 raise exceptions.ValidationError(self.error_messages['invalid_char'] % value)
 
     def to_python(self, value):
+        """
+        This function checks when 'value' is a list simply returns it,
+        when it is a string with multiple options separated by a delimiter
+        it converts it to an instance of OtherMultiSelectFieldList and then returns it
+        and when 'value' is a dictionary it converts it to an instance of MSFList and
+        then returns it
+        :param value: options
+        :type value: list, string or dict
+        :return: list of strings with options
+        :rtype: list
+        """
         choices = dict(self.flatchoices)
         if value:
             if isinstance(value, list):
@@ -103,7 +116,13 @@ class MultiSelectWithOtherField(MultiSelectField):
                 return MSFList(choices, list(value))
         return MSFList(choices, [])
 
-    def _check_other_max_length_attribute(self, **kwargs):
+    def _check_other_max_length_attribute(self):
+        """
+        Validates `other_max_length` field
+        'other_max_length' attribute.
+        :return: list of errors
+        :rtype: list
+         """
         if self.other_max_length is None:
             return [
                 checks.Error(
@@ -125,5 +144,5 @@ class MultiSelectWithOtherField(MultiSelectField):
 
     def check(self, **kwargs):
         errors = super(MultiSelectWithOtherField, self).check(**kwargs)
-        errors.extend(self._check_other_max_length_attribute(**kwargs))
+        errors.extend(self._check_other_max_length_attribute())
         return errors
