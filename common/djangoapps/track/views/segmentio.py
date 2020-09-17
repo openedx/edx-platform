@@ -127,7 +127,7 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
 
     # Start with the context provided by Segment in the "client" field if it exists
     # We should tightly control which fields actually get included in the event emitted.
-    segment_context = full_segment_event.get('context', {})
+    segment_context = full_segment_event.get('context') or {}
 
     # Build up the event context by parsing fields out of the event received from Segment
     context = {}
