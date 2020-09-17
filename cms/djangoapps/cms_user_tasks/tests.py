@@ -62,9 +62,7 @@ def _data(response):
     return response.data
 
 
-@override_settings(
-    BROKER_URL='memory://localhost/', BROKER_BACKEND='memory'
-)
+@override_settings(BROKER_URL='memory://localhost/')
 class TestUserTasks(APITestCase):
     """
     Tests of the django-user-tasks REST API endpoints.
@@ -72,7 +70,6 @@ class TestUserTasks(APITestCase):
     Detailed tests of the default authorization rules are in the django-user-tasks code.
     These tests just verify that the API is exposed and functioning.
     """
-
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user('test_user', 'test@example.com', 'password')
