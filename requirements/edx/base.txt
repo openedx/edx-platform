@@ -27,7 +27,7 @@ attrs==20.2.0             # via -r requirements/edx/base.in, edx-ace
 babel==2.8.0              # via -r requirements/edx/base.in, enmerkar, enmerkar-underscore
 beautifulsoup4==4.9.1     # via pynliner
 billiard==3.3.0.23        # via celery
-bleach==3.1.5             # via -r requirements/edx/base.in, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
+bleach==3.2.0             # via -r requirements/edx/base.in, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
 boto3==1.4.8              # via -r requirements/edx/base.in, fs-s3fs
 boto==2.39.0              # via -r requirements/edx/base.in, django-ses, edxval, ora2
 botocore==1.8.17          # via -r requirements/edx/base.in, boto3, s3transfer
