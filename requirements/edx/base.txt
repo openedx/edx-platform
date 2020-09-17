@@ -233,7 +233,7 @@ ua-parser==0.10.0         # via django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/base.in, edx-enterprise
 uritemplate==3.0.1        # via coreapi, drf-yasg
 urllib3==1.25.10          # via -r requirements/edx/paver.txt, elasticsearch, geoip2, requests
-user-util==0.2            # via -r requirements/edx/base.in
+user-util==0.3.1          # via -r requirements/edx/base.in
 voluptuous==0.11.7        # via ora2
 watchdog==0.10.3          # via -r requirements/edx/paver.txt
 web-fragments==0.3.2      # via -r requirements/edx/base.in, crowdsourcehinter-xblock, staff-graded-xblock, xblock, xblock-utils

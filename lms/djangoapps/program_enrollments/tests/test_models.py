@@ -100,11 +100,19 @@ class ProgramEnrollmentModelTests(TestCase):
         self.enrollment.refresh_from_db()
 
         # Ensure those values are retired
-        self.assertEqual(self.enrollment.external_user_key, None)
+        self.assertTrue(
+            self.enrollment.external_user_key.startswith(
+                'retired_external_key'
+            )
+        )
 
         self.assertTrue(self.enrollment.historical_records.all())
         for record in self.enrollment.historical_records.all():
-            self.assertEqual(record.external_user_key, None)
+            self.assertTrue(
+                record.external_user_key.startswith(
+                    'retired_external_key'
+                )
+            )
 
 
 @ddt.ddt
