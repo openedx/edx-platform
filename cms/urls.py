@@ -228,6 +228,8 @@ if True:  # if: settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
             certificates_list_handler, name='certificates_list_handler')
     ]
 
+urlpatterns.append(url(r'^', include('cms.djangoapps.appsembler_tiers.urls')))
+
 # Maintenance Dashboard
 urlpatterns.append(url(r'^maintenance/', include('maintenance.urls', namespace='maintenance')))
 

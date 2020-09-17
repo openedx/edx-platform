@@ -7,7 +7,6 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 from rest_framework_swagger.views import get_swagger_view
 
@@ -141,6 +140,8 @@ urlpatterns = [
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
+
+    url(r'^', include('lms.djangoapps.appsembler_tiers.urls')),
 
     # appsembler management console endpoint for student enrollment
     url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.sites.urls')),
@@ -1100,12 +1101,4 @@ urlpatterns += (
     url(r'^tahoe/api/',
         include('openedx.core.djangoapps.appsembler.api.urls',
                 namespace='tahoe-api')),
-)
-
-# Tahoe trial expired redirect
-urlpatterns += (
-    url(r'^site-unavailable/$',
-        TemplateView.as_view(
-            template_name='design-templates/pages/messages/site-expired.html'
-        )),
 )
