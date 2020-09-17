@@ -78,7 +78,7 @@ def test_get_activation_error_alert_message_ajax_failure(request_object):  # pyl
 
     request = request_object
     request.user.is_active = False
-    request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+    request.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'  # so request.is_ajax() == True
 
     expected_global_alert_message = []
     actual_global_alert_message = get_global_alert_messages(request).get('global_alert_messages')
@@ -141,7 +141,7 @@ def test_get_activation_error_alert_message_activation_url_failure(
 
     request = request_object
     request.user.is_active = False
-    request.path = request.path + '/activate/'  # append to url
+    request.path = request.path + '/activate/'
 
     expected_global_alert_message = []
     actual_global_alert_message = get_global_alert_messages(request).get('global_alert_messages')
@@ -169,7 +169,7 @@ def test_get_org_oef_update_alert_message_success(
     """
 
     request = request_object
-    request.path = request.path + '/oef/dashboard'  # append to url
+    request.path = request.path + '/oef/dashboard'
 
     mock_get_org_oef_update_prompt.return_value = True
     mock_is_org_oef_prompt_available.return_value = True
@@ -206,7 +206,7 @@ def test_get_org_oef_update_alert_message_oef_prompt_failure(
     """
 
     request = request_object
-    request.path = request.path + '/oef/dashboard'  # append to url
+    request.path = request.path + '/oef/dashboard'
 
     mock_get_org_oef_update_prompt.return_value = False
     mock_is_org_oef_prompt_available.return_value = True
@@ -238,7 +238,7 @@ def test_get_org_oef_update_alert_message_oef_available_failure(
     """
 
     request = request_object
-    request.path = request.path + '/oef/dashboard'  # append to url
+    request.path = request.path + '/oef/dashboard'
 
     mock_get_org_oef_update_prompt.return_value = True
     mock_is_org_oef_prompt_available.return_value = False
@@ -304,7 +304,7 @@ def test_get_org_details_update_alert_message_success(
     """
 
     request = request_object
-    request.path = request.path + '/organization/details/'  # append to url
+    request.path = request.path + '/organization/details/'
 
     mock_get_org_metric_update_prompt.return_value = True
     mock_is_org_detail_prompt_available.return_value = True
@@ -337,7 +337,7 @@ def test_get_org_details_update_alert_message_metric_prompt_failure(
     """
 
     request = request_object
-    request.path = request.path + '/organization/details/'  # append to url
+    request.path = request.path + '/organization/details/'
 
     mock_get_org_metric_update_prompt.return_value = False
     mock_is_org_detail_prompt_available.return_value = True
@@ -364,7 +364,7 @@ def test_get_org_details_update_alert_message_detail_prompt_failure(
     """
 
     request = request_object
-    request.path = request.path + '/organization/details/'  # append to url
+    request.path = request.path + '/organization/details/'
 
     mock_get_org_metric_update_prompt.return_value = True
     mock_is_org_detail_prompt_available.return_value = False
@@ -534,7 +534,7 @@ def test_overlay_message_oef_url_failure(
     """
 
     request = request_object
-    request.path = request.path + '/oef/dashboard'  # append to url
+    request.path = request.path + '/oef/dashboard'
 
     mock_get_org_metric_update_prompt.return_value = True
     mock_is_org_detail_prompt_available.return_value = True
@@ -562,7 +562,7 @@ def test_overlay_message_org_url_failure(
     """
 
     request = request_object
-    request.path = request.path + '/organization/details/'  # append to url
+    request.path = request.path + '/organization/details/'
 
     mock_get_org_metric_update_prompt.return_value = True
     mock_is_org_detail_prompt_available.return_value = True
