@@ -344,6 +344,9 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                     email_learners = serializer.data.get('email_learners')
                     identifiers = serializer.data.get('identifiers')
                     auto_enroll = serializer.data.get('auto_enroll')
+                    response_code = status.HTTP_201_CREATED if action == 'enroll' else status.HTTP_200_OK
+                    results = []
+
                     for course_id in serializer.data.get('courses'):
                         course_key = as_course_key(course_id)
                         if email_learners:
@@ -354,7 +357,7 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                             email_params = {}
 
                         if action == 'enroll':
-                            results = enroll_learners_in_course(
+                            results += enroll_learners_in_course(
                                 course_id=course_key,
                                 identifiers=identifiers,
                                 enroll_func=partial(
@@ -365,9 +368,8 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                                 ),
                                 request_user=request.user,
                             )
-                            response_code = status.HTTP_201_CREATED
                         else:
-                            results = unenroll_learners_in_course(
+                            results += unenroll_learners_in_course(
                                 course_id=course_key,
                                 identifiers=identifiers,
                                 unenroll_func=partial(
@@ -377,7 +379,6 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                                 ),
                                 request_user=request.user,
                             )
-                            response_code = status.HTTP_200_OK
 
                     response_data = {
                         'auto_enroll': serializer.data.get('auto_enroll'),
