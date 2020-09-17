@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.urls import reverse
 from django.test import override_settings
+from celery import Celery
 from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.serializers import ArtifactSerializer, StatusSerializer
@@ -77,6 +78,13 @@ class TestUserTasks(APITestCase):
             user=cls.user, task_id=str(uuid4()), task_class='test_rest_api.sample_task', name='SampleTask 2',
             total_steps=5)
         cls.artifact = UserTaskArtifact.objects.create(status=cls.status, text='Lorem ipsum')
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        app = Celery('user_tasks', broker='memory://localhost/')
+        app.conf.task_protocol = 1
+        # app.config_from_object('django.conf:settings')
 
     def setUp(self):
         super(TestUserTasks, self).setUp()

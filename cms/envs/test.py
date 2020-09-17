@@ -190,7 +190,7 @@ CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 # test_status_cancel in cms/cms_user_tasks/test.py is failing without this
 # @override_setting for BROKER_URL is not working in testcase
 # https://github.com/celery/celery/blob/v4.4.7/celery/app/control.py#L478
-BROKER_URL = 'memory://localhost/'
+# BROKER_URL = 'memory://localhost/'
 
 ########################### Server Ports ###################################
 
