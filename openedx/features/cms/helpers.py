@@ -1,15 +1,16 @@
-from pytz import utc
-from django.contrib.auth.models import User
-
 from dateutil.parser import parse
-from courseware.courses import get_course_by_id
+from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
-from openassessment.xblock.defaults import DEFAULT_START, DEFAULT_DUE
-from xmodule.course_module import CourseFields
-from xmodule.modulestore.django import modulestore
+from openassessment.xblock.defaults import DEFAULT_DUE, DEFAULT_START
+from pytz import utc
+
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+from courseware.courses import get_course_by_id
 from custom_settings.models import CustomSettings
 from models.settings.course_metadata import CourseMetadata
+from xmodule.course_module import CourseFields
+from xmodule.modulestore.django import modulestore
+
 from .constants import ERROR_MESSAGES
 
 MODULE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S%z'
@@ -18,29 +19,38 @@ RUN_DATE_FORMAT = '%Y%m%d'
 
 def initialize_course_settings(source_course, re_run_course, skip_open_date=True):
     """
-    When ever a new course is created
+    Whenever a new course is created
     1: We add a default entry for the given course in the CustomSettings Model
     2: We add a an honor mode for the given course so students can view certificates
        on their dashboard and progress page
-    3: set rerun course's course open date that exists in the course custom settings
+    3: Set rerun course's course open date that exists in the course custom settings
        on the basis of delta from the source_course start date with the source_course course open date
-
     """
 
     if not source_course:
         return
 
-    _settings = CustomSettings.objects.filter(id=source_course.id).first()
-    tags = _settings.tags
+    _source_course_settings = CustomSettings.objects.get(id=source_course.id)
+    source_course_tags = _source_course_settings.tags
+    source_course_is_mini_lesson = _source_course_settings.is_mini_lesson
 
-    source_course_open_date = _settings.course_open_date
+    source_course_open_date = _source_course_settings.course_open_date
+
+    rerun_course_settings = {
+        'tags': source_course_tags,
+        'is_mini_lesson': source_course_is_mini_lesson
+    }
 
     if source_course_open_date and not skip_open_date:
-        rerun_course_open_date = calculate_date_by_delta(source_course_open_date,
-                                                         source_course.start, re_run_course.start)
-        CustomSettings.objects.filter(id=re_run_course.id).update(tags=tags, course_open_date=rerun_course_open_date)
-    else:
-        CustomSettings.objects.filter(id=re_run_course.id).update(tags=tags)
+        rerun_course_open_date = calculate_date_by_delta(
+            source_course_open_date,
+            source_course.start,
+            re_run_course.start
+        )
+
+        rerun_course_settings['course_open_date'] = rerun_course_open_date
+
+    CustomSettings.objects.filter(id=re_run_course.id).update(**rerun_course_settings)
 
 
 def apply_post_rerun_creation_tasks(source_course_key, destination_course_key, user_id):

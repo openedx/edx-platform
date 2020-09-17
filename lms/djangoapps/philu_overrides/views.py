@@ -1,51 +1,53 @@
 """ Views for a student's account information. """
-from datetime import datetime
 import json
-import third_party_auth
 import logging
 import urlparse
-from pytz import utc
-from w3lib.url import url_query_cleaner
+from datetime import datetime
 
-from django.http import HttpResponseNotFound, HttpResponse, Http404, HttpResponseServerError
+import analytics
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model, login
 from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-from django.utils.translation import ugettext as _
-from edxmako.shortcuts import render_to_response, render_to_string
+from eventtracking import tracker
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from openedx.core.djangoapps.catalog.utils import get_programs_with_type
-from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes, \
-    get_user_current_enrolled_class, get_next_url_for_login_page_override, is_user_enrolled_in_any_class
-from lms.djangoapps.philu_overrides.constants import ENROLL_SHARE_TITLE_FORMAT, ENROLL_SHARE_DESC_FORMAT
+from pytz import utc
+from ratelimitbackend.exceptions import RateLimitException
+from w3lib.url import url_query_cleaner
+
+import third_party_auth
+from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from lms.djangoapps.courseware.access import _can_enroll_courselike, has_access
+from lms.djangoapps.courseware.courses import get_course_by_id, get_courses, sort_by_announcement, sort_by_start_date
 from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
-from openedx.core.djangoapps.user_authn.views.deprecated import (
-    signin_user as old_login_view,
-    register_user as old_register_view
-)
-from third_party_auth.decorators import xframe_allow_whitelisted
-from util.cache import cache_if_anonymous
-from xmodule.modulestore.django import modulestore
-from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
-from lms.djangoapps.courseware.access import has_access, _can_enroll_courselike
-from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
 from lms.djangoapps.onboarding.helpers import get_alquity_community_url
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings, get_social_sharing_urls
+from lms.djangoapps.philu_overrides.constants import ENROLL_SHARE_DESC_FORMAT, ENROLL_SHARE_TITLE_FORMAT
+from lms.djangoapps.philu_overrides.courseware.views.views import get_course_related_keys
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
-from third_party_auth import pipeline, provider
-from util.json_request import JsonResponse
-from edxmako.shortcuts import marketing_link
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from student.models import (LoginFailures, CourseEnrollment)
-from ratelimitbackend.exceptions import RateLimitException
-from django.contrib.auth import authenticate, login
-import analytics
-from eventtracking import tracker
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.views.deprecated import register_user as old_register_view
+from openedx.core.djangoapps.user_authn.views.deprecated import signin_user as old_login_view
+from philu_overrides.helpers import (
+    get_course_next_classes,
+    get_next_url_for_login_page_override,
+    get_user_current_enrolled_class,
+    is_user_enrolled_in_any_class,
+    reactivation_email_for_user_custom
+)
+from student.models import CourseEnrollment, LoginFailures
+from third_party_auth import pipeline, provider
+from third_party_auth.decorators import xframe_allow_whitelisted
+from util.cache import cache_if_anonymous
+from util.json_request import JsonResponse
+from xmodule.modulestore.django import modulestore
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -613,6 +615,8 @@ def course_about(request, course_id):
 
         social_sharing_urls = get_social_sharing_urls(url_query_cleaner(request.build_absolute_uri()), meta_tags)
 
+        is_mini_lesson = custom_settings.is_mini_lesson
+
         context = {
             'course': course,
             'course_details': course_details,
@@ -637,7 +641,8 @@ def course_about(request, course_id):
             'course_image_urls': overview.image_urls,
             'meta_tags': meta_tags,
             'is_alquity': is_alquity,
-            'social_sharing_urls': social_sharing_urls
+            'social_sharing_urls': social_sharing_urls,
+            'is_mini_lesson': is_mini_lesson
         }
 
         return render_to_response('courseware/course_about.html', context)
