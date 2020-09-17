@@ -489,7 +489,7 @@ def activate_account(request, key):
         monitoring_utils.set_custom_attribute('student_activate_account', 'cms')
         return activate_account_studio(request, key)
 
-    # TODO: Use metric to determine if there are any `activate_account` calls for cms in Production.
+    # TODO: Use custom attribute to determine if there are any `activate_account` calls for cms in Production.
     # If not, the templates wouldn't be needed for cms, but we still need a way to activate for cms tests.
     monitoring_utils.set_custom_attribute('student_activate_account', 'lms')
     try:
