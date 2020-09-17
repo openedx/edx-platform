@@ -159,6 +159,9 @@ class TestCourseWaffleFlag(TestCase):
     )
     @patch('openedx.core.djangoapps.waffle_utils.set_custom_attribute')
     def test_waffle_flag_metric_for_various_settings(self, data, mock_set_custom_attribute):
+        """
+        Test that custom attributes are recorded when waffle flag accessed.
+        """
         with override_settings(WAFFLE_FLAG_CUSTOM_METRICS=data['waffle_flag_metric_setting']):
             with patch(
                 'openedx.core.djangoapps.waffle_utils._WAFFLE_FLAG_CUSTOM_METRIC_SET',
@@ -172,6 +175,9 @@ class TestCourseWaffleFlag(TestCase):
         self.assertEqual(mock_set_custom_attribute.call_count, data['expected_count'])
 
     def _assert_waffle_flag_metric(self, mock_set_custom_attribute, expected_flag_value=None):
+        """
+        Assert that a custom attribute was set as expected on the mock.
+        """
         if expected_flag_value:
             expected_flag_name = 'flag_{}'.format(self.NAMESPACED_FLAG_NAME)
             expected_calls = [call(expected_flag_name, expected_flag_value)]
