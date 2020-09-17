@@ -64,6 +64,7 @@ from openedx.core.djangoapps.appsembler.api.v1.serializers import (
     BulkEnrollmentSerializer,
     UserIndexSerializer,
 )
+from openedx.core.djangoapps.appsembler.api.v1.waffle import FIX_ENROLLMENT_RESULTS_BUG
 
 # TODO: Just move into v1 directory
 from openedx.core.djangoapps.appsembler.api.permissions import (
@@ -355,6 +356,11 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                                                             secure=request.is_secure())
                         else:
                             email_params = {}
+
+                        if not FIX_ENROLLMENT_RESULTS_BUG.is_enabled():
+                            # RED-1386: Preserve the original bug behaviour and put it behind a feature flag to
+                            # decouple deployment from release.
+                            results = []
 
                         if action == 'enroll':
                             results += enroll_learners_in_course(
