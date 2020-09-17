@@ -619,6 +619,27 @@ ul.fa-ul{
       }
     }
 
+    &.button-oa2-apple-id {
+      color: white;
+      border-color: $apple-black;
+      background-color: $apple-black;
+
+      .icon {
+        background: transparent;
+
+        .icon-image {
+          margin-left: 2px;
+        }
+      }
+
+      &:hover,
+      &:focus {
+        background-color: $apple-focus-black;
+        border: 1px solid $apple-focus-black;
+        color: $white;
+      }
+    }
+
     &.button-oa2-linkedin-oauth2 {
       color: $linkedin-blue;
 
