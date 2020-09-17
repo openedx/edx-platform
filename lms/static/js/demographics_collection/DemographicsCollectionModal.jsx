@@ -91,11 +91,15 @@ class DemographicsCollectionModal extends React.Component {
         // we get a 404 if the user resource does not exist in demographics, which is expected.
         if (response.status === 404) {
           try {
+            const postUrl = `${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`;
             requestOptions.method = 'POST'
             requestOptions.body = JSON.stringify({
               user: this.props.user,
             });
-            response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, requestOptions);
+            const csrfToken = await this.csrfTokenService.getCsrfToken(url);
+            requestOptions.headers['X-CSRFToken'] = csrfToken;
+            Cookies.set('demographics_csrftoken', csrfToken);
+            response = await fetch(postUrl, requestOptions);
             // A 201 is a created success message. if we don't get a 201, throw an error.
             if (response.status !== 201) {
               const error = await response.json();
