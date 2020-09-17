@@ -663,6 +663,10 @@ def course_index(request, course_key):
 
         course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
 
+        # gather any errors in the currently stored proctoring settings.
+        advanced_dict = CourseMetadata.fetch(course_module)
+        proctoring_errors = CourseMetadata.validate_proctoring_settings(course_module, advanced_dict, request.user)
+
         return render_to_response('course_outline.html', {
             'language_code': request.LANGUAGE_CODE,
             'context_course': course_module,
@@ -684,6 +688,8 @@ def course_index(request, course_key):
             ) if current_action else None,
             'frontend_app_publisher_url': frontend_app_publisher_url,
             'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
+            'advance_settings_url': reverse_course_url('advanced_settings_handler', course_module.id),
+            'proctoring_errors': proctoring_errors,
         })
 
 
@@ -1341,13 +1347,16 @@ def advanced_settings_handler(request, course_key_string):
 
             course_authoring_microfrontend_url = get_proctored_exam_settings_url(course_module)
 
+            # gather any errors in the currently stored proctoring settings.
+            proctoring_errors = CourseMetadata.validate_proctoring_settings(course_module, advanced_dict, request.user)
+
             return render_to_response('settings_advanced.html', {
                 'context_course': course_module,
                 'advanced_dict': advanced_dict,
                 'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key),
                 'publisher_enabled': publisher_enabled,
                 'course_authoring_microfrontend_url': course_authoring_microfrontend_url,
-
+                'proctoring_errors': proctoring_errors,
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
