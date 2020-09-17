@@ -86,7 +86,7 @@ django-simple-history==2.11.0  # via -r requirements/edx/base.txt, edx-enterpris
 django-splash==0.2.9      # via -r requirements/edx/base.txt
 django-statici18n==1.9.0  # via -r requirements/edx/base.txt
 django-storages==1.8      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edxval
--e git+https://github.com/edx/django-user-tasks.git@8732b973ae82c9e722740b3a1cbdddba0a771e09#egg=django-user-tasks==1.3.1
+django-user-tasks==1.3.0  # via -r requirements/edx/base.txt
 django-waffle==2.0.0      # via -r requirements/edx/base.txt, edx-django-utils, edx-drf-extensions, edx-enterprise, edx-proctoring
 django-webpack-loader==0.7.0  # via -r requirements/edx/base.txt, edx-proctoring
 djangorestframework-xml==2.0.0  # via -r requirements/edx/base.txt, edx-enterprise
