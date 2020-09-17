@@ -314,7 +314,7 @@ def change_enrollment(request, check_access=True):
 
     # Allow us to monitor performance of this transaction on a per-course basis since we often roll-out features
     # on a per-course basis.
-    monitoring_utils.set_custom_metric('course_id', text_type(course_id))
+    monitoring_utils.set_custom_attribute('course_id', text_type(course_id))
 
     if action == "enroll":
         # Make sure the course exists
@@ -486,12 +486,12 @@ def activate_account(request, key):
     """
     # If request is in Studio call the appropriate view
     if theming_helpers.get_project_root_name().lower() == u'cms':
-        monitoring_utils.set_custom_metric('student_activate_account', 'cms')
+        monitoring_utils.set_custom_attribute('student_activate_account', 'cms')
         return activate_account_studio(request, key)
 
     # TODO: Use metric to determine if there are any `activate_account` calls for cms in Production.
     # If not, the templates wouldn't be needed for cms, but we still need a way to activate for cms tests.
-    monitoring_utils.set_custom_metric('student_activate_account', 'lms')
+    monitoring_utils.set_custom_attribute('student_activate_account', 'lms')
     try:
         registration = Registration.objects.get(activation_key=key)
     except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):

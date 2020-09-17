@@ -16,7 +16,7 @@ from django.db.utils import DatabaseError
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
@@ -304,28 +304,28 @@ def _is_delivery_enabled(site, delivery_config_var, log_prefix):
 
 def _annotate_for_monitoring(message_type, site, bin_num=None, target_day_str=None, day_offset=None, course_key=None):
     # This identifies the type of message being sent, for example: schedules.recurring_nudge3.
-    set_custom_metric('message_name', '{0}.{1}'.format(message_type.app_label, message_type.name))
+    set_custom_attribute('message_name', '{0}.{1}'.format(message_type.app_label, message_type.name))
     # The domain name of the site we are sending the message for.
-    set_custom_metric('site', site.domain)
+    set_custom_attribute('site', site.domain)
     # This is the "bin" of data being processed. We divide up the work into chunks so that we don't tie up celery
     # workers for too long. This could help us identify particular bins that are problematic.
     if bin_num:
-        set_custom_metric('bin', bin_num)
+        set_custom_attribute('bin', bin_num)
     # The date we are processing data for.
     if target_day_str:
-        set_custom_metric('target_day', target_day_str)
+        set_custom_attribute('target_day', target_day_str)
     # The number of days relative to the current date to process data for.
     if day_offset:
-        set_custom_metric('day_offset', day_offset)
+        set_custom_attribute('day_offset', day_offset)
     # If we're processing these according to a course_key rather than bin we can use this to identify problematic keys.
     if course_key:
-        set_custom_metric('course_key', course_key)
+        set_custom_attribute('course_key', course_key)
     # A unique identifier for this batch of messages being sent.
-    set_custom_metric('send_uuid', message_type.uuid)
+    set_custom_attribute('send_uuid', message_type.uuid)
 
 
 def _annonate_send_task_for_monitoring(msg):
     # A unique identifier for this batch of messages being sent.
-    set_custom_metric('send_uuid', msg.send_uuid)
+    set_custom_attribute('send_uuid', msg.send_uuid)
     # A unique identifier for this particular message.
-    set_custom_metric('uuid', msg.uuid)
+    set_custom_attribute('uuid', msg.uuid)

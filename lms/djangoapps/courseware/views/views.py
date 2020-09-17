@@ -1017,9 +1017,9 @@ def dates(request, course_id):
     course_key = CourseKey.from_string(course_id)
 
     # Enable NR tracing for this view based on course
-    monitoring_utils.set_custom_metric('course_id', text_type(course_key))
-    monitoring_utils.set_custom_metric('user_id', request.user.id)
-    monitoring_utils.set_custom_metric('is_staff', request.user.is_staff)
+    monitoring_utils.set_custom_attribute('course_id', text_type(course_key))
+    monitoring_utils.set_custom_attribute('user_id', request.user.id)
+    monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
 
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
 

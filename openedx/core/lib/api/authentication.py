@@ -6,7 +6,7 @@ import django.utils.timezone
 from oauth2_provider import models as dot_models
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.authentication import BaseAuthentication, get_authorization_header
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 
 OAUTH2_TOKEN_ERROR = 'token_error'
 OAUTH2_TOKEN_ERROR_EXPIRED = 'token_expired'
@@ -39,7 +39,7 @@ class BearerAuthentication(BaseAuthentication):
         fails.
         """
 
-        set_custom_metric("BearerAuthentication", "Failed")  # default value
+        set_custom_attribute("BearerAuthentication", "Failed")  # default value
         auth = get_authorization_header(request).split()
 
         if len(auth) == 1:
@@ -54,12 +54,12 @@ class BearerAuthentication(BaseAuthentication):
         if auth and auth[0].lower() == b'bearer':
             access_token = auth[1].decode('utf8')
         else:
-            set_custom_metric("BearerAuthentication", "None")
+            set_custom_attribute("BearerAuthentication", "None")
             return None
 
         user, token = self.authenticate_credentials(access_token)
 
-        set_custom_metric("BearerAuthentication", "Success")
+        set_custom_attribute("BearerAuthentication", "Success")
 
         return user, token
 
@@ -93,13 +93,13 @@ class BearerAuthentication(BaseAuthentication):
             user = token.user
             # Check to make sure the users have activated their account (by confirming their email)
             if not self.allow_inactive_users and not user.is_active:
-                set_custom_metric("BearerAuthentication_user_active", False)
+                set_custom_attribute("BearerAuthentication_user_active", False)
                 msg = 'User inactive or deleted: %s' % user.get_username()
                 raise AuthenticationFailed({
                     'error_code': OAUTH2_USER_NOT_ACTIVE_ERROR,
                     'developer_message': msg})
             else:
-                set_custom_metric("BearerAuthentication_user_active", True)
+                set_custom_attribute("BearerAuthentication_user_active", True)
 
             return user, token
 
