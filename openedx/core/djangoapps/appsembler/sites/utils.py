@@ -314,7 +314,6 @@ def get_branding_values_from_file():
 
 @beeline.traced(name="get_branding_labels_from_file")
 def get_branding_labels_from_file(custom_branding=None):
-
     if not settings.ENABLE_COMPREHENSIVE_THEMING:
         return []
 
@@ -498,626 +497,626 @@ def _get_initial_page_elements():
         "embargo": {
             "content": []
         },
-        "index":{
-            "content":[
+        "index": {
+            "content": [
                 {
-                    "element-type":"layout-33:66",
-                    "element-path":"page-builder/layouts/_two-col-33-66.html",
-                    "options":{
-                    "layout-bg-image":"",
-                    "bg-color":"#fff",
-                    "margin-right":"marg-r-0",
-                    "margin-bottom":"marg-b-0",
-                    "layout-bg-image-size":"bg-img-size--cover",
-                    "text-color":"#000",
-                    "margin-top":"marg-t-0",
-                    "padding-right":"padd-r-0",
-                    "margin-left":"marg-l-0",
-                    "padding-bottom":"padd-b-100",
-                    "align-content":"align-content-center",
-                    "text-alignment":"text-align--left",
-                    "padding-top":"padd-t-75",
-                    "padding-left":"padd-l-0"
+                    "element-type": "layout-33:66",
+                    "element-path": "page-builder/layouts/_two-col-33-66.html",
+                    "options": {
+                        "layout-bg-image": "",
+                        "bg-color": "#fff",
+                        "margin-right": "marg-r-0",
+                        "margin-bottom": "marg-b-0",
+                        "layout-bg-image-size": "bg-img-size--cover",
+                        "text-color": "#000",
+                        "margin-top": "marg-t-0",
+                        "padding-right": "padd-r-0",
+                        "margin-left": "marg-l-0",
+                        "padding-bottom": "padd-b-100",
+                        "align-content": "align-content-center",
+                        "text-alignment": "text-align--left",
+                        "padding-top": "padd-t-75",
+                        "padding-left": "padd-l-0"
                     },
-                    "children":{
-                    "column-1":[
-                        {
-                        "element-type":"heading",
-                        "element-path":"page-builder/elements/_heading.html",
-                        "options":{
-                            "font-size":"font-size--72px",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-20",
-                            "text-color":"#0090c1",
-                            "margin-top":"marg-t-0",
-                            "margin-left":"marg-l-0",
-                            "text-content":{
-                            "en":"Welcome to your Tahoe trial LMS site!"
+                    "children": {
+                        "column-1": [
+                            {
+                                "element-type": "heading",
+                                "element-path": "page-builder/elements/_heading.html",
+                                "options": {
+                                    "font-size": "font-size--72px",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-20",
+                                    "text-color": "#0090c1",
+                                    "margin-top": "marg-t-0",
+                                    "margin-left": "marg-l-0",
+                                    "text-content": {
+                                        "en": "Welcome to your Tahoe trial LMS site!"
+                                    },
+                                    "font-family": "font--primary--bold",
+                                    "text-alignment": "text-align--left"
+                                }
                             },
-                            "font-family":"font--primary--bold",
-                            "text-alignment":"text-align--left"
-                        }
-                        },
-                        {
-                        "element-type":"paragraph-text",
-                        "element-path":"page-builder/elements/_paragraph.html",
-                        "options":{
-                            "font-size":"font-size--20px",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-5",
-                            "text-color":"#323232",
-                            "margin-top":"marg-t-5",
-                            "margin-left":"marg-l-0",
-                            "text-content":{
-                            "en":"Imagine how your courses might look like in your own Tahoe site"
+                            {
+                                "element-type": "paragraph-text",
+                                "element-path": "page-builder/elements/_paragraph.html",
+                                "options": {
+                                    "font-size": "font-size--20px",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-5",
+                                    "text-color": "#323232",
+                                    "margin-top": "marg-t-5",
+                                    "margin-left": "marg-l-0",
+                                    "text-content": {
+                                        "en": "Imagine how your courses might look like in your own Tahoe site"
+                                    },
+                                    "font-family": "font--primary--regular",
+                                    "text-alignment": "text-align--left"
+                                }
                             },
-                            "font-family":"font--primary--regular",
-                            "text-alignment":"text-align--left"
-                        }
-                        },
-                        {
-                        "element-type":"cta-button",
-                        "element-path":"page-builder/elements/_cta-button.html",
-                        "options":{
-                            "font-size":"font-size--18px",
-                            "bg-color":"#0090c1",
-                            "border-color":"#0090c1",
-                            "margin-right":"marg-r-0",
-                            "border-width":"border-width--none",
-                            "margin-bottom":"marg-b-0",
-                            "text-color":"#fff",
-                            "margin-top":"marg-t-30",
-                            "padding-right":"padd-r-30",
-                            "margin-left":"marg-l-0",
-                            "url":"/login",
-                            "padding-bottom":"padd-b-15",
-                            "text-content":{
-                            "en":"Log in to start!"
-                            },
-                            "padding-top":"padd-t-15",
-                            "font-family":"font--primary--regular",
-                            "padding-left":"padd-l-30"
-                        }
-                        }
-                    ],
-                    "column-2":[
-                        {
-                        "element-type":"image-graphic",
-                        "element-path":"page-builder/elements/_image-graphic.html",
-                        "options":{
-                            "margin-left":"marg-l-auto",
-                            "image-alt-text":{
-                            "en":"Grow with Tahoe!"
-                            },
-                            "margin-bottom":"marg-b-0",
-                            "image-file":"https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/Tahoe-Figures-768x432.png",
-                            "margin-top":"marg-t-0",
-                            "margin-right":"marg-r-auto",
-                            "link-url":"",
-                            "image-width":"set-width--80percent"
-                        }
-                        }
-                    ]
+                            {
+                                "element-type": "cta-button",
+                                "element-path": "page-builder/elements/_cta-button.html",
+                                "options": {
+                                    "font-size": "font-size--18px",
+                                    "bg-color": "#0090c1",
+                                    "border-color": "#0090c1",
+                                    "margin-right": "marg-r-0",
+                                    "border-width": "border-width--none",
+                                    "margin-bottom": "marg-b-0",
+                                    "text-color": "#fff",
+                                    "margin-top": "marg-t-30",
+                                    "padding-right": "padd-r-30",
+                                    "margin-left": "marg-l-0",
+                                    "url": "/login",
+                                    "padding-bottom": "padd-b-15",
+                                    "text-content": {
+                                        "en": "Log in to start!"
+                                    },
+                                    "padding-top": "padd-t-15",
+                                    "font-family": "font--primary--regular",
+                                    "padding-left": "padd-l-30"
+                                }
+                            }
+                        ],
+                        "column-2": [
+                            {
+                                "element-type": "image-graphic",
+                                "element-path": "page-builder/elements/_image-graphic.html",
+                                "options": {
+                                    "margin-left": "marg-l-auto",
+                                    "image-alt-text": {
+                                        "en": "Grow with Tahoe!"
+                                    },
+                                    "margin-bottom": "marg-b-0",
+                                    "image-file": "https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/Tahoe-Figures-768x432.png",
+                                    "margin-top": "marg-t-0",
+                                    "margin-right": "marg-r-auto",
+                                    "link-url": "",
+                                    "image-width": "set-width--80percent"
+                                }
+                            }
+                        ]
                     }
                 },
                 {
-                    "element-type":"layout-33:66",
-                    "element-path":"page-builder/layouts/_two-col-33-66.html",
-                    "options":{
-                    "layout-bg-image":"",
-                    "bg-color":"#EFEFEF",
-                    "margin-right":"marg-r-0",
-                    "margin-bottom":"marg-b-0",
-                    "layout-bg-image-size":"bg-img-size--cover",
-                    "text-color":"#000",
-                    "margin-top":"marg-t-0",
-                    "padding-right":"padd-r-0",
-                    "margin-left":"marg-l-0",
-                    "padding-bottom":"padd-b-50",
-                    "align-content":"align-content-center",
-                    "text-alignment":"text-align--left",
-                    "padding-top":"padd-t-50",
-                    "padding-left":"padd-l-0"
+                    "element-type": "layout-33:66",
+                    "element-path": "page-builder/layouts/_two-col-33-66.html",
+                    "options": {
+                        "layout-bg-image": "",
+                        "bg-color": "#EFEFEF",
+                        "margin-right": "marg-r-0",
+                        "margin-bottom": "marg-b-0",
+                        "layout-bg-image-size": "bg-img-size--cover",
+                        "text-color": "#000",
+                        "margin-top": "marg-t-0",
+                        "padding-right": "padd-r-0",
+                        "margin-left": "marg-l-0",
+                        "padding-bottom": "padd-b-50",
+                        "align-content": "align-content-center",
+                        "text-alignment": "text-align--left",
+                        "padding-top": "padd-t-50",
+                        "padding-left": "padd-l-0"
                     },
-                    "children":{
-                    "column-1":[
-                        {
-                        "element-type":"heading",
-                        "element-path":"page-builder/elements/_heading.html",
-                        "options":{
-                            "font-size":"font-size--18px",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-30",
-                            "text-color":"#0090c1",
-                            "margin-top":"marg-t-0",
-                            "margin-left":"marg-l-0",
-                            "text-content":{
-                            "en":"Appsembler sample course"
-                            },
-                            "font-family":"font--primary--bold",
-                            "text-alignment":"text-align--left"
-                        }
-                        },
-                        {
-                        "element-type":"heading",
-                        "element-path":"page-builder/elements/_heading.html",
-                        "options":{
-                            "font-size":"font-size--32px",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-30",
-                            "text-color":"#0e0e0e",
-                            "margin-top":"marg-t-0",
-                            "margin-left":"marg-l-0",
-                            "text-content":{
-                            "en":"Featured course"
-                            },
-                            "font-family":"font--primary--regular",
-                            "text-alignment":"text-align--left"
-                        }
-                        },
-                        {
-                        "element-type":"paragraph-text",
-                        "element-path":"page-builder/elements/_paragraph.html",
-                        "options":{
-                            "font-size":"font-size--16px",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-5",
-                            "text-color":"#323232",
-                            "margin-top":"marg-t-5",
-                            "margin-left":"marg-l-0",
-                            "text-content":{
-                            "en":"Learn about Appsembler, Tahoe and our hands-on Virtual Labs tool and get some tips and insights on how we built this course!"
-                            },
-                            "font-family":"font--primary--regular",
-                            "text-alignment":"text-align--left"
-                        }
-                        },
-                        {
-                        "element-type":"cta-button",
-                        "element-path":"page-builder/elements/_cta-button.html",
-                        "options":{
-                            "font-size":"font-size--16px",
-                            "bg-color":"rgba(255,255,255,0)",
-                            "border-color":"#0090c1",
-                            "margin-right":"marg-r-0",
-                            "border-width":"border-width--2px",
-                            "margin-bottom":"marg-b-0",
-                            "text-color":"#0090c1",
-                            "margin-top":"marg-t-30",
-                            "padding-right":"padd-r-30",
-                            "margin-left":"marg-l-0",
-                            "url":"/login",
-                            "padding-bottom":"padd-b-15",
-                            "text-content":{
-                            "en":"Start the course!"
-                            },
-                            "padding-top":"padd-t-15",
-                            "font-family":"font--primary--regular",
-                            "padding-left":"padd-l-30"
-                        }
-                        },
-                        {
-                        "element-type":"paragraph-text",
-                        "element-path":"page-builder/elements/_paragraph.html",
-                        "options":{
-                            "font-size":"font-size--12px",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-5",
-                            "text-color":"rgba(14,14,14,0.6)",
-                            "margin-top":"marg-t-15",
-                            "margin-left":"marg-l-0",
-                            "text-content":{
-                            "en":"First you need to log in with the account you created during trial signup to interact with this Trial site. Once logged in, take our Appsembler sample course to learn more."
-                            },
-                            "font-family":"font--primary--regular",
-                            "text-alignment":"text-align--left"
-                        }
-                        }
-                    ],
-                    "column-2":[
-                        {
-                        "element-type":"layout-1:1:1",
-                        "element-path":"page-builder/layouts/_three-col.html",
-                        "options":{
-                            "layout-bg-image":"https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/lp--bg-blob_8Uo19jE.png",
-                            "bg-color":"rgba(255,255,255,0)",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-0",
-                            "layout-bg-image-size":"bg-img-size--contain",
-                            "text-color":"#000",
-                            "margin-top":"marg-t-0",
-                            "padding-right":"padd-r-0",
-                            "margin-left":"marg-l-0",
-                            "padding-bottom":"padd-b-50",
-                            "align-content":"align-content-center",
-                            "text-alignment":"text-align--left",
-                            "padding-top":"padd-t-50",
-                            "padding-left":"padd-l-0"
-                        },
-                        "children":{
-                            "column-1":[],
-                            "column-3":[],
-                            "column-2":[
+                    "children": {
+                        "column-1": [
                             {
-                                "element-type":"courses-listing",
-                                "element-path":"page-builder/elements/_courses-listing.html",
-                                "options":{
-                                "tile-type":"course-tile-01",
-                                "num-of-courses":"4",
-                                "text-alignment":"text-align--left"
+                                "element-type": "heading",
+                                "element-path": "page-builder/elements/_heading.html",
+                                "options": {
+                                    "font-size": "font-size--18px",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-30",
+                                    "text-color": "#0090c1",
+                                    "margin-top": "marg-t-0",
+                                    "margin-left": "marg-l-0",
+                                    "text-content": {
+                                        "en": "Appsembler sample course"
+                                    },
+                                    "font-family": "font--primary--bold",
+                                    "text-alignment": "text-align--left"
+                                }
+                            },
+                            {
+                                "element-type": "heading",
+                                "element-path": "page-builder/elements/_heading.html",
+                                "options": {
+                                    "font-size": "font-size--32px",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-30",
+                                    "text-color": "#0e0e0e",
+                                    "margin-top": "marg-t-0",
+                                    "margin-left": "marg-l-0",
+                                    "text-content": {
+                                        "en": "Featured course"
+                                    },
+                                    "font-family": "font--primary--regular",
+                                    "text-alignment": "text-align--left"
+                                }
+                            },
+                            {
+                                "element-type": "paragraph-text",
+                                "element-path": "page-builder/elements/_paragraph.html",
+                                "options": {
+                                    "font-size": "font-size--16px",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-5",
+                                    "text-color": "#323232",
+                                    "margin-top": "marg-t-5",
+                                    "margin-left": "marg-l-0",
+                                    "text-content": {
+                                        "en": "Learn about Appsembler, Tahoe and our hands-on Virtual Labs tool and get some tips and insights on how we built this course!"
+                                    },
+                                    "font-family": "font--primary--regular",
+                                    "text-alignment": "text-align--left"
+                                }
+                            },
+                            {
+                                "element-type": "cta-button",
+                                "element-path": "page-builder/elements/_cta-button.html",
+                                "options": {
+                                    "font-size": "font-size--16px",
+                                    "bg-color": "rgba(255,255,255,0)",
+                                    "border-color": "#0090c1",
+                                    "margin-right": "marg-r-0",
+                                    "border-width": "border-width--2px",
+                                    "margin-bottom": "marg-b-0",
+                                    "text-color": "#0090c1",
+                                    "margin-top": "marg-t-30",
+                                    "padding-right": "padd-r-30",
+                                    "margin-left": "marg-l-0",
+                                    "url": "/login",
+                                    "padding-bottom": "padd-b-15",
+                                    "text-content": {
+                                        "en": "Start the course!"
+                                    },
+                                    "padding-top": "padd-t-15",
+                                    "font-family": "font--primary--regular",
+                                    "padding-left": "padd-l-30"
+                                }
+                            },
+                            {
+                                "element-type": "paragraph-text",
+                                "element-path": "page-builder/elements/_paragraph.html",
+                                "options": {
+                                    "font-size": "font-size--12px",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-5",
+                                    "text-color": "rgba(14,14,14,0.6)",
+                                    "margin-top": "marg-t-15",
+                                    "margin-left": "marg-l-0",
+                                    "text-content": {
+                                        "en": "First you need to log in with the account you created during trial signup to interact with this Trial site. Once logged in, take our Appsembler sample course to learn more."
+                                    },
+                                    "font-family": "font--primary--regular",
+                                    "text-alignment": "text-align--left"
                                 }
                             }
-                            ]
-                        }
-                        }
-                    ]
+                        ],
+                        "column-2": [
+                            {
+                                "element-type": "layout-1:1:1",
+                                "element-path": "page-builder/layouts/_three-col.html",
+                                "options": {
+                                    "layout-bg-image": "https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/lp--bg-blob_8Uo19jE.png",
+                                    "bg-color": "rgba(255,255,255,0)",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-0",
+                                    "layout-bg-image-size": "bg-img-size--contain",
+                                    "text-color": "#000",
+                                    "margin-top": "marg-t-0",
+                                    "padding-right": "padd-r-0",
+                                    "margin-left": "marg-l-0",
+                                    "padding-bottom": "padd-b-50",
+                                    "align-content": "align-content-center",
+                                    "text-alignment": "text-align--left",
+                                    "padding-top": "padd-t-50",
+                                    "padding-left": "padd-l-0"
+                                },
+                                "children": {
+                                    "column-1": [],
+                                    "column-3": [],
+                                    "column-2": [
+                                        {
+                                            "element-type": "courses-listing",
+                                            "element-path": "page-builder/elements/_courses-listing.html",
+                                            "options": {
+                                                "tile-type": "course-tile-01",
+                                                "num-of-courses": "4",
+                                                "text-alignment": "text-align--left"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
                     }
                 },
                 {
-                    "element-type":"layout-50:50",
-                    "element-path":"page-builder/layouts/_two-col-50-50.html",
-                    "options":{
-                    "layout-bg-image":"",
-                    "bg-color":"#fff",
-                    "margin-right":"marg-r-0",
-                    "margin-bottom":"marg-b-0",
-                    "layout-bg-image-size":"bg-img-size--cover",
-                    "text-color":"#000",
-                    "margin-top":"marg-t-0",
-                    "padding-right":"padd-r-0",
-                    "margin-left":"marg-l-0",
-                    "padding-bottom":"padd-b-75",
-                    "align-content":"align-content-top",
-                    "text-alignment":"text-align--left",
-                    "padding-top":"padd-t-75",
-                    "padding-left":"padd-l-0"
+                    "element-type": "layout-50:50",
+                    "element-path": "page-builder/layouts/_two-col-50-50.html",
+                    "options": {
+                        "layout-bg-image": "",
+                        "bg-color": "#fff",
+                        "margin-right": "marg-r-0",
+                        "margin-bottom": "marg-b-0",
+                        "layout-bg-image-size": "bg-img-size--cover",
+                        "text-color": "#000",
+                        "margin-top": "marg-t-0",
+                        "padding-right": "padd-r-0",
+                        "margin-left": "marg-l-0",
+                        "padding-bottom": "padd-b-75",
+                        "align-content": "align-content-top",
+                        "text-alignment": "text-align--left",
+                        "padding-top": "padd-t-75",
+                        "padding-left": "padd-l-0"
                     },
-                    "children":{
-                    "column-1":[
-                        {
-                        "element-type":"layout-50:50",
-                        "element-path":"page-builder/layouts/_two-col-50-50.html",
-                        "options":{
-                            "layout-bg-image":"",
-                            "bg-color":"#fff",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-0",
-                            "layout-bg-image-size":"bg-img-size--cover",
-                            "text-color":"#000",
-                            "margin-top":"marg-t-0",
-                            "padding-right":"padd-r-0",
-                            "margin-left":"marg-l-0",
-                            "padding-bottom":"padd-b-20",
-                            "align-content":"align-content-top",
-                            "text-alignment":"text-align--left",
-                            "padding-top":"padd-t-20",
-                            "padding-left":"padd-l-0"
-                        },
-                        "children":{
-                            "column-1":[
+                    "children": {
+                        "column-1": [
                             {
-                                "element-type":"image-graphic",
-                                "element-path":"page-builder/elements/_image-graphic.html",
-                                "options":{
-                                "margin-left":"marg-l-auto",
-                                "image-alt-text":{
-                                    "en":"Access the LMS"
+                                "element-type": "layout-50:50",
+                                "element-path": "page-builder/layouts/_two-col-50-50.html",
+                                "options": {
+                                    "layout-bg-image": "",
+                                    "bg-color": "#fff",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-0",
+                                    "layout-bg-image-size": "bg-img-size--cover",
+                                    "text-color": "#000",
+                                    "margin-top": "marg-t-0",
+                                    "padding-right": "padd-r-0",
+                                    "margin-left": "marg-l-0",
+                                    "padding-bottom": "padd-b-20",
+                                    "align-content": "align-content-top",
+                                    "text-alignment": "text-align--left",
+                                    "padding-top": "padd-t-20",
+                                    "padding-left": "padd-l-0"
                                 },
-                                "margin-bottom":"marg-b-30",
-                                "image-file":"https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/access-the-lms.png",
-                                "margin-top":"marg-t-0",
-                                "margin-right":"marg-r-auto",
-                                "link-url":"",
-                                "image-width":"set-width--30percent"
-                                }
-                            },
-                            {
-                                "element-type":"heading",
-                                "element-path":"page-builder/elements/_heading.html",
-                                "options":{
-                                "font-size":"font-size--24px",
-                                "margin-right":"marg-r-0",
-                                "margin-bottom":"marg-b-20",
-                                "text-color":"#0090c1",
-                                "margin-top":"marg-t-0",
-                                "margin-left":"marg-l-0",
-                                "text-content":{
-                                    "en":"Access the LMS"
-                                },
-                                "font-family":"font--primary--bold",
-                                "text-alignment":"text-align--center"
-                                }
-                            },
-                            {
-                                "element-type":"paragraph-text",
-                                "element-path":"page-builder/elements/_paragraph.html",
-                                "options":{
-                                "font-size":"font-size--14px",
-                                "margin-right":"marg-r-20",
-                                "margin-bottom":"marg-b-5",
-                                "text-color":"#323232",
-                                "margin-top":"marg-t-5",
-                                "margin-left":"marg-l-20",
-                                "text-content":{
-                                    "en":"This is where your learners can take their training courses and your instructors can handle learner management."
-                                },
-                                "font-family":"font--primary--regular",
-                                "text-alignment":"text-align--center"
-                                }
-                            }
-                            ],
-                            "column-2":[
-                            {
-                                "element-type":"image-graphic",
-                                "element-path":"page-builder/elements/_image-graphic.html",
-                                "options":{
-                                "margin-left":"marg-l-auto",
-                                "image-alt-text":{
-                                    "en":"Get to know Studio"
-                                },
-                                "margin-bottom":"marg-b-30",
-                                "image-file":"https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/get-to-know-studio.png",
-                                "margin-top":"marg-t-0",
-                                "margin-right":"marg-r-auto",
-                                "link-url":"",
-                                "image-width":"set-width--30percent"
-                                }
-                            },
-                            {
-                                "element-type":"heading",
-                                "element-path":"page-builder/elements/_heading.html",
-                                "options":{
-                                "font-size":"font-size--24px",
-                                "margin-right":"marg-r-0",
-                                "margin-bottom":"marg-b-20",
-                                "text-color":"#0090c1",
-                                "margin-top":"marg-t-0",
-                                "margin-left":"marg-l-0",
-                                "text-content":{
-                                    "en":"Get to know Studio"
-                                },
-                                "font-family":"font--primary--bold",
-                                "text-alignment":"text-align--center"
-                                }
-                            },
-                            {
-                                "element-type":"paragraph-text",
-                                "element-path":"page-builder/elements/_paragraph.html",
-                                "options":{
-                                "font-size":"font-size--14px",
-                                "margin-right":"marg-r-20",
-                                "margin-bottom":"marg-b-5",
-                                "text-color":"#323232",
-                                "margin-top":"marg-t-5",
-                                "margin-left":"marg-l-20",
-                                "text-content":{
-                                    "en":"You\u2019ll get to see how the Sample course is built and create your own courses."
-                                },
-                                "font-family":"font--primary--regular",
-                                "text-alignment":"text-align--center"
-                                }
-                            }
-                            ]
-                        }
-                        }
-                    ],
-                    "column-2":[
-                        {
-                        "element-type":"layout-50:50",
-                        "element-path":"page-builder/layouts/_two-col-50-50.html",
-                        "options":{
-                            "layout-bg-image":"",
-                            "bg-color":"#fff",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-0",
-                            "layout-bg-image-size":"bg-img-size--cover",
-                            "text-color":"#000",
-                            "margin-top":"marg-t-0",
-                            "padding-right":"padd-r-0",
-                            "margin-left":"marg-l-0",
-                            "padding-bottom":"padd-b-20",
-                            "align-content":"align-content-top",
-                            "text-alignment":"text-align--left",
-                            "padding-top":"padd-t-20",
-                            "padding-left":"padd-l-0"
-                        },
-                        "children":{
-                            "column-1":[
-                            {
-                                "element-type":"image-graphic",
-                                "element-path":"page-builder/elements/_image-graphic.html",
-                                "options":{
-                                "margin-left":"marg-l-auto",
-                                "image-alt-text":{
-                                    "en":"Manage your site"
-                                },
-                                "margin-bottom":"marg-b-30",
-                                "image-file":"https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/manage-your-site.png",
-                                "margin-top":"marg-t-0",
-                                "margin-right":"marg-r-auto",
-                                "link-url":"",
-                                "image-width":"set-width--30percent"
-                                }
-                            },
-                            {
-                                "element-type":"heading",
-                                "element-path":"page-builder/elements/_heading.html",
-                                "options":{
-                                "font-size":"font-size--24px",
-                                "margin-right":"marg-r-0",
-                                "margin-bottom":"marg-b-20",
-                                "text-color":"#0090c1",
-                                "margin-top":"marg-t-0",
-                                "margin-left":"marg-l-0",
-                                "text-content":{
-                                    "en":"Manage your site"
-                                },
-                                "font-family":"font--primary--bold",
-                                "text-alignment":"text-align--center"
-                                }
-                            },
-                            {
-                                "element-type":"paragraph-text",
-                                "element-path":"page-builder/elements/_paragraph.html",
-                                "options":{
-                                "font-size":"font-size--14px",
-                                "margin-right":"marg-r-20",
-                                "margin-bottom":"marg-b-5",
-                                "text-color":"#323232",
-                                "margin-top":"marg-t-5",
-                                "margin-left":"marg-l-20",
-                                "text-content":{
-                                    "en":"In the Management Console, you\u2019ll define your site's look and feel and manage site-wide content (e.g. certificates, SSO, custom domain)."
-                                },
-                                "font-family":"font--primary--regular",
-                                "text-alignment":"text-align--center"
+                                "children": {
+                                    "column-1": [
+                                        {
+                                            "element-type": "image-graphic",
+                                            "element-path": "page-builder/elements/_image-graphic.html",
+                                            "options": {
+                                                "margin-left": "marg-l-auto",
+                                                "image-alt-text": {
+                                                    "en": "Access the LMS"
+                                                },
+                                                "margin-bottom": "marg-b-30",
+                                                "image-file": "https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/access-the-lms.png",
+                                                "margin-top": "marg-t-0",
+                                                "margin-right": "marg-r-auto",
+                                                "link-url": "",
+                                                "image-width": "set-width--30percent"
+                                            }
+                                        },
+                                        {
+                                            "element-type": "heading",
+                                            "element-path": "page-builder/elements/_heading.html",
+                                            "options": {
+                                                "font-size": "font-size--24px",
+                                                "margin-right": "marg-r-0",
+                                                "margin-bottom": "marg-b-20",
+                                                "text-color": "#0090c1",
+                                                "margin-top": "marg-t-0",
+                                                "margin-left": "marg-l-0",
+                                                "text-content": {
+                                                    "en": "Access the LMS"
+                                                },
+                                                "font-family": "font--primary--bold",
+                                                "text-alignment": "text-align--center"
+                                            }
+                                        },
+                                        {
+                                            "element-type": "paragraph-text",
+                                            "element-path": "page-builder/elements/_paragraph.html",
+                                            "options": {
+                                                "font-size": "font-size--14px",
+                                                "margin-right": "marg-r-20",
+                                                "margin-bottom": "marg-b-5",
+                                                "text-color": "#323232",
+                                                "margin-top": "marg-t-5",
+                                                "margin-left": "marg-l-20",
+                                                "text-content": {
+                                                    "en": "This is where your learners can take their training courses and your instructors can handle learner management."
+                                                },
+                                                "font-family": "font--primary--regular",
+                                                "text-alignment": "text-align--center"
+                                            }
+                                        }
+                                    ],
+                                    "column-2": [
+                                        {
+                                            "element-type": "image-graphic",
+                                            "element-path": "page-builder/elements/_image-graphic.html",
+                                            "options": {
+                                                "margin-left": "marg-l-auto",
+                                                "image-alt-text": {
+                                                    "en": "Get to know Studio"
+                                                },
+                                                "margin-bottom": "marg-b-30",
+                                                "image-file": "https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/get-to-know-studio.png",
+                                                "margin-top": "marg-t-0",
+                                                "margin-right": "marg-r-auto",
+                                                "link-url": "",
+                                                "image-width": "set-width--30percent"
+                                            }
+                                        },
+                                        {
+                                            "element-type": "heading",
+                                            "element-path": "page-builder/elements/_heading.html",
+                                            "options": {
+                                                "font-size": "font-size--24px",
+                                                "margin-right": "marg-r-0",
+                                                "margin-bottom": "marg-b-20",
+                                                "text-color": "#0090c1",
+                                                "margin-top": "marg-t-0",
+                                                "margin-left": "marg-l-0",
+                                                "text-content": {
+                                                    "en": "Get to know Studio"
+                                                },
+                                                "font-family": "font--primary--bold",
+                                                "text-alignment": "text-align--center"
+                                            }
+                                        },
+                                        {
+                                            "element-type": "paragraph-text",
+                                            "element-path": "page-builder/elements/_paragraph.html",
+                                            "options": {
+                                                "font-size": "font-size--14px",
+                                                "margin-right": "marg-r-20",
+                                                "margin-bottom": "marg-b-5",
+                                                "text-color": "#323232",
+                                                "margin-top": "marg-t-5",
+                                                "margin-left": "marg-l-20",
+                                                "text-content": {
+                                                    "en": "You\u2019ll get to see how the Sample course is built and create your own courses."
+                                                },
+                                                "font-family": "font--primary--regular",
+                                                "text-alignment": "text-align--center"
+                                            }
+                                        }
+                                    ]
                                 }
                             }
-                            ],
-                            "column-2":[
+                        ],
+                        "column-2": [
                             {
-                                "element-type":"image-graphic",
-                                "element-path":"page-builder/elements/_image-graphic.html",
-                                "options":{
-                                "margin-left":"marg-l-auto",
-                                "image-alt-text":{
-                                    "en":"Get reports"
+                                "element-type": "layout-50:50",
+                                "element-path": "page-builder/layouts/_two-col-50-50.html",
+                                "options": {
+                                    "layout-bg-image": "",
+                                    "bg-color": "#fff",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-0",
+                                    "layout-bg-image-size": "bg-img-size--cover",
+                                    "text-color": "#000",
+                                    "margin-top": "marg-t-0",
+                                    "padding-right": "padd-r-0",
+                                    "margin-left": "marg-l-0",
+                                    "padding-bottom": "padd-b-20",
+                                    "align-content": "align-content-top",
+                                    "text-alignment": "text-align--left",
+                                    "padding-top": "padd-t-20",
+                                    "padding-left": "padd-l-0"
                                 },
-                                "margin-bottom":"marg-b-30",
-                                "image-file":"https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/get-reports.png",
-                                "margin-top":"marg-t-0",
-                                "margin-right":"marg-r-auto",
-                                "link-url":"",
-                                "image-width":"set-width--30percent"
-                                }
-                            },
-                            {
-                                "element-type":"heading",
-                                "element-path":"page-builder/elements/_heading.html",
-                                "options":{
-                                "font-size":"font-size--24px",
-                                "margin-right":"marg-r-0",
-                                "margin-bottom":"marg-b-20",
-                                "text-color":"#0090c1",
-                                "margin-top":"marg-t-0",
-                                "margin-left":"marg-l-0",
-                                "text-content":{
-                                    "en":"Get reports"
-                                },
-                                "font-family":"font--primary--bold",
-                                "text-alignment":"text-align--center"
-                                }
-                            },
-                            {
-                                "element-type":"paragraph-text",
-                                "element-path":"page-builder/elements/_paragraph.html",
-                                "options":{
-                                "font-size":"font-size--14px",
-                                "margin-right":"marg-r-20",
-                                "margin-bottom":"marg-b-5",
-                                "text-color":"#323232",
-                                "margin-top":"marg-t-5",
-                                "margin-left":"marg-l-20",
-                                "text-content":{
-                                    "en":"Understand how your learners are doing in your courses."
-                                },
-                                "font-family":"font--primary--regular",
-                                "text-alignment":"text-align--center"
+                                "children": {
+                                    "column-1": [
+                                        {
+                                            "element-type": "image-graphic",
+                                            "element-path": "page-builder/elements/_image-graphic.html",
+                                            "options": {
+                                                "margin-left": "marg-l-auto",
+                                                "image-alt-text": {
+                                                    "en": "Manage your site"
+                                                },
+                                                "margin-bottom": "marg-b-30",
+                                                "image-file": "https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/manage-your-site.png",
+                                                "margin-top": "marg-t-0",
+                                                "margin-right": "marg-r-auto",
+                                                "link-url": "",
+                                                "image-width": "set-width--30percent"
+                                            }
+                                        },
+                                        {
+                                            "element-type": "heading",
+                                            "element-path": "page-builder/elements/_heading.html",
+                                            "options": {
+                                                "font-size": "font-size--24px",
+                                                "margin-right": "marg-r-0",
+                                                "margin-bottom": "marg-b-20",
+                                                "text-color": "#0090c1",
+                                                "margin-top": "marg-t-0",
+                                                "margin-left": "marg-l-0",
+                                                "text-content": {
+                                                    "en": "Manage your site"
+                                                },
+                                                "font-family": "font--primary--bold",
+                                                "text-alignment": "text-align--center"
+                                            }
+                                        },
+                                        {
+                                            "element-type": "paragraph-text",
+                                            "element-path": "page-builder/elements/_paragraph.html",
+                                            "options": {
+                                                "font-size": "font-size--14px",
+                                                "margin-right": "marg-r-20",
+                                                "margin-bottom": "marg-b-5",
+                                                "text-color": "#323232",
+                                                "margin-top": "marg-t-5",
+                                                "margin-left": "marg-l-20",
+                                                "text-content": {
+                                                    "en": "In the Management Console, you\u2019ll define your site's look and feel and manage site-wide content (e.g. certificates, SSO, custom domain)."
+                                                },
+                                                "font-family": "font--primary--regular",
+                                                "text-alignment": "text-align--center"
+                                            }
+                                        }
+                                    ],
+                                    "column-2": [
+                                        {
+                                            "element-type": "image-graphic",
+                                            "element-path": "page-builder/elements/_image-graphic.html",
+                                            "options": {
+                                                "margin-left": "marg-l-auto",
+                                                "image-alt-text": {
+                                                    "en": "Get reports"
+                                                },
+                                                "margin-bottom": "marg-b-30",
+                                                "image-file": "https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/get-reports.png",
+                                                "margin-top": "marg-t-0",
+                                                "margin-right": "marg-r-auto",
+                                                "link-url": "",
+                                                "image-width": "set-width--30percent"
+                                            }
+                                        },
+                                        {
+                                            "element-type": "heading",
+                                            "element-path": "page-builder/elements/_heading.html",
+                                            "options": {
+                                                "font-size": "font-size--24px",
+                                                "margin-right": "marg-r-0",
+                                                "margin-bottom": "marg-b-20",
+                                                "text-color": "#0090c1",
+                                                "margin-top": "marg-t-0",
+                                                "margin-left": "marg-l-0",
+                                                "text-content": {
+                                                    "en": "Get reports"
+                                                },
+                                                "font-family": "font--primary--bold",
+                                                "text-alignment": "text-align--center"
+                                            }
+                                        },
+                                        {
+                                            "element-type": "paragraph-text",
+                                            "element-path": "page-builder/elements/_paragraph.html",
+                                            "options": {
+                                                "font-size": "font-size--14px",
+                                                "margin-right": "marg-r-20",
+                                                "margin-bottom": "marg-b-5",
+                                                "text-color": "#323232",
+                                                "margin-top": "marg-t-5",
+                                                "margin-left": "marg-l-20",
+                                                "text-content": {
+                                                    "en": "Understand how your learners are doing in your courses."
+                                                },
+                                                "font-family": "font--primary--regular",
+                                                "text-alignment": "text-align--center"
+                                            }
+                                        }
+                                    ]
                                 }
                             }
-                            ]
-                        }
-                        }
-                    ]
+                        ]
                     }
                 },
                 {
-                    "element-type":"layout-33:66",
-                    "element-path":"page-builder/layouts/_two-col-33-66.html",
-                    "options":{
-                    "layout-bg-image":"",
-                    "bg-color":"#EEEEEE",
-                    "margin-right":"marg-r-0",
-                    "margin-bottom":"marg-b-0",
-                    "layout-bg-image-size":"bg-img-size--cover",
-                    "text-color":"#000",
-                    "margin-top":"marg-t-0",
-                    "padding-right":"padd-r-0",
-                    "margin-left":"marg-l-0",
-                    "padding-bottom":"padd-b-200",
-                    "align-content":"align-content-center",
-                    "text-alignment":"text-align--left",
-                    "padding-top":"padd-t-75",
-                    "padding-left":"padd-l-0"
+                    "element-type": "layout-33:66",
+                    "element-path": "page-builder/layouts/_two-col-33-66.html",
+                    "options": {
+                        "layout-bg-image": "",
+                        "bg-color": "#EEEEEE",
+                        "margin-right": "marg-r-0",
+                        "margin-bottom": "marg-b-0",
+                        "layout-bg-image-size": "bg-img-size--cover",
+                        "text-color": "#000",
+                        "margin-top": "marg-t-0",
+                        "padding-right": "padd-r-0",
+                        "margin-left": "marg-l-0",
+                        "padding-bottom": "padd-b-200",
+                        "align-content": "align-content-center",
+                        "text-alignment": "text-align--left",
+                        "padding-top": "padd-t-75",
+                        "padding-left": "padd-l-0"
                     },
-                    "children":{
-                    "column-1":[
-                        {
-                        "element-type":"image-graphic",
-                        "element-path":"page-builder/elements/_image-graphic.html",
-                        "options":{
-                            "margin-left":"marg-l-auto",
-                            "image-alt-text":{
-                            "en":"Appsembler Support"
+                    "children": {
+                        "column-1": [
+                            {
+                                "element-type": "image-graphic",
+                                "element-path": "page-builder/elements/_image-graphic.html",
+                                "options": {
+                                    "margin-left": "marg-l-auto",
+                                    "image-alt-text": {
+                                        "en": "Appsembler Support"
+                                    },
+                                    "margin-bottom": "marg-b-0",
+                                    "image-file": "https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/support-graphic.svg",
+                                    "margin-top": "marg-t-0",
+                                    "margin-right": "marg-r-50",
+                                    "link-url": "",
+                                    "image-width": "set-width--100percent"
+                                }
+                            }
+                        ],
+                        "column-2": [
+                            {
+                                "element-type": "heading",
+                                "element-path": "page-builder/elements/_heading.html",
+                                "options": {
+                                    "font-size": "font-size--18px",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-30",
+                                    "text-color": "#0090c1",
+                                    "margin-top": "marg-t-0",
+                                    "margin-left": "marg-l-0",
+                                    "text-content": {
+                                        "en": "We're here to support you"
+                                    },
+                                    "font-family": "font--primary--bold",
+                                    "text-alignment": "text-align--left"
+                                }
                             },
-                            "margin-bottom":"marg-b-0",
-                            "image-file":"https://s3.amazonaws.com/staging-tahoe-bucket/customer_files/support-graphic.svg",
-                            "margin-top":"marg-t-0",
-                            "margin-right":"marg-r-50",
-                            "link-url":"",
-                            "image-width":"set-width--100percent"
-                        }
-                        }
-                    ],
-                    "column-2":[
-                        {
-                        "element-type":"heading",
-                        "element-path":"page-builder/elements/_heading.html",
-                        "options":{
-                            "font-size":"font-size--18px",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-30",
-                            "text-color":"#0090c1",
-                            "margin-top":"marg-t-0",
-                            "margin-left":"marg-l-0",
-                            "text-content":{
-                            "en":"We're here to support you"
+                            {
+                                "element-type": "heading",
+                                "element-path": "page-builder/elements/_heading.html",
+                                "options": {
+                                    "font-size": "font-size--32px",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-30",
+                                    "text-color": "#0e0e0e",
+                                    "margin-top": "marg-t-0",
+                                    "margin-left": "marg-l-0",
+                                    "text-content": {
+                                        "en": "Wondering how to start creating courses?"
+                                    },
+                                    "font-family": "font--primary--regular",
+                                    "text-alignment": "text-align--left"
+                                }
                             },
-                            "font-family":"font--primary--bold",
-                            "text-alignment":"text-align--left"
-                        }
-                        },
-                        {
-                        "element-type":"heading",
-                        "element-path":"page-builder/elements/_heading.html",
-                        "options":{
-                            "font-size":"font-size--32px",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-30",
-                            "text-color":"#0e0e0e",
-                            "margin-top":"marg-t-0",
-                            "margin-left":"marg-l-0",
-                            "text-content":{
-                            "en":"Wondering how to start creating courses?"
-                            },
-                            "font-family":"font--primary--regular",
-                            "text-alignment":"text-align--left"
-                        }
-                        },
-                        {
-                        "element-type":"content-block",
-                        "element-path":"page-builder/elements/_content-block.html",
-                        "options":{
-                            "content":{
-                            "en":"<p>We recommend you take a look at our <a title=\"https://appsembler.com/blog/how-to-author-first-open-edx-course-webinar-recording/\" href=\"https://appsembler.com/blog/how-to-author-first-open-edx-course-webinar-recording/\">How to Author Your First Open edX Course in 30 Minutes</a> blog post and the <a title=\"https://appsembler.wistia.com/medias/l5wyg0ua6l\" href=\"https://appsembler.wistia.com/medias/l5wyg0ua6l\">30 minute tutorial video from our Webinar</a>!</p>\n<p>For more, visit our <a title=\"http://help.appsembler.com/\" href=\"http://help.appsembler.com/\">Appsembler knowledge base</a>.</p>\n<p>If you run into any issues or have any questions about using our product, please feel free to contact our support team via <a title=\"mailto:support@appsembler.com\" href=\"mailto:support@appsembler.com\"><strong>support@appsembler.com</strong></a>!</p>"
-                            },
-                            "margin-top":"marg-t-5",
-                            "margin-left":"marg-l-0",
-                            "margin-right":"marg-r-0",
-                            "margin-bottom":"marg-b-5"
-                        }
-                        }
-                    ]
+                            {
+                                "element-type": "content-block",
+                                "element-path": "page-builder/elements/_content-block.html",
+                                "options": {
+                                    "content": {
+                                        "en": "<p>We recommend you take a look at our <a title=\"https://appsembler.com/blog/how-to-author-first-open-edx-course-webinar-recording/\" href=\"https://appsembler.com/blog/how-to-author-first-open-edx-course-webinar-recording/\">How to Author Your First Open edX Course in 30 Minutes</a> blog post and the <a title=\"https://appsembler.wistia.com/medias/l5wyg0ua6l\" href=\"https://appsembler.wistia.com/medias/l5wyg0ua6l\">30 minute tutorial video from our Webinar</a>!</p>\n<p>For more, visit our <a title=\"http://help.appsembler.com/\" href=\"http://help.appsembler.com/\">Appsembler knowledge base</a>.</p>\n<p>If you run into any issues or have any questions about using our product, please feel free to contact our support team via <a title=\"mailto:support@appsembler.com\" href=\"mailto:support@appsembler.com\"><strong>support@appsembler.com</strong></a>!</p>"
+                                    },
+                                    "margin-top": "marg-t-5",
+                                    "margin-left": "marg-l-0",
+                                    "margin-right": "marg-r-0",
+                                    "margin-bottom": "marg-b-5"
+                                }
+                            }
+                        ]
                     }
                 }
             ]
