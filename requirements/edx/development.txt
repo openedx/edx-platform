@@ -30,7 +30,7 @@ attrs==20.2.0             # via -r requirements/edx/testing.txt, edx-ace, jsonsc
 babel==2.8.0              # via -r requirements/edx/testing.txt, enmerkar, enmerkar-underscore, sphinx
 beautifulsoup4==4.9.1     # via -r requirements/edx/testing.txt, pynliner
 billiard==3.3.0.23        # via -r requirements/edx/testing.txt, celery
-bleach==3.1.5             # via -r requirements/edx/testing.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
+bleach==3.2.0             # via -r requirements/edx/testing.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
 bok-choy==1.1.1           # via -r requirements/edx/testing.txt
 boto3==1.4.8              # via -r requirements/edx/testing.txt, fs-s3fs
 boto==2.39.0              # via -r requirements/edx/testing.txt, django-ses, edxval, ora2
