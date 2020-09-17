@@ -33,7 +33,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
 from edx_django_utils import monitoring as monitoring_utils
-from edx_django_utils.monitoring import set_custom_metrics_for_course_key
+from edx_django_utils.monitoring import set_custom_attributes_for_course_key
 from ipware.ip import get_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
@@ -604,7 +604,7 @@ class CourseTabView(EdxFragmentView):
                 # Must come after masquerading on creation of page context
                 self.register_user_access_warning_messages(request, course)
 
-                set_custom_metrics_for_course_key(course_key)
+                set_custom_attributes_for_course_key(course_key)
                 return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
             except Exception as exception:  # pylint: disable=broad-except
                 return CourseTabView.handle_exceptions(request, course_key, course, exception)
