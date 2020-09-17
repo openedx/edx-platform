@@ -126,7 +126,7 @@ from django.urls import reverse
           <p>
             % if course_authoring_microfrontend_url:
               <% url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='') %>
-              ${Text(_("To update these settings go to the {link_start}Exam Settings page{link_end}.")).format(
+              ${Text(_("To update these settings go to the {link_start}Proctored Exam Settings page{link_end}.")).format(
                 link_start=HTML('<a href="{course_authoring_microfrontend_url}/proctored-exam-settings/{url_encoded_course_id}">').format(
                   course_authoring_microfrontend_url=course_authoring_microfrontend_url,
                   url_encoded_course_id=url_encoded_course_id,

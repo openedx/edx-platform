@@ -110,7 +110,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
             in alert_text
         )
         assert (
-            'To update these settings go to the Exam Settings page.'
+            'To update these settings go to the Proctored Exam Settings page.'
             in alert_text
         )
 
