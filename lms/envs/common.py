@@ -1677,7 +1677,7 @@ MIDDLEWARE = [
 
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
-    'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
+    'edx_django_utils.monitoring.middleware.CachedCustomMonitoringMiddleware',
 
     # Generate code ownership metrics. Keep this immediately after RequestCacheMiddleware.
     'edx_django_utils.monitoring.code_owner.middleware.CodeOwnerMetricMiddleware',
