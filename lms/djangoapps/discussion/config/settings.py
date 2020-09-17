@@ -6,14 +6,11 @@ from django.conf import settings
 # .. toggle_name: FEATURES['ENABLE_FORUM_DAILY_DIGEST']
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: True
-# .. toggle_description: Settings for forums/discussions to on/off daily digest feature. Set this to True if you want to enable users to subscribe and unsubscribe for daily digest. This setting enables deprecation of daily digest.
-# .. toggle_category: discussion
+# .. toggle_description: Settings for forums/discussions to on/off daily digest
+#   feature. Set this to True if you want to enable users to subscribe and unsubscribe
+#   for daily digest. This setting enables deprecation of daily digest.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-03-09
-# .. toggle_expiration_date: None
-# .. toggle_tickets: None
-# .. toggle_status: supported
-# .. toggle_warnings: None
 ENABLE_FORUM_DAILY_DIGEST = 'enable_forum_daily_digest'
 
 

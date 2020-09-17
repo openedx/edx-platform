@@ -38,13 +38,11 @@ experiments_namespace = WaffleFlagNamespace(name=u'experiments')
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding the current course's program information to user metadata
-# .. toggle_category: experiments
-# .. toggle_use_cases: monitored_rollout
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-2-25
-# .. toggle_expiration_date: None
-# .. toggle_warnings: None
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: REVEM-63, REVEM-198
-# .. toggle_status: supported
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 PROGRAM_INFO_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_programs',
@@ -55,13 +53,11 @@ PROGRAM_INFO_FLAG = WaffleFlag(
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Toggle for adding info about each course to the dashboard metadata
-# .. toggle_category: experiments
-# .. toggle_use_cases: monitored_rollout
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2019-3-28
-# .. toggle_expiration_date: None
-# .. toggle_warnings: None
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: REVEM-118
-# .. toggle_status: supported
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace, u'add_dashboard_info', __name__)
 # TODO END: clean up as part of REVEM-199 (End)
 
@@ -70,13 +66,11 @@ DASHBOARD_INFO_FLAG = WaffleFlag(experiments_namespace, u'add_dashboard_info', _
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Make sure upsell tracking JS works as expected.
-# .. toggle_category: experiments
-# .. toggle_use_cases: monitored_rollout
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-7-7
-# .. toggle_expiration_date: None
-# .. toggle_warnings: None
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: REV-1205
-# .. toggle_status: supported
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 UPSELL_TRACKING_FLAG = WaffleFlag(
     waffle_namespace=experiments_namespace,
     flag_name=u'add_upsell_tracking',

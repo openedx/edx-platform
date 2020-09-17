@@ -9,7 +9,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from oauth2_provider.models import Application
 from slumber.exceptions import HttpClientError
 
-from openedx.core.djangoapps.video_pipeline.config.waffle import ENABLE_VEM_PIPELINE, waffle_flags
 from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration, VideoPipelineIntegration
 from openedx.core.djangoapps.video_pipeline.utils import create_video_pipeline_api_client
 

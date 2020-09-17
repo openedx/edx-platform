@@ -7,14 +7,11 @@ import json
 import ddt
 from django.test.testcases import TestCase
 from mock import Mock, patch
-from opaque_keys.edx.locations import CourseLocator
 from slumber.exceptions import HttpClientError
 from student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
-from openedx.core.djangoapps.video_pipeline.config.waffle import ENABLE_VEM_PIPELINE, waffle_flags
 from openedx.core.djangoapps.video_pipeline.tests.mixins import VideoPipelineMixin
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
 
 @ddt.ddt

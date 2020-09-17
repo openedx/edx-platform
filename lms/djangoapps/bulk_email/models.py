@@ -468,18 +468,6 @@ class CourseAuthorization(models.Model):
         return u"Course '{}': Instructor Email {}Enabled".format(text_type(self.course_id), not_en)
 
 
-# .. toggle_name: require_course_email_auth
-# .. toggle_implementation: ConfigurationModel
-# .. toggle_default: True (enabled)
-# .. toggle_description: If the flag is enabled, course-specific authorization is required, and the course_id is either
-# not provided or not authorixed, the feature is not available.
-# .. toggle_category: bulk email
-# .. toggle_use_cases:  open_edx
-# .. toggle_creation_date: 2016-05-05
-# .. toggle_expiration_date: None
-# .. toggle_warnings: None
-# .. toggle_tickets: None
-# .. toggle_status: supported
 @python_2_unicode_compatible
 class BulkEmailFlag(ConfigurationModel):
     """
@@ -490,6 +478,15 @@ class BulkEmailFlag(ConfigurationModel):
     2. Course-specific authorization not required, or course authorized to use bulk email.
 
     .. no_pii:
+
+    .. toggle_name: require_course_email_auth
+    .. toggle_implementation: ConfigurationModel
+    .. toggle_default: True (enabled)
+    .. toggle_description: If the flag is enabled, course-specific authorization is
+      required, and the course_id is either not provided or not authorized, the feature
+      is not available.
+    .. toggle_use_cases:  open_edx
+    .. toggle_creation_date: 2016-05-05
     """
     # boolean field 'enabled' inherited from parent ConfigurationModel
     require_course_email_auth = models.BooleanField(default=True)

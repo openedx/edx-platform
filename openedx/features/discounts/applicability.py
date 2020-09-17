@@ -26,17 +26,15 @@ from openedx.features.discounts.models import DiscountPercentageConfig, Discount
 from student.models import CourseEnrollment
 from track import segment
 
-# .. feature_toggle_name: discounts.enable_discounting
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Toggle discounts always being disabled
-# .. feature_toggle_category: discounts
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2019-4-16
-# .. feature_toggle_expiration_date: None
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: REVEM-282
-# .. feature_toggle_status: supported
+# .. toggle_name: discounts.enable_discounting
+# .. toggle_type: flag
+# .. toggle_default: False
+# .. toggle_description: Toggle discounts always being disabled
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2019-4-16
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: REVEM-282
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
     waffle_namespace=WaffleFlagNamespace(name=u'discounts'),
     flag_name=u'enable_discounting',

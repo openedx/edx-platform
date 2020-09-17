@@ -90,13 +90,12 @@ COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_acce
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Used with our integration with CourseTalk to display reviews for a course.
-# .. toggle_category: course_experience
-# .. toggle_use_cases: monitored_rollout
+# .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2017-06-19
-# .. toggle_expiration_date: ???
-# .. toggle_warnings: We are no longer integrating with CourseTalk, so this probably should be deprecated and the code for reviews should be removed.
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: We are no longer integrating with CourseTalk, so this probably should be deprecated and the code
+#   for reviews should be removed. This temporary feature toggle should have a target removal date.
 # .. toggle_tickets: DEPR-48
-# .. toggle_status: unsupported
 SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_tool', __name__)
 
 # Waffle flag to enable the setting of course goals.
@@ -104,13 +103,10 @@ SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_t
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Used to determine whether or not to use course goals for the particular course.
-# .. toggle_category: course_experience
-# .. toggle_use_cases: opt_out, monitored_rollout
+# .. toggle_use_cases: opt_out, temporary
 # .. toggle_creation_date: 2017-09-11
-# .. toggle_expiration_date: ???
-# .. toggle_warnings: N/A
-# .. toggle_tickets: N/A
-# .. toggle_status: supported
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
 ENABLE_COURSE_GOALS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_course_goals', __name__)
 
 # Waffle flag to control the display of the hero
@@ -124,13 +120,10 @@ UPGRADE_DEADLINE_MESSAGE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'upgrade_dead
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Used to switch between 'welcome message' and 'latest update' on the course home page.
-# .. toggle_category: course_experience
 # .. toggle_use_cases: opt_out
 # .. toggle_creation_date: 2017-09-11
-# .. toggle_expiration_date: ???
-# .. toggle_warnings: This is meant to be configured using waffle_utils course override only.  Either do not create the actual waffle flag, or be sure to unset the flag even for Superusers.
-# .. toggle_tickets: N/A
-# .. toggle_status: supported
+# .. toggle_warnings: This is meant to be configured using waffle_utils course override only. Either do not create the
+#   actual waffle flag, or be sure to unset the flag even for Superusers.
 LATEST_UPDATE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'latest_update', __name__)
 
 # Waffle flag to enable anonymous access to a course

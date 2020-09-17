@@ -378,17 +378,14 @@ def _get_waffle_flag_custom_metrics_set():
     waffle_flag_custom_metrics = waffle_flag_custom_metrics if waffle_flag_custom_metrics else []
     return set(waffle_flag_custom_metrics)
 
-    # .. toggle_name: WAFFLE_FLAG_CUSTOM_METRICS
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: A list of waffle flag to track with custom metrics having values of (True, False, or Both).
-    # .. toggle_category: monitoring
-    # .. toggle_use_cases: opt_in
-    # .. toggle_creation_date: 2020-06-17
-    # .. toggle_expiration_date: None
-    # .. toggle_tickets: None
-    # .. toggle_status: supported
-    # .. toggle_warnings: Intent is for temporary research (1 day - several weeks) of a flag's usage.
+# .. toggle_name: WAFFLE_FLAG_CUSTOM_METRICS
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: A list of waffle flag to track with custom metrics having
+#   values of (True, False, or Both).
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2020-06-17
+# .. toggle_warnings: Intent is for temporary research (1 day - several weeks) of a flag's usage.
 _WAFFLE_FLAG_CUSTOM_METRICS = 'WAFFLE_FLAG_CUSTOM_METRICS'
 
 # set of waffle flags that should be instrumented with custom metrics
