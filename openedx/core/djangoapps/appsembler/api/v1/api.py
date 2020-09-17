@@ -28,19 +28,13 @@ from student.models import (
     ManualEnrollmentAudit
 )
 
-from organizations.models import (
-    OrganizationCourse,
-    UserOrganizationMapping,
-)
-
 
 log = logging.getLogger(__name__)
 
 
-def enrollment_learners_context(course_id, identifiers):
+def enrollment_learners_context(identifiers):
     """
     Get emails (and learner language) from a list of learner identifiers.
-    :param course_id: The course ID.
     :param identifiers: list of usernames/emails of students.
     :return: iterator of tuples
         (
@@ -50,10 +44,6 @@ def enrollment_learners_context(course_id, identifiers):
             language: string: Learner language,
         )
     """
-    # Ensuring the course is linked to an organization
-    _site = get_site_for_course(course_id)
-    _org = OrganizationCourse.objects.get(course_id=str(course_id))
-
     for identifier in identifiers:
         language = None
         user = None
@@ -97,7 +87,7 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
     enrollment_obj = None
     state_transition = DEFAULT_TRANSITION_STATE
 
-    for user, identifier, email, language in enrollment_learners_context(course_id, identifiers):
+    for user, identifier, email, language in enrollment_learners_context(identifiers):
         try:
             # Use django.core.validators.validate_email to check email address
             # validity (obviously, cannot check if email actually /exists/,
@@ -177,7 +167,7 @@ def unenroll_learners_in_course(course_id, identifiers, unenroll_func, **kwargs)
     results = []
     enrollment_obj = None
 
-    for user, identifier, email, language in enrollment_learners_context(course_id, identifiers):
+    for user, identifier, email, language in enrollment_learners_context(identifiers):
         try:
             validate_email(email)  # Raises ValidationError if invalid
             before, after = unenroll_func(

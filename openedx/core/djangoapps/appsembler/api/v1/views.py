@@ -25,6 +25,8 @@ from rest_framework.filters import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from organizations.models import OrganizationCourse
+
 from enrollment.serializers import CourseEnrollmentSerializer
 
 # from courseware.courses import get_course_by_id, get_course_with_access
@@ -350,6 +352,13 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
 
                     for course_id in serializer.data.get('courses'):
                         course_key = as_course_key(course_id)
+                        # TODO: The two checks below deserve a refactor to make it clearer or a v2 API that works on a
+                        #       single course and use `instructor/views/api.py:students_update_enrollment` directly.
+                        # Ensuring the course is linked to an organization. It's somewhat a legacy code, keeping
+                        # it just in case.
+                        # _site = get_site_for_course(course_id)
+                        # _org = OrganizationCourse.objects.get(course_id=str(course_id))
+
                         if email_learners:
                             email_params = get_email_params(course=get_course_by_id(course_key),
                                                             auto_enroll=auto_enroll,
