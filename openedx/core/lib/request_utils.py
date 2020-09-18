@@ -95,14 +95,14 @@ def course_id_from_url(url):
         return None
 
 
-class CookieMetricsMiddleware(MiddlewareMixin):
+class CookingMonitoringMiddleware(MiddlewareMixin):
     """
     Middleware for monitoring the size and growth of all our cookies, to see if
     we're running into browser limits.
     """
     def process_request(self, request):
         """
-        Emit custom metrics for cookie size values for every cookie we have.
+        Emit custom attributes for cookie size values for every cookie we have.
 
         Don't log contents of cookies because that might cause a security issue.
         We just want to see if any cookies are growing out of control.
@@ -118,9 +118,9 @@ class CookieMetricsMiddleware(MiddlewareMixin):
             for name, value in request.COOKIES.items()
         }
         for name, size in cookie_names_to_size.items():
-            metric_name = 'cookies.{}.size'.format(name)
-            newrelic.agent.add_custom_parameter(metric_name, size)
-            log.debug(u'%s = %d', metric_name, size)
+            attribute_name = 'cookies.{}.size'.format(name)
+            newrelic.agent.add_custom_parameter(attribute_name, size)
+            log.debug(u'%s = %d', attribute_name, size)
 
         total_cookie_size = sum(cookie_names_to_size.values())
         newrelic.agent.add_custom_parameter('cookies_total_size', total_cookie_size)

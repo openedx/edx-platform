@@ -1683,7 +1683,7 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.code_owner.middleware.CodeOwnerMonitoringMiddleware',
 
     # Cookie monitoring
-    'openedx.core.lib.request_utils.CookieMetricsMiddleware',
+    'openedx.core.lib.request_utils.CookingMonitoringMiddleware',
 
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
