@@ -3,6 +3,7 @@ Course API
 """
 import logging
 
+from edx_django_utils.monitoring import function_trace
 from edx_when.api import get_dates_for_course
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
@@ -139,6 +140,7 @@ def list_courses(request, username, org=None, filter_=None, search_term=None):
     return course_qs
 
 
+@function_trace('list_course_keys')
 def list_course_keys(request, username, role):
     """
     Yield all available CourseKeys for the user having the given role.

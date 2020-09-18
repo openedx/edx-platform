@@ -3,6 +3,7 @@ Course API Serializers.  Representing course catalog data
 """
 
 
+from edx_django_utils.monitoring import function_trace
 import six.moves.urllib.error
 import six.moves.urllib.parse
 import six.moves.urllib.request
@@ -127,5 +128,7 @@ class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstrac
     """
     Serializer that takes a CourseKey and serializes it to a string course_id.
     """
+
+    @function_trace('to_representation')
     def to_representation(self, instance):
         return str(instance)
