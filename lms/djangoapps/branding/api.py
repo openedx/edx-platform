@@ -454,7 +454,7 @@ def _footer_logo_img(is_secure):
     logo_name = configuration_helpers.get_value('FOOTER_ORGANIZATION_IMAGE', settings.FOOTER_ORGANIZATION_IMAGE)
     # `logo_name` is looked up from the configuration,
     # which falls back on the Django settings, which loads it from
-    # `lms.env.json`, which is created and managed by Ansible. Because of
+    # `lms.yml`, which is created and managed by Ansible. Because of
     # this runaround, we lose a lot of the flexibility that Django's
     # staticfiles system provides, and we end up having to hardcode the path
     # to the footer logo rather than use the comprehensive theming system.
