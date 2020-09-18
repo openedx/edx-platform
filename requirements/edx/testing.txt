@@ -31,8 +31,8 @@ beautifulsoup4==4.9.1     # via -r requirements/edx/base.txt, -r requirements/ed
 billiard==3.3.0.23        # via -r requirements/edx/base.txt, celery
 bleach==3.2.0             # via -r requirements/edx/base.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-poll
 bok-choy==1.1.1           # via -r requirements/edx/testing.in
-boto3==1.4.8              # via -r requirements/edx/base.txt, fs-s3fs
-boto==2.39.0              # via -r requirements/edx/base.txt, django-ses, edxval, ora2
+boto3==1.4.8              # via -r requirements/edx/base.txt, django-ses, fs-s3fs
+boto==2.39.0              # via -r requirements/edx/base.txt, edxval, ora2
 botocore==1.8.17          # via -r requirements/edx/base.txt, boto3, s3transfer
 bridgekeeper==0.9         # via -r requirements/edx/base.txt
 celery==3.1.26.post2      # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-celery, django-user-tasks, edx-celeryutils, edx-enterprise, event-tracking
@@ -82,7 +82,7 @@ git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-rate
 django-ratelimit==3.0.1   # via -r requirements/edx/base.txt
 django-require==1.0.11    # via -r requirements/edx/base.txt
 django-sekizai==2.0.0     # via -r requirements/edx/base.txt, django-wiki
-django-ses==0.8.14        # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
+django-ses==1.0.3         # via -r requirements/edx/base.txt
 django-simple-history==2.11.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-organizations, ora2
 django-splash==0.2.9      # via -r requirements/edx/base.txt
 django-statici18n==1.9.0  # via -r requirements/edx/base.txt

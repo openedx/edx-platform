@@ -28,9 +28,6 @@ django-ipware<3.0.0
 # 2.0.0 dropped support for Python 3.5
 django-pipeline<2.0.0
 
-# 1.0.0 currently causes an AttributeError that is under investigation: https://github.com/django-ses/django-ses/issues/186
-django-ses==0.8.14
-
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
 
