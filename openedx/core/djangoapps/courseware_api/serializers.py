@@ -92,8 +92,9 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     marketing_url = serializers.CharField()
     celebrations = serializers.DictField()
     user_has_passing_grade = serializers.BooleanField()
-    course_completion_is_active = serializers.BooleanField()
+    course_exit_page_is_active = serializers.BooleanField()
     certificate_data = CertificateDataSerializer()
+    verify_identity_url = AbsoluteURLField()
 
     def __init__(self, *args, **kwargs):
         """
