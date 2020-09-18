@@ -38,8 +38,21 @@ class DemographicsCollectionModal extends React.Component {
       errorMessage: '',
       loading: true,
       open: this.props.open,
-      selected: Object.values(FIELD_NAMES).reduce((acc, current) => ({ ...acc, [current]: '' }), {}),
+      selected: {
+        [FIELD_NAMES.CURRENT_WORK]: '',
+        [FIELD_NAMES.FUTURE_WORK]: '',
+        [FIELD_NAMES.GENDER]: '',
+        [FIELD_NAMES.GENDER_DESCRIPTION]: '',
+        [FIELD_NAMES.INCOME]: '',
+        [FIELD_NAMES.EDUCATION_LEVEL]: '',
+        [FIELD_NAMES.MILITARY]: '',
+        [FIELD_NAMES.PARENT_EDUCATION]: '',
+        [FIELD_NAMES.ETHNICITY]: [],
+        [FIELD_NAMES.WORK_STATUS]: '',
+        [FIELD_NAMES.WORK_STATUS_DESCRIPTION]: '',
+      }
     };
+    console.log(this.state.selected)
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.handleMultiselectChange = this.handleMultiselectChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -86,42 +99,53 @@ class DemographicsCollectionModal extends React.Component {
     try {
       await this.jwtTokenService.getJwtToken();
       response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, requestOptions);
-      // if the user has not yet bee created in the demographics service, we need to make a post to create an entry
-      if (response.status !== 200) {
-        // we get a 404 if the user resource does not exist in demographics, which is expected.
-        if (response.status === 404) {
-          try {
-            const postUrl = `${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`;
-            requestOptions.method = 'POST'
-            requestOptions.body = JSON.stringify({
-              user: this.props.user,
-            });
-            const csrfToken = await this.csrfTokenService.getCsrfToken(url);
-            requestOptions.headers['X-CSRFToken'] = csrfToken;
-            Cookies.set('demographics_csrftoken', csrfToken);
-            response = await fetch(postUrl, requestOptions);
-            // A 201 is a created success message. if we don't get a 201, throw an error.
-            if (response.status !== 201) {
-              const error = await response.json();
-              throw error.detail;
-            }
-          } catch (error) {
-            this.setState({ loading: false, error: true, errorMessage: error });
-          }
-        } else {
-          const error = await response.json();
-          throw error.detail;
+      // We found the user, return their data
+      if (response.status === 200) {
+        data = await response.json();
+        if (data[FIELD_NAMES.ETHNICITY]) {
+          // map ethnicity data to match what the UI requires
+          data[FIELD_NAMES.ETHNICITY] = this.reduceEthnicityArray(data[FIELD_NAMES.ETHNICITY]);
         }
+        this.setState({ options: options.actions.POST, loading: false, selected: data });
       }
-
-      data = await response.json();
-      if (data[FIELD_NAMES.ETHNICITY]) {
-        // map ethnicity data to match what the UI requires
-        data[FIELD_NAMES.ETHNICITY] = this.reduceEthnicityArray(data[FIELD_NAMES.ETHNICITY]);
+    } catch (e) {
+      // an error other than "no entry found" occured
+      if (response.status !== 404) {
+        this.setState({ loading: false, error: true, errorMessage: error });
       }
-      this.setState({ options: options.actions.POST, loading: false, selected: data });
-    } catch (error) {
-      this.setState({ loading: false, error: true, errorMessage: error });
+    }
+    // an entry was not found in demographics, so we can create one
+    if (response.status === 404) {
+      const postUrl = `${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`;
+      let csrfToken;
+      // set the csrf token cookie if not already set
+      try {
+        csrfToken = await this.csrfTokenService.getCsrfToken(postUrl);
+        Cookies.set('demographics_csrftoken', csrfToken)
+      } catch (error) {
+        this.setState({ loading: false, error: true, errorMessage: error });
+      }
+      // Create the entry
+      try {
+        const postOptions = {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'USE-JWT-COOKIE': true,
+            'X-CSRFToken': Cookies.get('demographics_csrftoken')
+          },
+          body: JSON.stringify({
+            user: this.props.user,
+          }),
+        };
+        const postResponse = await fetch(postUrl, postOptions);
+        const postData = await postResponse.json();
+        this.setState({ options: options.actions.POST, loading: false, selected: postData });
+        console.log(this.state)
+      } catch (e) {
+        this.setState({ loading: false, error: true, errorMessage: error });
+      }
     }
     // we add a class here to prevent scrolling on anything that is not the modal
     document.body.classList.add('modal-open');
@@ -225,12 +249,12 @@ class DemographicsCollectionModal extends React.Component {
               <div>
                 <p className="font-weight-light">
                   {StringUtils.interpolate(
-                      gettext('Section {currentPage} of {totalPages}'),
-                        {
-                          currentPage: currentPage,
-                          totalPages: totalPages
-                        }
-                      )
+                    gettext('Section {currentPage} of {totalPages}'),
+                    {
+                      currentPage: currentPage,
+                      totalPages: totalPages
+                    }
+                  )
                   }
                 </p>
                 <h2 className="mb-1 mt-4 font-weight-bold text-secondary">
@@ -274,6 +298,7 @@ class DemographicsCollectionModal extends React.Component {
                   disabled={this.state.fieldError}
                 />
                 {/* Ethnicity */}
+                {console.log(this.state.selected)}
                 <MultiselectDropdown
                   label={gettext("Which of the following describes you best?")}
                   emptyLabel={gettext("Check all that apply")}
@@ -436,7 +461,7 @@ class DemographicsCollectionModal extends React.Component {
           </Wizard.Page>
           <Wizard.Closer>
             <div className="demographics-modal-closer m-sm-0">
-            <i class="fa fa-check" aria-hidden="true"></i>
+              <i class="fa fa-check" aria-hidden="true"></i>
               <h3>
                 {gettext("Thank you! You’re helping make edX better for everyone.")}
               </h3>
