@@ -52,7 +52,6 @@ class DemographicsCollectionModal extends React.Component {
         [FIELD_NAMES.WORK_STATUS_DESCRIPTION]: '',
       }
     };
-    console.log(this.state.selected)
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.handleMultiselectChange = this.handleMultiselectChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -142,7 +141,6 @@ class DemographicsCollectionModal extends React.Component {
         const postResponse = await fetch(postUrl, postOptions);
         const postData = await postResponse.json();
         this.setState({ options: options.actions.POST, loading: false, selected: postData });
-        console.log(this.state)
       } catch (e) {
         this.setState({ loading: false, error: true, errorMessage: error });
       }
@@ -298,7 +296,6 @@ class DemographicsCollectionModal extends React.Component {
                   disabled={this.state.fieldError}
                 />
                 {/* Ethnicity */}
-                {console.log(this.state.selected)}
                 <MultiselectDropdown
                   label={gettext("Which of the following describes you best?")}
                   emptyLabel={gettext("Check all that apply")}
