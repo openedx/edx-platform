@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
-from edx_django_utils.monitoring import set_custom_metric, set_custom_metrics_for_course_key
+from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
@@ -213,8 +213,8 @@ def _recalculate_subsection_grade(self, **kwargs):
 
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
 
-        set_custom_metrics_for_course_key(course_key)
-        set_custom_metric('usage_id', six.text_type(scored_block_usage_key))
+        set_custom_attributes_for_course_key(course_key)
+        set_custom_attribute('usage_id', six.text_type(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the

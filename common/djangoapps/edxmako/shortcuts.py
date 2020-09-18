@@ -24,7 +24,7 @@ from six.moves.urllib.parse import urljoin
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from xmodule.util.xmodule_django import get_current_request_hostname
@@ -95,7 +95,7 @@ def marketing_link(name):
                     return reverse(link_map[name])
                 except NoReverseMatch:
                     log.debug(u"Cannot find corresponding link for name: %s", name)
-                    set_custom_metric('unresolved_marketing_link', name)
+                    set_custom_attribute('unresolved_marketing_link', name)
                     return '#'
     else:
         log.debug(u"Cannot find corresponding link for name: %s", name)

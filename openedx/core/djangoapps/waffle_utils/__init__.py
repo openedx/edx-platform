@@ -63,7 +63,7 @@ from weakref import WeakSet
 import crum
 import six
 from django.conf import settings
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from opaque_keys.edx.keys import CourseKey
 from waffle import flag_is_active, switch_is_active
 
@@ -302,7 +302,7 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
             # a page redirects to a 404, or for celery workers.
             value = self._is_flag_active_for_everyone(namespaced_flag_name)
             self._set_waffle_flag_metric(namespaced_flag_name, value)
-            set_custom_metric('warn_flag_no_request_return_value', value)
+            set_custom_attribute('warn_flag_no_request_return_value', value)
             return value
 
         value = flag_is_active(request, namespaced_flag_name)
@@ -367,7 +367,7 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
 
         if is_value_change:
             metric_name = 'flag_{}'.format(name)
-            set_custom_metric(metric_name, flag_metric_data[name])
+            set_custom_attribute(metric_name, flag_metric_data[name])
 
 
 def _get_waffle_flag_custom_metrics_set():

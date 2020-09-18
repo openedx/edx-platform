@@ -12,7 +12,7 @@ from django.db.models import F, Q
 from django.urls import reverse
 from edx_ace.recipient import Recipient
 from edx_ace.recipient_resolver import RecipientResolver
-from edx_django_utils.monitoring import function_trace, set_custom_metric
+from edx_django_utils.monitoring import function_trace, set_custom_attribute
 from edx_when.api import get_schedules_with_due_date
 from opaque_keys.edx.keys import CourseKey
 
@@ -160,7 +160,7 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         LOG.info(u'Number of schedules = %d', num_schedules)
 
         # This should give us a sense of the volume of data being processed by each task.
-        set_custom_metric('num_schedules', num_schedules)
+        set_custom_attribute('num_schedules', num_schedules)
 
         return schedules
 
