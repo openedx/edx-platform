@@ -5,6 +5,7 @@ Course API Views
 
 from django.core.exceptions import ValidationError
 from django.core.paginator import InvalidPage
+from edx_django_utils.monitoring import function_trace
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
@@ -172,6 +173,7 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
     """
 
+    @function_trace('get_paginated_response')
     def get_paginated_response(self, data):
         # Clear the cached property values to recalculate the estimated count from the LazySequence
         del self.page.paginator.__dict__['count']
@@ -365,6 +367,7 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
     serializer_class = CourseKeySerializer
     throttle_classes = (CourseIdListUserThrottle,)
 
+    @function_trace('get_queryset')
     def get_queryset(self):
         """
         Returns CourseKeys for courses which the user has the provided role.
