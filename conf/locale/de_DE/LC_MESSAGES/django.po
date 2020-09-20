@@ -172,7 +172,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-06 20:42+0000\n"
+"POT-Creation-Date: 2020-09-13 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
 "Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
@@ -7383,6 +7383,12 @@ msgstr ""
 "Die Anzahl der Sekunden bis zur Verzögerung / Timeout-Wartezeit, um Cookie-"
 "Werte von sailthru zu erhalten."
 
+#: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
+msgid ""
+"Cannot override subsection grade: subsection is not available for target "
+"learner."
+msgstr ""
+
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
@@ -12220,27 +12226,12 @@ msgstr "Sie besitzen nicht die Berechtigung ein Konto zu eröffnen."
 #, python-brace-format
 msgid ""
 "You've successfully signed in to your {provider_name} account, but this "
-"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
-" your {platform_name} username and password to sign in to {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
-" yet, click {register_label_strong} at the top of the page."
+"account isn't linked with your {platform_name} account yet.Use your "
+"{platform_name} username and password to sign in to {platform_name} below, "
+"and then link your {platform_name} account with {provider_name} from your "
+"dashboard.If you don't have an account on {platform_name} yet, click "
+"{register_label_strong} at the top of the page."
 msgstr ""
-"Du hast dich erfolgreich in deinem {provider_name} Konto angemeldet, aber "
-"dieses Konto ist noch nicht mit deinem {platform_name} Konto verknüpft. "
-"{blank_lines}Verwenden Sie Ihren {platform_name} Benutzernamen und Ihr "
-"Passwort, um sich unten bei {platform_name} anzumelden, und verknüpfen Sie "
-"dann Ihr {platform_name} Konto mit {provider_name} aus Ihrer 'Meine Kurse' "
-"Übersicht. {blank_lines}Wenn Sie noch kein Konto bei {platform_name} haben, "
-"klicken Sie auf {register_label_strong} oben auf der Seite."
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "Registrieren"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "There was an error receiving your login information. Please email us."
@@ -12259,19 +12250,6 @@ msgstr ""
 "{locked_out_period} Minuten können Sie erneut versuchen sich einzuloggen. "
 "{li_start}Um auf der sicheren Seite zu sein, können Sie Ihr Passwort "
 "{link_start}hier{link_end}zurücksetzen."
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"In order to sign in, you need to activate your account.{blank_lines}We just "
-"sent an activation link to {email_strong}. If you do not receive an email, "
-"check your spam folders or {link_start}contact {platform_name} "
-"Support{link_end}."
-msgstr ""
-"Um sich anzumelden, müssen Sie Ihr Konto aktivieren.{blank_lines}Wir haben "
-"gerade einen Aktivierungslink an {email_strong} geschickt. Wenn Sie keine "
-"E-Mail erhalten, überprüfen Sie Ihre Spam-Ordner oder "
-"{link_start}kontaktieren Sie den {platform_name} Support{link_end}."
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
@@ -19129,6 +19107,13 @@ msgstr "Wie es funktioniert"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "Schulen"
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "Registrieren"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"

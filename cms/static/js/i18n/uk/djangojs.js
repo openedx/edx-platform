@@ -1581,12 +1581,6 @@
     "{selectedProvider} credentials saved": "{selectedProvider} \u043e\u0431\u043b\u0456\u043a\u043e\u0432\u0456 \u0434\u0430\u043d\u0456 \u0437\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u043e",
     "{start_strong}{total}{end_strong} words submitted in total.": "{start_strong}{total}{end_strong} \u043f\u043e\u0434\u0430\u043d\u043e \u0441\u043b\u0456\u0432 \u0437\u0430\u0433\u0430\u043b\u043e\u043c.",
     "{totalItems} total": "{totalItems} \u0437\u0430\u0433\u0430\u043b\u043e\u043c",
-    "{total_results} result": [
-      "{total_results} \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442",
-      "{total_results} \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0456\u0432",
-      "{total_results} \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0456\u0432",
-      "{total_results} \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0456\u0432"
-    ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",
     "{type} Progress": "{type} \u041f\u0440\u043e\u0433\u0440\u0435\u0441",
     "\u2026": "..."
