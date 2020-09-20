@@ -18,6 +18,7 @@ from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 
+
 def _get_thread_callback(thread_data):
     """
     Get a callback function that will return POST/PUT data overridden by

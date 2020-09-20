@@ -868,7 +868,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "author": [str(author_boolean)],
         }
 
-        if author_boolean == None:
+        if author_boolean is None:
             del expected_last_query_params["author"]
 
         self.assert_last_query_params(expected_last_query_params)
@@ -901,7 +901,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "post_type": [post_type],
         }
 
-        if post_type == None:
+        if post_type is None:
             del expected_last_query_params["post_type"]
 
         self.assert_last_query_params(expected_last_query_params)
@@ -934,7 +934,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "flagged": [str(flagged_boolean)],
         }
 
-        if flagged_boolean == None:
+        if flagged_boolean is None:
             del expected_last_query_params["flagged"]
 
         self.assert_last_query_params(expected_last_query_params)
