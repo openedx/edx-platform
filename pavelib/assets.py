@@ -5,6 +5,7 @@ Asset compilation and collection.
 
 import argparse
 import glob
+import json
 import os
 import traceback
 from datetime import datetime
@@ -765,10 +766,14 @@ def webpack(options):
     result = Env.get_django_settings(['STATIC_ROOT', 'WEBPACK_CONFIG_PATH'], "lms", settings=settings)
     static_root_lms, config_path = result
     static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
-    environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
+    additional_node_env_vars = json.dumps(Env.get_django_settings("ADDITIONAL_NODE_ENV_VARS", "cms",
+                                                                  settings=settings).replace("'", '"'))
+    environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} \
+    ADDITIONAL_NODE_ENV_VARS={additional_node_env_vars}'.format(
         node_env="development" if config_path == 'webpack.dev.config.js' else "production",
         static_root_lms=static_root_lms,
-        static_root_cms=static_root_cms
+        static_root_cms=static_root_cms,
+        additional_node_env_vars=additional_node_env_vars
     )
     sh(
         cmd(

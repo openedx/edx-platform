@@ -20,7 +20,8 @@ module.exports = _.values(Merge.smart(commonConfig, {
                 debug: true
             }),
             new webpack.DefinePlugin({
-                'process.env.NODE_ENV': JSON.stringify('development')
+                'process.env.NODE_ENV': JSON.stringify('development'),
+                'process.env.ADDITIONAL_NODE_ENV_VARS': JSON.stringify(process.env.ADDITIONAL_NODE_ENV_VARS)
             })
         ],
         module: {
