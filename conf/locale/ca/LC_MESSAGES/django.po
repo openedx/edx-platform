@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-06 20:42+0000\n"
+"POT-Creation-Date: 2020-09-13 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Catalan (https://www.transifex.com/open-edx/teams/6205/ca/)\n"
@@ -6267,6 +6267,12 @@ msgid ""
 "sailthru."
 msgstr ""
 
+#: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
+msgid ""
+"Cannot override subsection grade: subsection is not available for target "
+"learner."
+msgstr ""
+
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
 msgid "Proctored Exam Review: {review_status}"
@@ -10503,20 +10509,12 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "You've successfully signed in to your {provider_name} account, but this "
-"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
-" your {platform_name} username and password to sign in to {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
-" yet, click {register_label_strong} at the top of the page."
+"account isn't linked with your {platform_name} account yet.Use your "
+"{platform_name} username and password to sign in to {platform_name} below, "
+"and then link your {platform_name} account with {provider_name} from your "
+"dashboard.If you don't have an account on {platform_name} yet, click "
+"{register_label_strong} at the top of the page."
 msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "Registre"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "There was an error receiving your login information. Please email us."
@@ -10530,15 +10528,6 @@ msgid ""
 "To protect your account, it’s been temporarily locked. Try again in "
 "{locked_out_period} minutes.{li_start}To be on the safe side, you can reset "
 "your password {link_start}here{link_end} before you try again."
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"In order to sign in, you need to activate your account.{blank_lines}We just "
-"sent an activation link to {email_strong}. If you do not receive an email, "
-"check your spam folders or {link_start}contact {platform_name} "
-"Support{link_end}."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -17112,6 +17101,13 @@ msgstr "Com funciona"
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Schools"
 msgstr "Escoles"
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "Registre"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"

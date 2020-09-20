@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-13 20:43+0000\n"
+"POT-Creation-Date: 2020-09-20 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -726,8 +726,8 @@ msgid ""
 "The window of time after enrolling during which users can be granted a "
 "refund, represented in microseconds. The default is 14 days."
 msgstr ""
-"Kullanıcıların katıldıktan sonra geri ödeme alabileceği zaman aralığı, "
-"mikrosaniyeler ile belirtilir. Ödeme süresi 14 gündür."
+"Kullanıcıların kayıt yaptıktan sonra geri ödeme alabileceği zaman aralığı, "
+"mikrosaniyeler ile belirtilir. Öntanımlı süre 14 gündür."
 
 #: common/djangoapps/student/models.py
 msgid "Name of the UTM cookie"
@@ -1048,6 +1048,11 @@ msgid ""
 "(zero), the session will expire upon the user closing their browser. If left"
 " blank, the Django platform session default length will be used."
 msgstr ""
+"Bu seçenek tercih edildiğinde, bu SSO sağlayıcısını kullanarak giriş yapan "
+"kullanıcıların oturum süreleri bu değerden daha uzun olmayacak şekilde "
+"sınırlandırılır. 0 (sıfır) olarak ayarlanırsa, kullanıcının tarayıcısını "
+"kapatmasıyla oturum sona erer. Boş bırakılırsa, Django platform oturumu "
+"varsayılan süresi kullanılır."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1066,6 +1071,10 @@ msgid ""
 "address associated with their account is changed as a part of this "
 "synchronization."
 msgstr ""
+"Kimlik sağlayıcısından alınan kullanıcı profili verilerini her bir SSO "
+"girişindeki edX kullanıcı hesabıyla eşleştirin. Hesaplarıyla "
+"ilişkilendirilen e-posta adresi bu eşleştirmenin bir parçası olarak "
+"değiştirilirse kullanıcı bilgilendirilir."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
@@ -2660,7 +2669,9 @@ msgstr ""
 #: common/lib/xmodule/xmodule/conditional_module.py
 #, python-brace-format
 msgid "You must complete {link} before you can access this unit."
-msgstr "Bu üniteye erişim sağlamadan önce {link} tamamlamalısınız."
+msgstr ""
+"Bu üniteye erişim hakkını edinmeden önce {link} bağlantısını "
+"tamamlamalısınız."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "This component has no source components configured yet."
@@ -2676,6 +2687,8 @@ msgid ""
 "The selected proctoring provider, {proctoring_provider}, is not a valid "
 "provider. Please select from one of {available_providers}."
 msgstr ""
+"Seçili gözetmen sağlayıcısı {proctoring_provider}, geçerli bir sağlayıcı "
+"değil. Lütfen {available_providers} seçeneklerinden birini seçiniz."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -2744,7 +2757,7 @@ msgid ""
 "the start date that you have set for this course is used."
 msgstr ""
 "Ders başlangıcı olarak duyurmak istediğiniz tarih aralığını girin, örneğin "
-"\"Kış 2018\" gibi. Bu değeri null/boş olarak girerseniz, bu ders için "
+"\"Kış 2018\" gibi. Bu değeri null olarak girerseniz, bu ders için "
 "belirlediğiniz başlangıç tarihi gösterilecektir."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2893,7 +2906,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Is New"
-msgstr "Yeni Ders"
+msgstr "Bu Ders Yeni"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -5008,6 +5021,8 @@ msgid ""
 "{display_name} is only accessible to enrolled learners. Sign in or register,"
 " and enroll in this course to view it."
 msgstr ""
+"{display_name} sadece kayıtlanmış öğrencilere görünür. Görmek için, bu derse"
+" giriş yapın ve derse kayıtlanın."
 
 #: common/templates/admin/student/loginfailures/change_form_template.html
 msgid "Unlock Account"
@@ -5935,6 +5950,7 @@ msgstr "E-ticaret hizmeti tarafından barındırılan ödeme sayfasını kullan.
 #: lms/djangoapps/commerce/models.py
 msgid "Path to course(s) checkout page hosted by the E-Commerce service."
 msgstr ""
+"E-ticaret hizmeti tarafından barındırılan ders ödeme sayfa(lar)ına yol."
 
 #: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
@@ -6294,6 +6310,10 @@ msgid ""
 "your identity on {platform_name} if you have not done so "
 "already.{button_panel}"
 msgstr ""
+"Sertifika almaya hak kazanmak için, tüm ders notlandırma gereksinimlerini "
+"karşılamanız, ders son tarihinden önce yükseltmeniz ve henüz yapmadıysanız "
+"{platform_name} platformu üzerindeki kimliğinizi başarıyla doğrulamanız "
+"gerekir. {button_panel}"
 
 #: lms/djangoapps/courseware/date_summary.py
 #, python-brace-format
@@ -6340,6 +6360,8 @@ msgid ""
 "There is no user with the username or email address \"{user_identifier}\" "
 "enrolled in this course."
 msgstr ""
+"Bu derse \"{user_identifier}\" kullanıcı adı ya da e-posta adresiyle "
+"kaydolmuş bir kullanıcı yoktur."
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
@@ -6566,19 +6588,24 @@ msgstr "Yıllık Hanehalkı Geliri"
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
+msgstr "Mâli durumunuzdan bahsedin. Neden yardıma ihtiyacınız var ?"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "Tell us about your learning or professional goals. How will a Verified "
 "Certificate in this course help you achieve these goals?"
 msgstr ""
+"Öğrenme ya da mesleki hedeflerinizden bahsedin. Bu dersten alacağınız Onaylı"
+" Sertifika belirttiğiniz hedeflerinizi gerçekleştirmenize nasıl yardımcı "
+"olacak ?"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "Tell us about your plans for this course. What steps will you take to help "
 "you complete the course work and receive a certificate?"
 msgstr ""
+"Bu ders için planlarınızdan bahsedin. Bu ders çalışmalarını tamamlamada ve "
+"sertifika almanızda size yardımcı olacak hangi adımları izleyeceksiniz ?"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Use between 1250 and 2500 characters or so in your response."
@@ -10260,6 +10287,9 @@ msgid ""
 "earning a verified certificate. Upgrade by "
 "%(user_schedule_upgrade_deadline_time)s."
 msgstr ""
+"Onaylı bir sertifika alarak yeni bilgi ve becerilerinizi öne çıkarma "
+"fırsatını kaçırmayın. %(user_schedule_upgrade_deadline_time)s tarihine dek "
+"bu sertifikayı edinebilirsiniz."
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.html
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/upsell_cta.txt
@@ -16087,6 +16117,7 @@ msgstr "Bu içerik puanlandı"
 #: lms/templates/courseware/course_about.html
 msgid "An error has occurred. Please ensure that you are logged in to enroll."
 msgstr ""
+"Bir hata oluştu. Kayıt olmak için, lütfen oturum açtığınızdan emin olun."
 
 #: lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
@@ -17927,7 +17958,6 @@ msgid "Sysadmin"
 msgstr "Sistem Yöneticisi"
 
 #: lms/templates/header/navbar-logo-header.html
-#: lms/templates/header/user_dropdown.html
 msgid "{name} Dashboard"
 msgstr ""
 
@@ -18705,7 +18735,7 @@ msgstr "Bu yüzden, bu eylem için lütfen hesaba gerekli detayları veriniz."
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Reason"
-msgstr "Neden"
+msgstr "Gerekçe"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Register/Enroll Students"
@@ -21520,6 +21550,27 @@ msgstr ""
 msgid "Unsupported Advance Modules"
 msgstr "Desteklenmeyen Gelişmiş Modüller"
 
+#: cms/templates/course_outline.html cms/templates/settings_advanced.html
+msgid ""
+"This course has proctored exam settings that are incomplete or invalid."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To update these settings go to the {link_start}Proctored Exam Settings "
+"page{link_end}."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To update these settings go to the {link_start}Advanced Settings "
+"page{link_end}."
+msgstr ""
+
+#: cms/templates/course_outline.html cms/templates/settings_advanced.html
+msgid "Proctoring Settings Errors"
+msgstr ""
+
 #: cms/templates/course_outline.html
 msgid "Click to add a new section"
 msgstr "Yeni bölüm açmak için tıklayın"
@@ -23864,6 +23915,18 @@ msgstr ""
 " ders özeti, ders görseli, eğitim videosu ve tahmini zaman gereksinimlerini "
 "içermektektedir. Öğrenciler Hakkında sayfalarını alacakları yeni dersleri "
 "seçmek için kullanır."
+
+#: cms/templates/settings_advanced.html
+msgid ""
+"You will be unable to make changes until the errors are resolved. To update "
+"these settings go to the {link_start}Proctored Exam Settings page{link_end}."
+msgstr ""
+
+#: cms/templates/settings_advanced.html
+msgid ""
+"You will be unable to make changes until the following settings are updated "
+"on the page below."
+msgstr ""
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."

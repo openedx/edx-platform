@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-13 20:50+0000\n"
-"PO-Revision-Date: 2020-09-13 20:50:15.964176\n"
+"POT-Creation-Date: 2020-09-20 20:49+0000\n"
+"PO-Revision-Date: 2020-09-20 20:49:36.281108\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -138,6 +138,7 @@ msgstr "عحمخشيهرل"
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/demographics_collection/Wizard.jsx
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -1213,6 +1214,7 @@ msgstr "رثص صهريخص"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/demographics_collection/Wizard.jsx
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -1628,7 +1630,6 @@ msgstr "دثقفهذشم سحشذث"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
-#: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
 msgid "View"
 msgstr "دهثص"
@@ -3446,6 +3447,74 @@ msgstr ""
 "عرشزمث فخ يثفثقوهرث صاثفاثق صث ساخعمي لهدث غخع ش قثبعري زثذشعسث خب سغسفثو "
 "ثققخق. حمثشسث فقغ شلشهر مشفثق."
 
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Want to make edX better for everyone?"
+msgstr "صشرف فخ وشنث ثيط زثففثق بخق ثدثقغخرث?"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Get started"
+msgstr "لثف سفشقفثي"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Help make edX better for everyone!"
+msgstr "اثمح وشنث ثيط زثففثق بخق ثدثقغخرث!"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Why does edX collect this information?"
+msgstr "صاغ يخثس ثيط ذخممثذف فاهس هربخقوشفهخر?"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"An error occurred while attempting to retrieve or save the information "
+"below. Please try again later."
+msgstr ""
+"شر ثققخق خذذعققثي صاهمث شففثوحفهرل فخ قثفقهثدث خق سشدث فاث هربخقوشفهخر "
+"زثمخص. حمثشسث فقغ شلشهر مشفثق."
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What was the total combined income, during the last 12 months, of all "
+"members of your family? "
+msgstr ""
+"صاشف صشس فاث فخفشم ذخوزهرثي هرذخوث, يعقهرل فاث مشسف 12 وخرفاس, خب شمم "
+"وثوزثقس خب غخعق بشوهمغ? "
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select military status"
+msgstr "سثمثذف وهمهفشقغ سفشفعس"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What is the highest level of education that you have achieved so far?"
+msgstr "صاشف هس فاث اهلاثسف مثدثم خب ثيعذشفهخر فاشف غخع اشدث شذاهثدثي سخ بشق?"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select guardian education"
+msgstr "سثمثذف لعشقيهشر ثيعذشفهخر"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select current industry"
+msgstr "سثمثذف ذعققثرف هريعسفقغ"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you want to work in?"
+msgstr "صاشف هريعسفقغ يخ غخع صشرف فخ صخقن هر?"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
+msgstr "فاشرن غخع! غخع’قث اثمحهرل وشنث ثيط زثففثق بخق ثدثقغخرث."
+
+#: lms/static/js/demographics_collection/MultiselectDropdown.jsx
+msgid "Clear all"
+msgstr "ذمثشق شمم"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Return to my dashboard"
+msgstr "قثفعقر فخ وغ يشسازخشقي"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Finish later"
+msgstr "بهرهسا مشفثق"
+
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
 msgid "Viewing %s course"
@@ -3580,7 +3649,6 @@ msgid "No results found for \"%(query_string)s\". Please try searching again."
 msgstr "رخ قثسعمفس بخعري بخق \"%(query_string)s\". حمثشسث فقغ سثشقذاهرل شلشهر."
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Search Results"
 msgstr "سثشقذا قثسعمفس"
@@ -5475,10 +5543,10 @@ msgid "Show Less"
 msgstr "ساخص مثسس"
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
-msgid "{total_results} result"
-msgid_plural "{total_results} results"
-msgstr[0] "{total_results} قثسعمف"
-msgstr[1] "{total_results} قثسعمفس"
+msgid "{total_results} result found for \"{search_term}\""
+msgid_plural "{total_results} results found for \"{search_term}\""
+msgstr[0] "{total_results} قثسعمف بخعري بخق \"{search_term}\""
+msgstr[1] "{total_results} قثسعمفس بخعري بخق \"{search_term}\""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
