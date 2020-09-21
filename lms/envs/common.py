@@ -3705,7 +3705,7 @@ FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 # IE: custom_form_app.forms.RegistrationExtensionForm
 # Note: If you want to use a model to store the results of the form, you will
 # need to add the model's app to the ADDL_INSTALLED_APPS array in your
-# lms.env.json file.
+# lms.yml file.
 
 REGISTRATION_EXTENSION_FORM = None
 
