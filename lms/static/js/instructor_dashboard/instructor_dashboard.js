@@ -164,6 +164,9 @@ such that the value can be defined later than this assignment (file load order).
                 constructor: window.InstructorDashboard.sections.DataDownload,
                 $element: idashContent.find('.' + CSS_IDASH_SECTION + '#data_download')
             }, {
+                constructor: window.InstructorDashboard.sections.DataDownloadV2,
+                $element: idashContent.find('.' + CSS_IDASH_SECTION + '#data_download_2')
+            }, {
                 constructor: window.InstructorDashboard.sections.ECommerce,
                 $element: idashContent.find('.' + CSS_IDASH_SECTION + '#e-commerce')
             }, {
