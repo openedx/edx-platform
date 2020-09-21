@@ -56,6 +56,8 @@ class DemographicsCollectionModal extends React.Component {
     this.handleMultiselectChange = this.handleMultiselectChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.loadOptions = this.loadOptions.bind(this);
+    this.getDemographicsQuestionOptions = this.getDemographicsQuestionOptions.bind(this);
+    this.getDemographicsData = this.getDemographicsData.bind(this);
 
     // Get JWT token service to ensure the JWT token refreshes if needed
     const accessToken = this.props.jwtAuthToken;
@@ -68,83 +70,10 @@ class DemographicsCollectionModal extends React.Component {
   }
 
   async componentDidMount() {
-    const requestOptions = {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'USE-JWT-COOKIE': true
-      },
-    };
-    let options = {};
-    let optionsResponse = {};
-    let response = {};
-    let data = {};
-
-    // gather options for the demographics selects
-    try {
-      optionsResponse = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, { method: 'OPTIONS' })
-      // this should only fail if demographics is down
-      if (optionsResponse.status !== 200) {
-        let error = await optionsResponse.json().detail;
-        throw error;
-      }
-      options = await optionsResponse.json();
-    } catch (error) {
-      this.setState({ loading: false, error: true, errorMessage: error });
-    }
-
+    const options = await this.getDemographicsQuestionOptions();
     // gather previously answers questions
-    try {
-      await this.jwtTokenService.getJwtToken();
-      response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, requestOptions);
-      // We found the user, return their data
-      if (response.status === 200) {
-        data = await response.json();
-        if (data[FIELD_NAMES.ETHNICITY]) {
-          // map ethnicity data to match what the UI requires
-          data[FIELD_NAMES.ETHNICITY] = this.reduceEthnicityArray(data[FIELD_NAMES.ETHNICITY]);
-        }
-        this.setState({ options: options.actions.POST, loading: false, selected: data });
-      }
-    } catch (e) {
-      // an error other than "no entry found" occured
-      if (response.status !== 404) {
-        this.setState({ loading: false, error: true, errorMessage: error });
-      }
-    }
-    // an entry was not found in demographics, so we can create one
-    if (response.status === 404) {
-      const postUrl = `${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`;
-      let csrfToken;
-      // set the csrf token cookie if not already set
-      try {
-        csrfToken = await this.csrfTokenService.getCsrfToken(postUrl);
-        Cookies.set('demographics_csrftoken', csrfToken)
-      } catch (error) {
-        this.setState({ loading: false, error: true, errorMessage: error });
-      }
-      // Create the entry
-      try {
-        const postOptions = {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'USE-JWT-COOKIE': true,
-            'X-CSRFToken': Cookies.get('demographics_csrftoken')
-          },
-          body: JSON.stringify({
-            user: this.props.user,
-          }),
-        };
-        const postResponse = await fetch(postUrl, postOptions);
-        const postData = await postResponse.json();
-        this.setState({ options: options.actions.POST, loading: false, selected: postData });
-      } catch (e) {
-        this.setState({ loading: false, error: true, errorMessage: error });
-      }
-    }
+    const data = await this.getDemographicsData();
+    this.setState({ options: options.actions.POST, loading: false, selected: data });
     // we add a class here to prevent scrolling on anything that is not the modal
     document.body.classList.add('modal-open');
   }
@@ -170,16 +99,15 @@ class DemographicsCollectionModal extends React.Component {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'USE-JWT-COOKIE': true
+        'USE-JWT-COOKIE': true,
+        'X-CSRFToken': await this.retrieveDemographicsCsrfToken(url),
       },
       body: JSON.stringify({
         [name]: value === "default" ? null : value,
       }),
     };
-
     try {
       await this.jwtTokenService.getJwtToken();
-      options.headers['X-CSRFToken'] = await this.csrfTokenService.getCsrfToken(url);
       await fetch(url, options)
     } catch (error) {
       this.setState({ loading: false, fieldError: true, errorMessage: error });
@@ -228,6 +156,86 @@ class DemographicsCollectionModal extends React.Component {
   // the format the UI requires the data to be in.
   reduceEthnicityArray(ethnicityArray) {
     return ethnicityArray.map((o) => o.ethnicity);
+  }
+
+  // Sets the CSRF token cookie to be used before each request that needs it.
+  // if the cookie is already set, return it instead. We don't have to worry
+  // about the cookie expiring, as it is tied to the session.
+  async retrieveDemographicsCsrfToken(url) {
+    let csrfToken = Cookies.get('demographics_csrftoken');
+    if (!csrfToken) {
+      // set the csrf token cookie if not already set
+      csrfToken = await this.csrfTokenService.getCsrfToken(url);
+      Cookies.set('demographics_csrftoken', csrfToken);
+    }
+    return csrfToken;
+  }
+
+  // We gather the possible answers to any demographics questions from the OPTIONS of the api
+  async getDemographicsQuestionOptions() {
+    try {
+      const optionsResponse = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, { method: 'OPTIONS' })
+      const demographicsOptions = await optionsResponse.json();
+      return demographicsOptions;
+    } catch (error) {
+      this.setState({ loading: false, error: true, errorMessage: error });
+    }
+  }
+
+  async getDemographicsData() {
+    const requestOptions = {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'USE-JWT-COOKIE': true
+      },
+    };
+    let response;
+    let data;
+    try {
+      await this.jwtTokenService.getJwtToken();
+      response = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`, requestOptions);
+    } catch (e) {
+      // an error other than "no entry found" occured
+      this.setState({ loading: false, error: true, errorMessage: e });
+    }
+    // an entry was not found in demographics, so we need to create one
+    if (response.status === 404) {
+      data = await this.createDemographicsEntry();
+      return data;
+    }
+    // Otherwise, just return the data found
+    data = await response.json();
+      if (data[FIELD_NAMES.ETHNICITY]) {
+        // map ethnicity data to match what the UI requires
+        data[FIELD_NAMES.ETHNICITY] = this.reduceEthnicityArray(data[FIELD_NAMES.ETHNICITY]);
+      }
+      return data;
+  }
+
+  async createDemographicsEntry() {
+    const postUrl = `${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`;
+      const postOptions = {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'USE-JWT-COOKIE': true,
+          'X-CSRFToken': await this.retrieveDemographicsCsrfToken(postUrl),
+        },
+        body: JSON.stringify({
+          user: this.props.user,
+        }),
+      };
+      // Create the entry for the user
+      try {
+        const postResponse = await fetch(postUrl, postOptions);
+        const data = await postResponse.json();
+        return data;
+      } catch (e) {
+        this.setState({ loading: false, error: true, errorMessage: e });
+      }
   }
 
   render() {
@@ -458,7 +466,7 @@ class DemographicsCollectionModal extends React.Component {
           </Wizard.Page>
           <Wizard.Closer>
             <div className="demographics-modal-closer m-sm-0">
-              <i class="fa fa-check" aria-hidden="true"></i>
+              <i className="fa fa-check" aria-hidden="true"></i>
               <h3>
                 {gettext("Thank you! You’re helping make edX better for everyone.")}
               </h3>
