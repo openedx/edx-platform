@@ -6,7 +6,7 @@
 #
 common/lib/sandbox-packages  # via -r requirements/edx-sandbox/py35.in
 common/lib/symmath  # via -r requirements/edx-sandbox/py35.in
-cffi==1.14.2              # via -r requirements/edx-sandbox/shared.txt, cryptography
+cffi==1.14.3              # via -r requirements/edx-sandbox/shared.txt, cryptography
 chem==1.2.0               # via -r requirements/edx-sandbox/py35.in
 click==7.1.2              # via -r requirements/edx-sandbox/shared.txt, nltk
 cryptography==3.1         # via -r requirements/edx-sandbox/shared.txt

@@ -114,7 +114,7 @@ newrelic                            # New Relic agent for performance monitoring
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 openedx-calc                        # Library supporting mathematical calculations for Open edX
-ora2
+git+https://github.com/edx/edx-ora2.git@jkantor/regisb/boto2to3#egg=ora2
 pdfminer.six                        # Used in shoppingcart for extracting/parsing pdf text
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
