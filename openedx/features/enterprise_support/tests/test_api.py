@@ -19,6 +19,7 @@ from six.moves.urllib.parse import parse_qs
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
+    ENTERPRISE_CUSTOMER_KEY_NAME,
     ConsentApiClient,
     ConsentApiServiceClient,
     EnterpriseApiClient,
@@ -30,6 +31,7 @@ from openedx.features.enterprise_support.api import (
     get_consent_required_courses,
     get_dashboard_consent_notification,
     get_enterprise_consent_url,
+    get_enterprise_learner_portal_enabled_message,
     insert_enterprise_pipeline_elements
 )
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
@@ -218,13 +220,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
         data_sharing_consent.save()
         consent_required = get_consent_required_courses(user, [course_id])
-        self.assertTrue(course_id in consent_required)
+        self.assertIn(course_id, consent_required)
 
         # now grant consent and call our method again
         data_sharing_consent.granted = True
         data_sharing_consent.save()
         consent_required = get_consent_required_courses(user, [course_id])
-        self.assertFalse(course_id in consent_required)
+        self.assertNotIn(course_id, consent_required)
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
@@ -595,3 +597,82 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
                                     'enterprise.tpa_pipeline.handle_enterprise_logistration',
                                     'social_core.pipeline.social_auth.load_extra_data',
                                     'def'])
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    def test_enterprise_learner_portal_message_cache_miss_no_customer(self, mock_learner_data_from_db):
+        """
+        When no customer data exists in the request session _and_
+        no customer is associated with the requesting user, then ``get_enterprise_learner_portal_enabled_message()``
+        should return None.
+        """
+        mock_request = mock.Mock(session={})
+        mock_learner_data_from_db.return_value = None
+
+        actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
+        self.assertIsNone(actual_result)
+        mock_learner_data_from_db.assert_called_once_with(mock_request.user)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    @override_settings(ENTERPRISE_LEARNER_PORTAL_BASE_URL='http://localhost')
+    def test_enterprise_learner_portal_message_cache_miss_customer_exists(self, mock_learner_data_from_db):
+        """
+        When no customer data exists in the request session but a
+        customer is associated with the requesting user, then ``get_enterprise_learner_portal_enabled_message()``
+        should return an appropriate message for that customer.
+        """
+        mock_request = mock.Mock(session={})
+        mock_enterprise_customer = {
+            'uuid': 'some-uuid',
+            'name': 'Best Corp',
+            'enable_learner_portal': True,
+            'slug': 'best-corp',
+        }
+        mock_learner_data_from_db.return_value = [
+            {
+                'enterprise_customer': mock_enterprise_customer,
+            },
+        ]
+
+        actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
+        self.assertIn('custom dashboard for learning', actual_result)
+        self.assertIn('Best Corp', actual_result)
+        mock_learner_data_from_db.assert_called_once_with(mock_request.user)
+        # assert we cached the enterprise customer data in the request session after fetching it
+        assert mock_request.session.get(ENTERPRISE_CUSTOMER_KEY_NAME) == mock_enterprise_customer
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    def test_enterprise_learner_portal_message_cache_hit_no_customer(self, mock_learner_data_from_db):
+        """
+        When customer data exists in the request session but it's null/empty,
+        then ``get_enterprise_learner_portal_enabled_message()`` should return None.
+        """
+        mock_request = mock.Mock(session={
+            ENTERPRISE_CUSTOMER_KEY_NAME: None,
+        })
+
+        actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
+        self.assertIsNone(actual_result)
+        self.assertFalse(mock_learner_data_from_db.called)
+
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db')
+    @override_settings(ENTERPRISE_LEARNER_PORTAL_BASE_URL='http://localhost')
+    def test_enterprise_learner_portal_message_cache_hit_customer_exists(self, mock_learner_data_from_db):
+        """
+        When customer data exists in the request session and it's a non-empty customer,
+        then ``get_enterprise_learner_portal_enabled_message()`` should return
+        an appropriate message for that customer.
+        """
+        mock_enterprise_customer = {
+            'uuid': 'some-uuid',
+            'name': 'Best Corp',
+            'enable_learner_portal': True,
+            'slug': 'best-corp',
+        }
+        mock_request = mock.Mock(session={
+            ENTERPRISE_CUSTOMER_KEY_NAME: mock_enterprise_customer,
+        })
+
+        actual_result = get_enterprise_learner_portal_enabled_message(mock_request)
+        self.assertIn('custom dashboard for learning', actual_result)
+        self.assertIn('Best Corp', actual_result)
+        self.assertFalse(mock_learner_data_from_db.called)
