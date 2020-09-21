@@ -11,4 +11,4 @@ class SiteUnavailableView(TemplateView):
 
     This works in the LMS and shows a message.
     """
-    template_name = 'site-unavailable.html'
+    template_name = 'static_templates/site-unavailable.html'
