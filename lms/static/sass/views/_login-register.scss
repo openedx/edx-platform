@@ -626,14 +626,15 @@ ul.fa-ul{
 
       span {
         vertical-align: middle;
-        font-size: 120%;
+        @include font-size(15);
       }
 
       .icon {
         background: transparent;
 
         .icon-image {
-          margin-left: 2px;
+          max-height: 3em;
+          max-width: 2.5em;
           margin-top: 0px;
         }
       }
