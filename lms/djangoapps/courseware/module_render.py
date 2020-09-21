@@ -25,7 +25,7 @@ from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from edx_django_utils.cache import RequestCache
-from edx_django_utils.monitoring import set_custom_attributes_for_course_key, set_monitoring_transaction_name
+from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_monitoring_transaction_name
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -1159,7 +1159,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     except InvalidKeyError:
         raise Http404
 
-    set_custom_attributes_for_course_key(course_key)
+    set_custom_metrics_for_course_key(course_key)
 
     with modulestore().bulk_operations(course_key):
         try:

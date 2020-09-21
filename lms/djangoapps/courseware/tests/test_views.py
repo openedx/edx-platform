@@ -3120,8 +3120,8 @@ class DatesTabTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
     @RELATIVE_DATES_FLAG.override(active=True)
-    @patch('edx_django_utils.monitoring.set_custom_attribute')
-    def test_defaults(self, mock_set_custom_attribute):
+    @patch('edx_django_utils.monitoring.set_custom_metric')
+    def test_defaults(self, mock_set_custom_metric):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
         with self.store.bulk_operations(self.course.id):
@@ -3169,7 +3169,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
 
             response = self._get_response(self.course)
 
-            mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=True)
+            mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
             self.assertContains(response, subsection.display_name)
             # Don't show the Verification Deadline for audit
             self.assertNotContains(response, 'Verification Deadline')

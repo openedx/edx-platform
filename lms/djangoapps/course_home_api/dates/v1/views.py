@@ -77,9 +77,9 @@ class DatesTabView(RetrieveAPIView):
             raise Http404
 
         # Enable NR tracing for this view based on course
-        monitoring_utils.set_custom_attribute('course_id', course_key_string)
-        monitoring_utils.set_custom_attribute('user_id', request.user.id)
-        monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
+        monitoring_utils.set_custom_metric('course_id', course_key_string)
+        monitoring_utils.set_custom_metric('user_id', request.user.id)
+        monitoring_utils.set_custom_metric('is_staff', request.user.is_staff)
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
 
