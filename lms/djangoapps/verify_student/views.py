@@ -910,7 +910,7 @@ class SubmitPhotosView(View):
             log.error(
                 (
                     u"User %s does not have an initial verification attempt "
-                    "and no photo ID image data was p rovided. "
+                    "and no photo ID image data was provided. "
                     "This most likely means that the JavaScript client is not "
                     "correctly constructing the request to submit photos."
                 ), request.user.id
