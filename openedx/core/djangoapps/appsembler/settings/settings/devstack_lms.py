@@ -31,7 +31,7 @@ def plugin_settings(settings):
         # LMS-generated files looks like: `appsembler-academy.tahoe.appsembler.com.css`
         customer_themes_dir = path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes')
         if path.isdir(customer_themes_dir):
-            settings.STATICFILES_DIRS.insert(0, customer_themes_dir)
+            settings.STATICFILES_DIRS.insert(0, ('customer_themes', customer_themes_dir))
 
     # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
     # from the redirect mechanics.
