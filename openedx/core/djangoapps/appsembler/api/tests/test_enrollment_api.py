@@ -11,6 +11,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 
 import ddt
 import mock
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
 from openedx.core.djangoapps.site_configuration.tests.factories import (
     SiteFactory,
@@ -26,7 +27,7 @@ from organizations.models import UserOrganizationMapping
 from openedx.core.djangoapps.appsembler.api.sites import (
     get_enrollments_for_site,
 )
-
+from openedx.core.djangoapps.appsembler.api.v1.waffle import FIX_ENROLLMENT_RESULTS_BUG
 from openedx.core.djangoapps.appsembler.api.tests.factories import (
     CourseOverviewFactory,
     OrganizationFactory,
@@ -250,14 +251,14 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         assert after_other_site_ce_count == before_other_site_ce_count
         assert after_other_site_user_count == before_other_site_user_count
 
-        assert after_my_site_ce_count == before_my_site_ce_count + len(reg_users)
-        assert after_my_site_user_count == before_my_site_user_count
+        assert after_my_site_ce_count == before_my_site_ce_count + len(reg_users), response.content
+        assert after_my_site_user_count == before_my_site_user_count, response.content
 
         # By comparing the total count of CourseEnrollmentAllowed records to the
         # number of new users, we verify that CourseEnrollmentAllowed records
         # are not created for the other site. However, this is a hack and brittle.
         # Therefore we want to test this in a more robust way
-        assert CourseEnrollmentAllowed.objects.count() == len(new_users_emails)
+        assert CourseEnrollmentAllowed.objects.count() == len(new_users_emails), response.content
 
         for rec in results:
             assert 'error' not in rec
@@ -285,6 +286,52 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
                 assert not CourseEnrollmentAllowed.objects.filter(
                     email=rec['identifier']).exists()
 
+    @override_waffle_flag(FIX_ENROLLMENT_RESULTS_BUG, True)
+    def test_enroll_learner_in_two_courses(self):
+        """
+        Enroll a learner in two courses in a single call.
+        """
+        assert FIX_ENROLLMENT_RESULTS_BUG.is_enabled(), 'Fix can be enabled'
+        new_users_email = 'alpha@example.com'
+        payload = {
+            'action': 'enroll',
+            'auto_enroll': True,
+            # Enroll both of the registered users and new ones
+            'identifiers': [new_users_email],
+            'email_learners': True,
+            'courses': [str(co.id) for co in self.my_course_overviews],
+        }
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': payload,
+        })
+        results = response.data['results']
+        assert CourseEnrollmentAllowed.objects.count() == len(self.my_course_overviews)
+        assert len(results) == len(self.my_course_overviews), 'Ensure result from all courses are returned'
+
+    def test_enroll_learner_in_two_courses_with_bug(self):
+        """
+        Enroll a learner in two courses in a single call, but preserve the resutls bug.
+
+        Really? Yup, until the fix is rolled out to all customers. See RED-1386.
+        TODO: RED-1387: This temporary and should be removed.
+        """
+        assert not FIX_ENROLLMENT_RESULTS_BUG.is_enabled(), 'Ensure fix is disabled by default'
+        new_users_email = 'alpha@example.com'
+        payload = {
+            'action': 'enroll',
+            'auto_enroll': True,
+            # Enroll both of the registered users and new ones
+            'identifiers': [new_users_email],
+            'email_learners': True,
+            'courses': [str(co.id) for co in self.my_course_overviews],
+        }
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': payload,
+        })
+        results = response.data['results']
+        assert CourseEnrollmentAllowed.objects.count() == len(self.my_course_overviews)
+        assert len(results) == 1, 'Ensure the flag preserves the original bug in results'
+
     def test_enroll_with_other_site_course(self):
 
         reg_users = [UserFactory(), UserFactory()]
@@ -306,24 +353,6 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         assert response.data['error'] == 'invalid-course-ids'
         assert set(response.data['invalid_course_ids']) == set(invalid_course_ids)
 
-    def test_enroll_with_unsupported_unenroll(self):
-        reg_users = [UserFactory(), UserFactory()]
-        # TODO: Improvement - make sure these emails don't exist
-        learner_emails = [obj.email for obj in reg_users]
-        course_ids = [str(co.id) for co in self.my_course_overviews]
-        response = self.call_enrollment_api('post', self.my_site, self.caller, {
-            'data': {
-                'action': 'unenroll',
-                'auto_enroll': True,
-                'identifiers': learner_emails,
-                'email_learners': True,
-                'courses': course_ids,
-            },
-        })
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data['error'] == 'action-not-supported'
-        assert response.data['action_not_supported'] == 'unenroll'
-
     @ddt.data(None, 'spam', 'delete')
     def test_enroll_with_invalid_action(self, action):
         reg_users = [UserFactory(), UserFactory()]
@@ -342,3 +371,100 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data['action'] == [u'"{}" is not a valid choice.'.format(
             'None' if not action else action)]
+
+
+@ddt.ddt
+@mock.patch(APPSEMBLER_API_VIEWS_MODULE + '.EnrollmentViewSet.throttle_classes', [])
+class EnrollmentApiUnenrollPostTest(BaseEnrollmentApiTestCase):
+    """
+    Test cases for the `unenroll` action.
+    """
+
+    NEW_USERS_EMAILS = ['alpha@example.com', 'bravo@example.com']
+
+    def setUp(self):
+        super(EnrollmentApiUnenrollPostTest, self).setUp()
+        self.reg_users = [UserFactory(), UserFactory()]
+        self.first_course = self.my_course_overviews[0]
+        for reg_user in self.reg_users:
+            # add the users to the site, otherwise they won't have new enrollments
+            UserOrganizationMappingFactory(user=reg_user, organization=self.my_site_org)
+            # make sure that the registered users are not in the enrollments
+            mode, is_active = CourseEnrollment.enrollment_mode_for_user(reg_user, self.first_course.id)
+            assert mode is None and is_active is None, "email: {}".format(reg_user.email)
+
+        # Enroll 2 users and invite another two via email (as CourseEnrollmentAllowed)
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': {
+                'action': 'enroll',
+                # Enroll both of the registered users and new ones
+                'identifiers': [obj.email for obj in self.reg_users] + self.NEW_USERS_EMAILS,
+                'email_learners': True,
+                'courses': [
+                    str(self.first_course.id)
+                ],
+            },
+        })
+        assert response.status_code == status.HTTP_201_CREATED, response.content
+        assert CourseEnrollmentAllowed.objects.count() == len(self.NEW_USERS_EMAILS), response.content
+
+    def test_unenroll_learners_on_my_site(self):
+        """
+        Test successful unenroll on my site for registered learners (not CourseEnrollmentAllowed).
+        """
+        payload = {
+            'action': 'unenroll',
+            # Enroll both of the registered users and new ones
+            'identifiers': [obj.email for obj in self.reg_users],
+            'courses': [
+                str(self.first_course.id)
+            ],
+        }
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': payload,
+        })
+        assert response.status_code == status.HTTP_200_OK, response.content
+        message = 'Enrollments should all be deleted'
+        assert not CourseEnrollment.is_enrolled(self.reg_users[0], self.first_course.id), message
+        assert not CourseEnrollment.is_enrolled(self.reg_users[1], self.first_course.id), message
+
+    def test_unenroll_on_other_site(self):
+        payload = {
+            'action': 'unenroll',
+            # Enroll both of the registered users and new ones
+            'identifiers': [obj.email for obj in self.reg_users],
+            'courses': [
+                str(self.first_course.id)
+            ],
+        }
+        other_site_caller = UserFactory()
+        UserOrganizationMappingFactory(user=other_site_caller,
+                                       organization=self.other_site_org,
+                                       is_amc_admin=True)
+
+        response = self.call_enrollment_api('post', self.other_site, other_site_caller, {
+            'data': payload,
+        })
+        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.content
+        message = 'Security: Enrollments should NOT be touched'
+        assert 'invalid_course_ids' in response.content, message
+        assert CourseEnrollment.is_enrolled(self.reg_users[0], self.first_course.id), message
+        assert CourseEnrollment.is_enrolled(self.reg_users[1], self.first_course.id), message
+
+    def test_unenroll_on_enrollment_allowed(self):
+        payload = {
+            'action': 'unenroll',
+            # Enroll both of the registered users and new ones
+            'identifiers': self.NEW_USERS_EMAILS,
+            'courses': [
+                str(self.first_course.id)
+            ],
+        }
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': payload,
+        })
+        assert response.status_code == status.HTTP_200_OK, response.content
+        assert not CourseEnrollmentAllowed.objects.count(), '{} {}'.format(
+            response.content,
+            'CourseEnrollmentAllowed: should be removed',
+        )
