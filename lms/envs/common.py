@@ -3345,6 +3345,7 @@ OPTIONAL_APPS = [
     ('integrated_channels.cornerstone', None),
     ('integrated_channels.xapi', None),
     ('integrated_channels.canvas', None),
+    ('integrated_channels.moodle', None),
 
     # Required by the Enterprise App
     ('django_object_actions', None),  # https://github.com/crccheck/django-object-actions

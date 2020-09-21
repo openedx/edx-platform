@@ -1656,6 +1656,7 @@ OPTIONAL_APPS = (
     ('integrated_channels.xapi', None),
     ('integrated_channels.cornerstone', None),
     ('integrated_channels.canvas', None),
+    ('integrated_channels.moodle', None),
 )
 
 
