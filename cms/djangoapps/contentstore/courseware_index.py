@@ -388,7 +388,6 @@ class CoursewareSearchIndexer(SearchIndexerBase):
             )
         return indexed_count
 
-
     @classmethod
     def fetch_group_usage(cls, modulestore, structure):
         groups_usage_dict = {}
