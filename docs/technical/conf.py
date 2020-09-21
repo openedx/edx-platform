@@ -1,5 +1,5 @@
 """
-Configuration file for the generation of feature toggle documentation.
+Configuration file for the generation of technical documentation.
 """
 import os
 
@@ -8,7 +8,7 @@ import git
 
 # -- Project information -----------------------------------------------------
 
-project = "Open edX feature toggles"
+project = "edx-platform technical reference"
 copyright = edx_theme.COPYRIGHT  # pylint: disable=redefined-builtin
 author = edx_theme.AUTHOR
 release = ""
