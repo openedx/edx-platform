@@ -4,12 +4,12 @@ Tests for Blockstore-based Content Libraries
 """
 from contextlib import contextmanager
 from io import BytesIO
-from mock import patch
 from urllib.parse import urlencode
 import unittest
 
 from django.conf import settings
 from django.test.utils import override_settings
+from mock import patch
 from organizations.models import Organization
 from rest_framework.test import APITestCase, APIClient
 from search.search_engine_base import SearchEngine

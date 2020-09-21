@@ -160,6 +160,12 @@ PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 # Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
 FAVICON_PATH = 'images/favicon.ico'
+
+
+# .. setting_name: STUDIO_NAME
+# .. setting_default: Your Platform Studio
+# .. setting_description: The name that will appear on the landing page of Studio, as well as in various emails and
+#   templates.
 STUDIO_NAME = _("Your Platform Studio")
 STUDIO_SHORT_NAME = _("Studio")
 FEATURES = {

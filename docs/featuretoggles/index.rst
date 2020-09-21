@@ -1,3 +1,22 @@
+Open edX Django settings
+========================
+
+This is the list of Django settings defined in the ``common.py`` modules of edx-platform.
+
+LMS settings
+------------
+
+.. TODO move this to a dedicated page
+.. settings::
+    :folder_path: lms/envs/common.py
+
+CMS settings
+------------
+
+.. settings::
+    :folder_path: cms/envs/common.py
+
+
 Open edX Feature Toggles
 ========================
 
