@@ -87,20 +87,63 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
 
         return value
 
-    def validate_signature(self, value):
-        """ Validate the signature and ensure the provider is setup properly. """
-        provider_id = self.provider.provider_id
-        secret_key = get_shared_secret_key(provider_id)
+    def _check_keys_exist_for_provider(self, secret_key, provider_id):
+        """
+        Verify there are keys available in the secret to
+        verify signature against.
+
+        Throw error if none are available.
+        """
+
+        # Accounts for old way of storing provider key
         if secret_key is None:
             msg = 'Could not retrieve secret key for credit provider [{}]. ' \
                   'Unable to validate requests from provider.'.format(provider_id)
             log.error(msg)
             raise PermissionDenied(msg)
 
+        # Accounts for new way of storing provider key
+        # We need at least 1 key value here that we can use to validate the signature
+        if isinstance(secret_key, dict) and not any(secret_key.values()):
+            msg = 'Could not retrieve secret key for credit provider [{}]. ' \
+              'Unable to validate requests from provider.'.format(provider_id)
+            log.error(msg)
+            raise PermissionDenied(msg)
+
+    def _compare_signatures(self, secret_key, provider_id):
+        """
+        Compare signature we received with the signature we expect/have.
+
+        Throw an error if they don't match.
+        """
+
         data = self.initial_data
         actual_signature = data["signature"]
-        if signature(data, secret_key) != actual_signature:
+
+        # Accounts for old way of storing provider key
+        if isinstance(secret_key, six.text_type) and signature(data, secret_key) != actual_signature:
             msg = 'Request from credit provider [{}] had an invalid signature.'.format(provider_id)
             raise PermissionDenied(msg)
+
+        # Accounts for new way of storing provider key
+        if isinstance(secret_key, dict):
+            # Received value just needs to match one of the keys we have
+            key_match = False
+            for secretvalue in secret_key.values():
+                if signature(data, secret_key) == actual_signature:
+                    key_match = True
+
+            if not key_match:
+                msg = 'Request from credit provider [{}] had an invalid signature.'.format(provider_id)
+                raise PermissionDenied(msg)
+
+
+    def validate_signature(self, value):
+        """ Validate the signature and ensure the provider is setup properly. """
+        provider_id = self.provider.provider_id
+        secret_key = get_shared_secret_key(provider_id)
+
+        self._check_keys_exist_for_provider(secret_key, provider_id)
+        self._compare_signatures(secret_key, provider_id)
 
         return value

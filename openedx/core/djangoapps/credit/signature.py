@@ -27,18 +27,47 @@ from django.conf import settings
 log = logging.getLogger(__name__)
 
 
+def _encode_secret(secret, provider_id):
+    """
+    Helper function for encoding text_type secrets into ascii.
+    """
+    try:
+        secret.encode('ascii')
+    except UnicodeEncodeError:
+        secret = None
+        log.error(u'Shared secret key for credit provider "%s" contains non-ASCII unicode.', provider_id)
+
+    return secret
+
 def get_shared_secret_key(provider_id):
     """
-    Retrieve the shared secret key for a particular credit provider.
+    Retrieve the shared secret for a particular credit provider.
+
+    It is possible for the secret to be stored in 2 ways:
+    1 - a key/value pair of provider_id and secret string
+        {'cool_school': '123abc'}
+    2 - a key/value pair of provider_id and secret dict (which should contain old
+        and new keys with their respective values)
+        {'cool_school':
+          {
+          'previous_key': '987zyx',
+          'current_key': '123abc',
+          }
+        }
     """
+
     secret = getattr(settings, "CREDIT_PROVIDER_SECRET_KEYS", {}).get(provider_id)
 
+    # When secret is just characters
     if isinstance(secret, six.text_type):
-        try:
-            secret.encode('ascii')
-        except UnicodeEncodeError:
-            secret = None
-            log.error(u'Shared secret key for credit provider "%s" contains non-ASCII unicode.', provider_id)
+        secret = _encode_secret(secret, provider_id)
+
+    # When secret is a dict containing old and new keys, encode both key values if
+    # appropriate
+    elif isinstance(secret, dict):
+        for keyname, keyvalue in secret.items():
+            if isinstance(keyvalue, six.text_type):
+                secret[keyname] = _encode_secret(keyvalue, provider_id)
 
     return secret
 
