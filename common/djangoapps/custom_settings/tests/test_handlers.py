@@ -1,3 +1,6 @@
+"""
+All unit test for handlers in custom settings app
+"""
 import pytest
 
 from course_modes.models import CourseMode

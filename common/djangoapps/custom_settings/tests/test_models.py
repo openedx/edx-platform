@@ -1,3 +1,6 @@
+"""
+All unit test for models in custom settings app
+"""
 import pytest
 
 from .factories import CustomSettingsFactory

@@ -1,3 +1,6 @@
+"""
+All handlers for custom settings app
+"""
 from logging import getLogger
 
 from django.db.models.signals import post_save
@@ -11,7 +14,7 @@ log = getLogger(__name__)
 
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="custom_settings.signals.handlers.initialize_course_settings")
-def initialize_course_settings(sender, instance, created, **kwargs):
+def initialize_course_settings(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """
     When ever a new course is created
     1: We add a default entry for the given course in the CustomSettings Model

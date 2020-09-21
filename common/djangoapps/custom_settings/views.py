@@ -1,3 +1,6 @@
+"""
+All views for custom settings app
+"""
 import json
 import logging
 

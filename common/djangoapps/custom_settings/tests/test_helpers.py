@@ -1,3 +1,7 @@
+"""
+All unit test for helpers in custom settings app
+"""
+# pylint: disable=redefined-outer-name
 from datetime import datetime
 
 import pytest

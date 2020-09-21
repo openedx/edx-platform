@@ -1,3 +1,6 @@
+"""
+All models for custom settings
+"""
 import json
 
 from django.db import models
@@ -26,7 +29,7 @@ class CustomSettings(models.Model):
     def __unicode__(self):
         return '{} | {}'.format(self.id, self.is_featured)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         # This means that the model isn't saved to the database yet
         if self._state.adding and not self.course_short_id:
             # Get the maximum course_short_id value from the database
@@ -45,8 +48,10 @@ class CustomSettings(models.Model):
 
     def get_course_meta_tags(self):
         """
-        :return:
-            get seo tags for course
+        Extract and get course meta tags from seo_tags, if seo_tags is empty return empty course meta tags
+
+        Returns:
+            dict: Course meta tags
         """
         title, description, keywords, robots, utm_params = "", "", "", "", {}
         if self.seo_tags:
