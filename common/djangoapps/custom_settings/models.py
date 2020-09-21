@@ -12,7 +12,7 @@ class CustomSettingsManager(models.Manager):
     """
     def is_mini_lesson(self, course_key):
         """
-        This method checks course with course_key is mini lesson or not
+        This method checks course with course_key if it is mini lesson or not
 
         Args:
             course_key (CourseKey, str): Course key
