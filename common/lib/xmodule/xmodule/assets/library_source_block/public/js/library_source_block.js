@@ -1,17 +1,25 @@
-/* JavaScript for allowing editing options on LibrarySourceBlock's author view */
-window.LibrarySourceBlockAuthorView = function(runtime, element) {
+/* JavaScript for allowing editing options on LibrarySourceBlock's studio view */
+window.LibrarySourceBlockStudioView = function(runtime, element) {
     'use strict';
-    var $element = $(element);
+    var self = this;
 
-    $element.on('click', '.save-btn', function(e) {
+    $('#library-sourced-block-picker', element).on('selected-xblocks', function(e, params) {
+        self.sourceBlockIds = params.sourceBlockIds;
+    });
+
+    $('#library-sourced-block-picker', element).on('error', function(e, params) {
+        runtime.notify('error', {title: gettext(params.title), message: params.message});
+    });
+
+    $('.save-button', element).on('click', function(e) {
+        e.preventDefault();
         var url = $(e.target).data('submit-url');
         var data = {
             values: {
-                source_block_id: $element.find('input').val()
+                source_block_ids: self.sourceBlockIds
             },
             defaults: ['display_name']
         };
-        e.preventDefault();
 
         runtime.notify('save', {
             state: 'start',
@@ -41,5 +49,10 @@ window.LibrarySourceBlockAuthorView = function(runtime, element) {
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
+    });
+
+    $('.cancel-button', element).on('click', function(e) {
+        e.preventDefault();
+        runtime.notify('cancel', {});
     });
 };
