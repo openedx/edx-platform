@@ -3,8 +3,11 @@ A custom Strategy for python-social-auth that allows us to fetch configuration f
 ConfigurationModels rather than django.settings
 """
 
+from django.contrib.sites.models import Site
 from social_core.backends.oauth import OAuthAuth
 from social_django.strategy import DjangoStrategy
+
+from openedx.core.djangoapps.theming.helpers import get_current_request
 
 from .models import OAuth2ProviderConfig
 from .pipeline import get as get_pipeline_from_request
@@ -29,7 +32,8 @@ class ConfigurationModelStrategy(DjangoStrategy):
             setting 'name' is configured via LTIProviderConfig.
         """
         if isinstance(backend, OAuthAuth):
-            provider_config = OAuth2ProviderConfig.current(backend.name)
+            site = Site.objects.get_current(get_current_request())
+            provider_config = OAuth2ProviderConfig.current(backend.name, site)
             if not provider_config.enabled_for_current_site:
                 raise Exception("Can't fetch setting of a disabled backend/provider.")
             try:

@@ -28,12 +28,13 @@ class Registry(object):
         Helper method that returns a generator used to iterate over all providers
         of the current site.
         """
+        site = Site.objects.get_current(get_current_request())
         oauth2_backend_names = OAuth2ProviderConfig.key_values('backend_name', flat=True)
         for oauth2_backend_name in oauth2_backend_names:
-            provider = OAuth2ProviderConfig.current(oauth2_backend_name)
+            provider = OAuth2ProviderConfig.current(oauth2_backend_name, site)
             if provider.enabled_for_current_site and provider.backend_name in _PSA_OAUTH2_BACKENDS:
                 yield provider
-        if SAMLConfiguration.is_enabled(Site.objects.get_current(get_current_request()), 'default'):
+        if SAMLConfiguration.is_enabled(site, 'default'):
             idp_slugs = SAMLProviderConfig.key_values('slug', flat=True)
             for idp_slug in idp_slugs:
                 provider = SAMLProviderConfig.current(idp_slug)
@@ -111,14 +112,14 @@ class Registry(object):
         Yields:
             Instances of ProviderConfig.
         """
+        site = Site.objects.get_current(get_current_request())
         if backend_name in _PSA_OAUTH2_BACKENDS:
             oauth2_backend_names = OAuth2ProviderConfig.key_values('backend_name', flat=True)
             for oauth2_backend_name in oauth2_backend_names:
-                provider = OAuth2ProviderConfig.current(oauth2_backend_name)
+                provider = OAuth2ProviderConfig.current(oauth2_backend_name, site)
                 if provider.backend_name == backend_name and provider.enabled_for_current_site:
                     yield provider
-        elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled(
-                Site.objects.get_current(get_current_request()), 'default'):
+        elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled(site, 'default'):
             idp_names = SAMLProviderConfig.key_values('slug', flat=True)
             for idp_name in idp_names:
                 provider = SAMLProviderConfig.current(idp_name)
