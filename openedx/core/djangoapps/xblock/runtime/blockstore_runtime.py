@@ -11,6 +11,7 @@ from opaque_keys.edx.locator import BundleDefinitionLocator
 from xblock.exceptions import NoSuchDefinition, NoSuchUsage
 from xblock.fields import ScopeIds
 
+from openedx.core.djangoapps.xblock.runtime.transitional_service import TransitionalService
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntime
 from openedx.core.djangoapps.xblock.runtime.olx_parsing import parse_xblock_include, BundleFormatException
@@ -32,6 +33,14 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
     """
     def parse_xml_file(self, fileobj, id_generator=None):
         raise NotImplementedError("Use parse_olx_file() instead")
+
+    def service(self, block, service_name):
+        """
+        Adding in a hacky shim to make sure we can load the TransitionalService. Is there a better place to inject it?
+        """
+        if service_name == 'transitional':
+            return TransitionalService()
+        return super(BlockstoreXBlockRuntime, self).service(block, service_name)
 
     def get_block(self, usage_id, for_parent=None):
         """

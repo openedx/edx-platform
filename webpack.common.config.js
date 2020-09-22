@@ -79,6 +79,7 @@ module.exports = Merge.smart({
             'js/factories/xblock_validation': './cms/static/js/factories/xblock_validation.js',
             'js/factories/edit_tabs': './cms/static/js/factories/edit_tabs.js',
             'js/sock': './cms/static/js/sock.js',
+            VideoBlockEditor: './common/lib/xmodule/xmodule/video_module/static/VideoBlock/index.jsx',
 
             // LMS
             SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',

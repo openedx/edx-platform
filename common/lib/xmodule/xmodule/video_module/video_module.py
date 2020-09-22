@@ -12,7 +12,7 @@ Examples of html5 videos for manual testing:
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv
 """
-
+from urllib.parse import urlparse, parse_qs
 
 import copy
 import json
@@ -25,7 +25,9 @@ from django.conf import settings
 from edx_django_utils.cache import RequestCache
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
+from rest_framework import status
 from web_fragments.fragment import Fragment
+from webob import Response
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
@@ -109,7 +111,7 @@ EXPORT_IMPORT_COURSE_DIR = u'course'
 EXPORT_IMPORT_STATIC_DIR = u'static'
 
 
-@XBlock.wants('settings', 'completion', 'i18n', 'request_cache')
+@XBlock.wants('settings', 'completion', 'i18n', 'request_cache', 'transitional')
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         TabsEditingMixin, EmptyDataRawMixin, XmlMixin, EditingMixin,
@@ -227,6 +229,73 @@ class VideoBlock(
 
         return False
 
+    def get_settings(self):
+        """
+        Grabs the data that studio_view usually sends to the template rendering system and derives the fields
+        to display/edit from that.
+        """
+        context = self.get_context()
+        block_settings = {key: value['value'] for (key, value) in context['editable_metadata_fields'].items()}
+        block_settings.update({
+            key: value['value'] for (key, value) in context['transcripts_basic_tab_metadata'].items()
+        })
+        return block_settings
+
+    @XBlock.handler
+    def load_settings(self, data, suffix=''):
+        return Response(json=self.get_settings())
+
+    def set_video_values(self, video_urls):
+        """
+        This function takes 'video_url' (which is a list of URLs for videos for the block to load, depending on
+        compatibility) and determines what settings should be set on the block from it. We may not need this function
+        in the final version-- perhaps the data should be properly derived by the front end, and we POST
+        the target fields instead.
+        """
+        youtube_id_1_0 = ''
+        html5_sources = []
+        for url in video_urls:
+            parsed_url = urlparse(url)
+            if parsed_url.netloc in ['youtube.com', 'www.youtube.com']:
+                youtube_id_1_0 = parse_qs(parsed_url.query)['v'][0]
+            elif parsed_url.netloc == 'youtu.be':
+                youtube_id_1_0 = parsed_url.path.replace('/', '')
+            elif len(html5_sources) < 2:
+                html5_sources.append(url)
+        self.youtube_id_1_0 = youtube_id_1_0
+        self.html5_sources = html5_sources
+
+    @XBlock.json_handler
+    def save_settings(self, data, suffix=''):
+        """
+        Saves settings via AJAX request.
+        """
+        block_settings = self.get_settings()
+        errors = {}
+        for key, value in data.items():
+            if key in block_settings:
+                if hasattr(self, key):
+                    # At least one field isn't real, which is video_url. There may be more.
+                    try:
+                        value = self.fields[key].from_json(value)
+                        setattr(self, key, value)
+                    except (ValueError, TypeError) as err:
+                        # The errors provided by the serializer aren't always pretty, but they're usually useful.
+                        # To see what this looks like, try putting a bogus value for 'end time'.
+                        # This begs the questions if should make a Django REST serializer shim that this and other
+                        # XBlocks can use much like Django models can use ModelSerializer.
+                        # For now, we're passing these back to the client in the same format Django REST would,
+                        # since we will probably standardize our error handling code to expect it at some point.
+                        errors[key] = [str(err)]
+                block_settings[key] = value
+        # 'video_url' is a list.
+        self.set_video_values(video_urls=block_settings['video_url'])
+        # Special fields that were set need to be re-evaluated again.
+        block_settings = self.get_settings()
+        if errors:
+            return Response(json={'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(json=block_settings)
+
     def student_view(self, _context):
         """
         Return the student view.
@@ -242,7 +311,7 @@ class VideoBlock(
         """
         return self.student_view(context)
 
-    def studio_view(self, _context):
+    def legacy_editor(self, _context):
         """
         Return the studio view.
         """
@@ -252,6 +321,21 @@ class VideoBlock(
         add_webpack_to_fragment(fragment, 'VideoBlockStudio')
         shim_xmodule_js(fragment, 'TabsEditingDescriptor')
         return fragment
+
+    def studio_view(self, _context):
+        """
+        Return the studio view.
+        """
+        transitional_service = self.runtime.service(self, 'transitional')
+        if transitional_service and transitional_service.load_new_editor_for_block(self):
+            fragment = Fragment(
+                '<div id="video_app_container"></div>'
+            )
+            add_webpack_to_fragment(fragment, 'VideoBlockEditor')
+            fragment.initialize_js('videoBlockInit')
+            return fragment
+        # print('Returning old view.')
+        return self.legacy_editor(_context)
 
     def public_view(self, context):
         """
