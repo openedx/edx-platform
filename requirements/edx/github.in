@@ -74,3 +74,6 @@ git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-rate
 
 git+https://github.com/open-craft/xblock-poll@1efd04bd6e16252a20e39a7516f9b69a000ace24#egg=xblock-poll==1.10.0
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10
+
+# edx-sga requirement to test some changes
+git+https://github.com/mitodl/edx-sga@0cff8c411af57edb76090797fe5408bcac4aad89
