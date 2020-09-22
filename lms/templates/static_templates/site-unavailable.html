@@ -1,0 +1,5 @@
+## mako
+## Appsembler: This file is specific to Tahoe and used by the SiteUnavailableView.
+<%! from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization %>
+
+The trial site of ${get_current_organization().name} has expired.
