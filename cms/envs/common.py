@@ -1704,10 +1704,6 @@ DEFAULT_COURSE_LANGUAGE = "en"
 #
 ADVANCED_PROBLEM_TYPES = [
     {
-        'component': 'openassessment',
-        'boilerplate_name': None,
-    },
-    {
         'component': 'drag-and-drop-v2',
         'boilerplate_name': None
     },
