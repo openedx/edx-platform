@@ -56,7 +56,7 @@ CELERY_BROKER_PASSWORD: celery
 CELERY_BROKER_TRANSPORT: amqp
 CELERY_BROKER_USER: celery
 CELERY_ALWAYS_EAGER: True
-CELERY_RESULT_BACKEND: 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND: 'django-cache'
 
 CERT_QUEUE: certificates
 CMS_BASE: localhost:8031
