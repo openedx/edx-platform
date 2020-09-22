@@ -2501,7 +2501,7 @@ class TestComponentTemplates(CourseTestCase):
 
     def _verify_basic_component_display_name(self, component_type, display_name):
         """
-        Verify the display name and support level of basic components (that have no boilerplates).
+        Verify the display name of basic components.
         """
         component_display_name = self.get_display_name_of_type(component_type)
         self.assertEqual(display_name, component_display_name)
