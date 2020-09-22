@@ -83,7 +83,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
         self.assertEqual(data_parsed, {
             'auth_entry': 'custom1',
             'backend_name': 'google-oauth2',
-            'provider_id': 'oa2-google-oauth2',
+            'provider_id': self.provider.provider_id,
             'user_details': {
                 'username': 'user',
                 'email': 'user@email.com',

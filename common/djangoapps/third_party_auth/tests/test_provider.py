@@ -1,5 +1,6 @@
 """Unit tests for provider.py."""
 
+import ddt
 import unittest
 
 from django.contrib.sites.models import Site
@@ -13,6 +14,7 @@ SITE_DOMAIN_A = 'professionalx.example.com'
 SITE_DOMAIN_B = 'somethingelse.example.com'
 
 
+@ddt.ddt
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class RegistryTest(testutil.TestCase):
     """Tests registry discovery and operation."""
@@ -146,6 +148,16 @@ class RegistryTest(testutil.TestCase):
         prov = self.configure_google_provider(visible=True, enabled=True, site=site_b)
         self.assertEqual(prov.enabled_for_current_site, False)
 
+    @ddt.data(SITE_DOMAIN_A, SITE_DOMAIN_B)
+    def test_single_provider_for_multiple_sites(self, site_domain):
+        """
+        Verify that enabled_for_current_site returns True when the provider is configured for a multiple sites.
+        """
+        site, __ = Site.objects.get_or_create(domain=site_domain, name=site_domain)
+        auth_provider = self.configure_google_provider(visible=True, enabled=True, site=site)
+        with patch('django.contrib.sites.models.SiteManager.get_current', return_value=site):
+            self.assertEqual(auth_provider.enabled_for_current_site, True)
+
     def test_get_returns_enabled_provider(self):
         google_provider = self.configure_google_provider(enabled=True)
         self.assertEqual(google_provider.id, provider.Registry.get(google_provider.provider_id).id)
@@ -184,10 +196,10 @@ class RegistryTest(testutil.TestCase):
         self.assertEqual(provider.Registry.enabled(), [])
         self.assertIsNone(provider.Registry.get(linkedin_provider_id))
         # Now explicitly disabled this provider:
-        self.configure_linkedin_provider(enabled=False)
-        self.assertIsNone(provider.Registry.get(linkedin_provider_id))
-        self.configure_linkedin_provider(enabled=True)
-        self.assertEqual(provider.Registry.get(linkedin_provider_id).provider_id, linkedin_provider_id)
+        linkedin_provider = self.configure_linkedin_provider(enabled=False)
+        self.assertIsNone(provider.Registry.get(linkedin_provider.provider_id))
+        linkedin_provider = self.configure_linkedin_provider(enabled=True)
+        self.assertEqual(provider.Registry.get(linkedin_provider.provider_id).provider_id, linkedin_provider.provider_id)
 
     def test_get_from_pipeline_returns_none_if_provider_not_enabled(self):
         self.assertEqual(provider.Registry.enabled(), [], "By default, no providers are enabled.")
