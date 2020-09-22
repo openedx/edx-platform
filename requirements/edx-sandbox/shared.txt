@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-cffi==1.14.2              # via cryptography
+cffi==1.14.3              # via cryptography
 click==7.1.2              # via nltk
 cryptography==3.1         # via -r requirements/edx-sandbox/shared.in
 joblib==0.14.1            # via -c requirements/edx-sandbox/../constraints.txt, nltk
