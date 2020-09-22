@@ -46,14 +46,8 @@ def get_shared_secret_key(provider_id):
     It is possible for the secret to be stored in 2 ways:
     1 - a key/value pair of provider_id and secret string
         {'cool_school': '123abc'}
-    2 - a key/value pair of provider_id and secret dict (which should contain old
-        and new keys with their respective values)
-        {'cool_school':
-          {
-          'previous_key': '987zyx',
-          'current_key': '123abc',
-          }
-        }
+    2 - a key/value pair of provider_id and secret list
+        {'cool_school': ['987zyx', '123abc']}
     """
 
     secret = getattr(settings, "CREDIT_PROVIDER_SECRET_KEYS", {}).get(provider_id)
@@ -62,12 +56,11 @@ def get_shared_secret_key(provider_id):
     if isinstance(secret, six.text_type):
         secret = _encode_secret(secret, provider_id)
 
-    # When secret is a dict containing old and new keys, encode both key values if
-    # appropriate
-    elif isinstance(secret, dict):
-        for keyname, keyvalue in secret.items():
-            if isinstance(keyvalue, six.text_type):
-                secret[keyname] = _encode_secret(keyvalue, provider_id)
+    # When secret is a list containing multiple keys, encode all of them
+    elif isinstance(secret, list):
+        for index, secretvalue in enumerate(secret):
+            if isinstance(secretvalue, six.text_type):
+                secret[index] = _encode_secret(secretvalue, provider_id)
 
     return secret
 

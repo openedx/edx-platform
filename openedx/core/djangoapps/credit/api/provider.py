@@ -212,12 +212,26 @@ def create_credit_request(course_key, provider_id, username):
         # That way, if there's a misconfiguration, we won't have requests
         # in our system that we know weren't sent to the provider.
         shared_secret_key = get_shared_secret_key(credit_provider.provider_id)
+
+        # Accounts for old way of storing provider key
         if shared_secret_key is None:
             msg = u'Credit provider with ID "{provider_id}" does not have a secret key configured.'.format(
                 provider_id=credit_provider.provider_id
             )
             log.error(msg)
             raise CreditProviderNotConfigured(msg)
+
+        # Accounts for new way of storing provider key
+        elif isinstance(shared_secret_key, list):
+            if not any(shared_secret_key):
+                msg = 'Could not retrieve secret key for credit provider [{}]. ' \
+                  'Unable to validate requests from provider.'.format(provider_id)
+                log.error(msg)
+                raise PermissionDenied(msg)
+            else:
+                # Use the first non-None key you have. This assumes the provider
+                # can accept a new key on their end that they gave you
+                shared_secret_key = [key for key in shared_secret_key if key][0]
 
     # Initiate a new request if one has not already been created
     credit_request, created = CreditRequest.objects.get_or_create(

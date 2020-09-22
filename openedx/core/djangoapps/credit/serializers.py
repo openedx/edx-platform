@@ -103,8 +103,8 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
             raise PermissionDenied(msg)
 
         # Accounts for new way of storing provider key
-        # We need at least 1 key value here that we can use to validate the signature
-        if isinstance(secret_key, dict) and not any(secret_key.values()):
+        # We need at least 1 key here that we can use to validate the signature
+        if isinstance(secret_key, list) and not any(secret_key):
             msg = 'Could not retrieve secret key for credit provider [{}]. ' \
               'Unable to validate requests from provider.'.format(provider_id)
             log.error(msg)
@@ -126,11 +126,11 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
             raise PermissionDenied(msg)
 
         # Accounts for new way of storing provider key
-        if isinstance(secret_key, dict):
+        if isinstance(secret_key, list):
             # Received value just needs to match one of the keys we have
             key_match = False
-            for secretvalue in secret_key.values():
-                if signature(data, secret_key) == actual_signature:
+            for secretvalue in secret_key:
+                if signature(data, secretvalue) == actual_signature:
                     key_match = True
 
             if not key_match:
