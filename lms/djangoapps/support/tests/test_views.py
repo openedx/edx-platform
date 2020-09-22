@@ -430,7 +430,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
 
-        with patch('support.views.enrollments.get_credit_provider_attribute_values') as mock_method:
+        with patch('lms.djangoapps.support.views.enrollments.get_credit_provider_attribute_values') as mock_method:
             credit_provider = (
                 [u'Arizona State University'], 'You are now eligible for credit from Arizona State University'
             )
@@ -469,7 +469,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
     Tests for the link_program_enrollments support view.
     """
     patch_render = patch(
-        'support.views.program_enrollments.render_to_response',
+        'lms.djangoapps.support.views.program_enrollments.render_to_response',
         return_value=HttpResponse(),
         autospec=True,
     )
@@ -537,7 +537,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         '0001,learner-01,apple,orange\n0002,learner-02,purple',             # extra fields
         '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
     )
-    @patch('support.views.program_enrollments.link_program_enrollments')
+    @patch('lms.djangoapps.support.views.program_enrollments.link_program_enrollments')
     def test_text(self, text, mocked_link):
         self.client.post(self.url, data={
             'program_uuid': self.program_uuid,
@@ -638,7 +638,7 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
     View tests for Program Enrollments Inspector
     """
     patch_render = patch(
-        'support.views.program_enrollments.render_to_response',
+        'lms.djangoapps.support.views.program_enrollments.render_to_response',
         return_value=HttpResponse(),
         autospec=True,
     )

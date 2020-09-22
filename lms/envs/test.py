@@ -30,6 +30,7 @@ from six.moves import range
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
 from .common import *
 

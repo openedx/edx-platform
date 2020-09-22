@@ -6,7 +6,7 @@ Defines the shoppingcart URLs
 from django.conf import settings
 from django.conf.urls import url
 
-from shoppingcart import views
+from . import views
 
 urlpatterns = [
     # Both the ~accept and ~reject callback pages are handled here

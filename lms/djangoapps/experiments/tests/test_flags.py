@@ -40,7 +40,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
         self.flag = ExperimentWaffleFlag('experiments', 'test', num_buckets=2, experiment_id=0)
         self.key = CourseKey.from_string('a/b/c')
 
-        bucket_patch = patch('experiments.flags.stable_bucketing_hash_group', return_value=1)
+        bucket_patch = patch('lms.djangoapps.experiments.flags.stable_bucketing_hash_group', return_value=1)
         self.addCleanup(bucket_patch.stop)
         bucket_patch.start()
 
@@ -110,7 +110,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
 
     def test_tracking(self):
         # Run twice, with same request
-        with patch('experiments.flags.segment') as segment_mock:
+        with patch('lms.djangoapps.experiments.flags.segment') as segment_mock:
             self.assertEqual(self.get_bucket(track=True), 1)
             RequestCache.clear_all_namespaces()  # we want to force get_bucket to check session, not early exit
             self.assertEqual(self.get_bucket(track=True), 1)
@@ -136,10 +136,10 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
         self.assertEqual(self.get_bucket(active=False), 1)  # still returns 1!
 
     def test_is_enabled(self):
-        with patch('experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=1):
+        with patch('lms.djangoapps.experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=1):
             self.assertEqual(self.flag.is_enabled(self.key), True)
             self.assertEqual(self.flag.is_enabled(), True)
-        with patch('experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=0):
+        with patch('lms.djangoapps.experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=0):
             self.assertEqual(self.flag.is_enabled(self.key), False)
             self.assertEqual(self.flag.is_enabled(), False)
 
@@ -207,7 +207,7 @@ class ExperimentWaffleFlagCourseAwarenessTest(SharedModuleStoreTestCase):
 
         # Use our custom fake `stable_bucketing_hash_group` implementation.
         stable_bucket_patcher = patch(
-            'experiments.flags.stable_bucketing_hash_group', self._mock_stable_bucket
+            'lms.djangoapps.experiments.flags.stable_bucketing_hash_group', self._mock_stable_bucket
         )
         stable_bucket_patcher.start()
         self.addCleanup(stable_bucket_patcher.stop)
