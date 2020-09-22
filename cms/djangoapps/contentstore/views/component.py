@@ -274,7 +274,7 @@ def get_component_templates(courselike, library=False):
     component_not_supported_by_library = ['discussion', 'openassessment']
     if library:
         component_types = [component for component in component_types
-                            if component not in set(component_not_supported_by_library)]
+                           if component not in set(component_not_supported_by_library)]
 
     component_types = _filter_disabled_blocks(component_types)
 
