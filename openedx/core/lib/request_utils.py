@@ -95,7 +95,7 @@ def course_id_from_url(url):
         return None
 
 
-class CookingMonitoringMiddleware(MiddlewareMixin):
+class CookieMonitoringMiddleware(MiddlewareMixin):
     """
     Middleware for monitoring the size and growth of all our cookies, to see if
     we're running into browser limits.
