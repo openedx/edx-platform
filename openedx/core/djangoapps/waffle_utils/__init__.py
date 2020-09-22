@@ -48,7 +48,7 @@ For long-lived flags, you may want to change the default for devstack, sandboxes
 or new Open edX releases. For help with this, see:
 openedx/core/djangoapps/waffle_utils/docs/decisions/0001-refactor-waffle-flag-default.rst
 
-Also see ``WAFFLE_FLAG_CUSTOM_METRICS`` and docstring for _set_waffle_flag_metric
+Also see ``WAFFLE_FLAG_CUSTOM_ATTRIBUTES`` and docstring for _set_waffle_flag_attribute
 for temporarily instrumenting/monitoring waffle flag usage.
 
 """
@@ -285,12 +285,12 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
             if value is not None:
                 # Do not cache value for the callback, because the key might be different.
                 # The callback needs to handle its own caching if it wants it.
-                self._set_waffle_flag_metric(namespaced_flag_name, value)
+                self._set_waffle_flag_attribute(namespaced_flag_name, value)
                 return value
 
         value = self._cached_flags.get(namespaced_flag_name)
         if value is not None:
-            self._set_waffle_flag_metric(namespaced_flag_name, value)
+            self._set_waffle_flag_attribute(namespaced_flag_name, value)
             return value
 
         request = crum.get_current_request()
@@ -301,14 +301,14 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
             # in a normal request context. This case seems to occur when
             # a page redirects to a 404, or for celery workers.
             value = self._is_flag_active_for_everyone(namespaced_flag_name)
-            self._set_waffle_flag_metric(namespaced_flag_name, value)
+            self._set_waffle_flag_attribute(namespaced_flag_name, value)
             set_custom_attribute('warn_flag_no_request_return_value', value)
             return value
 
         value = flag_is_active(request, namespaced_flag_name)
         self._cached_flags[namespaced_flag_name] = value
 
-        self._set_waffle_flag_metric(namespaced_flag_name, value)
+        self._set_waffle_flag_attribute(namespaced_flag_name, value)
         return value
 
     def _is_flag_active_for_everyone(self, namespaced_flag_name):
@@ -325,14 +325,14 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
         except Flag.DoesNotExist:
             return False
 
-    def _set_waffle_flag_metric(self, name, value):
+    def _set_waffle_flag_attribute(self, name, value):
         """
-        For any flag name in _WAFFLE_FLAG_CUSTOM_METRIC_SET, add name/value
-        to cached values and set custom metric if the value changed.
+        For any flag name in _WAFFLE_FLAG_CUSTOM_ATTRIBUTE_SET, add name/value
+        to cached values and set custom attribute if the value changed.
 
-        The name of the custom metric will have the prefix ``flag_`` and the
+        The name of the custom attribute will have the prefix ``flag_`` and the
         suffix will match the name of the flag.
-        The value of the custom metric could be False, True, or Both.
+        The value of the custom attribute could be False, True, or Both.
 
           The value Both would mean that the flag had both a True and False
           value at different times during the transaction. This is most
@@ -347,49 +347,49 @@ class WaffleFlagNamespace(six.with_metaclass(ABCMeta, WaffleNamespace)):
           WHERE flag_my.waffle.flag IS NOT NULL
           FACET appName, flag_my.waffle.flag
 
-        Important: Remember to configure ``WAFFLE_FLAG_CUSTOM_METRICS`` for
+        Important: Remember to configure ``WAFFLE_FLAG_CUSTOM_ATTRIBUTES`` for
           LMS, Studio and Workers in order to see waffle flag usage in all
           edx-platform environments.
 
         """
-        if name not in _WAFFLE_FLAG_CUSTOM_METRIC_SET:
+        if name not in _WAFFLE_FLAG_CUSTOM_ATTRIBUTE_SET:
             return
 
-        flag_metric_data = self._get_request_cache().setdefault('flag_metric', {})
+        flag_attribute_data = self._get_request_cache().setdefault('flag_attribute', {})
         is_value_change = False
-        if name not in flag_metric_data:
-            flag_metric_data[name] = str(value)
+        if name not in flag_attribute_data:
+            flag_attribute_data[name] = str(value)
             is_value_change = True
         else:
-            if flag_metric_data[name] != str(value):
-                flag_metric_data[name] = 'Both'
+            if flag_attribute_data[name] != str(value):
+                flag_attribute_data[name] = 'Both'
                 is_value_change = True
 
         if is_value_change:
-            metric_name = 'flag_{}'.format(name)
-            set_custom_attribute(metric_name, flag_metric_data[name])
+            attribute_name = 'flag_{}'.format(name)
+            set_custom_attribute(attribute_name, flag_attribute_data[name])
 
 
-def _get_waffle_flag_custom_metrics_set():
+def _get_waffle_flag_custom_attributes_set():
     """
-    Returns a set based on the Django setting WAFFLE_FLAG_CUSTOM_METRICS (list).
+    Returns a set based on the Django setting WAFFLE_FLAG_CUSTOM_ATTRIBUTES (list).
     """
-    waffle_flag_custom_metrics = getattr(settings, _WAFFLE_FLAG_CUSTOM_METRICS, None)
-    waffle_flag_custom_metrics = waffle_flag_custom_metrics if waffle_flag_custom_metrics else []
-    return set(waffle_flag_custom_metrics)
+    waffle_flag_custom_attributes = getattr(settings, _WAFFLE_FLAG_CUSTOM_ATTRIBUTES, None)
+    waffle_flag_custom_attributes = waffle_flag_custom_attributes if waffle_flag_custom_attributes else []
+    return set(waffle_flag_custom_attributes)
 
-# .. toggle_name: WAFFLE_FLAG_CUSTOM_METRICS
+# .. toggle_name: WAFFLE_FLAG_CUSTOM_ATTRIBUTES
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: A list of waffle flag to track with custom metrics having
+# .. toggle_description: A list of waffle flag to track with custom attributes having
 #   values of (True, False, or Both).
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2020-06-17
 # .. toggle_warnings: Intent is for temporary research (1 day - several weeks) of a flag's usage.
-_WAFFLE_FLAG_CUSTOM_METRICS = 'WAFFLE_FLAG_CUSTOM_METRICS'
+_WAFFLE_FLAG_CUSTOM_ATTRIBUTES = 'WAFFLE_FLAG_CUSTOM_ATTRIBUTES'
 
-# set of waffle flags that should be instrumented with custom metrics
-_WAFFLE_FLAG_CUSTOM_METRIC_SET = _get_waffle_flag_custom_metrics_set()
+# set of waffle flags that should be instrumented with custom attributes
+_WAFFLE_FLAG_CUSTOM_ATTRIBUTE_SET = _get_waffle_flag_custom_attributes_set()
 
 
 class WaffleFlag(object):

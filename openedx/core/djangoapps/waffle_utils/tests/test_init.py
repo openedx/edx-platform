@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from waffle.testutils import override_flag
 
 from .. import (
-    _get_waffle_flag_custom_metrics_set,
+    _get_waffle_flag_custom_attributes_set,
     CourseWaffleFlag,
     WaffleFlagNamespace,
     WaffleSwitchNamespace,
@@ -46,7 +46,7 @@ class TestCourseWaffleFlag(TestCase):
         crum.set_current_request(request)
         RequestCache.clear_all_namespaces()
 
-    @override_settings(WAFFLE_FLAG_CUSTOM_METRICS=[NAMESPACED_FLAG_NAME])
+    @override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=[NAMESPACED_FLAG_NAME])
     @patch('openedx.core.djangoapps.waffle_utils.set_custom_attribute')
     @ddt.data(
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on, 'waffle_enabled': False, 'result': True},
@@ -60,8 +60,8 @@ class TestCourseWaffleFlag(TestCase):
         for a course.
         """
         with patch(
-            'openedx.core.djangoapps.waffle_utils._WAFFLE_FLAG_CUSTOM_METRIC_SET',
-            _get_waffle_flag_custom_metrics_set(),
+            'openedx.core.djangoapps.waffle_utils._WAFFLE_FLAG_CUSTOM_ATTRIBUTE_SET',
+            _get_waffle_flag_custom_attributes_set(),
         ):
             with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
                 with override_flag(self.NAMESPACED_FLAG_NAME, active=data['waffle_enabled']):
@@ -74,7 +74,7 @@ class TestCourseWaffleFlag(TestCase):
                         self.TEST_COURSE_KEY
                     )
 
-            self._assert_waffle_flag_metric(mock_set_custom_attribute, expected_flag_value=str(data['result']))
+            self._assert_waffle_flag_attribute(mock_set_custom_attribute, expected_flag_value=str(data['result']))
             mock_set_custom_attribute.reset_mock()
 
             # check flag for a second course
@@ -90,9 +90,9 @@ class TestCourseWaffleFlag(TestCase):
                 self.assertEqual(self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_2_KEY), second_value)
 
         expected_flag_value = None if second_value == data['result'] else 'Both'
-        self._assert_waffle_flag_metric(mock_set_custom_attribute, expected_flag_value=expected_flag_value)
+        self._assert_waffle_flag_attribute(mock_set_custom_attribute, expected_flag_value=expected_flag_value)
 
-    @override_settings(WAFFLE_FLAG_CUSTOM_METRICS=[NAMESPACED_FLAG_NAME])
+    @override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=[NAMESPACED_FLAG_NAME])
     @patch('openedx.core.djangoapps.waffle_utils.set_custom_attribute')
     def test_undefined_waffle_flag(self, mock_set_custom_attribute):
         """
@@ -105,8 +105,8 @@ class TestCourseWaffleFlag(TestCase):
         )
 
         with patch(
-            'openedx.core.djangoapps.waffle_utils._WAFFLE_FLAG_CUSTOM_METRIC_SET',
-            _get_waffle_flag_custom_metrics_set(),
+            'openedx.core.djangoapps.waffle_utils._WAFFLE_FLAG_CUSTOM_ATTRIBUTE_SET',
+            _get_waffle_flag_custom_attributes_set(),
         ):
             with patch.object(
                 WaffleFlagCourseOverrideModel,
@@ -122,7 +122,7 @@ class TestCourseWaffleFlag(TestCase):
                     self.TEST_COURSE_KEY
                 )
 
-        self._assert_waffle_flag_metric(
+        self._assert_waffle_flag_attribute(
             mock_set_custom_attribute,
             expected_flag_value=str(False),
         )
@@ -153,19 +153,19 @@ class TestCourseWaffleFlag(TestCase):
             self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), True)
 
     @ddt.data(
-        {'expected_count': 0, 'waffle_flag_metric_setting': None},
-        {'expected_count': 1, 'waffle_flag_metric_setting': [NAMESPACED_FLAG_NAME]},
-        {'expected_count': 2, 'waffle_flag_metric_setting': [NAMESPACED_FLAG_NAME, NAMESPACED_FLAG_2_NAME]},
+        {'expected_count': 0, 'waffle_flag_attribute_setting': None},
+        {'expected_count': 1, 'waffle_flag_attribute_setting': [NAMESPACED_FLAG_NAME]},
+        {'expected_count': 2, 'waffle_flag_attribute_setting': [NAMESPACED_FLAG_NAME, NAMESPACED_FLAG_2_NAME]},
     )
     @patch('openedx.core.djangoapps.waffle_utils.set_custom_attribute')
-    def test_waffle_flag_metric_for_various_settings(self, data, mock_set_custom_attribute):
+    def test_waffle_flag_attribute_for_various_settings(self, data, mock_set_custom_attribute):
         """
         Test that custom attributes are recorded when waffle flag accessed.
         """
-        with override_settings(WAFFLE_FLAG_CUSTOM_METRICS=data['waffle_flag_metric_setting']):
+        with override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=data['waffle_flag_attribute_setting']):
             with patch(
-                'openedx.core.djangoapps.waffle_utils._WAFFLE_FLAG_CUSTOM_METRIC_SET',
-                _get_waffle_flag_custom_metrics_set(),
+                'openedx.core.djangoapps.waffle_utils._WAFFLE_FLAG_CUSTOM_ATTRIBUTE_SET',
+                _get_waffle_flag_custom_attributes_set(),
             ):
                 test_course_flag = CourseWaffleFlag(self.TEST_NAMESPACE, self.FLAG_NAME, __name__)
                 test_course_flag.is_enabled(self.TEST_COURSE_KEY)
@@ -174,7 +174,7 @@ class TestCourseWaffleFlag(TestCase):
 
         self.assertEqual(mock_set_custom_attribute.call_count, data['expected_count'])
 
-    def _assert_waffle_flag_metric(self, mock_set_custom_attribute, expected_flag_value=None):
+    def _assert_waffle_flag_attribute(self, mock_set_custom_attribute, expected_flag_value=None):
         """
         Assert that a custom attribute was set as expected on the mock.
         """
