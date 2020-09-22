@@ -1,0 +1,4 @@
+import warnings
+warnings.warn("Importing commerce.management.commands.create_orders_for_old_enterprise_course_enrollment instead of lms.djangoapps.commerce.management.commands.create_orders_for_old_enterprise_course_enrollment is deprecated", stacklevel=2)
+
+from lms.djangoapps.commerce.management.commands.create_orders_for_old_enterprise_course_enrollment import *
