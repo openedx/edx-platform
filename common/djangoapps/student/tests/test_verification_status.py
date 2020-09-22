@@ -44,7 +44,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         None: None,
     }
 
-    URLCONF_MODULES = ['verify_student.urls']
+    URLCONF_MODULES = ['lms.djangoapps.verify_student.urls']
 
     def setUp(self):
         # Invoke UrlResetMixin

@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from branding.api import _footer_business_links, get_footer, get_home_url, get_logo_url
+from ..api import _footer_business_links, get_footer, get_home_url, get_logo_url
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
 test_config_disabled_contact_us = {   # pylint: disable=invalid-name

@@ -84,7 +84,7 @@ class OrderTest(ModuleStoreTestCase):
         self.cost = 40
 
         # Add mock tracker for event testing.
-        patcher = patch('shoppingcart.models.segment')
+        patcher = patch('lms.djangoapps.shoppingcart.models.segment')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -299,7 +299,7 @@ class OrderTest(ModuleStoreTestCase):
         # CertificateItem
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        with patch('shoppingcart.models.CertificateItem.save', side_effect=DatabaseError):
+        with patch('lms.djangoapps.shoppingcart.models.CertificateItem.save', side_effect=DatabaseError):
             with self.assertRaises(DatabaseError):
                 cart.purchase()
                 # verify that we rolled back the entire transaction
@@ -315,15 +315,15 @@ class OrderTest(ModuleStoreTestCase):
         cart.purchase()
         self.assertEqual(len(mail.outbox), 1)
 
-    @patch('shoppingcart.models.log.error')
+    @patch('lms.djangoapps.shoppingcart.models.log.error')
     def test_purchase_item_email_smtp_failure(self, error_logger):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        with patch('shoppingcart.models.EmailMessage.send', side_effect=smtplib.SMTPException):
+        with patch('lms.djangoapps.shoppingcart.models.EmailMessage.send', side_effect=smtplib.SMTPException):
             cart.purchase()
             self.assertTrue(error_logger.called)
 
-    @patch('shoppingcart.models.log.error')
+    @patch('lms.djangoapps.shoppingcart.models.log.error')
     def test_purchase_item_email_boto_failure(self, error_logger):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
@@ -348,7 +348,7 @@ class OrderTest(ModuleStoreTestCase):
             cardtype='001',
         )
 
-    @patch('shoppingcart.models.render_to_string')
+    @patch('lms.djangoapps.shoppingcart.models.render_to_string')
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
     def test_billing_info_storage_on(self, render):
         cart = Order.get_cart_for_user(self.user)
@@ -366,7 +366,7 @@ class OrderTest(ModuleStoreTestCase):
         ((_, context), _) = render.call_args
         self.assertTrue(context['has_billing_info'])
 
-    @patch('shoppingcart.models.render_to_string')
+    @patch('lms.djangoapps.shoppingcart.models.render_to_string')
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': False})
     def test_billing_info_storage_off(self, render):
         cart = Order.get_cart_for_user(self.user)
@@ -517,7 +517,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
 
-        analytics_patcher = patch('shoppingcart.models.segment')
+        analytics_patcher = patch('lms.djangoapps.shoppingcart.models.segment')
         self.mock_analytics_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
@@ -657,7 +657,7 @@ class CertificateItemTest(ModuleStoreTestCase):
 
         mail.outbox = []
         cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
-        with patch('shoppingcart.models.log.error') as mock_error_logger:
+        with patch('lms.djangoapps.shoppingcart.models.log.error') as mock_error_logger:
             CourseEnrollment.unenroll(self.user, course_key)
             self.assertFalse(mock_error_logger.called)
             self.assertEqual(len(mail.outbox), 1)
@@ -666,7 +666,7 @@ class CertificateItemTest(ModuleStoreTestCase):
             self.assertIn('has requested a refund on Order', mail.outbox[0].body)
 
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
-    @patch('shoppingcart.models.log.error')
+    @patch('lms.djangoapps.shoppingcart.models.log.error')
     def test_refund_cert_callback_before_expiration_email_error(self, error_logger, cutoff_date):
         # If there's an error sending an email to billing, we need to log this error
         many_days = datetime.timedelta(days=60)
@@ -687,7 +687,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         cart.purchase()
 
         cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
-        with patch('shoppingcart.models.send_mail', side_effect=smtplib.SMTPException):
+        with patch('lms.djangoapps.shoppingcart.models.send_mail', side_effect=smtplib.SMTPException):
             CourseEnrollment.unenroll(self.user, course_key)
             self.assertTrue(error_logger.call_args[0][0].startswith('Failed sending email'))
 

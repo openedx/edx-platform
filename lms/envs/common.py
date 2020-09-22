@@ -52,8 +52,6 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 )
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
-from xmodule.modulestore.modulestore_settings import update_module_store_settings
-from xmodule.modulestore.edit_info import EditInfoMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -724,7 +722,7 @@ DATA_DIR = COURSES_ROOT
 
 # TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
-sys.path.append(PROJECT_ROOT / 'djangoapps')
+sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'lms')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For Node.js
@@ -1169,9 +1167,12 @@ COURSE_LISTINGS = {}
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
+# pylint: disable=wrong-import-position
+from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
+# pylint: enable=wrong-import-position
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
@@ -2483,26 +2484,26 @@ INSTALLED_APPS = [
 
     # Our courseware
     'lms.djangoapps.courseware',
-    'coursewarehistoryextended',
+    'lms.djangoapps.coursewarehistoryextended',
     'student.apps.StudentConfig',
 
-    'static_template_view',
-    'staticbook',
+    'lms.djangoapps.static_template_view',
+    'lms.djangoapps.staticbook',
     'track',
     'eventtracking.django.apps.EventTrackingConfig',
     'util',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
-    'dashboard',
+    'lms.djangoapps.dashboard',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
-    'bulk_email',
-    'branding',
+    'lms.djangoapps.bulk_email',
+    'lms.djangoapps.branding',
 
     # New (Blockstore-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.LmsXBlockAppConfig',
 
     # Student support tools
-    'support',
+    'lms.djangoapps.support',
 
     # django-oauth-toolkit
     'oauth2_provider',
@@ -2518,7 +2519,7 @@ INSTALLED_APPS = [
     # For the wiki
     'wiki',  # The new django-wiki from benjaoming
     'django_notify',
-    'course_wiki',  # Our customizations
+    'lms.djangoapps.course_wiki',  # Our customizations
     'mptt',
     'sekizai',
     #'wiki.plugins.attachments',
@@ -2527,18 +2528,18 @@ INSTALLED_APPS = [
     # got tangled up during the Django 1.8 migration, so we are disabling it.
     # See TNL-3783 for details.
     #'wiki.plugins.notifications',
-    'course_wiki.plugins.markdownedx',
+    'lms.djangoapps.course_wiki.plugins.markdownedx',
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
-    'debug',
+    'lms.djangoapps.debug',
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Discussion forums
     'openedx.core.djangoapps.django_comment_common',
 
     # Notes
-    'edxnotes',
+    'lms.djangoapps.edxnotes',
 
     # Splash screen
     'splash',
@@ -2549,7 +2550,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.user_api',
 
     # Shopping cart
-    'shoppingcart',
+    'lms.djangoapps.shoppingcart',
 
     # Different Course Modes
     'course_modes.apps.CourseModesConfig',
@@ -2561,7 +2562,7 @@ INSTALLED_APPS = [
     'entitlements.apps.EntitlementsConfig',
 
     # Bulk Enrollment API
-    'bulk_enroll',
+    'lms.djangoapps.bulk_enroll',
 
     # Student Identity Verification
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
@@ -2570,7 +2571,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.dark_lang',
 
     # RSS Proxy
-    'rss_proxy',
+    'lms.djangoapps.rss_proxy',
 
     # Country embargo support
     'openedx.core.djangoapps.embargo',
@@ -2649,7 +2650,7 @@ INSTALLED_APPS = [
     'learner_dashboard',
 
     # Needed whether or not enabled, due to migrations
-    'badges.apps.BadgesConfig',
+    'lms.djangoapps.badges.apps.BadgesConfig',
 
     # Enables default site and redirects
     'django_sites_extensions',
@@ -2690,7 +2691,7 @@ INSTALLED_APPS = [
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
 
-    'experiments',
+    'lms.djangoapps.experiments',
 
     # DRF filters
     'django_filters',

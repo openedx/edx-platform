@@ -16,7 +16,7 @@ class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
     Base class to test the fake software secure view.
     """
 
-    URLCONF_MODULES = ['verify_student.urls']
+    URLCONF_MODULES = ['lms.djangoapps.verify_student.urls']
 
     def setUp(self, **kwargs):
         enable_software_secure_fake = kwargs.get('enable_software_secure_fake', False)
