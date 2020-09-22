@@ -2256,9 +2256,10 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(name='discussion', enabled=True, support_level="ps")
         XBlockStudioConfiguration.objects.create(name='problem', enabled=True, support_level="us")
         XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
-        # XBlock masquerading as a problem
         XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
+        # XBlock masquerading as a problem
         XBlockStudioConfiguration.objects.create(name='drag-and-drop-v2', enabled=True, support_level="fs")
+        XBlockStudioConfiguration.objects.create(name='staffgradedxblock', enabled=True, support_level="us")
 
         self.templates = get_component_templates(self.course)
 
@@ -2266,8 +2267,21 @@ class TestComponentTemplates(CourseTestCase):
         """
         Returns the templates for the specified type, or None if none is found.
         """
-        template_dict = next((template for template in self.templates if template.get('type') == template_type), None)
+        template_dict = self._get_template_dict_of_type(template_type)
         return template_dict.get('templates') if template_dict else None
+
+    def get_display_name_of_type(self, template_type):
+        """
+        Returns the display name for the specified type, or None if none found.
+        """
+        template_dict = self._get_template_dict_of_type(template_type)
+        return template_dict.get('display_name') if template_dict else None
+
+    def _get_template_dict_of_type(self, template_type):
+        """
+        Returns a dictionary of values for a category type.
+        """
+        return next((template for template in self.templates if template.get('type') == template_type), None)
 
     def get_template(self, templates, display_name):
         """
@@ -2281,6 +2295,10 @@ class TestComponentTemplates(CourseTestCase):
         """
         self._verify_basic_component("discussion", "Discussion")
         self._verify_basic_component("video", "Video")
+        self._verify_basic_component("openassessment", "Open Response Assessment")
+        self._verify_basic_component_display_name("discussion", "Discussion")
+        self._verify_basic_component_display_name("video", "Video")
+        self._verify_basic_component_display_name("openassessment", "Open Response")
         self.assertGreater(len(self.get_templates_of_type('html')), 0)
         self.assertGreater(len(self.get_templates_of_type('problem')), 0)
         self.assertIsNone(self.get_templates_of_type('advanced'))
@@ -2338,13 +2356,13 @@ class TestComponentTemplates(CourseTestCase):
 
         # Verify that non-advanced components are not added twice
         self.course.advanced_modules.append('video')
-        self.course.advanced_modules.append('openassessment')
+        self.course.advanced_modules.append('drag-and-drop-v2')
         self.templates = get_component_templates(self.course)
         advanced_templates = self.get_templates_of_type('advanced')
         self.assertEqual(len(advanced_templates), 1)
         only_template = advanced_templates[0]
         self.assertNotEqual(only_template.get('category'), 'video')
-        self.assertNotEqual(only_template.get('category'), 'openassessment')
+        self.assertNotEqual(only_template.get('category'), 'drag-and-drop-v2')
 
         # Now fully disable word_cloud through XBlockConfiguration
         XBlockConfiguration.objects.create(name='word_cloud', enabled=False)
@@ -2415,12 +2433,19 @@ class TestComponentTemplates(CourseTestCase):
             problem_templates = self.get_templates_of_type('problem')
             return self.get_template(problem_templates, label)
 
-        def verify_openassessment_present(support_level):
+        def verify_openassessment_not_present():
             """ Helper method to verify that openassessment template is present """
             openassessment = get_xblock_problem('Open Response Assessment')
-            self.assertIsNotNone(openassessment)
-            self.assertEqual(openassessment.get('category'), 'openassessment')
-            self.assertEqual(openassessment.get('support_level'), support_level)
+            self.assertIsNone(openassessment)
+
+        def verify_staffgradedxblock_present(support_level):
+            """
+            Helper method to verify that staffgradedxblock template is present
+            """
+            dndv2 = get_xblock_problem('Staff Graded Points')
+            self.assertIsNotNone(dndv2)
+            self.assertEqual(dndv2.get('category'), 'staffgradedxblock')
+            self.assertEqual(dndv2.get('support_level'), support_level)
 
         def verify_dndv2_present(support_level):
             """
@@ -2431,24 +2456,25 @@ class TestComponentTemplates(CourseTestCase):
             self.assertEqual(dndv2.get('category'), 'drag-and-drop-v2')
             self.assertEqual(dndv2.get('support_level'), support_level)
 
-        verify_openassessment_present(True)
+        verify_openassessment_not_present()
         verify_dndv2_present(True)
+        verify_staffgradedxblock_present(True)
 
-        # Now enable XBlockStudioConfigurationFlag. The openassessment block is marked
+        # Now enable XBlockStudioConfigurationFlag. The staffgradedxblock block is marked
         # unsupported, so will no longer show up, but DnDv2 will continue to appear.
         XBlockStudioConfigurationFlag.objects.create(enabled=True)
-        self.assertIsNone(get_xblock_problem('Peer Assessment'))
+        self.assertIsNone(get_xblock_problem('Staff Graded Points'))
         self.assertIsNotNone(get_xblock_problem('Drag and Drop'))
 
         # Now allow unsupported components.
         self.course.allow_unsupported_xblocks = True
-        verify_openassessment_present('us')
+        verify_staffgradedxblock_present('us')
         verify_dndv2_present('fs')
 
         # Now disable the blocks completely through XBlockConfiguration
-        XBlockConfiguration.objects.create(name='openassessment', enabled=False)
+        XBlockConfiguration.objects.create(name='staffgradedxblock', enabled=False)
         XBlockConfiguration.objects.create(name='drag-and-drop-v2', enabled=False)
-        self.assertIsNone(get_xblock_problem('Peer Assessment'))
+        self.assertIsNone(get_xblock_problem('Staff Graded Points'))
         self.assertIsNone(get_xblock_problem('Drag and Drop'))
 
     def _verify_advanced_xblocks(self, expected_xblocks, expected_support_levels):
@@ -2472,6 +2498,13 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(1, len(templates))
         self.assertEqual(display_name, templates[0]['display_name'])
         self.assertEqual(support_level, templates[0]['support_level'])
+
+    def _verify_basic_component_display_name(self, component_type, display_name):
+        """
+        Verify the display name and support level of basic components (that have no boilerplates).
+        """
+        component_display_name = self.get_display_name_of_type(component_type)
+        self.assertEqual(display_name, component_display_name)
 
 
 @ddt.ddt

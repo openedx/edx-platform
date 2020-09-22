@@ -41,7 +41,7 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video', 'openassessment']
+COMPONENT_TYPES = ['discussion', 'html', 'problem', 'openassessment', 'video']
 
 ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
 
@@ -271,8 +271,10 @@ def get_component_templates(courselike, library=False):
     component_types = COMPONENT_TYPES[:]
 
     # Libraries do not support discussions
+    component_not_supported_by_library = ['discussion', 'openassessment']
     if library:
-        component_types = [component for component in component_types if component != 'discussion']
+        component_types = [component for component in component_types
+                            if component not in set(component_not_supported_by_library)]
 
     component_types = _filter_disabled_blocks(component_types)
 

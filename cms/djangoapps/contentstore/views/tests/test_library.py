@@ -337,6 +337,7 @@ class UnitTestLibraries(CourseTestCase):
         self.assertIn('problem', templates)
         self.assertNotIn('discussion', templates)
         self.assertNotIn('advanced', templates)
+        self.assertNotIn('openassessment', templates)
 
     def test_advanced_problem_types(self):
         """
