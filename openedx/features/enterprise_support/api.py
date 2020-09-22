@@ -471,6 +471,7 @@ def enterprise_customer_uuid_for_request(request):
     if enterprise_customer_uuid is _CACHE_MISS and request.user.is_authenticated:
         # If there's no way to get an Enterprise UUID for the request, check to see
         # if there's already an Enterprise attached to the requesting user on the backend.
+        enterprise_customer = None
         learner_data = get_enterprise_learner_data_from_db(request.user)
         if learner_data:
             enterprise_customer = learner_data[0]['enterprise_customer']
