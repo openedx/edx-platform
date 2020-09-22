@@ -1,0 +1,4 @@
+import warnings
+warnings.warn("Importing verify_student.management.commands.backfill_sso_verifications_for_old_account_links instead of lms.djangoapps.verify_student.management.commands.backfill_sso_verifications_for_old_account_links is deprecated", stacklevel=2)
+
+from lms.djangoapps.verify_student.management.commands.backfill_sso_verifications_for_old_account_links import *
