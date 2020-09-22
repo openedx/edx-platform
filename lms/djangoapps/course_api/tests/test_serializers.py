@@ -39,15 +39,22 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.honor_user = self.create_user('honor', is_staff=False)
         self.request_factory = APIRequestFactory()
 
+        course_id = u'edX/toy/2012_Fall'
+        banner_image_uri = u'/c4x/edX/toy/asset/images_course_image.jpg'
+        banner_image_absolute_uri = u'http://testserver' + banner_image_uri
         image_path = u'/c4x/edX/toy/asset/just_a_test.jpg'
         image_url = u'http://testserver' + image_path
         self.expected_data = {
-            'id': u'edX/toy/2012_Fall',
+            'id': course_id,
             'name': u'Toy Course',
             'number': u'toy',
             'org': u'edX',
             'short_description': u'A course about toys.',
             'media': {
+                'banner_image': {
+                    'uri': banner_image_uri,
+                    'uri_absolute': banner_image_absolute_uri,
+                },
                 'course_image': {
                     'uri': image_path,
                 },
@@ -74,7 +81,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'invitation_only': False,
 
             # 'course_id' is a deprecated field, please use 'id' instead.
-            'course_id': u'edX/toy/2012_Fall',
+            'course_id': course_id,
         }
 
     def _get_request(self, user=None):

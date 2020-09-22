@@ -11,6 +11,7 @@ from django.urls import reverse
 from rest_framework import serializers
 
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.fields import AbsoluteURLField
 
 
@@ -32,6 +33,40 @@ class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         return getattr(course_overview, self.uri_attribute)
 
 
+class _AbsolutMediaSerializer(_MediaSerializer):  # pylint: disable=abstract-method
+    """
+    Nested serializer to represent a media object and its absolute path.
+    """
+    requires_context = True
+
+    def __call__(self, serializer_field):
+        self.context = serializer_field.context
+        return super(self).__call__(serializer_field)
+
+    uri_absolute = serializers.SerializerMethodField(source="*")
+
+    def get_uri_absolute(self, course_overview):
+        """
+        Convert the media resource's URI to an absolute URI.
+        """
+        uri = getattr(course_overview, self.uri_attribute)
+
+        if not uri:
+            # Return empty string here, to keep the same
+            # response type in case uri is empty as well.
+            return ""
+
+        cdn_applied_uri = course_overview.apply_cdn_to_url(uri)
+        field = AbsoluteURLField()
+
+        # In order to use the AbsoluteURLField to have the same
+        # behaviour what ImageSerializer provides, we need to set
+        # the request for the field
+        field._context = {"request": self.context.get("request")}
+
+        return field.to_representation(cdn_applied_uri)
+
+
 class ImageSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Collection of URLs pointing to images of various sizes.
@@ -48,6 +83,7 @@ class _CourseApiMediaCollectionSerializer(serializers.Serializer):  # pylint: di
     """
     Nested serializer to represent a collection of media objects
     """
+    banner_image = _AbsolutMediaSerializer(source='*', uri_attribute='banner_image_url')
     course_image = _MediaSerializer(source='*', uri_attribute='course_image_url')
     course_video = _MediaSerializer(source='*', uri_attribute='course_video_url')
     image = ImageSerializer(source='image_urls')
