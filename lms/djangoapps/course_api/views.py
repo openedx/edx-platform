@@ -381,3 +381,45 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
             form.cleaned_data['username'],
             role=form.cleaned_data['role'],
         )
+
+    @function_trace('paginate_queryset')
+    def paginate_queryset(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for function-tracing (monitoring)
+        purposes.
+
+        This should be called once per GET request.
+        """
+        return super(CourseIdListView, self).paginate_queryset(*args, **kwargs)
+
+    @function_trace('get_paginated_response')
+    def get_paginated_response(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for function-tracing (monitoring)
+        purposes.
+
+        This should be called only when the response is paginated. Two pages
+        means two GET requests and one function call per request. Otherwise, if
+        the whole response fits in one page, this function never gets called.
+        """
+        return super(CourseIdListView, self).get_paginated_response(*args, **kwargs)
+
+    @function_trace('filter_queryset')
+    def filter_queryset(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for function-tracing (monitoring)
+        purposes.
+
+        This should be called once per GET request.
+        """
+        return super(CourseIdListView, self).filter_queryset(*args, **kwargs)
+
+    @function_trace('get_serializer')
+    def get_serializer(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for function-tracing (monitoring)
+        purposes.
+
+        This should be called once per GET request.
+        """
+        return super(CourseIdListView, self).get_serializer(*args, **kwargs)
