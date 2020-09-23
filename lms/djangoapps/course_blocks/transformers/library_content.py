@@ -234,7 +234,7 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
                 # has modified those blocks (for example, content gating may have affected this). So do not
                 # transform the order in that case.
                 if current_children_blocks != current_selected_blocks:
-                    logger.info(
+                    logger.debug(
                         u'Mismatch between the children of %s in the stored state and the actual children for user %s. '
                         'Continuing without order transformation.',
                         str(block_key),
