@@ -2256,6 +2256,7 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(name='discussion', enabled=True, support_level="ps")
         XBlockStudioConfiguration.objects.create(name='problem', enabled=True, support_level="us")
         XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
+        # ORA Block has it's own category.
         XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
         # XBlock masquerading as a problem
         XBlockStudioConfiguration.objects.create(name='drag-and-drop-v2', enabled=True, support_level="fs")
@@ -2433,11 +2434,6 @@ class TestComponentTemplates(CourseTestCase):
             problem_templates = self.get_templates_of_type('problem')
             return self.get_template(problem_templates, label)
 
-        def verify_openassessment_not_present():
-            """ Helper method to verify that openassessment template is present """
-            openassessment = get_xblock_problem('Open Response Assessment')
-            self.assertIsNone(openassessment)
-
         def verify_staffgradedxblock_present(support_level):
             """
             Helper method to verify that staffgradedxblock template is present
@@ -2456,7 +2452,6 @@ class TestComponentTemplates(CourseTestCase):
             self.assertEqual(dndv2.get('category'), 'drag-and-drop-v2')
             self.assertEqual(dndv2.get('support_level'), support_level)
 
-        verify_openassessment_not_present()
         verify_dndv2_present(True)
         verify_staffgradedxblock_present(True)
 
