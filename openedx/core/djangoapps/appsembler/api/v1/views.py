@@ -366,7 +366,7 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
                         else:
                             email_params = {}
 
-                        if not FIX_ENROLLMENT_RESULTS_BUG.is_enabled():
+                        if not FIX_ENROLLMENT_RESULTS_BUG.is_enabled():  # TODO: RED-1387 Clean up after release
                             # RED-1386: Preserve the original bug behaviour and put it behind a feature flag to
                             # decouple deployment from release.
                             results = []

@@ -265,7 +265,6 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
             if rec['identifier'] in new_users_emails:
                 assert CourseEnrollmentAllowed.objects.filter(
                     email=rec['identifier']).exists()
-
                 assert rec['before'] == dict(enrollment=False,
                                              auto_enroll=False,
                                              user=False,
@@ -307,6 +306,8 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         results = response.data['results']
         assert CourseEnrollmentAllowed.objects.count() == len(self.my_course_overviews)
         assert len(results) == len(self.my_course_overviews), 'Ensure result from all courses are returned'
+        assert results[0]['course'] == str(self.my_course_overviews[0].id), 'Flag on: Course ID should be in results'
+        assert results[1]['course'] == str(self.my_course_overviews[1].id), 'Flag on: Course ID should be in results'
 
     def test_enroll_learner_in_two_courses_with_bug(self):
         """
@@ -331,6 +332,7 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         results = response.data['results']
         assert CourseEnrollmentAllowed.objects.count() == len(self.my_course_overviews)
         assert len(results) == 1, 'Ensure the flag preserves the original bug in results'
+        assert 'course' not in results[0], 'Flag is off: Course ID should NOT be returned in results'
 
     def test_enroll_with_other_site_course(self):
 
