@@ -102,7 +102,7 @@ class CreditProviderCallbackSerializerTests(TestCase):
             data={'signature': sig}
         )
         with self.assertRaises(PermissionDenied):
-            # The first arg here is the key that gets grabbed from config
+            # The first arg here is key we have (that doesn't match the sig)
             serializer._compare_signatures('abcd1234', provider.provider_id)
 
     def test_compare_signatures_list_key(self):
@@ -121,7 +121,7 @@ class CreditProviderCallbackSerializerTests(TestCase):
         )
 
         with self.assertRaises(PermissionDenied):
-            # The first arg here is the key that gets grabbed from config
+            # The first arg here is the list of keys he have (that dont matcht the sig)
             serializer._compare_signatures(
                 ['abcd1234', 'xyz789'],
                 provider.provider_id
