@@ -129,13 +129,23 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         expected_result = {
             'badges': {
                 'conversationalist': [{
-                    'description': None, 'image': badge2.image, 'threshold': 2,
-                    'date_created': badge2.date_created, 'type': u'conversationalist',
-                    u'id': badge2.id, 'name': badge2.name
+                    'image': badge2.image,
+                    'color_image': u'',
+                    'congrats_message': u'',
+                    'threshold': 2,
+                    'date_created': badge2.date_created,
+                    'type': u'conversationalist',
+                    u'id': badge2.id,
+                    'name': badge2.name
                 }, {
-                    'description': None, 'image': badge3.image, 'threshold': 5,
-                    'date_created': badge3.date_created, 'type': u'conversationalist',
-                    u'id': badge3.id, 'name': badge3.name
+                    'image': badge3.image,
+                    'color_image': u'',
+                    'congrats_message': u'',
+                    'threshold': 5,
+                    'date_created': badge3.date_created,
+                    'type': u'conversationalist',
+                    u'id': badge3.id,
+                    'name': badge3.name
                 }]
             }
         }
@@ -178,13 +188,17 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         expected_result = {
             'badges': {
                 'conversationalist': [{
-                    'description': None, 'image': badge.image, 'threshold': 2,
-                    'date_created': badge.date_created, 'type': u'conversationalist',
-                    u'id': badge.id, 'name': badge.name
+                    'image': badge.image,
+                    'color_image': u'',
+                    'congrats_message': u'',
+                    'threshold': 2,
+                    'date_created': badge.date_created,
+                    'type': u'conversationalist',
+                    u'id': badge.id,
+                    'name': badge.name
                 }],
                 'team': []
-            },
-            'team_joined': False
+            }
         }
 
         self.assertEqual(expected_result, badges)
@@ -241,7 +255,7 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         :return: None
         """
         badge1 = BadgeFactory(threshold=2)
-        badge2 = BadgeFactory(threshold=2)
+        badge2 = BadgeFactory(threshold=12)
         user_badge1 = UserBadgeFactory(user=self.user, course_id=self.course1.id, badge=badge1, community_id=100)
         user_badge2 = UserBadgeFactory(user=self.user, course_id=self.course1.id, badge=badge2, community_id=101)
 
