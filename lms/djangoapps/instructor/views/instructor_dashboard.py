@@ -5,6 +5,7 @@ Instructor Dashboard Views
 import datetime
 import logging
 import uuid
+import beeline
 
 import pytz
 from django.conf import settings
@@ -94,6 +95,7 @@ def show_analytics_dashboard_message(course_key):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@beeline.traced(name='instructor.views.instructor_dashboard_2')  # TODO: RED-1242: Remove traced after debugging
 def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
     try:
@@ -102,6 +104,7 @@ def instructor_dashboard_2(request, course_id):
         log.error(u"Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
         return HttpResponseServerError()
 
+    beeline.add_context_field("course_id", course_id)
     course = get_course_by_id(course_key, depth=0)
 
     access = {
@@ -112,6 +115,10 @@ def instructor_dashboard_2(request, course_id):
         'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
     }
+    beeline.add_context({
+        'access_{name}'.format(name=name): bool(val)
+        for name, val in access.iteritems()
+    })
     if not access['staff']:
         raise Http404()
 
@@ -193,13 +200,17 @@ def instructor_dashboard_2(request, course_id):
     if certs_enabled and (access['admin'] or access['staff']) and configuration_helpers.get_value('CERTIFICATES_HTML_VIEW', False):
         sections.append(_section_certificates(course))
 
-    openassessment_blocks = modulestore().get_items(
-        course_key, qualifiers={'category': 'openassessment'}
-    )
-    # filter out orphaned openassessment blocks
-    openassessment_blocks = [
-        block for block in openassessment_blocks if block.parent is not None
-    ]
+    with beeline.tracer(name='instructor.views.instructor_dashboard_2.openassessment_blocks_query'):
+        openassessment_blocks = modulestore().get_items(
+            course_key, qualifiers={'category': 'openassessment'}
+        )
+
+    with beeline.tracer(name='instructor.views.instructor_dashboard_2.openassessment_blocks_list'):
+        # filter out orphaned openassessment blocks
+        openassessment_blocks = [
+            block for block in openassessment_blocks if block.parent is not None
+        ]
+
     if len(openassessment_blocks) > 0:
         sections.append(_section_open_response_assessment(request, course, openassessment_blocks, access))
 
@@ -224,23 +235,25 @@ def instructor_dashboard_2(request, course_id):
         kwargs={'course_id': unicode(course_key)}
     )
 
-    certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
+    with beeline.tracer(name='instructor.views.instructor_dashboard_2.get_certificate_invalidations'):
+        certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
 
-    context = {
-        'course': course,
-        'studio_url': get_studio_url(course, 'course'),
-        'sections': sections,
-        'disable_buttons': disable_buttons,
-        'analytics_dashboard_message': analytics_dashboard_message,
-        'certificate_white_list': certificate_white_list,
-        'certificate_invalidations': certificate_invalidations,
-        'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
-        'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
-        'certificate_exception_view_url': certificate_exception_view_url,
-        'certificate_invalidation_view_url': certificate_invalidation_view_url,
-    }
+    with beeline.tracer(name='instructor.views.instructor_dashboard_2.render'):
+        context = {
+            'course': course,
+            'studio_url': get_studio_url(course, 'course'),
+            'sections': sections,
+            'disable_buttons': disable_buttons,
+            'analytics_dashboard_message': analytics_dashboard_message,
+            'certificate_white_list': certificate_white_list,
+            'certificate_invalidations': certificate_invalidations,
+            'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
+            'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
+            'certificate_exception_view_url': certificate_exception_view_url,
+            'certificate_invalidation_view_url': certificate_invalidation_view_url,
+        }
 
-    return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
+        return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
 ## Section functions starting with _section return a dictionary of section data.
@@ -254,6 +267,7 @@ def instructor_dashboard_2(request, course_id):
 ## section_display_name will be used to generate link titles in the nav bar.
 
 
+@beeline.traced('instructor.views._section_e_commerce')
 def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enabled):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -304,6 +318,7 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
     return section_data
 
 
+@beeline.traced('instructor.views._section_special_exams')
 def _section_special_exams(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -317,6 +332,7 @@ def _section_special_exams(course, access):
     return section_data
 
 
+@beeline.traced('instructor.views._section_certificates')
 def _section_certificates(course):
     """Section information for the certificates panel.
 
@@ -431,6 +447,7 @@ def set_course_mode_price(request, course_id):
     return JsonResponse({'message': _("CourseMode price updated successfully")})
 
 
+@beeline.traced('instructor.views._section_course_info')
 def _section_course_info(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -479,6 +496,7 @@ def _section_course_info(course, access):
     return section_data
 
 
+@beeline.traced('instructor.views._section_membership')
 def _section_membership(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -504,6 +522,7 @@ def _section_membership(course, access):
     return section_data
 
 
+@beeline.traced('instructor.views._section_cohort_management')
 def _section_cohort_management(course, access):
     """ Provide data for the corresponding cohort management section """
     course_key = course.id
@@ -526,6 +545,7 @@ def _section_cohort_management(course, access):
     return section_data
 
 
+@beeline.traced('instructor.views._section_discussions_management')
 def _section_discussions_management(course, access):
     """ Provide data for the corresponding discussion management section """
     course_key = course.id
@@ -544,6 +564,7 @@ def _section_discussions_management(course, access):
     return section_data
 
 
+@beeline.traced('instructor.views.instructor_dashboard_2._is_small_course')
 def _is_small_course(course_key):
     """ Compares against MAX_ENROLLMENT_INSTR_BUTTONS to determine if course enrollment is considered small. """
     is_small_course = False
@@ -554,6 +575,7 @@ def _is_small_course(course_key):
     return is_small_course
 
 
+@beeline.traced('instructor.views._section_student_admin')
 def _section_student_admin(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -586,6 +608,7 @@ def _section_student_admin(course, access):
     return section_data
 
 
+@beeline.traced('instructor.views._section_extensions')
 def _section_extensions(course):
     """ Provide data for the corresponding dashboard section """
     section_data = {
@@ -601,6 +624,7 @@ def _section_extensions(course):
     return section_data
 
 
+@beeline.traced('instructor.views._section_data_download')
 def _section_data_download(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -646,6 +670,7 @@ def null_applicable_aside_types(block):  # pylint: disable=unused-argument
     return []
 
 
+@beeline.traced('instructor.views._section_send_email')
 def _section_send_email(course, access):
     """ Provide data for the corresponding bulk email section """
     course_key = course.id
@@ -705,6 +730,7 @@ def _get_dashboard_link(course_key):
     return link
 
 
+@beeline.traced('instructor.views._section_analytics')
 def _section_analytics(course, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
@@ -716,6 +742,7 @@ def _section_analytics(course, access):
     return section_data
 
 
+@beeline.traced('instructor.views._section_metrics')
 def _section_metrics(course, access):
     """Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -733,6 +760,7 @@ def _section_metrics(course, access):
     return section_data
 
 
+@beeline.traced('instructor.views._section_open_response_assessment')
 def _section_open_response_assessment(request, course, openassessment_blocks, access):
     """Provide data for the corresponding dashboard section """
     course_key = course.id
