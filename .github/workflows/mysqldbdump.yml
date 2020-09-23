@@ -1,6 +1,6 @@
 name: mysqldbdump
 on:
-  push:
+  pull_request:    
     branches:
       - 'master'
 jobs:
