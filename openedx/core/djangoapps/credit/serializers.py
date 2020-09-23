@@ -106,7 +106,7 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
         # We need at least 1 key here that we can use to validate the signature
         if isinstance(secret_key, list) and not any(secret_key):
             msg = 'Could not retrieve secret key for credit provider [{}]. ' \
-              'Unable to validate requests from provider.'.format(provider_id)
+                  'Unable to validate requests from provider.'.format(provider_id)
             log.error(msg)
             raise PermissionDenied(msg)
 
@@ -136,7 +136,6 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
             if not key_match:
                 msg = 'Request from credit provider [{}] had an invalid signature.'.format(provider_id)
                 raise PermissionDenied(msg)
-
 
     def validate_signature(self, value):
         """ Validate the signature and ensure the provider is setup properly. """

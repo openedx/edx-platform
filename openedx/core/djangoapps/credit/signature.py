@@ -39,6 +39,7 @@ def _encode_secret(secret, provider_id):
 
     return secret
 
+
 def get_shared_secret_key(provider_id):
     """
     Retrieve the shared secret for a particular credit provider.

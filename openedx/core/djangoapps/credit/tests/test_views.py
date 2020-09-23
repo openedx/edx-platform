@@ -488,6 +488,7 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
             response = self.post_credit_request(self.user.username, self.eligibility.course.course_key)
         self.assertEqual(response.status_code, 400)
 
+
 @ddt.ddt
 @skip_unless_lms
 class CreditProviderCallbackViewTests(UserMixin, TestCase):

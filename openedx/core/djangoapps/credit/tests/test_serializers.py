@@ -91,7 +91,7 @@ class CreditProviderCallbackSerializerTests(TestCase):
     def test_compare_signatures_string_key(self):
         """ Verify compare_signature errors if string key does not match. """
         provider = CreditProviderFactory(
-            provider_id = 'asu',
+            provider_id='asu',
             active=False,
         )
 
@@ -111,7 +111,7 @@ class CreditProviderCallbackSerializerTests(TestCase):
         in config match the key handed in the signature.
         """
         provider = CreditProviderFactory(
-            provider_id = 'asu',
+            provider_id='asu',
             active=False,
         )
 

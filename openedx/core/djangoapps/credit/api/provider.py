@@ -225,7 +225,7 @@ def create_credit_request(course_key, provider_id, username):
         elif isinstance(shared_secret_key, list):
             if not any(shared_secret_key):
                 msg = 'Could not retrieve secret key for credit provider [{}]. ' \
-                  'Unable to validate requests from provider.'.format(provider_id)
+                      'Unable to validate requests from provider.'.format(provider_id)
                 log.error(msg)
                 raise CreditProviderNotConfigured(msg)
             else:
