@@ -3,7 +3,7 @@ Unified course experience settings and helper methods.
 """
 import crum
 from django.utils.translation import ugettext as _
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from waffle import flag_is_active
 
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
@@ -55,7 +55,7 @@ class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
                 if request:
                     value = flag_is_active(request, namespaced_flag_name)
                 else:
-                    set_custom_metric('warn_flag_no_request', True)
+                    set_custom_attribute('warn_flag_no_request', True)
                     # Return the default value if not in a request context.
                     # Same as the original implementation
                     self._set_waffle_flag_metric(namespaced_flag_name, value)

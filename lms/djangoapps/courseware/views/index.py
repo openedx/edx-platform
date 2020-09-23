@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
-from edx_django_utils.monitoring import set_custom_metrics_for_course_key
+from edx_django_utils.monitoring import set_custom_attributes_for_course_key
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
@@ -134,7 +134,7 @@ class CoursewareIndex(View):
         self.url = request.path
 
         try:
-            set_custom_metrics_for_course_key(self.course_key)
+            set_custom_attributes_for_course_key(self.course_key)
             self._clean_position()
             with modulestore().bulk_operations(self.course_key):
 

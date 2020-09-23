@@ -5,7 +5,7 @@ import json
 from time import time
 
 from django.conf import settings
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from edx_rbac.utils import create_role_auth_claim_for_user
 from jwkest import jwk
 from jwkest.jws import JWS
@@ -146,7 +146,7 @@ def _compute_time_fields(expires_in):
     """
     now = int(time())
     expires_in = expires_in or settings.JWT_AUTH['JWT_EXPIRATION']
-    set_custom_metric('jwt_expires_in', expires_in)
+    set_custom_attribute('jwt_expires_in', expires_in)
     return now, now + expires_in
 
 
@@ -195,7 +195,7 @@ def _attach_profile_claim(payload, user):
 
 def _encode_and_sign(payload, use_asymmetric_key, secret):
     """Encode and sign the provided payload."""
-    set_custom_metric('jwt_is_asymmetric', use_asymmetric_key)
+    set_custom_attribute('jwt_is_asymmetric', use_asymmetric_key)
     keys = jwk.KEYS()
 
     if use_asymmetric_key:
