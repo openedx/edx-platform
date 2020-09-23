@@ -14,6 +14,7 @@ from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.appsembler.api.sites import (
     get_site_for_course
 )
+from openedx.core.djangoapps.appsembler.api.v1.waffle import FIX_ENROLLMENT_RESULTS_BUG
 
 from student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
@@ -138,11 +139,14 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
             ManualEnrollmentAudit.create_manual_enrollment_audit(
                 request_user, email, state_transition, reason, enrollment_obj, role
             )
-            results.append({
+            result = {
                 'identifier': identifier,
                 'before': before.to_dict(),
                 'after': after.to_dict(),
-            })
+            }
+            if FIX_ENROLLMENT_RESULTS_BUG.is_enabled():  # TODO: RED-1387 Clean up after release
+                result['course'] = str(course_id)
+            results.append(result)
     return results
 
 
@@ -208,9 +212,12 @@ def unenroll_learners_in_course(course_id, identifiers, unenroll_func, **kwargs)
             ManualEnrollmentAudit.create_manual_enrollment_audit(
                 request_user, email, state_transition, reason, enrollment_obj, role
             )
-            results.append({
+            result = {
                 'identifier': identifier,
                 'before': before.to_dict(),
                 'after': after.to_dict(),
-            })
+            }
+            if FIX_ENROLLMENT_RESULTS_BUG.is_enabled():  # TODO: RED-1387 Clean up after release
+                result['course'] = str(course_id)
+            results.append(result)
     return results
