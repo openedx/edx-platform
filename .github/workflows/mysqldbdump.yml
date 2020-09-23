@@ -6,16 +6,12 @@ on:
 jobs:
   mysqldbdump:
     name: mysqldbdump
-    runs-on: ubuntu-20.04
+    runs-on: test-docker
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Migrate
         run: docker-compose -f ./.github/workflows/docker-compose.yml.mysqldbdump up 
-      - name: Wait for migration to complete
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '600s'
       - name: Dump database
         run: docker exec -i edx.devstack.mysql mysqldump -u'edxapp001' -p'password' edxapp > edxapp.sql
       - name: Commit dump file to repo.
