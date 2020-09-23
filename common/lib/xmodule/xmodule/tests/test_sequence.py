@@ -15,7 +15,9 @@ from freezegun import freeze_time
 from mock import Mock, patch
 from six.moves import range
 
-from xmodule.seq_module import SequenceModule
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from student.tests.factories import UserFactory
+from xmodule.seq_module import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceModule
 from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -60,6 +62,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         xml.ChapterFactory.build(parent=course)  # has 0 child sequences
         chapter_3 = xml.ChapterFactory.build(parent=course)  # has 1 child sequence
         chapter_4 = xml.ChapterFactory.build(parent=course)  # has 1 child sequence, with hide_after_due
+        chapter_5 = xml.ChapterFactory.build(parent=course)  # has 1 child sequence, with a time limit
 
         xml.SequenceFactory.build(parent=chapter_1)
         xml.SequenceFactory.build(parent=chapter_1)
@@ -72,6 +75,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         for _ in range(3):
             xml.VerticalFactory.build(parent=sequence_3_1)
+
+        xml.SequenceFactory.build(
+            parent=chapter_5,
+            is_time_limited=str(True)
+        )
 
         return course
 
@@ -148,6 +156,30 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn("'next_url': 'NextSequential'", html)
         self.assertIn("'prev_url': 'PrevSequential'", html)
         self.assertNotIn("fa fa-check-circle check-circle is-hidden", html)
+
+    @patch('xmodule.seq_module.User.objects.get', return_value=UserFactory.build())
+    def test_timed_exam_gating_waffle_flag(self, mocked_user):
+        """
+        Verify the code inside the waffle flag is not executed with the flag off
+        Verify the code inside the waffle flag is executed with the flag on
+        """
+        # the order of the overrides is important since the `assert_not_called` does
+        # not appear to be limited to just the override_waffle_flag = False scope
+        with override_waffle_flag(TIMED_EXAM_GATING_WAFFLE_FLAG, active=False):
+            self._get_rendered_view(
+                self.sequence_5_1,
+                extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+                view=STUDENT_VIEW
+            )
+            mocked_user.assert_not_called()
+
+        with override_waffle_flag(TIMED_EXAM_GATING_WAFFLE_FLAG, active=True):
+            self._get_rendered_view(
+                self.sequence_5_1,
+                extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+                view=STUDENT_VIEW
+            )
+            mocked_user.assert_called_once()
 
     @ddt.unpack
     @ddt.data(
