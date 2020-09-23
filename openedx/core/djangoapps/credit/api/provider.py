@@ -227,7 +227,7 @@ def create_credit_request(course_key, provider_id, username):
                 msg = 'Could not retrieve secret key for credit provider [{}]. ' \
                   'Unable to validate requests from provider.'.format(provider_id)
                 log.error(msg)
-                raise PermissionDenied(msg)
+                raise CreditProviderNotConfigured(msg)
             else:
                 # Use the first non-None key you have. This assumes the provider
                 # can accept a new key on their end that they gave you
