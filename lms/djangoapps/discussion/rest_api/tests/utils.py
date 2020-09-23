@@ -381,7 +381,6 @@ class CommentsServiceMockMixin(object):
         """
         Returns expected thread data in API response
         """
-        # TODO: Try to see if we can add count_flags here. Currently create_thread removes count_flags
         response_data = {
             "author": self.user.username,
             "author_label": None,
