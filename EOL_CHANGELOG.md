@@ -1,5 +1,8 @@
 # Changelog EOL
 
+### 23/09/2020 Update send email message at instructor view
+- Update success message. Append the email targets (lms/static/js/instructor_dashboard/send_email.js)
+
 ### 26/08/2020 Send email with *reply_to* attribute at instructor view
 - New attribute on model *CourseEmail* (lms/djangoapps/bulk_email/models.py)
 - Add *reply_to* attribute into *EmailMultiAlternatives()* (lms/djangoapps/bulk_email/tasks.py)

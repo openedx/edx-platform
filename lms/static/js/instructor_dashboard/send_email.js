@@ -60,12 +60,29 @@
             this.$email_messages_wrapper = this.$container.find('.email-messages-wrapper');
             this.$btn_send.click(function() {
                 var body, confirmMessage, displayTarget, fullConfirmMessage, message,
-                    sendData, subject, reply_to, successMessage, target, targets, validation, i, len;
+                    sendData, subject, reply_to, successMessage, target, targets, targets_name, sendedToMessage, validation, i, len;
                 subject = sendemail.$subject.val();
                 reply_to = sendemail.$reply_to.val();
                 body = sendemail.$emailEditor.save().data;
                 targets = [];
+                targets_name = [];
+                displayTarget = function(value) {
+                    if (value === 'myself') {
+                        return gettext('Yourself');
+                    } else if (value === 'staff') {
+                        return gettext('Everyone who has staff privileges in this course');
+                    } else if (value === 'learners') {
+                        return gettext('All learners who are enrolled in this course');
+                    } else if (value.startsWith('cohort')) {
+                        return gettext('All learners in the {cohort_name} cohort')
+                            .replace('{cohort_name}', value.slice(value.indexOf(':') + 1));
+                    } else if (value.startsWith('track')) {
+                        return gettext('All learners in the {track_name} track')
+                            .replace('{track_name}', value.slice(value.indexOf(':') + 1));
+                    }
+                };
                 sendemail.$send_to.filter(':checked').each(function() {
+                    targets_name.push(displayTarget(this.value));
                     return targets.push(this.value);
                 });
                 if (subject === '') {
@@ -84,22 +101,8 @@
                         alert(message);  // eslint-disable-line no-alert
                         return false;
                     }
-                    displayTarget = function(value) {
-                        if (value === 'myself') {
-                            return gettext('Yourself');
-                        } else if (value === 'staff') {
-                            return gettext('Everyone who has staff privileges in this course');
-                        } else if (value === 'learners') {
-                            return gettext('All learners who are enrolled in this course');
-                        } else if (value.startsWith('cohort')) {
-                            return gettext('All learners in the {cohort_name} cohort')
-                                .replace('{cohort_name}', value.slice(value.indexOf(':') + 1));
-                        } else if (value.startsWith('track')) {
-                            return gettext('All learners in the {track_name} track')
-                                .replace('{track_name}', value.slice(value.indexOf(':') + 1));
-                        }
-                    };
-                    successMessage = gettext('Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.');  // eslint-disable-line max-len
+                    sendedToMessage = '<br /><br />Enviado a: <br />- ' + targets_name.toString().replace(/\,/g, "<br />- ");
+                    successMessage = gettext('Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.') + sendedToMessage;  // eslint-disable-line max-len
                     confirmMessage = gettext(
                         'You are sending an email message with the subject {subject} to the following recipients.');
                     for (i = 0, len = targets.length; i < len; i++) {
@@ -225,7 +228,7 @@
         SendEmail.prototype.display_response = function(dataFromServer) {
             this.$task_response.empty();
             this.$request_response_error.empty();
-            this.$task_response.text(dataFromServer);
+            this.$task_response.html(dataFromServer);
             return $('.msg-confirm').css({
                 display: 'block'
             });
