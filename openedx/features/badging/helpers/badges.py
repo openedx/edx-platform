@@ -10,15 +10,14 @@ from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.teams import is_feature_enabled as is_teams_feature_enabled
 from lms.djangoapps.teams.models import CourseTeam
 from nodebb.constants import CONVERSATIONALIST_ENTRY_INDEX, TEAM_PLAYER_ENTRY_INDEX
-
 from openedx.features.badging.constants import (
-    BADGES_KEY,
     BADGES_DATE_EARNED_KEY,
+    BADGES_KEY,
     BADGES_PROGRESS_KEY,
-    COURSES_KEY,
     CONVERSATIONALIST,
-    DISCUSSION_ID_KEY,
+    COURSES_KEY,
     DISCUSSION_COUNT_KEY,
+    DISCUSSION_ID_KEY,
     FILTER_BADGES_ERROR,
     POST_COUNT_KEY,
     TEAM_COUNT_KEY,

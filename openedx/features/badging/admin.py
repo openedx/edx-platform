@@ -2,6 +2,7 @@
 Admin site bindings for badging models
 """
 from django.contrib import admin
+
 from .models import Badge, UserBadge
 
 

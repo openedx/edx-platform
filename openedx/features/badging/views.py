@@ -4,14 +4,15 @@ Badging app views
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views.decorators.http import require_GET
+from opaque_keys.edx.keys import CourseKey
 
+from common.lib.nodebb_client.client import NodeBBClient
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey
-from student.models import CourseEnrollment
 from nodebb.models import DiscussionCommunity
-from common.lib.nodebb_client.client import NodeBBClient
+from student.models import CourseEnrollment
 
+from .constants import BADGES_KEY, COMMUNITY_URL_KEY, COURSE_ID_KEY, COURSE_NAME_KEY, COURSES_KEY
 from .helpers.badges import (
     add_posts_count_in_badges_list,
     get_badge_progress_request_data,
@@ -20,7 +21,6 @@ from .helpers.badges import (
     populate_trophycase
 )
 from .models import UserBadge
-from .constants import BADGES_KEY, COURSES_KEY, COURSE_ID_KEY, COMMUNITY_URL_KEY, COURSE_NAME_KEY
 
 
 @require_GET

@@ -3,6 +3,7 @@ This module is essentially a broker to `xmodule/tabs.py`, It was originally intr
 to display My Badges in Course Experience side menu for the badging feature
 """
 from django.utils.translation import ugettext_noop
+
 from xmodule.tabs import CourseTab
 
 
