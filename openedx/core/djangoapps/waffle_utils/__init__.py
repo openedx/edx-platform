@@ -381,7 +381,7 @@ def _get_waffle_flag_custom_attributes_set():
 # .. toggle_name: WAFFLE_FLAG_CUSTOM_ATTRIBUTES
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: A list of waffle flag to track with custom attributes having
+# .. toggle_description: A list of waffle flags to track with custom attributes having
 #   values of (True, False, or Both).
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2020-06-17
