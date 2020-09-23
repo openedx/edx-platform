@@ -17,7 +17,7 @@ cd "$REPO_NAME"
 git config --global user.name "${GITHUB_USER}"
 git config --global user.email "${GITHUB_EMAIL}"
 
-obsolete_dump_pr=`../hub-linux*/bin/hub pr list -s open  | grep 'github-actions-mysqldbdump' | awk '{print $1}' | sed 's/\#//g'`
+obsolete_dump_pr=`../hub-linux*/bin/hub pr list -s open  | grep "${DB_NAME} MySQL database dump" | awk '{print $1}' | sed 's/\#//g'`
 if [[ ! -z $obsolete_dump_pr ]]; then
  ../hub-linux*/bin/hub issue update $obsolete_dump_pr -s closed
 fi
@@ -26,4 +26,4 @@ git checkout -b github-actions-mysqldbdump/$GITHUB_SHA
 git add "${DB_NAME}".sql
 git commit  -m "MySQLdbdump" --author "GitHub Actions MySQLdbdump automation <admin@edx.org>"
 git push --set-upstream origin github-actions-mysqldbdump/$GITHUB_SHA
-../hub-linux*/bin/hub pull-request -m "${DB_NAME} MySQL database dump" -m "MySQL database dump" -l github-actions-mysqldbdump
+../hub-linux*/bin/hub pull-request -m "${DB_NAME} MySQL database dump" -m "MySQL database dump"
