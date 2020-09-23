@@ -1,19 +1,15 @@
 name: mysqldbdump
 on:
-  pull_request:
+  push:
     branches:
       - 'master'
 jobs:
   mysqldbdump:
     name: mysqldbdump
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-        if: github.event_name == 'pull_request'
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.ref }}
       - name: Migrate
         run: docker-compose -f ./.github/workflows/docker-compose.yml.mysqldbdump up 
       - name: Wait for migration to complete
@@ -22,3 +18,7 @@ jobs:
           time: '600s'
       - name: Dump database
         run: docker exec -i edx.devstack.mysql mysqldump -u'edxapp001' -p'password' edxapp > edxapp.sql
+      - name: Commit dump file to repo.
+        run: ./.github/workflows/mysqldbdump_pr.sh
+        env:
+          GH_ACCESS_TOKEN: ${{ secrets.EDX_DEPLOYMENT_GH_TOKEN }}
