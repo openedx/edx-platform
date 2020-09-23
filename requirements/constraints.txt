@@ -55,6 +55,9 @@ isort<5.0.0
 # 0.15.0 dropped support for Python 3.5
 joblib<0.15.0
 
+# Version 2.0.0 is giving incompatible versions errors on upgrade
+importlib-metadata==1.7.0
+
 # jsonfield2 3.1.0 drops support for python 3.5
 jsonfield2<3.1.0
 
