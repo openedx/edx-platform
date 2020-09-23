@@ -2442,10 +2442,10 @@ class TestComponentTemplates(CourseTestCase):
             """
             Helper method to verify that staffgradedxblock template is present
             """
-            dndv2 = get_xblock_problem('Staff Graded Points')
-            self.assertIsNotNone(dndv2)
-            self.assertEqual(dndv2.get('category'), 'staffgradedxblock')
-            self.assertEqual(dndv2.get('support_level'), support_level)
+            sgp = get_xblock_problem('Staff Graded Points')
+            self.assertIsNotNone(sgp)
+            self.assertEqual(sgp.get('category'), 'staffgradedxblock')
+            self.assertEqual(sgp.get('support_level'), support_level)
 
         def verify_dndv2_present(support_level):
             """
