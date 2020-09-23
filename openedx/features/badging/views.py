@@ -1,3 +1,6 @@
+"""
+Badging app views
+"""
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views.decorators.http import require_GET
@@ -18,6 +21,9 @@ from .constants import BADGES_KEY, COURSES_KEY, COURSE_ID_KEY, COMMUNITY_URL_KEY
 @require_GET
 @login_required
 def trophycase(request):
+    """
+    This displays list of all badges in enrolled courses
+    """
     user = request.user
 
     # Get course id and course name of courses user is enrolled in

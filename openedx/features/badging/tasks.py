@@ -1,3 +1,6 @@
+"""
+Celery tasks used by badging
+"""
 from celery.task import task
 from django.conf import settings
 from django.urls import reverse

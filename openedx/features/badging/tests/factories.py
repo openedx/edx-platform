@@ -1,3 +1,6 @@
+"""
+Factories for badging models
+"""
 import factory
 
 from faker.providers import internet
@@ -12,7 +15,10 @@ factory.Faker.add_provider(internet)
 
 
 class BadgeFactory(factory.django.DjangoModelFactory):
-    class Meta:
+    """
+    Factory for Badge model
+    """
+    class Meta:  # pylint: disable=old-style-class
         model = Badge
 
     name = factory.Faker('name')
@@ -22,7 +28,10 @@ class BadgeFactory(factory.django.DjangoModelFactory):
 
 
 class UserBadgeFactory(factory.django.DjangoModelFactory):
-    class Meta:
+    """
+    Factory for UserBadge model
+    """
+    class Meta:  # pylint: disable=old-style-class
         model = UserBadge
 
     badge = factory.SubFactory(BadgeFactory)

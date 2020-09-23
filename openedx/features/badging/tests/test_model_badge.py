@@ -1,3 +1,6 @@
+"""
+Unit tests for Badge model
+"""
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -8,9 +11,12 @@ from openedx.features.badging.tests.factories import BadgeFactory
 
 
 class BadgeModelTestCases(TestCase):
+    """
+    Unit tests for Badge model
+    """
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser',
-                                             password='12345')
+        super(BadgeModelTestCases, self).setUp()
+        self.user = User.objects.create_user(username='testuser', password='12345')
 
     def test_save_badge_normal(self):
         """

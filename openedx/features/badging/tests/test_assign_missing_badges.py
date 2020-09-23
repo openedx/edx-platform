@@ -1,3 +1,6 @@
+"""
+Unit tests for missing badges assignment
+"""
 import factory
 
 from django.db.models import signals
@@ -16,8 +19,12 @@ from .factories import BadgeFactory, UserBadgeFactory
 
 
 class MissingBadgeTestCase(TestCase):
+    """
+    Unit test the missing badge assignment
+    """
 
     def setUp(self):
+        super(MissingBadgeTestCase, self).setUp()
         self.team_badge = BadgeFactory(type=TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX])
         self.course_key = CourseKey.from_string('abc/course/123')
         self.test_chat_room_id = 200

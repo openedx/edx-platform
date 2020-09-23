@@ -1,3 +1,6 @@
+"""
+Helper methods
+"""
 import json
 from collections import OrderedDict
 
@@ -265,7 +268,7 @@ def add_badge_progress(course_badges, posts_count):
     :param posts_count: Count of post in Int format
     """
     previous_threshold = 0
-    for index, badge in enumerate(course_badges):
+    for badge in course_badges:
         badge[THRESHOLD_LABEL_KEY] = badge[THRESHOLD_LABEL_KEY] - previous_threshold
         previous_threshold = badge[THRESHOLD_LABEL_KEY] + previous_threshold
         if BADGES_DATE_EARNED_KEY in badge:
