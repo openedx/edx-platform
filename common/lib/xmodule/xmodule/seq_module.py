@@ -287,6 +287,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         prereq_met = True
         prereq_meta_info = {}
 
+
         if TIMED_EXAM_GATING_WAFFLE_FLAG.is_enabled():
             # Content type gating for FBE previously only gated individual blocks
             # This was an issue because audit learners could start a timed exam and then be unable to complete the exam
