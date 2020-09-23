@@ -49,7 +49,7 @@ export default class Wizard extends React.Component {
   renderPage() {
     if (this.state.totalPages) {
       const page = this.state.pages[this.state.currentPage - 1];
-      if(page.type.name === Wizard.Closer.name) {
+      if (page.type.name === Wizard.Closer.name) {
         return page.props.children;
       }
 
@@ -66,12 +66,12 @@ export default class Wizard extends React.Component {
   renderError() {
     const errorPage = this.findSubComponentByType(Wizard.ErrorPage.name)[0];
     return (
-      <div className="wizard-container">
+      <div className="wizard-container" role="dialog" aria-label={gettext("demographics questionnaire")}>
         <div className="wizard-header">
           {errorPage.props.children}
         </div>
         <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
-          <button className="wizard-button blue" onClick={this.props.onWizardComplete}>{gettext("Close")}</button>
+          <button className="wizard-button blue" arial-label={gettext("close questionnaire")} onClick={this.props.onWizardComplete}>{gettext("Close")}</button>
         </div>
       </div>
     )
@@ -89,29 +89,29 @@ export default class Wizard extends React.Component {
    * If a learner is on the final page of the modal, meaning they have answered all of the
    * questions, clicking the "Return to my dashboard" button will also dismiss the CTA from the
    * course dashboard.
-   */ 
+   */
   async wizardComplete() {
     if (this.onFinalPage()) {
       this.props.dismissBanner();
     }
-    
+
     this.props.onWizardComplete();
   }
 
   render() {
     const finalPage = this.onFinalPage();
-    if(this.props.error) {
+    if (this.props.error) {
       return this.renderError();
     }
     return (
-      <div className="wizard-container">
+      <div className="wizard-container" role="dialog" aria-label={gettext("demographics questionnaire")}>
         <div className="wizard-header mb-4">
           {this.state.totalPages >= this.state.currentPage && this.renderHeader()}
         </div>
         {this.renderPage()}
         <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
-          <button className={`wizard-button ${finalPage && 'blue'}`} onClick={this.wizardComplete}>{finalPage ? gettext("Return to my dashboard") : gettext("Finish later")}</button>
-          <button className="wizard-button blue" hidden={finalPage} onClick={this.handleNext}>{gettext("Next")}</button>
+          <button className={`wizard-button ${finalPage && 'blue'}`} onClick={this.wizardComplete} aria-label={gettext("finish later")}>{finalPage ? gettext("Return to my dashboard") : gettext("Finish later")}</button>
+          <button className="wizard-button blue" hidden={finalPage} onClick={this.handleNext} aria-label={gettext("next page")}>{gettext("Next")}</button>
         </div>
       </div>
     );
