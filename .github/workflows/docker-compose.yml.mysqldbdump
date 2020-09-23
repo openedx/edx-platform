@@ -16,7 +16,7 @@ services:
       retries: 10
   edxapp:
     image: edxops/edxapp:latest
-    command: bash -c '/edx/bin/edxapp-migrate-lms'
+    command: /edx/bin/edxapp-migrate-lms
     volumes:
        - ../../:/edx/app/edxapp/edx-platform
     depends_on:
