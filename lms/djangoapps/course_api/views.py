@@ -195,6 +195,50 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
         return super(LazyPageNumberPagination, self).get_paginated_response(data)
 
+    @function_trace('pagination_paginate_queryset')
+    def paginate_queryset(self, queryset, request, view=None):
+        """
+        Paginate a queryset if required, either returning a
+        page object, or `None` if pagination is not configured for this view.
+
+        This is copied verbatim from upstream with added function traces.
+        https://github.com/encode/django-rest-framework/blob/c6e24521dab27a7af8e8637a32b868ffa03dec2f/rest_framework/pagination.py#L191
+        """
+        with function_trace('pagination_paginate_queryset_get_page_size'):
+            page_size = self.get_page_size(request)
+            if not page_size:
+                return None
+
+        with function_trace('pagination_paginate_queryset_construct_paginator_instance'):
+            paginator = self.django_paginator_class(queryset, page_size)
+
+        with function_trace('pagination_paginate_queryset_get_page_number'):
+            page_number = request.query_params.get(self.page_query_param, 1)
+
+        if page_number in self.last_page_strings:
+            page_number = paginator.num_pages
+
+        with function_trace('pagination_paginate_queryset_get_page'):
+            try:
+                self.page = paginator.page(page_number)
+            except InvalidPage as exc:
+                msg = self.invalid_page_message.format(
+                    page_number=page_number, message=str(exc)
+                )
+                raise NotFound(msg)
+
+        with function_trace('pagination_paginate_queryset_get_num_pages'):
+            if paginator.num_pages > 1 and self.template is not None:
+                # The browsable API should display pagination controls.
+                self.display_page_controls = True
+
+        self.request = request
+
+        with function_trace('pagination_paginate_queryset_listify_page'):
+            page_list = list(self.page)
+
+        return page_list
+
 
 @view_auth_classes(is_authenticated=False)
 class CourseListView(DeveloperErrorViewMixin, ListAPIView):
