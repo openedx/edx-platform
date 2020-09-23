@@ -6,6 +6,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from common.lib.mandrill_client.client import MandrillClient
+from openedx.features.badging.helpers.notifications import send_user_badge_notification
 
 from .constants import COURSE_ID_KEY, MY_BADGES_URL_NAME
 
@@ -15,8 +16,6 @@ def task_user_badge_notify(user, course_id, badge_name):
     """
     Send email and generate a notification to user, when he earns new badge.
     """
-    from .helpers import send_user_badge_notification
-
     my_badge_url = u'{host}{path}'.format(
         host=settings.LMS_ROOT_URL,
         path=reverse(MY_BADGES_URL_NAME, kwargs={COURSE_ID_KEY: course_id})

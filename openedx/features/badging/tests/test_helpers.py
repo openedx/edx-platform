@@ -8,12 +8,12 @@ from django.db.models import signals
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from nodebb.constants import CONVERSATIONALIST_ENTRY_INDEX, TEAM_PLAYER_ENTRY_INDEX
 from openedx.features.badging.constants import CONVERSATIONALIST, TEAM_PLAYER
+from openedx.features.badging.helpers import badges as badge_helpers, notifications as notification_helpers
 from openedx.features.teams.tests.factories import TeamGroupChatFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from .. import helpers as badge_helpers
 from ..handlers import register_notification_types
 from ..models import Badge
 from .factories import BadgeFactory, UserBadgeFactory
@@ -47,7 +47,7 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         with self.assertRaises(TypeError):
             badge_helpers.populate_trophycase(user=self.user, courses=None, earned_badges=mock.ANY)
 
-    @mock.patch('openedx.features.badging.helpers.get_course_badges')
+    @mock.patch('openedx.features.badging.helpers.badges.get_course_badges')
     def test_populate_trophycase_successful_and_ordered_by_course_name(self, mock_get_course_badges):
         """
         For a list of courses, trophy case should return data sorted by course name
@@ -83,7 +83,7 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         self.assertEqual(expected_return_value['test1/123/1'], course_detail[0])
         self.assertEqual(expected_return_value['test2/123/1'], course_detail[1])
 
-    @mock.patch('openedx.features.badging.helpers.Badge.objects.all')
+    @mock.patch('openedx.features.badging.helpers.badges.Badge.objects.all')
     def test_get_course_badges_with_empty_badge_queryset(self, mock_badge_objects_all):
         """
         Testing optional parameter badge_queryset. If it is None or not passed to function, it
@@ -100,10 +100,10 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
 
         self.assertEqual(str(error.exception), message)
 
-    @mock.patch('openedx.features.badging.helpers.add_badge_earned_date')
-    @mock.patch('openedx.features.badging.helpers.filter_earned_badge_by_joined_team')
-    @mock.patch('openedx.features.badging.helpers.is_teams_feature_enabled')
-    @mock.patch('openedx.features.badging.helpers.get_course_by_id')
+    @mock.patch('openedx.features.badging.helpers.badges.add_badge_earned_date')
+    @mock.patch('openedx.features.badging.helpers.badges.filter_earned_badge_by_joined_team')
+    @mock.patch('openedx.features.badging.helpers.badges.is_teams_feature_enabled')
+    @mock.patch('openedx.features.badging.helpers.badges.get_course_by_id')
     def test_get_course_badges_successfully(self, mock_get_course_by_id,
                                         mock_is_teams_feature_enabled,
                                         mock_filter_earned_badge_by_joined_team,
@@ -150,10 +150,10 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         self.assertIn('conversationalist', badge_keys)
         self.assertNotIn('team', badge_keys)
 
-    @mock.patch('openedx.features.badging.helpers.add_badge_earned_date')
-    @mock.patch('openedx.features.badging.helpers.filter_earned_badge_by_joined_team')
-    @mock.patch('openedx.features.badging.helpers.is_teams_feature_enabled')
-    @mock.patch('openedx.features.badging.helpers.get_course_by_id')
+    @mock.patch('openedx.features.badging.helpers.badges.add_badge_earned_date')
+    @mock.patch('openedx.features.badging.helpers.badges.filter_earned_badge_by_joined_team')
+    @mock.patch('openedx.features.badging.helpers.badges.is_teams_feature_enabled')
+    @mock.patch('openedx.features.badging.helpers.badges.get_course_by_id')
     def test_get_course_badges_user_not_joined_any_course_team(self, mock_get_course_by_id,
                                                        mock_is_teams_feature_enabled,
                                                        mock_filter_earned_badge_by_joined_team,
@@ -282,8 +282,8 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         self.assertIsNone(course_team)
         self.assertEqual(earned_badges, list())
 
-    @mock.patch('openedx.features.badging.helpers.render_to_string')
-    @mock.patch('openedx.features.badging.helpers.publish_notification_to_user')
+    @mock.patch('openedx.features.badging.helpers.notifications.render_to_string')
+    @mock.patch('openedx.features.badging.helpers.notifications.publish_notification_to_user')
     def test_send_user_badge_notification(self, mock_publish_notification_to_user,
                                           mock_render_to_string):
         """
@@ -296,7 +296,7 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
         register_notification_types(None)
         mock_render_to_string.return_value = 'You have earned a new badge:<br><strong>newly_earned_badge_name</strong>'
 
-        badge_helpers.send_user_badge_notification(self.user, 'dummy_badge_url', 'newly_earned_badge_name')
+        notification_helpers.send_user_badge_notification(self.user, 'dummy_badge_url', 'newly_earned_badge_name')
 
         expected_context = {
             'badge_name': 'newly_earned_badge_name'

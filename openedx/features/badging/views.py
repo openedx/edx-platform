@@ -12,8 +12,13 @@ from student.models import CourseEnrollment
 from nodebb.models import DiscussionCommunity
 from common.lib.nodebb_client.client import NodeBBClient
 
-from .helpers import populate_trophycase, get_course_badges, add_posts_count_in_badges_list, \
-    get_discussion_team_ids, get_badge_progress_request_data
+from .helpers.badges import (
+    add_posts_count_in_badges_list,
+    get_badge_progress_request_data,
+    get_course_badges,
+    get_discussion_team_ids,
+    populate_trophycase
+)
 from .models import UserBadge
 from .constants import BADGES_KEY, COURSES_KEY, COURSE_ID_KEY, COMMUNITY_URL_KEY, COURSE_NAME_KEY
 
@@ -26,11 +31,9 @@ def trophycase(request):
     """
     user = request.user
 
-    # Get course id and course name of courses user is enrolled in
     enrolled_courses_data = CourseEnrollment.enrollments_for_user(user).order_by(
         COURSE_NAME_KEY).values_list(COURSE_ID_KEY, COURSE_NAME_KEY)
 
-    # list of badges earned by user
     earned_user_badges = list(
         UserBadge.objects.filter(user=user)
     )
