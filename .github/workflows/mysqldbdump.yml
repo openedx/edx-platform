@@ -1,6 +1,6 @@
 name: mysqldbdump
 on:
-  push:
+  pull_request:
     branches:
       - 'master'
 jobs:
@@ -11,14 +11,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Migrate
-        run: docker-compose -f ./.github/workflows/docker-compose.yml.mysqldbdump up -d
+        run: docker-compose -f ./.github/workflows/docker-compose.yml.mysqldbdump up 
       - name: Wait for migration to complete
         uses: jakejarvis/wait-action@master
         with:
           time: '600s'
       - name: Dump database
         run: docker exec -i edx.devstack.mysql mysqldump -u'edxapp001' -p'password' edxapp > edxapp.sql
-      - name: Commit dump file to repo.
-        run: ./.github/workflows/mysqldbdump_pr.sh
-        env:
-          GH_ACCESS_TOKEN: ${{ secrets.EDX_DEPLOYMENT_GH_TOKEN }}
