@@ -1,5 +1,5 @@
 """
-Helper methods
+All helper methods related to badges
 """
 import json
 from collections import OrderedDict

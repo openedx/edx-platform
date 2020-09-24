@@ -1,6 +1,6 @@
 """
-This module is essentially a broker to `xmodule/tabs.py`, It was originally introduced
-to display My Badges in Course Experience side menu for the badging feature
+This module is essentially a broker to `xmodule/tabs.py`. It was originally introduced
+to display "My Badges" in Course Experience side menu for the badging feature
 """
 from django.utils.translation import ugettext_noop
 

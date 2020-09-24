@@ -27,7 +27,13 @@ from .models import UserBadge
 @login_required
 def trophycase(request):
     """
-    This displays list of all badges in enrolled courses
+    This view displays list of all badges in enrolled courses
+
+    Args:
+        request (HttpRequest): Django request object
+
+    Returns:
+        HttpResponse: Template with context
     """
     user = request.user
 
@@ -76,7 +82,15 @@ def trophycase(request):
 @require_GET
 @login_required
 def my_badges(request, course_id):
-    """ this function returns badges related to on course """
+    """
+    This view displays list of all badges related to one course
+
+    Args:
+        request (HttpRequest): Django request object
+
+    Returns:
+        HttpResponse: Template with context
+    """
     user = request.user
 
     course_key = CourseKey.from_string(unicode(course_id))

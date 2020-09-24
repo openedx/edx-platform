@@ -42,7 +42,7 @@ class BadgeManager(models.Manager):
 
 class Badge(models.Model):
     """
-    This stores the badge information
+    Model to store badge information
     """
     BADGE_TYPES = (
         badge_constants.CONVERSATIONALIST,

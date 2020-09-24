@@ -8,7 +8,8 @@ from django.db.models import signals
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from nodebb.constants import CONVERSATIONALIST_ENTRY_INDEX, TEAM_PLAYER_ENTRY_INDEX
 from openedx.features.badging.constants import CONVERSATIONALIST, TEAM_PLAYER
-from openedx.features.badging.helpers import badges as badge_helpers, notifications as notification_helpers
+from openedx.features.badging.helpers import badges as badge_helpers
+from openedx.features.badging.helpers import notifications as notification_helpers
 from openedx.features.teams.tests.factories import TeamGroupChatFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -105,9 +106,8 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
     @mock.patch('openedx.features.badging.helpers.badges.is_teams_feature_enabled')
     @mock.patch('openedx.features.badging.helpers.badges.get_course_by_id')
     def test_get_course_badges_successfully(self, mock_get_course_by_id,
-                                        mock_is_teams_feature_enabled,
-                                        mock_filter_earned_badge_by_joined_team,
-                                        mock_add_badge_earned_date):  # pylint: disable=unused-argument
+            mock_is_teams_feature_enabled, mock_filter_earned_badge_by_joined_team,
+            mock_add_badge_earned_date):  # pylint: disable=unused-argument
         """
         Create 1 course, 3 badges (1 team, 2 conversationalist), none of the badges are earned, to test success case
         :param mock_get_course_by_id: mock course id, because it is irrelevant here
@@ -165,9 +165,8 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
     @mock.patch('openedx.features.badging.helpers.badges.is_teams_feature_enabled')
     @mock.patch('openedx.features.badging.helpers.badges.get_course_by_id')
     def test_get_course_badges_user_not_joined_any_course_team(self, mock_get_course_by_id,
-                                                       mock_is_teams_feature_enabled,
-                                                       mock_filter_earned_badge_by_joined_team,
-                                                       mock_add_badge_earned_date):  # pylint: disable=unused-argument
+           mock_is_teams_feature_enabled, mock_filter_earned_badge_by_joined_team,
+           mock_add_badge_earned_date):  # pylint: disable=unused-argument
         """
         Create 1 course, 1 conversationalist badge, to test course badges, when team feature is enabled but user
         has not joined any team in a course

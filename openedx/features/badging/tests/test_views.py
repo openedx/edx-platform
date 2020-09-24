@@ -3,10 +3,10 @@ Unit tests for badging views
 """
 import mock
 from django.core.urlresolvers import reverse
+
 from lms.djangoapps.onboarding.tests.factories import UserFactory
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from openedx.core.djangolib.testing.philu_utils import (clear_philu_theme,
-                                                        configure_philu_theme)
+from openedx.core.djangolib.testing.philu_utils import clear_philu_theme, configure_philu_theme
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

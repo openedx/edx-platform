@@ -2,14 +2,13 @@
 Unit tests for missing badges assignment
 """
 import factory
-
 from django.db.models import signals
 from django.test import TestCase
 from mock import patch
+from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from nodebb.constants import TEAM_PLAYER_ENTRY_INDEX
-from opaque_keys.edx.keys import CourseKey
 from openedx.features.badging.constants import BADGE_ID_KEY, TEAM_PLAYER
 from openedx.features.badging.models import UserBadge
 from openedx.features.teams.tests.factories import TeamGroupChatFactory

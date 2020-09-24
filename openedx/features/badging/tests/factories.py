@@ -2,13 +2,12 @@
 Factories for badging models
 """
 import factory
-
 from faker.providers import internet
+from opaque_keys.edx.keys import CourseKey
 
 from nodebb.constants import CONVERSATIONALIST_ENTRY_INDEX
-from openedx.features.badging.models import Badge, UserBadge
 from openedx.features.badging.constants import CONVERSATIONALIST
-from opaque_keys.edx.keys import CourseKey
+from openedx.features.badging.models import Badge, UserBadge
 from student.tests.factories import UserFactory
 
 factory.Faker.add_provider(internet)
