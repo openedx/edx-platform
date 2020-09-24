@@ -121,7 +121,7 @@ BROKER_POOL_LIMIT = 0
 BROKER_CONNECTION_TIMEOUT = 1
 
 # For the Result Store, use the django cache named 'celery'
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 # When the broker is behind an ELB, use a heartbeat to refresh the
 # connection and to detect if it has been dropped.
@@ -771,8 +771,8 @@ CREDIT_PROVIDER_SECRET_KEYS = AUTH_TOKENS.get("CREDIT_PROVIDER_SECRET_KEYS", {})
 
 ##################### LTI Provider #####################
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
-    INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
-    AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+    INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
+    AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 
 LTI_USER_EMAIL_DOMAIN = ENV_TOKENS.get('LTI_USER_EMAIL_DOMAIN', 'lti.example.com')
 

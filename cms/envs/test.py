@@ -14,7 +14,6 @@ sessions. Assumes structure:
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 
-from .common import *
 import os
 from uuid import uuid4
 
@@ -22,10 +21,13 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.lib.derived import derive_settings
-from util.db import NoOpMigrationModules
+
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
+
+from .common import *
 
 # import settings from LMS for consistent behavior with CMS
-from lms.envs.test import (
+from lms.envs.test import (  # pylint: disable=wrong-import-order
     COMPREHENSIVE_THEME_DIRS,
     DEFAULT_FILE_STORAGE,
     ECOMMERCE_API_URL,
@@ -183,9 +185,13 @@ BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', '
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
+# test_status_cancel in cms/cms_user_tasks/test.py is failing without this
+# @override_setting for BROKER_URL is not working in testcase, so updating here
+BROKER_URL = 'memory://localhost/'
 
 ########################### Server Ports ###################################
 

@@ -1803,9 +1803,6 @@
     "{seconds} {unit}": "{seconds} {unit}",
     "{start_strong}{total}{end_strong} words submitted in total.": "t\u1ed5ng c\u1ed9ng {start_strong}{total}{end_strong} t\u1eeb \u0111\u00e3 g\u1eedi.",
     "{totalItems} total": "t\u1ed5ng s\u1ed1 {totalItems}",
-    "{total_results} result": [
-      "{total_results} k\u1ebft qu\u1ea3"
-    ],
     "{type} Progress": "{type} Ti\u1ebfn \u0111\u1ed9",
     "\u2026": "..."
   };

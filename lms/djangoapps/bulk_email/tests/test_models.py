@@ -31,7 +31,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class CourseEmailTest(ModuleStoreTestCase):
     """Test the CourseEmail model."""
 

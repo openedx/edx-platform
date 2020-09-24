@@ -2262,9 +2262,6 @@
     "{sessionDates} - Currently Selected": "{sessionDates} - \u5f53\u524d\u5df2\u9009",
     "{start_strong}{total}{end_strong} words submitted in total.": "\u5171\u63d0\u4ea4{start_strong}{total}{end_strong}\u5b57\u3002",
     "{totalItems} total": "\u5171{totalItems} ",
-    "{total_results} result": [
-      "{total_results} \u7ed3\u679c"
-    ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",
     "{type} Progress": "{type}\u8fdb\u5ea6",
     "\u2026": "\u2026"

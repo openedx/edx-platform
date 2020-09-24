@@ -5,7 +5,7 @@ Experimentation URLs
 
 from django.conf.urls import include, url
 
-from experiments import routers, views, views_custom
+from . import routers, views, views_custom
 
 router = routers.DefaultRouter()
 router.register(r'data', views.ExperimentDataViewSet, basename='data')

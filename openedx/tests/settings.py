@@ -13,7 +13,7 @@ from path import Path
 # TODO: Remove the rest of the sys.path modification here and in (cms|lms)/envs/common.py
 REPO_ROOT = Path(__file__).abspath().dirname().dirname().dirname()  # /edx-platform/
 sys.path.append(REPO_ROOT / 'common' / 'djangoapps')
-sys.path.append(REPO_ROOT / 'lms' / 'djangoapps')
+sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'lms')
 
 ALL_LANGUAGES = []
 
@@ -64,7 +64,6 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'djcelery',
     'django_sites_extensions',
     'openedx.core.djangoapps.django_comment_common',
     'openedx.core.djangoapps.video_config',
@@ -91,7 +90,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.external_user_ids',
     'openedx.core.djangoapps.demographics',
 
-    'experiments',
+    'lms.djangoapps.experiments',
     'openedx.features.content_type_gating',
     'openedx.features.course_duration_limits',
     'openedx.features.discounts',

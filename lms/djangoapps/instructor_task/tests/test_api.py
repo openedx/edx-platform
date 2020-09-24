@@ -189,7 +189,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             task_function(self.create_task_request(self.instructor), location, **params)
 
 
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
 

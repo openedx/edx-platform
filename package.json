@@ -47,6 +47,7 @@
     "raw-loader": "0.5.1",
     "react": "16.1.0",
     "react-dom": "16.1.2",
+    "react-focus-lock": "^1.19.1",
     "react-redux": "5.0.7",
     "react-router-dom": "5.1.2",
     "react-slick": "0.16.0",

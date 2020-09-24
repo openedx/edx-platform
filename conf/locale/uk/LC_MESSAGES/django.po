@@ -122,7 +122,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-13 20:43+0000\n"
+"POT-Creation-Date: 2020-09-20 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
@@ -17720,7 +17720,6 @@ msgid "Sysadmin"
 msgstr "Системний адміністратор"
 
 #: lms/templates/header/navbar-logo-header.html
-#: lms/templates/header/user_dropdown.html
 msgid "{name} Dashboard"
 msgstr ""
 
@@ -21056,6 +21055,27 @@ msgstr ""
 msgid "Unsupported Advance Modules"
 msgstr ""
 
+#: cms/templates/course_outline.html cms/templates/settings_advanced.html
+msgid ""
+"This course has proctored exam settings that are incomplete or invalid."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To update these settings go to the {link_start}Proctored Exam Settings "
+"page{link_end}."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To update these settings go to the {link_start}Advanced Settings "
+"page{link_end}."
+msgstr ""
+
+#: cms/templates/course_outline.html cms/templates/settings_advanced.html
+msgid "Proctoring Settings Errors"
+msgstr ""
+
 #: cms/templates/course_outline.html
 msgid "Click to add a new section"
 msgstr "Клацніть, щоб додатки новий розділ"
@@ -23219,6 +23239,18 @@ msgstr ""
 "інформація включає в себе огляд курсу, зображення курсу, вступне відео та "
 "прогнозовані вимоги до часу. Студенти враховують іформацію на сторінці \"Про"
 " курс\" під час вибору курсу."
+
+#: cms/templates/settings_advanced.html
+msgid ""
+"You will be unable to make changes until the errors are resolved. To update "
+"these settings go to the {link_start}Proctored Exam Settings page{link_end}."
+msgstr ""
+
+#: cms/templates/settings_advanced.html
+msgid ""
+"You will be unable to make changes until the following settings are updated "
+"on the page below."
+msgstr ""
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."

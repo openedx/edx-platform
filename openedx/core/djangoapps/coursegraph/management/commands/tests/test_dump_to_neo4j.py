@@ -414,9 +414,10 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)
 
         self.assertCourseDump(
             mock_graph,
@@ -441,9 +442,10 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph(transaction_errors=True)
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)
 
         self.assertCourseDump(
             mock_graph,
@@ -472,17 +474,18 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
         # run once to warm the cache
         self.mss.dump_courses_to_neo4j(
-            mock_credentials, override_cache=override_cache
+            credentials, override_cache=override_cache
         )
 
         # when run the second time, only dump courses if the cache override
         # is enabled
         submitted, __ = self.mss.dump_courses_to_neo4j(
-            mock_credentials, override_cache=override_cache
+            credentials, override_cache=override_cache
         )
         self.assertEqual(len(submitted), expected_number_courses)
 
@@ -496,10 +499,11 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
         # run once to warm the cache
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)
         self.assertEqual(len(submitted), len(self.course_strings))
 
         # simulate one of the courses being published
@@ -507,7 +511,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
             update_block_structure_on_course_publish(None, self.course.id)
 
         # make sure only the published course was dumped
-        submitted, __ = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, __ = self.mss.dump_courses_to_neo4j(credentials)
         self.assertEqual(len(submitted), 1)
         self.assertEqual(submitted[0], six.text_type(self.course.id))
 

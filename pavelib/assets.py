@@ -767,7 +767,7 @@ def webpack(options):
     static_root_lms, config_path = result
     static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
     additional_node_env_vars = json.dumps(Env.get_django_settings("ADDITIONAL_NODE_ENV_VARS", "cms",
-                                                                  settings=settings).replace("'", '"'))
+                                                                  settings=settings).replace("'", '"')) # pylint: disable=no-member
     environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} \
     ADDITIONAL_NODE_ENV_VARS={additional_node_env_vars}'.format(
         node_env="development" if config_path == 'webpack.dev.config.js' else "production",

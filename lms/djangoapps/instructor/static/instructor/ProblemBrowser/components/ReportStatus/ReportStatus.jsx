@@ -14,7 +14,7 @@ const ReportStatus = ({ error, succeeded, inProgress, reportPath }) => {
 
   const successMessage = (
     <div className="msg success">
-      {gettext('Your report has being successfully generated.')}
+      {gettext('Your report has been successfully generated.')}
       {reportPath &&
       <a href={reportPath}>
         <Icon hidden className={['fa', 'fa-link']} />

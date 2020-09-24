@@ -48,7 +48,7 @@ from datetime import timedelta
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
-    USE_TZ, ALL_LANGUAGES, update_module_store_settings, ASSET_IGNORE_REGEX,
+    USE_TZ, ALL_LANGUAGES, ASSET_IGNORE_REGEX,
     PARENTAL_CONSENT_AGE_LIMIT, REGISTRATION_EMAIL_PATTERNS_ALLOWED,
     # The following PROFILE_IMAGE_* settings are included as they are
     # indirectly accessed through the email opt-in API, which is
@@ -1313,7 +1313,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'djcelery',
+    'django_celery_results',
     'method_override',
 
     # Common Initialization
@@ -1443,7 +1443,7 @@ INSTALLED_APPS = [
     # by installed apps.
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
     'lms.djangoapps.courseware',
-    'coursewarehistoryextended',
+    'lms.djangoapps.coursewarehistoryextended',
     'survey.apps.SurveyConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'completion',
@@ -1502,7 +1502,7 @@ INSTALLED_APPS = [
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
-    'experiments',
+    'lms.djangoapps.experiments',
 
     'openedx.core.djangoapps.external_user_ids',
     # so sample_task is available to celery workers
@@ -1659,6 +1659,7 @@ OPTIONAL_APPS = (
     ('integrated_channels.xapi', None),
     ('integrated_channels.cornerstone', None),
     ('integrated_channels.canvas', None),
+    ('integrated_channels.moodle', None),
 )
 
 

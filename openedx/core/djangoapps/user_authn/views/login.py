@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
-from edx_django_utils.monitoring import set_custom_attribute
+from edx_django_utils.monitoring import set_custom_metric
 from ratelimit.decorators import ratelimit
 from ratelimitbackend.exceptions import RateLimitException
 from rest_framework.views import APIView
@@ -296,7 +296,7 @@ def _check_user_auth_flow(site, user):
             # User has a nonstandard email so we record their id.
             # we don't record their e-mail in case there is sensitive info accidentally
             # in there.
-            set_custom_attribute('login_tpa_domain_shortcircuit_user_id', user.id)
+            set_custom_metric('login_tpa_domain_shortcircuit_user_id', user.id)
             log.warn("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)
             return
         user_domain = email_parts[1].strip().lower()
@@ -399,7 +399,7 @@ def login_user(request):
     first_party_auth_requested = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     is_user_third_party_authenticated = False
 
-    set_custom_attribute('login_user_course_id', request.POST.get('course_id'))
+    set_custom_metric('login_user_course_id', request.POST.get('course_id'))
 
     try:
         if third_party_auth_requested and not first_party_auth_requested:
@@ -413,10 +413,10 @@ def login_user(request):
             try:
                 user = _do_third_party_auth(request)
                 is_user_third_party_authenticated = True
-                set_custom_attribute('login_user_tpa_success', True)
+                set_custom_metric('login_user_tpa_success', True)
             except AuthFailedError as e:
-                set_custom_attribute('login_user_tpa_success', False)
-                set_custom_attribute('login_user_tpa_failure_msg', e.value)
+                set_custom_metric('login_user_tpa_success', False)
+                set_custom_metric('login_user_tpa_failure_msg', e.value)
 
                 # user successfully authenticated with a third party provider, but has no linked Open edX account
                 response_content = e.get_response()
@@ -454,9 +454,9 @@ def login_user(request):
         # Ensure that the external marketing site can
         # detect that the user is logged in.
         response = set_logged_in_cookies(request, response, possibly_authenticated_user)
-        set_custom_attribute('login_user_auth_failed_error', False)
-        set_custom_attribute('login_user_response_status', response.status_code)
-        set_custom_attribute('login_user_redirect_url', redirect_url)
+        set_custom_metric('login_user_auth_failed_error', False)
+        set_custom_metric('login_user_response_status', response.status_code)
+        set_custom_metric('login_user_redirect_url', redirect_url)
         return response
     except AuthFailedError as error:
         response_content = error.get_response()
@@ -465,8 +465,8 @@ def login_user(request):
             response_content['email'] = user.email
 
         response = JsonResponse(response_content, status=400)
-        set_custom_attribute('login_user_auth_failed_error', True)
-        set_custom_attribute('login_user_response_status', response.status_code)
+        set_custom_metric('login_user_auth_failed_error', True)
+        set_custom_metric('login_user_response_status', response.status_code)
         return response
 
 
@@ -540,12 +540,12 @@ def _parse_analytics_param_for_course_id(request):
         # Works for an HttpRequest but not a rest_framework.request.Request.
         # Note: This case seems to be used for tests only.
         request.POST = modified_request
-        set_custom_attribute('login_user_request_type', 'django')
+        set_custom_metric('login_user_request_type', 'django')
     else:
         # The request must be a rest_framework.request.Request.
         # Note: Only DRF seems to be used in Production.
         request._data = modified_request  # pylint: disable=protected-access
-        set_custom_attribute('login_user_request_type', 'drf')
+        set_custom_metric('login_user_request_type', 'drf')
 
     # Include the course ID if it's specified in the analytics info
     # so it can be included in analytics events.
@@ -555,7 +555,7 @@ def _parse_analytics_param_for_course_id(request):
             if "enroll_course_id" in analytics:
                 modified_request["course_id"] = analytics.get("enroll_course_id")
         except (ValueError, TypeError):
-            set_custom_attribute('shim_analytics_course_id', 'parse-error')
+            set_custom_metric('shim_analytics_course_id', 'parse-error')
             log.error(
                 u"Could not parse analytics object sent to user API: {analytics}".format(
                     analytics=analytics

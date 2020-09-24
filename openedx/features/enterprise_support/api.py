@@ -53,7 +53,6 @@ class EnterpriseApiException(Exception):
     """
     Exception for errors while communicating with the Enterprise service API.
     """
-    pass
 
 
 class ConsentApiClient(object):
@@ -130,7 +129,6 @@ class ConsentApiServiceClient(EnterpriseServiceClientMixin, ConsentApiClient):
     """
     Class for producing an Enterprise Consent API client with service user.
     """
-    pass
 
 
 class EnterpriseApiClient(object):
@@ -473,6 +471,7 @@ def enterprise_customer_uuid_for_request(request):
     if enterprise_customer_uuid is _CACHE_MISS and request.user.is_authenticated:
         # If there's no way to get an Enterprise UUID for the request, check to see
         # if there's already an Enterprise attached to the requesting user on the backend.
+        enterprise_customer = None
         learner_data = get_enterprise_learner_data_from_db(request.user)
         if learner_data:
             enterprise_customer = learner_data[0]['enterprise_customer']
@@ -662,10 +661,11 @@ def get_enterprise_learner_portal_enabled_message(request):
         add_enterprise_customer_to_session(request, enterprise_customer)
         if enterprise_customer:
             cache_enterprise(enterprise_customer)
-        else:
-            return None
 
-    if enterprise_customer['enable_learner_portal']:
+    if not enterprise_customer:
+        return None
+
+    if enterprise_customer.get('enable_learner_portal', False):
         learner_portal_url = settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + enterprise_customer['slug']
         return Text(_(
             "Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a custom dashboard for learning. "

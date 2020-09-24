@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-13 20:50+0000\n"
-"PO-Revision-Date: 2020-09-13 20:50:15.788352\n"
+"POT-Creation-Date: 2020-09-20 20:49+0000\n"
+"PO-Revision-Date: 2020-09-20 20:49:35.964813\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -21116,7 +21116,6 @@ msgid "Sysadmin"
 msgstr "Sýsädmïn Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/header/navbar-logo-header.html
-#: lms/templates/header/user_dropdown.html
 msgid "{name} Dashboard"
 msgstr "{name} Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -25294,6 +25293,33 @@ msgstr ""
 msgid "Unsupported Advance Modules"
 msgstr "Ûnsüppörtéd Àdvänçé Mödülés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
+#: cms/templates/course_outline.html cms/templates/settings_advanced.html
+msgid ""
+"This course has proctored exam settings that are incomplete or invalid."
+msgstr ""
+"Thïs çöürsé häs pröçtöréd éxäm séttïngs thät äré ïnçömplété ör ïnvälïd. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: cms/templates/course_outline.html
+msgid ""
+"To update these settings go to the {link_start}Proctored Exam Settings "
+"page{link_end}."
+msgstr ""
+"Tö üpdäté thésé séttïngs gö tö thé {link_start}Pröçtöréd Éxäm Séttïngs "
+"pägé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/templates/course_outline.html
+msgid ""
+"To update these settings go to the {link_start}Advanced Settings "
+"page{link_end}."
+msgstr ""
+"Tö üpdäté thésé séttïngs gö tö thé {link_start}Àdvänçéd Séttïngs "
+"pägé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/course_outline.html cms/templates/settings_advanced.html
+msgid "Proctoring Settings Errors"
+msgstr "Pröçtörïng Séttïngs Érrörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
 #: cms/templates/course_outline.html
 msgid "Click to add a new section"
 msgstr "Çlïçk tö ädd ä néw séçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
@@ -28113,6 +28139,28 @@ msgstr ""
 "єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
 "αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
 "νσłυρтα#"
+
+#: cms/templates/settings_advanced.html
+msgid ""
+"You will be unable to make changes until the errors are resolved. To update "
+"these settings go to the {link_start}Proctored Exam Settings page{link_end}."
+msgstr ""
+"Ýöü wïll ßé ünäßlé tö mäké çhängés üntïl thé érrörs äré résölvéd. Tö üpdäté "
+"thésé séttïngs gö tö thé {link_start}Pröçtöréd Éxäm Séttïngs pägé{link_end}."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσя#"
+
+#: cms/templates/settings_advanced.html
+msgid ""
+"You will be unable to make changes until the following settings are updated "
+"on the page below."
+msgstr ""
+"Ýöü wïll ßé ünäßlé tö mäké çhängés üntïl thé föllöwïng séttïngs äré üpdätéd "
+"ön thé pägé ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."

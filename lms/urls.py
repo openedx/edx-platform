@@ -13,8 +13,8 @@ from edx_api_doc_tools import make_docs_urls
 from edx_django_utils.plugins import get_plugin_url_patterns
 from ratelimitbackend import admin
 
-from branding import views as branding_views
-from debug import views as debug_views
+from lms.djangoapps.branding import views as branding_views
+from lms.djangoapps.debug import views as debug_views
 from lms.djangoapps.certificates import views as certificates_views
 from lms.djangoapps.courseware.masquerade import MasqueradeView
 from lms.djangoapps.courseware.module_render import (
@@ -31,6 +31,8 @@ from lms.djangoapps.discussion.config.settings import is_forum_daily_digest_enab
 from lms.djangoapps.discussion.notification_prefs import views as notification_prefs_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
+from lms.djangoapps.staticbook import views as staticbook_views
+from lms.djangoapps.static_template_view import views as static_template_view_views
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -49,8 +51,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
-from static_template_view import views as static_template_view_views
-from staticbook import views as staticbook_views
 from student import views as student_views
 from util import views as util_views
 
@@ -159,7 +159,7 @@ urlpatterns = [
     url(r'^api/course_modes/', include(('course_modes.rest_api.urls', 'common.djangoapps.course_mods'),
                                        namespace='course_modes_api')),
 
-    url(r'^verify_student/', include('verify_student.urls')),
+    url(r'^verify_student/', include('lms.djangoapps.verify_student.urls')),
 
     # URLs for managing dark launches of languages
     url(r'^update_lang/', include(('openedx.core.djangoapps.dark_lang.urls', 'openedx.core.djangoapps.dark_lang'),
@@ -212,7 +212,7 @@ urlpatterns += [
 # the custom tab catch-all)
 if settings.WIKI_ENABLED:
     from wiki.urls import get_pattern as wiki_pattern
-    from course_wiki import views as course_wiki_views
+    from lms.djangoapps.course_wiki import views as course_wiki_views
     from django_notify.urls import get_pattern as notify_pattern
 
     wiki_url_patterns, wiki_app_name = wiki_pattern()
@@ -854,7 +854,7 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
 
 # Certificates
 urlpatterns += [
-    url(r'^certificates/', include('certificates.urls')),
+    url(r'^certificates/', include('lms.djangoapps.certificates.urls')),
 
     # Backwards compatibility with XQueue, which uses URLs that are not prefixed with /certificates/
     url(r'^update_certificate$', certificates_views.update_certificate, name='update_certificate'),
@@ -885,7 +885,7 @@ if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
 # Access to courseware as an LTI provider
 if settings.FEATURES.get('ENABLE_LTI_PROVIDER'):
     urlpatterns += [
-        url(r'^lti_provider/', include('lti_provider.urls')),
+        url(r'^lti_provider/', include('lms.djangoapps.lti_provider.urls')),
     ]
 
 urlpatterns += [

@@ -30,10 +30,10 @@ from six.moves import range
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
 from .common import *
 
-from util.db import NoOpMigrationModules  # pylint: disable=wrong-import-order
 from util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
 
 # This patch disables the commit_on_success decorator during tests
@@ -305,7 +305,7 @@ GIT_REPO_DIR = TEST_ROOT / "course_repos"
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 
