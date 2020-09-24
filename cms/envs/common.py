@@ -725,7 +725,7 @@ MIDDLEWARE = [
     'edx_django_utils.cache.middleware.TieredCacheMiddleware',
 
     # Outputs monitoring metrics for a request.
-    'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
+    'edx_rest_framework_extensions.middleware.RequestCustomAttributesMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
 
