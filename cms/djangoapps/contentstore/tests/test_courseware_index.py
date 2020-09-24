@@ -1231,9 +1231,9 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         """
         Return content values from args tuple in a mocked calls list.
         """
-        kall = mock_index.call_args
-        args, kwargs = kall  # pylint: disable=unused-variable
-        return args[0]
+        call = mock_index.call_args
+        (indexed_content, ), kwargs = call  # pylint: disable=unused-variable
+        return indexed_content
 
     def reindex_course(self, store):
         """ kick off complete reindex of the course """
