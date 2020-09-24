@@ -3,28 +3,25 @@ Studio views for the tiers app.
 """
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views.generic import View
+from django.views.generic import TemplateView
 
-from openedx.core.djangoapps.appsembler.sites.utils import (
-    get_site_by_organization,
-    get_single_user_organization,
-)
+from openedx.core.djangoapps.appsembler.sites.utils import get_single_user_organization
 
 
-class SiteUnavailableRedirectView(View):
+class SiteUnavailableRedirectView(TemplateView):
     """
-    Studio view to redirect to the LMS view (above).
+    Studio Site Unavailable view.
+
+    This works in the Studio and shows a message.
     """
+    template_name = 'site-unavailable.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SiteUnavailableRedirectView, self).get_context_data(**kwargs)
+        context['organization'] = get_single_user_organization(self.request.user)
+        return context
 
     @method_decorator(login_required)
-    def get(self, request):
-        organization = get_single_user_organization(request.user)
-        site = get_site_by_organization(organization)
-        return redirect('{protocol}://{domain}{page}'.format(
-            protocol='https' if request.is_secure() else 'http',
-            domain=site.domain,  # This don't will redirect to the Tahoe domain. Custom domains are not supported yet.
-            page=reverse('site_unavailable'),
-        ))
+    def get(self, request, *args, **kwargs):
+        return super(SiteUnavailableRedirectView, self).get(request, *args, **kwargs)
