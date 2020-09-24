@@ -12,8 +12,8 @@ from model_utils.models import TimeStampedModel
 from lms.djangoapps.onboarding.models import Organization
 from openedx.features.philu_utils.backend_storage import CustomS3Storage
 from openedx.features.philu_utils.utils import bytes_to_mb
-
 from util.philu_utils import UploadToPathAndRename
+
 from .constants import CITY_MAX_LENGTH, IDEA_FILE_MAX_SIZE, IDEA_IMAGE_MAX_SIZE, OVERVIEW_MAX_LENGTH, TITLE_MAX_LENGTH
 
 
