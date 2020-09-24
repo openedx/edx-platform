@@ -120,8 +120,8 @@ define(['js/views/validation',
                         JSON.parse(stringValue);
                     } catch (e) {
                         jsonValidationErrors.push({
-                            key,
-                            message: "Incorrectly formatted JSON",
+                            key: key,
+                            message: 'Incorrectly formatted JSON',
                             model: {display_name: displayName}
                         });
                     }
@@ -162,7 +162,7 @@ define(['js/views/validation',
                 var self = this;
                 err_modal = new ValidationErrorModal();
                 err_modal.setContent(content);
-                err_modal.setResetCallback(function() {self.revertView()});
+                err_modal.setResetCallback(function() { self.revertView(); });
                 err_modal.show();
             },
             revertView: function() {
