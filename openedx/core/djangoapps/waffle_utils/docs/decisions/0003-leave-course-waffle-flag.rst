@@ -4,7 +4,7 @@ Leave CourseWaffleFlag
 Status
 ======
 
-Draft
+Accepted
 
 Context
 =======

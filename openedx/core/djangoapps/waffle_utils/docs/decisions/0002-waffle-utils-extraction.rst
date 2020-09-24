@@ -4,7 +4,7 @@ Waffle Utils Extraction
 Status
 ======
 
-Draft
+Accepted
 
 Context
 =======

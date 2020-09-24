@@ -4,7 +4,7 @@ Waffle Util Namespacing
 Status
 ======
 
-Draft
+Accepted
 
 Context
 =======
@@ -31,13 +31,8 @@ Consequences
 
 This change will enable WaffleFlag, WaffleSwitch, and all subclasses to have a simpler interface. In addition to a simpler constructor, we will no longer need to differentiate between an instance's namespaced and non-namespaced name.
 
-.. note:: It would probably be simpler to make this change before these classes are extracted to ``edx-toggles``, so we have fewer places to update.
+A possible rollout plan would be to introduce WaffleFlag and WaffleSwitch classes with the new interface when they are added into edx-toggles, and deprecate the old versions in edx-platform. This would enable us to reuse the same class names with a new import, for an iterative rollout.
 
-Implementation Steps:
+Although it would be nice to update CourseWaffleFlag to have a similar interface for consistency, it is a lower priority if it is not moving to edx-toggles. See 0003-leave-course-waffle-flag.rst.
 
-* A rollout plan will be required to introduce this backward incompatible change. A possible plan might include the following:
-
-  * This could include adding WaffleFlag2, WaffleSwitch2, CourseWaffleFlag2, etc. as new superclasses with the newer interface.
-  * Once all known flags and switches have been updated, we can use the toggle state endpoint to see if there were any that were missed.
-  * Once we are sure we know all usages of these classes, we can remove the old classes and rename the newer ones.
-  * This change needs to be documented for the next Open edX release.
+This change needs be documented for the next Open edX release.
