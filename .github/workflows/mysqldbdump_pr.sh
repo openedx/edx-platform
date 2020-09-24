@@ -17,9 +17,14 @@ cd "$REPO_NAME"
 git config --global user.name "${GITHUB_USER}"
 git config --global user.email "${GITHUB_EMAIL}"
 
-obsolete_dump_pr=`../hub-linux*/bin/hub pr list -s open  | grep "${DB_NAME} MySQL database dump" | awk '{print $1}' | sed 's/\#//g'`
-if [[ ! -z $obsolete_dump_pr ]]; then
- ../hub-linux*/bin/hub issue update $obsolete_dump_pr -s closed
+obsolete_dump_prs=`../hub-linux*/bin/hub pr list -s open --format '%I:%H %n' | grep 'github-actions-mysqldbdump'`
+
+if [[ ! -z $obsolete_dump_prs ]]; then
+ for pr in $obsolete_dump_prs; do
+   IFS=':' read pr_num branch <<< "$pr"
+     ../hub-linux*/bin/hub issue update ${pr_num} -s closed
+     ../hub-linux*/bin/hub push origin --delete ${branch}
+ done
 fi
 
 git checkout -b github-actions-mysqldbdump/$GITHUB_SHA
