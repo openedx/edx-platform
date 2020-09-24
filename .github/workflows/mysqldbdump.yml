@@ -1,19 +1,21 @@
 name: mysqldbdump
 on:
-  pull_request:    
+  pull_request:
     branches:
       - 'master'
 jobs:
   mysqldbdump:
     name: mysqldbdump
-    runs-on: test-docker
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Migrate
         run: docker-compose -f ./.github/workflows/docker-compose.yml.mysqldbdump up 
+      - name: Wait for migration to complete
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '600s'
       - name: Dump database
         run: docker exec -i edx.devstack.mysql mysqldump -u'edxapp001' -p'password' edxapp > edxapp.sql
       - name: Commit dump file to repo.
