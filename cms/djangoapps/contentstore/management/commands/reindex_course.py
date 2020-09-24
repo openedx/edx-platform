@@ -75,7 +75,6 @@ class Command(BaseCommand):
             if setup_option:
                 for index_name in index_names:
                     try:
-                        # try getting the ElasticSearch engine
                         searcher = SearchEngine.get_search_engine(index_name)
                     except exceptions.ElasticsearchException as exc:
                         logging.exception(u'Search Engine error - %s', exc)

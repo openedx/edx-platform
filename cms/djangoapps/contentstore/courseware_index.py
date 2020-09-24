@@ -371,17 +371,17 @@ class CoursewareSearchIndexer(SearchIndexerBase):
         return cls._do_reindex(modulestore, course_key)
 
     @classmethod
-    def _do_reindex(cls, modulestore, course_key):
+    def _do_reindex(cls, modulestore, structure_key):
         """
         (Re)index course content within the given structure.
 
         The course_info index is indexed with the courseware_content index. This method
         helps to track the fact that course_info reindex has taken place.
         """
-        indexed_count = super()._do_reindex(modulestore, course_key)
+        indexed_count = super()._do_reindex(modulestore, structure_key)
         if indexed_count:
             course_about = CourseAboutSearchIndexer
-            course_about._track_index_request(
+            cls._track_index_request(
                 course_about.INDEX_EVENT['name'],
                 course_about.INDEX_EVENT['category'],
                 indexed_count
