@@ -18,8 +18,10 @@ from lms.djangoapps.courseware.courses import (
     get_courses,
     get_permission_for_course_about
 )
+from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import LazySequence
+from student.models import CourseAccessRole
 from student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -170,19 +172,40 @@ def list_course_keys(request, username, role):
     """
     user = get_effective_user(request.user, username)
 
-    course_keys = CourseOverview.get_all_course_keys()
+    all_course_keys = CourseOverview.get_all_course_keys()
 
     # Global staff have access to all courses. Filter courses for non-global staff.
     if GlobalStaff().has_user(user):
-        return course_keys
+        return all_course_keys
 
-    return LazySequence(
-        (
-            course_key for course_key in course_keys
-            if has_access(user, role, course_key)
-        ),
-        est_len=len(course_keys)
-    )
+    if role == 'staff':
+        # This short-circuit implementation bypasses has_access() which we think is too slow for some users when
+        # evaluating staff-level course access for Insights.  Various tickets have context on this issue: CR-2487,
+        # TNL-7448, DESUPPORT-416, and probably more.
+        #
+        # This is a simplified implementation that does not consider org-level access grants (e.g. when course_id is
+        # blank).
+        filtered_course_keys = (
+            CourseAccessRole.objects.filter(
+                user=user,
+                # Having the instructor role implies staff access. This fact was reverse-engineered from unit tests.
+                role__in=['staff', 'instructor'],
+            )
+            .exclude(course_id=CourseKeyField.Empty)
+            .order_by('course_id')
+            .values_list('course_id', flat=True)
+            .distinct()
+        )
+    else:
+        # This is the original implementation which still covers the case where role = "instructor":
+        filtered_course_keys = LazySequence(
+            (
+                course_key for course_key in all_course_keys
+                if has_access(user, role, course_key)
+            ),
+            est_len=len(all_course_keys)
+        )
+    return filtered_course_keys
 
 
 def get_due_dates(request, course_key, user):
