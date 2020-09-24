@@ -20,6 +20,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
 )
 from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
 from openedx.core.lib import blockstore_api
@@ -430,6 +431,49 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         sm = get_score(self.student_a, block_id)
         self.assertEqual(sm.grade, 1)
         self.assertEqual(sm.max_grade, 1)
+
+    @skip_unless_lms
+    def test_i18n(self):
+        """
+        Test that a block's rendered content respects the Accept-Language header and returns translated content.
+        """
+        block_id = library_api.create_library_block(self.library.key, "problem", "i18n_problem").usage_key
+        new_olx = """
+        <problem display_name="New Multi Choice Question" max_attempts="5">
+            <multiplechoiceresponse>
+                <p>This is a normal capa problem. It has "maximum attempts" set to **5**.</p>
+                <label>Blockstore is designed to store.</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">XBlock metadata only</choice>
+                    <choice correct="true">XBlock data/metadata and associated static asset files</choice>
+                    <choice correct="false">Static asset files for XBlocks and courseware</choice>
+                    <choice correct="false">XModule metadata only</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """.strip()
+        library_api.set_library_block_olx(block_id, new_olx)
+        library_api.publish_changes(self.library.key)
+
+        # Enable the dummy language in darklang
+        DarkLangConfig(
+            released_languages='eo',
+            changed_by=self.student_a,
+            enabled=True
+        ).save()
+
+        client = APIClient()
+
+        # View the problem without specifying a language
+        default_public_view = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='public_view'))
+        self.assertIn("Submit", default_public_view.data["content"])
+        self.assertNotIn("Süßmït", default_public_view.data["content"])
+
+        # View the problem and request the dummy language
+        dummy_public_view = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='public_view'),
+                                       HTTP_ACCEPT_LANGUAGE='eo')
+        self.assertIn("Süßmït", dummy_public_view.data["content"])
+        self.assertNotIn("Submit", dummy_public_view.data["content"])
 
 
 @requires_blockstore
