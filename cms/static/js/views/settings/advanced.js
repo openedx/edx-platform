@@ -147,23 +147,24 @@ define(['js/views/validation',
                     },
                     silent: true,
                     error: function(model, response, options) {
-                        var json_response;
+                        var jsonResponse;
 
                 /* Check that the server came back with a bad request error*/
                         if (response.status === 400) {
-                            json_response = $.parseJSON(response.responseText);
-                            self.showErrorModal(json_response);
+                            jsonResponse = $.parseJSON(response.responseText);
+                            self.showErrorModal(jsonResponse);
                         }
                     }
                 });
             },
             showErrorModal: function(content) {
                 /* initialize and show validation error modal */
-                var self = this;
-                err_modal = new ValidationErrorModal();
-                err_modal.setContent(content);
-                err_modal.setResetCallback(function() { self.revertView(); });
-                err_modal.show();
+                var self, errModal;
+                self = this;
+                errModal = new ValidationErrorModal();
+                errModal.setContent(content);
+                errModal.setResetCallback(function() { self.revertView(); });
+                errModal.show();
             },
             revertView: function() {
                 var self = this;
