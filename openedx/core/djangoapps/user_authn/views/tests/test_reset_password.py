@@ -39,7 +39,7 @@ from openedx.core.djangoapps.user_authn.views.password_reset import (
     SETTING_CHANGE_INITIATED, password_reset,
     PasswordResetConfirmWrapper)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory
+from student.tests.factories import TEST_PASSWORD, UserFactory
 from student.tests.test_configuration_overrides import fake_get_value
 from student.tests.test_email import mock_render_to_string
 
@@ -629,3 +629,52 @@ class PasswordResetViewTest(UserAPITestCase):
                 "supplementalLink": "",
             }
         ])
+
+
+@skip_unless_lms
+class PasswordResetTokenValidateViewTest(UserAPITestCase):
+    """Tests of the user API's password reset endpoint. """
+
+    def setUp(self):
+        super(PasswordResetTokenValidateViewTest, self).setUp()
+        self.user = UserFactory.create()
+        self.user.is_active = False
+        self.user.save()
+        self.token = '{uidb36}-{token}'.format(
+            uidb36=int_to_base36(self.user.id),
+            token=default_token_generator.make_token(self.user)
+        )
+        self.url = reverse("user_api_password_reset_token_validate")
+
+    def test_reset_password_valid_token(self):
+        """
+        Verify that API valid token response and activate user if not active.
+        """
+        response = self.client.post(self.url, data={'token': self.token})
+        json_response = json.loads(response.content.decode('utf-8'))
+        self.assertTrue(json_response.get('is_valid'))
+
+        self.user = User.objects.get(pk=self.user.pk)
+        self.assertTrue(self.user.is_active)
+
+    def test_reset_password_invalid_token(self):
+        """
+        Verify that API invalid token response if token is invalid.
+        """
+        response = self.client.post(self.url, data={'token': 'invalid-token'})
+        json_response = json.loads(response.content.decode('utf-8'))
+        self.assertFalse(json_response.get('is_valid'))
+
+    def test_reset_password_token_with_other_user(self):
+        """
+        Verify that API returns invalid token response if the user different.
+        """
+        different_user = UserFactory.create(password=TEST_PASSWORD)
+        self.client.login(username=different_user.username, password=TEST_PASSWORD)
+
+        response = self.client.post(self.url, {'token': self.token})
+        json_response = json.loads(response.content.decode('utf-8'))
+        self.assertFalse(json_response.get('is_valid'))
+
+        self.user = User.objects.get(pk=self.user.pk)
+        self.assertFalse(self.user.is_active)

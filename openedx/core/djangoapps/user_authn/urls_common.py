@@ -63,6 +63,8 @@ urlpatterns = [
         name='password_reset_confirm',
     ),
     url(r'^account/password$', password_reset.password_change_request_handler, name='password_change_request'),
+    url(r'^user_api/v1/account/password_reset/token/validate/$', password_reset.password_reset_token_validate,
+        name="user_api_password_reset_token_validate"),
 
 ]
 
