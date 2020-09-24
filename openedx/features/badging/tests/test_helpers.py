@@ -165,8 +165,8 @@ class BadgeHelperTestCases(ModuleStoreTestCase):
     @mock.patch('openedx.features.badging.helpers.badges.is_teams_feature_enabled')
     @mock.patch('openedx.features.badging.helpers.badges.get_course_by_id')
     def test_get_course_badges_user_not_joined_any_course_team(self, mock_get_course_by_id,
-           mock_is_teams_feature_enabled, mock_filter_earned_badge_by_joined_team,
-           mock_add_badge_earned_date):  # pylint: disable=unused-argument
+            mock_is_teams_feature_enabled, mock_filter_earned_badge_by_joined_team,
+            mock_add_badge_earned_date):  # pylint: disable=unused-argument
         """
         Create 1 course, 1 conversationalist badge, to test course badges, when team feature is enabled but user
         has not joined any team in a course
