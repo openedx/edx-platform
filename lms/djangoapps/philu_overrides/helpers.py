@@ -1,17 +1,19 @@
 import json
-
-import pytz
 from datetime import datetime
 
+import pytz
+from django.urls import reverse
+
+from common.lib.mandrill_client.client import MandrillClient
+from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.onboarding.constants import ORG_PARTNERSHIP_END_DATE_PLACEHOLDER
 from lms.djangoapps.onboarding.models import GranteeOptIn
-
+from lms.djangoapps.philu_overrides.constants import ACTIVATION_ALERT_TYPE, ACTIVATION_ERROR_MSG_FORMAT
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from lms.djangoapps.courseware.courses import get_course_by_id
+from openedx.core.lib.request_utils import safe_get_host
 from student.models import Registration
 from util.json_request import JsonResponse
-from openedx.core.lib.request_utils import safe_get_host
-from common.lib.mandrill_client.client import MandrillClient
+
 utc = pytz.UTC
 
 
@@ -270,3 +272,13 @@ def save_user_partner_network_consent(user, _data):
                     organization_partner=organization_partner,
                     user=user
                 )
+
+
+def get_activation_alert_error_msg_dict(user_id):
+    return {
+        'type': ACTIVATION_ALERT_TYPE,
+        'alert': ACTIVATION_ERROR_MSG_FORMAT.format(
+            api_endpoint=reverse('resend_activation_email'),
+            user_id=user_id
+        )
+    }

@@ -11,6 +11,7 @@ img2pdf==0.2.4
 -e git+https://github.com/philanthropy-u/xblock-poll#egg=xblock-poll
 -e git+https://github.com/philanthropy-u/edx-notifications.git@9c602923d0e8a7b512a52bc4d0df5c7043286386#egg=edx-notifications
 django-multiselectfield==0.1.12
+pytest-mock==2.0.0
 # Downgrading following packages back to edX's versions as 'channels' has upgraded them.
 cryptography==2.4.2
 attrs==17.4.0
