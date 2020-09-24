@@ -21,7 +21,7 @@ These utilities will be be moved to `edx/edx-toggles`_ so that they can be used 
 Consequences
 ============
 
-* Rollout plan required to deprecate and move to moved classes.
+* Rollout plan required to deprecate and update class references.
 * See ADR 0003-leave-course-waffle-flag for the decision to leave the CourseWaffleFlag behind.
 * See ADR 0004-waffle-util-namespacing for decision to change namespacing implementation before extraction.
 * The toggle state endpoint, which is meant to be a Django Plugin, could be extracted as a separate step. This requires some additional work:
