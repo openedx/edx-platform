@@ -598,3 +598,26 @@ def password_change_request_handler(request):
         return HttpResponse(status=200)
     else:
         return HttpResponseBadRequest(_("No email address provided."))
+
+
+@require_POST
+@ensure_csrf_cookie
+def password_reset_token_validate(request):
+    """HTTP end-point to validate password reset token. """
+    is_valid = False
+    token = request.POST.get('token')
+    try:
+        token = token.split('-', 1)
+        uid_int = base36_to_int(token[0])
+        if request.user.is_authenticated and request.user.id != uid_int:
+            return JsonResponse({'is_valid': is_valid})
+
+        user = User.objects.get(id=uid_int)
+        is_valid = default_token_generator.check_token(user, token[1])
+        if is_valid and not user.is_active:
+            user.is_active = True
+            user.save()
+    except Exception:   # pylint: disable=broad-except
+        AUDIT_LOG.exception("Invalid password reset confirm token")
+
+    return JsonResponse({'is_valid': is_valid})
