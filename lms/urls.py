@@ -601,14 +601,14 @@ urlpatterns += [
         r'^courses/{}/edxnotes/'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        include('edxnotes.urls'),
+        include('lms.djangoapps.edxnotes.urls'),
         name='edxnotes_endpoints',
     ),
 
     # Student Notes API
     url(
         r'^api/edxnotes/v1/',
-        include('edxnotes.api_urls'),
+        include('lms.djangoapps.edxnotes.api_urls'),
     ),
 
     # Branding API
