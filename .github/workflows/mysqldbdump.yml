@@ -15,7 +15,7 @@ jobs:
       - name: Wait for migration to complete
         uses: jakejarvis/wait-action@master
         with:
-          time: '600s'
+          time: '900s'
       - name: Dump database
         run: docker exec -i edx.devstack.mysql mysqldump -u'edxapp001' -p'password' edxapp > edxapp.sql
       - name: Commit dump file to repo.
