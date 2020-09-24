@@ -608,6 +608,37 @@ def get_course_run_details(course_run_key, fields):
     return course_run_details
 
 
+def get_courses_by_uuid(course_uuids):
+    """
+    Retrieve courses by the course UUIDs.
+
+    Arguments:
+        course_uuids (list<str>): List of course uuids in the form of a string.
+
+    Returns:
+        (dict): A Dictionary containing course data from the discovery's courses/ API endpoint.
+    """
+    courses = dict()
+    user, catalog_integration = check_catalog_integration_and_get_user(
+        error_message_field=u'Data for course UUIDs {}'.format(', '.join(course_uuids))
+    )
+    if user:
+        api = create_catalog_api_client(user)
+
+        cache_key = '{base}.course_runs'.format(base=catalog_integration.CACHE_KEY)
+
+        courses = get_edx_api_data(
+            catalog_integration,
+            'courses',
+            api,
+            querystring={'uuids': course_uuids},
+            cache_key=cache_key,
+            many=True,
+            traverse_pagination=True,
+        )
+    return courses
+
+
 def is_course_run_in_program(course_run_key, program):
     """
     Check if a course run is part of a program.
