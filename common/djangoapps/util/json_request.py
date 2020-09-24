@@ -71,6 +71,7 @@ class JsonResponse(HttpResponse):
         else:
             content = json.dumps(resp_obj, cls=encoder, indent=2, ensure_ascii=True)
         kwargs.setdefault("content_type", "application/json")
+        kwargs.setdefault("Access-Control-Allow-Origin", "*")
         if status:
             kwargs["status"] = status
         super(JsonResponse, self).__init__(content, *args, **kwargs)
