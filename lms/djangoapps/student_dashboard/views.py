@@ -4,39 +4,15 @@ Student Custom Dashboard View
 from datetime import datetime
 
 import pytz
-from student.views.dashboard import get_course_enrollments
 from course_action_state.models import CourseRerunState
-from django.core.exceptions import ObjectDoesNotExist
+from custom_settings.models import CustomSettings
+from student.models import CourseEnrollment
+from student.views.dashboard import get_course_enrollments
+from xmodule.modulestore.django import modulestore
 
 from common.lib.nodebb_client.client import NodeBBClient
-from courseware.courses import get_courses
-from custom_settings.models import CustomSettings
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_card.helpers import get_course_cards_list, get_related_card, get_course_open_date
-from xmodule.modulestore.django import modulestore
-from student.models import CourseEnrollment
-
-
-def get_recommended_courses(user):
-    """
-    Helper function to get recommended courses for a user based on his interests
-    """
-    recommended_courses = []
-    all_courses = get_courses(user)
-    try:
-        user_interests = user.extended_profile.get_user_selected_interests()
-        for course in all_courses:
-            try:
-                tags = CustomSettings.objects.filter(id=course.id).first().tags
-                tags = tags.split('|')
-                tags = [tag.strip() for tag in tags]
-                if set(user_interests) & set(tags) and not CourseEnrollment.is_enrolled(user, course.id):
-                    recommended_courses.append(course)
-            except AttributeError:
-                pass
-    except ObjectDoesNotExist:
-        pass
-    return recommended_courses
 
 
 def get_enrolled_past_courses(request, course_enrollments):
@@ -47,7 +23,7 @@ def get_enrolled_past_courses(request, course_enrollments):
     enrolled, past = [], []
     past_course_cards = {}
 
-    card_list = get_course_cards_list()
+    card_list = get_course_cards_list(request)
 
     for course in course_enrollments:
         course_card = get_related_card(course.course_overview)
@@ -78,12 +54,13 @@ def get_recommended_xmodule_courses(request, _from='onboarding'):
     all_courses = []
 
     utc = pytz.UTC
-    courses_list = get_course_cards_list()
+    courses_list = get_course_cards_list(request)
     course_list_ids = []
 
     current_time = datetime.utcnow().replace(tzinfo=utc)
 
-    user_enrolled_courses = [enrollment.course_overview.id for enrollment in list(get_course_enrollments(user, None, []))]
+    user_enrolled_courses = [enrollment.course_overview.id for enrollment in
+                             list(get_course_enrollments(user, None, []))]
 
     for course in courses_list:
 
@@ -131,14 +108,6 @@ def get_recommended_xmodule_courses(request, _from='onboarding'):
                 recommended_courses.append(course)
 
     return recommended_courses
-
-
-def get_recommended_communities(user):
-    """
-    Helper function to get recommended communities from NodeBB API
-    """
-    status, categories = NodeBBClient().categories.recommended(user)
-    return categories if status == 200 else []
 
 
 def get_joined_communities(user):
