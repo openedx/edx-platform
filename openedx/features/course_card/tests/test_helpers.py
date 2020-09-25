@@ -7,8 +7,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..helpers import *
+from .helpers import disable_course_card, set_course_dates
 from .test_views import CourseCardBaseClass
-from .helpers import set_course_dates, disable_course_card
 
 
 class CourseCardHelperBaseClass(CourseCardBaseClass):

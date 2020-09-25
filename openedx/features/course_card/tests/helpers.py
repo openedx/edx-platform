@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
 from custom_settings.models import CustomSettings
-from lms.djangoapps.onboarding.models import UserExtendedProfile, EmailPreference, Organization
+from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import UserProfile
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from ..models import CourseCard
 

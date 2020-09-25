@@ -1,17 +1,16 @@
 from datetime import datetime, timedelta
 
-from pyquery import PyQuery as pq
 from django.core.urlresolvers import reverse
+from pyquery import PyQuery as pq
 
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from openedx.features.course_card.helpers import get_course_open_date
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..models import CourseCard
-from .helpers import set_course_dates, save_course_custom_settings
-
+from .helpers import save_course_custom_settings, set_course_dates
 
 TEST_COURSE_OPEN_DATE = datetime.utcnow() + timedelta(days=1)
 

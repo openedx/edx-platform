@@ -3,8 +3,8 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..admin import get_parent_courses
-from .test_views import CourseCardBaseClass
 from .helpers import set_course_dates
+from .test_views import CourseCardBaseClass
 
 
 class CourseCardAdminBaseClass(CourseCardBaseClass):

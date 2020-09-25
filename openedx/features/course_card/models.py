@@ -1,6 +1,7 @@
 from django.db import models
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class CourseCard(models.Model):

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.forms import ModelForm, Select
+
 from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_card.models import CourseCard
@@ -61,5 +62,3 @@ class CourseRerunStateModelAdmin(admin.ModelAdmin):
 
 admin.site.register(CourseCard, CardModelAdmin)
 admin.site.register(CourseRerunState, CourseRerunStateModelAdmin)
-
-

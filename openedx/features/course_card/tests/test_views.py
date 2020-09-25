@@ -1,15 +1,15 @@
-from pyquery import PyQuery as pq
 from django.core.urlresolvers import reverse
+from pyquery import PyQuery as pq
 
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from course_action_state.models import CourseRerunState
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from student.models import CourseEnrollment
-from course_action_state.models import CourseRerunState
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..models import CourseCard, CourseOverview
-from .helpers import set_course_dates, disable_course_card, initialize_test_user
+from .helpers import disable_course_card, initialize_test_user, set_course_dates
 
 
 class CourseCardBaseClass(ModuleStoreTestCase):
