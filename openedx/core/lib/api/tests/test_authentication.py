@@ -3,7 +3,6 @@ Tests for OAuth2.  This module is copied from django-rest-framework-oauth
 (tests/test_authentication.py) and updated to use our subclass of BearerAuthentication.
 """
 
-
 import itertools
 import json
 import unittest
@@ -60,7 +59,6 @@ urlpatterns = [
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
 class OAuth2AllowInActiveUsersTests(TestCase):
-
     OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'
 
     def setUp(self):
@@ -230,3 +228,24 @@ class BearerAuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disab
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
         self.user.save()
+
+
+class OAuthDenyDisabledUsers(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
+
+    OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
+
+    def setUp(self):
+        super(OAuthDenyDisabledUsers, self).setUp()
+        # User is active but has have disabled status
+        self.user.is_active = True
+        self.user.set_unusable_password()
+        self.user.save()
+
+    # Over ride parent methods to assert error response
+    def test_get_form_passing_auth_with_dot(self):
+        response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_post_form_passing_auth(self):
+        response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
