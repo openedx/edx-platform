@@ -78,9 +78,7 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-# edx-django-utils 3.8.0 renames metric -> attribute and deprecates the old
-# methods; edx-platform calls the new names
-edx-django-utils>=3.8.0
+edx-django-utils>=3.8.0             # Utilities for cache, monitoring, and plugins; 3.8.0+ for set_custom_attribute method
 edx-drf-extensions
 edx-enterprise
 edx-milestones
