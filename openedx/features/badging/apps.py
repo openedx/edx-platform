@@ -1,3 +1,6 @@
+"""
+Badging app configurations
+"""
 from django.apps import AppConfig
 
 
@@ -8,4 +11,4 @@ class BadgingConfig(AppConfig):
         """
         Connect signal handlers.
         """
-        import openedx.features.badging.handlers
+        import openedx.features.badging.handlers  # pylint: disable=unused-variable

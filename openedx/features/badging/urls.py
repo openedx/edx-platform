@@ -1,3 +1,6 @@
+"""
+Urls for badging app
+"""
 from django.conf import settings
 from django.conf.urls import url
 

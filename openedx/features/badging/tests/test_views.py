@@ -1,10 +1,12 @@
+"""
+Unit tests for badging views
+"""
 import mock
 from django.core.urlresolvers import reverse
-from django.test.client import Client
+
 from lms.djangoapps.onboarding.tests.factories import UserFactory
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from openedx.core.djangolib.testing.philu_utils import (clear_philu_theme,
-                                                        configure_philu_theme)
+from openedx.core.djangolib.testing.philu_utils import clear_philu_theme, configure_philu_theme
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -13,6 +15,9 @@ from .factories import BadgeFactory, UserBadgeFactory
 
 
 class BadgeViewsTestCases(ModuleStoreTestCase):
+    """
+    Unit tests for badging views
+    """
 
     def setUp(self):
         super(BadgeViewsTestCases, self).setUp()
@@ -59,7 +64,7 @@ class BadgeViewsTestCases(ModuleStoreTestCase):
         UserBadgeFactory(user=any_other_user, course_id=CourseKeyField.Empty, badge=badge2)
 
         mock_populate_trophycase.return_value = dict()
-        response = self.client.get(reverse('trophycase'), data= {'json':True}, follow=True)
+        response = self.client.get(reverse('trophycase'), data={'json':True}, follow=True)
         self.assertEqual(response.status_code, 200)
         mock_populate_trophycase.assert_called_once_with(self.user, mock.ANY, [user_badge])
 

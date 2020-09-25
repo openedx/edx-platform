@@ -1,3 +1,6 @@
+"""
+Unit tests for badging handlers
+"""
 from django.test import TestCase
 from edx_notifications.lib.publisher import get_notification_type
 

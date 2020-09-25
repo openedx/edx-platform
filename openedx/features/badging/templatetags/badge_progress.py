@@ -1,3 +1,6 @@
+"""
+Template tags related to badge progress and congratulations modal popup
+"""
 from django.template import Library
 
 register = Library()

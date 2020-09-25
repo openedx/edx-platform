@@ -1,3 +1,6 @@
+"""
+Signal handlers for the badging app
+"""
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from edx_notifications.data import NotificationType
@@ -12,7 +15,7 @@ from .models import Badge, UserBadge
 
 
 @receiver(post_save, sender=Badge)
-def sync_badge_info_with_nodebb(sender, instance, update_fields, **kwargs):
+def sync_badge_info_with_nodebb(sender, instance, update_fields, **kwargs):  # pylint: disable=unused-argument
     """When badge is created or updated in platform, sync it in NodeBB."""
     badge_info = {
         'id': instance.id,
@@ -25,7 +28,7 @@ def sync_badge_info_with_nodebb(sender, instance, update_fields, **kwargs):
 
 
 @receiver(post_delete, sender=Badge)
-def delete_badge_info_from_nodebb(sender, instance, **kwargs):
+def delete_badge_info_from_nodebb(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """On badge deletion, delete it from NodeBB. This will not effect any post count on NodeBB."""
     badge_data = {
         'id': instance.id
@@ -34,7 +37,7 @@ def delete_badge_info_from_nodebb(sender, instance, **kwargs):
 
 
 @receiver(post_delete, sender=TeamGroupChat)
-def delete_user_badges(sender, instance, **kwargs):
+def delete_user_badges(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     This method will delete all user badges of a team that is to be deleted.
 

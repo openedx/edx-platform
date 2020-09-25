@@ -1,3 +1,6 @@
+"""
+Models to store user and team badges.
+"""
 import logging
 
 from django.contrib.auth.models import User
@@ -38,6 +41,9 @@ class BadgeManager(models.Manager):
 
 
 class Badge(models.Model):
+    """
+    Model to store badge information
+    """
     BADGE_TYPES = (
         badge_constants.CONVERSATIONALIST,
         badge_constants.TEAM_PLAYER

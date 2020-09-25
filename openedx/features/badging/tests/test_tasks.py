@@ -1,3 +1,6 @@
+"""
+Unit tests for badging tasks
+"""
 import mock
 from django.conf import settings
 from django.test import TestCase
@@ -12,7 +15,7 @@ from ..constants import COURSE_ID_KEY, MY_BADGES_URL_NAME
 
 class BadgeViewsTestCases(TestCase):
 
-    @mock.patch('openedx.features.badging.helpers.send_user_badge_notification')
+    @mock.patch('openedx.features.badging.helpers.notifications.send_user_badge_notification')
     @mock.patch('openedx.features.badging.tasks.MandrillClient.send_mail')
     def test_task_user_badge_notify_successfully(self, mock_send_mail, mock_send_user_badge_notification):
         """

@@ -1,3 +1,6 @@
+"""
+Unit tests for UserBadge model
+"""
 import factory
 import mock
 from django.db.models import signals
@@ -18,8 +21,12 @@ from .factories import BadgeFactory, UserBadgeFactory
 
 
 class UserBadgeModelTestCases(TestCase):
+    """
+    Unit tests for UserBadge model
+    """
 
     def setUp(self):
+        super(UserBadgeModelTestCases, self).setUp()
         self.type_conversationalist = CONVERSATIONALIST[CONVERSATIONALIST_ENTRY_INDEX]
         self.type_team = TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX]
         self.team_badge = BadgeFactory(type=self.type_team)
@@ -151,9 +158,13 @@ class UserBadgeModelTestCases(TestCase):
 
 
 class AssignBadgeToTeamTestCases(TestCase):
+    """
+    Unit tests for badge assignment to team
+    """
 
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def setUp(self):
+        super(AssignBadgeToTeamTestCases, self).setUp()
         self.team_badge = BadgeFactory(type=TEAM_PLAYER[TEAM_PLAYER_ENTRY_INDEX])
 
         self.user_1 = UserFactory()

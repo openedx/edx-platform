@@ -1,30 +1,45 @@
+"""
+Badging app views
+"""
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.views.decorators.http import require_GET
+from opaque_keys.edx.keys import CourseKey
 
+from common.lib.nodebb_client.client import NodeBBClient
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey
-from student.models import CourseEnrollment
 from nodebb.models import DiscussionCommunity
-from common.lib.nodebb_client.client import NodeBBClient
+from student.models import CourseEnrollment
 
-from .helpers import populate_trophycase, get_course_badges, add_posts_count_in_badges_list, \
-    get_discussion_team_ids, get_badge_progress_request_data
+from .constants import BADGES_KEY, COMMUNITY_URL_KEY, COURSE_ID_KEY, COURSE_NAME_KEY, COURSES_KEY
+from .helpers.badges import (
+    add_posts_count_in_badges_list,
+    get_badge_progress_request_data,
+    get_course_badges,
+    get_discussion_team_ids,
+    populate_trophycase
+)
 from .models import UserBadge
-from .constants import BADGES_KEY, COURSES_KEY, COURSE_ID_KEY, COMMUNITY_URL_KEY, COURSE_NAME_KEY
 
 
 @require_GET
 @login_required
 def trophycase(request):
+    """
+    This view displays list of all badges in enrolled courses
+
+    Args:
+        request (HttpRequest): Django request object
+
+    Returns:
+        HttpResponse: Template with context
+    """
     user = request.user
 
-    # Get course id and course name of courses user is enrolled in
     enrolled_courses_data = CourseEnrollment.enrollments_for_user(user).order_by(
         COURSE_NAME_KEY).values_list(COURSE_ID_KEY, COURSE_NAME_KEY)
 
-    # list of badges earned by user
     earned_user_badges = list(
         UserBadge.objects.filter(user=user)
     )
@@ -67,7 +82,15 @@ def trophycase(request):
 @require_GET
 @login_required
 def my_badges(request, course_id):
-    """ this function returns badges related to on course """
+    """
+    This view displays list of all badges related to one course
+
+    Args:
+        request (HttpRequest): Django request object
+
+    Returns:
+        HttpResponse: Template with context
+    """
     user = request.user
 
     course_key = CourseKey.from_string(unicode(course_id))
