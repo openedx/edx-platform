@@ -418,6 +418,7 @@ class DemographicsCollectionModal extends React.Component {
                     selectOnChange={this.handleSelectChange}
                     labelText={"What is your current employment status?"}
                     options={[
+                      <option value="default" key="default">{gettext("Select employment status")}</option>,
                       this.loadOptions(FIELD_NAMES.WORK_STATUS)
                     ]}
                     showInput={wizardConsumer[FIELD_NAMES.WORK_STATUS] == "other"}
