@@ -4,9 +4,9 @@ Models for Job Board
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.utils.text import format_lazy
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel

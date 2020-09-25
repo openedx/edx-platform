@@ -3,11 +3,10 @@ Tests for Job Board views
 """
 
 from ddt import data, ddt, unpack
-from rest_framework import status
-from w3lib.url import add_or_replace_parameters
-
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework import status
+from w3lib.url import add_or_replace_parameters
 
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from openedx.features.job_board.constants import (
