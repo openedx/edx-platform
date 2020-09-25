@@ -6,22 +6,13 @@ Instructor tasks related to enrollments.
 import logging
 from datetime import datetime
 from time import time
-
-from django.conf import settings
-from django.utils.translation import ugettext as _
 from pytz import UTC
-from six import StringIO
-
-from edxmako.shortcuts import render_to_string
-from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.instructor_analytics.basic import enrolled_students_features, list_may_enroll
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
-from lms.djangoapps.instructor_task.models import ReportStore
-from student.models import CourseAccessRole, CourseEnrollment
-from util.file import course_filename_prefix_generator
+from student.models import CourseEnrollment
 
 from .runner import TaskProgress
-from .utils import tracker_emit, upload_csv_to_report_store
+from .utils import upload_csv_to_report_store
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 FILTERED_OUT_ROLES = ['staff', 'instructor', 'finance_admin', 'sales_admin']

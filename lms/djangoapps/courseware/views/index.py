@@ -41,10 +41,8 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
     COURSE_OUTLINE_PAGE_FLAG,
-    default_course_url_name,
-    RELATIVE_DATES_FLAG,
+    default_course_url_name
 )
-from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from student.models import CourseEnrollment
@@ -56,7 +54,6 @@ from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 from ..access import has_access
 from ..access_utils import check_public_access
 from ..courses import (
-    check_course_access_with_redirect,
     get_course_with_access,
     get_current_child,
     get_studio_url

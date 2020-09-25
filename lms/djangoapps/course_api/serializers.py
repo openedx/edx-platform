@@ -4,9 +4,7 @@ Course API Serializers.  Representing course catalog data
 
 
 from edx_django_utils import monitoring as monitoring_utils
-import six.moves.urllib.error
 import six.moves.urllib.parse
-import six.moves.urllib.request
 from django.urls import reverse
 from rest_framework import serializers
 

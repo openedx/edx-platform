@@ -13,7 +13,6 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
-from django.urls import reverse
 from django.utils.timezone import now
 from edx_ace import ace
 from edx_ace.recipient import Recipient
@@ -22,7 +21,6 @@ from util.query import use_read_replica_if_available
 
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
-from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference

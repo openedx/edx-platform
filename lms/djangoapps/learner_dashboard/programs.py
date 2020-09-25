@@ -8,7 +8,7 @@ import json
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.translation import get_language_bidi, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService

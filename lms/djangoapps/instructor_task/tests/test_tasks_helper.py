@@ -14,14 +14,11 @@ import shutil
 import tempfile
 from contextlib import contextmanager, ExitStack
 from datetime import datetime, timedelta
-from io import BytesIO
-from zipfile import ZipFile
 
 import ddt
 import unicodecsv
 from django.conf import settings
 from django.test.utils import override_settings
-from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
 from mock import ANY, MagicMock, Mock, patch
@@ -29,16 +26,13 @@ from pytz import UTC
 from six import text_type
 from six.moves import range, zip
 from six.moves.urllib.parse import quote
-from waffle.testutils import override_switch
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
-from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
@@ -75,7 +69,7 @@ from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from openedx.core.lib.teams_config import TeamsConfig
-from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore import ModuleStoreEnum

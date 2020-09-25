@@ -24,7 +24,6 @@ from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
-from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
 from track.tests import EventTrackingTestCase
 from util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses

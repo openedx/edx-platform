@@ -5,38 +5,26 @@ Tests for instructor.basic
 
 
 import ddt
-import datetime
 import json
-
-import pytz
-from django.db.models import Q
-from django.urls import reverse
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import UsageKey
-from six import text_type
 from six.moves import range, zip
-
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.instructor_analytics.basic import (
     AVAILABLE_FEATURES,
     PROFILE_FEATURES,
     STUDENT_FEATURES,
     StudentModule,
-    coupon_codes_features,
-    course_registration_features,
     enrolled_students_features,
     get_proctored_exam_results,
     get_response_state,
     list_may_enroll,
-    list_problem_responses,
+    list_problem_responses
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from student.roles import CourseSalesAdminRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

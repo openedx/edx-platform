@@ -71,7 +71,6 @@ from simple_history.models import HistoricalRecords
 
 from badges.events.course_complete import course_badge_check
 from badges.events.course_meta import completion_check, course_group_check
-from course_modes.models import CourseMode
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED

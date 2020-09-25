@@ -32,13 +32,12 @@ from ..tasks import (
     _get_list_from_email_marketing_provider,
     _get_or_create_user_list,
     get_email_cookies_via_sailthru,
-    update_course_enrollment,
     update_user,
     update_user_email
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from student.models import Registration
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, UserProfileFactory
+from student.tests.factories import UserFactory
 from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)

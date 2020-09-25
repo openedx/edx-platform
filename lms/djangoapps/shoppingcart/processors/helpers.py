@@ -7,8 +7,6 @@ but should NOT be imported by modules outside this package.
 
 from django.conf import settings
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 
 def get_processor_config():
     """

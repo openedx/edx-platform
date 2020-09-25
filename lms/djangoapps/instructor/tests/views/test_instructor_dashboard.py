@@ -30,7 +30,6 @@ from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.models import CourseEnrollment
-from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase

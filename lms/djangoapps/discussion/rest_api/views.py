@@ -4,8 +4,6 @@ Discussion API views
 
 
 import logging
-
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication

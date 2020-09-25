@@ -8,20 +8,19 @@ from datetime import datetime, timedelta
 from logging import getLogger
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 from pytz import UTC
 from lms.djangoapps.courseware.access_response import (
     AccessResponse,
     StartDateError,
     EnrollmentRequiredAccessError,
     AuthenticationRequiredAccessError,
+
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
-from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import (
     COURSE_PRE_START_ACCESS_FLAG,
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+
 )
 from student.models import CourseEnrollment
 from student.roles import CourseBetaTesterRole

@@ -11,7 +11,6 @@ import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.mail import send_mail
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -31,7 +30,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.emails import send_verification_approved_email, send_verification_confirmation_email
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
@@ -50,7 +49,6 @@ from student.models import CourseEnrollment
 from track import segment
 from util.db import outer_atomic
 from util.json_request import JsonResponse
-from verify_student.toggles import use_new_templates_for_id_verification_emails
 from xmodule.modulestore.django import modulestore
 
 from .services import IDVerificationService

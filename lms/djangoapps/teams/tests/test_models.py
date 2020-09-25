@@ -11,7 +11,7 @@ from datetime import datetime
 import ddt
 import pytz
 import six
-from mock import Mock, patch
+from mock import Mock
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode

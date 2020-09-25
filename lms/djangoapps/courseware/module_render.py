@@ -1,9 +1,6 @@
 """
 Module rendering
 """
-
-
-import hashlib
 import json
 import logging
 import textwrap

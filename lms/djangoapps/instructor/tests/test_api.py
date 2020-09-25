@@ -41,8 +41,7 @@ from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
     InstructorFactory,
-    StaffFactory,
-    UserProfileFactory
+    StaffFactory
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.certificates.api import generate_user_certificates
@@ -67,7 +66,6 @@ from openedx.core.djangoapps.django_comment_common.utils import seed_permissions
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
@@ -88,9 +86,9 @@ from student.models import (
 )
 from student.roles import (
     CourseBetaTesterRole, CourseDataResearcherRole, CourseFinanceAdminRole,
-    CourseInstructorRole, CourseSalesAdminRole
+    CourseInstructorRole
 )
-from student.tests.factories import AdminFactory, UserFactory
+from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase

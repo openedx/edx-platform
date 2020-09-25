@@ -9,7 +9,6 @@ from textwrap import dedent
 
 import pytest
 import pytz
-from django.conf import settings
 from mock import patch
 import six
 from six import StringIO

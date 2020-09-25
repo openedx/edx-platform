@@ -2,9 +2,6 @@
 Tests for the Certificate REST APIs.
 """
 
-
-from itertools import product
-
 import ddt
 import six
 from django.conf import settings

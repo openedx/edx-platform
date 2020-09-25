@@ -2,13 +2,9 @@
 User Partitions Transformer
 """
 
-
-import six
-
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.block_structure.transformer import (
-    BlockStructureTransformer,
-    FilteringTransformerMixin
+    BlockStructureTransformer
 )
 from xmodule.partitions.partitions_service import (
     get_all_partitions_for_course,

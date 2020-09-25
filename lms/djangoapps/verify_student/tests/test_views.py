@@ -19,9 +19,7 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-from django.utils.translation import ugettext as _
 from mock import Mock, patch
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from six.moves import zip
 from waffle.testutils import override_switch

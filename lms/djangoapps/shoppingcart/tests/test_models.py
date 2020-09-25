@@ -22,24 +22,17 @@ from django.core.mail.message import EmailMessage
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.urls import reverse
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
 from shoppingcart.exceptions import (
-    AlreadyEnrolledInCourseException,
     CourseDoesNotExistException,
     InvalidStatusToRetire,
-    ItemAlreadyInCartException,
-    PurchasedCallbackException,
     UnexpectedOrderItemStatus
 )
 from shoppingcart.models import (
     CertificateItem,
-    Coupon,
-    CouponRedemption,
-    CourseRegCodeItem,
     CourseRegistrationCode,
     CourseRegistrationCodeInvoiceItem,
     Donation,
@@ -50,8 +43,7 @@ from shoppingcart.models import (
     Order,
     OrderItem,
     OrderItemSubclassPK,
-    PaidCourseRegistration,
-    RegistrationCodeRedemption
+    PaidCourseRegistration
 )
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory

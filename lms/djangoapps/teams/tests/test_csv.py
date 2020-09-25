@@ -2,8 +2,6 @@
 from csv import DictWriter, DictReader
 from io import BytesIO, StringIO, TextIOWrapper
 
-from django.contrib.auth.models import User
-
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory, ProgramCourseEnrollmentFactory
 from lms.djangoapps.teams import csv
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership

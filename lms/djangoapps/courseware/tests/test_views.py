@@ -7,7 +7,6 @@ Tests courseware views.py
 import html
 import itertools
 import json
-import unittest
 from datetime import datetime, timedelta
 from uuid import uuid4
 

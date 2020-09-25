@@ -4,10 +4,7 @@ Tests for experimentation views
 
 
 import unittest
-
-import six.moves.urllib.error
 import six.moves.urllib.parse
-import six.moves.urllib.request
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.test.utils import override_settings
@@ -16,7 +13,7 @@ from mock import patch
 from rest_framework.test import APITestCase
 
 from experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
-from experiments.models import ExperimentData, ExperimentKeyValue
+from experiments.models import ExperimentData
 from experiments.serializers import ExperimentDataSerializer
 from student.tests.factories import UserFactory
 

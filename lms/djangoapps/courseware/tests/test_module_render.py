@@ -75,7 +75,6 @@ from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_MODULESTORE,
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )

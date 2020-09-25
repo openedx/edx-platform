@@ -15,7 +15,6 @@ from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Group, User
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.core import mail
 from django.core.cache import cache
 from django.http import HttpRequest
 from django.test import TestCase
@@ -31,9 +30,7 @@ from six.moves.urllib.parse import urlparse
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from edxmako.shortcuts import render_to_response
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from ..admin import SoftDeleteCouponAdmin
 from ..models import (
     CertificateItem,
@@ -43,18 +40,15 @@ from ..models import (
     CourseRegistrationCode,
     DonationConfiguration,
     Order,
-    PaidCourseRegistration,
-    RegistrationCodeRedemption
+    PaidCourseRegistration
 )
 from ..processors import render_purchase_form_html
 from ..processors.CyberSource2 import sign
 from ..tests.payment_fake import PaymentFakeView
 from ..views import _can_download_report, _get_date_from_str, initialize_report
 from student.models import CourseEnrollment
-from student.roles import CourseSalesAdminRole
 from student.tests.factories import AdminFactory, UserFactory
 from util.date_utils import get_default_time_display
-from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
