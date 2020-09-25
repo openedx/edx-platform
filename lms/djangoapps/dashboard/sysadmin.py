@@ -26,7 +26,7 @@ from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
-from six import StringIO, text_type
+from six import BytesIO, StringIO, text_type
 
 import dashboard.git_import as git_import
 import track.views
@@ -77,7 +77,7 @@ class SysadminDashboardView(TemplateView):
         data should be iterable and is used to stream object over http
         """
 
-        csv_file = StringIO()
+        csv_file = BytesIO()
         writer = csv.writer(csv_file, dialect='excel', quotechar='"',
                             quoting=csv.QUOTE_ALL)
 
