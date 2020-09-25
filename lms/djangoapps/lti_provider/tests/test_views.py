@@ -241,4 +241,4 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         #   (5)-(8) calls related to the inherited user_partitions field.
         #   (9) edx_notes descriptor call to get_course
         """
-        return 8
+        return 9
