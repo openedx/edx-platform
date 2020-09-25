@@ -39,7 +39,7 @@ class MultiselectDropdown extends React.Component {
     if (this.buttonRef) this.buttonRef.focus();
   }
 
-  handleKeydown(e) {
+  handleKeydown(event) {
     if (this.state.open && event.keyCode == 27) {
       this.setState({ open: false }, this.focusButton);
     }
@@ -94,7 +94,7 @@ class MultiselectDropdown extends React.Component {
 
   renderUnselect() {
     return this.props.selected.length > 0 && (
-      <button id="unselect-button" onClick={this.handleRemoveAllClick}>{gettext("Clear all")}</button>
+      <button id="unselect-button" disabled={this.props.disabled} aria-label="Clear all selected" onClick={this.handleRemoveAllClick}>{gettext("Clear all")}</button>
     )
   }
 
@@ -127,8 +127,7 @@ class MultiselectDropdown extends React.Component {
     return (
       <div
         className="multiselect-dropdown"
-        tabIndex={0}
-        ref={this.setMultiselectRef}
+        tabIndex={-1}
         onBlur={e => {
           // We need to make sure we only close and save the dropdown when
           // the user blurs on the parent to an element other than it's children.

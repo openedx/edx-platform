@@ -33,6 +33,7 @@ export const SelectWithInput = (props) => {
       {showInput &&
         <input
           className="form-control"
+          aria-label={`${selectName} description field`}
           type={inputType}
           name={inputName}
           id={inputId}
