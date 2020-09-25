@@ -724,7 +724,7 @@ MIDDLEWARE = [
     # Enables force_django_cache_miss functionality for TieredCache.
     'edx_django_utils.cache.middleware.TieredCacheMiddleware',
 
-    # Outputs monitoring metrics for a request.
+    # Adds monitoring attributes to requests.
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',

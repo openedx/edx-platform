@@ -197,7 +197,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
     @patch.object(resolvers, 'set_custom_attribute')
-    def test_schedule_bin(self, schedule_count, mock_metric, mock_ace):
+    def test_schedule_bin(self, schedule_count, mock_attribute, mock_ace):
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
             current_day, offset, target_day, upgrade_deadline = self._get_dates()
             schedules = [
@@ -226,7 +226,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                         site_id=self.site_config.site.id, target_day_str=target_day_str, day_offset=offset, bin_num=b,
                     ))
 
-                num_schedules = mock_metric.call_args[0][1]
+                num_schedules = mock_attribute.call_args[0][1]
                 if b in bins_in_use:
                     self.assertGreater(num_schedules, 0)
                 else:
