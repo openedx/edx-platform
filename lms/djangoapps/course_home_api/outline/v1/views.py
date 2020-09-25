@@ -39,7 +39,7 @@ from openedx.features.course_experience.views.latest_update import LatestUpdateF
 from openedx.features.course_experience.views.welcome_message import PREFERENCE_KEY, WelcomeMessageFragmentView
 from openedx.features.discounts.utils import generate_offer_html
 from student.models import CourseEnrollment
-from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
+from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
 
 
@@ -150,22 +150,23 @@ class OutlineTabView(RetrieveAPIView):
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
         allow_anonymous = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
         allow_public = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC
+        allow_public_outline = allow_anonymous and course.course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE
         is_enrolled = enrollment and enrollment.is_active
-        is_staff = has_access(request.user, 'staff', course_key)
+        is_staff = bool(has_access(request.user, 'staff', course_key))
         show_enrolled = is_enrolled or is_staff
 
         show_handouts = show_enrolled or allow_public
         handouts_html = get_course_info_section(request, request.user, course, 'handouts') if show_handouts else ''
 
         # TODO: TNL-7185 Legacy: Refactor to return the offer & expired data and format the message in the MFE
-        offer_html = generate_offer_html(request.user, course_overview)
-        course_expired_html = generate_course_expired_message(request.user, course_overview)
+        offer_html = show_enrolled and generate_offer_html(request.user, course_overview)
+        course_expired_html = show_enrolled and generate_course_expired_message(request.user, course_overview)
 
         welcome_message_html = None
-        if get_course_tag(request.user, course_key, PREFERENCE_KEY) != 'False':
+        if show_enrolled:
             if LATEST_UPDATE_FLAG.is_enabled(course_key):
                 welcome_message_html = LatestUpdateFragmentView().latest_update_html(request, course)
-            else:
+            elif get_course_tag(request.user, course_key, PREFERENCE_KEY) != 'False':
                 welcome_message_html = WelcomeMessageFragmentView().welcome_message_html(request, course)
 
         enroll_alert = {
@@ -191,25 +192,26 @@ class OutlineTabView(RetrieveAPIView):
         if course_home_mfe_dates_tab_is_active(course.id):
             dates_tab_link = get_microfrontend_url(course_key=course.id, view_name='dates')
 
-        course_blocks = get_course_outline_block_tree(request, course_key_string, request.user if is_enrolled else None)
-
-        has_visited_course = False
-        try:
-            resume_block = get_key_to_last_completed_block(request.user, course.id)
-            has_visited_course = True
-        except UnavailableCompletionData:
-            resume_block = course_usage_key
-
-        resume_path = reverse('jump_to', kwargs={
-            'course_id': course_key_string,
-            'location': str(resume_block)
-        })
-        resume_course_url = request.build_absolute_uri(resume_path)
+        course_blocks = None
+        if show_enrolled or allow_public or allow_public_outline:
+            outline_user = request.user if show_enrolled else None
+            course_blocks = get_course_outline_block_tree(request, course_key_string, outline_user)
 
         resume_course = {
-            'has_visited_course': has_visited_course,
-            'url': resume_course_url,
+            'has_visited_course': False,
+            'url': None,
         }
+        if show_enrolled:
+            try:
+                resume_block = get_key_to_last_completed_block(request.user, course.id)
+                resume_course['has_visited_course'] = True
+            except UnavailableCompletionData:
+                resume_block = course_usage_key
+            resume_path = reverse('jump_to', kwargs={
+                'course_id': course_key_string,
+                'location': str(resume_block)
+            })
+            resume_course['url'] = request.build_absolute_uri(resume_path)
 
         dates_widget = {
             'course_date_blocks': [block for block in date_blocks if not isinstance(block, TodaysDate)],
@@ -241,15 +243,15 @@ class OutlineTabView(RetrieveAPIView):
 
         data = {
             'course_blocks': course_blocks,
-            'course_expired_html': course_expired_html,
+            'course_expired_html': course_expired_html or None,
             'course_goals': course_goals,
             'course_tools': course_tools,
             'dates_widget': dates_widget,
             'enroll_alert': enroll_alert,
-            'handouts_html': handouts_html,
-            'offer_html': offer_html,
+            'handouts_html': handouts_html or None,
+            'offer_html': offer_html or None,
             'resume_course': resume_course,
-            'welcome_message_html': welcome_message_html,
+            'welcome_message_html': welcome_message_html or None,
         }
         context = self.get_serializer_context()
         context['course_key'] = course_key
