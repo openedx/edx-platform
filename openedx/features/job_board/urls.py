@@ -1,3 +1,6 @@
+"""
+Urls for Job Board views
+"""
 from django.conf.urls import url
 
 from .views import JobCreateView, JobDetailView, JobListView

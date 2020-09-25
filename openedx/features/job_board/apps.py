@@ -1,3 +1,6 @@
+"""
+Job Board app configurations
+"""
 from django.apps import AppConfig
 
 

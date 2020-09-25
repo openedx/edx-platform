@@ -1,3 +1,6 @@
+"""
+Views for Job Board app
+"""
 from django.core.urlresolvers import reverse
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
@@ -28,6 +31,9 @@ from .models import Job
 
 
 class JobListView(ListView):
+    """
+    To render jobs as a list view
+    """
     model = Job
     context_object_name = 'job_list'
     paginate_by = 10

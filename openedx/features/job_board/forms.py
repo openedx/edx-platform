@@ -1,3 +1,6 @@
+"""
+Forms for Job Board app
+"""
 from django.forms import ModelForm, RadioSelect
 
 from openedx.features.job_board.models import Job
