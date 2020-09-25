@@ -1,13 +1,15 @@
 from datetime import datetime
 
 import pytz
-from course_action_state.models import CourseRerunState
-from philu_overrides.helpers import get_user_current_enrolled_class
-from edxmako.shortcuts import render_to_response
-from openedx.features.course_card.models import CourseCard
 from django.views.decorators.csrf import csrf_exempt
+
+from course_action_state.models import CourseRerunState
+from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.course_card.models import CourseCard
+from philu_overrides.helpers import get_user_current_enrolled_class
 from student.models import CourseEnrollment
+
 from .helpers import get_course_open_date
 
 utc = pytz.UTC
@@ -107,7 +109,3 @@ def get_course_with_link_and_start_date(course, course_rerun_object, request):
 
     course.start_date = None
     return course
-
-
-
-

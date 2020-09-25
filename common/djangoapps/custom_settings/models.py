@@ -4,8 +4,27 @@ All models for custom settings
 import json
 
 from django.db import models
+from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+
+
+class CustomSettingsManager(models.Manager):
+    """
+    Course Custom Settings Manager
+    """
+    def is_mini_lesson(self, course_key):
+        """
+        This method checks course with course_key if it is mini lesson or not
+
+        Args:
+            course_key (CourseKey, str): Course key
+        Returns:
+            bool: True if course is mini lesson else False
+        """
+        if isinstance(course_key, (str, unicode)):
+            course_key = CourseKey.from_string(course_key)
+        return self.get_queryset().filter(id=course_key, is_mini_lesson=True).exists()
 
 
 class CustomSettings(models.Model):
@@ -22,6 +41,8 @@ class CustomSettings(models.Model):
     seo_tags = models.TextField(null=True, blank=True)
     course_open_date = models.DateTimeField(null=True)
     is_mini_lesson = models.BooleanField(default=False)
+
+    objects = CustomSettingsManager()
 
     class Meta:
         app_label = 'custom_settings'
