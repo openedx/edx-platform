@@ -14,7 +14,7 @@ from openedx.core.djangoapps.appsembler.multi_tenant_emails.tests.test_utils imp
 )
 
 
-class SiteUnavailableRedirectViewTest(TestCase):
+class SiteUnavailableStudioViewTest(TestCase):
     """
     Unit tests for the Tiers views.
     """
@@ -23,7 +23,7 @@ class SiteUnavailableRedirectViewTest(TestCase):
     PASSWORD = 'xyz'
 
     def setUp(self):
-        super(SiteUnavailableRedirectViewTest, self).setUp()
+        super(SiteUnavailableStudioViewTest, self).setUp()
         self.url = reverse('site_unavailable')
 
         with override_settings(DEFAULT_SITE_THEME='edx-theme-codebase'):
@@ -32,7 +32,7 @@ class SiteUnavailableRedirectViewTest(TestCase):
 
     def test_site_unavailable_page_non_logged_in(self):
         """
-        The trial page needs a logged in user.
+        The trial page needs a logged in user because Studio isn't multi-site aware.
         """
         response = self.client.get(self.url)
         assert response.status_code == status.HTTP_302_FOUND, response.content
@@ -42,7 +42,7 @@ class SiteUnavailableRedirectViewTest(TestCase):
         """
         Ensure trial expire page shows up with site information.
         """
-        assert self.client.login(username=self.admin.username, password=self.PASSWORD)
+        assert self.client.login(username=self.admin.username, password=self.PASSWORD), 'Admin should log in'
         response = self.client.get(self.url)
-        assert response.status_code == status.HTTP_302_FOUND, response.content
-        assert response['Location'] == 'http://blue2/site-unavailable/', response.content
+        message = 'The trial site of {} has expired.'.format(self.BLUE)
+        assert message in response.content, 'Trial page works.'
