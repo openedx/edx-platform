@@ -78,9 +78,9 @@ def test_get_activation_error_alert_message(
     Test success and all failure scenarios of activation error alert message
 
     1. Test that get_global_alert_messages should successfully return activation error message as the context when:
-        - request is not AJAX,
-        - user is authenticated,
-        - user is inactive,
+        - request is not AJAX and
+        - user is authenticated and
+        - user is inactive and
         - user is not requesting for activation
 
     2. Test that get_global_alert_messages should NOT return activation error message as the context when:
@@ -136,8 +136,8 @@ def test_get_org_oef_update_alert_message(
     Test success and all failure scenarios of ORG_OEF_UPDATE_ALERT message
 
     1. Test that get_global_alert_messages returns ORG_OEF_UPDATE_ALERT as the context successfully when:
-        - oef_update_prompt = True,
-        - org_oef_prompt_available = True
+        - oef_update_prompt = True and
+        - org_oef_prompt_available = True and
         - request.path contains '/oef/dashboard'
 
     2. Test that get_global_alert_messages should NOT return ORG_OEF_UPDATE_ALERT as the context when:
@@ -183,8 +183,8 @@ def test_get_org_details_update_alert_message(
     Test success and all failure scenarios of ORG_DETAILS_UPDATE_ALERT message
 
     1. Test that get_global_alert_messages returns ORG_DETAILS_UPDATE_ALERT as the context successfully when:
-        - metric_update_prompt = True,
-        - org_detail_prompt_available = True
+        - metric_update_prompt = True and
+        - org_detail_prompt_available = True and
         - request.path contains '/organization/details/'
 
     2. Test that get_global_alert_messages should NOT return ORG_DETAILS_UPDATE_ALERT as the context when:
@@ -234,10 +234,10 @@ def test_overlay_message(
     Test success and all failure scenarios of overlay_message flag
 
     1. Test that get_global_alert_messages returns overlay_message = True when:
-        - metric_update_prompt = True,
-        - org_detail_prompt_available = True,
-        - org_detail_platform_overlay_available = True,
-        - request.path does not contain '/oef/dashboard'
+        - metric_update_prompt = True and
+        - org_detail_prompt_available = True and
+        - org_detail_platform_overlay_available = True and
+        - request.path does not contain '/oef/dashboard' and
         - request.path does not contain '/organization/details/'
 
     2. Test that get_global_alert_messages returns overlay_message = None when:
