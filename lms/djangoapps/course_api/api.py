@@ -188,8 +188,10 @@ def list_course_keys(request, username, role):
         filtered_course_keys = (
             CourseAccessRole.objects.filter(
                 user=user,
-                # Having the instructor role implies staff access. This fact was reverse-engineered from unit tests.
+                # Having the instructor role implies staff access.
                 role__in=['staff', 'instructor'],
+                # We need to check against CourseOverview so that we don't return any Libraries.
+                course_id__in=CourseOverview.objects.all(),
             )
             .exclude(course_id=CourseKeyField.Empty)
             .order_by('course_id')

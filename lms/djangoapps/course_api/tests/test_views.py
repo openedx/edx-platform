@@ -22,6 +22,7 @@ from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from opaque_keys.edx.locator import LibraryLocator
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -510,6 +511,28 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
         })
         self.assertEqual(len(filtered_response.data['results']), 1)
         self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course2.org))
+
+    def test_no_libraries(self):
+        """
+        Verify that only Course IDs are returned, not anything else like libraries.
+        """
+        # Make this user a course staff user for a course, AND a library.
+        course_staff_user = self.create_user(username='course_staff', is_staff=False)
+        add_users(self.global_admin, CourseStaffRole(self.course.id), course_staff_user)
+        add_users(
+            self.global_admin,
+            CourseStaffRole(LibraryLocator.from_string('library-v1:library_org+library_name')),
+            course_staff_user,
+        )
+
+        # Requesting the courses should return *only* courses and not libraries.
+        self.setup_user(self.staff_user)
+        filtered_response = self.verify_response(params={
+            'username': course_staff_user.username,
+            'role': 'staff'
+        })
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertTrue(filtered_response.data['results'][0].startswith(self.course.org))
 
 
 class LazyPageNumberPaginationTestCase(TestCase):
