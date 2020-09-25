@@ -2656,7 +2656,7 @@ INSTALLED_APPS = [
     'django_sites_extensions',
 
     # Email marketing integration
-    'email_marketing.apps.EmailMarketingConfig',
+    'lms.djangoapps.email_marketing.apps.EmailMarketingConfig',
 
     # additional release utilities to ease automation
     'release_util',
