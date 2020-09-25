@@ -114,6 +114,10 @@ class InvalidNameError(ValueError):
     """ The specified name/identifier is not valid """
 
 
+class LibraryPermissionIntegrityError(IntegrityError):
+    """ Thrown when an operation would cause insane permissions. """
+
+
 # Models:
 
 @attr.s
@@ -412,6 +416,22 @@ def get_library_team(library_key):
     ]
 
 
+def get_library_user_permissions(library_key, user):
+    """
+    Fetch the specified user's access information. Will return None if no
+    permissions have been granted.
+    """
+    ref = ContentLibrary.objects.get_by_key(library_key)
+    grant = ref.permission_grants.filter(user=user).first()
+    if grant is None:
+        return None
+    return ContentLibraryPermissionEntry(
+        user=grant.user,
+        group=grant.group,
+        access_level=grant.access_level,
+    )
+
+
 def set_library_user_permissions(library_key, user, access_level):
     """
     Change the specified user's level of access to this library.
@@ -419,6 +439,10 @@ def set_library_user_permissions(library_key, user, access_level):
     access_level should be one of the AccessLevel values defined above.
     """
     ref = ContentLibrary.objects.get_by_key(library_key)
+    current_grant = get_library_user_permissions(library_key, user)
+    if current_grant and current_grant.access_level == AccessLevel.ADMIN_LEVEL:
+        if not ref.permission_grants.filter(access_level=AccessLevel.ADMIN_LEVEL).exclude(user_id=user.id).exists():
+            raise LibraryPermissionIntegrityError(_('Cannot change or remove the access level for the only admin.'))
     if access_level is None:
         ref.permission_grants.filter(user=user).delete()
     else:
@@ -528,7 +552,7 @@ def get_library_blocks(library_key, text_search=None):
                 for item in LibraryBlockIndexer.get_items(filter_terms=filter_terms, text_search=text_search)
                 if item is not None
             ]
-        except (ConnectionError) as e:
+        except (ElasticConnectionError) as e:
             log.exception(e)
 
     # If indexing is disabled, or connection to elastic failed
