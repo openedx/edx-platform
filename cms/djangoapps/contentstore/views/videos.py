@@ -22,7 +22,6 @@ from django.http import FileResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
-from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edxval.api import (
     SortDirection,
@@ -50,7 +49,6 @@ from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFl
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
-    ENABLE_VEM_PIPELINE,
     waffle_flags
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
@@ -826,20 +824,12 @@ def storage_service_bucket(course_key=None):
         }
 
     conn = s3.connection.S3Connection(**params)
-    vem_pipeline = VEMPipelineIntegration.current()
 
     # We don't need to validate our bucket, it requires a very permissive IAM permission
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each
     # environment (since we share a single bucket for multiple deployments in some configurations)
-    #
-    # All the videos should go to VEM by default. VEDA related code will remain in-place
-    # until its deprecation.
-    if vem_pipeline and vem_pipeline.enabled:
-        return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False)
-    else:
-        LOGGER.info('Uploading course: {} to VEDA bucket.'.format(course_key))
-        return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['BUCKET'], validate=False)
+    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False)
 
 
 def storage_service_key(bucket, file_name):
