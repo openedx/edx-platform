@@ -84,7 +84,7 @@ def validate_video_image(image_file, skip_aspect_ratio=False):
 
 def download_youtube_video_thumbnail(youtube_id):
     """
-    Download highest resoultion video thumbnail available from youtube.
+    Download highest resolutions video thumbnail available from youtube.
     """
     thumbnail_content = thumbnail_content_type = None
     # Download highest resolution thumbnail available.

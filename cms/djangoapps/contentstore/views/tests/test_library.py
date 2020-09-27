@@ -339,7 +339,7 @@ class UnitTestLibraries(CourseTestCase):
         edit_response = self.client.ajax_post(user_details_url, {"role": LibraryUserRole.ROLE})
         self.assertIn(edit_response.status_code, (200, 204))
 
-        # Now extra_user should apear in the list:
+        # Now extra_user should appear in the list:
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, extra_user.username)

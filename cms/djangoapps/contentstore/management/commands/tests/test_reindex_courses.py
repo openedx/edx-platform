@@ -41,7 +41,7 @@ class TestReindexCourse(ModuleStoreTestCase):
     YESNO_PATCH_LOCATION = 'contentstore.management.commands.reindex_course.query_yes_no'
 
     def _get_lib_key(self, library):
-        """ Get's library key as it is passed to indexer """
+        """ Gets library key as it is passed to indexer """
         return library.location.library_key
 
     def _build_calls(self, *courses):

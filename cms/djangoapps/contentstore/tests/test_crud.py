@@ -127,7 +127,7 @@ class TemplateTests(ModuleStoreTestCase):
         id_locator = test_course.id.for_branch(ModuleStoreEnum.BranchName.draft)
         # verify it can be retrieved by id
         self.assertIsInstance(self.store.get_course(id_locator), CourseDescriptor)
-        # TODO reenable when split_draft supports getting specific versions
+        # TODO re-enable when split_draft supports getting specific versions
         # guid_locator = test_course.location.course_agnostic()
         # Verify it can be retrieved by guid
         # self.assertIsInstance(self.store.get_item(guid_locator), CourseDescriptor)

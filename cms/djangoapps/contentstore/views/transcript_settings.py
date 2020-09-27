@@ -266,7 +266,7 @@ def transcript_delete_handler(request, course_key_string, edx_video_id, language
         language_code: transcript's language code.
 
     Returns
-        - A 404 if the user does not have required permisions
+        - A 404 if the user does not have required permissions
         - A 200 if transcript is deleted without any error(s)
     """
     # Check whether the feature is available for this course.

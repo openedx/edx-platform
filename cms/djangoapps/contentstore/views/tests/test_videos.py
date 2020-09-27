@@ -1429,7 +1429,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
 
         self.assertEqual(response.status_code, 204)
 
-        # Verify transcript preferences no loger exist
+        # Verify transcript preferences no longer exist
         preferences = get_transcript_preferences(six.text_type(self.course.id))
         self.assertIsNone(preferences)
 

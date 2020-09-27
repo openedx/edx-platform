@@ -285,7 +285,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.assertEqual(response["total"], 4)
 
     def _test_not_indexing_unpublished_content(self, store):
-        """ add a new one, only appers in index once added """
+        """ add a new one, only appears in index once added """
         # Publish the vertical to start with
         self.publish_item(store, self.vertical.location)
         self.reindex_course(store)

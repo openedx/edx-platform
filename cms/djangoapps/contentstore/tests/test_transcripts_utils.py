@@ -655,7 +655,7 @@ class TestTranscript(unittest.TestCase):
 
 class TestSubsFilename(unittest.TestCase):
     """
-    Tests for subs_filename funtion.
+    Tests for subs_filename function.
     """
 
     def test_unicode(self):

@@ -32,7 +32,7 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 @override_settings(FEATURES=FEATURES_WITH_EXPORT_GIT)
 class TestGitExport(CourseTestCase):
     """
-    Excercise the git_export django management command with various inputs.
+    Exercise the git_export django management command with various inputs.
     """
 
     def setUp(self):

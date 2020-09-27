@@ -369,7 +369,7 @@ class TestUploadTranscripts(BaseTranscripts):
         """
         non_existant_edx_video_id = '1111-2222-3333-4444'
 
-        # Upload with non-existant `edx_video_id`
+        # Upload with non-existent `edx_video_id`
         response = self.upload_transcript(
             locator=self.video_usage_key,
             transcript_file=self.good_srt_file,
@@ -378,7 +378,7 @@ class TestUploadTranscripts(BaseTranscripts):
         # Verify the response
         self.assert_response(response, expected_status_code=400, expected_message='Invalid Video ID')
 
-        # Verify transcript does not exist for non-existant `edx_video_id`
+        # Verify transcript does not exist for non-existent `edx_video_id`
         self.assertIsNone(get_video_transcript_content(non_existant_edx_video_id, language_code=u'en'))
 
 

@@ -1758,7 +1758,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertEqual(course.textbooks, fetched_course.textbooks)
 
     def test_image_import(self):
-        """Test backwards compatibilty of course image."""
+        """Test backwards compatibility of course image."""
         content_store = contentstore()
 
         # Use conditional_and_poll, as it's got an image already

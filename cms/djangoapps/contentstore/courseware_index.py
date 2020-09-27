@@ -50,7 +50,7 @@ def indexing_is_enabled():
 
 
 class SearchIndexingError(Exception):
-    """ Indicates some error(s) occured during indexing """
+    """ Indicates some error(s) occurred during indexing """
 
     def __init__(self, message, error_list):
         super(SearchIndexingError, self).__init__(message)

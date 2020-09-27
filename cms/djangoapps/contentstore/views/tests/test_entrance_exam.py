@@ -190,7 +190,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
 
         # What we have now is a course milestone requirement and no valid fulfillment
         # paths for the specified user.  The LMS is going to have to ignore this situation,
-        # because we can't confidently prevent it from occuring at some point in the future.
+        # because we can't confidently prevent it from occurring at some point in the future.
         # milestone_key_1 =
         self.assertEqual(len(paths[milestone_key]), 0)
 

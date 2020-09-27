@@ -131,7 +131,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
             log.exception(u'Failed to pull git repository: %r', ex.output)
             raise GitExportError(GitExportError.CANNOT_PULL)
 
-    # export course as xml before commiting and pushing
+    # export course as xml before committing and pushing
     root_dir = os.path.dirname(rdirp)
     course_dir = os.path.basename(rdirp).rsplit('.git', 1)[0]
     try:

@@ -646,7 +646,7 @@ class ExportTestCase(CourseTestCase):
         course_elem = course_xml.getroot()
 
         # The course run file should have a vertical that points to the
-        # non-existant block.
+        # non-existent block.
         self.assertEqual(course_elem.tag, 'course')
         self.assertEqual(course_elem[0].tag, 'vertical')  # This is just a reference
 

@@ -3043,7 +3043,7 @@ class TestXBlockPublishingInfo(ItemTest):
 
     def _get_xblock_outline_info(self, location):
         """
-        Returns the xblock info for the specified location as neeeded for the course outline page.
+        Returns the xblock info for the specified location as needed for the course outline page.
         """
         return create_xblock_info(
             modulestore().get_item(location),
