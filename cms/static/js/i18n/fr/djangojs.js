@@ -2007,10 +2007,6 @@
     "{screen_reader_start}Warning:{screen_reader_end} The previously selected content group was deleted. Select another content group.": "{screen_reader_start}Avertissement : {screen_reader_end} Le groupe de contenu s\u00e9lectionn\u00e9 pr\u00e9c\u00e9demment a \u00e9t\u00e9 supprim\u00e9. S\u00e9lectionnez un autre groupe de contenu.",
     "{seconds} {unit}": "{seconds} {unit}",
     "{start_strong}{total}{end_strong} words submitted in total.": "{start_strong}{total}{end_strong} mots soumis au total.",
-    "{total_results} result": [
-      "{total_results} r\u00e9sultat",
-      "{total_results} r\u00e9sultats"
-    ],
     "{type} Progress": "{type} Progress",
     "\u2026": "\u2026"
   };

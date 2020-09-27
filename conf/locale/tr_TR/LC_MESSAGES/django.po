@@ -129,7 +129,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-20 20:43+0000\n"
+"POT-Creation-Date: 2020-09-27 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -1695,7 +1695,7 @@ msgstr "Desteklenmiyor"
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
-msgstr "Olası dosya yüklemeleri olan problemler yeniden notlandırılamaz."
+msgstr "Olası dosya yüklemeleri olan problemler yeniden notlandırılamaz"
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Question {}"
@@ -2965,7 +2965,7 @@ msgstr "PDF Ders Kitapları"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "List of dictionaries containing pdf_textbook configuration"
-msgstr "Sözlüklerin listesi pdf_textbook yapılandırmasını içerir"
+msgstr "pdf_textbook yapılandırmasını içeren sözlüklerin listesi"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "HTML Textbooks"
@@ -3000,7 +3000,7 @@ msgstr ""
 #. his students.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enable CCX"
-msgstr "CCX Etkin"
+msgstr "CCX Etkinleştir"
 
 #. Translators: Custom Courses for edX (CCX) is an edX feature for re-using
 #. course content. CCX Coach is
@@ -3141,15 +3141,15 @@ msgid ""
 "early_with_info. To display only the links to passing students as soon as "
 "certificates are generated, enter early_no_info."
 msgstr ""
-"Sonuna önceden_bilgi_var, ya da önceden_bilgi_yok olarak girin. Sertifika "
+"Sonuna early_with_info ya da early_no_info olarak girin. Sertifika "
 "oluşturduktan sonra dersi geçen öğrenciler ana panellerinde sertifikalarının"
 " bağlantısını görürken dersi geçemeyen öğrenciler notlandırma "
 "yapılandırmasıyla ilgili bilgileri görür. Varsayılan, dersin bitiş "
 "tarihinden sonra tüm öğrencilere sertifika bilgisinin gösterilmesidir. Bu "
 "sertifika bilgisini tüm öğrencilere sertifikalar oluşturulduğu andan "
-"itibaren gösterilmesini isterseniz önceden_bilgi_var olarak girin. "
+"itibaren gösterilmesini isterseniz early_with_info olarak girin. "
 "Sertifikaların oluşturulduğu andan itibaren dersten geçen öğrencilere "
-"yalnızca bağlantıları göstermek içinse önceden_bilgi_yok olarak girin."
+"yalnızca bağlantıları göstermek içinse early_no_info olarak girin."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"
@@ -3198,8 +3198,8 @@ msgid ""
 "Issue Open Badges badges for this course. Badges are generated when "
 "certificates are created."
 msgstr ""
-"Bu ders için Open Badge oluşturun. Open Badge, sertifikalar düzenlendiğinde "
-"oluşturulur. "
+"Bu ders için Open Badges rozeti oluşturun. Rozetler sertifikalar "
+"düzenlendiğinde oluşturulur. "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3269,7 +3269,7 @@ msgstr "Ders-belirli yapılandırma bilgisini buraya girin (JSON formatı)"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "CSS Class for Course Reruns"
-msgstr " Dersleri Yeniden Çalıştırmak için CSS Sınıfları "
+msgstr "Dersleri Yeniden Çalıştırmak için CSS Sınıfları "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3277,7 +3277,7 @@ msgid ""
 "different numbers."
 msgstr ""
 "Farklı numaralı olsa bile aynı css sınıfını paylaşmak için derslere izin "
-"ver."
+"verir."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Forum External Link"
@@ -3286,7 +3286,7 @@ msgstr "Harici Forum Bağlantısı"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allows specification of an external link to replace discussion forums."
 msgstr ""
-"Tartışma forumlarını değiştirmek için harici bağlantının özelliğine izin "
+"Tartışma forumlarını değiştirmek için harici bağlantının belirtimine izin "
 "ver. "
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3295,11 +3295,11 @@ msgstr "İlerleme Sekmesini Gizle"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allows hiding of the progress tab."
-msgstr "İlerleme sekmesini gizlemeye izin ver"
+msgstr "İlerleme sekmesini gizlemeye izin verir."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Organization Display String"
-msgstr "Ders Organizasyonu Görüntü Dizesi"
+msgstr "Ders Organizasyonu Görüntüleme Dizesi"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3308,14 +3308,14 @@ msgid ""
 "course. To use the organization that you entered when you created the "
 "course, enter null."
 msgstr ""
-"Ders yazılımında görünmesini istediğiniz ders organizasyonunu girin. Bu ayar"
-" dersi oluşturduğunuzda girdiğiniz organizasyonu geçersiz kılar. Dersi "
-"oluşturduğunuzda girdiğiniz organizasyonu kullanmak için, değeri null/boş "
-"girin."
+"Derste görünmesini istediğiniz ders organizasyonunu girin. Bu ayar dersi "
+"oluşturduğunuzda girdiğiniz organizasyonu geçersiz kılar. Dersi "
+"oluşturduğunuzda girdiğiniz organizasyonu kullanmak için, değeri null olarak"
+" girin."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Number Display String"
-msgstr "Ders Sayısı Görüntü Dizesi"
+msgstr "Ders Sayısı Görüntüleme Dizesi"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3324,9 +3324,9 @@ msgid ""
 " use the course number that you entered when you created the course, enter "
 "null."
 msgstr ""
-"Derste görülmesini istediğiniz ders numarasını girin. Bu ayar dersi "
-"oluşturduğunuzda girmiş olduğunuz ders numarasını geçersiz hale getirir. "
-"Dersi oluşturduğunuzda girmiş olduğunuz numarayı kullanmak için boş olarak "
+"Derste görünmesini istediğiniz ders numarasını girin. Bu ayar, dersi "
+"oluşturduğunuzda girmiş olduğunuz ders numarasını geçersiz kılar. Dersi "
+"oluşturduğunuzda girmiş olduğunuz numarayı kullanmak için, null değerini "
 "girin."
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3339,7 +3339,7 @@ msgid ""
 " an unlimited number of students, enter null."
 msgstr ""
 "Derse en fazla kaç öğrencinin kaydolabileceğini girin. Öğrenci sayısı sınırı"
-" olmasını istemiyorsanız null/boş değerini girin."
+" olmasını istemiyorsanız null değerini girin."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Public Wiki Access"
@@ -3634,7 +3634,7 @@ msgstr "Ders Eğitmeni"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enter the details for Course Instructor"
-msgstr "Ders eğitmeni hakkındaki ayrıntıları girin"
+msgstr "Ders Eğitmeni hakkındaki ayrıntıları girin"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Add Unsupported Problems and Tools"
@@ -3792,7 +3792,7 @@ msgstr "Kütüphane Sürümü"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Determines how content is drawn from the library"
-msgstr "İçeriğin kütüphaneden nasıl çekileceğini belirler."
+msgstr "İçeriğin kütüphaneden nasıl çekileceğini belirler"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Choose n at random"
@@ -3912,7 +3912,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
 msgid "Open Editor"
-msgstr ""
+msgstr "Açık Düzenleyici"
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
 msgid "Importing Library Block failed - are the IDs valid and readable?"
@@ -4127,7 +4127,7 @@ msgstr "GIT URL"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the URL for the course data GIT repository."
-msgstr "GIT havuzunun ders verileri için URL girin."
+msgstr "Ders verileri GIT deposu için URL girin."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "XQA Key"
@@ -4173,10 +4173,10 @@ msgid ""
 "\"never\", and \"per_student\"."
 msgstr ""
 "Bir problemdeki değişken değerlerin hangi sıklıkla rasgele sıralanacağını "
-"belirtin. Bu ayar dersinizin çoğu problemindeki değerleri Python komut "
-"dizisi ile belirlemeyi ve rastgele sıralamayı planlamayı düşünüyorsanız "
-"\"asla\" olarak ayarlanmalıdır. Geçerli değerler \"herzaman\", \"onreset\", "
-"asla\" ve \"öğrenci_başına\"dır."
+"belirtin. Bu ayar dersinizin çoğu problemindeki değerleri Python "
+"betikleriyle sağlamayı ve rasgele sıralamayı planlamayı düşününceye dek "
+"\"never\" olarak ayarlanmalıdır. Geçerli değerler \"always\", \"onreset\", "
+"\"never\" ve \"per_student\"dır."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Days Early for Beta Users"
@@ -4240,7 +4240,7 @@ msgid ""
 "obtain a key for your course, or to report an issue, please contact "
 "moocsupport@mathworks.com"
 msgstr ""
-"MATLAB hizmetine ulaşmak için MAthWorks tarafından sağlanan API anahtarını "
+"MATLAB hizmetine ulaşmak için MathWorks tarafından sağlanan API anahtarını "
 "girin. Bu anahtar yalnızca belirlenen süre içinde bu derste kullanılmak "
 "üzere verilmiştir. API anahtarını diğer derslerde paylaşmayın. Anahtarın "
 "ortaya çıktığına ya da başkası tarafından kullanıldığına inanıyorsanız hemen"
@@ -4321,7 +4321,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable Student Notes"
-msgstr "Öğrenci Notları Etkin"
+msgstr "Öğrenci Notlarını Etkinleştir"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -4336,7 +4336,7 @@ msgid ""
 " show or hide their notes in the courseware."
 msgstr ""
 "Öğrenci Notlarının derste görünür olup olmadığını gösterir. Ayrıca "
-"öğrenciler ders içeriğinde kendi notlarını gösterip gizleyebilir."
+"öğrenciler ders yazılımında kendi notlarını gösterip gizleyebilir."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Tag this module as part of an Entrance Exam section"
@@ -4464,7 +4464,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Onboarding Exam"
-msgstr "Bu Bir Test Sürüşü Sınavı"
+msgstr "Bu Bir Test Sürüşü Sınavı Mı"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "This setting indicates whether this exam is an onboarding exam."
@@ -4584,7 +4584,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
 "The experiment does not contain all of the groups in the configuration."
-msgstr "Deney, yapılandırmada tüm grupları içermez."
+msgstr "Deney, yapılandırmadaki tüm grupları içermez."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Add Missing Groups"
@@ -4752,8 +4752,8 @@ msgid ""
 "Not supported in the native mobile app: the full video file will play. "
 "Formatted as HH:MM:SS. The maximum value is 23:59:59."
 msgstr ""
-"Videonun tamamının gösterilmesini istemediğniz durumda videonun "
-"durdurulacağı zaman. Yerel mobil uygulamada desteklenmez, videonun tamamı "
+"Videonun tamamının gösterilmesini istemediğiniz durumda videonun "
+"durdurulacağı zaman. Native mobil uygulamada desteklenmez, videonun tamamı "
 "gösterilir. SS:DD:SS olarak formatlanmıştır. Maksimum değer 23:59:59'dur. "
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -4846,7 +4846,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Default Timed Transcript"
-msgstr "Varsayılan Zamanları İşaretlenmiş Altyazı"
+msgstr "Zamanları İşaretlenmiş Öntanımlı Altyazı"
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Specify whether the transcripts appear with the video by default."
@@ -4909,7 +4909,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Specify whether YouTube is available for the user."
-msgstr "YouTube'un kullanıcılar için kullanılabilir olup olmadığını belirtin."
+msgstr "YouTube'un kullanıcı için kullanılabilir olup olmadığını belirtin."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
@@ -4917,7 +4917,7 @@ msgid ""
 "by clicking Download Handout under the video."
 msgstr ""
 "Video ile ilgili dinleyici notunu yükle. Öğrenciler, video altındaki "
-"Dinleyici Notu İndir'e tıklayaıp dinleyici notunu indirebilir."
+"Dinleyici Notu İndir'e tıklayıp dinleyici notunu indirebilir."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Upload Handout"
@@ -5148,7 +5148,7 @@ msgid ""
 "not yet reset your password."
 msgstr ""
 "Bu değişikliği talep etmediyseniz, bu e-postayı dikkate almayınız - "
-"Parolanızı henüz sıfırlamadık."
+"parolanızı henüz sıfırlamadık."
 
 #: common/templates/student/edx_ace/accountrecovery/email/body.txt
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
@@ -5290,7 +5290,7 @@ msgstr "Bu değer tamamen küçük harf olmalı."
 
 #: lms/djangoapps/badges/models.py
 msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr "Bu rozet görüntüsü için ders modu. Örneğin, \"onaylı\" ya da \"onurlu\"."
+msgstr "Bu rozet görüntüsü için ders modu. Örneğin, \"onaylı\" ya da \"onur\"."
 
 #: lms/djangoapps/badges/models.py
 msgid ""
@@ -5306,8 +5306,8 @@ msgid ""
 " one default image."
 msgstr ""
 "Eğer belirlenmiş bir rozet görüntüsü olmayan bir ders modu için bu "
-"görüntünün varsayılan görüntü olmasını istiyorsanız bu değeri True olarak "
-"işaretleyin."
+"görüntünün varsayılan görüntü olmasını istiyorsanız, bu değeri True olarak "
+"belirleyin. Sadece tek bir öntanımlı görseliniz olabilir."
 
 #: lms/djangoapps/badges/models.py
 msgid "There can be only one default image."
@@ -5488,7 +5488,7 @@ msgstr "\"{course_title}\" Ders Ekibi"
 
 #: lms/djangoapps/ccx/plugins.py
 msgid "CCX Coach"
-msgstr "CCX Hocası"
+msgstr "CCX Koçu"
 
 #: lms/djangoapps/ccx/utils.py
 msgid ""
@@ -5503,11 +5503,11 @@ msgstr "Bu ders doldu: kontenjan {max_student_enrollments_allowed} kişidir"
 
 #: lms/djangoapps/ccx/views.py
 msgid "You must be a CCX Coach to access this view."
-msgstr "Bu görüntüye erişebilmeniz için CCX Hocası olmanız gerekir."
+msgstr "Bu görüntüye erişebilmeniz için CCX Koçu olmanız gerekir."
 
 #: lms/djangoapps/ccx/views.py
 msgid "You must be the coach for this ccx to access this view"
-msgstr "Bu görüntüye erişebilmeniz için bu ccx'in hocası olmanız gerekir."
+msgstr "Bu görüntüye erişebilmeniz için bu ccx'in koçu olmanız gerekir."
 
 #: lms/djangoapps/ccx/views.py
 msgid ""
@@ -5515,7 +5515,7 @@ msgid ""
 " rerun of this course in the studio to allow this action."
 msgstr ""
 "Artık kullanılmayan bir kimlik kullanan bir dersten CCX oluşturamazsınız. Bu"
-" eyleme izin vermek için lütfen dersin yeniden çalıştırılmasını oluşturun."
+" eyleme izin vermek için lütfen Studio'da dersi yeniden yayına alın."
 
 #: lms/djangoapps/certificates/models.py wiki/admin.py wiki/models/article.py
 msgid "created"
@@ -5867,7 +5867,7 @@ msgstr "{platform_name}'de çalış"
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
 msgid "Contact {platform_name}"
-msgstr "İletişim{platform_name}"
+msgstr "{platform_name} İletişim"
 
 #. Translators:  This text appears near the top of the certficate and
 #. describes the guarantee provided by edX
@@ -7193,7 +7193,7 @@ msgstr "Doğrulama Durumu"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Last Login"
-msgstr ""
+msgstr "Son Görülme"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Date Joined"
@@ -8707,7 +8707,7 @@ msgstr "Üniversite"
 msgid "Course Announce Date"
 msgstr "Ders Duyuru Tarihi"
 
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
 msgid "Course Start Date"
 msgstr "Ders Başlama Tarihi"
 
@@ -10530,6 +10530,10 @@ msgid "Learning Sequences"
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
+msgid "Cannot change or remove the access level for the only admin."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/api.py
 msgid "Library cannot have more than {} XBlocks"
 msgstr ""
 
@@ -10547,6 +10551,14 @@ msgstr "Salt-okunur"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "One and only one of 'user' and 'group' must be set."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/views.py
+msgid "We could not find a user with that email address."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/views.py
+msgid "This user already has access to this library."
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -12088,7 +12100,7 @@ msgstr ""
 
 #: openedx/features/calendar_sync/plugins.py
 msgid "Calendar Sync"
-msgstr ""
+msgstr "Takvim Eşleştirme"
 
 #: openedx/features/calendar_sync/plugins.py
 msgid "Unsubscribe from calendar updates"
@@ -16290,6 +16302,8 @@ msgid ""
 "To access course materials, you must score {required_score}% or higher on "
 "this                     exam. Your current score is {current_score}%."
 msgstr ""
+"Ders materyallerine erişmek için, bu              sınavda en az "
+"{required_score}% puan yapmalısınız. Şu anki puanınız {current_score}%."
 
 #: lms/templates/courseware/courseware.html
 msgid "Your score is {current_score}%. You have passed the entrance exam."
@@ -16301,7 +16315,7 @@ msgstr "{course.display_number_with_default} Ders Bilgisi"
 
 #: lms/templates/courseware/dates.html
 msgid "Important Dates"
-msgstr ""
+msgstr "Önemli Tarihler"
 
 #: lms/templates/courseware/dates.html
 msgid "Today"
@@ -18092,6 +18106,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Tasks"
@@ -18100,6 +18115,7 @@ msgstr "Bekleyen Görevler"
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "The status for any active tasks appears in a table below."
 msgstr "Aşağıdaki tabloda aktif olan görevlerin durumu görülmektedir."
@@ -18350,10 +18366,12 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
 msgid "NOTE"
 msgstr "NOT"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
 msgid ""
 "The generated report is limited to {max_entries} responses. If you expect "
 "more than {max_entries} responses, try generating the report on a chapter-"
@@ -18362,6 +18380,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
 msgid "Click to list certificates that are issued for this course:"
 msgstr "Bu ders için verilen sertifikalar listelemek için tıklayın:"
 
@@ -18386,6 +18405,7 @@ msgid "List enrolled students' profile information"
 msgstr "Kayıtlı öğrencilerin profil bilgisini listele"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
 msgid ""
 "Click to generate a CSV grade report for all currently enrolled students."
 msgstr ""
@@ -18414,10 +18434,12 @@ msgid "Generate Submission Files Archive"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 msgid "Reports Available for Download"
 msgstr "İndirme için Hazır Raporlar"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 msgid ""
 "The reports listed below are available for download, identified by UTC date "
 "and time of generation."
@@ -18443,6 +18465,24 @@ msgid ""
 "days after generation. If you will need access to old reports, download and "
 "store the files, in accordance with your institution's data security "
 "policies.{li_end}{ul_end}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
+msgid ""
+"The answer distribution report listed below is generated periodically by an "
+"automated background process.         The report is cumulative, so answers "
+"submitted after the process starts are included in a subsequent report."
+"         The report is generated several times per day."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
+msgid ""
+"{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data "
+"secure, you cannot save or         email these links for direct access. "
+"Copies of links expire within 5 minutes.{li_end}{li_start}Report files"
+"         are deleted 90 days after generation. If you will need access to "
+"old reports, download and store the files,         in accordance with your "
+"institution's data security policies.{li_end}{ul_end}"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -18974,7 +19014,7 @@ msgstr "Topluluk Öğretim Görevlisi Ekle"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "CCX Coaches"
-msgstr "CCX Hocaları"
+msgstr "CCX Koçları"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -19337,6 +19377,91 @@ msgstr "Sadece Notlar Yükselecekse Yeniden Puanla"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show the status for the tasks that you submitted for this problem."
 msgstr "Bu problem için gönderdiğiniz görevlerin durumunu gösterin."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid "Note"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
+msgid ""
+"Select a problem to generate a CSV         file that lists all student "
+"answers to the problem. You also select a section or chapter to include"
+"         results of all problems in that section or chapter."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to display the grading configuration for the                 course. "
+"The grading configuration is the breakdown of graded subsections of the "
+"course                 (such as exams and problem sets), and can be changed "
+"on the 'Grading'                 page (under 'Settings') in Studio."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid "Click to download a CSV of                 anonymized student IDs:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"For large courses, generating some reports can take                 several "
+"hours. When report generation is complete, a                 link that "
+"includes the date and time of generation appears in the table below. These "
+"reports are                 generated in the background, meaning it is OK to"
+" navigate away from this page while your report is                 "
+"generating."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Please be patient and do not click these buttons                 multiple "
+"times. Clicking these buttons multiple times will significantly slow the "
+"generation                 process."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"For smaller courses, click to list                 profile information for "
+"enrolled students directly on this page:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file of                 all students enrolled in "
+"this course, along with profile information such as email address and"
+"                 username:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file                 that lists learners who can "
+"enroll in the course but have not yet done so."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file                 of all proctored exam results "
+"in this course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file of                 survey results for this "
+"course."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV                 ORA grade report for all currently "
+"enrolled students."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV                 problem grade report for all "
+"currently enrolled students."
+msgstr ""
 
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -20048,7 +20173,7 @@ msgstr "Onaylama"
 msgid ""
 "The page that you were looking for was not found. Go back to the "
 "{link_start}homepage{link_end} ."
-msgstr ""
+msgstr "Aradığınız sayfa bulunamadı. {link_start}Anasayfaya{link_end} dönün."
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -23441,6 +23566,8 @@ msgid ""
 "Please note that changes here may take up to a business day to appear on "
 "your course summary page."
 msgstr ""
+"Lütfen buradaki değişikliklerin ders özeti sayfanızda görünmesinin bir iş "
+"günü kadar sürebileceğini unutmayın."
 
 #: cms/templates/settings.html
 msgid "Course Credit Requirements"
@@ -23528,7 +23655,7 @@ msgstr "(UTC)"
 
 #: cms/templates/settings.html
 msgid "Course End Date"
-msgstr ""
+msgstr "Ders Bitiş Tarihi"
 
 #: cms/templates/settings.html
 msgid "Last day your course is active"

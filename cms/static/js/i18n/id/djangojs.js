@@ -1843,9 +1843,6 @@
     "{sessionDates} (Open until {enrollmentEnd})": "{sessionDates} (Dibuka sampai {enrollmentEnd})",
     "{sessionDates} - Currently Selected": "{sessionDates} - Sedang Dipilih",
     "{start_strong}{total}{end_strong} words submitted in total.": "{start_strong}{total}{end_strong} total kata dikumpulkan",
-    "{total_results} result": [
-      "{total_results} hasil"
-    ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",
     "{type} Progress": "Kemajuan {type} ",
     "\u2026": "\u2026"

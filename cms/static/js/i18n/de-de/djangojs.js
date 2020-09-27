@@ -2543,10 +2543,6 @@
       "{team_count} Teams"
     ],
     "{totalItems} total": "insgesamt {totalItems}",
-    "{total_results} result": [
-      "{total_results} Ergebnis",
-      "{total_results} Ergebnisse"
-    ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",
     "{type} Progress": "{type} Fortschritt",
     "{unread_comments_count} new": "{unread_comments_count} neu",

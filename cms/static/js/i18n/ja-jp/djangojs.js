@@ -1580,9 +1580,6 @@
     "{screen_reader_start}Warning:{screen_reader_end} No content groups exist.": "{screen_reader_start}\u8b66\u544a:{screen_reader_end} \u30b3\u30f3\u30c6\u30f3\u30c4\u30b0\u30eb\u30fc\u30d7\u304c\u5b58\u5728\u3057\u307e\u305b\u3093\u3002",
     "{screen_reader_start}Warning:{screen_reader_end} The previously selected content group was deleted. Select another content group.": "{screen_reader_start}\u8b66\u544a:{screen_reader_end} \u4ee5\u524d\u9078\u629e\u3057\u305f\u30b3\u30f3\u30c6\u30f3\u30c4\u30b0\u30eb\u30fc\u30d7\u306f\u524a\u9664\u3055\u308c\u307e\u3057\u305f\u3002\u5225\u306e\u30b3\u30f3\u30c6\u30f3\u30c4\u30b0\u30eb\u30fc\u30d7\u3092\u9078\u629e\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
     "{seconds} {unit}": "{seconds} {unit}",
-    "{total_results} result": [
-      "\u7d50\u679c {total_results}\u4ef6"
-    ],
     "{type} Progress": "{type} \u306e\u9032\u6357",
     "\u2026": "..."
   };

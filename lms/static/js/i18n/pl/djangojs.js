@@ -1742,12 +1742,6 @@
     "{selectedProvider} credentials saved": "Dane {selectedProvider} zapisane",
     "{sessionDates} (Open until {enrollmentEnd})": "{sessionDates} (Otwarte do {enrollmentEnd})",
     "{sessionDates} - Currently Selected": "{sessionDates} - obecnie wybrana",
-    "{total_results} result": [
-      "{total_results} wynik",
-      "{total_results} wyniki",
-      "{total_results} wynik\u00f3w",
-      "{total_results} wynik\u00f3w"
-    ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",
     "{type} Progress": "{type} - post\u0119p",
     "\u2026": "\u2026"

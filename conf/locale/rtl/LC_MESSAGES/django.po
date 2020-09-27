@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-20 20:49+0000\n"
-"PO-Revision-Date: 2020-09-20 20:49:35.964813\n"
+"POT-Creation-Date: 2020-09-27 20:50+0000\n"
+"PO-Revision-Date: 2020-09-27 20:50:25.720823\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -10546,6 +10546,10 @@ msgid "Learning Sequences"
 msgstr "مثشقرهرل سثضعثرذثس"
 
 #: openedx/core/djangoapps/content_libraries/api.py
+msgid "Cannot change or remove the access level for the only admin."
+msgstr "ذشررخف ذاشرلث خق قثوخدث فاث شذذثسس مثدثم بخق فاث خرمغ شيوهر."
+
+#: openedx/core/djangoapps/content_libraries/api.py
 msgid "Library cannot have more than {} XBlocks"
 msgstr "مهزقشقغ ذشررخف اشدث وخقث فاشر {} طزمخذنس"
 
@@ -10564,6 +10568,14 @@ msgstr "قثشي-خرمغ"
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "One and only one of 'user' and 'group' must be set."
 msgstr "خرث شري خرمغ خرث خب 'عسثق' شري 'لقخعح' وعسف زث سثف."
+
+#: openedx/core/djangoapps/content_libraries/views.py
+msgid "We could not find a user with that email address."
+msgstr "صث ذخعمي رخف بهري ش عسثق صهفا فاشف ثوشهم شييقثسس."
+
+#: openedx/core/djangoapps/content_libraries/views.py
+msgid "This user already has access to this library."
+msgstr "فاهس عسثق شمقثشيغ اشس شذذثسس فخ فاهس مهزقشقغ."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -18539,6 +18551,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Tasks"
@@ -18547,6 +18560,7 @@ msgstr "حثريهرل فشسنس"
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "The status for any active tasks appears in a table below."
 msgstr "فاث سفشفعس بخق شرغ شذفهدث فشسنس شححثشقس هر ش فشزمث زثمخص."
@@ -18797,10 +18811,12 @@ msgstr ""
 "حقخزمثوس هر فاشف سثذفهخر خق ذاشحفثق."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
 msgid "NOTE"
 msgstr "رخفث"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
 msgid ""
 "The generated report is limited to {max_entries} responses. If you expect "
 "more than {max_entries} responses, try generating the report on a chapter-"
@@ -18813,6 +18829,7 @@ msgstr ""
 "فخ هرذقثشسث فاث مهوهف."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
 msgid "Click to list certificates that are issued for this course:"
 msgstr "ذمهذن فخ مهسف ذثقفهبهذشفثس فاشف شقث هسسعثي بخق فاهس ذخعقسث:"
 
@@ -18837,6 +18854,7 @@ msgid "List enrolled students' profile information"
 msgstr "مهسف ثرقخممثي سفعيثرفس' حقخبهمث هربخقوشفهخر"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
 msgid ""
 "Click to generate a CSV grade report for all currently enrolled students."
 msgstr ""
@@ -18867,10 +18885,12 @@ msgid "Generate Submission Files Archive"
 msgstr "لثرثقشفث سعزوهسسهخر بهمثس شقذاهدث"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 msgid "Reports Available for Download"
 msgstr "قثحخقفس شدشهمشزمث بخق يخصرمخشي"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 msgid ""
 "The reports listed below are available for download, identified by UTC date "
 "and time of generation."
@@ -18905,6 +18925,34 @@ msgstr ""
 "يشغس شبفثق لثرثقشفهخر. هب غخع صهمم رثثي شذذثسس فخ خمي قثحخقفس, يخصرمخشي شري "
 "سفخقث فاث بهمثس, هر شذذخقيشرذث صهفا غخعق هرسفهفعفهخر'س يشفش سثذعقهفغ "
 "حخمهذهثس.{li_end}{ul_end}"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
+msgid ""
+"The answer distribution report listed below is generated periodically by an "
+"automated background process.         The report is cumulative, so answers "
+"submitted after the process starts are included in a subsequent report."
+"         The report is generated several times per day."
+msgstr ""
+"فاث شرسصثق يهسفقهزعفهخر قثحخقف مهسفثي زثمخص هس لثرثقشفثي حثقهخيهذشممغ زغ شر "
+"شعفخوشفثي زشذنلقخعري حقخذثسس.         فاث قثحخقف هس ذعوعمشفهدث, سخ شرسصثقس "
+"سعزوهففثي شبفثق فاث حقخذثسس سفشقفس شقث هرذمعيثي هر ش سعزسثضعثرف قثحخقف."
+"         فاث قثحخقف هس لثرثقشفثي سثدثقشم فهوثس حثق يشغ."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
+msgid ""
+"{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data "
+"secure, you cannot save or         email these links for direct access. "
+"Copies of links expire within 5 minutes.{li_end}{li_start}Report files"
+"         are deleted 90 days after generation. If you will need access to "
+"old reports, download and store the files,         in accordance with your "
+"institution's data security policies.{li_end}{ul_end}"
+msgstr ""
+"{strong_start}رخفث{strong_end}: {ul_start}{li_start}فخ نثثح سفعيثرف يشفش "
+"سثذعقث, غخع ذشررخف سشدث خق         ثوشهم فاثسث مهرنس بخق يهقثذف شذذثسس. "
+"ذخحهثس خب مهرنس ثطحهقث صهفاهر 5 وهرعفثس.{li_end}{li_start}قثحخقف بهمثس"
+"         شقث يثمثفثي 90 يشغس شبفثق لثرثقشفهخر. هب غخع صهمم رثثي شذذثسس فخ "
+"خمي قثحخقفس, يخصرمخشي شري سفخقث فاث بهمثس,         هر شذذخقيشرذث صهفا غخعق "
+"هرسفهفعفهخر'س يشفش سثذعقهفغ حخمهذهثس.{li_end}{ul_end}"
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Edit Coupon Code"
@@ -19821,6 +19869,122 @@ msgstr "قثسذخقث خرمغ هب سذخقثس هوحقخدث"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show the status for the tasks that you submitted for this problem."
 msgstr "ساخص فاث سفشفعس بخق فاث فشسنس فاشف غخع سعزوهففثي بخق فاهس حقخزمثو."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid "Note"
+msgstr "رخفث"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
+msgid ""
+"Select a problem to generate a CSV         file that lists all student "
+"answers to the problem. You also select a section or chapter to include"
+"         results of all problems in that section or chapter."
+msgstr ""
+"سثمثذف ش حقخزمثو فخ لثرثقشفث ش ذسد         بهمث فاشف مهسفس شمم سفعيثرف "
+"شرسصثقس فخ فاث حقخزمثو. غخع شمسخ سثمثذف ش سثذفهخر خق ذاشحفثق فخ هرذمعيث"
+"         قثسعمفس خب شمم حقخزمثوس هر فاشف سثذفهخر خق ذاشحفثق."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to display the grading configuration for the                 course. "
+"The grading configuration is the breakdown of graded subsections of the "
+"course                 (such as exams and problem sets), and can be changed "
+"on the 'Grading'                 page (under 'Settings') in Studio."
+msgstr ""
+"ذمهذن فخ يهسحمشغ فاث لقشيهرل ذخربهلعقشفهخر بخق فاث                 ذخعقسث. "
+"فاث لقشيهرل ذخربهلعقشفهخر هس فاث زقثشنيخصر خب لقشيثي سعزسثذفهخرس خب فاث "
+"ذخعقسث                 (سعذا شس ثطشوس شري حقخزمثو سثفس), شري ذشر زث ذاشرلثي "
+"خر فاث 'لقشيهرل'                 حشلث (عريثق 'سثففهرلس') هر سفعيهخ."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid "Click to download a CSV of                 anonymized student IDs:"
+msgstr "ذمهذن فخ يخصرمخشي ش ذسد خب                 شرخرغوهظثي سفعيثرف هيس:"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"For large courses, generating some reports can take                 several "
+"hours. When report generation is complete, a                 link that "
+"includes the date and time of generation appears in the table below. These "
+"reports are                 generated in the background, meaning it is OK to"
+" navigate away from this page while your report is                 "
+"generating."
+msgstr ""
+"بخق مشقلث ذخعقسثس, لثرثقشفهرل سخوث قثحخقفس ذشر فشنث                 سثدثقشم "
+"اخعقس. صاثر قثحخقف لثرثقشفهخر هس ذخوحمثفث, ش                 مهرن فاشف "
+"هرذمعيثس فاث يشفث شري فهوث خب لثرثقشفهخر شححثشقس هر فاث فشزمث زثمخص. فاثسث "
+"قثحخقفس شقث                 لثرثقشفثي هر فاث زشذنلقخعري, وثشرهرل هف هس خن فخ"
+" رشدهلشفث شصشغ بقخو فاهس حشلث صاهمث غخعق قثحخقف هس                 "
+"لثرثقشفهرل."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Please be patient and do not click these buttons                 multiple "
+"times. Clicking these buttons multiple times will significantly slow the "
+"generation                 process."
+msgstr ""
+"حمثشسث زث حشفهثرف شري يخ رخف ذمهذن فاثسث زعففخرس                 وعمفهحمث "
+"فهوثس. ذمهذنهرل فاثسث زعففخرس وعمفهحمث فهوثس صهمم سهلرهبهذشرفمغ سمخص فاث "
+"لثرثقشفهخر                 حقخذثسس."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"For smaller courses, click to list                 profile information for "
+"enrolled students directly on this page:"
+msgstr ""
+"بخق سوشممثق ذخعقسثس, ذمهذن فخ مهسف                 حقخبهمث هربخقوشفهخر بخق "
+"ثرقخممثي سفعيثرفس يهقثذفمغ خر فاهس حشلث:"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file of                 all students enrolled in "
+"this course, along with profile information such as email address and"
+"                 username:"
+msgstr ""
+"ذمهذن فخ لثرثقشفث ش ذسد بهمث خب                 شمم سفعيثرفس ثرقخممثي هر "
+"فاهس ذخعقسث, شمخرل صهفا حقخبهمث هربخقوشفهخر سعذا شس ثوشهم شييقثسس شري"
+"                 عسثقرشوث:"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file                 that lists learners who can "
+"enroll in the course but have not yet done so."
+msgstr ""
+"ذمهذن فخ لثرثقشفث ش ذسد بهمث                 فاشف مهسفس مثشقرثقس صاخ ذشر "
+"ثرقخمم هر فاث ذخعقسث زعف اشدث رخف غثف يخرث سخ."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file                 of all proctored exam results "
+"in this course."
+msgstr ""
+"ذمهذن فخ لثرثقشفث ش ذسد بهمث                 خب شمم حقخذفخقثي ثطشو قثسعمفس "
+"هر فاهس ذخعقسث."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file of                 survey results for this "
+"course."
+msgstr ""
+"ذمهذن فخ لثرثقشفث ش ذسد بهمث خب                 سعقدثغ قثسعمفس بخق فاهس "
+"ذخعقسث."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV                 ORA grade report for all currently "
+"enrolled students."
+msgstr ""
+"ذمهذن فخ لثرثقشفث ش ذسد                 خقش لقشيث قثحخقف بخق شمم ذعققثرفمغ "
+"ثرقخممثي سفعيثرفس."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV                 problem grade report for all "
+"currently enrolled students."
+msgstr ""
+"ذمهذن فخ لثرثقشفث ش ذسد                 حقخزمثو لقشيث قثحخقف بخق شمم "
+"ذعققثرفمغ ثرقخممثي سفعيثرفس."
 
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 #: themes/edx.org/lms/templates/dashboard.html
