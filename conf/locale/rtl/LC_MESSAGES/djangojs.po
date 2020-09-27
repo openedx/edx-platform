@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-20 20:49+0000\n"
-"PO-Revision-Date: 2020-09-20 20:49:36.281108\n"
+"POT-Creation-Date: 2020-09-27 20:50+0000\n"
+"PO-Revision-Date: 2020-09-27 20:50:25.804109\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2377,8 +2377,8 @@ msgid "Your report is being generated..."
 msgstr "غخعق قثحخقف هس زثهرل لثرثقشفثي..."
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
-msgid "Your report has being successfully generated."
-msgstr "غخعق قثحخقف اشس زثهرل سعذذثسسبعممغ لثرثقشفثي."
+msgid "Your report has been successfully generated."
+msgstr "غخعق قثحخقف اشس زثثر سعذذثسسبعممغ لثرثقشفثي."
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 msgid "View Report"
@@ -3492,20 +3492,32 @@ msgid "Select guardian education"
 msgstr "سثمثذف لعشقيهشر ثيعذشفهخر"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select current industry"
-msgstr "سثمثذف ذعققثرف هريعسفقغ"
+msgid "Select employment status"
+msgstr "سثمثذف ثوحمخغوثرف سفشفعس"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
-msgstr "صاشف هريعسفقغ يخ غخع صشرف فخ صخقن هر?"
+msgid "What industry do you currently work in?"
+msgstr "صاشف هريعسفقغ يخ غخع ذعققثرفمغ صخقن هر?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Thank you! You’re helping make edX better for everyone."
-msgstr "فاشرن غخع! غخع’قث اثمحهرل وشنث ثيط زثففثق بخق ثدثقغخرث."
+msgid "Select prospective industry"
+msgstr "سثمثذف حقخسحثذفهدث هريعسفقغ"
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
 msgstr "ذمثشق شمم"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "demographics questionnaire"
+msgstr "يثوخلقشحاهذس ضعثسفهخررشهقث"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "close questionnaire"
+msgstr "ذمخسث ضعثسفهخررشهقث"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "finish later"
+msgstr "بهرهسا مشفثق"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
@@ -3514,6 +3526,10 @@ msgstr "قثفعقر فخ وغ يشسازخشقي"
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
 msgstr "بهرهسا مشفثق"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "next page"
+msgstr "رثطف حشلث"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3878,22 +3894,27 @@ msgid "Error while regenerating certificates. Please try again."
 msgstr "ثققخق صاهمث قثلثرثقشفهرل ذثقفهبهذشفثس. حمثشسث فقغ شلشهر."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Loading data..."
 msgstr "مخشيهرل يشفش..."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error getting issued certificates list."
 msgstr "ثققخق لثففهرل هسسعثي ذثقفهبهذشفثس مهسف."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr "ثققخق لثرثقشفهرل حقخذفخقثي ثطشو قثسعمفس. حمثشسث فقغ شلشهر."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating survey results. Please try again."
 msgstr "ثققخق لثرثقشفهرل سعقدثغ قثسعمفس. حمثشسث فقغ شلشهر."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating student profile information. Please try again."
 msgstr "ثققخق لثرثقشفهرل سفعيثرف حقخبهمث هربخقوشفهخر. حمثشسث فقغ شلشهر."
 
@@ -3909,6 +3930,7 @@ msgid "Error getting student list."
 msgstr "ثققخق لثففهرل سفعيثرف مهسف."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr "ثققخق لثرثقشفهرل مهسف خب سفعيثرفس صاخ وشغ ثرقخمم. حمثشسث فقغ شلشهر."
 
@@ -3917,14 +3939,17 @@ msgid "Error retrieving grading configuration."
 msgstr "ثققخق قثفقهثدهرل لقشيهرل ذخربهلعقشفهخر."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating grades. Please try again."
 msgstr "ثققخق لثرثقشفهرل لقشيثس. حمثشسث فقغ شلشهر."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "ثققخق لثرثقشفهرل حقخزمثو لقشيث قثحخقف. حمثشسث فقغ شلشهر."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating ORA data report. Please try again."
 msgstr "ثققخق لثرثقشفهرل خقش يشفش قثحخقف. حمثشسث فقغ شلشهر."
 

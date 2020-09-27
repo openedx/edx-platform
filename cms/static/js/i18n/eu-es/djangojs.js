@@ -1487,10 +1487,6 @@
     "{sessionDates} - Currently Selected": "{sessionDates} - Une honetan aukeratuta",
     "{start_strong}{total}{end_strong} words submitted in total.": "{start_strong}{total}{end_strong} denera bidalitako hitzak",
     "{totalItems} total": "denera {totalItems}",
-    "{total_results} result": [
-      "emaitza {total_results}",
-      "{total_results} emaitza"
-    ],
     "{type} Progress": "{type} Aurrerapena",
     "\u2026": "\u2026"
   };

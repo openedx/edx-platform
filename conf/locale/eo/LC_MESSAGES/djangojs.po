@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-20 20:49+0000\n"
-"PO-Revision-Date: 2020-09-20 20:49:36.281108\n"
+"POT-Creation-Date: 2020-09-27 20:50+0000\n"
+"PO-Revision-Date: 2020-09-27 20:50:25.804109\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2507,9 +2507,9 @@ msgstr ""
 "Ýöür répört ïs ßéïng générätéd... Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
-msgid "Your report has being successfully generated."
+msgid "Your report has been successfully generated."
 msgstr ""
-"Ýöür répört häs ßéïng süççéssfüllý générätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Ýöür répört häs ßéén süççéssfüllý générätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
@@ -3795,24 +3795,34 @@ msgid "Select guardian education"
 msgstr "Séléçt güärdïän édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select current industry"
-msgstr "Séléçt çürrént ïndüstrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+msgid "Select employment status"
+msgstr "Séléçt émplöýmént stätüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
+msgid "What industry do you currently work in?"
 msgstr ""
-"Whät ïndüstrý dö ýöü wänt tö wörk ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
+"Whät ïndüstrý dö ýöü çürréntlý wörk ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Thank you! You’re helping make edX better for everyone."
-msgstr ""
-"Thänk ýöü! Ýöü’ré hélpïng mäké édX ßéttér för évérýöné. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+msgid "Select prospective industry"
+msgstr "Séléçt pröspéçtïvé ïndüstrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
 msgstr "Çléär äll Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "demographics questionnaire"
+msgstr "démögräphïçs qüéstïönnäïré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "close questionnaire"
+msgstr "çlösé qüéstïönnäïré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "finish later"
+msgstr "fïnïsh lätér Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Return to my dashboard"
@@ -3821,6 +3831,10 @@ msgstr "Rétürn tö mý däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
 msgstr "Fïnïsh lätér Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "next page"
+msgstr "néxt pägé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -4277,28 +4291,33 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Loading data..."
 msgstr "Löädïng dätä... Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error getting issued certificates list."
 msgstr ""
 "Érrör géttïng ïssüéd çértïfïçätés lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
 "Érrör générätïng pröçtöréd éxäm résülts. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating survey results. Please try again."
 msgstr ""
 "Érrör générätïng sürvéý résülts. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating student profile information. Please try again."
 msgstr ""
 "Érrör générätïng stüdént pröfïlé ïnförmätïön. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм"
@@ -4316,6 +4335,7 @@ msgid "Error getting student list."
 msgstr "Érrör géttïng stüdént lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr ""
 "Érrör générätïng lïst öf stüdénts whö mäý énröll. Pléäsé trý ägäïn. Ⱡ'σяєм "
@@ -4328,18 +4348,21 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating grades. Please try again."
 msgstr ""
 "Érrör générätïng grädés. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Érrör générätïng prößlém grädé répört. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating ORA data report. Please try again."
 msgstr ""
 "Érrör générätïng ÖRÀ dätä répört. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "

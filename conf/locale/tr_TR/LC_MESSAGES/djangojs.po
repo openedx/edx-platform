@@ -107,7 +107,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-20 20:42+0000\n"
+"POT-Creation-Date: 2020-09-27 20:42+0000\n"
 "PO-Revision-Date: 2020-06-14 20:45+0000\n"
 "Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
@@ -2461,7 +2461,7 @@ msgid "Your report is being generated..."
 msgstr ""
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
-msgid "Your report has being successfully generated."
+msgid "Your report has been successfully generated."
 msgstr ""
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
@@ -3547,19 +3547,31 @@ msgid "Select guardian education"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select current industry"
+msgid "Select employment status"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
+msgid "What industry do you currently work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Thank you! You’re helping make edX better for everyone."
+msgid "Select prospective industry"
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "demographics questionnaire"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "close questionnaire"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "finish later"
 msgstr ""
 
 #: lms/static/js/demographics_collection/Wizard.jsx
@@ -3568,6 +3580,10 @@ msgstr ""
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "Finish later"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "next page"
 msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
@@ -3931,24 +3947,29 @@ msgstr ""
 "Sertifikayı yeniden oluştururken hata oluştu. Lütfen tekrar deneyiniz."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Loading data..."
 msgstr "Veri yükleniyor..."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error getting issued certificates list."
 msgstr "Veriler sertifikalar listesini alırken hata."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
 "Sınav gözetmenli sınav sonuçlarını oluştururken hata oluştu. Lütfen tekrar "
 "deneyiniz."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating survey results. Please try again."
 msgstr "Anket sonuçlarını oluştururken hata. Lütfen tekrar deneyin."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating student profile information. Please try again."
 msgstr ""
 "Öğrenci profil bilgisini oluştururken hata oluştu. Lütfen tekrar deneyiniz."
@@ -3965,6 +3986,7 @@ msgid "Error getting student list."
 msgstr "Öğrenci listesini alırken hata."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr ""
 "Kayıt olan öğrencilerin listesini oluştururken hata oluştu. Lütfen tekrar "
@@ -3975,15 +3997,18 @@ msgid "Error retrieving grading configuration."
 msgstr "Notlandırma konfigürasyonunu alırken hata"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating grades. Please try again."
 msgstr "Notları oluştururken hata. Lütfen tekrar deneyin."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating problem grade report. Please try again."
 msgstr ""
 "Problem notu raporunu oluştururken hata oluştu. Lütfen tekrar deneyiniz."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating ORA data report. Please try again."
 msgstr "ORA veri raporunu oluştururken hata oluştu. Lütfen tekrar deneyin."
 
@@ -7284,7 +7309,7 @@ msgstr "İlgili: %(courseware_title_linked)s"
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "This post is visible only to %(group_name)s."
-msgstr ""
+msgstr "Bu ileti sadece %(group_name)s grubuna görünür olacak."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "This post is visible to everyone."
@@ -7312,8 +7337,8 @@ msgstr "İleti güncelle"
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "(%(num_comments)s) Yorumu Göster"
+msgstr[1] "(%(num_comments)s) Yorumu Göster"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a comment"
@@ -7433,7 +7458,7 @@ msgstr "İletinizi yüklerken sorun çıktı."
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "This post will be visible only to %(group_name)s."
-msgstr ""
+msgstr "Bu ileti sadece %(group_name)s grubuna görünür olacak."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "This post will be visible to everyone."
@@ -7445,7 +7470,7 @@ msgstr "Başlık alanı"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
+msgstr "Başkalarının bulması için gönderini alakalı konuya ekle. (Gerekli)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "(Community TA)"
@@ -7462,7 +7487,7 @@ msgstr "Tüm Gönderiler"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Return to all posts"
-msgstr ""
+msgstr "Tüm gönderilere dön"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "View discussion"
@@ -7813,7 +7838,7 @@ msgstr "Üyelikleri Düzenle"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "View Current Team Memberships"
-msgstr ""
+msgstr "Mevcut Takım Üyeliklerini Görüntüle"
 
 #: lms/djangoapps/teams/static/teams/templates/manage.underscore
 msgid "Download Memberships"
@@ -9525,8 +9550,8 @@ msgstr ""
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Load next {num_items} result"
 msgid_plural "Load next {num_items} results"
-msgstr[0] ""
-msgstr[1] "{num_items} adet sonucu yükle"
+msgstr[0] "Sonraki {num_items} adet sonucu yükle"
+msgstr[1] "Sonraki {num_items} adet sonucu yükle"
 
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
