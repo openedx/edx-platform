@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx.core.djangoapps.content_libraries.constants import LIBRARY_TYPES, COMPLEX
 from organizations.models import Organization
 import six
 
@@ -45,6 +46,7 @@ class ContentLibrary(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.PROTECT, null=False)
     slug = models.SlugField(allow_unicode=True)
     bundle_uuid = models.UUIDField(unique=True, null=False)
+    type = models.CharField(max_length=25, default=COMPLEX, choices=LIBRARY_TYPES)
 
     # How is this library going to be used?
     allow_public_learning = models.BooleanField(

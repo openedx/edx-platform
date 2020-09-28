@@ -305,7 +305,7 @@ def index_block(sender, usage_key, **kwargs):  # pylint: disable=unused-argument
     if LibraryBlockIndexer.indexing_is_enabled():
         try:
             LibraryBlockIndexer.index_items([usage_key])
-        except ConnectionError as e:
+        except ElasticConnectionError as e:
             log.exception(e)
 
 
@@ -317,5 +317,5 @@ def remove_block_index(sender, usage_key, **kwargs):  # pylint: disable=unused-a
     if LibraryBlockIndexer.indexing_is_enabled():
         try:
             LibraryBlockIndexer.remove_items([usage_key])
-        except ConnectionError as e:
+        except ElasticConnectionError as e:
             log.exception(e)
