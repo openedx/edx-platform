@@ -34,6 +34,7 @@ from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTE
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_message
 from openedx.features.discounts.utils import generate_offer_html
@@ -132,8 +133,8 @@ class CoursewareMeta:
 
     @property
     def can_show_upgrade_sock(self):
-        can_show = can_show_verified_upgrade(self.effective_user, self.enrollment_object)
-        return can_show
+        return (DISPLAY_COURSE_SOCK_FLAG.is_enabled(self.course_key) and
+                can_show_verified_upgrade(self.effective_user, self.enrollment_object))
 
     @property
     def license(self):
