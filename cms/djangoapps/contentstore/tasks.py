@@ -16,6 +16,7 @@ from celery import group
 from celery.task import task
 from celery.utils.log import get_task_logger
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
+from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
@@ -180,6 +181,17 @@ def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
         course_key = CourseKey.from_string(course_id)
+
+        # We skip search indexing for CCX courses because there is currently
+        # some issue around Modulestore caching that makes it prohibitively
+        # expensive (sometimes hours-long for really complex courses).
+        if isinstance(course_key, CCXLocator):
+            LOGGER.warning(
+                u'Search indexing skipped for CCX Course %s (this is currently too slow to run in production)',
+                course_id
+            )
+            return
+
         CoursewareSearchIndexer.index(modulestore(), course_key, triggered_at=(_parse_time(triggered_time_isoformat)))
 
     except SearchIndexingError as exc:
