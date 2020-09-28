@@ -196,7 +196,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
-    @patch.object(resolvers, 'set_custom_metric')
+    @patch.object(resolvers, 'set_custom_attribute')
     def test_schedule_bin(self, schedule_count, mock_metric, mock_ace):
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
             current_day, offset, target_day, upgrade_deadline = self._get_dates()

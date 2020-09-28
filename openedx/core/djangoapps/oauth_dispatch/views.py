@@ -34,7 +34,7 @@ class _DispatchingView(View):
         Returns the appropriate adapter based on the OAuth client linked to the request.
         """
         client_id = self._get_client_id(request)
-        monitoring_utils.set_custom_metric('oauth_client_id', client_id)
+        monitoring_utils.set_custom_attribute('oauth_client_id', client_id)
 
         return self.dot_adapter
 
@@ -92,8 +92,8 @@ class AccessTokenView(_DispatchingView):
 
         token_type = request.POST.get('token_type',
                                       request.META.get('HTTP_X_TOKEN_TYPE', 'no_token_type_supplied')).lower()
-        monitoring_utils.set_custom_metric('oauth_token_type', token_type)
-        monitoring_utils.set_custom_metric('oauth_grant_type', request.POST.get('grant_type', ''))
+        monitoring_utils.set_custom_attribute('oauth_token_type', token_type)
+        monitoring_utils.set_custom_attribute('oauth_grant_type', request.POST.get('grant_type', ''))
 
         if response.status_code == 200 and token_type == 'jwt':
             response.content = self._build_jwt_response_from_access_token_response(request, response)

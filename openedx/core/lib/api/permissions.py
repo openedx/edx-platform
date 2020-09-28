@@ -5,7 +5,7 @@ API library for Django REST Framework permissions-oriented workflows
 
 from django.conf import settings
 from django.http import Http404
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_condition import C
@@ -37,7 +37,7 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
             audit_log("ApiKeyHeaderPermission used",
                       path=request.path,
                       ip=request.META.get("REMOTE_ADDR"))
-            set_custom_metric('deprecated_api_key_header', True)
+            set_custom_attribute('deprecated_api_key_header', True)
             return True
 
         return False

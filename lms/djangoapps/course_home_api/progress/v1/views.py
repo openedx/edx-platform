@@ -98,9 +98,9 @@ class ProgressTabView(RetrieveAPIView):
         course_key = CourseKey.from_string(course_key_string)
 
         # Enable NR tracing for this view based on course
-        monitoring_utils.set_custom_metric('course_id', course_key_string)
-        monitoring_utils.set_custom_metric('user_id', request.user.id)
-        monitoring_utils.set_custom_metric('is_staff', request.user.is_staff)
+        monitoring_utils.set_custom_attribute('course_id', course_key_string)
+        monitoring_utils.set_custom_attribute('user_id', request.user.id)
+        monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
 
         _, request.user = setup_masquerade(
             request,
