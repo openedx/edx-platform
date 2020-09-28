@@ -70,6 +70,17 @@ class TestActivateAccount(TestCase):
         self.assertTrue(self.user.is_active)
         self.assertFalse(mock_segment_identify.called)
 
+    @patch('student.models.USER_ACCOUNT_ACTIVATED')
+    def test_activation_signal(self, mock_signal):
+        """
+        Verify that USER_ACCOUNT_ACTIVATED is emitted upon account email activation.
+        """
+        assert not self.user.is_active, 'Ensure that the user starts inactive'
+        assert not mock_signal.send_robust.call_count, 'Ensure no signal is fired before activation'
+        self.registration.activate()  # Until you explicitly activate it
+        assert self.user.is_active, 'Sanity check for .activate()'
+        mock_signal.send_robust.assert_called_once_with(Registration, user=self.user)  # Ensure the signal is emitted
+
     def test_account_activation_message(self):
         """
         Verify that account correct activation message is displayed.

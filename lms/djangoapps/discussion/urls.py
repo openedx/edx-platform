@@ -5,7 +5,7 @@ Forum urls for the django_comment_client.
 
 from django.conf.urls import url
 
-from discussion import views
+from . import views
 
 urlpatterns = [
     url(r'users/(?P<user_id>\w+)/followed$', views.followed_threads, name='followed_threads'),

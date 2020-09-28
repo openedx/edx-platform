@@ -57,12 +57,21 @@ class ContentLibraryPermissionLevelSerializer(serializers.Serializer):
     access_level = serializers.ChoiceField(choices=ContentLibraryPermission.ACCESS_LEVEL_CHOICES)
 
 
+class ContentLibraryAddPermissionByEmailSerializer(serializers.Serializer):
+    """
+    Serializer for adding a new user and granting their access level via their email address.
+    """
+    access_level = serializers.ChoiceField(choices=ContentLibraryPermission.ACCESS_LEVEL_CHOICES)
+    email = serializers.EmailField()
+
+
 class ContentLibraryPermissionSerializer(ContentLibraryPermissionLevelSerializer):
     """
     Serializer for a ContentLibraryPermission object, which grants either a user
     or a group permission to view a content library.
     """
-    user_id = serializers.IntegerField(source="user.id", allow_null=True)
+    email = serializers.EmailField(source="user.email", read_only=True, default=None)
+    username = serializers.CharField(source="user.username", read_only=True, default=None)
     group_name = serializers.CharField(source="group.name", allow_null=True, allow_blank=False, default=None)
 
 
@@ -72,7 +81,7 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
     """
     id = serializers.CharField(source="usage_key", read_only=True)
     def_key = serializers.CharField(read_only=True)
-    block_type = serializers.CharField(source="def_key.block_type")
+    block_type = serializers.CharField(source="usage_key.block_type")
     display_name = serializers.CharField(read_only=True)
     has_unpublished_changes = serializers.BooleanField(read_only=True)
     # When creating a new XBlock in a library, the slug becomes the ID part of

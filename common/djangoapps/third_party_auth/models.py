@@ -367,7 +367,7 @@ class OAuth2ProviderConfig(ProviderConfig):
             u'For increased security, you can avoid storing this in your database by leaving '
             ' this field blank and setting '
             'SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} '
-            'in your instance\'s Django settings (or lms.auth.json)'
+            'in your instance\'s Django settings (or lms.yml)'
         )
     )
     other_settings = models.TextField(blank=True, help_text=u"Optional JSON object with advanced settings, if any.")
@@ -431,7 +431,7 @@ class SAMLConfiguration(ConfigurationModel):
             'Paste the contents of saml.key here. '
             'For increased security, you can avoid storing this in your database by leaving '
             'this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PRIVATE_KEY setting '
-            'in your instance\'s Django settings (or lms.auth.json).'
+            'in your instance\'s Django settings (or lms.yml).'
         ),
         blank=True,
     )
@@ -440,7 +440,7 @@ class SAMLConfiguration(ConfigurationModel):
             u'Public key certificate. '
             'For increased security, you can avoid storing this in your database by leaving '
             'this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PUBLIC_CERT setting '
-            'in your instance\'s Django settings (or lms.auth.json).'
+            'in your instance\'s Django settings (or lms.yml).'
         ),
         blank=True,
     )
@@ -879,7 +879,7 @@ class LTIProviderConfig(ProviderConfig):
             'For increased security, you can avoid storing this in '
             'your database by leaving this field blank and setting '
             'SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} '
-            'in your instance\'s Django setttigs (or lms.auth.json)'
+            'in your instance\'s Django setttigs (or lms.yml)'
         ),
         blank=True,
     )

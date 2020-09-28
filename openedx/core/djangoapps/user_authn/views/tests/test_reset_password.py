@@ -191,14 +191,14 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.request_password_reset(200)
         # now reset the time to 1 min from now in future and change the email and
         # verify that it will allow another request from same IP
-        for status in [200, 403]:
-            reset_time = datetime.now(UTC) + timedelta(seconds=61)
-            with freeze_time(reset_time):
+        reset_time = datetime.now(UTC) + timedelta(seconds=61)
+        with freeze_time(reset_time):
+            for status in [200, 403]:
                 self.request_password_reset(status)
 
-        # Even changing the IP will not allow more than two requests for same email.
-        new_ip = "8.8.8.8"
-        self.request_password_reset(403, new_ip=new_ip)
+            # Even changing the IP will not allow more than two requests for same email.
+            new_ip = "8.8.8.8"
+            self.request_password_reset(403, new_ip=new_ip)
 
         cache.clear()
 

@@ -20,7 +20,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from course_modes.models import CourseMode
-from edxnotes.helpers import is_feature_enabled
+from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (

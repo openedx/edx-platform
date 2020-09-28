@@ -382,26 +382,6 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
 
-    def test_login_ratelimited(self):
-        """
-        Test that login endpoint is IP ratelimited and only allow 5 requests
-        per 5 minutes per IP.
-        """
-        for i in range(5):
-            password = u'test_password{0}'.format(i)
-            response, _audit_log = self._login_response(self.user_email, password)
-            self._assert_response(response, success=False)
-
-        response, _audit_log = self._login_response(self.user_email, self.password)
-        self.assertEqual(response.status_code, 403)
-
-        # now reset the time to 6 min from now in future and verify that it will
-        # allow another request from same IP and user can successfully login
-        reset_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=361)
-        with freeze_time(reset_time):
-            response, _audit_log = self._login_response(self.user_email, self.password)
-            self._assert_response(response, success=True)
-
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_login_refresh(self):
         def _assert_jwt_cookie_present(response):

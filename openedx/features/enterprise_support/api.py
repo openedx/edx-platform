@@ -43,13 +43,16 @@ except ImportError:
 
 CONSENT_FAILED_PARAMETER = 'consent_failed'
 LOGGER = logging.getLogger("edx.enterprise_helpers")
+ENTERPRISE_CUSTOMER_KEY_NAME = 'enterprise_customer'
+
+# See https://open-edx-proposals.readthedocs.io/en/latest/oep-0022-bp-django-caches.html#common-caching-defect-and-fix
+_CACHE_MISS = '__CACHE_MISS__'
 
 
 class EnterpriseApiException(Exception):
     """
     Exception for errors while communicating with the Enterprise service API.
     """
-    pass
 
 
 class ConsentApiClient(object):
@@ -126,7 +129,6 @@ class ConsentApiServiceClient(EnterpriseServiceClientMixin, ConsentApiClient):
     """
     Class for producing an Enterprise Consent API client with service user.
     """
-    pass
 
 
 class EnterpriseApiClient(object):
@@ -283,7 +285,7 @@ class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClie
         API response`.
         """
         enterprise_customer = enterprise_customer_from_cache(uuid=uuid)
-        if not enterprise_customer:
+        if enterprise_customer is _CACHE_MISS:
             endpoint = getattr(self.client, 'enterprise-customer')
             enterprise_customer = endpoint(uuid).get()
             if enterprise_customer:
@@ -348,7 +350,6 @@ def enterprise_is_enabled(otherwise=None):
     return decorator
 
 
-@enterprise_is_enabled()
 def get_enterprise_customer_cache_key(uuid, username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME):
     """The cache key used to get cached Enterprise Customer data."""
     return get_cache_key(
@@ -358,28 +359,63 @@ def get_enterprise_customer_cache_key(uuid, username=settings.ENTERPRISE_SERVICE
     )
 
 
-@enterprise_is_enabled()
 def cache_enterprise(enterprise_customer):
-    """Cache this customer's data."""
+    """Add this customer's data to the Django cache."""
     cache_key = get_enterprise_customer_cache_key(enterprise_customer['uuid'])
     cache.set(cache_key, enterprise_customer, settings.ENTERPRISE_API_CACHE_TIMEOUT)
 
 
-@enterprise_is_enabled()
-def enterprise_customer_from_cache(request=None, uuid=None):
-    """Check all available caches for Enterprise Customer data."""
-    enterprise_customer = None
+def enterprise_customer_from_cache(uuid):
+    """
+    Retrieve enterprise customer data associated with the given ``uuid`` from the Django cache,
+    returning a ``__CACHE_MISS__`` if absent.
+    """
+    cache_key = get_enterprise_customer_cache_key(uuid)
+    return cache.get(cache_key, _CACHE_MISS)
 
-    # Check if it's cached in the general cache storage.
-    if uuid:
-        cache_key = get_enterprise_customer_cache_key(uuid)
-        enterprise_customer = cache.get(cache_key)
 
-    # Check if it's cached in the session.
-    if not enterprise_customer and request:
-        enterprise_customer = request.session.get('enterprise_customer')
+def add_enterprise_customer_to_session(request, enterprise_customer):
+    """ Add the given enterprise_customer data to the request's session. """
+    request.session[ENTERPRISE_CUSTOMER_KEY_NAME] = enterprise_customer
 
-    return enterprise_customer
+
+def enterprise_customer_from_session(request):
+    """
+    Retrieve enterprise_customer data from the request's session,
+    returning a ``__CACHE_MISS__`` if absent.
+    """
+    return request.session.get(ENTERPRISE_CUSTOMER_KEY_NAME, _CACHE_MISS)
+
+
+def enterprise_customer_uuid_from_session(request):
+    """
+    Retrieve an enterprise customer UUID from the request's session,
+    returning a ``__CACHE_MISS__`` if absent.  Note that this may
+    return ``None``, which indicates that we've previously looked
+    for an associated customer for this request's user, and
+    none was present.
+    """
+    customer_data = enterprise_customer_from_session(request)
+    if customer_data is not _CACHE_MISS:
+        customer_data = customer_data or {}
+        return customer_data.get('uuid')
+    return _CACHE_MISS
+
+
+def enterprise_customer_uuid_from_query_param(request):
+    """
+    Returns an enterprise customer UUID from the given request's GET data,
+    or ``__CACHE_MISS__`` if not present.
+    """
+    return request.GET.get(ENTERPRISE_CUSTOMER_KEY_NAME, _CACHE_MISS)
+
+
+def enterprise_customer_uuid_from_cookie(request):
+    """
+    Returns an enterprise customer UUID from the given request's cookies,
+    or ``__CACHE_MISS__`` if not present.
+    """
+    return request.COOKIES.get(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME, _CACHE_MISS)
 
 
 @enterprise_is_enabled()
@@ -430,20 +466,44 @@ def enterprise_customer_uuid_for_request(request):
         except EnterpriseCustomer.DoesNotExist:
             enterprise_customer_uuid = None
     else:
-        # Check if we got an Enterprise UUID passed directly as either a query
-        # parameter, or as a value in the Enterprise cookie.
-        enterprise_customer_uuid = request.GET.get('enterprise_customer') or request.COOKIES.get(
-            settings.ENTERPRISE_CUSTOMER_COOKIE_NAME
-        )
+        enterprise_customer_uuid = _customer_uuid_from_query_param_cookies_or_session(request)
 
-    if not enterprise_customer_uuid and request.user.is_authenticated:
+    if enterprise_customer_uuid is _CACHE_MISS and request.user.is_authenticated:
         # If there's no way to get an Enterprise UUID for the request, check to see
         # if there's already an Enterprise attached to the requesting user on the backend.
+        enterprise_customer = None
         learner_data = get_enterprise_learner_data_from_db(request.user)
         if learner_data:
-            enterprise_customer_uuid = learner_data[0]['enterprise_customer']['uuid']
+            enterprise_customer = learner_data[0]['enterprise_customer']
+            enterprise_customer_uuid = enterprise_customer['uuid']
+            cache_enterprise(enterprise_customer)
+        else:
+            enterprise_customer_uuid = None
+
+        # Now that we've asked the database for this users's enterprise customer data,
+        # add it to their session (even if it's null/empty, which indicates the user
+        # has no associated enterprise customer).
+        add_enterprise_customer_to_session(request, enterprise_customer)
 
     return enterprise_customer_uuid
+
+
+def _customer_uuid_from_query_param_cookies_or_session(request):
+    """
+    Helper function that plucks a customer UUID out of the given requests's
+    query params, cookie, or session data.
+    Returns ``__CACHE_MISS__`` if none of those keys are present in the request.
+    """
+    for function in (
+        enterprise_customer_uuid_from_query_param,
+        enterprise_customer_uuid_from_cookie,
+        enterprise_customer_uuid_from_session,
+    ):
+        enterprise_customer_uuid = function(request)
+        if enterprise_customer_uuid is not _CACHE_MISS:
+            return enterprise_customer_uuid
+
+    return _CACHE_MISS
 
 
 @enterprise_is_enabled()
@@ -452,12 +512,11 @@ def enterprise_customer_for_request(request):
     Check all the context clues of the request to determine if
     the request being made is tied to a particular EnterpriseCustomer.
     """
-    if 'enterprise_customer' in request.session and request.session['enterprise_customer']:
-        return enterprise_customer_from_cache(request=request)
-    else:
+    enterprise_customer = enterprise_customer_from_session(request)
+    if enterprise_customer is _CACHE_MISS:
         enterprise_customer = enterprise_customer_from_api(request)
-        request.session['enterprise_customer'] = enterprise_customer
-        return enterprise_customer
+        add_enterprise_customer_to_session(request, enterprise_customer)
+    return enterprise_customer
 
 
 @enterprise_is_enabled(otherwise=False)
@@ -587,23 +646,26 @@ def get_enterprise_learner_portal_enabled_message(request):
     """
     Returns message to be displayed in dashboard if the user is linked to an Enterprise with the Learner Portal enabled.
 
-    Note: request.session['enterprise_customer'] will be used in case the user is linked to
+    Note: request.session[ENTERPRISE_CUSTOMER_KEY_NAME] will be used in case the user is linked to
         multiple Enterprises. Otherwise, it won't exist and the Enterprise Learner data
         will be used. If that doesn't exist return None.
 
     Args:
         request: request made to the LMS dashboard
     """
-    if 'enterprise_customer' in request.session and request.session['enterprise_customer']:
-        enterprise_customer = request.session['enterprise_customer']
-    else:
+    enterprise_customer = enterprise_customer_from_session(request)
+    if enterprise_customer is _CACHE_MISS:
         learner_data = get_enterprise_learner_data_from_db(request.user)
-        if learner_data:
-            enterprise_customer = learner_data[0]['enterprise_customer']
-        else:
-            return None
+        enterprise_customer = learner_data[0]['enterprise_customer'] if learner_data else None
+        # Add to session cache regardless of whether it is null
+        add_enterprise_customer_to_session(request, enterprise_customer)
+        if enterprise_customer:
+            cache_enterprise(enterprise_customer)
 
-    if enterprise_customer['enable_learner_portal']:
+    if not enterprise_customer:
+        return None
+
+    if enterprise_customer.get('enable_learner_portal', False):
         learner_portal_url = settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + enterprise_customer['slug']
         return Text(_(
             "Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a custom dashboard for learning. "

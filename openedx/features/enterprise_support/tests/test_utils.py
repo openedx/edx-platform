@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.enterprise_support.utils import ENTERPRISE_HEADER_LINKS, get_enterprise_learner_portals
+from openedx.features.enterprise_support.utils import ENTERPRISE_HEADER_LINKS, get_enterprise_learner_portal
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCustomerBrandingConfigurationFactory, EnterpriseCustomerUserFactory,
@@ -49,9 +49,10 @@ class TestEnterpriseUtils(TestCase):
             self.assertEqual(mock_customer_request.call_count, expected_calls)
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
-    def test_get_enterprise_learner_portals_uncached(self):
+    def test_get_enterprise_learner_portal_uncached(self):
         """
-        Test that only enabled enterprise portals are returned
+        Test that only an enabled enterprise portal is returned,
+        and that it matches the customer UUID provided in the request.
         """
         enterprise_customer_user = EnterpriseCustomerUserFactory(active=True, user_id=self.user.id)
         EnterpriseCustomerBrandingConfigurationFactory(
@@ -61,24 +62,88 @@ class TestEnterpriseUtils(TestCase):
         enterprise_customer_user.enterprise_customer.save()
 
         request = mock.MagicMock(session={}, user=self.user)
-        portals = get_enterprise_learner_portals(request)
-        self.assertEqual(len(portals), 1)
-        self.assertDictEqual(portals[0], {
+        # Indicate the "preferred" customer in the request
+        request.GET = {'enterprise_customer': enterprise_customer_user.enterprise_customer.uuid}
+
+        # Create another enterprise customer association for the same user.
+        # There should be no data returned for this customer's portal,
+        # because we filter for only the enterprise customer uuid found in the request.
+        other_enterprise_customer_user = EnterpriseCustomerUserFactory(active=True, user_id=self.user.id)
+        other_enterprise_customer_user.enable_learner_portal = True
+        other_enterprise_customer_user.save()
+
+        portal = get_enterprise_learner_portal(request)
+        self.assertDictEqual(portal, {
             'name': enterprise_customer_user.enterprise_customer.name,
             'slug': enterprise_customer_user.enterprise_customer.slug,
             'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
         })
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
-    def test_get_enterprise_learner_portals_cached(self):
+    def test_get_enterprise_learner_portal_no_branding_config(self):
+        """
+        Test that only an enabled enterprise portal is returned,
+        and that it matches the customer UUID provided in the request,
+        even if no branding config is associated with the customer.
+        """
+        enterprise_customer_user = EnterpriseCustomerUserFactory.create(active=True, user_id=self.user.id)
+        enterprise_customer_user.enterprise_customer.enable_learner_portal = True
+        enterprise_customer_user.enterprise_customer.save()
+
+        request = mock.MagicMock(session={}, user=self.user)
+        # Indicate the "preferred" customer in the request
+        request.GET = {'enterprise_customer': enterprise_customer_user.enterprise_customer.uuid}
+
+        portal = get_enterprise_learner_portal(request)
+        self.assertDictEqual(portal, {
+            'name': enterprise_customer_user.enterprise_customer.name,
+            'slug': enterprise_customer_user.enterprise_customer.slug,
+            'logo': None,
+        })
+
+    @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
+    def test_get_enterprise_learner_portal_no_customer_from_request(self):
+        """
+        Test that only one enabled enterprise portal is returned,
+        even if enterprise_customer_uuid_from_request() returns None.
+        """
+        # Create another enterprise customer association for the same user.
+        # There should be no data returned for this customer's portal,
+        # because another customer is later created with a more recent active/modified time.
+        other_enterprise_customer_user = EnterpriseCustomerUserFactory(active=True, user_id=self.user.id)
+        other_enterprise_customer_user.enable_learner_portal = True
+        other_enterprise_customer_user.save()
+
+        enterprise_customer_user = EnterpriseCustomerUserFactory(active=True, user_id=self.user.id)
+        EnterpriseCustomerBrandingConfigurationFactory(
+            enterprise_customer=enterprise_customer_user.enterprise_customer,
+        )
+        enterprise_customer_user.enterprise_customer.enable_learner_portal = True
+        enterprise_customer_user.enterprise_customer.save()
+
+        request = mock.MagicMock(session={}, user=self.user)
+
+        with mock.patch(
+                'openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request',
+                return_value=None,
+        ):
+            portal = get_enterprise_learner_portal(request)
+
+        self.assertDictEqual(portal, {
+            'name': enterprise_customer_user.enterprise_customer.name,
+            'slug': enterprise_customer_user.enterprise_customer.slug,
+            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
+        })
+
+    @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
+    def test_get_enterprise_learner_portal_cached(self):
         enterprise_customer_data = {
             'name': 'Enabled Customer',
             'slug': 'enabled_customer',
             'logo': 'https://logo.url',
         }
         request = mock.MagicMock(session={
-            'enterprise_learner_portals': json.dumps([enterprise_customer_data])
+            'enterprise_learner_portal': json.dumps(enterprise_customer_data)
         }, user=self.user)
-        portals = get_enterprise_learner_portals(request)
-        self.assertEqual(len(portals), 1)
-        self.assertDictEqual(portals[0], enterprise_customer_data)
+        portal = get_enterprise_learner_portal(request)
+        self.assertDictEqual(portal, enterprise_customer_data)

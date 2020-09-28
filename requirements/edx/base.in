@@ -41,7 +41,7 @@ crowdsourcehinter-xblock
 defusedxml
 Django                              # Web application framework
 django-appconf
-django-celery                       # Only used for the CacheBackend for celery results
+django-celery-results               # Only used for the CacheBackend for celery results
 django-cookies-samesite             # Middleware which allows SameSite=None flag for session and csrf cookies in Django<3.0.5
 django-config-models>=1.0.0         # Configuration models for Django allowing config management with auditing
 django-cors-headers                 # Used to allow to configure CORS headers for cross-domain requests
@@ -140,7 +140,7 @@ social-auth-core
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
-redis==2.10.6                       # celery task broker
+redis                               # celery task broker
 requests-oauthlib                   # Simplifies use of OAuth via the requests library, used for CCX and LTI
 random2
 rules                               # Django extension for rules-based authorization checks

@@ -21,6 +21,7 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.release import RELEASE_LINE
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
 CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"

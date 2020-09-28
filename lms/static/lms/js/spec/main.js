@@ -757,6 +757,7 @@
         'js/spec/financial-assistance/financial_assistance_form_view_spec.js',
         'js/spec/groups/views/cohorts_spec.js',
         'js/spec/groups/views/discussions_spec.js',
+        'js/spec/instructor_dashboard/data_download_spec.js',
         'js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
         'js/spec/instructor_dashboard/certificates_exception_spec.js',
         'js/spec/instructor_dashboard/certificates_invalidation_spec.js',

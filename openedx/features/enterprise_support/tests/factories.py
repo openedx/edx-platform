@@ -9,7 +9,11 @@ import factory
 from faker import Factory as FakerFactory
 
 from enterprise.models import (
-    EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerBrandingConfiguration, EnterpriseCustomerUser,
+    EnterpriseCourseEnrollment,
+    EnterpriseCustomer,
+    EnterpriseCustomerBrandingConfiguration,
+    EnterpriseCustomerIdentityProvider,
+    EnterpriseCustomerUser,
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 
@@ -91,7 +95,23 @@ class EnterpriseCustomerBrandingConfigurationFactory(factory.django.DjangoModelF
 
         model = EnterpriseCustomerBrandingConfiguration
 
-    logo = FAKER.image_url()
-    primary_color = FAKER.color()
-    secondary_color = FAKER.color()
-    tertiary_color = FAKER.color()
+    logo = FAKER.image_url()  # pylint: disable=no-member
+    primary_color = FAKER.color()  # pylint: disable=no-member
+    secondary_color = FAKER.color()  # pylint: disable=no-member
+    tertiary_color = FAKER.color()  # pylint: disable=no-member
+
+
+class EnterpriseCustomerIdentityProviderFactory(factory.django.DjangoModelFactory):
+    """
+    EnterpriseCustomerIdentityProvider factory.
+    """
+
+    class Meta(object):
+        """
+        Meta for EnterpriseCustomerIdentityProviderFactory.
+        """
+
+        model = EnterpriseCustomerIdentityProvider
+
+    enterprise_customer = factory.SubFactory(EnterpriseCustomerFactory)
+    provider_id = factory.LazyAttribute(lambda x: FAKER.slug())  # pylint: disable=no-member

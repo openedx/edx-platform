@@ -2536,10 +2536,6 @@
       "{team_count} Equipos"
     ],
     "{totalItems} total": "{totalItems} total",
-    "{total_results} result": [
-      "{total_results} resultado",
-      "{total_results} resultados"
-    ],
     "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}": "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}",
     "{type} Progress": "{type} Progreso",
     "{unread_comments_count} new": "{unread_comments_count} nuevos",

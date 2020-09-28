@@ -14,7 +14,6 @@ sessions. Assumes structure:
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 
-from .common import *
 import os
 from uuid import uuid4
 
@@ -22,10 +21,13 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.lib.derived import derive_settings
-from util.db import NoOpMigrationModules
+
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
+
+from .common import *
 
 # import settings from LMS for consistent behavior with CMS
-from lms.envs.test import (
+from lms.envs.test import (  # pylint: disable=wrong-import-order
     COMPREHENSIVE_THEME_DIRS,
     DEFAULT_FILE_STORAGE,
     ECOMMERCE_API_URL,
@@ -183,9 +185,13 @@ BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', '
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
+# test_status_cancel in cms/cms_user_tasks/test.py is failing without this
+# @override_setting for BROKER_URL is not working in testcase, so updating here
+BROKER_URL = 'memory://localhost/'
 
 ########################### Server Ports ###################################
 
@@ -249,6 +255,16 @@ FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+
+####################### ELASTICSEARCH TESTS #######################
+# Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
+ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(
+    'EDXAPP_ENABLE_ELASTICSEARCH_FOR_TESTS', 'no').lower() in ('true', 'yes', '1')
+
+TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
+    'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
+TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch')
+TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
 
 ########################## AUTHOR PERMISSION #######################
 FEATURES['ENABLE_CREATOR_GROUP'] = False

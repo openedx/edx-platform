@@ -58,7 +58,7 @@ from openedx.core.djangolib.markup import HTML, Text
       </p>
     %endif
 
-    <div class="problems">
+    <div class="mb-15 problems">
         ${static.renderReact(
           component="ProblemBrowser",
           id="react-problem-report",
@@ -67,7 +67,8 @@ from openedx.core.djangolib.markup import HTML, Text
             "excludeBlockTypes": ['html', 'video', 'discussion'],
             "problemResponsesEndpoint": section_data['get_problem_responses_url'],
             "taskStatusEndpoint": "/instructor_task_status",
-            "reportDownloadEndpoint": section_data['list_report_downloads_url']
+            "reportDownloadEndpoint": section_data['list_report_downloads_url'],
+            "ShowBtnUi": "true",
           }
         )}
     </div>

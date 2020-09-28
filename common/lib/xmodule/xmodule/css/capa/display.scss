@@ -852,6 +852,15 @@ div.problem {
 
   }
 
+  .inputtype.formulaequationinput {
+    > div {
+      input {
+        direction: ltr;
+        @include text-align(left);
+      }
+    }
+  }
+
   .trailing_text {
     @include margin-right($baseline/2);
 

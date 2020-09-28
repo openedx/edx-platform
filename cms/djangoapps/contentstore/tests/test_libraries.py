@@ -478,6 +478,22 @@ class TestLibraries(LibraryTestCase):
         with self.assertRaises(ValueError):
             self._refresh_children(lc_block, status_code_expected=400)
 
+    def test_library_filters(self):
+        """
+        Test the filters in the list libraries API
+        """
+        self._create_library(library="test-lib1", display_name="Foo", org='org')
+        self._create_library(library="test-lib2", display_name="Library-Title-2", org='org-test1')
+        self._create_library(library="l3", display_name="Library-Title-3", org='org-test1')
+        self._create_library(library="l4", display_name="Library-Title-4", org='org-test2')
+
+        self.assertEqual(len(self.client.get_json(LIBRARY_REST_URL).json()), 5)  # 1 more from self.setUp()
+        self.assertEqual(len(self.client.get_json('{}?org=org-test1'.format(LIBRARY_REST_URL)).json()), 2)
+        self.assertEqual(len(self.client.get_json('{}?text_search=test-lib'.format(LIBRARY_REST_URL)).json()), 2)
+        self.assertEqual(len(self.client.get_json('{}?text_search=library-title'.format(LIBRARY_REST_URL)).json()), 3)
+        self.assertEqual(len(self.client.get_json('{}?text_search=library-'.format(LIBRARY_REST_URL)).json()), 3)
+        self.assertEqual(len(self.client.get_json('{}?text_search=org-test'.format(LIBRARY_REST_URL)).json()), 3)
+
 
 @ddt.ddt
 @patch('django.conf.settings.SEARCH_ENGINE', None)

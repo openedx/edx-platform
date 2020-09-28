@@ -21,6 +21,7 @@
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
 # jakubfajkowski <j.fajkowski@stud.elka.pw.edu.pl>, 2016
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
+# Martyna Bogusz <piotr.boguszewicz@bluesoft.com>, 2020
 # Mateusz <blue90pl@gmail.com>, 2014
 # Michał Szkutnik <michal7x7@o2.pl>, 2015
 # Monika Biskupska <monika.biskupska@nask.pl>, 2019
@@ -47,6 +48,7 @@
 # Kamil Magryta <gryxon@gmail.com>, 2015
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Magdalena Jarosińska <m.jarosinska@stud.elka.pw.edu.pl>, 2015
+# Martyna Bogusz <piotr.boguszewicz@bluesoft.com>, 2020
 # Mateusz <blue90pl@gmail.com>, 2014
 # 2cdc55bf3a20ff25d939c7db7de19147_3ae98f5, 2014
 # Ned Batchelder <ned@edx.org>, 2017
@@ -75,6 +77,7 @@
 # Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>, 2020
 # jakubfajkowski <j.fajkowski@stud.elka.pw.edu.pl>, 2016
+# Martyna Bogusz <piotr.boguszewicz@bluesoft.com>, 2020
 # Monika Olszewska <molszewska1995@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)
@@ -98,7 +101,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-06 20:42+0000\n"
+"POT-Creation-Date: 2020-09-20 20:42+0000\n"
 "PO-Revision-Date: 2020-08-20 11:18+0000\n"
 "Last-Translator: Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
@@ -186,6 +189,7 @@ msgstr "Przesyłanie"
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/demographics_collection/Wizard.jsx
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
@@ -1626,7 +1630,6 @@ msgid "Vertical space"
 msgstr ""
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
-#: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
 msgid "View"
 msgstr "Wyświetl"
@@ -2386,6 +2389,10 @@ msgstr ""
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 msgid "View Report"
+msgstr ""
+
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
+msgid "There was an error generating the report link."
 msgstr ""
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
@@ -3428,6 +3435,70 @@ msgstr ""
 "Z powodu błędu systemu nie udało się określić zasadności przyznania zwrotu. "
 "Proszę spróbować ponownie później."
 
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
+msgid "Get started"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Help make edX better for everyone!"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Why does edX collect this information?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"An error occurred while attempting to retrieve or save the information "
+"below. Please try again later."
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid ""
+"What was the total combined income, during the last 12 months, of all "
+"members of your family? "
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select military status"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What is the highest level of education that you have achieved so far?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select guardian education"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select current industry"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "What industry do you want to work in?"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
+msgstr ""
+
+#: lms/static/js/demographics_collection/MultiselectDropdown.jsx
+msgid "Clear all"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Return to my dashboard"
+msgstr ""
+
+#: lms/static/js/demographics_collection/Wizard.jsx
+msgid "Finish later"
+msgstr ""
+
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
 msgid "Viewing %s course"
@@ -3565,7 +3636,6 @@ msgid "No results found for \"%(query_string)s\". Please try searching again."
 msgstr "Brak wyników dla \"%(query_string)s\". Spróbuj wyszukać ponownie."
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Search Results"
 msgstr "Wyniki wyszukiwania"
@@ -4900,6 +4970,15 @@ msgstr ""
 "Wystąpił błąd. Spróbuj odświeżyć stronę lub sprawdź połączenie z Internetem."
 
 #: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"In order to sign in, you need to activate your "
+"account.{line_break}{line_break}We just sent an activation link to "
+"{strong_start} {email} {strong_end}. If  you do not receive an email, check "
+"your spam folders or  {anchorStart}contact {platform_name} "
+"Support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
 msgid "An unexpected error has occurred."
 msgstr ""
 
@@ -5457,12 +5536,12 @@ msgid "Show Less"
 msgstr ""
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
-msgid "{total_results} result"
-msgid_plural "{total_results} results"
-msgstr[0] "{total_results} wynik"
-msgstr[1] "{total_results} wyniki"
-msgstr[2] "{total_results} wyników"
-msgstr[3] "{total_results} wyników"
+msgid "{total_results} result found for \"{search_term}\""
+msgid_plural "{total_results} results found for \"{search_term}\""
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -6055,6 +6134,10 @@ msgstr "Wczytaj inny plik"
 #: cms/static/js/views/components/add_xblock.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Adding"
+msgstr ""
+
+#: cms/static/js/views/container.js
+msgid "{startTag}{requestToken}{endTag}{selector}"
 msgstr ""
 
 #: cms/static/js/views/course_info_update.js

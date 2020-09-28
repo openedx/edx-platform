@@ -58,7 +58,7 @@ from xblock.exceptions import XBlockNotFoundError
 from openedx.core.djangoapps.content_libraries import permissions
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
-from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryNotIndexedException
+from openedx.core.djangoapps.content_libraries.libraries_index import ContentLibraryIndexer, LibraryBlockIndexer
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary, ContentLibraryPermission
 from openedx.core.djangoapps.content_libraries.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -112,6 +112,10 @@ class BlockLimitReachedError(Exception):
 
 class InvalidNameError(ValueError):
     """ The specified name/identifier is not valid """
+
+
+class LibraryPermissionIntegrityError(IntegrityError):
+    """ Thrown when an operation would cause insane permissions. """
 
 
 # Models:
@@ -220,15 +224,18 @@ class AccessLevel:
     NO_ACCESS = None
 
 
-def get_libraries_for_user(user):
+def get_libraries_for_user(user, org=None):
     """
     Return content libraries that the user has permission to view.
     """
-    qs = ContentLibrary.objects.all()
+    if org:
+        qs = ContentLibrary.objects.filter(org__short_name=org)
+    else:
+        qs = ContentLibrary.objects.all()
     return permissions.perms[permissions.CAN_VIEW_THIS_CONTENT_LIBRARY].filter(user, qs)
 
 
-def get_metadata_from_index(queryset):
+def get_metadata_from_index(queryset, text_search=None):
     """
     Take a list of ContentLibrary objects and return metadata stored in
     ContentLibraryIndex.
@@ -236,15 +243,33 @@ def get_metadata_from_index(queryset):
     metadata = None
     if ContentLibraryIndexer.indexing_is_enabled():
         try:
-            library_keys = [lib.library_key for lib in queryset]
-            metadata = ContentLibraryIndexer.get_libraries(library_keys)
-        except (LibraryNotIndexedException, KeyError, ElasticConnectionError) as e:
+            library_keys = [str(lib.library_key) for lib in queryset]
+            metadata = ContentLibraryIndexer.get_items(library_keys, text_search=text_search)
+            metadata_dict = {
+                item["id"]: item
+                for item in metadata
+            }
+            metadata = [
+                metadata_dict[key]
+                if key in metadata_dict
+                else None
+                for key in library_keys
+            ]
+        except ElasticConnectionError as e:
             log.exception(e)
 
     # If ContentLibraryIndex is not available, we query blockstore for a limited set of metadata
     if metadata is None:
         uuids = [lib.bundle_uuid for lib in queryset]
-        bundles = get_bundles(uuids)
+        bundles = get_bundles(uuids=uuids, text_search=text_search)
+
+        if text_search:
+            # Bundle APIs can't apply text_search on a bundle's org, so including those results here
+            queryset_org_search = queryset.filter(org__short_name__icontains=text_search)
+            if queryset_org_search.exists():
+                uuids_org_search = [lib.bundle_uuid for lib in queryset_org_search]
+                bundles += get_bundles(uuids=uuids_org_search)
+
         bundle_dict = {
             bundle.uuid: {
                 'uuid': bundle.uuid,
@@ -254,7 +279,12 @@ def get_metadata_from_index(queryset):
             }
             for bundle in bundles
         }
-        metadata = [bundle_dict[uuid] for uuid in uuids]
+        metadata = [
+            bundle_dict[uuid]
+            if uuid in bundle_dict
+            else None
+            for uuid in uuids
+        ]
 
     libraries = [
         ContentLibraryMetadata(
@@ -271,6 +301,7 @@ def get_metadata_from_index(queryset):
             has_unpublished_deletes=metadata[i].get('has_unpublished_deletes'),
         )
         for i, lib in enumerate(queryset)
+        if metadata[i] is not None
     ]
     return libraries
 
@@ -385,6 +416,22 @@ def get_library_team(library_key):
     ]
 
 
+def get_library_user_permissions(library_key, user):
+    """
+    Fetch the specified user's access information. Will return None if no
+    permissions have been granted.
+    """
+    ref = ContentLibrary.objects.get_by_key(library_key)
+    grant = ref.permission_grants.filter(user=user).first()
+    if grant is None:
+        return None
+    return ContentLibraryPermissionEntry(
+        user=grant.user,
+        group=grant.group,
+        access_level=grant.access_level,
+    )
+
+
 def set_library_user_permissions(library_key, user, access_level):
     """
     Change the specified user's level of access to this library.
@@ -392,6 +439,10 @@ def set_library_user_permissions(library_key, user, access_level):
     access_level should be one of the AccessLevel values defined above.
     """
     ref = ContentLibrary.objects.get_by_key(library_key)
+    current_grant = get_library_user_permissions(library_key, user)
+    if current_grant and current_grant.access_level == AccessLevel.ADMIN_LEVEL:
+        if not ref.permission_grants.filter(access_level=AccessLevel.ADMIN_LEVEL).exclude(user_id=user.id).exists():
+            raise LibraryPermissionIntegrityError(_('Cannot change or remove the access level for the only admin.'))
     if access_level is None:
         ref.permission_grants.filter(user=user).delete()
     else:
@@ -480,28 +531,62 @@ def delete_library(library_key):
         raise
 
 
-def get_library_blocks(library_key):
+def get_library_blocks(library_key, text_search=None):
     """
     Get the list of top-level XBlocks in the specified library.
 
     Returns a list of LibraryXBlockMetadata objects
     """
-    ref = ContentLibrary.objects.get_by_key(library_key)
-    lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
-    usages = lib_bundle.get_top_level_usages()
-    blocks = []
-    for usage_key in usages:
-        # For top-level definitions, we can go from definition key to usage key using the following, but this would not
-        # work for non-top-level blocks as they may have multiple usages. Top level blocks are guaranteed to have only
-        # a single usage in the library, which is part of the definition of top level block.
-        def_key = lib_bundle.definition_for_usage(usage_key)
-        blocks.append(LibraryXBlockMetadata(
-            usage_key=usage_key,
-            def_key=def_key,
-            display_name=get_block_display_name(def_key),
-            has_unpublished_changes=lib_bundle.does_definition_have_unpublished_changes(def_key),
-        ))
-    return blocks
+    metadata = None
+    if LibraryBlockIndexer.indexing_is_enabled():
+        try:
+            filter_terms = {
+                'library_key': [str(library_key)],
+                'is_child': [False],
+            }
+            metadata = [
+                {
+                    **item,
+                    "id": LibraryUsageLocatorV2.from_string(item['id']),
+                }
+                for item in LibraryBlockIndexer.get_items(filter_terms=filter_terms, text_search=text_search)
+                if item is not None
+            ]
+        except (ElasticConnectionError) as e:
+            log.exception(e)
+
+    # If indexing is disabled, or connection to elastic failed
+    if metadata is None:
+        metadata = []
+        ref = ContentLibrary.objects.get_by_key(library_key)
+        lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
+        usages = lib_bundle.get_top_level_usages()
+
+        for usage_key in usages:
+            # For top-level definitions, we can go from definition key to usage key using the following, but this would
+            # not work for non-top-level blocks as they may have multiple usages. Top level blocks are guaranteed to
+            # have only a single usage in the library, which is part of the definition of top level block.
+            def_key = lib_bundle.definition_for_usage(usage_key)
+            display_name = get_block_display_name(def_key)
+            if (text_search is None or
+                    text_search.lower() in display_name.lower() or
+                    text_search.lower() in str(usage_key).lower()):
+                metadata.append({
+                    "id": usage_key,
+                    "def_key": def_key,
+                    "display_name": display_name,
+                    "has_unpublished_changes": lib_bundle.does_definition_have_unpublished_changes(def_key),
+                })
+
+    return [
+        LibraryXBlockMetadata(
+            usage_key=item['id'],
+            def_key=item['def_key'],
+            display_name=item['display_name'],
+            has_unpublished_changes=item['has_unpublished_changes'],
+        )
+        for item in metadata
+    ]
 
 
 def _lookup_usage_key(usage_key):
@@ -571,7 +656,7 @@ def set_library_block_olx(usage_key, new_olx_str):
     write_draft_file(draft.uuid, metadata.def_key.olx_path, new_olx_str.encode('utf-8'))
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(metadata.def_key.bundle_uuid, draft_name=DRAFT_NAME).clear()
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=usage_key.context_key)
+    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=usage_key.context_key, usage_key=usage_key)
 
 
 def create_library_block(library_key, block_type, definition_id):
@@ -613,7 +698,7 @@ def create_library_block(library_key, block_type, definition_id):
     # Clear the bundle cache so everyone sees the new block immediately:
     BundleCache(ref.bundle_uuid, draft_name=DRAFT_NAME).clear()
     # Now return the metadata about the new block:
-    LIBRARY_BLOCK_CREATED.send(sender=None, library_key=ref.library_key)
+    LIBRARY_BLOCK_CREATED.send(sender=None, library_key=ref.library_key, usage_key=usage_key)
     return get_library_block(usage_key)
 
 
@@ -666,7 +751,7 @@ def delete_library_block(usage_key, remove_from_parent=True):
         pass
     # Clear the bundle cache so everyone sees the deleted block immediately:
     lib_bundle.cache.clear()
-    LIBRARY_BLOCK_DELETED.send(sender=None, library_key=lib_bundle.library_key)
+    LIBRARY_BLOCK_DELETED.send(sender=None, library_key=lib_bundle.library_key, usage_key=usage_key)
 
 
 def create_library_block_child(parent_usage_key, block_type, definition_id):
@@ -689,6 +774,8 @@ def create_library_block_child(parent_usage_key, block_type, definition_id):
     include_data = XBlockInclude(link_id=None, block_type=block_type, definition_id=definition_id, usage_hint=None)
     parent_block.runtime.add_child_include(parent_block, include_data)
     parent_block.save()
+    ref = ContentLibrary.objects.get_by_key(parent_usage_key.context_key)
+    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=ref.library_key, usage_key=metadata.usage_key)
     return metadata
 
 
@@ -738,7 +825,7 @@ def add_library_block_static_asset_file(usage_key, file_name, file_content):
     file_metadata = blockstore_cache.get_bundle_file_metadata_with_cache(
         bundle_uuid=def_key.bundle_uuid, path=file_path, draft_name=DRAFT_NAME,
     )
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key)
+    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key, usage_key=usage_key)
     return LibraryXBlockStaticFile(path=file_metadata.path, url=file_metadata.url, size=file_metadata.size)
 
 
@@ -759,7 +846,7 @@ def delete_library_block_static_asset_file(usage_key, file_name):
     write_draft_file(draft.uuid, file_path, contents=None)
     # Clear the bundle cache so everyone sees the new file immediately:
     lib_bundle.cache.clear()
-    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key)
+    LIBRARY_BLOCK_UPDATED.send(sender=None, library_key=lib_bundle.library_key, usage_key=usage_key)
 
 
 def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
@@ -886,7 +973,7 @@ def publish_changes(library_key):
         return  # If there is no draft, no action is needed.
     LibraryBundle(library_key, ref.bundle_uuid).cache.clear()
     LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
-    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key)
+    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key, update_blocks=True)
 
 
 def revert_changes(library_key):
@@ -902,4 +989,4 @@ def revert_changes(library_key):
     else:
         return  # If there is no draft, no action is needed.
     LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME).cache.clear()
-    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key)
+    CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=library_key, update_blocks=True)

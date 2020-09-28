@@ -20,6 +20,7 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.release import RELEASE_LINE
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
 ########################## Prod-like settings ###################################
 # These should be as close as possible to the settings we use in production.
@@ -35,6 +36,7 @@ os.environ['STUDIO_CFG'] = str.format("{config_root}/{service_variant}.yml",
 os.environ['REVISION_CFG'] = "{config_root}/revisions.yml".format(config_root=CONFIG_ROOT)
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
+
 
 ######################### Testing overrides ####################################
 

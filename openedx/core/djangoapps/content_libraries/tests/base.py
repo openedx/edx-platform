@@ -4,14 +4,18 @@ Tests for Blockstore-based Content Libraries
 """
 from contextlib import contextmanager
 from io import BytesIO
+from mock import patch
 from urllib.parse import urlencode
 import unittest
 
 from django.conf import settings
+from django.test.utils import override_settings
 from organizations.models import Organization
 from rest_framework.test import APITestCase, APIClient
+from search.search_engine_base import SearchEngine
 
 from student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries.libraries_index import MAX_SIZE
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
 
@@ -26,7 +30,7 @@ URL_LIB_LINKS = URL_LIB_DETAIL + 'links/'  # Get the list of links in this libra
 URL_LIB_COMMIT = URL_LIB_DETAIL + 'commit/'  # Commit (POST) or revert (DELETE) all pending changes to this library
 URL_LIB_BLOCKS = URL_LIB_DETAIL + 'blocks/'  # Get the list of XBlocks in this library, or add a new one
 URL_LIB_TEAM = URL_LIB_DETAIL + 'team/'  # Get the list of users/groups authorized to use this library
-URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{user_id}/'  # Add/edit/remove a user's permission to use this library
+URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{username}/'  # Add/edit/remove a user's permission to use this library
 URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a group's permission to use this library
 URL_LIB_BLOCK = URL_PREFIX + 'blocks/{block_key}/'  # Get data about a block, or delete it
 URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specified XBlock
@@ -40,6 +44,44 @@ URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'
 
 # Decorator for tests that require blockstore
 requires_blockstore = unittest.skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
+
+
+def elasticsearch_test(func):
+    """
+    Decorator for tests which connect to elasticsearch when needed
+    """
+    # This is disabled by default. Set to True if the elasticsearch engine is needed to test parts of code.
+    if settings.ENABLE_ELASTICSEARCH_FOR_TESTS:
+        func = override_settings(SEARCH_ENGINE="search.elastic.ElasticSearchEngine")(func)
+        func = override_settings(ELASTIC_SEARCH_CONFIG=[{
+            'use_ssl': settings.TEST_ELASTICSEARCH_USE_SSL,
+            'host': settings.TEST_ELASTICSEARCH_HOST,
+            'port': settings.TEST_ELASTICSEARCH_PORT,
+        }])(func)
+        func = patch("openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase.SEARCH_KWARGS", new={
+            'refresh': 'wait_for'
+        })(func)
+        return func
+    else:
+        @classmethod
+        def mock_perform(cls, filter_terms, text_search):
+            # pylint: disable=no-member
+            return SearchEngine.get_search_engine(cls.INDEX_NAME).search(
+                doc_type=cls.DOCUMENT_TYPE,
+                field_dictionary=filter_terms,
+                query_string=text_search,
+                size=MAX_SIZE
+            )
+
+        func = patch(
+            "openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase.SEARCH_KWARGS",
+            new={}
+        )(func)
+        func = patch(
+            "openedx.core.djangoapps.content_libraries.libraries_index.SearchIndexerBase._perform_elastic_search",
+            new=mock_perform
+        )(func)
+        return func
 
 
 @requires_blockstore
@@ -124,10 +166,12 @@ class ContentLibrariesRestApiTest(APITestCase):
         yield
         self.client = old_client  # pylint: disable=attribute-defined-outside-init
 
-    def _create_library(self, slug, title, description="", expect_response=200):
+    def _create_library(self, slug, title, description="", org=None, expect_response=200):
         """ Create a library """
+        if org is None:
+            org = self.organization.short_name
         return self._api('post', URL_LIB_CREATE, {
-            "org": self.organization.short_name,
+            "org": org,
             "slug": slug,
             "title": title,
             "description": description,
@@ -181,13 +225,25 @@ class ContentLibrariesRestApiTest(APITestCase):
         """ Get the list of users/groups authorized to use this library """
         return self._api('get', URL_LIB_TEAM.format(lib_key=lib_key), None, expect_response)
 
-    def _set_user_access_level(self, lib_key, user_id, access_level, expect_response=200):
+    def _get_user_access_level(self, lib_key, username, expect_response=200):
+        """ Fetch a user's access level """
+        url = URL_LIB_TEAM_USER.format(lib_key=lib_key, username=username)
+        return self._api('get', url, None, expect_response)
+
+    def _add_user_by_email(self, lib_key, email, access_level, expect_response=200):
+        """ Add a user of a specified permission level by their email address. """
+        url = URL_LIB_TEAM.format(lib_key=lib_key)
+        return self._api('post', url, {"access_level": access_level, "email": email}, expect_response)
+
+    def _set_user_access_level(self, lib_key, username, access_level, expect_response=200):
         """ Change the specified user's access level """
-        url = URL_LIB_TEAM_USER.format(lib_key=lib_key, user_id=user_id)
-        if access_level is None:
-            return self._api('delete', url, None, expect_response)
-        else:
-            return self._api('put', url, {"access_level": access_level}, expect_response)
+        url = URL_LIB_TEAM_USER.format(lib_key=lib_key, username=username)
+        return self._api('put', url, {"access_level": access_level}, expect_response)
+
+    def _remove_user_access(self, lib_key, username, expect_response=200):
+        """ Should effectively be the same as the above with access_level=None, but using the delete HTTP verb. """
+        url = URL_LIB_TEAM_USER.format(lib_key=lib_key, username=username)
+        return self._api('delete', url, None, expect_response)
 
     def _set_group_access_level(self, lib_key, group_name, access_level, expect_response=200):
         """ Change the specified group's access level """
@@ -197,9 +253,16 @@ class ContentLibrariesRestApiTest(APITestCase):
         else:
             return self._api('put', url, {"access_level": access_level}, expect_response)
 
-    def _get_library_blocks(self, lib_key, expect_response=200):
+    def _get_library_blocks(self, lib_key, query_params_dict=None, expect_response=200):
         """ Get the list of XBlocks in the library """
-        return self._api('get', URL_LIB_BLOCKS.format(lib_key=lib_key), None, expect_response)
+        if query_params_dict is None:
+            query_params_dict = {}
+        return self._api(
+            'get',
+            URL_LIB_BLOCKS.format(lib_key=lib_key) + '?' + urlencode(query_params_dict),
+            None,
+            expect_response
+        )
 
     def _add_block_to_library(self, lib_key, block_type, slug, parent_block=None, expect_response=200):
         """ Add a new XBlock to the library """

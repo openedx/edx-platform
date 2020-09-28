@@ -30,10 +30,10 @@ from six.moves import range
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
 from .common import *
 
-from util.db import NoOpMigrationModules  # pylint: disable=wrong-import-order
 from util.testing import patch_sessions, patch_testcase  # pylint: disable=wrong-import-order
 
 # This patch disables the commit_on_success decorator during tests
@@ -305,7 +305,7 @@ GIT_REPO_DIR = TEST_ROOT / "course_repos"
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 
@@ -457,6 +457,16 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.8"
+
+####################### ELASTICSEARCH TESTS #######################
+# Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
+ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(
+    'EDXAPP_ENABLE_ELASTICSEARCH_FOR_TESTS', 'no').lower() in ('true', 'yes', '1')
+
+TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
+    'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
+TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch')
+TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
 
 ######### custom courses #########
 INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']

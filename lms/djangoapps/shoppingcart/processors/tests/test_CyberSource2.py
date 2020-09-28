@@ -9,15 +9,15 @@ from django.conf import settings
 from django.test import TestCase
 from mock import patch
 
-from shoppingcart.models import Order, OrderItem
-from shoppingcart.processors.CyberSource2 import (
+from ...models import Order, OrderItem
+from ..CyberSource2 import (
     _get_processor_exception_html,
     get_signed_purchase_params,
     process_postpay_callback,
     processor_hash,
     render_purchase_form_html
 )
-from shoppingcart.processors.exceptions import (
+from ..exceptions import (
     CCProcessorDataException,
     CCProcessorSignatureException,
     CCProcessorWrongAmountException

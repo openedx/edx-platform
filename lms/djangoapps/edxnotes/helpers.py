@@ -23,8 +23,8 @@ from requests.exceptions import RequestException
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_current_child
-from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
-from edxnotes.plugins import EdxNotesTab
+from lms.djangoapps.edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
+from lms.djangoapps.edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangolib.markup import Text

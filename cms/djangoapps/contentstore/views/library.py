@@ -144,15 +144,33 @@ def _display_library(library_key_string, request):
 
 def _list_libraries(request):
     """
-    List all accessible libraries
+    List all accessible libraries, after applying filters in the request
+    Query params:
+        org - The organization used to filter libraries
+        text_search - The string used to filter libraries by searching in title, id or org
     """
+    org = request.GET.get('org', '')
+    text_search = request.GET.get('text_search', '').lower()
+
+    if org:
+        libraries = modulestore().get_libraries(org=org)
+    else:
+        libraries = modulestore().get_libraries()
+
     lib_info = [
         {
             "display_name": lib.display_name,
             "library_key": text_type(lib.location.library_key),
         }
-        for lib in modulestore().get_libraries()
-        if has_studio_read_access(request.user, lib.location.library_key)
+        for lib in libraries
+        if (
+            (
+                text_search in lib.display_name.lower() or
+                text_search in lib.location.library_key.org.lower() or
+                text_search in lib.location.library_key.library.lower()
+            ) and
+            has_studio_read_access(request.user, lib.location.library_key)
+        )
     ]
     return JsonResponse(lib_info)
 

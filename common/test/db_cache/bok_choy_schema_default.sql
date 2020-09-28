@@ -431,7 +431,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2920 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2928 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2727,7 +2727,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=831 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=833 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2738,7 +2738,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=768 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=770 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4600,6 +4600,59 @@ CREATE TABLE `mobile_api_mobileapiconfig` (
   PRIMARY KEY (`id`),
   KEY `mobile_api_mobileapi_changed_by_id_8799981a_fk_auth_user` (`changed_by_id`),
   CONSTRAINT `mobile_api_mobileapi_changed_by_id_8799981a_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `moodle_historicalmoodleenterprisecustomerconfiguration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `moodle_historicalmoodleenterprisecustomerconfiguration` (
+  `id` int(11) NOT NULL,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  `transmission_chunk_size` int(11) NOT NULL,
+  `channel_worker_username` varchar(255) DEFAULT NULL,
+  `catalogs_to_transmit` longtext,
+  `moodle_base_url` varchar(255) NOT NULL,
+  `service_short_name` varchar(255) NOT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `history_date` datetime(6) NOT NULL,
+  `history_change_reason` varchar(100) DEFAULT NULL,
+  `history_type` varchar(1) NOT NULL,
+  `enterprise_customer_id` char(32) DEFAULT NULL,
+  `history_user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`history_id`),
+  KEY `moodle_historicalmoo_history_user_id_22017ee9_fk_auth_user` (`history_user_id`),
+  KEY `moodle_historicalmoodleente_id_71ddc422` (`id`),
+  KEY `moodle_historicalmoodleente_enterprise_customer_id_a816d974` (`enterprise_customer_id`),
+  CONSTRAINT `moodle_historicalmoo_history_user_id_22017ee9_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `moodle_moodleenterprisecustomerconfiguration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `moodle_moodleenterprisecustomerconfiguration` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  `transmission_chunk_size` int(11) NOT NULL,
+  `channel_worker_username` varchar(255) DEFAULT NULL,
+  `catalogs_to_transmit` longtext,
+  `moodle_base_url` varchar(255) NOT NULL,
+  `service_short_name` varchar(255) NOT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `enterprise_customer_id` char(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
+  CONSTRAINT `moodle_moodleenterpr_enterprise_customer__6668537b_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `notes_note`;

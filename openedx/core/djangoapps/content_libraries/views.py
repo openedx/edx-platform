@@ -7,6 +7,7 @@ import logging
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext as _
 import edx_api_doc_tools as apidocs
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
@@ -31,6 +32,7 @@ from openedx.core.djangoapps.content_libraries.serializers import (
     LibraryXBlockOlxSerializer,
     LibraryXBlockStaticFileSerializer,
     LibraryXBlockStaticFilesSerializer,
+    ContentLibraryAddPermissionByEmailSerializer,
 )
 from openedx.core.lib.api.view_utils import view_auth_classes
 
@@ -66,12 +68,30 @@ def convert_exceptions(fn):
     return wrapped_fn
 
 
-class LibraryRootPagination(PageNumberPagination):
+class LibraryApiPagination(PageNumberPagination):
     """
     Paginates over ContentLibraryMetadata objects.
     """
     page_size = 50
     page_size_query_param = 'page_size'
+
+    apidoc_params = [
+        apidocs.query_parameter(
+            'pagination',
+            bool,
+            description="Enables paginated schema",
+        ),
+        apidocs.query_parameter(
+            'page',
+            int,
+            description="Page number of result. Defaults to 1",
+        ),
+        apidocs.query_parameter(
+            'page_size',
+            int,
+            description="Page size of the result. Defaults to 50",
+        ),
+    ]
 
 
 @view_auth_classes()
@@ -82,20 +102,16 @@ class LibraryRootView(APIView):
 
     @apidocs.schema(
         parameters=[
+            *LibraryApiPagination.apidoc_params,
             apidocs.query_parameter(
-                'pagination',
-                bool,
-                description="Enables paginated schema",
+                'org',
+                str,
+                description="The organization short-name used to filter libraries",
             ),
             apidocs.query_parameter(
-                'page',
-                int,
-                description="Page number of result. Defaults to 1",
-            ),
-            apidocs.query_parameter(
-                'page_size',
-                int,
-                description="Page size of the result. Defaults to 50",
+                'text_search',
+                str,
+                description="The string used to filter libraries by searching in title, id, org, or description",
             ),
         ],
     )
@@ -103,10 +119,19 @@ class LibraryRootView(APIView):
         """
         Return a list of all content libraries that the user has permission to view.
         """
-        paginator = LibraryRootPagination()
-        queryset = api.get_libraries_for_user(request.user)
-        paginated_qs = paginator.paginate_queryset(queryset, request)
-        result = api.get_metadata_from_index(paginated_qs)
+        org = request.query_params.get('org', None)
+        text_search = request.query_params.get('text_search', None)
+
+        paginator = LibraryApiPagination()
+        queryset = api.get_libraries_for_user(request.user, org=org)
+        if text_search:
+            result = api.get_metadata_from_index(queryset, text_search=text_search)
+            result = paginator.paginate_queryset(result, request)
+        else:
+            # We can paginate queryset early and prevent fetching unneeded metadata
+            paginated_qs = paginator.paginate_queryset(queryset, request)
+            result = api.get_metadata_from_index(paginated_qs)
+
         serializer = ContentLibraryMetadataSerializer(result, many=True)
         # Verify `pagination` param to maintain compatibility with older
         # non pagination-aware clients
@@ -189,6 +214,33 @@ class LibraryTeamView(APIView):
     library itself (LibraryDetailsView.patch).
     """
     @convert_exceptions
+    def post(self, request, lib_key_str):
+        """
+        Add a user to this content library via email, with permissions specified in the
+        request body.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM)
+        serializer = ContentLibraryAddPermissionByEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            user = User.objects.get(email=serializer.validated_data.get('email'))
+        except User.DoesNotExist:
+            raise ValidationError({'email': _('We could not find a user with that email address.')})
+        grant = api.get_library_user_permissions(key, user)
+        if grant:
+            return Response(
+                {'email': [_('This user already has access to this library.')]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            api.set_library_user_permissions(key, user, access_level=serializer.validated_data["access_level"])
+        except api.LibraryPermissionIntegrityError as err:
+            raise ValidationError(detail=str(err))
+        grant = api.get_library_user_permissions(key, user)
+        return Response(ContentLibraryPermissionSerializer(grant).data)
+
+    @convert_exceptions
     def get(self, request, lib_key_str):
         """
         Get the list of users and groups who have permissions to view and edit
@@ -207,7 +259,7 @@ class LibraryTeamUserView(APIView):
     library.
     """
     @convert_exceptions
-    def put(self, request, lib_key_str, user_id):
+    def put(self, request, lib_key_str, username):
         """
         Add a user to this content library, with permissions specified in the
         request body.
@@ -216,20 +268,40 @@ class LibraryTeamUserView(APIView):
         api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM)
         serializer = ContentLibraryPermissionLevelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = get_object_or_404(User, pk=int(user_id))
-        api.set_library_user_permissions(key, user, access_level=serializer.validated_data["access_level"])
-        return Response({})
+        user = get_object_or_404(User, username=username)
+        try:
+            api.set_library_user_permissions(key, user, access_level=serializer.validated_data["access_level"])
+        except api.LibraryPermissionIntegrityError as err:
+            raise ValidationError(detail=str(err))
+        grant = api.get_library_user_permissions(key, user)
+        return Response(ContentLibraryPermissionSerializer(grant).data)
 
     @convert_exceptions
-    def delete(self, request, lib_key_str, user_id):
+    def get(self, request, lib_key_str, username):
+        """
+        Gets the current permissions settings for a particular user.
+        """
+        key = LibraryLocatorV2.from_string(lib_key_str)
+        api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY_TEAM)
+        user = get_object_or_404(User, username=username)
+        grant = api.get_library_user_permissions(key, user)
+        if not grant:
+            raise NotFound
+        return Response(ContentLibraryPermissionSerializer(grant).data)
+
+    @convert_exceptions
+    def delete(self, request, lib_key_str, username):
         """
         Remove the specified user's permission to access or edit this content
         library.
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM)
-        user = get_object_or_404(User, pk=int(user_id))
-        api.set_library_user_permissions(key, user, access_level=None)
+        user = get_object_or_404(User, username=username)
+        try:
+            api.set_library_user_permissions(key, user, access_level=None)
+        except api.LibraryPermissionIntegrityError as err:
+            raise ValidationError(detail=str(err))
         return Response({})
 
 
@@ -253,14 +325,14 @@ class LibraryTeamGroupView(APIView):
         return Response({})
 
     @convert_exceptions
-    def delete(self, request, lib_key_str, user_id):
+    def delete(self, request, lib_key_str, username):
         """
         Remove the specified user's permission to access or edit this content
         library.
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY_TEAM)
-        group = get_object_or_404(Group, pk=int(user_id))
+        group = get_object_or_404(Group, username=username)
         api.set_library_group_permissions(key, group, access_level=None)
         return Response({})
 
@@ -388,14 +460,35 @@ class LibraryBlocksView(APIView):
     """
     Views to work with XBlocks in a specific content library.
     """
+    @apidocs.schema(
+        parameters=[
+            *LibraryApiPagination.apidoc_params,
+            apidocs.query_parameter(
+                'text_search',
+                str,
+                description="The string used to filter libraries by searching in title, id, org, or description",
+            ),
+        ],
+    )
     @convert_exceptions
     def get(self, request, lib_key_str):
         """
         Get the list of all top-level blocks in this content library
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
+        text_search = request.query_params.get('text_search', None)
+
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        result = api.get_library_blocks(key)
+        result = api.get_library_blocks(key, text_search=text_search)
+
+        # Verify `pagination` param to maintain compatibility with older
+        # non pagination-aware clients
+        if request.GET.get('pagination', 'false').lower() == 'true':
+            paginator = LibraryApiPagination()
+            result = paginator.paginate_queryset(result, request)
+            serializer = LibraryXBlockMetadataSerializer(result, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
         return Response(LibraryXBlockMetadataSerializer(result, many=True).data)
 
     @convert_exceptions
