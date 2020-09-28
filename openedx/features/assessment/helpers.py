@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pytz import utc
-from submissions.models import Submission
+from submissions.models import Score, Submission
 
 from openassessment.assessment.api.staff import STAFF_TYPE
 from openassessment.assessment.models import Assessment, AssessmentPart
@@ -49,7 +49,7 @@ def find_and_autoscore_submissions(enrollments, submission_uuids):
         )
         if submissions_to_autoscore_by_enrollment:
             submissions_to_autoscore.extend(submissions_to_autoscore_by_enrollment)
-            log.info('Found {count} submission(s) for course enrollment {id}'.format(
+            log.info('Found {count} submission(s) for course enrollment id={id}'.format(
                 count=len(submissions_to_autoscore_by_enrollment), id=enrollment.id)
             )
 
@@ -124,8 +124,9 @@ def _log_multiple_submissions_info(submissions_to_autoscore, days_to_wait, delta
 
 def autoscore_ora_submission(submission):
     """
-    Auto score ORA submission, by Philu bot. Score will appear as awarded by staff (instructor). This function will
-    also mark all requirements of submitter to fulfilled, which means all ORA steps will be marked as completed.
+    Auto score ORA submission, by Philu bot. Score will appear as awarded by staff (instructor). If staff assessment by
+    philu bot already exists then do not create it again, similarly do not score submission again if score exists (and
+    is not reset).
 
     Args:
         submission (Submission): ORA submission model object
@@ -137,43 +138,48 @@ def autoscore_ora_submission(submission):
     usage_key = submission.student_item.item_id
     course_id_str = submission.student_item.course_id
 
-    log.info('Started autoscoring submission {uuid} for course {course}'.format(
-        uuid=submission.uuid, course=course_id_str)
-    )
-
     # Find the associated rubric
     rubric_dict = get_rubric_from_ora(course_id_str, usage_key)
 
     rubric = rubric_from_dict(rubric_dict)
     options_selected = select_options(rubric_dict)[0]
 
-    # Create assessments
-    assessment = Assessment.create(
-        rubric=rubric,
-        scorer_id=get_philu_bot(),
+    is_staff_assessment_exists = Assessment.objects.filter(
         submission_uuid=submission.uuid,
+        scorer_id=get_philu_bot(),
         score_type=STAFF_TYPE
-    )
-    AssessmentPart.create_from_option_names(
-        assessment=assessment,
-        selected=options_selected
-    )
+    ).exists()
 
-    log.info(
-        u"Created assessment for user {user_id}, submission {submission}, "
-        u"course {course_id}, item {item_id} with rubric {rubric} by PhilU Bot.".format(
-            user_id=anonymous_user_id,
-            submission=submission.uuid,
-            course_id=course_id_str,
-            item_id=usage_key,
-            rubric=rubric.content_hash
+    if not is_staff_assessment_exists:
+        log.info('Started autoscoring submission {uuid} for course {course}'.format(
+            uuid=submission.uuid, course=course_id_str)
         )
-    )
+        assessment = Assessment.create(
+            rubric=rubric,
+            scorer_id=get_philu_bot(),
+            submission_uuid=submission.uuid,
+            score_type=STAFF_TYPE
+        )
+        AssessmentPart.create_from_option_names(
+            assessment=assessment,
+            selected=options_selected
+        )
 
-    # Mark all requirement of submitter to fulfilled and update status to done,
-    # Reset previous score and auto score ORA as per assessment made by philu bot and selected options
+        log.info(
+            u"Created assessment for user {user_id}, submission {submission}, "
+            u"course {course_id}, item {item_id} with rubric {rubric} by PhilU Bot.".format(
+                user_id=anonymous_user_id,
+                submission=submission.uuid,
+                course_id=course_id_str,
+                item_id=usage_key,
+                rubric=rubric.content_hash
+            )
+        )
+
+    # Reset previous score and auto score ORA as per assessment made by philu bot and selected options, but do not
+    # update assessment workflow status. If submission is already scored do not score it again.
     assessment_workflow = AssessmentWorkflow.objects.get(submission_uuid=submission.uuid)
-    assessment_workflow.update_from_assessments(assessment_requirements=None, override_submitter_requirements=True)
+    assessment_workflow.update_from_assessments(assessment_requirements=None)
 
 
 def autoscore_ora(course_id, usage_key, student):
