@@ -284,7 +284,7 @@ class DemographicsCollectionModal extends React.Component {
             </Wizard.Header>
             <Wizard.Page>
               {({ wizardConsumer }) =>
-                <div className="demographics-form-container">
+                <div className="demographics-form-container" data-hj-suppress>
                   {/* Gender Identity */}
                   <SelectWithInput
                     selectName={FIELD_NAMES.GENDER}
@@ -346,7 +346,7 @@ class DemographicsCollectionModal extends React.Component {
             </Wizard.Page>
             <Wizard.Page>
               {({ wizardConsumer }) =>
-                <div className="demographics-form-container">
+                <div className="demographics-form-container" data-hj-suppress>
                   {/* Military History */}
                   <label htmlFor={FIELD_NAMES.MILITARY}>
                     {gettext("Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?")}
@@ -369,7 +369,7 @@ class DemographicsCollectionModal extends React.Component {
             </Wizard.Page>
             <Wizard.Page>
               {({ wizardConsumer }) =>
-                <div className="demographics-form-container">
+                <div className="demographics-form-container" data-hj-suppress>
                   {/* Learner Education Level */}
                   <label htmlFor={FIELD_NAMES.EDUCATION_LEVEL}>
                     {gettext("What is the highest level of education that you have achieved so far?")}
@@ -409,7 +409,7 @@ class DemographicsCollectionModal extends React.Component {
             </Wizard.Page>
             <Wizard.Page>
               {({ wizardConsumer }) =>
-                <div className="demographics-form-container">
+                <div className="demographics-form-container" data-hj-suppress>
                   {/* Employment Status */}
                   <SelectWithInput
                     selectName={FIELD_NAMES.WORK_STATUS}
