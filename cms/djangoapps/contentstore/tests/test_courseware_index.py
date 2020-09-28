@@ -27,6 +27,7 @@ from contentstore.courseware_index import (
     SearchIndexingError
 )
 from contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
+from contentstore.tasks import update_search_index
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from course_modes.models import CourseMode
@@ -754,6 +755,20 @@ class TestTaskExecution(SharedModuleStoreTestCase):
         # Note that this test will only succeed if celery is working in inline mode
         response = searcher.search(field_dictionary={"library": library_search_key})
         self.assertEqual(response["total"], 2)
+
+    def test_ignore_ccx(self):
+        """Test that we ignore CCX courses (it's too slow now)."""
+        # We're relying on our CCX short circuit to just stop execution as soon
+        # as it encounters a CCX key. If that isn't working properly, it will
+        # fall through to the normal indexing and raise an exception because
+        # there is no data or backing course behind the course key.
+        with patch('contentstore.courseware_index.CoursewareSearchIndexer.index') as mock_index:
+            self.assertIsNone(
+                update_search_index(
+                    "ccx-v1:OpenEdX+FAKECOURSE+FAKERUN+ccx@1", "2020-09-28T16:41:57.150796"
+                )
+            )
+            self.assertFalse(mock_index.called)
 
 
 @ddt.ddt
