@@ -661,7 +661,7 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.middleware.MonitoringMemoryMiddleware',
 
     # Cookie monitoring
-    'openedx.core.lib.request_utils.CookieMetricsMiddleware',
+    'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
 
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
@@ -724,7 +724,7 @@ MIDDLEWARE = [
     # Enables force_django_cache_miss functionality for TieredCache.
     'edx_django_utils.cache.middleware.TieredCacheMiddleware',
 
-    # Outputs monitoring metrics for a request.
+    # Adds monitoring attributes to requests.
     'edx_rest_framework_extensions.middleware.RequestCustomAttributesMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',

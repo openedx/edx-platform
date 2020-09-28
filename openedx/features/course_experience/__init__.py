@@ -58,12 +58,12 @@ class DefaultTrueWaffleFlagNamespace(WaffleFlagNamespace):
                     set_custom_attribute('warn_flag_no_request', True)
                     # Return the default value if not in a request context.
                     # Same as the original implementation
-                    self._set_waffle_flag_metric(namespaced_flag_name, value)
+                    self._set_waffle_flag_attribute(namespaced_flag_name, value)
                     return True
 
             self._cached_flags[namespaced_flag_name] = value
 
-        self._set_waffle_flag_metric(namespaced_flag_name, value)
+        self._set_waffle_flag_attribute(namespaced_flag_name, value)
         return value
 
 

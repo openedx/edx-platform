@@ -234,7 +234,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
     )
     @ddt.unpack
     @patch('edx_django_utils.monitoring.set_custom_attribute')
-    def test_access_token_metrics(self, token_type, expected_token_type, mock_set_custom_attribute):
+    def test_access_token_attributes(self, token_type, expected_token_type, mock_set_custom_attribute):
         response = self._post_request(self.user, self.dot_app, token_type=token_type)
         self.assertEqual(response.status_code, 200)
         expected_calls = [
@@ -244,7 +244,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=True)
 
     @patch('edx_django_utils.monitoring.set_custom_attribute')
-    def test_access_token_metrics_for_bad_request(self, mock_set_custom_attribute):
+    def test_access_token_attributes_for_bad_request(self, mock_set_custom_attribute):
         grant_type = dot_models.Application.GRANT_PASSWORD
         invalid_body = {
             'grant_type': grant_type.replace('-', '_'),
