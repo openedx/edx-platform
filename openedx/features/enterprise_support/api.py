@@ -423,6 +423,11 @@ def enterprise_customer_from_api(request):
     """Use an API to get Enterprise Customer data from request context clues."""
     enterprise_customer = None
     enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
+    if enterprise_customer_uuid is _CACHE_MISS:
+        # enterprise_customer_uuid_for_request() `shouldn't` return a __CACHE_MISS__,
+        # but just in case it does, we check for it and return early if found.
+        return enterprise_customer
+
     if enterprise_customer_uuid:
         # If we were able to obtain an EnterpriseCustomer UUID, go ahead
         # and use it to attempt to retrieve EnterpriseCustomer details
@@ -468,7 +473,10 @@ def enterprise_customer_uuid_for_request(request):
     else:
         enterprise_customer_uuid = _customer_uuid_from_query_param_cookies_or_session(request)
 
-    if enterprise_customer_uuid is _CACHE_MISS and request.user.is_authenticated:
+    if enterprise_customer_uuid is _CACHE_MISS:
+        if not request.user.is_authenticated:
+            return None
+
         # If there's no way to get an Enterprise UUID for the request, check to see
         # if there's already an Enterprise attached to the requesting user on the backend.
         enterprise_customer = None

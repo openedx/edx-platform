@@ -19,6 +19,7 @@ from six.moves.urllib.parse import parse_qs
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
+    _CACHE_MISS,
     ENTERPRISE_CUSTOMER_KEY_NAME,
     ConsentApiClient,
     ConsentApiServiceClient,
@@ -27,6 +28,7 @@ from openedx.features.enterprise_support.api import (
     consent_needed_for_course,
     data_sharing_consent_required,
     enterprise_customer_for_request,
+    enterprise_customer_from_api,
     enterprise_customer_uuid_for_request,
     enterprise_enabled,
     get_consent_required_courses,
@@ -155,6 +157,16 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         authenticate and access enterprise API.
         """
         self._assert_api_client_with_user(EnterpriseApiClient, mock_jwt_builder)
+
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
+    @mock.patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
+    def test_enterprise_customer_from_api_cache_miss(self, mock_client_class, mock_uuid_from_request):
+        mock_uuid_from_request.return_value = _CACHE_MISS
+        mock_request = mock.Mock()
+
+        actual_result = enterprise_customer_from_api(mock_request)
+        self.assertIsNone(actual_result)
+        self.assertFalse(mock_client_class.called)
 
     @httpretty.activate
     @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
@@ -777,18 +789,30 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         mock_data_from_db.assert_called_once_with(mock_request.user)
         self.assertEqual({'uuid': 'my-uuid'}, mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME])
 
+    @ddt.data(True, False)
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data_from_db', return_value=None)
     @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline', return_value=None)
-    def test_enterprise_uuid_for_request_cache_miss_non_existent(self, mock_partial_pipeline, mock_data_from_db):
+    def test_enterprise_uuid_for_request_cache_miss_non_existent(
+        self,
+        is_user_authenticated,
+        mock_partial_pipeline,
+        mock_data_from_db
+    ):
         mock_request = mock.Mock(
             GET={},
             COOKIES={},
             session={},
         )
+        mock_request.user.is_authenticated = is_user_authenticated
 
         actual_uuid = enterprise_customer_uuid_for_request(mock_request)
 
         self.assertIsNone(actual_uuid)
         mock_partial_pipeline.assert_called_once_with(mock_request)
-        mock_data_from_db.assert_called_once_with(mock_request.user)
-        self.assertIsNone(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME])
+
+        if is_user_authenticated:
+            mock_data_from_db.assert_called_once_with(mock_request.user)
+            self.assertIsNone(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME])
+        else:
+            self.assertFalse(mock_data_from_db.called)
+            self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
