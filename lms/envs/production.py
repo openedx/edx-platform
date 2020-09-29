@@ -82,7 +82,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'TRACKING_BACKENDS',
         'EVENT_TRACKING_BACKENDS',
         'JWT_AUTH',
-        'CELERY_QUEUES',
+        'CELERY_TASK_QUEUES',
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
     ]
@@ -117,41 +117,41 @@ CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 ###################################### CELERY  ################################
 
 # Don't use a connection pool, since connections are dropped by ELB.
-BROKER_POOL_LIMIT = 0
-BROKER_CONNECTION_TIMEOUT = 1
+CELERY_BROKER_POOL_LIMIT = 0
+CELERY_BROKER_CONNECTION_TIMEOUT = 1
 
 # For the Result Store, use the django cache named 'celery'
 CELERY_RESULT_BACKEND = 'django-cache'
 
 # When the broker is behind an ELB, use a heartbeat to refresh the
 # connection and to detect if it has been dropped.
-BROKER_HEARTBEAT = ENV_TOKENS.get('BROKER_HEARTBEAT', 60.0)
-BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
+CELERY_BROKER_HEARTBEAT = ENV_TOKENS.get('BROKER_HEARTBEAT', 60.0)
+CELERY_BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
 
 # Each worker should only fetch one message at a time
-CELERYD_PREFETCH_MULTIPLIER = 1
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 
 # Rename the exchange and queues for each variant
 
 QUEUE_VARIANT = CONFIG_PREFIX.lower()
 
-CELERY_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
+CELERY_TASK_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
 
 HIGH_PRIORITY_QUEUE = 'edx.{0}core.high'.format(QUEUE_VARIANT)
 DEFAULT_PRIORITY_QUEUE = 'edx.{0}core.default'.format(QUEUE_VARIANT)
 HIGH_MEM_QUEUE = 'edx.{0}core.high_mem'.format(QUEUE_VARIANT)
 
-CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
-CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+CELERY_TASK_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
+CELERY_TASK_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-CELERY_QUEUES = {
+CELERY_TASK_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {},
     HIGH_MEM_QUEUE: {},
 }
 
-CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
-CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
+CELERY_TASK_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
+CELERY_BEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
 
 # STATIC_ROOT specifies the directory where static files are
 # collected
@@ -266,10 +266,10 @@ ENTITLEMENTS_EXPIRATION_ROUTING_KEY = ENV_TOKENS.get('ENTITLEMENTS_EXPIRATION_RO
 # Message expiry time in seconds
 CELERY_EVENT_QUEUE_TTL = ENV_TOKENS.get('CELERY_EVENT_QUEUE_TTL', None)
 
-# Allow CELERY_QUEUES to be overwritten by ENV_TOKENS,
-ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
-if ENV_CELERY_QUEUES:
-    CELERY_QUEUES = {queue: {} for queue in ENV_CELERY_QUEUES}
+# Allow CELERY_TASK_QUEUES to be overwritten by ENV_TOKENS,
+ENV_CELERY_TASK_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
+if ENV_CELERY_TASK_QUEUES:
+    CELERY_TASK_QUEUES = {queue: {} for queue in ENV_CELERY_TASK_QUEUES}
 
 # Then add alternate environment queues
 ALTERNATE_QUEUE_ENVS = ENV_TOKENS.get('ALTERNATE_WORKER_QUEUES', '').split()
@@ -277,11 +277,11 @@ ALTERNATE_QUEUES = [
     DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
     for alternate in ALTERNATE_QUEUE_ENVS
 ]
-CELERY_QUEUES.update(
+CELERY_TASK_QUEUES.update(
     {
         alternate: {}
         for alternate in ALTERNATE_QUEUES
-        if alternate not in list(CELERY_QUEUES.keys())
+        if alternate not in list(CELERY_TASK_QUEUES.keys())
     }
 )
 
@@ -535,14 +535,14 @@ CELERY_BROKER_VHOST = ENV_TOKENS.get("CELERY_BROKER_VHOST", "")
 CELERY_BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
 CELERY_BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
 
-BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
-                                            CELERY_BROKER_USER,
-                                            CELERY_BROKER_PASSWORD,
-                                            CELERY_BROKER_HOSTNAME,
-                                            CELERY_BROKER_VHOST)
+CELERY_BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
+                                                   CELERY_BROKER_USER,
+                                                   CELERY_BROKER_PASSWORD,
+                                                   CELERY_BROKER_HOSTNAME,
+                                                   CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
-BROKER_TRANSPORT_OPTIONS = {
+CELERY_BROKER_TRANSPORT_OPTIONS = {
     'fanout_patterns': True,
     'fanout_prefix': True,
 }
@@ -656,7 +656,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     THIRD_PARTY_AUTH_OLD_CONFIG = AUTH_TOKENS.get('THIRD_PARTY_AUTH', None)
 
     if ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24) is not None:
-        CELERYBEAT_SCHEDULE['refresh-saml-metadata'] = {
+        CELERY_BEAT_SCHEDULE['refresh-saml-metadata'] = {
             'task': 'third_party_auth.fetch_saml_metadata',
             'schedule': datetime.timedelta(hours=ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24)),
         }
