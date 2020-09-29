@@ -21,6 +21,7 @@ export const SelectWithInput = (props) => {
     <div className="d-flex flex-column pb-3">
       <label htmlFor={selectName}>{labelText}</label>
       <select
+        autoFocus
         className="form-control"
         name={selectName}
         id={selectId}

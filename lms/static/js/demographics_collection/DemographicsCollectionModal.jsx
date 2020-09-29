@@ -355,6 +355,7 @@ class DemographicsCollectionModal extends React.Component {
                       {gettext("Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?")}
                     </label>
                     <select
+                      autoFocus
                       className="form-control"
                       onChange={this.handleSelectChange}
                       name={FIELD_NAMES.MILITARY}
@@ -381,7 +382,9 @@ class DemographicsCollectionModal extends React.Component {
                     </label>
                     <select
                       className="form-control"
+                      autoFocus
                       onChange={this.handleSelectChange}
+                      key="self-education"
                       name={FIELD_NAMES.EDUCATION_LEVEL}
                       id={FIELD_NAMES.EDUCATION_LEVEL}
                       value={wizardConsumer[FIELD_NAMES.EDUCATION_LEVEL]}
@@ -399,7 +402,7 @@ class DemographicsCollectionModal extends React.Component {
                       {gettext("What is the highest level of education that any of your parents or guardians have achieved?")}
                     </label>
                     <select
-                      className="form-control pb-3"
+                      className="form-control"
                       onChange={this.handleSelectChange}
                       name={FIELD_NAMES.PARENT_EDUCATION}
                       id={FIELD_NAMES.PARENT_EDUCATION}
@@ -444,7 +447,7 @@ class DemographicsCollectionModal extends React.Component {
                       {gettext("What industry do you currently work in?")}
                     </label>
                     <select
-                      className="form-control pb-3"
+                      className="form-control"
                       onChange={this.handleSelectChange}
                       name={FIELD_NAMES.CURRENT_WORK}
                       id={FIELD_NAMES.CURRENT_WORK}
@@ -463,7 +466,7 @@ class DemographicsCollectionModal extends React.Component {
                       {gettext("What industry do you want to work in?")}
                     </label>
                     <select
-                      className="form-control pb-3"
+                      className="form-control"
                       onChange={this.handleSelectChange}
                       name={FIELD_NAMES.FUTURE_WORK}
                       id={FIELD_NAMES.FUTURE_WORK}
