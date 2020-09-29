@@ -18,7 +18,7 @@ export const SelectWithInput = (props) => {
     disabled,
   } = props;
   return (
-    <div className="d-flex flex-column">
+    <div className="d-flex flex-column pb-3">
       <label htmlFor={selectName}>{labelText}</label>
       <select
         className="form-control"

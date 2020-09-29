@@ -109,7 +109,7 @@ class MultiselectDropdown extends React.Component {
         <div key={index} id={`${option.value}-option-container`} className="option-container">
           <label className="option-label">
             <input id={`${option.value}-option-checkbox`} className="option-checkbox" type="checkbox" value={option.value} checked={checked} onChange={this.handleOptionClick} />
-            {option.display_name}
+            <span className="pl-2">{option.display_name}</span>
           </label>
         </div>
       )
@@ -126,7 +126,7 @@ class MultiselectDropdown extends React.Component {
   render() {
     return (
       <div
-        className="multiselect-dropdown"
+        className="multiselect-dropdown pb-3"
         tabIndex={-1}
         onBlur={e => {
           // We need to make sure we only close and save the dropdown when
