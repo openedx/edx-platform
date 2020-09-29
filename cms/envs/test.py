@@ -191,7 +191,7 @@ CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 
 # test_status_cancel in cms/cms_user_tasks/test.py is failing without this
 # @override_setting for CELERY_BROKER_URL is not working in testcase, so updating here
-CELERY_BROKER_URL = 'memory://localhost/'
+BROKER_URL = 'memory://localhost/'
 
 ########################### Server Ports ###################################
 
