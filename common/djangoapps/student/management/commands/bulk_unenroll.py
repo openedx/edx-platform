@@ -46,7 +46,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         csv_path = options['csv_path']
-        import pdb;pdb.set_trace()
         self.commit = options['commit']
 
         if csv_path:
