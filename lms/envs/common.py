@@ -1886,7 +1886,6 @@ verify_student_js = [
     'js/verify_student/views/step_view.js',
     'js/verify_student/views/intro_step_view.js',
     'js/verify_student/views/make_payment_step_view.js',
-    'js/verify_student/views/payment_confirmation_step_view.js',
     'js/verify_student/views/face_photo_step_view.js',
     'js/verify_student/views/id_photo_step_view.js',
     'js/verify_student/views/review_photos_step_view.js',

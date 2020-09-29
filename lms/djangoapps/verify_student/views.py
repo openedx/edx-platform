@@ -116,7 +116,6 @@ class PayAndVerifyView(View):
     #
     INTRO_STEP = 'intro-step'
     MAKE_PAYMENT_STEP = 'make-payment-step'
-    PAYMENT_CONFIRMATION_STEP = 'payment-confirmation-step'
     FACE_PHOTO_STEP = 'face-photo-step'
     ID_PHOTO_STEP = 'id-photo-step'
     REVIEW_PHOTOS_STEP = 'review-photos-step'
@@ -125,7 +124,6 @@ class PayAndVerifyView(View):
     ALL_STEPS = [
         INTRO_STEP,
         MAKE_PAYMENT_STEP,
-        PAYMENT_CONFIRMATION_STEP,
         FACE_PHOTO_STEP,
         ID_PHOTO_STEP,
         REVIEW_PHOTOS_STEP,
@@ -134,7 +132,6 @@ class PayAndVerifyView(View):
 
     PAYMENT_STEPS = [
         MAKE_PAYMENT_STEP,
-        PAYMENT_CONFIRMATION_STEP
     ]
 
     VERIFICATION_STEPS = [
@@ -152,7 +149,6 @@ class PayAndVerifyView(View):
     STEP_TITLES = {
         INTRO_STEP: ugettext_lazy("Intro"),
         MAKE_PAYMENT_STEP: ugettext_lazy("Make payment"),
-        PAYMENT_CONFIRMATION_STEP: ugettext_lazy("Payment confirmation"),
         FACE_PHOTO_STEP: ugettext_lazy("Take photo"),
         ID_PHOTO_STEP: ugettext_lazy("Take a photo of your ID"),
         REVIEW_PHOTOS_STEP: ugettext_lazy("Review your info"),
@@ -171,7 +167,6 @@ class PayAndVerifyView(View):
     VERIFY_NOW_MSG = 'verify-now'
     VERIFY_LATER_MSG = 'verify-later'
     UPGRADE_MSG = 'upgrade'
-    PAYMENT_CONFIRMATION_MSG = 'payment-confirmation'
 
     # Requirements
     #
@@ -496,9 +491,8 @@ class PayAndVerifyView(View):
         if already_verified and already_paid:
             # If they've already paid and verified, there's nothing else to do,
             # so redirect them to the dashboard.
-            if message != self.PAYMENT_CONFIRMATION_MSG:
-                url = reverse('dashboard')
-        elif message in [self.VERIFY_NOW_MSG, self.VERIFY_LATER_MSG, self.PAYMENT_CONFIRMATION_MSG]:
+            url = reverse('dashboard')
+        elif message in [self.VERIFY_NOW_MSG, self.VERIFY_LATER_MSG]:
             if is_enrolled:
                 # If the user is already enrolled but hasn't yet paid,
                 # then the "upgrade" messaging is more appropriate.

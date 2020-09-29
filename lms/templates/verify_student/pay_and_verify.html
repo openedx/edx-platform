@@ -14,8 +14,6 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
 <%block name="pagetitle">
   % if message_key == PayAndVerifyView.UPGRADE_MSG:
     ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name)}
-  % elif message_key == PayAndVerifyView.PAYMENT_CONFIRMATION_MSG:
-    ${_("Receipt For {course_name}").format(course_name=course.display_name)}
   % elif message_key in [PayAndVerifyView.VERIFY_NOW_MSG, PayAndVerifyView.VERIFY_LATER_MSG]:
     ${_("Verify For {course_name}").format(course_name=course.display_name)}
   % else:
@@ -27,7 +25,7 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
     <%
       template_names = (
           ["webcam_photo", "image_input", "error"] +
-          ["intro_step", "payment_confirmation_step"] +
+          ["intro_step"] +
           ["face_photo_step", "id_photo_step", "review_photos_step", "enrollment_confirmation_step"]
       )
 

@@ -62,20 +62,6 @@ urlpatterns = [
         }
     ),
 
-    # The user is returning to the flow after paying.
-    # This usually occurs after a redirect from the shopping cart
-    # once the order has been fulfilled.
-    url(
-        r'^payment-confirmation/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-        views.PayAndVerifyView.as_view(),
-        name="verify_student_payment_confirmation",
-        kwargs={
-            'always_show_payment': True,
-            'current_step': views.PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
-            'message': views.PayAndVerifyView.PAYMENT_CONFIRMATION_MSG
-        }
-    ),
-
     url(
         r'^create_order',
         views.create_order,
