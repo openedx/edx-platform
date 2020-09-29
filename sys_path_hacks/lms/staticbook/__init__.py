@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing staticbook instead of lms.djangoapps.staticbook is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'staticbook')
 
 from lms.djangoapps.staticbook import *

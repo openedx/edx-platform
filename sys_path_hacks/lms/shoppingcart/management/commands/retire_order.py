@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing shoppingcart.management.commands.retire_order instead of lms.djangoapps.shoppingcart.management.commands.retire_order is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'shoppingcart.management.commands.retire_order')
 
 from lms.djangoapps.shoppingcart.management.commands.retire_order import *

@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing gating.tests.test_signals instead of lms.djangoapps.gating.tests.test_signals is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'gating.tests.test_signals')
 
 from lms.djangoapps.gating.tests.test_signals import *

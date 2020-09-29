@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing shoppingcart.tests.payment_fake instead of lms.djangoapps.shoppingcart.tests.payment_fake is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'shoppingcart.tests.payment_fake')
 
 from lms.djangoapps.shoppingcart.tests.payment_fake import *

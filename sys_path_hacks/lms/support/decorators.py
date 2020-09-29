@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing support.decorators instead of lms.djangoapps.support.decorators is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'support.decorators')
 
 from lms.djangoapps.support.decorators import *

@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.management.commands.dump_course_ids instead of lms.djangoapps.courseware.management.commands.dump_course_ids is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.management.commands.dump_course_ids')
 
 from lms.djangoapps.courseware.management.commands.dump_course_ids import *

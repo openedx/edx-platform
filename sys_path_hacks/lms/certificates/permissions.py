@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing certificates.permissions instead of lms.djangoapps.certificates.permissions is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'certificates.permissions')
 
 from lms.djangoapps.certificates.permissions import *

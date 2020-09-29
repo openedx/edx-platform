@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing lti_provider instead of lms.djangoapps.lti_provider is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'lti_provider')
 
 from lms.djangoapps.lti_provider import *

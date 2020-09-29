@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.config instead of lms.djangoapps.discussion.config is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.config')
 
 from lms.djangoapps.discussion.config import *

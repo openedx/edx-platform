@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing grades.grade_utils instead of lms.djangoapps.grades.grade_utils is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'grades.grade_utils')
 
 from lms.djangoapps.grades.grade_utils import *

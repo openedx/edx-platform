@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor.settings.test instead of lms.djangoapps.instructor.settings.test is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor.settings.test')
 
 from lms.djangoapps.instructor.settings.test import *

@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing shoppingcart.management instead of lms.djangoapps.shoppingcart.management is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'shoppingcart.management')
 
 from lms.djangoapps.shoppingcart.management import *

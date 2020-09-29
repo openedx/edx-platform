@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing email_marketing instead of lms.djangoapps.email_marketing is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'email_marketing')
 
 from lms.djangoapps.email_marketing import *

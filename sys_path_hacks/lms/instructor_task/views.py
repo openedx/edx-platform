@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor_task.views instead of lms.djangoapps.instructor_task.views is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor_task.views')
 
 from lms.djangoapps.instructor_task.views import *

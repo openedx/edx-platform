@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.toggles instead of lms.djangoapps.courseware.toggles is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.toggles')
 
 from lms.djangoapps.courseware.toggles import *

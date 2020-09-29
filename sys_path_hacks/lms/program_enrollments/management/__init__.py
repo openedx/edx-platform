@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing program_enrollments.management instead of lms.djangoapps.program_enrollments.management is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'program_enrollments.management')
 
 from lms.djangoapps.program_enrollments.management import *

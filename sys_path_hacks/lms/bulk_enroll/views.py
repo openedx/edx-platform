@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing bulk_enroll.views instead of lms.djangoapps.bulk_enroll.views is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'bulk_enroll.views')
 
 from lms.djangoapps.bulk_enroll.views import *

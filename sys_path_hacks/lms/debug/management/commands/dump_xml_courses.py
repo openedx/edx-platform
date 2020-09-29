@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing debug.management.commands.dump_xml_courses instead of lms.djangoapps.debug.management.commands.dump_xml_courses is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'debug.management.commands.dump_xml_courses')
 
 from lms.djangoapps.debug.management.commands.dump_xml_courses import *

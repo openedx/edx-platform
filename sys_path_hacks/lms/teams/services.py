@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing teams.services instead of lms.djangoapps.teams.services is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'teams.services')
 
 from lms.djangoapps.teams.services import *

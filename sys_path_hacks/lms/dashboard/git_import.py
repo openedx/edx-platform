@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing dashboard.git_import instead of lms.djangoapps.dashboard.git_import is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'dashboard.git_import')
 
 from lms.djangoapps.dashboard.git_import import *

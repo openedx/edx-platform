@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.fields instead of lms.djangoapps.courseware.fields is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.fields')
 
 from lms.djangoapps.courseware.fields import *

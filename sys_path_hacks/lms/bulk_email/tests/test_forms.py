@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing bulk_email.tests.test_forms instead of lms.djangoapps.bulk_email.tests.test_forms is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'bulk_email.tests.test_forms')
 
 from lms.djangoapps.bulk_email.tests.test_forms import *

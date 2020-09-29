@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor.tests.views.test_instructor_dashboard instead of lms.djangoapps.instructor.tests.views.test_instructor_dashboard is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor.tests.views.test_instructor_dashboard')
 
 from lms.djangoapps.instructor.tests.views.test_instructor_dashboard import *

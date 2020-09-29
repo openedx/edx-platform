@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.tests.test_view_authentication instead of lms.djangoapps.courseware.tests.test_view_authentication is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.tests.test_view_authentication')
 
 from lms.djangoapps.courseware.tests.test_view_authentication import *
