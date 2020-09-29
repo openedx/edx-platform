@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.django_comment_client.tests.test_middleware instead of lms.djangoapps.discussion.django_comment_client.tests.test_middleware is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.django_comment_client.tests.test_middleware')
 
 from lms.djangoapps.discussion.django_comment_client.tests.test_middleware import *

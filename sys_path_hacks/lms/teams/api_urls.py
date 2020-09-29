@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing teams.api_urls instead of lms.djangoapps.teams.api_urls is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'teams.api_urls')
 
 from lms.djangoapps.teams.api_urls import *

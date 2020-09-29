@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.django_comment_client.tests.mock_cs_server.test_mock_cs_server instead of lms.djangoapps.discussion.django_comment_client.tests.mock_cs_server.test_mock_cs_server is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.django_comment_client.tests.mock_cs_server.test_mock_cs_server')
 
 from lms.djangoapps.discussion.django_comment_client.tests.mock_cs_server.test_mock_cs_server import *

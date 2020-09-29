@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing course_api.forms instead of lms.djangoapps.course_api.forms is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'course_api.forms')
 
 from lms.djangoapps.course_api.forms import *

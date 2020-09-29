@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing course_home_api.urls instead of lms.djangoapps.course_home_api.urls is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'course_home_api.urls')
 
 from lms.djangoapps.course_home_api.urls import *

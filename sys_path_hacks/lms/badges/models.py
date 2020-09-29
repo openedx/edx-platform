@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing badges.models instead of lms.djangoapps.badges.models is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'badges.models')
 
 from lms.djangoapps.badges.models import *

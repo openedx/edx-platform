@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor_task.config instead of lms.djangoapps.instructor_task.config is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor_task.config')
 
 from lms.djangoapps.instructor_task.config import *

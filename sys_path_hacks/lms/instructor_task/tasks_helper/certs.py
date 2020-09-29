@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor_task.tasks_helper.certs instead of lms.djangoapps.instructor_task.tasks_helper.certs is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor_task.tasks_helper.certs')
 
 from lms.djangoapps.instructor_task.tasks_helper.certs import *

@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing mobile_api.admin instead of lms.djangoapps.mobile_api.admin is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'mobile_api.admin')
 
 from lms.djangoapps.mobile_api.admin import *

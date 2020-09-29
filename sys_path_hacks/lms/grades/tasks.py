@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing grades.tasks instead of lms.djangoapps.grades.tasks is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'grades.tasks')
 
 from lms.djangoapps.grades.tasks import *

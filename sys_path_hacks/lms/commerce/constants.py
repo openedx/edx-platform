@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing commerce.constants instead of lms.djangoapps.commerce.constants is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'commerce.constants')
 
 from lms.djangoapps.commerce.constants import *

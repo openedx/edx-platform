@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing survey.apps instead of lms.djangoapps.survey.apps is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'survey.apps')
 
 from lms.djangoapps.survey.apps import *

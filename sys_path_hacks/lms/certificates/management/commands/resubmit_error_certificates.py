@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing certificates.management.commands.resubmit_error_certificates instead of lms.djangoapps.certificates.management.commands.resubmit_error_certificates is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'certificates.management.commands.resubmit_error_certificates')
 
 from lms.djangoapps.certificates.management.commands.resubmit_error_certificates import *

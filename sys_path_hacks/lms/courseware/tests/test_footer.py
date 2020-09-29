@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.tests.test_footer instead of lms.djangoapps.courseware.tests.test_footer is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.tests.test_footer')
 
 from lms.djangoapps.courseware.tests.test_footer import *

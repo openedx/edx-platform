@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor_analytics.tests.test_distributions instead of lms.djangoapps.instructor_analytics.tests.test_distributions is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor_analytics.tests.test_distributions')
 
 from lms.djangoapps.instructor_analytics.tests.test_distributions import *

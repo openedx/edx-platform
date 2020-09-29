@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor_task.management instead of lms.djangoapps.instructor_task.management is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor_task.management')
 
 from lms.djangoapps.instructor_task.management import *

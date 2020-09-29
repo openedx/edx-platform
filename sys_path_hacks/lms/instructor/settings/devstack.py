@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor.settings.devstack instead of lms.djangoapps.instructor.settings.devstack is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor.settings.devstack')
 
 from lms.djangoapps.instructor.settings.devstack import *

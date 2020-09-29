@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.url_helpers instead of lms.djangoapps.courseware.url_helpers is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.url_helpers')
 
 from lms.djangoapps.courseware.url_helpers import *

@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing lti_provider.signals instead of lms.djangoapps.lti_provider.signals is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'lti_provider.signals')
 
 from lms.djangoapps.lti_provider.signals import *

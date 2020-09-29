@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing mobile_api.users.urls instead of lms.djangoapps.mobile_api.users.urls is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'mobile_api.users.urls')
 
 from lms.djangoapps.mobile_api.users.urls import *

@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing commerce.tests.factories instead of lms.djangoapps.commerce.tests.factories is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'commerce.tests.factories')
 
 from lms.djangoapps.commerce.tests.factories import *

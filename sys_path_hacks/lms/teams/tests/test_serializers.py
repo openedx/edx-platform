@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing teams.tests.test_serializers instead of lms.djangoapps.teams.tests.test_serializers is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'teams.tests.test_serializers')
 
 from lms.djangoapps.teams.tests.test_serializers import *

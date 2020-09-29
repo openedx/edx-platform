@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.model_data instead of lms.djangoapps.courseware.model_data is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.model_data')
 
 from lms.djangoapps.courseware.model_data import *

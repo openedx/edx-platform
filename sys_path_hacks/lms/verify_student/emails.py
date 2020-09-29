@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing verify_student.emails instead of lms.djangoapps.verify_student.emails is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'verify_student.emails')
 
 from lms.djangoapps.verify_student.emails import *

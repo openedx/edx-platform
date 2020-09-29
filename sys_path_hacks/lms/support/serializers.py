@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing support.serializers instead of lms.djangoapps.support.serializers is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'support.serializers')
 
 from lms.djangoapps.support.serializers import *

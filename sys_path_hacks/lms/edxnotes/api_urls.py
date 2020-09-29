@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing edxnotes.api_urls instead of lms.djangoapps.edxnotes.api_urls is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'edxnotes.api_urls')
 
 from lms.djangoapps.edxnotes.api_urls import *

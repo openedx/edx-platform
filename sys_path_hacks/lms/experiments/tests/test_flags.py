@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing experiments.tests.test_flags instead of lms.djangoapps.experiments.tests.test_flags is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'experiments.tests.test_flags')
 
 from lms.djangoapps.experiments.tests.test_flags import *

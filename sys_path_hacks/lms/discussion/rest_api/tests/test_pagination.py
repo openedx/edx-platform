@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.rest_api.tests.test_pagination instead of lms.djangoapps.discussion.rest_api.tests.test_pagination is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.rest_api.tests.test_pagination')
 
 from lms.djangoapps.discussion.rest_api.tests.test_pagination import *
