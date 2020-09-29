@@ -28,7 +28,7 @@ This deprecation will take place in the following steps:
 
 2. For every module importable using the ``sys.path`` style (for instance, ``courseware``), duplicate that module structure into the ``sys_path_hacks/lms`` (or ``sys_path_hacks/studio``) directory. Each file in that directory should do a wild-card import of the corresponding ``lms.djangoapps.`` module, and should log a warning indicating where it was imported from. For example, in ``sys_path_hacks/lms/courseware/views/views.py``, it will wild-card import ``from lms.djangoapps.courseware.views.views import *``. The ``sys_path_hacks/clean.sh`` script will generate these files.
 
-3. The ``sys.path`` modification will be changed to point to ``sys_path_hacks/lms``, rather than ``lms/djangoapps``. At this point, any code that references the modules directly will trigger warnings with logging about where the imports were coming from (to drive future cleanup efforts).
+3. The ``sys.path`` modification will be changed to point to ``sys_path_hacks/lms``, rather than ``lms/djangoapps``. At this point, any code that references the modules directly will trigger warnings with logging about where the imports were coming from (to drive future cleanup efforts). The warnings will be instances of ``SysPathHackWarning`` (subclass of ``DeprecationWarning``).
 
 4. Fix all instances where the ``sys.path``-based modules were ``patch``-ed in unit tests, as those patches no longer work.
 
