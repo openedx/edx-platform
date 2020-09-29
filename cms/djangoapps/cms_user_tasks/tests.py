@@ -4,6 +4,7 @@ Unit tests for integration of the django-user-tasks app and its REST API.
 
 
 import logging
+from django.conf import settings
 from uuid import uuid4
 
 import mock
@@ -62,7 +63,6 @@ def _data(response):
     return response.data
 
 
-@override_settings(BROKER_URL='memory://localhost/')
 class TestUserTasks(APITestCase):
     """
     Tests of the django-user-tasks REST API endpoints.
@@ -106,6 +106,7 @@ class TestUserTasks(APITestCase):
         """
         Users should be able to cancel tasks they no longer wish to complete.
         """
+        assert settings.CELERY_BROKER_URL == 'aaaa'
         response = self.client.post(reverse('usertaskstatus-cancel', args=[self.status.uuid]))
         assert response.status_code == 200
         self.status.refresh_from_db()
