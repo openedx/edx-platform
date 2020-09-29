@@ -279,6 +279,74 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             datetime.now(UTC) < date
         )
 
+    def _has_access_check(self, *args):
+        """
+        Helper method created for the following method
+        gate_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems
+        Created to simplify the relevant unit tests
+        This way the has_access call can be patched without impacting other has_access calls made during the test
+        """
+        # importing here to avoid a circular import
+        from lms.djangoapps.courseware.access import has_access
+        return has_access(*args)
+
+    def gate_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems(self):
+        """
+        Problem:
+        Content type gating for FBE (Feature Based Enrollments) previously only gated individual blocks.
+        This was an issue because audit learners could start a timed exam
+        and then be unable to complete it because the graded content would be gated.
+        Even if they later upgraded, they could still be unable to complete the exam
+        because the timer could have expired.
+
+        Solution:
+        Gate the entire sequence when we think the above problem can occur.
+
+        If:
+        1. This sequence is a timed exam
+        2. And this sequence contains problems which this user cannot load due to content type gating
+        Then:
+        We will gate access to the entire sequence.
+        Otherwise, learners would have the ability to start their timer for an exam,
+        but then not have the ability to complete it.
+
+        We are displaying the gating fragment within the sequence, as is done for gating for prereqs,
+        rather than content type gating the entire sequence because that would remove the next/previous navigation.
+
+        This functionality still needs to be replicated in the frontend-app-learning courseware MFE
+        The ticket to track this is https://openedx.atlassian.net/browse/REV-1220
+        Note that this will break compatability with using sequences outside of edx-platform
+        but we are ok with this for now
+        """
+        # importing here to avoid a circular import
+        from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+
+        if not self.is_time_limited:
+            return
+
+        try:
+            user = User.objects.get(id=self.runtime.user_id)
+            if not ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=self.runtime.course_id):
+                return
+
+            for vertical in self.get_children():
+                for block in vertical.get_children():
+                    problem_eligible_for_content_gating = (getattr(block, 'graded', False) and
+                                                           block.has_score and
+                                                           getattr(block, 'weight', 0) != 0)
+                    if problem_eligible_for_content_gating:
+                        access = self._has_access_check(user, 'load', block, self.course_id)
+                        # If any block has been gated by content type gating inside the sequence
+                        # and the sequence is a timed exam, then gate the entire sequence.
+                        # In order to avoid scope creep, we are not handling other potential causes
+                        # of access failures as part of this work.
+                        if not access and access.error_code == 'incorrect_user_group':
+                            self.gated_sequence_fragment = access.user_fragment
+                            break
+                        self.gated_sequence_fragment = None  # Don't gate other cases
+        except User.DoesNotExist:
+            pass
+
     def student_view(self, context):
         _ = self.runtime.service(self, "i18n").ugettext
         context = context or {}
@@ -287,32 +355,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         prereq_met = True
         prereq_meta_info = {}
 
-
         if TIMED_EXAM_GATING_WAFFLE_FLAG.is_enabled():
-            # Content type gating for FBE previously only gated individual blocks
-            # This was an issue because audit learners could start a timed exam and then be unable to complete the exam
-            # even if they later upgrade because the timer would have expired.
-            # For this reason we check if content gating is enabled for the user
-            # and gate the entire sequence in that case
-            # This functionality still needs to be replicated in the frontend-app-learning courseware MFE
-            # The ticket to track this is https://openedx.atlassian.net/browse/REV-1220
-            # Note that this will break compatability with using sequences outside of edx-platform
-            # but we are ok with this for now
-            if self.is_time_limited:
-                try:
-                    user = User.objects.get(id=self.runtime.user_id)
-                    # importing here to avoid a circular import
-                    from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-                    from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
-                    if ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=self.runtime.course_id):
-                        # Get the content type gating locked content fragment to render for this sequence
-                        partition = self.descriptor._get_user_partition(CONTENT_GATING_PARTITION_ID)  # pylint: disable=protected-access
-                        user_group = partition.scheme.get_group_for_user(self.runtime.course_id, user, partition)
-                        self.gated_sequence_fragment = partition.access_denied_fragment(
-                            self.descriptor, user, user_group, []
-                        )
-                except User.DoesNotExist:
-                    pass
+            self.gate_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems()
 
         if self._required_prereq():
             if self.runtime.user_is_staff:
