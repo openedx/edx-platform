@@ -72,17 +72,20 @@ def _do_third_party_auth(request):
             u"with backend_name {backend_name}".format(
                 username=username, backend_name=backend_name)
         )
-        message = _(
+        message = Text(_(
             u"You've successfully signed in to your {provider_name} account, "
-            u"but this account isn't linked with your {platform_name} account yet."
+            u"but this account isn't linked with your {platform_name} account yet. {blank_lines}"
             u"Use your {platform_name} username and password to sign in to {platform_name} below, "
-            u"and then link your {platform_name} account with {provider_name} from your dashboard."
+            u"and then link your {platform_name} account with {provider_name} from your dashboard. {blank_lines}"
             u"If you don't have an account on {platform_name} yet, "
             u"click {register_label_strong} at the top of the page."
-        ).format(
+        )).format(
+            blank_lines=HTML('<br/><br/>'),
             platform_name=platform_name,
             provider_name=requested_provider.name,
-            register_label_strong='Register'
+            register_label_strong=HTML('<strong>{register_text}</strong>').format(
+                register_text=_('Register')
+            )
         )
 
         raise AuthFailedError(message, error_code='third-party-auth-with-no-linked-account')
