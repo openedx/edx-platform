@@ -1359,6 +1359,7 @@ class ReceiptRedirectTest(SharedModuleStoreTestCase):
             password=self.PASSWORD
         )
 
+
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
     """
