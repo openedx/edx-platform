@@ -10,7 +10,7 @@ class GatingConfig(AppConfig):
     """
     Django AppConfig class for the gating app
     """
-    name = 'gating'
+    name = 'lms.djangoapps.gating'
 
     def ready(self):
         # Import signals to wire up the signal handlers contained within
