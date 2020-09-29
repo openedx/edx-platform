@@ -104,7 +104,7 @@ urlpatterns = [
     url(r'', include('track.urls')),
 
     # Static template view endpoints like blog, faq, etc.
-    url(r'', include('static_template_view.urls')),
+    url(r'', include('lms.djangoapps.static_template_view.urls')),
 
     url(r'^heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
 
@@ -127,7 +127,7 @@ urlpatterns = [
     url(r'^search/', include('search.urls')),
 
     # Course API
-    url(r'^api/courses/', include('course_api.urls')),
+    url(r'^api/courses/', include('lms.djangoapps.course_api.urls')),
 
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
@@ -145,7 +145,7 @@ urlpatterns = [
     url(r'^api/commerce/', include(('commerce.api.urls', 'lms.djangoapps.commerce'), namespace='commerce_api')),
     url(r'^api/credit/', include('openedx.core.djangoapps.credit.urls')),
     url(r'^api/toggles/', include('openedx.core.djangoapps.waffle_utils.urls')),
-    url(r'^rss_proxy/', include('rss_proxy.urls')),
+    url(r'^rss_proxy/', include('lms.djangoapps.rss_proxy.urls')),
     url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
 
     url(r'^catalog/', include(('openedx.core.djangoapps.catalog.urls', 'openedx.core.djangoapps.catalog'),
@@ -172,7 +172,7 @@ urlpatterns = [
     url(r'^api-admin/', include(('openedx.core.djangoapps.api_admin.urls', 'openedx.core.djangoapps.api_admin'),
                                 namespace='api_admin')),
 
-    url(r'^dashboard/', include('learner_dashboard.urls')),
+    url(r'^dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
     url(r'^api/experiments/', include(('experiments.urls', 'lms.djangoapps.experiments'), namespace='api_experiments')),
     url(r'^api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                     namespace='api_discounts')),
@@ -180,7 +180,7 @@ urlpatterns = [
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
-        url(r'^api/mobile/(?P<api_version>v(1|0.5))/', include('mobile_api.urls')),
+        url(r'^api/mobile/(?P<api_version>v(1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
     ]
 
 if settings.FEATURES.get('ENABLE_OPENBADGES'):
@@ -195,11 +195,11 @@ urlpatterns += [
 # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
     urlpatterns += [
-        url(r'^sysadmin/', include('dashboard.sysadmin_urls')),
+        url(r'^sysadmin/', include('lms.djangoapps.dashboard.sysadmin_urls')),
     ]
 
 urlpatterns += [
-    url(r'^support/', include('support.urls')),
+    url(r'^support/', include('lms.djangoapps.support.urls')),
 ]
 
 # Favicon
@@ -614,7 +614,7 @@ urlpatterns += [
     # Branding API
     url(
         r'^api/branding/v1/',
-        include('branding.api_urls')
+        include('lms.djangoapps.branding.api_urls')
     ),
 
     # Course experience
@@ -697,7 +697,7 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
     urlpatterns += [
         url(
             r'^api/discussion/',
-            include('discussion.rest_api.urls')
+            include('lms.djangoapps.discussion.rest_api.urls')
         ),
         url(
             r'^courses/{}/discussion/'.format(
@@ -711,7 +711,7 @@ if is_forum_daily_digest_enabled():
     urlpatterns += notification_prefs_urls
 
 urlpatterns += [
-    url(r'^bulk_email/', include('bulk_email.urls')),
+    url(r'^bulk_email/', include('lms.djangoapps.bulk_email.urls')),
 ]
 
 urlpatterns += [
@@ -767,12 +767,12 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 
 if configuration_helpers.get_value('ENABLE_BULK_ENROLLMENT_VIEW', settings.FEATURES.get('ENABLE_BULK_ENROLLMENT_VIEW')):
     urlpatterns += [
-        url(r'^api/bulk_enroll/v1/', include('bulk_enroll.urls')),
+        url(r'^api/bulk_enroll/v1/', include('lms.djangoapps.bulk_enroll.urls')),
     ]
 
 # Shopping cart
 urlpatterns += [
-    url(r'^shoppingcart/', include('shoppingcart.urls')),
+    url(r'^shoppingcart/', include('lms.djangoapps.shoppingcart.urls')),
 ]
 
 # Course goals
@@ -792,7 +792,7 @@ if settings.FEATURES.get('EMBARGO'):
 
 # Survey Djangoapp
 urlpatterns += [
-    url(r'^survey/', include('survey.urls')),
+    url(r'^survey/', include('lms.djangoapps.survey.urls')),
 ]
 
 if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
@@ -878,7 +878,7 @@ urlpatterns += [
 if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
     urlpatterns += [
         url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN),
-            include('ccx.urls')),
+            include('lms.djangoapps.ccx.urls')),
         url(r'^api/ccx/', include(('lms.djangoapps.ccx.api.urls', 'lms.djangoapps.ccx'), namespace='ccx_api')),
     ]
 

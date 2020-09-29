@@ -897,7 +897,7 @@ CONTEXT_PROCESSORS = [
     'edxmako.shortcuts.marketing_link_context_processor',
 
     # Shoppingcart processor (detects if request.user has a cart)
-    'shoppingcart.context_processor.user_has_cart_context_processor',
+    'lms.djangoapps.shoppingcart.context_processor.user_has_cart_context_processor',
 
     # Timezone processor (sends language and time_zone preference)
     'lms.djangoapps.courseware.context_processor.user_timezone_locale_prefs',
@@ -907,7 +907,7 @@ CONTEXT_PROCESSORS = [
     'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 
     # Mobile App processor (Detects if request is from the mobile app)
-    'mobile_api.context_processor.is_from_mobile_app'
+    'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app'
 ]
 
 # Django templating
@@ -1686,7 +1686,7 @@ MIDDLEWARE = [
     # Cookie monitoring
     'openedx.core.lib.request_utils.CookieMonitoringMiddleware',
 
-    'mobile_api.middleware.AppVersionUpgrade',
+    'lms.djangoapps.mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'lms.djangoapps.discussion.django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -2441,7 +2441,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.common_initialization.apps.CommonInitializationConfig',
 
     # LMS-specific Initialization
-    'lms_initialization.apps.LMSInitializationConfig',
+    'lms.djangoapps.lms_initialization.apps.LMSInitializationConfig',
 
     # Common views
     'openedx.core.djangoapps.common_views',
@@ -2586,11 +2586,11 @@ INSTALLED_APPS = [
     'django_countries',
 
     # edX Mobile API
-    'mobile_api',
+    'lms.djangoapps.mobile_api',
     'social_django',
 
     # Surveys
-    'survey.apps.SurveyConfig',
+    'lms.djangoapps.survey.apps.SurveyConfig',
 
     'lms.djangoapps.lms_xblock.apps.LMSXBlockConfig',
 
@@ -2604,7 +2604,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
 
     # Mailchimp Syncing
-    'mailing',
+    'lms.djangoapps.mailing',
 
     # CORS and cross-domain CSRF
     'corsheaders',
@@ -2635,7 +2635,7 @@ INSTALLED_APPS = [
     'milestones',
 
     # Gating of course content
-    'gating.apps.GatingConfig',
+    'lms.djangoapps.gating.apps.GatingConfig',
 
     # Static i18n support
     'statici18n',
@@ -2647,7 +2647,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.verified_track_content',
 
     # Learner's dashboard
-    'learner_dashboard',
+    'lms.djangoapps.learner_dashboard',
 
     # Needed whether or not enabled, due to migrations
     'lms.djangoapps.badges.apps.BadgesConfig',
@@ -2656,7 +2656,7 @@ INSTALLED_APPS = [
     'django_sites_extensions',
 
     # Email marketing integration
-    'email_marketing.apps.EmailMarketingConfig',
+    'lms.djangoapps.email_marketing.apps.EmailMarketingConfig',
 
     # additional release utilities to ease automation
     'release_util',
@@ -3007,7 +3007,7 @@ CERT_NAME_LONG = "Certificate of Achievement"
 
 #################### OpenBadges Settings #######################
 
-BADGING_BACKEND = 'badges.backends.badgr.BadgrBackend'
+BADGING_BACKEND = 'lms.djangoapps.badges.backends.badgr.BadgrBackend'
 
 # Be sure to set up images for course modes using the BadgeImageConfiguration model in the certificates app.
 BADGR_API_TOKEN = None
