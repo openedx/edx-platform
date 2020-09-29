@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing teams.tests.factories instead of lms.djangoapps.teams.tests.factories is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'teams.tests.factories')
 
 from lms.djangoapps.teams.tests.factories import *

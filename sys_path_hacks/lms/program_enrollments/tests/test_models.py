@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing program_enrollments.tests.test_models instead of lms.djangoapps.program_enrollments.tests.test_models is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'program_enrollments.tests.test_models')
 
 from lms.djangoapps.program_enrollments.tests.test_models import *

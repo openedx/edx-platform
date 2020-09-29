@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing commerce.api.v1.serializers instead of lms.djangoapps.commerce.api.v1.serializers is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'commerce.api.v1.serializers')
 
 from lms.djangoapps.commerce.api.v1.serializers import *

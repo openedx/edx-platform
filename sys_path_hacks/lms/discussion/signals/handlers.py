@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.signals.handlers instead of lms.djangoapps.discussion.signals.handlers is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.signals.handlers')
 
 from lms.djangoapps.discussion.signals.handlers import *

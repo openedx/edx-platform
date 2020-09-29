@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing certificates.management.commands.create_fake_cert instead of lms.djangoapps.certificates.management.commands.create_fake_cert is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'certificates.management.commands.create_fake_cert')
 
 from lms.djangoapps.certificates.management.commands.create_fake_cert import *

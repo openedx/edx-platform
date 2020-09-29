@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor.apps instead of lms.djangoapps.instructor.apps is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor.apps')
 
 from lms.djangoapps.instructor.apps import *

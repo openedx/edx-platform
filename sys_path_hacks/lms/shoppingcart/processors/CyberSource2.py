@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing shoppingcart.processors.CyberSource2 instead of lms.djangoapps.shoppingcart.processors.CyberSource2 is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'shoppingcart.processors.CyberSource2')
 
 from lms.djangoapps.shoppingcart.processors.CyberSource2 import *

@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing program_enrollments.exceptions instead of lms.djangoapps.program_enrollments.exceptions is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'program_enrollments.exceptions')
 
 from lms.djangoapps.program_enrollments.exceptions import *

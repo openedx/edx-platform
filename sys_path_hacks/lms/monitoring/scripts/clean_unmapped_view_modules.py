@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing monitoring.scripts.clean_unmapped_view_modules instead of lms.djangoapps.monitoring.scripts.clean_unmapped_view_modules is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'monitoring.scripts.clean_unmapped_view_modules')
 
 from lms.djangoapps.monitoring.scripts.clean_unmapped_view_modules import *

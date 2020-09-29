@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing teams.search_indexes instead of lms.djangoapps.teams.search_indexes is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'teams.search_indexes')
 
 from lms.djangoapps.teams.search_indexes import *

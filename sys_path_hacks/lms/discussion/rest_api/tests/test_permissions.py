@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.rest_api.tests.test_permissions instead of lms.djangoapps.discussion.rest_api.tests.test_permissions is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.rest_api.tests.test_permissions')
 
 from lms.djangoapps.discussion.rest_api.tests.test_permissions import *

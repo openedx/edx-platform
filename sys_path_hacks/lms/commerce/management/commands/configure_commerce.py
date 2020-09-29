@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing commerce.management.commands.configure_commerce instead of lms.djangoapps.commerce.management.commands.configure_commerce is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'commerce.management.commands.configure_commerce')
 
 from lms.djangoapps.commerce.management.commands.configure_commerce import *

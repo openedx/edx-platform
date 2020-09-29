@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing experiments.routers instead of lms.djangoapps.experiments.routers is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'experiments.routers')
 
 from lms.djangoapps.experiments.routers import *

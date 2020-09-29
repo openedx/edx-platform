@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.management instead of lms.djangoapps.discussion.management is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.management')
 
 from lms.djangoapps.discussion.management import *

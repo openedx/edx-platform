@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing ccx.modulestore instead of lms.djangoapps.ccx.modulestore is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'ccx.modulestore')
 
 from lms.djangoapps.ccx.modulestore import *

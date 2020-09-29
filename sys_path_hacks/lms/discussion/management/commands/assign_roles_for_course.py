@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.management.commands.assign_roles_for_course instead of lms.djangoapps.discussion.management.commands.assign_roles_for_course is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.management.commands.assign_roles_for_course')
 
 from lms.djangoapps.discussion.management.commands.assign_roles_for_course import *

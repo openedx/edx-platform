@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing grades.rest_api.urls instead of lms.djangoapps.grades.rest_api.urls is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'grades.rest_api.urls')
 
 from lms.djangoapps.grades.rest_api.urls import *

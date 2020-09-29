@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing branding instead of lms.djangoapps.branding is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'branding')
 
 from lms.djangoapps.branding import *

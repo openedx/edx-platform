@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing debug.management instead of lms.djangoapps.debug.management is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'debug.management')
 
 from lms.djangoapps.debug.management import *

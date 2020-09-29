@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing ccx.tests.utils instead of lms.djangoapps.ccx.tests.utils is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'ccx.tests.utils')
 
 from lms.djangoapps.ccx.tests.utils import *

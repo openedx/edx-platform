@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.notification_prefs.tests instead of lms.djangoapps.discussion.notification_prefs.tests is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.notification_prefs.tests')
 
 from lms.djangoapps.discussion.notification_prefs.tests import *

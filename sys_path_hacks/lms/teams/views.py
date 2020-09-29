@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing teams.views instead of lms.djangoapps.teams.views is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'teams.views')
 
 from lms.djangoapps.teams.views import *

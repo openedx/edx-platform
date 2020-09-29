@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing instructor.tests.test_spoc_gradebook instead of lms.djangoapps.instructor.tests.test_spoc_gradebook is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'instructor.tests.test_spoc_gradebook')
 
 from lms.djangoapps.instructor.tests.test_spoc_gradebook import *

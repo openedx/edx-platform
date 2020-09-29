@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing monitoring.scripts.generate_code_owner_mappings instead of lms.djangoapps.monitoring.scripts.generate_code_owner_mappings is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'monitoring.scripts.generate_code_owner_mappings')
 
 from lms.djangoapps.monitoring.scripts.generate_code_owner_mappings import *

@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing discussion.notifier_api.urls instead of lms.djangoapps.discussion.notifier_api.urls is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'discussion.notifier_api.urls')
 
 from lms.djangoapps.discussion.notifier_api.urls import *

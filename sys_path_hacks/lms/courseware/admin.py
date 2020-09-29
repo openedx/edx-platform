@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.admin instead of lms.djangoapps.courseware.admin is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.admin')
 
 from lms.djangoapps.courseware.admin import *

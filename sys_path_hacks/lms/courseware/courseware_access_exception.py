@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.courseware_access_exception instead of lms.djangoapps.courseware.courseware_access_exception is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.courseware_access_exception')
 
 from lms.djangoapps.courseware.courseware_access_exception import *

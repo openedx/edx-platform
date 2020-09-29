@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing certificates.services instead of lms.djangoapps.certificates.services is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'certificates.services')
 
 from lms.djangoapps.certificates.services import *

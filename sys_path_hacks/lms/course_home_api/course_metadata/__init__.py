@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing course_home_api.course_metadata instead of lms.djangoapps.course_home_api.course_metadata is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'course_home_api.course_metadata')
 
 from lms.djangoapps.course_home_api.course_metadata import *

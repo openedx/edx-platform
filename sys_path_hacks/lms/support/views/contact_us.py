@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing support.views.contact_us instead of lms.djangoapps.support.views.contact_us is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'support.views.contact_us')
 
 from lms.djangoapps.support.views.contact_us import *

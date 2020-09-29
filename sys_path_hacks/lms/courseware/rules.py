@@ -1,4 +1,5 @@
-import warnings
-warnings.warn("Importing courseware.rules instead of lms.djangoapps.courseware.rules is deprecated", stacklevel=2)
+from sys_path_hacks.warn import warn_deprecated_import
+
+warn_deprecated_import('lms.djangoapps', 'courseware.rules')
 
 from lms.djangoapps.courseware.rules import *
