@@ -446,8 +446,9 @@ def login_user(request):
         if is_user_third_party_authenticated:
             running_pipeline = pipeline.get(request)
             redirect_url = pipeline.get_complete_url(backend_name=running_pipeline['backend'])
+
         elif should_redirect_to_logistration_mircrofrontend():
-            redirect_url = get_next_url_for_login_page(request)
+            redirect_url = get_next_url_for_login_page(request, include_host=True)
 
         response = JsonResponse({
             'success': True,
