@@ -87,7 +87,7 @@ class DemographicsCollectionModal extends React.Component {
   loadOptions(field) {
     const { choices } = get(this.state.options, field, { choices: [] });
     if (choices.length) {
-      return choices.map(choice => <option value={choice.value} key={choice.value}>{choice.display_name}</option>);
+      return choices.map((choice, i) => <option value={choice.value} key={choice.value + i}>{choice.display_name}</option>);
     }
   }
 
