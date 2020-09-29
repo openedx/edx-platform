@@ -20,8 +20,8 @@ import os
 from lms.envs.devstack import *
 
 # Require a separate celery worker
-CELERY_ALWAYS_EAGER = False
-BROKER_URL = 'redis://:password@edx.devstack.redis:6379/'
+CELERY_TASK_ALWAYS_EAGER = False
+CELERY_BROKER_URL = 'redis://:password@edx.devstack.redis:6379/'
 # Disable transaction management because we are using a worker. Views
 # that request a task and wait for the result will deadlock otherwise.
 for database_name in DATABASES:
