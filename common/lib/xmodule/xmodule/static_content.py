@@ -100,20 +100,26 @@ def write_descriptor_js(output_root):
 
 def _list_descriptors():
     """Return a list of all registered XModuleDescriptor classes."""
-    return [
-        desc for desc in [
-            desc for (_, desc) in XModuleDescriptor.load_classes()
-        ]
-    ] + XBLOCK_CLASSES
+    return sorted(
+        [
+            desc for desc in [
+                desc for (_, desc) in XModuleDescriptor.load_classes()
+            ]
+        ] + XBLOCK_CLASSES,
+        key=str
+    )
 
 
 def _list_modules():
     """Return a list of all registered XModule classes."""
-    return [
-        desc.module_class for desc in [
-            desc for (_, desc) in XModuleDescriptor.load_classes()
-        ]
-    ] + XBLOCK_CLASSES
+    return sorted(
+        [
+            desc.module_class for desc in [
+                desc for (_, desc) in XModuleDescriptor.load_classes()
+            ]
+        ] + XBLOCK_CLASSES,
+        key=str
+    )
 
 
 def _ensure_dir(directory):
@@ -274,7 +280,13 @@ def write_webpack(output_file, module_files, descriptor_files):
         outfile.write(
             textwrap.dedent(u"""\
                 module.exports = {config_json};
-            """).format(config_json=json.dumps(config, indent=4))
+            """).format(
+                config_json=json.dumps(
+                    config,
+                    indent=4,
+                    sort_keys=True
+                )
+            )
         )
 
 
