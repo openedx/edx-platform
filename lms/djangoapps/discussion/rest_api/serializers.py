@@ -398,7 +398,7 @@ class CommentSerializer(_ContentSerializer):
         Returns a boolean indicating whether any user has flagged the
         content as abusive.
         """
-        if self.context.get('is_staff', False) == True:
+        if self.context.get('is_staff', False) is True:
             return len(obj.get("abuse_flaggers", [])) > 0
         else:
             return None
