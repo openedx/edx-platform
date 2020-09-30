@@ -720,10 +720,11 @@ NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
 
-# TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
+# Next two path modifications are temporary.
+# See docs/decisions/0007-sys-path-modification-removal.rst
 sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'lms')
-sys.path.append(COMMON_ROOT / 'djangoapps')
+sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'common')
 
 # For Node.js
 

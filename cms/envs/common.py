@@ -451,8 +451,10 @@ COURSES_ROOT = ENV_ROOT / "data"
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
 sys.path.append(REPO_ROOT)
-sys.path.append(PROJECT_ROOT / 'djangoapps')
-sys.path.append(COMMON_ROOT / 'djangoapps')
+# Next two path modifications are temporary.
+# See docs/decisions/0007-sys-path-modification-removal.rst
+sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'cms')
+sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'common')
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"

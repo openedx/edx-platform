@@ -5,7 +5,7 @@
 #   ....
 #   ~/edx-platform>
 
-# Shellchecks recommends using search/replace instead of sed. It's fine as is.
+# Shellcheck recommends using search/replace instead of sed. It's fine as is.
 # shellcheck disable=SC2001
 
 set -e
