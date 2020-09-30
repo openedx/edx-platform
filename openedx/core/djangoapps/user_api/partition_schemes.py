@@ -56,7 +56,10 @@ class RandomUserPartitionScheme(object):
         If the user has not yet been assigned, a group will be randomly chosen for them if assign flag is True.
         """
         partition_key = cls.key_for_partition(user_partition)
-        group_id = course_tag_api.get_course_tag(user, course_key, partition_key)
+
+        group_id = None
+        if user.is_authenticated:
+            group_id = course_tag_api.get_course_tag(user, course_key, partition_key)
 
         group = None
         if group_id is not None:
@@ -84,10 +87,16 @@ class RandomUserPartitionScheme(object):
             # TODO: had a discussion in arch council about making randomization more
             # deterministic (e.g. some hash).  Could do that, but need to be careful not
             # to introduce correlation between users or bias in generation.
-            group = cls.RANDOM.choice(user_partition.groups)
 
-            # persist the value as a course tag
-            course_tag_api.set_course_tag(user, course_key, partition_key, group.id)
+            # For anonymous user, always assign and show the first group to avoid
+            # inconsistency in the content being displayed.
+            if user.is_anonymous:
+                group = user_partition.groups[0]
+            else:
+                group = cls.RANDOM.choice(user_partition.groups)
+
+                # persist the value as a course tag
+                course_tag_api.set_course_tag(user, course_key, partition_key, group.id)
 
             # emit event for analytics
             # FYI - context is always user ID that is logged in, NOT the user id that is

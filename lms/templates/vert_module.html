@@ -1,7 +1,6 @@
 <%page expression_filter="h"/>
 <%! from openedx.core.djangolib.markup import HTML %>
-
-%if unit_title and show_title:
+%if unit_title:
   <h2 class="hd hd-2 unit-title">${unit_title}</h2>
 % endif
 

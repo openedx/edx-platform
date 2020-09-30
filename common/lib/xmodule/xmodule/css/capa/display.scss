@@ -1135,6 +1135,10 @@ div.problem {
       // the notification does not grow in height.
       margin-bottom: 8px;
 
+      .signin-link {
+        text-decoration: underline;
+      }
+
       ol {
         list-style: none outside none;
         padding: 0;

@@ -2804,11 +2804,11 @@ REGISTRATION_EXTRA_FIELDS = {
 }
 
 REGISTRATION_FIELD_ORDER = [
+    "email",
     "name",
     "first_name",
     "last_name",
     "username",
-    "email",
     "confirm_email",
     "password",
     "city",

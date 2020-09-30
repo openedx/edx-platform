@@ -1,22 +1,23 @@
 
 
 import logging
-import os
-import sys
-import time
+from os.path import join
+from sys import exc_info as sys_exc_info
+from time import time
 from collections import namedtuple
 from functools import partial
 
-import six
-import yaml
+from yaml import safe_load
 from contracts import contract, new_contract
+from django.urls import reverse
+from django.utils.http import urlquote_plus
 from django.utils.encoding import python_2_unicode_compatible
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
 from pkg_resources import resource_exists, resource_isdir, resource_listdir, resource_string
-from six import text_type
+from six import text_type, string_types, iterkeys, itervalues, iteritems
 from six.moves import map
 from web_fragments.fragment import Fragment
 from webob import Response
@@ -37,7 +38,7 @@ from xblock.fields import (
 )
 from xblock.runtime import IdGenerator, IdReader, Runtime
 
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule import block_metadata_utils
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import UndefinedContext
@@ -77,11 +78,6 @@ STUDIO_VIEW = 'studio_view'
 # Views that present a "preview" view of an xblock (as opposed to an editing view).
 PREVIEW_VIEWS = [STUDENT_VIEW, PUBLIC_VIEW, AUTHOR_VIEW]
 
-DEFAULT_PUBLIC_VIEW_MESSAGE = (
-    u'This content is only accessible to enrolled learners. '
-    u'Sign in or register, and enroll in this course to view it.'
-)
-
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
@@ -91,6 +87,7 @@ class OpaqueKeyReader(IdReader):
     """
     IdReader for :class:`DefinitionKey` and :class:`UsageKey`s.
     """
+
     def get_definition_id(self, usage_id):
         """Retrieve the definition that a usage is derived from.
 
@@ -168,6 +165,7 @@ class AsideKeyGenerator(IdGenerator):
     """
     An :class:`.IdGenerator` that only provides facilities for constructing new XBlockAsides.
     """
+
     def create_aside(self, definition_id, usage_id, aside_type):
         """
         Make a new aside definition and usage ids, indicating an :class:`.XBlockAside` of type `aside_type`
@@ -815,15 +813,46 @@ class XModuleMixin(XModuleFields, XBlock):
             u'<div class="message-content">{}</div></div></div>'
         )
 
-        if self.display_name:
-            display_text = _(
-                u'{display_name} is only accessible to enrolled learners. '
-                'Sign in or register, and enroll in this course to view it.'
-            ).format(
-                display_name=self.display_name
+        next_url = urlquote_plus(reverse('course_root', kwargs={
+            'course_id': self.location.course_key,
+        }))
+
+        link_start = lambda url: HTML(u'<a href="{url}">'.format(url=url))
+        link_end = HTML(u'</a>')
+
+        with_next_url = lambda url: u'{url}?next={next_url}'.format(
+            url=url,
+            next_url=next_url
+        )
+
+        display_text = _(u'This {display_name} assessment is only available to enrolled learners,')
+        display_name = self.display_name or u'This assessment'
+
+        # for anonymous users, show sign-in and register links
+        if not self.runtime.user_id:
+            display_text += _(
+                u' please {sign_in_link_start}sign in{sign_in_link_end} or '
+                u'{register_link_start}register{register_link_end}, '
+                u'and enroll in this course to view the content.'
             )
+            display_text = Text(display_text).format(
+                display_name=display_name,
+                sign_in_link_start=link_start(with_next_url(reverse('signin_user'))),
+                sign_in_link_end=link_end,
+                register_link_start=link_start(with_next_url(reverse('register_user'))),
+                register_link_end=link_end
+            )
+
+        # for logged in users, show "enroll" link only.
         else:
-            display_text = _(DEFAULT_PUBLIC_VIEW_MESSAGE)
+            display_text += _(u' please {enroll_link_start}enroll{enroll_link_end} in this course to view the content.')
+            display_text = Text(display_text).format(
+                display_name=display_name,
+                enroll_link_start=link_start(reverse('course_root', kwargs={
+                    'course_id': self.location.course_key
+                })),
+                enroll_link_end=link_end
+            )
 
         return Fragment(alert_html.format(display_text))
 
@@ -850,6 +879,7 @@ class ProxyAttribute(object):
     del bar.foo_attr
     assert not hasattr(bar.foo, 'foo_attr')
     """
+
     def __init__(self, source, name):
         """
         :param source: The name of the attribute to proxy to
@@ -912,7 +942,7 @@ class XModuleToXBlockMixin(object):
         # WebOb requests have multiple entries for uploaded files.  handle_ajax
         # expects a single entry as a list.
         request_post = MultiDict(request.POST)
-        for key in set(six.iterkeys(request.POST)):
+        for key in set(iterkeys(request.POST)):
             if hasattr(request.POST[key], "file"):
                 request_post[key] = list(map(FileObjForWebobFiles, request.POST.getall(key)))
 
@@ -1060,8 +1090,8 @@ class ResourceTemplates(object):
                     if not template_file.endswith('.yaml'):
                         log.warning("Skipping unknown template file %s", template_file)
                         continue
-                    template_content = resource_string(pkg, os.path.join(dirname, template_file))
-                    template = yaml.safe_load(template_content)
+                    template_content = resource_string(pkg, join(dirname, template_file))
+                    template = safe_load(template_content)
                     template['template_id'] = template_file
                     templates.append(template)
         return templates
@@ -1069,7 +1099,7 @@ class ResourceTemplates(object):
     @classmethod
     def get_template_dir(cls):
         if getattr(cls, 'template_dir_name', None):
-            dirname = os.path.join('templates', cls.template_dir_name)
+            dirname = join('templates', cls.template_dir_name)
             if not resource_isdir(__name__, dirname):
                 log.warning(u"No resource directory {dir} found when loading {cls_name} templates".format(
                     dir=dirname,
@@ -1090,11 +1120,11 @@ class ResourceTemplates(object):
         """
         dirname = cls.get_template_dir()
         if dirname is not None:
-            path = os.path.join(dirname, template_id)
+            path = join(dirname, template_id)
             for pkg in cls.template_packages:
                 if resource_exists(pkg, path):
                     template_content = resource_string(pkg, path)
-                    template = yaml.safe_load(template_content)
+                    template = safe_load(template_content)
                     template['template_id'] = template_id
                     return template
 
@@ -1314,7 +1344,7 @@ class XModuleDescriptor(XModuleDescriptorToXBlockMixin, HTMLSnippet, ResourceTem
                 log.exception('Error creating xmodule')
                 descriptor = self.xmodule_runtime.error_descriptor_class.from_descriptor(
                     self,
-                    error_msg=exc_info_to_str(sys.exc_info())
+                    error_msg=exc_info_to_str(sys_exc_info())
                 )
                 descriptor.xmodule_runtime = self.xmodule_runtime
                 self.xmodule_runtime.xmodule_instance = descriptor._xmodule  # pylint: disable=protected-access
@@ -1417,7 +1447,7 @@ class MetricsMixin(object):
     """
 
     def render(self, block, view_name, context=None):
-        start_time = time.time()
+        start_time = time()
         try:
             status = "success"
             return super(MetricsMixin, self).render(block, view_name, context=context)
@@ -1427,7 +1457,7 @@ class MetricsMixin(object):
             raise
 
         finally:
-            end_time = time.time()
+            end_time = time()
             duration = end_time - start_time
             course_id = getattr(self, 'course_id', '')
             tags = [
@@ -1447,7 +1477,7 @@ class MetricsMixin(object):
             )
 
     def handle(self, block, handler_name, request, suffix=''):
-        start_time = time.time()
+        start_time = time()
         try:
             status = "success"
             return super(MetricsMixin, self).handle(block, handler_name, request, suffix=suffix)
@@ -1457,7 +1487,7 @@ class MetricsMixin(object):
             raise
 
         finally:
-            end_time = time.time()
+            end_time = time()
             duration = end_time - start_time
             course_id = getattr(self, 'course_id', '')
             tags = [
@@ -1725,7 +1755,7 @@ class XMLParsingSystem(DescriptorSystem):
         """
         course_key = xblock.scope_ids.usage_id.course_key
 
-        for field in six.itervalues(xblock.fields):
+        for field in itervalues(xblock.fields):
             if field.is_set_on(xblock):
                 field_value = getattr(xblock, field.name)
                 if field_value is None:
@@ -1735,8 +1765,8 @@ class XMLParsingSystem(DescriptorSystem):
                 elif isinstance(field, ReferenceList):
                     setattr(xblock, field.name, [self._make_usage_key(course_key, ele) for ele in field_value])
                 elif isinstance(field, ReferenceValueDict):
-                    for key, subvalue in six.iteritems(field_value):
-                        assert isinstance(subvalue, six.string_types)
+                    for key, subvalue in iteritems(field_value):
+                        assert isinstance(subvalue, string_types)
                         field_value[key] = self._make_usage_key(course_key, subvalue)
                     setattr(xblock, field.name, field_value)
 

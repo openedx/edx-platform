@@ -84,7 +84,7 @@ git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef793
 git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0
 
 # Our libraries:
--e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
+-e git+https://github.com/edx/codejail.git@3.0.1#egg=codejail
 -e git+https://github.com/edx/acid-block.git@98aecba94ecbfa934e2d00262741c0ea9f557fc9#egg=acid-xblock
 git+https://github.com/edx/edx-ora2.git@2.7.6#egg=ora2==2.7.6
 git+https://github.com/edx/crowdsourcehinter.git@2178ac72891392106ffef389651aef374177d294#egg=crowdsourcehinter-xblock==0.4
@@ -97,5 +97,5 @@ git+https://github.com/edx/xblock-lti-consumer.git@v1.2.6#egg=lti_consumer-xbloc
 # Third Party XBlocks
 
 git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee579e00f#egg=xblock-poll==1.9.6
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10
+git+https://github.com/mitocw/xblock-drag-and-drop-v2@mit-v2.3.1#egg=xblock-drag-and-drop-v2==2.3.1
 git+https://github.com/django-compressor/django-appconf@1526a842ee084b791aa66c931b3822091a442853#egg=django-appconf

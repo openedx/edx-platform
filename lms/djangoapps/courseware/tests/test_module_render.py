@@ -5,14 +5,13 @@ Test for lms courseware app, module render unit
 
 
 import itertools
-import json
-import textwrap
+from json import loads, dumps
+from textwrap import dedent
 from datetime import datetime
 from functools import partial
 
 import ddt
 import pytz
-import six
 from bson import ObjectId
 from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
@@ -33,7 +32,7 @@ from mock import MagicMock, Mock, patch
 from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery
-from six import text_type
+from six import text_type, itervalues
 from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.completable import CompletableXBlockMixin
@@ -260,7 +259,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         Test for happy-path xqueue_callback
         """
         fake_key = 'fake key'
-        xqueue_header = json.dumps({'lms_key': fake_key})
+        xqueue_header = dumps({'lms_key': fake_key})
         data = {
             'xqueue_header': xqueue_header,
             'xqueue_body': 'hello world',
@@ -346,6 +345,18 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(dispatch_url)
         self.assertEqual(200, response.status_code)
 
+    @patch(
+        'lms.djangoapps.courseware.module_render.COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled', return_value=True
+    )
+    def test_anonymous_post_xblock_callback_with_public_access_enabled(self, _):
+        """
+        Test that anonymous POST is allowed if public access to
+        the course is enabled.
+        """
+        dispatch_url = self._get_dispatch_url()
+        response = self.client.post(dispatch_url, {'position': 2})
+        self.assertEquals(200, response.status_code)
+
     def test_oauth_authentication(self):
         """ Test that the xblock endpoint supports OAuth authentication."""
         dispatch_url = self._get_dispatch_url()
@@ -370,27 +381,27 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         dispatch_url = self._get_dispatch_url()
         response = self.client.post(dispatch_url)
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
+        self.assertEqual(loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': ''})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
+        self.assertEqual(loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': '-1'})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
+        self.assertEqual(loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': "string"})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
+        self.assertEqual(loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': u"Φυσικά"})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
+        self.assertEqual(loads(response.content.decode('utf-8')), {'success': True})
 
         response = self.client.post(dispatch_url, {'position': ''})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(json.loads(response.content.decode('utf-8')), {'success': True})
+        self.assertEqual(loads(response.content.decode('utf-8')), {'success': True})
 
     @ddt.data('pure', 'vertical')
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
@@ -567,7 +578,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         """
         request = self.request_factory.post(
             '/',
-            data=json.dumps(request_data),
+            data=dumps(request_data),
             content_type='application/json',
         )
         request.user = self.mock_user
@@ -640,7 +651,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
                 quote_slashes(text_type(self.location)),
                 'dummy_handler'
             ).content.decode('utf-8'),
-            json.dumps({
+            dumps({
                 'success': u'Submission aborted! Maximum %d files may be submitted at once' %
                            settings.MAX_FILEUPLOADS_PER_INPUT
             }, indent=2)
@@ -660,7 +671,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
                 quote_slashes(text_type(self.location)),
                 'dummy_handler'
             ).content.decode('utf-8'),
-            json.dumps({
+            dumps({
                 'success': u'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
                            (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
             }, indent=2)
@@ -733,7 +744,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
         request = self.request_factory.post(
             'dummy_url',
-            data=json.dumps({"grade": 0.75}),
+            data=dumps({"grade": 0.75}),
             content_type='application/json'
         )
         request.user = self.mock_user
@@ -765,7 +776,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             block = ItemFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
                 '/',
-                data=json.dumps(data),
+                data=dumps(data),
                 content_type='application/json',
             )
             request.user = self.mock_user
@@ -805,7 +816,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         block = ItemFactory.create(category='comp', parent=course)
         request = self.request_factory.post(
             '/',
-            data=json.dumps({'completion': 0.625}),
+            data=dumps({'completion': 0.625}),
             content_type='application/json',
         )
         request.user = self.mock_user
@@ -843,7 +854,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         course = CourseFactory.create()
         request = self.request_factory.post(
             '/',
-            data=json.dumps({'completion': 0.625}),
+            data=dumps({'completion': 0.625}),
             content_type='application/json',
         )
         request.user = self.mock_user
@@ -894,7 +905,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             block = ItemFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
                 '/',
-                data=json.dumps({'completion': 0.8}),
+                data=dumps({'completion': 0.8}),
                 content_type='application/json',
             )
             request.user = self.mock_user
@@ -964,7 +975,7 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(200, response.status_code)
 
         expected = ['csrf_token', 'html', 'resources']
-        content = json.loads(response.content.decode('utf-8'))
+        content = loads(response.content.decode('utf-8'))
         for section in expected:
             self.assertIn(section, content)
         doc = PyQuery(content['html'])
@@ -984,7 +995,7 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = render.xblock_view(request, *self.view_args)
         self.assertEqual(200, response.status_code)
 
-        html = json.loads(response.content.decode('utf-8'))['html']
+        html = loads(response.content.decode('utf-8'))['html']
         self.assertEqual('Staff Debug Info' in html, not hide)
 
     def test_xblock_view_handler_not_authenticated(self):
@@ -1405,7 +1416,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         )
 
         if attempt_status:
-            create_exam_attempt(six.text_type(exam_id).encode('utf-8'), self.request.user.id, taking_as_proctored=True)
+            create_exam_attempt(text_type(exam_id).encode('utf-8'), self.request.user.id, taking_as_proctored=True)
             update_attempt_status(exam_id, self.request.user.id, attempt_status)
 
         return usage_key
@@ -1911,7 +1922,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
             self.field_data_cache
         )
         html_fragment = module.render(STUDENT_VIEW)
-        expected_score_override_html = textwrap.dedent("""<div>
+        expected_score_override_html = dedent("""<div>
         <label for="sd_fs_{block_id}">Score (for override only):</label>
         <input type="text" tabindex="0" id="sd_fs_{block_id}" placeholder="0"/>
         <label for="sd_fs_{block_id}"> / 0</label>
@@ -2584,7 +2595,7 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
                 ItemFactory(category=child_type, parent=self.parent).scope_ids.usage_id
                 for child_type in BLOCK_TYPES
             ]
-            for user in six.itervalues(self.users)
+            for user in itervalues(self.users)
         }
 
         self.all_children = sum(list(self.children_for_user.values()), [])

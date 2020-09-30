@@ -2,15 +2,12 @@
 Module rendering
 """
 
-
-import hashlib
-import json
 import logging
-import textwrap
-from collections import OrderedDict
+from textwrap import dedent
 from functools import partial
+from json import loads, dumps
+from collections import OrderedDict
 
-import six
 from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
 from django.conf import settings
@@ -87,6 +84,7 @@ from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
 from openedx.features.discounts.utils import offer_banner_wrapper
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
@@ -197,7 +195,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
             display_id = slugify(chapter.display_name_with_default_escaped)
             local_hide_from_toc = False
             if required_content:
-                if six.text_type(chapter.location) not in required_content:
+                if text_type(chapter.location) not in required_content:
                     local_hide_from_toc = True
 
             # Skip the current chapter if a hide flag is tripped
@@ -272,8 +270,8 @@ def _add_timed_exam_info(user, course, section, section_context):
         try:
             timed_exam_attempt_context = get_attempt_status_summary(
                 user.id,
-                six.text_type(course.id),
-                six.text_type(section.location)
+                text_type(course.id),
+                text_type(section.location)
             )
         except Exception as ex:  # pylint: disable=broad-except
             # safety net in case something blows up in edx_proctoring
@@ -366,14 +364,14 @@ def display_access_messages(user, block, view, frag, context):  # pylint: disabl
     if load_access.user_fragment:
         msg_fragment = load_access.user_fragment
     elif load_access.user_message:
-        msg_fragment = Fragment(textwrap.dedent(HTML(u"""\
+        msg_fragment = Fragment(dedent(HTML(u"""\
             <div>{}</div>
         """).format(load_access.user_message)))
     else:
         msg_fragment = Fragment(u"")
 
     if load_access.developer_message and has_access(user, 'staff', block, block.scope_ids.usage_id.course_key):
-        msg_fragment.content += textwrap.dedent(HTML(u"""\
+        msg_fragment.content += dedent(HTML(u"""\
             <div>{}</div>
         """).format(load_access.developer_message))
 
@@ -964,7 +962,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
         if key not in data:
             raise Http404
 
-    header = json.loads(data['xqueue_header'])
+    header = loads(data['xqueue_header'])
     if not isinstance(header, dict) or 'lms_key' not in header:
         raise Http404
 
@@ -1023,7 +1021,10 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         suffix (str)
 
     Raises:
-        HttpResponseForbidden: If the request method is not `GET` and user is not authenticated.
+        HttpResponseForbidden: If :
+            - the request method is not `GET` AND
+            - the course does not have "public access" enabled AND
+            - user is not authenticated
         Http404: If the course is not found in the modulestore.
     """
     # In this case, we are using Session based authentication, so we need to check CSRF token.
@@ -1053,21 +1054,25 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
 
     # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
     # the XBlocks to use `handle_xblock_callback_noauth`, which is practically identical to this view.
-    if request.method != 'GET' and not (request.user and request.user.is_authenticated):
-        return HttpResponseForbidden('Unauthenticated')
-
-    request.user.known = request.user.is_authenticated
 
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404(u'{} is not a valid course key'.format(course_id))
+        raise Http404('{} is not a valid course key'.format(course_id))
+
+    if (request.method != 'GET' and
+        not COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key=course_key) and
+        not (request.user and
+             request.user.is_authenticated)):
+        return HttpResponseForbidden()
+
+    request.user.known = request.user.is_authenticated
 
     with modulestore().bulk_operations(course_key):
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404(u'{} does not exist in the modulestore'.format(course_id))
+            raise Http404('{} does not exist in the modulestore'.format(course_id))
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
@@ -1101,14 +1106,14 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         'module': {
             # xss-lint: disable=python-deprecated-display-name
             'display_name': descriptor.display_name_with_default_escaped,
-            'usage_key': six.text_type(descriptor.location),
+            'usage_key': text_type(descriptor.location),
         }
     }
 
     # For blocks that are inherited from a content library, we add some additional metadata:
     if descriptor_orig_usage_key is not None:
-        tracking_context['module']['original_usage_key'] = six.text_type(descriptor_orig_usage_key)
-        tracking_context['module']['original_usage_version'] = six.text_type(descriptor_orig_version)
+        tracking_context['module']['original_usage_key'] = text_type(descriptor_orig_usage_key)
+        tracking_context['module']['original_usage_version'] = text_type(descriptor_orig_version)
 
     unused_masquerade, user = setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -1172,7 +1177,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         else:
             block_usage_key = usage_key
         instance, tracking_context = get_module_by_usage_id(
-            request, course_id, six.text_type(block_usage_key), course=course
+            request, course_id, text_type(block_usage_key), course=course
         )
 
         # Name the transaction so that we can view XBlock handlers separately in
@@ -1262,7 +1267,7 @@ def xblock_view(request, course_id, usage_id, view_name):
         return JsonResponse({
             'html': fragment.content,
             'resources': list(hashed_resources.items()),
-            'csrf_token': six.text_type(csrf(request)['csrf_token']),
+            'csrf_token': text_type(csrf(request)['csrf_token']),
         })
 
 
@@ -1307,7 +1312,7 @@ def append_data_to_webob_response(response, data):
     """
     if getattr(response, 'content_type', None) == 'application/json':
         json_input = response.body.decode('utf-8') if isinstance(response.body, bytes) else response.body
-        response_data = json.loads(json_input)
+        response_data = loads(json_input)
         response_data.update(data)
-        response.body = json.dumps(response_data).encode('utf-8')
+        response.body = dumps(response_data).encode('utf-8')
     return response
