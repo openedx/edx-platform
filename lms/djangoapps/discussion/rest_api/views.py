@@ -323,7 +323,7 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
             form.cleaned_data["topic_id"],
             form.cleaned_data["text_search"],
             form.cleaned_data["following"],
-            form.cleaned_data["author"],
+            form.cleaned_data["filter_own_posts"],
             form.cleaned_data["post_type"],
             form.cleaned_data["flagged"],
             form.cleaned_data["view"],

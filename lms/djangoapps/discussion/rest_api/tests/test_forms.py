@@ -68,7 +68,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "topic_id": set(),
                 "text_search": "",
                 "following": None,
-                "author": None,
+                "filter_own_posts": None,
                 "post_type": "",
                 "flagged": None,
                 "view": "",
@@ -118,18 +118,18 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         self.assert_error("post_type", "Select a valid choice. invalid-option is not one of the available choices.")
 
     @ddt.data("True", "true", 1, True)
-    def test_author_true(self, value):
-        self.form_data["author"] = value
-        self.assert_field_value("author", True)
+    def test_filter_own_posts_true(self, value):
+        self.form_data["filter_own_posts"] = value
+        self.assert_field_value("filter_own_posts", True)
 
     @ddt.data("False", "false", 0, False)
-    def test_author_false(self, value):
-        self.form_data["author"] = value
-        self.assert_error("author", "The value of the 'author' parameter must be true.")
+    def test_filter_own_posts_false(self, value):
+        self.form_data["filter_own_posts"] = value
+        self.assert_field_value("filter_own_posts", False)
 
-    def test_invalid_author(self):
-        self.form_data["author"] = "invalid-boolean"
-        self.assert_error("author", "Invalid Boolean Value.")
+    def test_invalid_filter_own_posts(self):
+        self.form_data["filter_own_posts"] = "invalid-boolean"
+        self.assert_error("filter_own_posts", "Invalid Boolean Value.")
 
     @ddt.data("True", "true", 1, True)
     def test_flagged_true(self, value):
@@ -139,7 +139,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     @ddt.data("False", "false", 0, False)
     def test_flagged_false(self, value):
         self.form_data["flagged"] = value
-        self.assert_error("flagged", "The value of the 'flagged' parameter must be true.")
+        self.assert_field_value("flagged", False)
 
     def test_invalid_flagged(self):
         self.form_data["flagged"] = "invalid-boolean"

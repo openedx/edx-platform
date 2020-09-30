@@ -1144,7 +1144,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -1535,7 +1535,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -1626,7 +1626,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -1694,7 +1694,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             response_data,
             self.expected_response_data({
                 "abuse_flagged": value,
-                "abuse_flagged_any_user": False,
+                "abuse_flagged_any_user": None,
                 "editable_fields": ["abuse_flagged"],
             })
         )
@@ -1825,7 +1825,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "voted": False,
             "vote_count": 0,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": False,
+            "abuse_flagged_any_user": None,
             "editable_fields": ["abuse_flagged", "raw_body", "voted"],
             "child_count": 0,
         }

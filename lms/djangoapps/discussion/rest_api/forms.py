@@ -47,7 +47,7 @@ class ThreadListGetForm(_PaginationForm):
     topic_id = MultiValueField(required=False)
     text_search = CharField(required=False)
     following = ExtendedNullBooleanField(required=False)
-    author = ExtendedNullBooleanField(required=False)
+    filter_own_posts = ExtendedNullBooleanField(required=False)
     post_type = ChoiceField(
         choices=[(choice, choice) for choice in ["discussion", "question"]],
         required=False,
@@ -82,22 +82,6 @@ class ThreadListGetForm(_PaginationForm):
             return CourseLocator.from_string(value)
         except InvalidKeyError:
             raise ValidationError(u"'{}' is not a valid course id".format(value))
-
-    def clean_author(self):
-        """Validate author"""
-        value = self.cleaned_data["author"]
-        if value is False:
-            raise ValidationError("The value of the 'author' parameter must be true.")
-        else:
-            return value
-
-    def clean_flagged(self):
-        """Validate flagged"""
-        value = self.cleaned_data["flagged"]
-        if value is False:
-            raise ValidationError("The value of the 'flagged' parameter must be true.")
-        else:
-            return value
 
     def clean_following(self):
         """Validate following"""

@@ -734,10 +734,10 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "updated_at": "2015-04-28T00:33:33Z",
                 "comment_list_url": None,
                 "endorsed_comment_list_url": (
-                    "http://testserver/api/discussion/v1/comments/?endorsed=True&thread_id=test_thread_id_1"
+                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=True"
                 ),
                 "non_endorsed_comment_list_url": (
-                    "http://testserver/api/discussion/v1/comments/?endorsed=False&thread_id=test_thread_id_1"
+                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
                 "editable_fields": ["abuse_flagged", "following", "read", "voted"],
                 "count_flags": 0,
@@ -841,7 +841,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         })
 
     @ddt.data(True, False, None)
-    def test_author(self, author_boolean):
+    def test_filter_own_posts(self, filter_own_posts_boolean):
         expected_result = make_paginated_api_response(
             results=[], count=0, num_pages=0, next_link=None, previous_link=None
         )
@@ -854,7 +854,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 self.course.id,
                 page=1,
                 page_size=10,
-                author=author_boolean,
+                filter_own_posts=filter_own_posts_boolean,
             ).data,
             expected_result
         )
@@ -865,11 +865,11 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
-            "author": [str(author_boolean)],
+            "filter_own_posts": [str(filter_own_posts_boolean)],
         }
 
-        if author_boolean is None:
-            del expected_last_query_params["author"]
+        if filter_own_posts_boolean is None:
+            del expected_last_query_params["filter_own_posts"]
 
         self.assert_last_query_params(expected_last_query_params)
 
@@ -1328,7 +1328,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "endorsed_by_label": None,
                 "endorsed_at": None,
                 "abuse_flagged": False,
-                "abuse_flagged_any_user": False,
+                "abuse_flagged_any_user": None,
                 "voted": False,
                 "vote_count": 4,
                 "editable_fields": ["abuse_flagged", "voted"],
@@ -1350,7 +1350,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "endorsed_by_label": None,
                 "endorsed_at": None,
                 "abuse_flagged": True,
-                "abuse_flagged_any_user": True,
+                "abuse_flagged_any_user": None,
                 "voted": False,
                 "vote_count": 7,
                 "editable_fields": ["abuse_flagged", "voted"],
@@ -1902,7 +1902,7 @@ class CreateCommentTest(
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -2561,7 +2561,7 @@ class UpdateCommentTest(
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],

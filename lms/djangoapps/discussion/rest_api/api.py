@@ -469,6 +469,7 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
     results = []
     usernames = []
     include_profile_image = _include_profile_image(requested_fields)
+    context['is_staff'] = request.user.is_staff
     for entity in discussion_entities:
         if discussion_entity_type == DiscussionEntity.thread:
             serialized_entity = ThreadSerializer(entity, context=context).data
@@ -500,7 +501,7 @@ def get_thread_list(
         topic_id_list=None,
         text_search=None,
         following=False,
-        author=None,
+        filter_own_posts=None,
         post_type=None,
         flagged=None,
         view=None,
@@ -573,7 +574,7 @@ def get_thread_list(
         "per_page": page_size,
         "text": text_search,
         "sort_key": cc_map.get(order_by),
-        "author": author,
+        "filter_own_posts": filter_own_posts,
         "flagged": flagged,
         "post_type": post_type,
     }

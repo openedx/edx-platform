@@ -308,7 +308,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": False,
+            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 4,
             "children": [],

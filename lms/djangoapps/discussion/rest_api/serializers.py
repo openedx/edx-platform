@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from rest_framework import serializers
 from six.moves.urllib.parse import urlencode, urlunparse
+from collections import OrderedDict
 
 from lms.djangoapps.discussion.django_comment_client.utils import (
     course_discussion_division_enabled,
@@ -261,7 +262,7 @@ class ThreadSerializer(_ContentSerializer):
         ):
             return None
         path = reverse("comment-list")
-        query_dict = {"thread_id": obj["id"]}
+        query_dict = OrderedDict(thread_id=obj["id"])
         if endorsed is not None:
             query_dict["endorsed"] = endorsed
         return self.context["request"].build_absolute_uri(
@@ -317,6 +318,7 @@ class CommentSerializer(_ContentSerializer):
     not had retrieve() called, because of the interaction between DRF's attempts
     at introspection and Comment's __getattr__.
     """
+    is_staff = False
     thread_id = serializers.CharField()
     parent_id = serializers.CharField(required=False, allow_null=True)
     endorsed = serializers.BooleanField(required=False)
@@ -325,7 +327,7 @@ class CommentSerializer(_ContentSerializer):
     endorsed_at = serializers.SerializerMethodField()
     child_count = serializers.IntegerField(read_only=True)
     children = serializers.SerializerMethodField(required=False)
-    abuse_flagged_any_user = serializers.SerializerMethodField()
+    abuse_flagged_any_user = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
 
@@ -396,7 +398,10 @@ class CommentSerializer(_ContentSerializer):
         Returns a boolean indicating whether any user has flagged the
         content as abusive.
         """
-        return len(obj.get("abuse_flaggers", [])) > 0
+        if self.context.get('is_staff', False) == True:
+            return len(obj.get("abuse_flaggers", [])) > 0
+        else:
+            return None
 
     def validate(self, attrs):
         """
