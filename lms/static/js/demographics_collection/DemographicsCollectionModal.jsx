@@ -272,7 +272,7 @@ class DemographicsCollectionModal extends React.Component {
                     {gettext('Welcome to edX! Before you get started, please take a few minutes to fill-in the additional information below to help us understand a bit more about your background. You can always edit this information later in Account Settings.')}
                   </p>
                   <br />
-                  <span aria-hidden className="fa fa-info-circle" />
+                  <span aria-hidden="True" className="fa fa-info-circle" />
                   {/* Need to strip out extra '"' characters in the marketingSiteBaseUrl prop or it tries to setup the href as a relative URL */}
                   <a className="pl-3" target="_blank" rel="noopener" href={`${this.props.marketingSiteBaseUrl}/demographics`.replace(/"/g, "")}>
                     {gettext('Why does edX collect this information?')}
