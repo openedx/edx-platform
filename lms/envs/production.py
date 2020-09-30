@@ -144,7 +144,7 @@ HIGH_MEM_QUEUE = 'edx.{0}core.high_mem'.format(QUEUE_VARIANT)
 CELERY_TASK_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_TASK_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-CELERY_TASK_QUEUES = {
+CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {},
     HIGH_MEM_QUEUE: {},
@@ -266,10 +266,10 @@ ENTITLEMENTS_EXPIRATION_ROUTING_KEY = ENV_TOKENS.get('ENTITLEMENTS_EXPIRATION_RO
 # Message expiry time in seconds
 CELERY_EVENT_QUEUE_TTL = ENV_TOKENS.get('CELERY_EVENT_QUEUE_TTL', None)
 
-# Allow CELERY_TASK_QUEUES to be overwritten by ENV_TOKENS,
-ENV_CELERY_TASK_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
-if ENV_CELERY_TASK_QUEUES:
-    CELERY_TASK_QUEUES = {queue: {} for queue in ENV_CELERY_TASK_QUEUES}
+# Allow CELERY_QUEUES to be overwritten by ENV_TOKENS,
+ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
+if ENV_CELERY_QUEUES:
+    CELERY_QUEUES = {queue: {} for queue in ENV_CELERY_QUEUES}
 
 # Then add alternate environment queues
 ALTERNATE_QUEUE_ENVS = ENV_TOKENS.get('ALTERNATE_WORKER_QUEUES', '').split()
@@ -277,11 +277,11 @@ ALTERNATE_QUEUES = [
     DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
     for alternate in ALTERNATE_QUEUE_ENVS
 ]
-CELERY_TASK_QUEUES.update(
+CELERY_QUEUES.update(
     {
         alternate: {}
         for alternate in ALTERNATE_QUEUES
-        if alternate not in list(CELERY_TASK_QUEUES.keys())
+        if alternate not in list(CELERY_QUEUES.keys())
     }
 )
 
@@ -656,7 +656,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     THIRD_PARTY_AUTH_OLD_CONFIG = AUTH_TOKENS.get('THIRD_PARTY_AUTH', None)
 
     if ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24) is not None:
-        CELERY_BEAT_SCHEDULE['refresh-saml-metadata'] = {
+        CELERYBEAT_SCHEDULE['refresh-saml-metadata'] = {
             'task': 'third_party_auth.fetch_saml_metadata',
             'schedule': datetime.timedelta(hours=ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24)),
         }

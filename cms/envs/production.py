@@ -136,7 +136,7 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
-CELERY_TASK_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
+CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
@@ -409,7 +409,7 @@ CELERY_BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                                    CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
-CELERY_BROKER_TRANSPORT_OPTIONS = {
+BROKER_TRANSPORT_OPTIONS = {
     'fanout_patterns': True,
     'fanout_prefix': True,
 }
@@ -417,10 +417,10 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
 # Message expiry time in seconds
 CELERY_EVENT_QUEUE_TTL = ENV_TOKENS.get('CELERY_EVENT_QUEUE_TTL', None)
 
-# Allow CELERY_TASK_QUEUES to be overwritten by ENV_TOKENS,
-ENV_CELERY_TASK_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
-if ENV_CELERY_TASK_QUEUES:
-    CELERY_TASK_QUEUES = {queue: {} for queue in ENV_CELERY_TASK_QUEUES}
+# Allow CELERY_QUEUES to be overwritten by ENV_TOKENS,
+ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
+if ENV_CELERY_QUEUES:
+    CELERY_QUEUES = {queue: {} for queue in ENV_CELERY_QUEUES}
 
 # Then add alternate environment queues
 ALTERNATE_QUEUE_ENVS = ENV_TOKENS.get('ALTERNATE_WORKER_QUEUES', '').split()
