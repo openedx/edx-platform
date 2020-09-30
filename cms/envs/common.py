@@ -456,8 +456,11 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
+# TODO: Is this next line necessary?
 sys.path.append(REPO_ROOT)
-sys.path.append(PROJECT_ROOT / 'djangoapps')
+# TODO: The next two path modifications will be removed in an upcoming Open edX release.
+# See docs/decisions/0007-sys-path-modification-removal.rst
+sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'cms')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For geolocation ip database

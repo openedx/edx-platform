@@ -714,8 +714,10 @@ NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
 
-# TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
+# TODO: Is this next line necessary?
 sys.path.append(REPO_ROOT)
+# TODO: The next two path modifications will be removed in an upcoming Open edX release.
+# See docs/decisions/0007-sys-path-modification-removal.rst
 sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'lms')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 

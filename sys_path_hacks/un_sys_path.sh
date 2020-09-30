@@ -5,7 +5,7 @@
 #   ....
 #   ~/edx-platform>
 
-# Shellchecks recommends using search/replace instead of sed. It's fine as is.
+# Shellcheck recommends using search/replace instead of sed. It's fine as is.
 # shellcheck disable=SC2001
 
 set -e
@@ -21,6 +21,10 @@ for path in $(find "${TARGET}/djangoapps/" -name '*.py' | grep -v migrations); d
     if [[ "$path" == "lms/djangoapps/courseware/management/commands/import.py" ]]; then
         # Skip this file because its name is problematic for the sys path hack.
         # We've gone to prod with this excluded, and it hasn't been a problem.
+        continue
+    fi
+    if [[ "$path" == "cms/djangoapps/contentstore/management/commands/import.py" ]]; then
+        # Also skip this file because its name is problematic for the sys path hack.
         continue
     fi
     new_path=$(echo "$path" | sed "s#${TARGET}/djangoapps/#sys_path_hacks/${TARGET}/#")
