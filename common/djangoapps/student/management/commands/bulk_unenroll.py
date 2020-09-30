@@ -37,7 +37,7 @@ class Command(BaseCommand):
             '-p', '--csv_path',
             metavar='csv_path',
             dest='csv_path',
-            required=True,
+            required=False,
             help='Path to CSV file.')
         parser.add_argument(
             '--commit',
