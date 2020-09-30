@@ -131,7 +131,7 @@ DEFAULT_PRIORITY_QUEUE = 'edx.{0}core.default'.format(QUEUE_VARIANT)
 CELERY_TASK_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_TASK_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-CELERY_TASK_QUEUES = {
+CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {}
 }
@@ -429,11 +429,11 @@ ALTERNATE_QUEUES = [
     for alternate in ALTERNATE_QUEUE_ENVS
 ]
 
-CELERY_TASK_QUEUES.update(
+CELERY_QUEUES.update(
     {
         alternate: {}
         for alternate in ALTERNATE_QUEUES
-        if alternate not in list(CELERY_TASK_QUEUES.keys())
+        if alternate not in list(CELERY_QUEUES.keys())
     }
 )
 
