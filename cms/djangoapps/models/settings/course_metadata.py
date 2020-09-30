@@ -287,6 +287,8 @@ class CourseMetadata(object):
         """
         errors = []
         teams_configuration_model = settings_dict.get('teams_configuration', {})
+        if teams_configuration_model == {}:
+            return errors
         proposed_topics = teams_configuration_model.get('value').get('topics')
 
         proposed_max_team_size = teams_configuration_model.get('value').get('max_team_size')
