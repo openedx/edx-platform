@@ -106,8 +106,6 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         self.form_data.setlist("topic_id", ["", "not empty"])
         self.assert_error("topic_id", "This field cannot be empty.")
 
-    # ToDo: Make tests for post_type: discussions or question is okay, blank is okay(? not sure about this), invalid value is not okay
-
     @ddt.data("discussion", "question")
     def test_post_type(self, value):
         self.form_data["post_type"] = value
