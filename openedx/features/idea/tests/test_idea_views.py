@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Tests for idea views
+"""
 from __future__ import unicode_literals
 
 from ddt import ddt, file_data
@@ -8,14 +11,18 @@ from django.urls import reverse
 from rest_framework import status
 
 from common.test.utils import MockS3Mixin
-from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.tests.factories import OrganizationFactory, UserFactory
+from openedx.core.djangolib.testing.philu_utils import clear_philu_theme, configure_philu_theme
+from openedx.features.idea.models import Idea
 from openedx.features.philu_utils.tests.mixins import PhiluThemeMixin
 
-from ..models import Idea
+from .factories import IdeaFactory
 
 
 class ChallengeViewTests(PhiluThemeMixin, TestCase):
+    """
+    Tests for Challenge view page
+    """
 
     def test_get_idea_challange_page(self):
         response = self.client.get(reverse('challenge-landing'))
@@ -26,8 +33,29 @@ class ChallengeViewTests(PhiluThemeMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_get_idea_details_page(self):
-        response = self.client.get(reverse('idea-details', kwargs=dict(pk=1)))
+        idea = IdeaFactory()
+        response = self.client.get(reverse('idea-details', kwargs=dict(pk=idea.id)))
         self.assertEqual(response.status_code, 200)
+
+
+class IdeaListingViewTest(TestCase):
+    """
+    Class contains tests for Idea listing page
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(IdeaListingViewTest, cls).setUpClass()
+        configure_philu_theme()
+
+    @classmethod
+    def tearDownClass(cls):
+        clear_philu_theme()
+        super(IdeaListingViewTest, cls).tearDownClass()
+
+    def test_idea_list_view(self):
+        response = self.client.get(reverse('idea-listing'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 @ddt
@@ -57,7 +85,7 @@ class CreateIdeaViewTest(PhiluThemeMixin, MockS3Mixin, TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNone(form_data.initial.get('city'))
-        self.assertIsNone(form_data.initial.get('country'))
+        self.assertIsNone(form_data.initial.get('country').code)
         self.assertIsNone(form_data.initial.get('organization_name'))
         self.assertEqual(form_data.initial.get('user'), self.user)
 

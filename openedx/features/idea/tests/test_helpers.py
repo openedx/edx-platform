@@ -1,3 +1,6 @@
+"""
+Tests for idea app helpers
+"""
 from django.core.validators import ValidationError
 from django.test import TestCase
 from mock import Mock
@@ -8,7 +11,9 @@ from ..constants import IDEA_IMAGE_HEIGHT, IDEA_IMAGE_WIDTH
 
 
 class IdeaHelpersTest(TestCase):
-
+    """
+    Class contains tests for idea app helpers
+    """
     def test_validate_image_dimensions_success(self):
         """Test valid image dimension"""
         image = Mock()

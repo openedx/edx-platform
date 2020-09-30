@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Views for idea app
+"""
 from __future__ import unicode_literals
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -11,7 +14,6 @@ from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.onboarding.helpers import COUNTRIES
 from openedx.features.user_leads.helpers import save_user_utm
 
 from .forms import IdeaCreationForm
@@ -19,6 +21,9 @@ from .models import Idea
 
 
 class ChallengeLandingView(View):
+    """
+    Views for Challenge Landing page
+    """
     template_name = 'features/idea/challenges_landing.html'
 
     def get(self, request, *args, **kwargs):
@@ -26,6 +31,9 @@ class ChallengeLandingView(View):
 
 
 class IdeaListingView(ListView):
+    """
+    Views for Idea Listing page
+    """
     model = Idea
     context_object_name = 'idea_list'
     paginate_by = 9
@@ -41,11 +49,14 @@ class IdeaListingView(ListView):
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class IdeaCreateView(LoginRequiredMixin, CreateView):
+    """
+    Views for Idea creation page
+    """
     form_class = IdeaCreationForm
     template_name = 'features/idea/idea_form.html'
     success_url = reverse_lazy('idea-listing')
 
-    def get_initial(self, *args, **kwargs):
+    def get_initial(self, *args, **kwargs):  # pylint: disable=unused-argument, arguments-differ
         """Pre-fill form with initial data"""
         initial = super(IdeaCreateView, self).get_initial(**kwargs)
         user = self.request.user
@@ -62,6 +73,9 @@ class IdeaCreateView(LoginRequiredMixin, CreateView):
 
 
 class IdeaDetailView(View):
+    """
+    Views for Idea detail page
+    """
     template_name = 'features/idea/idea_details.html'
 
     def get(self, request, *args, **kwargs):

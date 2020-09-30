@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from django.core.exceptions import ValidationError
+"""
+Forms for Idea app.
+"""
 from django.db import transaction
 from django.forms import CharField, ModelForm, Textarea, TextInput
 from django.utils.translation import ugettext_lazy as _
 
-from lms.djangoapps.onboarding.helpers import COUNTRIES, get_country_iso
 from lms.djangoapps.onboarding.models import Organization
 from openedx.features.philu_utils.utils import validate_file_size
 

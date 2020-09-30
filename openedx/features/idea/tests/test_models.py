@@ -1,3 +1,6 @@
+"""
+Tests for idea app models
+"""
 from ddt import data, ddt, unpack
 from django.db import DataError, IntegrityError
 from django.test import TestCase

@@ -1,3 +1,6 @@
+"""
+Urls for idea app
+"""
 from django.conf.urls import url
 
 from openedx.features.idea.api_views import FavoriteAPIView

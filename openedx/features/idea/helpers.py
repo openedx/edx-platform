@@ -1,3 +1,6 @@
+"""
+Helper functions for idea app
+"""
 from django.core.validators import ValidationError
 
 from .constants import IDEA_IMAGE_HEIGHT, IDEA_IMAGE_WIDTH

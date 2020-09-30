@@ -1,3 +1,6 @@
+"""
+Tests for idea favorite api
+"""
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -7,7 +10,9 @@ from openedx.features.idea.tests.factories import IdeaFactory
 
 
 class IdeaFavoriteApiTestCase(TestCase):
-
+    """
+    Class contains tests for idea favorite api
+    """
     def setUp(self):
         super(IdeaFavoriteApiTestCase, self).setUp()
         self.user = UserFactory()
