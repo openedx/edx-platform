@@ -16,12 +16,13 @@ from lms.djangoapps.verify_student.models import SSOVerification
 from student.tests.factories import UserFactory
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
-
+from third_party_auth.tests.utils import skip_unless_thirdpartyauth
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.
 User = social_models.DjangoStorage.user.user_model()  # pylint: disable=invalid-name
 
 
+@skip_unless_thirdpartyauth()
 class TestCase(testutil.TestCase, test.TestCase):
     """Base test case."""
 
@@ -30,7 +31,6 @@ class TestCase(testutil.TestCase, test.TestCase):
         self.enabled_provider = self.configure_google_provider(enabled=True)
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class GetAuthenticatedUserTestCase(TestCase):
     """Tests for get_authenticated_user."""
 
@@ -71,12 +71,12 @@ class GetAuthenticatedUserTestCase(TestCase):
         self.assertEqual(self.enabled_provider.get_authentication_backend(), user.backend)
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
-class GetProviderUserStatesTestCase(testutil.TestCase, test.TestCase):
+class GetProviderUserStatesTestCase(TestCase):
     """Tests generation of ProviderUserStates."""
 
     def setUp(self):
         super(GetProviderUserStatesTestCase, self).setUp()
+        self.configure_google_provider(enabled=False)
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
 
     def test_returns_empty_list_if_no_enabled_providers(self):
@@ -147,7 +147,6 @@ class GetProviderUserStatesTestCase(testutil.TestCase, test.TestCase):
         self.assertEqual(self.user, linkedin_state.user)
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class UrlFormationTestCase(TestCase):
     """Tests formation of URLs for pipeline hook points."""
 
@@ -213,8 +212,7 @@ class UrlFormationTestCase(TestCase):
             pipeline.get_complete_url(provider_id)
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
-class TestPipelineUtilityFunctions(TestCase, test.TestCase):
+class TestPipelineUtilityFunctions(TestCase):
     """
     Test some of the isolated utility functions in the pipeline
     """
@@ -304,9 +302,8 @@ class TestPipelineUtilityFunctions(TestCase, test.TestCase):
         self.assertNotIn('third_party_auth_quarantined_modules', request.session)
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 @ddt.ddt
-class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
+class EnsureUserInformationTestCase(TestCase):
     """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
 
     def setUp(self):
@@ -386,8 +383,7 @@ class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
                     assert response.url == expected_redirect_url
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
-class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
+class UserDetailsForceSyncTestCase(TestCase):
     """Tests to ensure learner profile data is properly synced if the provider requires it."""
 
     def setUp(self):
@@ -491,8 +487,7 @@ class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
         assert len(mail.outbox) == 1
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
-class SetIDVerificationStatusTestCase(testutil.TestCase, test.TestCase):
+class SetIDVerificationStatusTestCase(TestCase):
     """Tests to ensure SSO ID Verification for the user is set if the provider requires it."""
 
     def setUp(self):

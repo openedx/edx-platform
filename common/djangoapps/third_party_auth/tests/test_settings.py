@@ -6,7 +6,7 @@ import unittest
 from mock import patch
 from third_party_auth import provider, settings
 from third_party_auth.tests import testutil
-
+from third_party_auth.tests.utils import skip_unless_thirdpartyauth
 _ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']
 _ORIGINAL_INSTALLED_APPS = ['first_installed_app']
 _ORIGINAL_MIDDLEWARE_CLASSES = ['first_middleware_class']
@@ -43,7 +43,7 @@ class SettingsUnitTest(testutil.TestCase):
         settings.apply_settings(self.settings)
         self.assertEqual(['auth_entry', 'next'], self.settings.FIELDS_STORED_IN_SESSION)
 
-    @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+    @skip_unless_thirdpartyauth()
     def test_apply_settings_enables_no_providers_by_default(self):
         # Providers are only enabled via ConfigurationModels in the database
         settings.apply_settings(self.settings)
