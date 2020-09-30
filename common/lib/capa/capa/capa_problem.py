@@ -667,11 +667,16 @@ class LoncapaProblem(object):
                 answer_id=answer_id,
                 choice_number=current_answer
             ))
-            assert len(elems) == 1
-            choicegroup = elems[0].getparent()
-            input_cls = inputtypes.registry.get_class_for_tag(choicegroup.tag)
-            choices_map = dict(input_cls.extract_choices(choicegroup, self.capa_system.i18n, text_only=True))
-            answer_text = choices_map[current_answer]
+            try:
+                assert len(elems) == 1
+                choicegroup = elems[0].getparent()
+                input_cls = inputtypes.registry.get_class_for_tag(choicegroup.tag)
+                choices_map = dict(input_cls.extract_choices(choicegroup, self.capa_system.i18n, text_only=True))
+                answer_text = choices_map[current_answer]
+            except AssertionError as error:
+                log.error('Problem Grade Report assertion Problem_id : %s answer_id : %s current_answer  : %s',
+                          self.problem_text, answer_id, current_answer)
+                raise error
 
         elif isinstance(current_answer, six.string_types):
             # Already a string with the answer
