@@ -36,9 +36,9 @@ class TestReindexCourse(ModuleStoreTestCase):
             org="test", course="course2", display_name="run1"
         )
 
-    REINDEX_PATH_LOCATION = 'contentstore.management.commands.reindex_course.CoursewareSearchIndexer.do_course_reindex'
-    MODULESTORE_PATCH_LOCATION = 'contentstore.management.commands.reindex_course.modulestore'
-    YESNO_PATCH_LOCATION = 'contentstore.management.commands.reindex_course.query_yes_no'
+    REINDEX_PATH_LOCATION = 'cms.djangoapps.contentstore.management.commands.reindex_course.CoursewareSearchIndexer.do_course_reindex'
+    MODULESTORE_PATCH_LOCATION = 'cms.djangoapps.contentstore.management.commands.reindex_course.modulestore'
+    YESNO_PATCH_LOCATION = 'cms.djangoapps.contentstore.management.commands.reindex_course.query_yes_no'
 
     def _get_lib_key(self, library):
         """ Get's library key as it is passed to indexer """
