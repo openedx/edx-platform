@@ -77,4 +77,4 @@ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-
 
 
 # Test new version of edx-search
-git+https://github.com/raccoongang/edx-search.git@golub-sergey/BD-19/transition-from-ES1.5-to-ES7
+git+https://github.com/raccoongang/edx-search.git@ad535ffa3587754e14dcdca57813a7f9a49e6d14
