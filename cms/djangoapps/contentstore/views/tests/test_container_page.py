@@ -205,7 +205,10 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
         self.validate_preview_html(empty_child_container, self.reorderable_child_view, can_add=False)
 
-    @patch('cms.djangoapps.contentstore.views.component.render_to_response', Mock(return_value=Mock(status_code=200, content='')))
+    @patch(
+        'cms.djangoapps.contentstore.views.component.render_to_response',
+        Mock(return_value=Mock(status_code=200, content=''))
+    )
     def test_container_page_with_valid_and_invalid_usage_key_string(self):
         """
         Check that invalid 'usage_key_string' raises Http404.

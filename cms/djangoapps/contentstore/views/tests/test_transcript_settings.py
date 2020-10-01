@@ -302,7 +302,10 @@ class TranscriptUploadTest(CourseTestCase):
         self.assertEqual(response.status_code, 405)
 
     @patch('cms.djangoapps.contentstore.views.transcript_settings.create_or_update_video_transcript')
-    @patch('cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
     def test_transcript_upload_handler(self, mock_create_or_update_video_transcript):
         """
         Tests that transcript upload handler works as expected.
@@ -364,7 +367,10 @@ class TranscriptUploadTest(CourseTestCase):
         )
     )
     @ddt.unpack
-    @patch('cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
     def test_transcript_upload_handler_missing_attrs(self, request_payload, expected_error_message):
         """
         Tests the transcript upload handler when the required attributes are missing.
@@ -374,7 +380,10 @@ class TranscriptUploadTest(CourseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8'))['error'], expected_error_message)
 
-    @patch('cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en', 'es']))
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en', 'es'])
+    )
     def test_transcript_upload_handler_existing_transcript(self):
         """
         Tests that upload handler do not update transcript's language if a transcript
@@ -393,7 +402,10 @@ class TranscriptUploadTest(CourseTestCase):
             u'A transcript with the "es" language code already exists.'
         )
 
-    @patch('cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
     def test_transcript_upload_handler_with_image(self):
         """
         Tests the transcript upload handler with an image file.
@@ -417,7 +429,10 @@ class TranscriptUploadTest(CourseTestCase):
                 u'There is a problem with this transcript file. Try to upload a different file.'
             )
 
-    @patch('cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
     def test_transcript_upload_handler_with_invalid_transcript(self):
         """
         Tests the transcript upload handler with an invalid transcript file.
