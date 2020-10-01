@@ -1,9 +1,12 @@
-from ddt import data, ddt, unpack
-from rest_framework import status
-from w3lib.url import add_or_replace_parameters
+"""
+Tests for Job Board views
+"""
 
+from ddt import data, ddt, unpack
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework import status
+from w3lib.url import add_or_replace_parameters
 
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from openedx.features.job_board.constants import (
@@ -27,8 +30,11 @@ from openedx.features.job_board.views import JobCreateView, JobListView
 
 @ddt
 class JobBoardViewTest(TestCase):
-
+    """
+    Test Class for Job Board views
+    """
     def setUp(self):
+        super(JobBoardViewTest, self).setUp()
         self.client.logout()
 
     @classmethod
@@ -42,35 +48,45 @@ class JobBoardViewTest(TestCase):
         self.assertEqual(JobCreateView.form_class.Meta.fields, '__all__')
 
     def test_create_view_post_successful(self):
-        self.client.post('/jobs/create/', {"function": "dummy function",
-                                           "city": "Lahore",
-                                           "description": "dummy description",
-                                           "title": "second title",
-                                           "country": "AX",
-                                           "company": "dummy company",
-                                           "responsibilities": "dummy responsibilities",
-                                           "hours": "parttime",
-                                           "compensation": "salaried",
-                                           "contact_email": "test@test.com",
-                                           "logo": "",
-                                           "type": "remote",
-                                           "website_link": ""})
+        self.client.post(
+            '/jobs/create/',
+            {
+                "function": "dummy function",
+                "city": "Lahore",
+                "description": "dummy description",
+                "title": "second title",
+                "country": "AX",
+                "company": "dummy company",
+                "responsibilities": "dummy responsibilities",
+                "hours": "parttime",
+                "compensation": "salaried",
+                "contact_email": "test@test.com",
+                "logo": "",
+                "type": "remote",
+                "website_link": ""
+            }
+        )
         self.assertEqual(Job.objects.all().count(), 1)
 
     def test_create_view_post_unsuccessful(self):
-        self.client.post('/jobs/create/', {"function": "dummy function",
-                                           "city": "Lahore",
-                                           "description": "dummy description",
-                                           "title": "second title",
-                                           "country": "AX",
-                                           "company": "dummy company",
-                                           "responsibilities": "dummy responsibilities",
-                                           "hours": "parttime",
-                                           "compensation": "salaried",
-                                           "contact_email": "test", #incorrect email
-                                           "logo": "",
-                                           "type": "remote",
-                                           "website_link": ""})
+        self.client.post(
+            '/jobs/create/',
+            {
+                "function": "dummy function",
+                "city": "Lahore",
+                "description": "dummy description",
+                "title": "second title",
+                "country": "AX",
+                "company": "dummy company",
+                "responsibilities": "dummy responsibilities",
+                "hours": "parttime",
+                "compensation": "salaried",
+                "contact_email": "test",  # incorrect email
+                "logo": "",
+                "type": "remote",
+                "website_link": ""
+            }
+        )
         self.assertEqual(Job.objects.all().count(), 0)
 
     def test_job_detail_view_invalid_pk(self):
@@ -95,9 +111,9 @@ class JobBoardViewTest(TestCase):
         JobFactory.create_batch(14)
         response_second_page = self.client.get(reverse('job_list') + page_query_param)
         self.assertEqual(response_second_page.status_code, status.HTTP_200_OK)
-        self.assertTrue('is_paginated' in response_second_page.context_data)
-        self.assertTrue(response_second_page.context_data['is_paginated'] is True)
-        self.assertTrue(len(response_second_page.context_data['job_list']) == job_list_size)
+        self.assertIn('is_paginated', response_second_page.context_data)
+        self.assertTrue(response_second_page.context_data['is_paginated'])
+        self.assertEqual(len(response_second_page.context_data['job_list']), job_list_size)
 
     @data(JOB_TYPE_REMOTE_KEY, JOB_TYPE_ONSITE_KEY)
     def test_job_list_view_filters_job_type(self, job_type):
@@ -117,7 +133,7 @@ class JobBoardViewTest(TestCase):
         self.assertTrue(not any(response.context_data['search_fields'].values()))
 
         self.assertTrue(response.context_data['filtered'], True)
-        self.assertTrue(len(response.context_data['job_list']) == 1)
+        self.assertEqual(len(response.context_data['job_list']), 1)
         self.assertEqual(response.context_data['job_list'].first().type, job_type)
 
     @data(JOB_COMP_VOLUNTEER_KEY, JOB_COMP_HOURLY_KEY, JOB_COMP_SALARIED_KEY)
@@ -138,7 +154,7 @@ class JobBoardViewTest(TestCase):
         self.assertTrue(not any(response.context_data['search_fields'].values()))
 
         self.assertTrue(response.context_data['filtered'], True)
-        self.assertTrue(len(response.context_data['job_list']) == 1)
+        self.assertEqual(len(response.context_data['job_list']), 1)
         self.assertEqual(response.context_data['job_list'].first().compensation, job_comp)
 
     @data(JOB_HOURS_FULLTIME_KEY, JOB_HOURS_PARTTIME_KEY, JOB_HOURS_FREELANCE_KEY)
@@ -159,7 +175,7 @@ class JobBoardViewTest(TestCase):
         self.assertTrue(not any(response.context_data['search_fields'].values()))
 
         self.assertTrue(response.context_data['filtered'], True)
-        self.assertTrue(len(response.context_data['job_list']) == 1)
+        self.assertEqual(len(response.context_data['job_list']), 1)
         self.assertEqual(response.context_data['job_list'].first().hours, job_hours)
 
     def test_job_list_view_filters_job_location(self):
@@ -179,9 +195,9 @@ class JobBoardViewTest(TestCase):
         self.assertTrue(not any(response.context_data['search_fields'].values()))
 
         self.assertTrue(response.context_data['filtered'], True)
-        self.assertTrue(len(response.context_data['job_list']) == 1)
-        self.assertTrue(response.context_data['job_list'][0].country.name == job.country.name)
-        self.assertTrue(response.context_data['job_list'][0].city == job.city)
+        self.assertEqual(len(response.context_data['job_list']), 1)
+        self.assertEqual(response.context_data['job_list'][0].country.name, job.country.name)
+        self.assertEqual(response.context_data['job_list'][0].city, job.city)
 
     def test_job_list_view_filters_job_query(self):
         # Create a new job with custom title to search for.
@@ -198,5 +214,5 @@ class JobBoardViewTest(TestCase):
         self.assertTrue(not any(response.context_data['search_fields'].values()))
 
         self.assertTrue(response.context_data['filtered'], True)
-        self.assertTrue(len(response.context_data['job_list']) == 1)
-        self.assertTrue(job.title in response.context_data['job_list'][0].title)
+        self.assertEqual(len(response.context_data['job_list']), 1)
+        self.assertIn(job.title, response.context_data['job_list'][0].title)

@@ -1,3 +1,6 @@
+"""
+Views for Job Board app
+"""
 from django.core.urlresolvers import reverse
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
@@ -5,6 +8,7 @@ from django.views.generic.list import ListView
 from django_countries import countries
 
 from openedx.features.teams.helpers import USER_ICON_COLORS
+
 from .constants import (
     DJANGO_COUNTRIES_KEY_INDEX,
     DJANGO_COUNTRIES_VALUE_INDEX,
@@ -28,6 +32,9 @@ from .models import Job
 
 
 class JobListView(ListView):
+    """
+    To render jobs as a list view
+    """
     model = Job
     context_object_name = 'job_list'
     paginate_by = 10

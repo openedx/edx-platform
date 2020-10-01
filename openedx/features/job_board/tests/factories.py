@@ -1,3 +1,6 @@
+"""
+Factory for Job model
+"""
 import factory.fuzzy
 
 from openedx.features.job_board.constants import JOB_COMPENSATION_CHOICES, JOB_HOURS_CHOICES, JOB_TYPE_CHOICES
@@ -5,8 +8,10 @@ from openedx.features.job_board.models import Job
 
 
 class JobFactory(factory.django.DjangoModelFactory):
-
-    class Meta:
+    """
+    Factory for Job model
+    """
+    class Meta:  # pylint: disable=old-style-class
         model = Job
 
     title = factory.Faker('pystr', min_chars=1, max_chars=255)
@@ -18,4 +23,3 @@ class JobFactory(factory.django.DjangoModelFactory):
     country = 'PK'
     description = factory.Faker('pystr', min_chars=1, max_chars=255)
     contact_email = factory.Faker('email')
-

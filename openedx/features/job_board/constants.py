@@ -1,3 +1,7 @@
+"""
+Constants for Job Board app
+"""
+
 JOB_PARAM_QUERY_KEY = 'query'
 JOB_PARAM_COUNTRY_KEY = 'country'
 JOB_PARAM_CITY_KEY = 'city'
@@ -37,4 +41,3 @@ DJANGO_COUNTRIES_VALUE_INDEX = 1
 # Logo image file max allowed file size in bytes
 LOGO_IMAGE_MAX_SIZE = 2 * 1024 * 1024  # 2 MB
 LOGO_ALLOWED_EXTENSION = ['jpg', 'png']
-
