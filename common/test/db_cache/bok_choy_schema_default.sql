@@ -431,7 +431,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2928 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2932 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1405,6 +1405,7 @@ CREATE TABLE `content_libraries_contentlibrary` (
   `allow_public_learning` tinyint(1) NOT NULL,
   `allow_public_read` tinyint(1) NOT NULL,
   `org_id` int(11) NOT NULL,
+  `type` varchar(25) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `bundle_uuid` (`bundle_uuid`),
   UNIQUE KEY `content_libraries_contentlibrary_org_id_slug_2b964108_uniq` (`org_id`,`slug`),
@@ -2634,6 +2635,33 @@ CREATE TABLE `django_admin_log` (
   CONSTRAINT `django_admin_log_user_id_c564eba6_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `django_celery_results_taskresult`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `django_celery_results_taskresult` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `task_id` varchar(255) NOT NULL,
+  `status` varchar(50) NOT NULL,
+  `content_type` varchar(128) NOT NULL,
+  `content_encoding` varchar(64) NOT NULL,
+  `result` longtext,
+  `date_done` datetime(6) NOT NULL,
+  `traceback` longtext,
+  `meta` longtext,
+  `task_args` longtext,
+  `task_kwargs` longtext,
+  `task_name` varchar(255) DEFAULT NULL,
+  `worker` varchar(100) DEFAULT NULL,
+  `date_created` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `task_id` (`task_id`),
+  KEY `django_celery_results_taskresult_date_done_49edada6` (`date_done`),
+  KEY `django_celery_results_taskresult_status_cbbed23a` (`status`),
+  KEY `django_celery_results_taskresult_task_name_90987df3` (`task_name`),
+  KEY `django_celery_results_taskresult_worker_f8711389` (`worker`),
+  KEY `django_celery_results_taskresult_date_created_099f3424` (`date_created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_comment_client_permission`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -2727,7 +2755,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=833 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=834 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2738,7 +2766,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=770 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=778 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
