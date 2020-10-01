@@ -1,5 +1,5 @@
 """
-Configuration file for the generation of feature toggle documentation.
+Configuration file for the generation of technical documentation.
 """
 import os
 
@@ -8,26 +8,33 @@ import git
 
 # -- Project information -----------------------------------------------------
 
-project = "Open edX feature toggles"
+project = "edx-platform technical reference"
 copyright = edx_theme.COPYRIGHT  # pylint: disable=redefined-builtin
 author = edx_theme.AUTHOR
 release = ""
 
 # -- General configuration ---------------------------------------------------
 
-extensions = ["code_annotations.config_and_tools.sphinx.extensions.featuretoggles"]
+extensions = ["code_annotations.contrib.sphinx.extensions.featuretoggles", "code_annotations.contrib.sphinx.extensions.settings"]
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-featuretoggles_source_path = os.path.abspath(
+edxplatform_repo_url = "https://github.com/edx/edx-platform"
+edxplatform_source_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..")
 )
-featuretoggles_repo_url = "https://github.com/edx/edx-platform"
 try:
     edx_platform_version = git.Repo(search_parent_directories=True).head.object.hexsha
 except git.InvalidGitRepositoryError:
     edx_platform_version = "master"
+
+featuretoggles_source_path = edxplatform_source_path
+featuretoggles_repo_url = edxplatform_repo_url
 featuretoggles_repo_version = edx_platform_version
+
+settings_source_path = edxplatform_source_path
+settings_repo_url = edxplatform_repo_url
+settings_repo_version = edx_platform_version
 
 # -- Options for HTML output -------------------------------------------------
 

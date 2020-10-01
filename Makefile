@@ -21,7 +21,7 @@ clean: ## archive and delete most git-ignored files
 
 SWAGGER = docs/swagger.yaml
 
-docs: api-docs guides feature-toggles-docs ## build all the developer documentation for this repository
+docs: api-docs guides technical-docs ## build all the developer documentation for this repository
 
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
@@ -33,8 +33,8 @@ api-docs-sphinx: swagger	## generate the sphinx source files for api-docs
 api-docs: api-docs-sphinx	## build the REST api docs
 	cd docs/api; make html
 
-feature-toggles-docs:
-	$(MAKE) -C docs/featuretoggles html
+technical-docs:  ## build the technical docs
+	$(MAKE) -C docs/technical html
 
 guides:	## build the developer guide docs
 	cd docs/guides; make clean html
