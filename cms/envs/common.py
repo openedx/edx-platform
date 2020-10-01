@@ -1357,7 +1357,7 @@ INSTALLED_APPS = [
     'cms.djangoapps.contentstore.apps.ContentstoreConfig',
 
     'openedx.core.djangoapps.contentserver',
-    'cms.djangoapps.course_creators',
+    'cms.djangoapps.course_creators.apps.CourseCreatorsConfig',
     'student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
@@ -1366,7 +1366,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
 
     # Maintenance tools
-    'cms.djangoapps.maintenance',
+    'cms.djangoapps.maintenance.apps.MaintenanceConfig',
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
@@ -1492,7 +1492,7 @@ INSTALLED_APPS = [
 
     # DRF filters
     'django_filters',
-    'cms.djangoapps.api',
+    'cms.djangoapps.api.apps.ApiConfig',
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
