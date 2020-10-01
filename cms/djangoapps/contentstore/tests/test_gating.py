@@ -45,8 +45,8 @@ class TestHandleItemDeleted(ModuleStoreTestCase, MilestonesTestCaseMixin):
         gating_api.add_prerequisite(self.course.id, self.open_seq.location)
         gating_api.set_required_content(self.course.id, self.gated_seq.location, self.open_seq.location, 100, 100)
 
-    @patch('contentstore.signals.handlers.gating_api.set_required_content')
-    @patch('contentstore.signals.handlers.gating_api.remove_prerequisite')
+    @patch('cms.djangoapps.contentstore.signals.handlers.gating_api.set_required_content')
+    @patch('cms.djangoapps.contentstore.signals.handlers.gating_api.remove_prerequisite')
     def test_chapter_deleted(self, mock_remove_prereq, mock_set_required):
         """ Test gating milestone data is cleanup up when course content item is deleted """
         handle_item_deleted(usage_key=self.chapter.location, user_id=0)
@@ -55,8 +55,8 @@ class TestHandleItemDeleted(ModuleStoreTestCase, MilestonesTestCaseMixin):
             self.open_seq.location.course_key, self.open_seq.location, None, None, None
         )
 
-    @patch('contentstore.signals.handlers.gating_api.set_required_content')
-    @patch('contentstore.signals.handlers.gating_api.remove_prerequisite')
+    @patch('cms.djangoapps.contentstore.signals.handlers.gating_api.set_required_content')
+    @patch('cms.djangoapps.contentstore.signals.handlers.gating_api.remove_prerequisite')
     def test_sequential_deleted(self, mock_remove_prereq, mock_set_required):
         """ Test gating milestone data is cleanup up when course content item is deleted """
         handle_item_deleted(usage_key=self.open_seq.location, user_id=0)

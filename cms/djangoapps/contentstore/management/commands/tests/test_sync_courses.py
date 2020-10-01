@@ -14,7 +14,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-COMMAND_MODULE = 'contentstore.management.commands.sync_courses'
+COMMAND_MODULE = 'cms.djangoapps.contentstore.management.commands.sync_courses'
 
 
 @mock.patch(COMMAND_MODULE + '.get_course_runs')

@@ -53,7 +53,7 @@ class ExportCourseTestCase(CourseTestCase):
         output = artifacts[0]
         self.assertEqual(output.name, 'Output')
 
-    @mock.patch('contentstore.tasks.export_course_to_xml', side_effect=side_effect_exception)
+    @mock.patch('cms.djangoapps.contentstore.tasks.export_course_to_xml', side_effect=side_effect_exception)
     def test_exception(self, mock_export):  # pylint: disable=unused-argument
         """
         The export task should fail gracefully if an exception is thrown
