@@ -1,4 +1,7 @@
 # Max length constraints for idea model fields
+"""
+Constants for Idea app
+"""
 CITY_MAX_LENGTH = 255
 ORGANIZATION_NAME_MAX_LENGTH = 255
 TITLE_MAX_LENGTH = 50

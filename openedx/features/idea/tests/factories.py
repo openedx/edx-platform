@@ -1,3 +1,6 @@
+"""
+Test data factories for Idea app models
+"""
 import factory
 
 from lms.djangoapps.onboarding.tests.factories import OrganizationFactory, UserFactory
@@ -31,7 +34,7 @@ class OrganizationBaseFactory(factory.django.DjangoModelFactory):
 class IdeaFactory(OrganizationBaseFactory, LocationFactory):
     """Factory for idea model. It contains fake data or sub-factories for all mandatory fields"""
 
-    class Meta:
+    class Meta(object):
         model = Idea
 
     user = factory.SubFactory(UserFactory)

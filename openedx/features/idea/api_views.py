@@ -1,3 +1,6 @@
+"""
+API views for Idea app
+"""
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -16,6 +19,16 @@ class FavoriteAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, idea_id):
+        """
+        Update the favorite status for idea and return it.
+
+        Arguments:
+            request (HttpRequest): Request object for post call
+            idea_id (int): Idea id whose status needs to be toggled
+
+        Returns:
+            JsonResponse: JsonResponse object contains message and favorite status
+        """
         response = {'message': 'Idea is added to favorites', 'is_idea_favorite': True}
         toggle_status = status.HTTP_201_CREATED
         user = request.user

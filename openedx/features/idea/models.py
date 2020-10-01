@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+"""
+Models for Idea app
+"""
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.urls import reverse
+from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
 from model_utils.models import TimeStampedModel
@@ -12,12 +16,15 @@ from model_utils.models import TimeStampedModel
 from lms.djangoapps.onboarding.models import Organization
 from openedx.features.philu_utils.backend_storage import CustomS3Storage
 from openedx.features.philu_utils.utils import bytes_to_mb
-
 from util.philu_utils import UploadToPathAndRename
+
 from .constants import CITY_MAX_LENGTH, IDEA_FILE_MAX_SIZE, IDEA_IMAGE_MAX_SIZE, OVERVIEW_MAX_LENGTH, TITLE_MAX_LENGTH
 
 
 class Location(models.Model):
+    """
+    Model contains fields related to location
+    """
     country = CountryField()
     city = models.CharField(max_length=CITY_MAX_LENGTH)
 
@@ -30,20 +37,26 @@ class Location(models.Model):
 
 
 class VisualAttachment(models.Model):
+    """
+    Model contains fields related to visual attachment
+    """
     video_link = models.URLField(blank=True, null=True, verbose_name=_('VIDEO LINK'))
     image = models.ImageField(
         storage=CustomS3Storage(), max_length=500, blank=True, null=True,
         upload_to=UploadToPathAndRename(path='images', name_prefix='image', add_path_prefix=True),
         validators=[FileExtensionValidator(['jpg', 'png'], )], verbose_name=_('ADD IMAGE'),
-        help_text=_('Accepted extensions: .jpg, .png (maximum {mb} MB)'.format(mb=bytes_to_mb(IDEA_IMAGE_MAX_SIZE)))
+        help_text=format_lazy(
+            _('Accepted extensions: .jpg, .png (maximum {mb} MB)'), mb=bytes_to_mb(IDEA_IMAGE_MAX_SIZE)
+        )
     )
     file = models.FileField(
         storage=CustomS3Storage(), max_length=500, blank=True, null=True,
         upload_to=UploadToPathAndRename(path='files', add_path_prefix=True),
         validators=[FileExtensionValidator(['docx', 'pdf', 'txt'])],
         verbose_name=_('ADD FILE'),
-        help_text=_(
-            'Accepted extensions: .docx, .pdf, .txt (maximum {mb} MB)'.format(mb=bytes_to_mb(IDEA_FILE_MAX_SIZE)))
+        help_text=format_lazy(
+            _('Accepted extensions: .docx, .pdf, .txt (maximum {mb} MB)'), mb=bytes_to_mb(IDEA_FILE_MAX_SIZE)
+        )
     )
 
     class Meta:
@@ -51,6 +64,9 @@ class VisualAttachment(models.Model):
 
 
 class OrganizationBase(models.Model):
+    """
+    Model contains fields related to organization and its mission
+    """
     organization = models.ForeignKey(
         Organization,
         related_name='%(app_label)s_%(class)ss',
@@ -64,6 +80,9 @@ class OrganizationBase(models.Model):
 
 
 class Idea(OrganizationBase, Location, VisualAttachment, TimeStampedModel):
+    """
+    Model contains all the fields related to Idea
+    """
     user = models.ForeignKey(User, related_name='ideas', related_query_name='idea', on_delete=models.CASCADE)
     title = models.CharField(max_length=TITLE_MAX_LENGTH, verbose_name=_('Idea Title'))
     overview = models.CharField(max_length=OVERVIEW_MAX_LENGTH, verbose_name=_('Idea Overview'))
@@ -78,11 +97,20 @@ class Idea(OrganizationBase, Location, VisualAttachment, TimeStampedModel):
         return self.title
 
     def toggle_favorite(self, user):
+        """
+        Toggle favorite status of idea.
+
+        Arguments:
+            user (User): Django User object
+
+        Returns:
+            bool: boolean value regarding favorite status
+        """
         if self.favorites.filter(pk=user.id).exists():
-            self.favorites.remove(user)
+            self.favorites.remove(user)  # pylint: disable=no-member
             return False
 
-        self.favorites.add(user)
+        self.favorites.add(user)  # pylint: disable=no-member
         return True
 
     def get_absolute_url(self):
