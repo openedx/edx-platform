@@ -107,7 +107,7 @@ class TestForcePublishModifications(ModuleStoreTestCase):
         # verify that draft and publish point to different versions
         self.assertNotEqual(draft_version, published_version)
 
-        with mock.patch('contentstore.management.commands.force_publish.query_yes_no') as patched_yes_no:
+        with mock.patch('cms.djangoapps.contentstore.management.commands.force_publish.query_yes_no') as patched_yes_no:
             patched_yes_no.return_value = True
 
             # force publish course

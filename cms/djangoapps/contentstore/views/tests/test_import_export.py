@@ -786,7 +786,7 @@ class ExportTestCase(CourseTestCase):
         mock_artifact.file.storage.url.return_value = file_url
         return mock_artifact
 
-    @patch('contentstore.views.import_export._latest_task_status')
+    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_other(
         self,
@@ -806,7 +806,7 @@ class ExportTestCase(CourseTestCase):
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
 
-    @patch('contentstore.views.import_export._latest_task_status')
+    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_s3(
         self,
@@ -826,7 +826,7 @@ class ExportTestCase(CourseTestCase):
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/s3/file/path/testfile.tar.gz')
 
-    @patch('contentstore.views.import_export._latest_task_status')
+    @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_filesystem(
         self,

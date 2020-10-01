@@ -332,7 +332,7 @@ class GetItemTest(ItemTest):
         """
         Tests that valid paging is passed along to underlying block
         """
-        with patch('contentstore.views.item.get_preview_fragment') as patched_get_preview_fragment:
+        with patch('cms.djangoapps.contentstore.views.item.get_preview_fragment') as patched_get_preview_fragment:
             retval = Mock()
             type(retval).content = PropertyMock(return_value="Some content")
             type(retval).resources = PropertyMock(return_value=[])
@@ -1235,7 +1235,7 @@ class TestMoveItem(ItemTest):
         validation = html.validate()
         self.assertEqual(len(validation.messages), 0)
 
-    @patch('contentstore.views.item.log')
+    @patch('cms.djangoapps.contentstore.views.item.log')
     def test_move_logging(self, mock_logger):
         """
         Test logging when an item is successfully moved.
@@ -2147,7 +2147,7 @@ class TestComponentHandler(TestCase):
 
         self.request_factory = RequestFactory()
 
-        patcher = patch('contentstore.views.component.modulestore')
+        patcher = patch('cms.djangoapps.contentstore.views.component.modulestore')
         self.modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -2219,12 +2219,12 @@ class TestComponentHandler(TestCase):
         self.descriptor.handle = create_response
 
         with patch(
-            'contentstore.views.component.is_xblock_aside',
+            'cms.djangoapps.contentstore.views.component.is_xblock_aside',
             return_value=is_xblock_aside
         ), patch(
-            'contentstore.views.component.get_aside_from_xblock'
+            'cms.djangoapps.contentstore.views.component.get_aside_from_xblock'
         ) as mocked_get_aside_from_xblock, patch(
-            "contentstore.views.component.webob_to_django_response"
+            "cms.djangoapps.contentstore.views.component.webob_to_django_response"
         ) as mocked_webob_to_django_response:
             component_handler(
                 self.request,

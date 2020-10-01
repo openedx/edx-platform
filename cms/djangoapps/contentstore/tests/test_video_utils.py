@@ -272,7 +272,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         )
     )
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('contentstore.video_utils.LOGGER')
+    @patch('cms.djangoapps.contentstore.video_utils.LOGGER')
     @patch('requests.get')
     @ddt.unpack
     def test_scrape_youtube_thumbnail_logging(
@@ -332,8 +332,8 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
             )
         ),
     )
-    @patch('contentstore.video_utils.LOGGER')
-    @patch('contentstore.video_utils.download_youtube_video_thumbnail')
+    @patch('cms.djangoapps.contentstore.video_utils.LOGGER')
+    @patch('cms.djangoapps.contentstore.video_utils.download_youtube_video_thumbnail')
     @ddt.unpack
     def test_no_video_thumbnail_downloaded(
         self,

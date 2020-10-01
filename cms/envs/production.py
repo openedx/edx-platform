@@ -344,7 +344,7 @@ else:
 COURSE_IMPORT_EXPORT_BUCKET = ENV_TOKENS.get('COURSE_IMPORT_EXPORT_BUCKET', '')
 
 if COURSE_IMPORT_EXPORT_BUCKET:
-    COURSE_IMPORT_EXPORT_STORAGE = 'contentstore.storage.ImportExportS3Storage'
+    COURSE_IMPORT_EXPORT_STORAGE = 'cms.djangoapps.contentstore.storage.ImportExportS3Storage'
 else:
     COURSE_IMPORT_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
 

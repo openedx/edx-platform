@@ -762,7 +762,7 @@ class TestTaskExecution(SharedModuleStoreTestCase):
         # as it encounters a CCX key. If that isn't working properly, it will
         # fall through to the normal indexing and raise an exception because
         # there is no data or backing course behind the course key.
-        with patch('contentstore.courseware_index.CoursewareSearchIndexer.index') as mock_index:
+        with patch('cms.djangoapps.contentstore.courseware_index.CoursewareSearchIndexer.index') as mock_index:
             self.assertIsNone(
                 update_search_index(
                     "ccx-v1:OpenEdX+FAKECOURSE+FAKERUN+ccx@1", "2020-09-28T16:41:57.150796"

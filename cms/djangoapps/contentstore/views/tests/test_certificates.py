@@ -211,7 +211,7 @@ class CertificatesListHandlerTestCase(
         """
         Set up CertificatesListHandlerTestCase.
         """
-        super(CertificatesListHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
+        super(CertificatesListHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')
         self.reset_urls()
 
     def _url(self):
@@ -436,7 +436,7 @@ class CertificatesDetailHandlerTestCase(
         """
         Set up CertificatesDetailHandlerTestCase.
         """
-        super(CertificatesDetailHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
+        super(CertificatesDetailHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')
         self.reset_urls()
 
     def _url(self, cid=-1):
