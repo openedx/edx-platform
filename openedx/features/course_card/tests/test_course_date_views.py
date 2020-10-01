@@ -1,3 +1,6 @@
+"""
+Unit Tests for Course Card date views
+"""
 from datetime import datetime, timedelta
 
 from django.core.urlresolvers import reverse
@@ -16,7 +19,9 @@ TEST_COURSE_OPEN_DATE = datetime.utcnow() + timedelta(days=1)
 
 
 class CourseCardBaseClass(ModuleStoreTestCase):
-
+    """
+    Base class to setup test cases for Course Card date view
+    """
     def setUp(self):
         super(CourseCardBaseClass, self).setUp()
 
@@ -45,7 +50,9 @@ class CourseCardBaseClass(ModuleStoreTestCase):
 
 
 class CourseCardViewBaseClass(CourseCardBaseClass):
-
+    """
+       Contains the cases for course card date view
+    """
     def test_catalog_course_date(self):
         response = self.client.get(reverse('courses'))
         # We are getting 3rd span from Div with class "course-date" and get text from it.

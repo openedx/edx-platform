@@ -1,15 +1,28 @@
+"""
+Unit test helper file
+"""
 from datetime import datetime, timedelta
 
 from custom_settings.models import CustomSettings
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import UserProfile
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import UserFactory
 
 from ..models import CourseCard
 
 
 def set_course_dates(course, enrollment_start, enrollment_end, course_start, course_end):
+    """
+    Args:
+        course (:obj:Course): Contains the course object
+        enrollment_start (:int): Contains the enrollment_start days
+        enrollment_end (:int): Contains the enrollment_end days
+        course_start (:int): Contains the course_start days
+        course_end (:int): Contains the course_end days
+    Returns:
+        A course (CourseOverview)
+    """
     course_overview = CourseOverview.get_from_id(course_id=course.id)
 
     course_overview.enrollment_start = datetime.utcnow() + timedelta(days=enrollment_start)
@@ -23,12 +36,25 @@ def set_course_dates(course, enrollment_start, enrollment_end, course_start, cou
 
 
 def disable_course_card(course):
+    """
+    Args:
+        course (:obj:CourseCard): Contains the course card details
+    Returns:
+        A course (CourseCard)
+    """
     course_card = CourseCard.objects.get(course_id=course.id)
     course_card.is_enabled = False
     course_card.save()
 
 
 def initialize_test_user(password='test', is_staff=False):
+    """
+    Args:
+        password (:string): password to set
+        is_staff (:boolean): is_staff or not
+    Returns:
+        A User
+    """
     user = UserFactory(is_staff=is_staff, password=password)
     email_preference = EmailPreference(
         user=user,

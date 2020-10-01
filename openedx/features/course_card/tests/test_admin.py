@@ -1,3 +1,6 @@
+"""
+Unit Tests for Course Card Admin
+"""
 from course_action_state.models import CourseRerunState
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -8,7 +11,9 @@ from .test_views import CourseCardBaseClass
 
 
 class CourseCardAdminBaseClass(CourseCardBaseClass):
-
+    """
+    Contains the test case for Course Card admin
+    """
     def setUp(self):
         super(CourseCardAdminBaseClass, self).setUp()
 
@@ -26,13 +31,12 @@ class CourseCardAdminBaseClass(CourseCardBaseClass):
 
     def test_get_parent_courses(self):
         parent_course = self.courses[-1]
-        
         set_course_dates(self.re_run_course, 5, 10, 15, 20)
         set_course_dates(parent_course, 5, 10, 15, 20)
 
         # Desired ouput is a list of tuple containing
         # only 1 parent course in the following format: (course_id, 'name -- id')
         self.assertEquals(
-            set(get_parent_courses()), 
+            set(get_parent_courses()),
             {(parent_course.id, '{} -- {}'.format(parent_course.display_name, parent_course.id))}
         )

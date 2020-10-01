@@ -1,18 +1,22 @@
+"""
+Unit tests for Course card helpers
+"""
 from crum import set_current_request
 from django.test.client import RequestFactory
 
 from course_action_state.models import CourseRerunState
-from custom_settings.models import CustomSettings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..helpers import *
+from ..helpers import get_related_card, get_related_card_id, is_course_rereun, get_course_cards_list, get_future_courses
 from .helpers import disable_course_card, set_course_dates
 from .test_views import CourseCardBaseClass
 
 
 class CourseCardHelperBaseClass(CourseCardBaseClass):
-
+    """
+    Base class for Course card helpers test cases
+    """
     def setUp(self):
         super(CourseCardHelperBaseClass, self).setUp()
 

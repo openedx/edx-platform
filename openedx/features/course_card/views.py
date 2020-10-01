@@ -1,3 +1,6 @@
+"""
+Views file for Course Card Application
+"""
 from datetime import datetime
 
 import pytz
@@ -69,7 +72,14 @@ def get_course_cards(request):
 
 
 def get_course_with_link_and_start_date(course, course_rerun_object, request):
-
+    """
+    Args:
+        course (:obj:CourseOverview): Contains the course details
+        course_rerun_object (:obj:CourseRerunState): Course rerun details
+        request (HTTPRequest): current request object
+    Returns:
+        A course (CourseOverview) with updated start date and current class link.
+    """
     date_time_format = '%b %-d, %Y'
     current_time = datetime.utcnow().replace(tzinfo=utc)
 

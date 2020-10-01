@@ -1,8 +1,10 @@
+"""
+Helper methods for Course Card application
+"""
 from datetime import datetime
 from logging import getLogger
 
 import pytz
-from crum import get_current_request
 from opaque_keys.edx.keys import CourseKey
 
 from course_action_state.models import CourseRerunState
@@ -98,6 +100,10 @@ def is_course_rereun(course_id):
 
 
 def get_course_cards_list(request=None):
+    """
+    Helper function to get the list of all enabled course cards detail
+    Returns: list of enabled course cards detail
+    """
     request = request or get_current_request()
     cards_query_set = CourseCard.objects.all() if request.user.is_staff else CourseCard.objects.filter(is_enabled=True)
     course_card_ids = [cc.course_id for cc in cards_query_set]

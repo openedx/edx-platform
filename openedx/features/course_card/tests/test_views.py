@@ -1,3 +1,6 @@
+"""
+Unit tests for Course Card views
+"""
 from django.core.urlresolvers import reverse
 from pyquery import PyQuery as pq
 
@@ -13,7 +16,9 @@ from .helpers import disable_course_card, initialize_test_user, set_course_dates
 
 
 class CourseCardBaseClass(ModuleStoreTestCase):
-
+    """
+    Base class for Course Card view test cases
+    """
     password = 'test'
     # Always keep NUMBER_OF_COURSES greater than equal to 2
     NUMBER_OF_COURSES = 4
@@ -37,7 +42,7 @@ class CourseCardBaseClass(ModuleStoreTestCase):
 
         for course in self.courses:
             course.save()
-            CourseOverview._create_or_update(course=course).save()
+            CourseOverview._create_or_update(course=course).save()  # pylint: disable=protected-access
             CourseCard(course_id=course.id, course_name=course.display_name, is_enabled=True).save()
 
     @classmethod
@@ -47,6 +52,9 @@ class CourseCardBaseClass(ModuleStoreTestCase):
 
 
 class CourseCardViewBaseClass(CourseCardBaseClass):
+    """
+    Contains the test cases for course card view
+    """
 
     def test_enabled_courses_view(self):
         course = self.courses[0]
@@ -66,7 +74,7 @@ class CourseCardViewBaseClass(CourseCardBaseClass):
 
         # desired output is (NUMBER_OF_COURSES - 1) since one course's course card has been disabled,
         # and normal user should not be able to see disabled courses
-        self.assertEqual(pq(response.content)("article.course").length, len(self.courses)-1)
+        self.assertEqual(pq(response.content)("article.course").length, len(self.courses) - 1)
 
     def test_no_scheduled_or_ended_classes_case(self):
         ended_course = self.courses[0]
@@ -108,7 +116,7 @@ class CourseCardViewBaseClass(CourseCardBaseClass):
         )
 
         course.save()
-        CourseOverview._create_or_update(course=course).save()
+        CourseOverview._create_or_update(course=course).save()  # pylint: disable=protected-access
         CourseCard(course_id=course.id, course_name=course.display_name, is_enabled=True).save()
 
         self.client.login(username=self.staff.username, password=self.password)
