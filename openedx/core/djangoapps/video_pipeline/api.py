@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from oauth2_provider.models import Application
 from slumber.exceptions import HttpClientError
 
-from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration, VideoPipelineIntegration
+from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration
 from openedx.core.djangoapps.video_pipeline.utils import create_video_pipeline_api_client
 
 log = logging.getLogger(__name__)
@@ -72,22 +72,11 @@ def update_3rd_party_transcription_service_credentials(**credentials_payload):
     error_response, is_updated = {}, False
 
     vem_pipeline_integration = VEMPipelineIntegration.current()
-    veda_pipeline_integration = VideoPipelineIntegration.current()
 
     if vem_pipeline_integration.enabled:
         log.info('Sending transcript credentials to VEM for org: {} and provider: {}'.format(
             credentials_payload.get('org'), credentials_payload.get('provider')
         ))
         error_response, is_updated = send_transcript_credentials(vem_pipeline_integration, credentials_payload)
-        # If credentials update fail for VEM, return proper error message and discontinue to
-        # send credentials to VEDA because we are going to try it next time anyway
-        if not is_updated:
-            return error_response, is_updated
-
-    if veda_pipeline_integration.enabled:
-        log.info('Sending transcript credentials to VEDA for org: {} and provider: {}'.format(
-            credentials_payload.get('org'), credentials_payload.get('provider')
-        ))
-        error_response, is_updated = send_transcript_credentials(veda_pipeline_integration, credentials_payload)
 
     return error_response, is_updated

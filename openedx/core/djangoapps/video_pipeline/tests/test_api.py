@@ -21,18 +21,9 @@ class TestAPIUtils(VideoPipelineMixin, TestCase):
     """
     def setUp(self):
         """
-        Setup VEDA and VEM oauth clients.
+        Setup VEM oauth client.
         """
-        self.add_veda_client()
         self.add_vem_client()
-
-    def add_veda_client(self):
-        """
-        Creates a VEDA oauth client
-        """
-        self.veda_pipeline_integration = self.create_video_pipeline_integration()
-        self.veda_user = UserFactory(username=self.veda_pipeline_integration.service_username)
-        self.veda_oauth_client = self.create_video_pipeline_oauth_client(user=self.veda_user)
 
     def add_vem_client(self):
         """
@@ -40,50 +31,16 @@ class TestAPIUtils(VideoPipelineMixin, TestCase):
         """
         self.vem_pipeline_integration = self.create_vem_pipeline_integration()
         self.vem_user = UserFactory(username=self.vem_pipeline_integration.service_username)
-        self.vem_oauth_client = self.create_video_pipeline_oauth_client(user=self.vem_user, vem_enabled=True)
+        self.vem_oauth_client = self.create_video_pipeline_oauth_client(user=self.vem_user)
 
-    @patch('openedx.core.djangoapps.video_pipeline.api.log')
-    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient')
-    def test_update_transcription_service_credentials_with_one_integration_disabled(self, mock_client, mock_logger):
+    def test_update_transcription_service_credentials_with_vem_disabled(self):
         """
-        Test that updating the credentials when one of the service integration is disabled, allows
-        the credentials to be updated for other pipeline.
+        Test updating the credentials when VEM integration is disabled.
         """
-        mock_client.request.return_value.ok = True
-        credentials_payload = {
-            'org': 'mit', 'provider': 'ABC Provider', 'api_key': '61c56a8d0'
-        }
-
-        self.veda_pipeline_integration.enabled = False
-        self.veda_pipeline_integration.save()
-        __, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
-        mock_logger.info.assert_called_with('Sending transcript credentials to VEM for org: {} and provider: {}'.format(
-            credentials_payload.get('org'), credentials_payload.get('provider')
-        ))
-        self.assertTrue(is_updated)
-
-    def test_update_transcription_service_credentials_with_both_integration_disabled(self):
-        """
-        Test updating the credentials when both service integration are disabled.
-        """
-        # Disabling VEDA
-        self.veda_pipeline_integration.enabled = False
-        self.veda_pipeline_integration.save()
-
         # Disabling VEM
         self.vem_pipeline_integration.enabled = False
         self.vem_pipeline_integration.save()
 
-        __, is_updated = update_3rd_party_transcription_service_credentials()
-        self.assertFalse(is_updated)
-
-    def test_update_transcription_service_credentials_when_one_service_fails(self):
-        """
-        Test that if one of the transcription service fails to update credentials,
-        response from `update_3rd_party_transcription_service_credentials` is False.
-        """
-        self.vem_pipeline_integration.client_name = 'non_existent_client'
-        self.vem_pipeline_integration.save()
         __, is_updated = update_3rd_party_transcription_service_credentials()
         self.assertFalse(is_updated)
 
@@ -114,9 +71,6 @@ class TestAPIUtils(VideoPipelineMixin, TestCase):
         self.assertTrue(is_updated)
 
         mock_logger.info.assert_any_call('Sending transcript credentials to VEM for org: {} and provider: {}'.format(
-            credentials_payload.get('org'), credentials_payload.get('provider')
-        ))
-        mock_logger.info.assert_any_call('Sending transcript credentials to VEDA for org: {} and provider: {}'.format(
             credentials_payload.get('org'), credentials_payload.get('provider')
         ))
 
