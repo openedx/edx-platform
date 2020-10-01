@@ -22,20 +22,31 @@ class Command(BaseCommand):
     It expect that the data will be provided in a csv file format with
     first row being the header and columns will be either one of the
     following:
-    username,course-id
+    | username | course_id |
     OR
-    course-id
+    | course_id |
+
+    Example:
+            $ ... bulk_unenroll --csv_path=foo.csv
+            $ ... bulk_unenroll --csv_path=foo.csv --commit
     """
+    commit = False
 
     def add_arguments(self, parser):
-        parser.add_argument('-p', '--csv_path',
-                            metavar='csv_path',
-                            dest='csv_path',
-                            required=False,
-                            help='Path to CSV file.')
+        parser.add_argument(
+            '-p', '--csv_path',
+            metavar='csv_path',
+            dest='csv_path',
+            required=False,
+            help='Path to CSV file.')
+        parser.add_argument(
+            '--commit',
+            action='store_true',
+            help='Save the changes, without this flag only a dry run will be performed and nothing will be changed')
 
     def handle(self, *args, **options):
         csv_path = options['csv_path']
+        self.commit = options['commit']
 
         if csv_path:
             with open(csv_path, 'rb') as csv_file:
@@ -67,7 +78,13 @@ class Command(BaseCommand):
         if username:
             enrollments = enrollments.filter(user__username=username)
 
-        for enrollment in enrollments:
-            enrollment.update_enrollment(is_active=False, skip_refund=True)
-            logger.info("User [{}] have been successfully unenrolled from the course: {}"
-                        .format(enrollment.user.username, course_key))
+        logger.info("Processing [{}] with [{}] enrollments.".format(course_id, enrollments.count()))
+
+        if self.commit:
+            for enrollment in enrollments:
+                enrollment.update_enrollment(is_active=False, skip_refund=True)
+                logger.info(
+                    "User [{}] have been successfully unenrolled from the course: {}".format(
+                        enrollment.user.username, course_key
+                    )
+                )
