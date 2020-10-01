@@ -59,6 +59,16 @@ import '../helper.js'
             expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
 
+        it('can emit "progress_video" event', function() {
+            state.el.trigger('progress', [10]);
+            expect(Logger.log).toHaveBeenCalledWith('progress_video', {
+                id: 'id',
+                code: this.code,
+                percentage: 10,
+                duration: this.duration
+            });
+        });
+
         it('can emit "speed_change_video" event', function() {
             state.el.trigger('speedchange', ['2.0', '1.0']);
             expect(Logger.log).toHaveBeenCalledWith('speed_change_video', {
@@ -204,6 +214,7 @@ import '../helper.js'
                 skip: plugin.onSkip,
                 speedchange: plugin.onSpeedChange,
                 autoadvancechange: plugin.onAutoAdvanceChange,
+                progress: plugin.onProgress,
                 'language_menu:show': plugin.onShowLanguageMenu,
                 'language_menu:hide': plugin.onHideLanguageMenu,
                 'transcript:show': plugin.onShowTranscript,
