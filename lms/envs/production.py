@@ -285,6 +285,8 @@ CELERY_QUEUES.update(
     }
 )
 
+CELERY_TASK_QUEUES = CELERY_QUEUES
+
 # following setting is for backward compatibility
 if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):
     COMPREHENSIVE_THEME_DIR = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR')
