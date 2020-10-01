@@ -8,7 +8,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from scipy import stats
 
-from contentstore.views.item import highlights_setting
+from cms.djangoapps.contentstore.views.item import highlights_setting
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.graph_traversals import traverse_pre_order

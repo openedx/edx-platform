@@ -11,10 +11,10 @@ import six
 from django.test.client import Client, RequestFactory
 from xblock.core import XBlock, XBlockAside
 
-from contentstore.utils import reverse_usage_url
-from contentstore.views.preview import _preview_module_system, get_preview_fragment
+from cms.djangoapps.contentstore.utils import reverse_usage_url
+from ..preview import _preview_module_system, get_preview_fragment
 from student.tests.factories import UserFactory
-from xblock_config.models import StudioConfig
+from cms.djangoapps.xblock_config.models import StudioConfig
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

@@ -31,11 +31,11 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.validation import ValidationMessage
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.views import item as item_module
-from contentstore.views.component import component_handler, get_component_templates
-from contentstore.views.item import (
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.views import item as item_module
+from ..component import component_handler, get_component_templates
+from ..item import (
     ALWAYS,
     VisibilityState,
     _get_module_info,

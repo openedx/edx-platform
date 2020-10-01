@@ -18,9 +18,9 @@ from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
 from pytz import UTC
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views import assets
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.views import assets
 from static_replace import replace_static_urls
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent

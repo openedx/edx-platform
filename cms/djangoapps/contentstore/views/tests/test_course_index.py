@@ -19,17 +19,17 @@ from edx_django_utils.monitoring.middleware import _DEFAULT_NAMESPACE as DJANGO_
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
 
-from contentstore.config.waffle import WAFFLE_NAMESPACE as STUDIO_WAFFLE_NAMESPACE
-from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
-from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
-from contentstore.views.course import (
+from cms.djangoapps.contentstore.config.waffle import WAFFLE_NAMESPACE as STUDIO_WAFFLE_NAMESPACE
+from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
+from ..course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
+from ..course import (
     _deprecated_blocks_info,
     course_outline_initial_state,
     reindex_course_and_check_access
 )
-from contentstore.views.item import VisibilityState, create_xblock_info
+from ..item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace

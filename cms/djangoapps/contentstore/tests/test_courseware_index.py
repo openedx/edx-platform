@@ -20,16 +20,16 @@ from search.search_engine_base import SearchEngine
 from six.moves import range
 from xblock.core import XBlock
 
-from contentstore.courseware_index import (
+from cms.djangoapps.contentstore.courseware_index import (
     CourseAboutSearchIndexer,
     CoursewareSearchIndexer,
     LibrarySearchIndexer,
     SearchIndexingError
 )
-from contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
-from contentstore.tasks import update_search_index
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
+from cms.djangoapps.contentstore.tasks import update_search_index
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.models.course_details import CourseDetails

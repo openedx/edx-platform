@@ -8,8 +8,8 @@ Course Header Menu Tests.
 from django.conf import settings
 from django.test.utils import override_settings
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from util.testing import UrlResetMixin
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()

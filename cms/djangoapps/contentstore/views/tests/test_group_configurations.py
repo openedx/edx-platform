@@ -13,9 +13,9 @@ import six
 from mock import patch
 from six.moves import range
 
-from contentstore.course_group_config import CONTENT_GROUP_CONFIGURATION_NAME, ENROLLMENT_SCHEME, GroupConfiguration
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.course_group_config import CONTENT_GROUP_CONFIGURATION_NAME, ENROLLMENT_SCHEME, GroupConfiguration
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from xmodule.modulestore import ModuleStoreEnum

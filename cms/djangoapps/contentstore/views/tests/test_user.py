@@ -7,8 +7,8 @@ import json
 
 from django.contrib.auth.models import User
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from student import auth
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole

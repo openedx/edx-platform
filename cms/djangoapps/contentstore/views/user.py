@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
-from course_creators.views import user_requested_access
+from cms.djangoapps.course_creators.views import user_requested_access
 from edxmako.shortcuts import render_to_response
 from student import auth
 from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions

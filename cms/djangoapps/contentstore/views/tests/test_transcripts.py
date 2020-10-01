@@ -17,7 +17,7 @@ from edxval.api import create_video
 from mock import Mock, patch
 from opaque_keys.edx.keys import UsageKey
 
-from contentstore.tests.utils import CourseTestCase, mock_requests_get
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase, mock_requests_get
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore

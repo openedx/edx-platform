@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.utils.http import urlquote_plus
 from waffle.decorators import waffle_switch
 
-from contentstore.config import waffle
+from ..config import waffle
 from edxmako.shortcuts import render_to_response
 
 __all__ = ['register_redirect_to_lms', 'login_redirect_to_lms', 'howitworks', 'accessibility']

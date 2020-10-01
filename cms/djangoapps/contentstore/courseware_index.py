@@ -5,7 +5,7 @@ import re
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 
-from contentstore.course_group_config import GroupConfiguration
+from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
 from course_modes.models import CourseMode
 from django.conf import settings
 from django.urls import resolve

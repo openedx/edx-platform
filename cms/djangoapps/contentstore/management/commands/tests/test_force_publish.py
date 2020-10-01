@@ -7,8 +7,8 @@ import mock
 import six
 from django.core.management import CommandError, call_command
 
-from contentstore.management.commands.force_publish import Command
-from contentstore.management.commands.utils import get_course_versions
+from cms.djangoapps.contentstore.management.commands.force_publish import Command
+from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

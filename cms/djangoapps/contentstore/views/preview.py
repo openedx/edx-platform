@@ -18,8 +18,8 @@ from xblock.runtime import KvsFieldData
 
 import static_replace
 from cms.lib.xblock.field_data import CmsFieldData
-from contentstore.utils import get_visibility_partition_info
-from contentstore.views.access import get_user_role
+from ..utils import get_visibility_partition_info
+from .access import get_user_role
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.license import wrap_with_license
@@ -32,7 +32,7 @@ from openedx.core.lib.xblock_utils import (
     xblock_local_resource_url
 )
 from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from xblock_config.models import StudioConfig
+from cms.djangoapps.xblock_config.models import StudioConfig
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor

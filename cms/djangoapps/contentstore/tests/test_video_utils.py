@@ -17,8 +17,8 @@ from django.test.utils import override_settings
 from edxval.api import create_profile, create_video, get_course_video_image_url, update_video_image
 from mock import patch
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.video_utils import (
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.video_utils import (
     YOUTUBE_THUMBNAIL_SIZES,
     download_youtube_video_thumbnail,
     scrape_youtube_thumbnail,
