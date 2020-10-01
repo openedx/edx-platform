@@ -15,7 +15,8 @@
                 return new EventsPlugin(state, i18n, options);
             }
 
-            _.bindAll(this, 'onReady', 'onPlay', 'onPause', 'onEnded', 'onSeek',
+            // eslint-disable-next-line no-undef
+            _.bindAll(this, 'onReady', 'onPlay', 'onPause', 'onEnded', 'onSeek', 'onProgress',
             'onSpeedChange', 'onAutoAdvanceChange', 'onShowLanguageMenu', 'onHideLanguageMenu',
             'onSkip', 'onShowTranscript', 'onHideTranscript', 'onShowCaptions', 'onHideCaptions',
             'destroy');
@@ -46,6 +47,7 @@
                     skip: this.onSkip,
                     speedchange: this.onSpeedChange,
                     autoadvancechange: this.onAutoAdvanceChange,
+                    progress: this.onProgress,
                     'language_menu:show': this.onShowLanguageMenu,
                     'language_menu:hide': this.onHideLanguageMenu,
                     'transcript:show': this.onShowTranscript,
@@ -134,6 +136,10 @@
 
             onHideCaptions: function() {
                 this.log('edx.video.closed_captions.hidden', {current_time: this.getCurrentTime()});
+            },
+
+            onProgress: function(event, percentage) {
+                this.log('progress_video', {percentage: percentage});
             },
 
             getCurrentTime: function() {
