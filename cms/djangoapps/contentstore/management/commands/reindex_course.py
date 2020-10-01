@@ -12,7 +12,7 @@ from opaque_keys.edx.locator import CourseLocator
 from search.search_engine_base import SearchEngine
 from six.moves import map
 
-from contentstore.courseware_index import CoursewareSearchIndexer
+from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer
 from xmodule.modulestore.django import modulestore
 
 from .prompt import query_yes_no

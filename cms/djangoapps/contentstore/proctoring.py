@@ -18,7 +18,7 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException, ProctoredExamReviewPolicyNotFoundException
 
-from contentstore.views.helpers import is_item_in_course_tree
+from .views.helpers import is_item_in_course_tree
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

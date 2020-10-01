@@ -19,11 +19,11 @@ from xblock.test.tools import TestRuntime
 
 from cms.lib.xblock.tagging import StructuredTagsAside
 from cms.lib.xblock.tagging.models import TagAvailableValues, TagCategories
-from contentstore.tests.utils import AjaxEnabledTestClient
-from contentstore.utils import reverse_usage_url
-from contentstore.views.preview import get_preview_fragment
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
+from cms.djangoapps.contentstore.utils import reverse_usage_url
+from cms.djangoapps.contentstore.views.preview import get_preview_fragment
 from student.tests.factories import UserFactory
-from xblock_config.models import StudioConfig
+from cms.djangoapps.xblock_config.models import StudioConfig
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

@@ -10,8 +10,8 @@ from django.conf import settings
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
-from contentstore.tasks import rerun_course
-from contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.tasks import rerun_course
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
 from student.auth import has_course_author_access

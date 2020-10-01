@@ -10,8 +10,8 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from contentstore.management.commands.utils import user_from_str
-from contentstore.views.course import create_new_course_in_store
+from cms.djangoapps.contentstore.management.commands.utils import user_from_str
+from cms.djangoapps.contentstore.views.course import create_new_course_in_store
 from openedx.core.djangoapps.catalog.utils import get_course_runs
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError

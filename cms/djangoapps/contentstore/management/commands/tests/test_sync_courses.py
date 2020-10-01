@@ -6,7 +6,7 @@ from django.core.management import call_command
 from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
 
-from contentstore.views.course import create_new_course_in_store
+from cms.djangoapps.contentstore.views.course import create_new_course_in_store
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.tests.factories import UserFactory

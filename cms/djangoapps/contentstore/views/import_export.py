@@ -30,9 +30,9 @@ from storages.backends.s3boto import S3BotoStorage
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from contentstore.storage import course_import_export_storage
-from contentstore.tasks import CourseExportTask, CourseImportTask, export_olx, import_olx
-from contentstore.utils import reverse_course_url, reverse_library_url
+from ..storage import course_import_export_storage
+from ..tasks import CourseExportTask, CourseImportTask, export_olx, import_olx
+from ..utils import reverse_course_url, reverse_library_url
 from edxmako.shortcuts import render_to_response
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse

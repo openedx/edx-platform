@@ -6,7 +6,7 @@ from textwrap import dedent
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from contentstore.course_group_config import GroupConfiguration
+from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup, CourseUserGroupPartitionGroup

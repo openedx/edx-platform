@@ -6,7 +6,7 @@ Unit tests for the gating feature in Studio
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 
-from contentstore.signals.handlers import handle_item_deleted
+from cms.djangoapps.contentstore.signals.handlers import handle_item_deleted
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

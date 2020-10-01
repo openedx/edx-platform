@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
-from contentstore.views.access import get_user_role
+from ..access import get_user_role
 from student.auth import add_users
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory

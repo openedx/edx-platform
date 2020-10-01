@@ -10,10 +10,10 @@ from hashlib import sha1
 import six
 from eventtracking import tracker
 
-from contentstore.signals.signals import GRADING_POLICY_CHANGED
+from cms.djangoapps.contentstore.signals.signals import GRADING_POLICY_CHANGED
 from track.event_transaction_utils import create_new_event_transaction_id
 from xmodule.modulestore.django import modulestore
-from models.settings.waffle import material_recompute_only
+from cms.djangoapps.models.settings.waffle import material_recompute_only
 
 log = logging.getLogger(__name__)
 

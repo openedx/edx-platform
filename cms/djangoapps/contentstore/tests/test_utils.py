@@ -9,8 +9,8 @@ from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 
-from contentstore import utils
-from contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore import utils
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
