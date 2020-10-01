@@ -12,9 +12,10 @@ from third_party_auth.tests import testutil
 from third_party_auth.tests.specs.base import IntegrationTestMixin
 from third_party_auth.tests.specs.test_testshib import SamlIntegrationTestUtilities
 from third_party_auth.tests.testutil import simulate_running_pipeline
+from third_party_auth.tests.utils import skip_unless_thirdpartyauth
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@skip_unless_thirdpartyauth()
 @ddt.ddt
 class ProviderUserStateTestCase(testutil.TestCase):
     """Tests ProviderUserState behavior."""
@@ -54,7 +55,7 @@ class ProviderUserStateTestCase(testutil.TestCase):
             self.assertEqual(idp_config['logout_url'], logout_url)
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@skip_unless_thirdpartyauth()
 @ddt.ddt
 class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
     """

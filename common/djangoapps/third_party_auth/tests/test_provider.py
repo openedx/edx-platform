@@ -12,12 +12,12 @@ from mock import Mock, patch
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from third_party_auth import provider
 from third_party_auth.tests import testutil
-
+from third_party_auth.tests.utils import skip_unless_thirdpartyauth
 SITE_DOMAIN_A = 'professionalx.example.com'
 SITE_DOMAIN_B = 'somethingelse.example.com'
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@skip_unless_thirdpartyauth()
 class RegistryTest(testutil.TestCase):
     """Tests registry discovery and operation."""
 
