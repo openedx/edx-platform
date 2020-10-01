@@ -1,0 +1,44 @@
+<%page args="resume_button_url, course_overview, enrollment, is_unfulfilled_entitlement, course_target, related_programs" expression_filter="h"/>
+
+<%!
+import six
+from django.utils.translation import ugettext as _
+
+MICROBACHELORS_SLUG = 'microbachelors'
+%>
+
+% if resume_button_url != '':
+  <%
+    account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
+    show_coaching_consent_form  = plugins.get("coaching", {}).get("show_coaching_consent_form")
+    if related_programs and account_mfe_url != '' and show_coaching_consent_form:
+      for program in related_programs:
+        if program.get('type_attrs', {}).get('slug') == MICROBACHELORS_SLUG:
+          resume_button_url = "%s/coaching_consent?next=%s" % (account_mfe_url, getattr(settings, 'LMS_ROOT_URL', '') + resume_button_url)
+  %>
+  <a href="${resume_button_url}"
+      class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
+      data-course-key="${enrollment.course_id}">
+    ${_('Resume Course')}
+    <span class="sr">
+      &nbsp;${course_overview.display_name_with_default}
+    </span>
+  </a>
+% else:
+  <%
+    account_mfe_url = getattr(settings, 'ACCOUNT_MICROFRONTEND_URL', '') or ''
+    show_coaching_consent_form = plugins.get("coaching", {}).get("show_coaching_consent_form")
+    if related_programs and account_mfe_url != '' and show_coaching_consent_form:
+      for program in related_programs:
+        if program.get('type_attrs', {}).get('slug') == MICROBACHELORS_SLUG:
+          course_target = "%s/coaching_consent?next=%s" % (account_mfe_url, getattr(settings, 'LMS_ROOT_URL', '') + course_target)
+  %>
+  <a href="${course_target}"
+      class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
+      data-course-key="${enrollment.course_id}">
+    ${_('View Course')}
+    <span class="sr">
+      &nbsp;${course_overview.display_name_with_default}
+    </span>
+  </a>
+% endif

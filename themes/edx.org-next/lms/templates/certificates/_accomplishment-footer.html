@@ -1,0 +1,31 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<div class="wrapper-footer">
+    <footer class="footer-app" role="contentinfo" id="company-info">
+        <div class="footer-app-legal">
+            <nav class="footer-app-nav">
+                <ul class="list list-legal">
+                    <li class="nav-item">
+                        <a class="action" href="${company_tos_url}">${_("Terms of Service & Honor Code")}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="action" href="https://www.edx.org/edx-privacy-policy">${_("Privacy Policy")}</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="copyright-trademarks">
+                <p class="copy">
+                    <span class="copyright">&copy;
+                        <a href="http://www.edx.org">${_("edX Inc.")}</a>
+                    </span>
+                    ${_("All rights reserved except where noted. edX, Open edX and the edX and Open edX logos are registered trademarks of edX Inc.")}</p>
+            </div>
+        </div>
+        <div class="footer-app-related">
+            <a class="img-link" href="http://edx.org/about"><img class="logo-img logo-openedx" src="https://edxuploads.s3.amazonaws.com/certificate_template_assets/3/edx-openedx-logo-tag.png" alt="${_('Powered by Open edX')}" /></a>
+        </div>
+    </footer>
+</div>

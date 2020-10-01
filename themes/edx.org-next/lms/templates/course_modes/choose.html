@@ -1,0 +1,247 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%namespace name='static' file='/static_content.html'/>
+<%block name="bodyclass">register verification-process step-select-track</%block>
+<%block name="pagetitle">
+    ${_("Enroll In {course_name} | Choose Your Track").format(course_name=course_name)}
+</%block>
+
+<%block name="js_extra">
+    <script type="text/javascript">
+        var expandCallback = function(event) {
+            event.preventDefault();
+            $(this).next('.expandable-area').slideToggle();
+            var title = $(this).parent();
+            title.toggleClass('is-expanded');
+            if (title.attr("aria-expanded") === "false") {
+                title.attr("aria-expanded", "true");
+            } else {
+                title.attr("aria-expanded", "false");
+            }
+        };
+
+        $(document).ready(function() {
+            $('.expandable-area').slideUp();
+            $('.is-expandable').addClass('is-ready');
+
+            $('.is-expandable .title-expand').click(expandCallback);
+            $('.is-expandable .title-expand').keypress(function(e) {
+                if (e.which == 13) {  // only activate on pressing enter
+                    expandCallback.call(this, e); // make sure that we bind `this` correctly
+                }
+            });
+
+            $('#contribution-other-amt').focus(function() {
+                $('#contribution-other').attr('checked',true);
+            });
+
+            % if use_ecommerce_payment_flow:
+            $('button[name=verified_mode]').click(function(e){
+                e.preventDefault();
+                window.location.href = '${ecommerce_payment_page | n, js_escaped_string}?sku=' +
+                encodeURIComponent('${sku | n, js_escaped_string}');
+            });
+            % endif
+        });
+    </script>
+</%block>
+<%static:webpack entry="Currency">
+    new Currency();
+</%static:webpack>
+
+<%block name="header_extras">
+    <link rel="stylesheet" type="text/css" href="${static.url('paragon/static/paragon.min.css')}" />
+</%block>
+
+<%block name="content">
+    % if error:
+        <div class="wrapper-msg wrapper-msg-error">
+            <div class=" msg msg-error">
+                <span class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></span>
+                <div class="msg-content">
+                    <h3 class="title">${_("Sorry, there was an error when trying to enroll you")}</h3>
+                    <div class="copy">
+                        <p>${error}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    %endif
+
+    <div id="currency_data" value="${currency_data}"></div>
+
+    <div class="container">
+        <section class="wrapper">
+            <div class="wrapper-register-choose wrapper-content-main">
+                <article class="register-choose content-main">
+                    <header class="page-header content-main">
+                        <h3 class="title">
+                            ${title_content}
+                        </h3>
+                    </header>
+
+                    <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+                        <%
+                        b_tag_kwargs = {'b_start': HTML('<b>'), 'b_end': HTML('</b>')}
+                        %>
+                        % if "verified" in modes:
+                            <div class="register-choice register-choice-certificate">
+                                <div class="wrapper-copy">
+                                    <span class="deco-ribbon"></span>
+                                    % if has_credit_upsell:
+                                    % if content_gating_enabled or course_duration_limit_enabled:
+                                        <h4 class="title">${_("Pursue Academic Credit with the Verified Track")}</h4>
+                                    % else:
+                                        <h4 class="title">${_("Pursue Academic Credit with a Verified Certificate")}</h4>
+                                    % endif
+
+                                    <div class="copy">
+                                        <p>${_("Become eligible for academic credit and highlight your new skills and knowledge with a verified certificate. Use this valuable credential to qualify for academic credit, advance your career, or strengthen your school applications.")}</p>
+                                        <p>
+                                            <div class="wrapper-copy-inline">
+                                                <div class="copy-inline">
+                                                    % if content_gating_enabled or course_duration_limit_enabled:
+                                                        <h4>${_("Benefits of the Verified Track")}</h4>
+                                                        <ul>
+                                                            <li>${Text(_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course")).format(**b_tag_kwargs)}</li>
+                                                            % if course_duration_limit_enabled:
+                                                                <li>${Text(_("{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access materials anytime to brush up on what you've learned.")).format(**b_tag_kwargs)}</li>
+                                                            % endif
+                                                            % if content_gating_enabled:
+                                                                <li>${Text(_("{b_start}Graded Assignments: {b_end}Build your skills through graded assignments and projects.")).format(**b_tag_kwargs)}</li>
+                                                            % endif
+                                                            <li>${Text(_("{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn.")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified certificates to help fund affordable education to everyone globally.")).format(**b_tag_kwargs)}</li>
+                                                        </ul>
+                                                    % else:
+                                                        <h4>${_("Benefits of a Verified Certificate")}</h4>
+                                                        <ul>
+                                                            <li>${Text(_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Official:{b_end} Receive an instructor-signed certificate with the institution's logo")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, or post it directly on LinkedIn")).format(**b_tag_kwargs)}</li>
+                                                        </ul>
+                                                    % endif
+                                                </div>
+                                                <div class="copy-inline list-actions">
+                                                    <ul class="list-actions">
+                                                        <%include file='_upgrade_button.html' args='content_gating_enabled=content_gating_enabled, course_duration_limit_enabled=course_duration_limit_enabled, min_price=min_price, price_before_discount=price_before_discount' />
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </div>
+                                    % else:
+                                    % if content_gating_enabled or course_duration_limit_enabled:
+                                        <h4 class="title">${_("Pursue the Verified Track")}</h4>
+                                    % else:
+                                        <h4 class="title">${_("Pursue a Verified Certificate")}</h4>
+                                    % endif
+                                    <div class="copy">
+                                        <p>${_("Highlight your new knowledge and skills with a verified certificate. Use this valuable credential to improve your job prospects and advance your career, or highlight your certificate in school applications.")}</p>
+                                        <p>
+                                            <div class="wrapper-copy-inline">
+                                                <div class="copy-inline">
+                                                    % if content_gating_enabled or course_duration_limit_enabled:
+                                                        <h4>${_("Benefits of the Verified Track")}</h4>
+                                                        <ul>
+                                                            % if course_duration_limit_enabled:
+                                                                <li>${Text(_("{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access materials anytime to brush up on what you've learned.")).format(**b_tag_kwargs)}</li>
+                                                            % endif
+                                                            % if content_gating_enabled:                                                                
+                                                                <li>${Text(_("{b_start}Graded Assignments: {b_end}Build your skills through graded assignments and projects.")).format(**b_tag_kwargs)}</li>
+                                                            % endif
+                                                            <li>${Text(_("{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn.")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified certificates to help fund affordable education to everyone globally.")).format(**b_tag_kwargs)}</li>
+                                                        </ul>
+                                                    % else:
+                                                        <h4>${_("Benefits of a Verified Certificate")}</h4>
+                                                        <ul>
+                                                            <li>${Text(_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified certificates to help fund free education for everyone globally")).format(**b_tag_kwargs)}</li>
+                                                        </ul>
+                                                    % endif
+                                                    <ul>
+                                                    </ul>
+                                                </div>
+                                                <div class="copy-inline list-actions">
+                                                    <ul class="list-actions">
+                                                        <%include file='_upgrade_button.html' args='content_gating_enabled=content_gating_enabled, course_duration_limit_enabled=course_duration_limit_enabled, min_price=min_price, price_before_discount=price_before_discount' />
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </p>
+                                    </div>
+                                    % endif
+                                </div>
+                            </div>
+                        % endif
+
+                        % if "honor" in modes:
+                            <span class="deco-divider">
+                                <span class="copy">${_("or")}</span>
+                            </span>
+
+                            <div class="register-choice register-choice-audit">
+                                <div class="wrapper-copy">
+                                    <span class="deco-ribbon"></span>
+                                    <h4 class="title">${_("Audit This Course")}</h4>
+                                    <div class="copy">
+                                        <p>${_("Audit this course for free and have complete access to all the course material, activities, tests, and forums.")}</p>
+                                    </div>
+                                </div>
+
+                                <ul class="list-actions">
+                                    <li class="action action-select">
+                                        <input type="submit" name="honor_mode" value="${_('Audit This Course')}" />
+                                    </li>
+                                </ul>
+                            </div>
+                        % elif "audit" in modes:
+                            <span class="deco-divider">
+                                <span class="copy">${_("or")}</span>
+                            </span>
+
+                            <div class="register-choice register-choice-audit">
+                                <div class="wrapper-copy">
+                                    <span class="deco-ribbon"></span>
+                                    <h4 class="title">${_("Audit This Course (No Certificate)")}</h4>
+                                    <div class="copy">
+                                        ## Translators: b_start notes the beginning of a section of text bolded for emphasis, and b_end marks the end of the bolded text.
+                                        % if content_gating_enabled and course_duration_limit_enabled:
+                                            <p>${Text(_("Audit this course for free and have access to course materials and discussions forums. {b_start}This track does not include graded assignments, or unlimited course access.{b_end}")).format(**b_tag_kwargs)}</p>
+                                        % elif content_gating_enabled and not course_duration_limit_enabled:
+                                            <p>${Text(_("Audit this course for free and have access to course materials and discussions forums. {b_start}This track does not include graded assignments.{b_end}")).format(**b_tag_kwargs)}</p>
+                                        % elif not content_gating_enabled and course_duration_limit_enabled:
+                                            <p>${Text(_("Audit this course for free and have access to course materials and discussions forums. {b_start}This track does not include unlimited course access.{b_end}")).format(**b_tag_kwargs)}</p>
+                                        % else:
+                                            <p>${Text(_("Audit this course for free and have complete access to all the course material, activities, tests, and forums.  {b_start}Please note that this track does not offer a certificate for learners who earn a passing grade.{b_end}")).format(**b_tag_kwargs)}</p>
+                                        % endif
+                                    </div>
+                                </div>
+
+                                <ul class="list-actions">
+                                    <li class="action action-select">
+                                        <input type="submit" name="audit_mode" value="${_('Audit This Course')}" />
+                                    </li>
+                                </ul>
+                            </div>
+                        % endif
+
+                        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                    </form>
+                </article>
+            </div> <!-- /wrapper-content-main -->
+        </section>
+    </div>
+</%block>

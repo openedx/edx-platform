@@ -1,0 +1,14 @@
+<%page expression_filter="h"/>
+<%! 
+from django.utils.translation import ugettext as _ 
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<div class="accomplishment-metadata-bit accomplishment-metadata-aboutedx">
+    <h3 class="accomplishment-metadata-title">${_("About edX")}</h3>
+    <p class="accomplishment-metadata-copy">
+        ${Text(_("{link_start}edX{link_end} offers interactive online classes and MOOCs from the world's best universities, including MIT, Harvard, Berkeley, University of Texas, and many others. edX is a non-profit online initiative created by founding partners Harvard and MIT.")).format(
+            link_start=HTML('<a href="http://www.edx.org">'),
+            link_end=HTML('</a>'),
+        )}
+    </p>
+</div>
