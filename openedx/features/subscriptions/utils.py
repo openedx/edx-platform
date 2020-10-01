@@ -13,7 +13,7 @@ def track_subscription_enrollment(subscription_id, username, course_id):
     if subscription_id:
         enrollment = api.get_enrollment(username, course_id)
         user = User.objects.get(username=username)
-        valid_user_subscription = UserSubscription.get_valid_subscription(user.id).first()
+        valid_user_subscription = UserSubscription.get_valid_subscriptions(user.id).first()
         if valid_user_subscription and valid_user_subscription.subscription_id == subscription_id:
             valid_user_subscription.course_enrollments.add(enrollment)
 
