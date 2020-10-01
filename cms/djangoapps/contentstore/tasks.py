@@ -449,7 +449,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             if courselike_module.entrance_exam_enabled:
                 fake_request = RequestFactory().get(u'/')
                 fake_request.user = user
-                from contentstore.views.entrance_exam import remove_entrance_exam_milestone_reference
+                from .views.entrance_exam import remove_entrance_exam_milestone_reference
                 # TODO: Is this really ok?  Seems dangerous for a live course
                 remove_entrance_exam_milestone_reference(fake_request, courselike_key)
                 LOGGER.info(
@@ -549,6 +549,6 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
                 metadata = {u'entrance_exam_id': text_type(entrance_exam_chapter.location)}
                 CourseMetadata.update_from_dict(metadata, course, user)
-                from contentstore.views.entrance_exam import add_entrance_exam_milestone
+                from .views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(u'Course %s Entrance exam imported', course.id)

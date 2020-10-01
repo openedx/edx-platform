@@ -16,7 +16,7 @@ from six.moves import range
 
 from contentstore.tests.utils import AjaxEnabledTestClient
 from contentstore.utils import delete_course
-from contentstore.views.course import (
+from cms.djangoapps.contentstore.views.course import (
     AccessListFallback,
     _accessible_courses_iter_for_tests,
     _accessible_courses_list_from_groups,
