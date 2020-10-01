@@ -138,6 +138,99 @@ class UnitTestLibraries(CourseTestCase):
             self.assertEqual(entry["display_name"], lib_dict[key].display_name)
             del lib_dict[key]  # To ensure no duplicates are matched
 
+    def test_list_paginated_libraries(self):
+        """
+        Test that we can GET /library/ to list all libraries visible to the current user
+        with a default 50 items per page using pagination.
+        """
+        # Create some more libraries
+        libraries = [LibraryFactory.create() for _ in range(3)]
+        lib_dict = {lib.location.library_key: lib for lib in libraries}
+
+        response = self.client.get_json(LIBRARY_REST_URL, {
+            "pagination": "true",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        response_data = parse_json(response)
+        lib_list = response_data["results"]
+
+        self.assertEqual(response_data["count"], len(lib_list))
+        self.assertEqual(len(lib_list), len(libraries))
+        for entry in lib_list:
+            self.assertIn("library_key", entry)
+            self.assertIn("display_name", entry)
+            key = CourseKey.from_string(entry["library_key"])
+            self.assertIn(key, lib_dict)
+            self.assertEqual(entry["display_name"], lib_dict[key].display_name)
+            del lib_dict[key]  # To ensure no duplicates are matched
+
+    def test_list_paginated_libraries_with_page_size_set(self):
+        """
+        Test that we can GET /library/ to list all libraries visible to the current user
+        with a 5 items per page using pagination.
+        """
+        # Create some more libraries
+        page_size = 5
+        libraries = [LibraryFactory.create() for _ in range(10)]
+
+        response = self.client.get_json(LIBRARY_REST_URL, {
+            "pagination": "true",
+            "page_size": page_size
+        })
+
+        self.assertEqual(response.status_code, 200)
+        response_data = parse_json(response)
+        lib_list = response_data["results"]
+
+        self.assertEqual(response_data["count"], len(libraries))
+        self.assertEqual(len(lib_list), page_size)
+
+        stored_libraries = self.store.get_libraries()
+        selected_libs = [
+            {
+                'display_name': lib.display_name,
+                'library_key': text_type(lib.location.library_key),
+            } for lib in stored_libraries[0:page_size]
+        ]
+
+        self.assertListEqual(selected_libs, lib_list)
+
+    def test_list_paginated_libraries_with_a_specific_page_selected(self):
+        """
+        Test that we can GET /library/ to list all libraries visible to the current user
+        with a 5 items per page on a specific page using pagination.
+        """
+        # Create some more libraries
+        page = 2
+        page_size = 5
+        libraries = [LibraryFactory.create() for _ in range(15)]
+
+        response = self.client.get_json(LIBRARY_REST_URL, {
+            "pagination": "true",
+            "page_size": page_size,
+            "page": page
+        })
+
+        self.assertEqual(response.status_code, 200)
+        response_data = parse_json(response)
+        lib_list = response_data["results"]
+
+        self.assertEqual(response_data["count"], len(libraries))
+        self.assertEqual(len(lib_list), page_size)
+
+        offset = (page - 1) * page_size
+        limit = page * page_size
+        stored_libraries = self.store.get_libraries()
+        selected_libs = [
+            {
+                'display_name': lib.display_name,
+                'library_key': text_type(lib.location.library_key),
+            } for lib in stored_libraries[offset:limit]
+        ]
+
+        self.assertListEqual(selected_libs, lib_list)
+
     @ddt.data("delete", "put")
     def test_bad_http_verb(self, verb):
         """

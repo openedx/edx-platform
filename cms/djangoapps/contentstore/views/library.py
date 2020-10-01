@@ -151,16 +151,27 @@ def _list_libraries(request):
     """
     org = request.GET.get('org', '')
     text_search = request.GET.get('text_search', '').lower()
+    paginate = request.GET.get('pagination', 'false').lower() == 'true'
 
     if org:
         libraries = modulestore().get_libraries(org=org)
     else:
         libraries = modulestore().get_libraries()
 
+    library_count = len(libraries)
+
+    if paginate:
+        page = int(request.GET.get('page', 1))
+        page_size = int(request.GET.get('page_size', 50))
+
+        offset = (page - 1) * page_size
+        limit = page * page_size
+        libraries = libraries[offset:limit]
+
     lib_info = [
         {
-            "display_name": lib.display_name,
-            "library_key": text_type(lib.location.library_key),
+            'display_name': lib.display_name,
+            'library_key': text_type(lib.location.library_key),
         }
         for lib in libraries
         if (
@@ -172,6 +183,16 @@ def _list_libraries(request):
             has_studio_read_access(request.user, lib.location.library_key)
         )
     ]
+
+    if paginate:
+        # This format is used by rest-framework based paginated API endpoints
+        # so we can use the same response processing on the client side as we
+        # do with other API endpoints
+        return JsonResponse({
+            'results': lib_info,
+            'count': library_count,
+        })
+
     return JsonResponse(lib_info)
 
 
