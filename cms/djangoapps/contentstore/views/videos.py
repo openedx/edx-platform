@@ -41,9 +41,9 @@ from edxval.api import (
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from contentstore.models import VideoUploadConfig
-from contentstore.utils import reverse_course_url
-from contentstore.video_utils import validate_video_image
+from ..models import VideoUploadConfig
+from ..utils import reverse_course_url
+from ..video_utils import validate_video_image
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import (

@@ -16,9 +16,9 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
 from six.moves import range
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
-from contentstore.views.certificates import CERTIFICATE_SCHEMA_VERSION, CertificateManager
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
+from ..certificates import CERTIFICATE_SCHEMA_VERSION, CertificateManager
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole

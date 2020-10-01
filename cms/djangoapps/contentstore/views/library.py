@@ -19,8 +19,8 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from six import text_type
 
-from contentstore.utils import add_instructor, reverse_library_url
-from contentstore.views.item import create_xblock_info
+from ..utils import add_instructor, reverse_library_url
+from .item import create_xblock_info
 from course_creators.views import get_course_creator_status
 from edxmako.shortcuts import render_to_response
 from student.auth import (

@@ -30,10 +30,10 @@ from mock import Mock, patch
 from six import StringIO
 from waffle.testutils import override_flag
 
-from contentstore.models import VideoUploadConfig
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views.videos import (
+from cms.djangoapps.contentstore.models import VideoUploadConfig
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from ..videos import (
     ENABLE_VIDEO_UPLOAD_PAGINATION,
     KEY_EXPIRATION_IN_SECONDS,
     VIDEO_IMAGE_UPLOAD_ENABLED,

@@ -13,7 +13,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from opaque_keys.edx.keys import CourseKey
 
-from contentstore.views.videos import TranscriptProvider
+from .videos import TranscriptProvider
 from edxval.api import (
     create_or_update_video_transcript,
     delete_video_transcript,

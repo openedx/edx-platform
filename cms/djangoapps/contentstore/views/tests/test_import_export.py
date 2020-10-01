@@ -26,9 +26,9 @@ from six.moves import zip
 from storages.backends.s3boto import S3BotoStorage
 from user_tasks.models import UserTaskStatus
 
-from contentstore.tests.test_libraries import LibraryTestCase
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from models.settings.course_metadata import CourseMetadata
 from openedx.core.lib.extract_tar import safetar_extractall
 from student import auth

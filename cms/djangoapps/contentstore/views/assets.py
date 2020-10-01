@@ -19,7 +19,7 @@ from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
 from six import text_type
 
-from contentstore.views.exception import AssetNotFoundException, AssetSizeTooLargeException
+from .exception import AssetNotFoundException, AssetSizeTooLargeException
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from student.auth import has_course_author_access

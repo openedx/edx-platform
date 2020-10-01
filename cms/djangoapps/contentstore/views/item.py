@@ -32,7 +32,7 @@ from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
-from contentstore.utils import (
+from ..utils import (
     ancestor_has_staff_lock,
     find_release_date_source,
     find_staff_lock_source,
@@ -43,7 +43,7 @@ from contentstore.utils import (
     is_currently_visible_to_students,
     is_self_paced
 )
-from contentstore.views.helpers import (
+from .helpers import (
     create_xblock,
     get_parent_xblock,
     is_unit,
@@ -52,7 +52,7 @@ from contentstore.views.helpers import (
     xblock_studio_url,
     xblock_type_display_name
 )
-from contentstore.views.preview import get_preview_fragment
+from .preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG

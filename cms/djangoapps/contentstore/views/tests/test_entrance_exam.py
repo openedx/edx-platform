@@ -13,16 +13,16 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 from opaque_keys.edx.keys import UsageKey
 
-from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase
-from contentstore.utils import reverse_url
-from contentstore.views.entrance_exam import (
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_url
+from ..entrance_exam import (
     add_entrance_exam_milestone,
     create_entrance_exam,
     delete_entrance_exam,
     remove_entrance_exam_milestone_reference,
     update_entrance_exam
 )
-from contentstore.views.helpers import GRADER_TYPES, create_xblock
+from ..helpers import GRADER_TYPES, create_xblock
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from student.tests.factories import UserFactory

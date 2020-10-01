@@ -21,9 +21,9 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
-from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from contentstore.views.item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
+from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
+from .helpers import get_parent_xblock, is_unit, xblock_type_display_name
+from .item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
 from edxmako.shortcuts import render_to_response
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from student.auth import has_course_author_access
