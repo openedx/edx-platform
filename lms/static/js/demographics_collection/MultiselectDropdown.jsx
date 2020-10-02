@@ -36,6 +36,7 @@ class MultiselectDropdown extends React.Component {
   }
 
   focusButton() {
+    console.log(this.buttonRef)
     if (this.buttonRef) this.buttonRef.focus();
   }
 
@@ -144,7 +145,7 @@ class MultiselectDropdown extends React.Component {
         <div 
           className="form-control d-flex" 
         >
-        <button className="multiselect-dropdown-button" disabled={this.props.disabled} id="multiselect-dropdown-button" ref={this.buttonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
+        <button className="multiselect-dropdown-button" disabled={this.props.disabled} id="multiselect-dropdown-button" ref={this.setButtonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
           {this.renderSelected()}
         </button>
         {this.renderUnselect()}
