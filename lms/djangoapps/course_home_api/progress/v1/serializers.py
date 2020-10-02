@@ -52,18 +52,11 @@ class ChapterSerializer(serializers.Serializer):
 
 
 class CertificateDataSerializer(serializers.Serializer):
+    cert_status = serializers.CharField()
     cert_web_view_url = serializers.CharField()
     download_url = serializers.CharField()
-    is_downloadable = serializers.SerializerMethodField()
-    is_requestable = serializers.SerializerMethodField()
     msg = serializers.CharField()
     title = serializers.CharField()
-
-    def get_is_downloadable(self, cert_data):
-        return cert_data.cert_status == CertificateStatuses.downloadable and cert_data.download_url is not None
-
-    def get_is_requestable(self, cert_data):
-        return cert_data.cert_status == CertificateStatuses.requesting and cert_data.request_cert_url is not None
 
 
 class CreditRequirementSerializer(serializers.Serializer):

@@ -30,6 +30,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.instructor.access import list_with_level
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from util.organizations_helpers import get_course_organization_id
 from xmodule.modulestore.django import modulestore
@@ -308,8 +309,16 @@ def certificate_downloadable_status(student, course_key):
         'download_url': None,
         'uuid': None,
     }
-    may_view_certificate = CourseOverview.get_from_id(course_key).may_certify()
 
+    course_overview = CourseOverview.get_from_id(course_key)
+    if (
+        not certificates_viewable_for_course(course_overview) and
+        (current_status['status'] in CertificateStatuses.PASSED_STATUSES) and
+        course_overview.certificate_available_date
+    ):
+        response_data['earned_but_not_available'] = True
+
+    may_view_certificate = course_overview.may_certify()
     if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
         response_data['is_downloadable'] = True
         response_data['download_url'] = current_status['download_url'] or get_certificate_url(

@@ -8,6 +8,7 @@ import ddt
 import mock
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
+from django.urls import reverse
 
 from lms.djangoapps.courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
 from lms.djangoapps.courseware.tabs import ExternalLinkCourseTab
@@ -105,6 +106,20 @@ class CourseApiTestViews(BaseCoursewareTests):
                         if tab['url'] == 'http://zombo.com':
                             found = True
                 assert found, 'external link not in course tabs'
+
+                assert not response.data['user_has_passing_grade']
+                if enrollment_mode == 'audit':
+                    # This message comes from AUDIT_PASSING_CERT_DATA in lms/djangoapps/courseware/views/views.py
+                    expected_audit_message = ('You are enrolled in the audit track for this course. '
+                                              'The audit track does not include a certificate.')
+                    assert response.data['certificate_data']['msg'] == expected_audit_message
+                    assert response.data['verify_identity_url'] is None
+                else:
+                    # Not testing certificate data for verified learner here. That is tested elsewhere
+                    assert response.data['certificate_data'] is None
+                    expected_verify_identity_url = reverse('verify_student_verify_now', args=[self.course.id])
+                    # The response contains an absolute URL so this is only checking the path of the final
+                    assert expected_verify_identity_url in response.data['verify_identity_url']
             elif enable_anonymous and not logged_in:
                 # multiple checks use this handler
                 check_public_access.assert_called()

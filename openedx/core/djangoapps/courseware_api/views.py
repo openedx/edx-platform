@@ -30,9 +30,12 @@ from lms.djangoapps.courseware.courses import check_course_access, get_course_by
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND
+from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND, course_exit_page_is_active
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.views.views import get_cert_data
+from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -55,18 +58,16 @@ class CoursewareMeta:
             username or request.user.username,
             course_key,
         )
-        self.effective_user = self.overview.effective_user
         self.original_user_is_staff = has_access(request.user, 'staff', self.overview).has_access
         self.course_key = course_key
-        self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
-                                                                 select_related=['celebration'])
-        course_masquerade, user = setup_masquerade(
+        self.course_masquerade, self.effective_user = setup_masquerade(
             request,
             course_key,
             staff_access=self.original_user_is_staff,
         )
-        self.is_staff = has_access(user, 'staff', self.overview).has_access
-        self.course_masquerade = course_masquerade
+        self.is_staff = has_access(self.effective_user, 'staff', self.overview).has_access
+        self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
+                                                                 select_related=['celebration'])
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
@@ -104,14 +105,12 @@ class CoursewareMeta:
         """
         Return enrollment information.
         """
-        if self.effective_user.is_anonymous:
+        if self.effective_user.is_anonymous or not self.enrollment_object:
             mode = None
             is_active = False
         else:
-            mode, is_active = CourseEnrollment.enrollment_mode_for_user(
-                self.effective_user,
-                self.course_key
-            )
+            mode = self.enrollment_object.mode
+            is_active = self.enrollment_object.is_active
         return {'mode': mode, 'is_active': is_active}
 
     @property
@@ -208,6 +207,43 @@ class CoursewareMeta:
             'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(self.enrollment_object),
         }
 
+    @property
+    def user_has_passing_grade(self):
+        """ Returns a boolean on if the effective_user has a passing grade in the course """
+        course = get_course_by_id(self.course_key)
+        user_grade = CourseGradeFactory().read(self.effective_user, course).percent
+        return user_grade >= course.lowest_passing_grade
+
+    @property
+    def course_exit_page_is_active(self):
+        """ Returns a boolean on if the course exit page is active """
+        return course_exit_page_is_active(self.course_key)
+
+    @property
+    def certificate_data(self):
+        """
+        Returns certificate data if the effective_user is enrolled.
+        Note: certificate data can be None depending on learner and/or course state.
+        """
+        course = get_course_by_id(self.course_key)
+        if self.enrollment_object:
+            return get_cert_data(self.effective_user, course, self.enrollment_object.mode)
+
+    @property
+    def verify_identity_url(self):
+        """
+        Returns a String to the location to verify a learner's identity
+        Note: This might return an absolute URL (if the verification MFE is enabled) or a relative
+            URL. The serializer will make the relative URL absolute so any consumers can treat this
+            as a full URL.
+        """
+        if self.enrollment_object and self.enrollment_object.mode in CourseMode.VERIFIED_MODES:
+            verification_status = IDVerificationService.user_status(self.effective_user)['status']
+            if verification_status == 'must_reverify':
+                return IDVerificationService.get_verify_location('verify_student_reverify')
+            else:
+                return IDVerificationService.get_verify_location('verify_student_verify_now', self.course_key)
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
@@ -252,6 +288,12 @@ class CoursewareInformation(RetrieveAPIView):
         * can_load_course: Whether the user can view the course (AccessResponse object)
         * is_staff: Whether the effective user has staff access to the course
         * original_user_is_staff: Whether the original user has staff access to the course
+        * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
+            passing grade
+        * course_exit_page_is_active: Flag for the learning mfe on whether or not the course exit page should display
+        * certificate_data: data regarding the effective user's certificate for the given course
+        * verify_identity_url: URL for a learner to verify their identity. Only returned for learners enrolled in a
+            verified mode. Will update to reverify URL if necessary.
 
     **Parameters:**
 

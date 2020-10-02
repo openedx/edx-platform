@@ -46,6 +46,9 @@ class ProgressTabTestViews(BaseCourseHomeTests):
             ManualVerification.objects.create(user=self.user, status='approved')
             response = self.client.get(self.url)
             self.assertEqual(response.data['verification_data']['status'], 'approved')
+            self.assertIsNone(response.data['certificate_data'])
+        elif enrollment_mode == CourseMode.AUDIT:
+            self.assertEqual(response.data['certificate_data']['cert_status'], 'audit_passing')
 
     def test_get_authenticated_user_not_enrolled(self):
         response = self.client.get(self.url)

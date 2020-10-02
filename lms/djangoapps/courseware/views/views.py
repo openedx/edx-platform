@@ -144,6 +144,7 @@ REQUIREMENTS_DISPLAY_MODES = CourseMode.CREDIT_MODES + [CourseMode.VERIFIED]
 CertData = namedtuple(
     "CertData", ["cert_status", "title", "msg", "download_url", "cert_web_view_url"]
 )
+EARNED_BUT_NOT_AVAILABLE_CERT_STATUS = 'earned_but_not_available'
 
 AUDIT_PASSING_CERT_DATA = CertData(
     CertificateStatuses.audit_passing,
@@ -200,6 +201,14 @@ UNVERIFIED_CERT_DATA = CertData(
         u'You have not received a certificate because you do not have a current {platform_name} '
         'verified identity.'
     ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
+    download_url=None,
+    cert_web_view_url=None
+)
+
+EARNED_BUT_NOT_AVAILABLE_CERT_DATA = CertData(
+    EARNED_BUT_NOT_AVAILABLE_CERT_STATUS,
+    _('Your certificate will be available soon!'),
+    _('After this course officially ends, you will receive an email notification with your certificate.'),
     download_url=None,
     cert_web_view_url=None
 )
@@ -1206,6 +1215,9 @@ def _certificate_message(student, course, enrollment_mode):
 
     cert_downloadable_status = certs_api.certificate_downloadable_status(student, course.id)
 
+    if cert_downloadable_status.get('earned_but_not_available'):
+        return EARNED_BUT_NOT_AVAILABLE_CERT_DATA
+
     if cert_downloadable_status['is_generating']:
         return GENERATING_CERT_DATA
 
@@ -1234,6 +1246,9 @@ def get_cert_data(student, course, enrollment_mode, course_grade=None):
     cert_data = _certificate_message(student, course, enrollment_mode)
     if not CourseMode.is_eligible_for_certificate(enrollment_mode, status=cert_data.cert_status):
         return INELIGIBLE_PASSING_CERT_DATA.get(enrollment_mode)
+
+    if cert_data.cert_status == EARNED_BUT_NOT_AVAILABLE_CERT_STATUS:
+        return cert_data
 
     certificates_enabled_for_course = certs_api.cert_generation_enabled(course.id)
     if course_grade is None:

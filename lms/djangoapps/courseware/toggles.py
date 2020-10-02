@@ -38,3 +38,26 @@ REDIRECT_TO_COURSEWARE_MICROFRONTEND = ExperimentWaffleFlag(
 COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_team_preview', __name__
 )
+
+# Waffle flag to enable the course exit page in the learning MFE.
+#
+# .. toggle_name: courseware.microfrontend_course_exit_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Supports staged rollout of the new micro-frontend-based implementation of the course exit page.
+# .. toggle_category: micro-frontend
+# .. toggle_use_cases: incremental_release, open_edx
+# .. toggle_creation_date: 2020-10-02
+# .. toggle_target_removal_date: n/a
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and ENABLE_COURSEWARE_MICROFRONTEND.
+# .. toggle_tickets: AA-188
+COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'microfrontend_course_exit_page', __name__
+)
+
+
+def course_exit_page_is_active(course_key):
+    return (
+        REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key) and
+        COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE.is_enabled(course_key)
+    )
