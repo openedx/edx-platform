@@ -11,40 +11,6 @@ from opaque_keys.edx.django.models import CourseKeyField
 import six
 
 
-class VideoPipelineIntegration(ConfigurationModel):
-    """
-    Manages configuration for connecting to the edx-video-pipeline service and using its API.
-
-    .. no_pii:
-    """
-    client_name = models.CharField(
-        max_length=100,
-        default=u'VEDA-Prod',
-        null=False,
-        blank=False,
-        help_text=_('Oauth client name of video pipeline service.')
-    )
-
-    api_url = models.URLField(
-        verbose_name=_('Internal API URL'),
-        help_text=_('edx-video-pipeline API URL.')
-    )
-
-    service_username = models.CharField(
-        max_length=100,
-        default=u'veda_service_user',
-        null=False,
-        blank=False,
-        help_text=_('Username created for Video Pipeline Integration, e.g. veda_service_user.')
-    )
-
-    def get_service_user(self):
-        # NOTE: We load the user model here to avoid issues at startup time that result from the hacks
-        # in lms/startup.py.
-        User = get_user_model()  # pylint: disable=invalid-name
-        return User.objects.get(username=self.service_username)
-
-
 class VEMPipelineIntegration(ConfigurationModel):
     """
     Manages configuration for connecting to the video encode manager service and using its API.
