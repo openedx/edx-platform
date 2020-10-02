@@ -36,7 +36,6 @@ class MultiselectDropdown extends React.Component {
   }
 
   focusButton() {
-    console.log(this.buttonRef)
     if (this.buttonRef) this.buttonRef.focus();
   }
 
