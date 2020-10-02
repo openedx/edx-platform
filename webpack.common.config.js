@@ -154,22 +154,19 @@ module.exports = Merge.smart({
                 // any other way to declare that dependency.
                 $script: 'scriptjs'
             }),
-
-            // Note: Until karma-webpack releases v3, it doesn't play well with
-            // the CommonsChunkPlugin. We have a kludge in karma.common.conf.js
-            // that dynamically removes this plugin from webpack config when
-            // running those tests (the details are in that file). This is a
-            // recommended workaround, as this plugin is just an optimization. But
-            // because of this, we really don't want to get too fancy with how we
-            // invoke this plugin until we can upgrade karma-webpack.
-            new webpack.optimize.CommonsChunkPlugin({
-                // If the value below changes, update the render_bundle call in
-                // common/djangoapps/pipeline_mako/templates/static_content.html
-                name: 'commons',
-                filename: 'commons.js',
-                minChunks: 3
-            })
         ],
+
+        optimization: {
+            splitChunks: {
+                cacheGroups: {
+                    commons: {
+                        name: 'commons',
+                        filename: 'commons.js',
+                        minChunks: 3
+                    }
+                }
+            }
+        },
 
         module: {
             noParse: [

@@ -5,6 +5,7 @@
 var Merge = require('webpack-merge');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 var _ = require('underscore');
 
 var commonConfig = require('./webpack.common.config.js');
@@ -12,25 +13,23 @@ var commonConfig = require('./webpack.common.config.js');
 var optimizedConfig = Merge.smart(commonConfig, {
   web: {
     output: {
-        filename: '[name].[chunkhash].js'
+        filename: '[name].[contenthash].js'
     },
     devtool: false,
-    plugins: [
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
-        }),
-        new webpack.LoaderOptionsPlugin({  // This may not be needed; legacy option for loaders written for webpack 1
-            minimize: true
-        }),
-        new webpack.optimize.UglifyJsPlugin(),
-        new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-            name: 'commons',
-            filename: 'commons.[chunkhash].js',
-            minChunks: 3
-        })
-    ]
+    optimization: {
+        nodeEnv: 'production',
+        minimizer: [
+            new UglifyJsPlugin(),
+        ],
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    name: 'commons',
+                    minChunks: 3
+                }
+            }
+        }
+    }
 }});
 
 // requireCompatConfig only exists so that you can use RequireJS to require a
@@ -51,15 +50,17 @@ var requireCompatConfig = Merge.smart(optimizedConfig, {
     output: {
         filename: '[name].js'
     },
-    plugins: [
-        new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-            name: 'commons',
-            filename: 'commons.js',
-            minChunks: 3
-        })
-    ]
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    name: 'commons',
+                    filename: 'commons.js',
+                    minChunks: 3
+                }
+            }
+        }
+    }
 }});
 
 // Step 2: Remove the plugin entries that generate the webpack-stats.json files

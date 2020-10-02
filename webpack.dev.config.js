@@ -15,14 +15,9 @@ module.exports = _.values(Merge.smart(commonConfig, {
             filename: '[name].js'
         },
         devtool: 'source-map',
-        plugins: [
-            new webpack.LoaderOptionsPlugin({
-                debug: true
-            }),
-            new webpack.DefinePlugin({
-                'process.env.NODE_ENV': JSON.stringify('development')
-            })
-        ],
+        optimization: {
+            nodeEnv: 'development'
+        },
         module: {
             rules: [
                 {
