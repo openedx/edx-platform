@@ -313,7 +313,7 @@ class CourseMetadata(object):
         proposed_topic_dupe_ids = {x for x in proposed_topic_ids if proposed_topic_ids.count(x) > 1}
         if len(proposed_topic_dupe_ids) > 0:
             message = 'duplicate ids: ' + ','.join(proposed_topic_dupe_ids)
-            errors.append({'key': 'team_settings', 'message': message, 'model': teams_configuration_model})
+            errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
 
         for proposed_topic in proposed_topics:
             topic_validation_errors = cls.validate_single_topic(proposed_topic)
