@@ -1,11 +1,11 @@
 {
   "plugins": [
-    "transform-object-assign",
-    "transform-object-rest-spread"
+    "@babel/plugin-transform-object-assign",
+    "@babel/plugin-proposal-object-rest-spread"
   ],
   "presets": [
     [
-      "env",
+      "@babel/preset-env",
       {
         "targets": {
           "browsers": [
@@ -16,18 +16,18 @@
         "modules": false
       }
     ],
-    "babel-preset-react"
+    "@babel/preset-react"
   ],
   "env": {
     "test": {
       "presets": [
         [
-          "env",
+          "@babel/preset-env",
           {
-            "modules": "commonjs",
+            "modules": "commonjs"
           }
         ]
       ]
     }
-  },
+  }
 }
