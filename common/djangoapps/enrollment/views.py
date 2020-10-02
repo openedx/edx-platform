@@ -36,6 +36,7 @@ from openedx.features.enterprise_support.api import (
     EnterpriseApiServiceClient,
     enterprise_enabled
 )
+from openedx.features.subscriptions.utils import track_subscription_enrollment
 from rest_framework import permissions, status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -659,6 +660,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
         username = request.data.get('user', request.user.username)
         course_id = request.data.get('course_details', {}).get('course_id')
+        subscription_id = request.data.get('subscription_id', None)
 
         if not course_id:
             return Response(
@@ -793,6 +795,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     enrollment_attributes=enrollment_attributes
                 )
 
+            track_subscription_enrollment(subscription_id, username, unicode(course_id))
             cohort_name = request.data.get('cohort')
             if cohort_name is not None:
                 cohort = get_cohort_by_name(course_id, cohort_name)
