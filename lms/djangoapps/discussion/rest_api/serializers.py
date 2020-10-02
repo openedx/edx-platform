@@ -120,7 +120,7 @@ class _ContentSerializer(serializers.Serializer):
                     ret.pop(staff_only_field)
                 except KeyError:
                     continue
-        return ret 
+        return ret
 
     def _validate_non_updatable(self, value):
         """Ensure that a field is not edited in an update operation."""
@@ -238,7 +238,6 @@ class ThreadSerializer(_ContentSerializer):
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
     staff_only_fields = ['abuse_flagged_count']
 
-
     def __init__(self, *args, **kwargs):
         super(ThreadSerializer, self).__init__(*args, **kwargs)
         # Compensate for the fact that some threads in the comments service do
@@ -345,7 +344,6 @@ class CommentSerializer(_ContentSerializer):
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
     staff_only_fields = ['abuse_flagged_any_user']
-
 
     def __init__(self, *args, **kwargs):
         remove_fields = kwargs.pop('remove_fields', None)

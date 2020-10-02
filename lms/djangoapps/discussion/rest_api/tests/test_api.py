@@ -1360,7 +1360,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "children": [],
             },
         ]
-        
+
         if is_staff:
             self.user.is_staff = True
             expected_comments[0]["abuse_flagged_any_user"] = False
