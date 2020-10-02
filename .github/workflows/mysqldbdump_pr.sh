@@ -31,4 +31,4 @@ git checkout -b github-actions-mysqldbdump/$GITHUB_SHA
 git add "${DB_NAME}".sql
 git commit  -m "MySQLdbdump" --author "GitHub Actions MySQLdbdump automation <admin@edx.org>"
 git push --set-upstream origin github-actions-mysqldbdump/$GITHUB_SHA
-../hub-linux*/bin/hub pull-request -m "${DB_NAME} MySQL database dump" -m "MySQL database dump"
+../hub-linux*/bin/hub pull-request -m "${DB_NAME} MySQL database dump" -m "MySQL database dump" -l mysqldbdump
