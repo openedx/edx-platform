@@ -367,36 +367,44 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
         )
 
         secret_key = 'secret'
-        with override_settings(CREDIT_PROVIDER_SECRET_KEYS={self.provider.provider_id: secret_key}):
-            response = self.post_credit_request(username, course_key)
-        self.assertEqual(response.status_code, 200)
+        # Provider keys can be stored as a string or list of strings
+        secret_key_with_key_as_string = {self.provider.provider_id: secret_key}
+        # The None represents a key that was not ascii encodable
+        secret_key_with_key_as_list = {
+            self.provider.provider_id: [secret_key, None]
+        }
 
-        # Check that the user's request status is pending
-        request = CreditRequest.objects.get(username=username, course__course_key=course_key)
-        self.assertEqual(request.status, 'pending')
+        for secret_key_dict in [secret_key_with_key_as_string, secret_key_with_key_as_list]:
+            with override_settings(CREDIT_PROVIDER_SECRET_KEYS=secret_key_dict):
+                response = self.post_credit_request(username, course_key)
+            self.assertEqual(response.status_code, 200)
 
-        # Check request parameters
-        content = json.loads(response.content.decode('utf-8'))
-        parameters = content['parameters']
+            # Check that the user's request status is pending
+            request = CreditRequest.objects.get(username=username, course__course_key=course_key)
+            self.assertEqual(request.status, 'pending')
 
-        self.assertEqual(content['url'], self.provider.provider_url)
-        self.assertEqual(content['method'], 'POST')
-        self.assertEqual(len(parameters['request_uuid']), 32)
-        self.assertEqual(parameters['course_org'], course_key.org)
-        self.assertEqual(parameters['course_num'], course_key.course)
-        self.assertEqual(parameters['course_run'], course_key.run)
-        self.assertEqual(parameters['final_grade'], six.text_type(final_grade))
-        self.assertEqual(parameters['user_username'], username)
-        self.assertEqual(parameters['user_full_name'], self.user.get_full_name())
-        self.assertEqual(parameters['user_mailing_address'], '')
-        self.assertEqual(parameters['user_country'], '')
+            # Check request parameters
+            content = json.loads(response.content.decode('utf-8'))
+            parameters = content['parameters']
 
-        # The signature is going to change each test run because the request
-        # is assigned a different UUID each time.
-        # For this reason, we use the signature function directly
-        # (the "signature" parameter will be ignored when calculating the signature).
-        # Other unit tests verify that the signature function is working correctly.
-        self.assertEqual(parameters['signature'], signature(parameters, secret_key))
+            self.assertEqual(content['url'], self.provider.provider_url)
+            self.assertEqual(content['method'], 'POST')
+            self.assertEqual(len(parameters['request_uuid']), 32)
+            self.assertEqual(parameters['course_org'], course_key.org)
+            self.assertEqual(parameters['course_num'], course_key.course)
+            self.assertEqual(parameters['course_run'], course_key.run)
+            self.assertEqual(parameters['final_grade'], six.text_type(final_grade))
+            self.assertEqual(parameters['user_username'], username)
+            self.assertEqual(parameters['user_full_name'], self.user.get_full_name())
+            self.assertEqual(parameters['user_mailing_address'], '')
+            self.assertEqual(parameters['user_country'], '')
+
+            # The signature is going to change each test run because the request
+            # is assigned a different UUID each time.
+            # For this reason, we use the signature function directly
+            # (the "signature" parameter will be ignored when calculating the signature).
+            # Other unit tests verify that the signature function is working correctly.
+            self.assertEqual(parameters['signature'], signature(parameters, secret_key))
 
     def test_post_invalid_provider(self):
         """ Verify the endpoint returns HTTP 404 if the credit provider is not valid. """
@@ -462,6 +470,21 @@ class CreditProviderRequestCreateViewTests(ApiTestCaseMixin, UserMixin, TestCase
 
         # Cannot initiate a request because we cannot sign it
         with override_settings(CREDIT_PROVIDER_SECRET_KEYS={}):
+            response = self.post_credit_request(self.user.username, self.eligibility.course.course_key)
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_secret_key_not_set_key_as_list(self):
+        """ Verify the endpoint returns HTTP 400 if we attempt to create a
+        request for a provider with no secret key set with keys set as list. """
+        # Enable provider integration
+        self.provider.enable_integration = True
+        self.provider.save()
+
+        # Cannot initiate a request because we cannot sign it
+        secret_key_with_key_as_list = {
+            self.provider.provider_id: []
+        }
+        with override_settings(CREDIT_PROVIDER_SECRET_KEYS=secret_key_with_key_as_list):
             response = self.post_credit_request(self.user.username, self.eligibility.course.course_key)
         self.assertEqual(response.status_code, 400)
 

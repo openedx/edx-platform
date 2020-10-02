@@ -46,12 +46,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
+TEST_CREDIT_PROVIDER_SECRET_KEY_TWO = "abcf433d583c8baebae1784bad3232e6"
 TEST_ECOMMERCE_WORKER = 'test_worker'
 
 
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
     "hogwarts": TEST_CREDIT_PROVIDER_SECRET_KEY,
-    "ASU": TEST_CREDIT_PROVIDER_SECRET_KEY,
+    "ASU": [TEST_CREDIT_PROVIDER_SECRET_KEY_TWO, TEST_CREDIT_PROVIDER_SECRET_KEY],
     "MIT": TEST_CREDIT_PROVIDER_SECRET_KEY
 })
 class CreditApiTestBase(ModuleStoreTestCase):

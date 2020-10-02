@@ -3,8 +3,10 @@
 
 import six
 from django.test import TestCase
+from django.test.utils import override_settings
+from rest_framework.exceptions import PermissionDenied
 
-from openedx.core.djangoapps.credit import serializers
+from openedx.core.djangoapps.credit import serializers, signature
 from openedx.core.djangoapps.credit.tests.factories import CreditEligibilityFactory, CreditProviderFactory
 from student.tests.factories import UserFactory
 
@@ -43,3 +45,84 @@ class CreditEligibilitySerializerTests(TestCase):
             'username': user.username,
         }
         self.assertDictEqual(serializer.data, expected)
+
+
+class CreditProviderCallbackSerializerTests(TestCase):
+    """ CreditProviderCallbackSerializer tests. """
+
+    def test_check_keys_exist_for_provider_string(self):
+        """ Verify _check_keys_exist_for_provider errors if key is None """
+
+        secret_key = None
+        provider_id = 'asu'
+
+        serializer = serializers.CreditProviderCallbackSerializer()
+        with self.assertRaises(PermissionDenied):
+            serializer._check_keys_exist_for_provider(secret_key, provider_id)
+
+    def test_check_keys_exist_for_provider_list_no_keys(self):
+        """
+        Verify _check_keys_exist_for_provider errors if no keys in list
+        are truthy. (This accounts for there being 2 keys present both
+        of which are None due to ascii encode issues)
+        """
+
+        secret_key = [None, None]
+        provider_id = 'asu'
+
+        serializer = serializers.CreditProviderCallbackSerializer()
+        with self.assertRaises(PermissionDenied):
+            serializer._check_keys_exist_for_provider(secret_key, provider_id)
+
+    def test_check_keys_exist_for_provider_list_with_key_present(self):
+        """
+        Verify _check_keys_exist_for_provider does not error when at least
+        1 key in config is a valid key
+        """
+
+        secret_key = [None, 'abc1234', None]
+        provider_id = 'asu'
+
+        serializer = serializers.CreditProviderCallbackSerializer()
+        result = serializer._check_keys_exist_for_provider(secret_key, provider_id)
+        # No return value, so we expect successful execution to return None
+        assert result is None
+
+    def test_compare_signatures_string_key(self):
+        """ Verify compare_signature errors if string key does not match. """
+        provider = CreditProviderFactory(
+            provider_id='asu',
+            active=False,
+        )
+
+        # Create a serializer that has a signature which was created with a key
+        # that we do not have in our system.
+        sig = signature.signature({}, 'iamthewrongkey')
+        serializer = serializers.CreditProviderCallbackSerializer(
+            data={'signature': sig}
+        )
+        with self.assertRaises(PermissionDenied):
+            # The first arg here is key we have (that doesn't match the sig)
+            serializer._compare_signatures('abcd1234', provider.provider_id)
+
+    def test_compare_signatures_list_key(self):
+        """
+        Verify compare_signature errors if no keys that are stored in the list
+        in config match the key handed in the signature.
+        """
+        provider = CreditProviderFactory(
+            provider_id='asu',
+            active=False,
+        )
+
+        sig = signature.signature({}, 'iamthewrongkey')
+        serializer = serializers.CreditProviderCallbackSerializer(
+            data={'signature': sig}
+        )
+
+        with self.assertRaises(PermissionDenied):
+            # The first arg here is the list of keys he have (that dont matcht the sig)
+            serializer._compare_signatures(
+                ['abcd1234', 'xyz789'],
+                provider.provider_id
+            )
