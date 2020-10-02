@@ -159,14 +159,18 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         merged_overrides.update(overrides)
         return make_minimal_cs_thread(merged_overrides)
 
-    def serialize(self, thread):
+    def serialize(self, thread, is_staff=False):
         """
         Create a serializer with an appropriate context and use it to serialize
         the given thread, returning the result.
         """
-        return ThreadSerializer(thread, context=get_context(self.course, self.request)).data
+        context = get_context(self.course, self.request)
+        if is_staff:
+            context["is_staff"] = True
+        return ThreadSerializer(thread, context=context).data
 
-    def test_basic(self):
+    @ddt.data(True, False)
+    def test_basic(self, is_staff):
         thread = make_minimal_cs_thread({
             "id": "test_thread",
             "course_id": six.text_type(self.course.id),
@@ -187,9 +191,10 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "unread_comment_count": 3,
             "pinned": True,
             "editable_fields": ["abuse_flagged", "following", "read", "voted"],
-            "count_flags": 0,
         })
-        self.assertEqual(self.serialize(thread), expected)
+        if is_staff:
+            expected["abuse_flagged_count"] = 0
+        self.assertEqual(self.serialize(thread, is_staff=is_staff), expected)
 
         thread["thread_type"] = "question"
         expected.update({
@@ -202,7 +207,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
                 "http://testserver/api/discussion/v1/comments/?thread_id=test_thread&endorsed=False"
             ),
         })
-        self.assertEqual(self.serialize(thread), expected)
+        self.assertEqual(self.serialize(thread, is_staff=is_staff), expected)
 
     def test_pinned_missing(self):
         """
@@ -267,15 +272,18 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         merged_overrides.update(overrides or {})
         return make_minimal_cs_comment(merged_overrides)
 
-    def serialize(self, comment, thread_data=None):
+    def serialize(self, comment, thread_data=None, is_staff=False):
         """
         Create a serializer with an appropriate context and use it to serialize
         the given comment, returning the result.
         """
         context = get_context(self.course, self.request, make_minimal_cs_thread(thread_data))
+        if is_staff:
+            context["is_staff"] = True
         return CommentSerializer(comment, context=context).data
 
-    def test_basic(self):
+    @ddt.data(True, False)
+    def test_basic(self, is_staff):
         comment = {
             "type": "comment",
             "id": "test_comment",
@@ -308,14 +316,17 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 4,
             "children": [],
             "editable_fields": ["abuse_flagged", "voted"],
             "child_count": 0,
         }
-        self.assertEqual(self.serialize(comment), expected)
+
+        if is_staff:
+            expected["abuse_flagged_any_user"] = False
+
+        self.assertEqual(self.serialize(comment, is_staff=is_staff), expected)
 
     @ddt.data(
         *itertools.product(

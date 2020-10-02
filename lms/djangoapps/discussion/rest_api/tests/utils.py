@@ -439,7 +439,7 @@ def make_minimal_cs_thread(overrides=None):
         "pinned": False,
         "closed": False,
         "abuse_flaggers": [],
-        "count_flags": 0,
+        "abuse_flagged_count": 0,
         "votes": {"up_count": 0},
         "comments_count": 0,
         "unread_comments_count": 0,

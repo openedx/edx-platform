@@ -606,7 +606,6 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             course=None,
             topic_id_list=None,
     ):
-        #TODO: Update the tests to take the new parameters into account
         """
         Register the appropriate comments service response, then call
         get_thread_list and return the result.
@@ -666,7 +665,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             "per_page": ["14"],
         })
 
-    def test_thread_content(self):
+    @ddt.data(True, False)
+    def test_thread_content(self, is_staff):
         self.course.cohort_config = {"cohorted": True}
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         source_threads = [
@@ -716,7 +716,6 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 "read": True,
                 "created_at": "2015-04-28T00:00:00Z",
                 "updated_at": "2015-04-28T11:11:11Z",
-                "count_flags": 0,
             }),
             self.expected_thread_data({
                 "id": "test_thread_id_1",
@@ -740,9 +739,13 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
                 "editable_fields": ["abuse_flagged", "following", "read", "voted"],
-                "count_flags": 0,
             }),
         ]
+
+        if is_staff:
+            self.user.is_staff = True
+            expected_threads[0]["abuse_flagged_count"] = 0
+            expected_threads[1]["abuse_flagged_count"] = 0
 
         expected_result = make_paginated_api_response(
             results=expected_threads, count=2, num_pages=1, next_link=None, previous_link=None
@@ -1275,7 +1278,8 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
             }
         )
 
-    def test_discussion_content(self):
+    @ddt.data(True, False)
+    def test_discussion_content(self, is_staff):
         source_comments = [
             {
                 "type": "comment",
@@ -1328,7 +1332,6 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "endorsed_by_label": None,
                 "endorsed_at": None,
                 "abuse_flagged": False,
-                "abuse_flagged_any_user": None,
                 "voted": False,
                 "vote_count": 4,
                 "editable_fields": ["abuse_flagged", "voted"],
@@ -1350,7 +1353,6 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "endorsed_by_label": None,
                 "endorsed_at": None,
                 "abuse_flagged": True,
-                "abuse_flagged_any_user": None,
                 "voted": False,
                 "vote_count": 7,
                 "editable_fields": ["abuse_flagged", "voted"],
@@ -1358,6 +1360,12 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "children": [],
             },
         ]
+        
+        if is_staff:
+            self.user.is_staff = True
+            expected_comments[0]["abuse_flagged_any_user"] = False
+            expected_comments[1]["abuse_flagged_any_user"] = True
+
         actual_comments = self.get_comment_list(
             self.make_minimal_cs_thread({"children": source_comments})
         ).data["results"]
@@ -1902,7 +1910,6 @@ class CreateCommentTest(
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],
@@ -2561,7 +2568,6 @@ class UpdateCommentTest(
             "endorsed_by_label": None,
             "endorsed_at": None,
             "abuse_flagged": False,
-            "abuse_flagged_any_user": None,
             "voted": False,
             "vote_count": 0,
             "children": [],
