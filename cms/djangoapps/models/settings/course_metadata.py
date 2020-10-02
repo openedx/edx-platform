@@ -295,7 +295,6 @@ class CourseMetadata(object):
             return errors
 
         proposed_max_team_size = json_value.get('max_team_size')
-        import pdb; pdb.set_trace()
         if proposed_max_team_size != '' and proposed_max_team_size is not None and proposed_max_team_size <= 0:
             message = 'max_team_size must be greater than zero'
             errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})

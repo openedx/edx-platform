@@ -321,6 +321,44 @@ config_block_unrecognized_teamset_type = {
     }
 }
 
+config_block_no_global_max_team_size = {
+    "teams_configuration": {
+        "value": {
+            "topics": [
+                {
+                    "max_team_size": 5,
+                    "name": "Topic 1 Name",
+                    "id": "topic_1_id",
+                    "description": "Topic 1 desc",
+                    "type": "public_managed"
+                },
+                {
+                    "id": "topic_2_id",
+                    "name": "Topic 2 Name",
+                    "description": "Topic 2 desc"
+                },
+                {
+                    "id": "topic_3_id",
+                    "name": "Topic 3 Name",
+                    "description": "Topic 3 desc"
+                },
+                {
+                    "id": "private_topic_1_id",
+                    "type": "private_managed",
+                    "description": "Private Topic 1 desc",
+                    "name": "Private Topic 1 Name"
+                },
+                {
+                    "id": "private_topic_2_id",
+                    "type": "private_managed",
+                    "description": "Private Topic 2 desc",
+                    "name": "Private Topic 2 Name"
+                }
+            ]
+        }
+    }
+}
+
 
 @ddt.ddt
 class TeamsConfigurationTests(unittest.TestCase):
@@ -339,7 +377,8 @@ class TeamsConfigurationTests(unittest.TestCase):
         ),
         (config_block_missing_name, {'name attribute must not be empty'}),
         (config_block_extra_attribute, {'extra keys: foo'}),
-        (config_block_unrecognized_teamset_type, {'type foo is invalid'})
+        (config_block_unrecognized_teamset_type, {'type foo is invalid'}),
+        (config_block_no_global_max_team_size, set())
     )
     @ddt.unpack
     def test_team_settings(self, config_block, error_message):
