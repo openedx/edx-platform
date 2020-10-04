@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-27 20:50+0000\n"
-"PO-Revision-Date: 2020-09-27 20:50:25.720823\n"
+"POT-Creation-Date: 2020-10-04 20:51+0000\n"
+"PO-Revision-Date: 2020-10-04 20:51:26.026355\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -59,6 +59,17 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "يهسذعسسهخر"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr "حقخزمثو"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+#: lms/templates/video.html
+msgid "Video"
+msgstr "دهيثخ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
@@ -6483,6 +6494,18 @@ msgstr ""
 "{platform_name} دثقهبهثي هيثرفهفغ."
 
 #: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate will be available soon!"
+msgstr "غخعق ذثقفهبهذشفث صهمم زث شدشهمشزمث سخخر!"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"After this course officially ends, you will receive an email notification "
+"with your certificate."
+msgstr ""
+"شبفثق فاهس ذخعقسث خببهذهشممغ ثريس, غخع صهمم قثذثهدث شر ثوشهم رخفهبهذشفهخر "
+"صهفا غخعق ذثقفهبهذشفث."
+
+#: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate is available"
 msgstr "غخعق ذثقفهبهذشفث هس شدشهمشزمث"
 
@@ -9033,10 +9056,6 @@ msgid "Make payment"
 msgstr "وشنث حشغوثرف"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Payment confirmation"
-msgstr "حشغوثرف ذخربهقوشفهخر"
-
-#: lms/djangoapps/verify_student/views.py
 msgid "Take photo"
 msgstr "فشنث حاخفخ"
 
@@ -10550,8 +10569,30 @@ msgid "Cannot change or remove the access level for the only admin."
 msgstr "ذشررخف ذاشرلث خق قثوخدث فاث شذذثسس مثدثم بخق فاث خرمغ شيوهر."
 
 #: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
+"You can only set a library to {library_type} if all existing blocks are of "
+"that type. Found incompatible block {block_id} with type {block_type}."
+msgstr ""
+"غخع ذشر خرمغ سثف ش مهزقشقغ فخ {library_type} هب شمم ثطهسفهرل زمخذنس شقث خب "
+"فاشف فغحث. بخعري هرذخوحشفهزمث زمخذن {block_id} صهفا فغحث {block_type}."
+
+#: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
+"Block type \"{block_type}\" is not compatible with library type "
+"\"{library_type}\"."
+msgstr ""
+"زمخذن فغحث \"{block_type}\" هس رخف ذخوحشفهزمث صهفا مهزقشقغ فغحث "
+"\"{library_type}\"."
+
+#: openedx/core/djangoapps/content_libraries/api.py
 msgid "Library cannot have more than {} XBlocks"
 msgstr "مهزقشقغ ذشررخف اشدث وخقث فاشر {} طزمخذنس"
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Complex"
+msgstr "ذخوحمثط"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
@@ -11706,18 +11747,26 @@ msgstr "شذذخعرف ذقثشفهخر رخف شممخصثي."
 #, python-brace-format
 msgid ""
 "You've successfully signed in to your {provider_name} account, but this "
-"account isn't linked with your {platform_name} account yet.Use your "
-"{platform_name} username and password to sign in to {platform_name} below, "
-"and then link your {platform_name} account with {provider_name} from your "
-"dashboard.If you don't have an account on {platform_name} yet, click "
-"{register_label_strong} at the top of the page."
+"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
+" your {platform_name} username and password to sign in to {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
+" yet, click {register_label_strong} at the top of the page."
 msgstr ""
 "غخع'دث سعذذثسسبعممغ سهلرثي هر فخ غخعق {provider_name} شذذخعرف, زعف فاهس "
-"شذذخعرف هسر'ف مهرنثي صهفا غخعق {platform_name} شذذخعرف غثف.عسث غخعق "
-"{platform_name} عسثقرشوث شري حشسسصخقي فخ سهلر هر فخ {platform_name} زثمخص, "
-"شري فاثر مهرن غخعق {platform_name} شذذخعرف صهفا {provider_name} بقخو غخعق "
-"يشسازخشقي.هب غخع يخر'ف اشدث شر شذذخعرف خر {platform_name} غثف, ذمهذن "
-"{register_label_strong} شف فاث فخح خب فاث حشلث."
+"شذذخعرف هسر'ف مهرنثي صهفا غخعق {platform_name} شذذخعرف غثف. {blank_lines}عسث"
+" غخعق {platform_name} عسثقرشوث شري حشسسصخقي فخ سهلر هر فخ {platform_name} "
+"زثمخص, شري فاثر مهرن غخعق {platform_name} شذذخعرف صهفا {provider_name} بقخو "
+"غخعق يشسازخشقي. {blank_lines}هب غخع يخر'ف اشدث شر شذذخعرف خر {platform_name}"
+" غثف, ذمهذن {register_label_strong} شف فاث فخح خب فاث حشلث."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "قثلهسفثق"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "There was an error receiving your login information. Please email us."
@@ -12049,20 +12098,6 @@ msgstr "يهسوهسس"
 #: openedx/core/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "فاث ذخعقسث نثغ بخق فاث ذخعقسث صث صخعمي مهنث فخ زث شعفخ-ذخاخقفثي."
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "Oauth client name of video pipeline service."
-msgstr "خشعفا ذمهثرف رشوث خب دهيثخ حهحثمهرث سثقدهذث."
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "edx-video-pipeline API URL."
-msgstr "ثيط-دهيثخ-حهحثمهرث شحه عقم."
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid ""
-"Username created for Video Pipeline Integration, e.g. veda_service_user."
-msgstr ""
-"عسثقرشوث ذقثشفثي بخق دهيثخ حهحثمهرث هرفثلقشفهخر, ث.ل. دثيش_سثقدهذث_عسثق."
 
 #: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Oauth client name of VEM service."
@@ -12856,14 +12891,6 @@ msgstr "{platform_name} سعححخقف مثدثمس:"
 #: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
 msgstr "افوم"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "Problem"
-msgstr "حقخزمثو"
-
-#: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
-msgid "Video"
-msgstr "دهيثخ"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -18435,13 +18462,6 @@ msgstr "اخص هف صخقنس"
 msgid "Schools"
 msgstr "سذاخخمس"
 
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "قثلهسفثق"
-
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "قثسعوث غخعق مشسف ذخعقسث"
@@ -20951,10 +20971,6 @@ msgstr ""
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Upgrade Your Enrollment For {course_name}."
 msgstr "عحلقشيث غخعق ثرقخمموثرف بخق {course_name}."
-
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Receipt For {course_name}"
-msgstr "قثذثهحف بخق {course_name}"
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Verify For {course_name}"
