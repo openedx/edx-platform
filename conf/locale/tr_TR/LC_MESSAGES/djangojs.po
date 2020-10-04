@@ -107,9 +107,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-27 20:42+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-10-04 20:43+0000\n"
+"PO-Revision-Date: 2020-10-04 20:44+0000\n"
+"Last-Translator: Emrah Emirtekin <eemirtekin@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
@@ -125,6 +125,9 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"Bu durum sunucudaki bir hatadan veya İnternet bağlantınızdan kaynaklanmış "
+"olabilir. Sayfayı yeniden yüklemeyi deneyin veya çevrimiçi olduğunuza emin "
+"olun."
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -352,7 +355,6 @@ msgstr "Uyarı"
 #: common/static/common/js/discussion/views/response_comment_view.js
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
 msgid "Error"
@@ -481,8 +483,8 @@ msgid ""
 "file uploads."
 msgstr ""
 "Gönderim iptal edildi. Üzgünüz ama tarayıcınız dosya gönderimini "
-"desteklemiyor. Yapabiliyorsanız, Chrome ya da Safari gibi dosya gönderimini "
-"destekleyen daha modern bir tarayıcı kullanın."
+"desteklemiyor. Yapabiliyorsanız, Chrome, Firefox ya da Safari gibi dosya "
+"gönderimini destekleyen daha modern bir tarayıcı kullanın."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
@@ -836,13 +838,9 @@ msgstr "Satırı sil"
 msgid "Delete table"
 msgstr "Tabloyu sil"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "Açıklama"
 
@@ -2042,7 +2040,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
-msgstr "Altyazıları gizle"
+msgstr "İşitme engelliler için altyazıyı gizle"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "(Caption will be displayed when you start playing the video.)"
@@ -2050,7 +2048,7 @@ msgstr "(Altyazı videoyu oynatmaya başladığınızda gösterilecek.)"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on closed captioning"
-msgstr "Altyazıyı aç"
+msgstr "İşitme engelliler için altyazıyı aç"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
@@ -2331,7 +2329,7 @@ msgstr "anonim"
 
 #: common/static/common/js/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
-msgstr "Bu yorumu silmeye emin misiniz?"
+msgstr "Bu yorumu silmek istediğinize emin misiniz?"
 
 #: common/static/common/js/discussion/views/response_comment_view.js
 msgid "This comment could not be deleted. Refresh the page and try again."
@@ -2339,7 +2337,7 @@ msgstr "Bu yorum silinemez. Sayfayı yenileyin ve tekrar deneyin."
 
 #: common/static/common/js/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr "Bu cevabı silmeye emin misiniz?"
+msgstr "Bu cevabı silmek istediğinize emin misiniz?"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
@@ -2347,11 +2345,11 @@ msgstr "Sağladığınız e-posta adresi, olması gerektiği gibi değil."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s must have at least %(count)d characters."
-msgstr "%(field)s en az %(count)d karakterlere sahip olmalıdır."
+msgstr "%(field)s en az %(count)d karaktere sahip olmalıdır."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "%(field)s can only contain up to %(count)d characters."
-msgstr "%(field)s sadece %(count)d karakterleri içerebilir."
+msgstr "%(field)s en fazla %(count)d karakter içerebilir."
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "Please enter your %(field)s."
@@ -2645,7 +2643,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr "Sana nasıl yardımcı olabiliriz,  {username}?"
+msgstr "Sana nasıl yardımcı olabiliriz, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
@@ -2723,7 +2721,7 @@ msgstr "son faaliyet"
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "open slots"
-msgstr "açık aralıklar"
+msgstr "açık yerler"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "name"
@@ -2948,7 +2946,7 @@ msgstr "Konular"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Teams"
-msgstr ""
+msgstr "Takımlarım"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
@@ -3326,11 +3324,11 @@ msgstr "Yüklenen dosya sorunları. Görüntülemek için \"+\" tuşuna basın."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
-msgstr "Öğrenciler istisna listesine başarıyla eklendi"
+msgstr " öğrenciler istisna listesine başarıyla eklendi"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is successfully added to the exception list"
-msgstr "Öğrenci istisna listesine başarıyla eklendi"
+msgstr " öğrenci istisna listesine başarıyla eklendi"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " records are not in correct format and not added to the exception list"
@@ -3535,7 +3533,9 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select military status"
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
@@ -3543,7 +3543,9 @@ msgid "What is the highest level of education that you have achieved so far?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select guardian education"
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
@@ -3555,7 +3557,7 @@ msgid "What industry do you currently work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select prospective industry"
+msgid "What industry do you want to work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
@@ -3584,7 +3586,7 @@ msgstr ""
 
 #: lms/static/js/demographics_collection/Wizard.jsx
 msgid "next page"
-msgstr ""
+msgstr "sonraki sayfa"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3856,7 +3858,7 @@ msgstr "Topluluk eklenemedi"
 
 #: lms/static/js/groups/views/cohorts.js
 msgid "You currently have no cohorts configured"
-msgstr "Mevcut yapılandırılmş topluluğunuz yok"
+msgstr "Mevcut yapılandırılmış topluluğunuz yok"
 
 #: lms/static/js/groups/views/cohorts.js
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
@@ -3939,7 +3941,7 @@ msgstr "Sertifika oluştururken hata oluştu. Lütfen tekrar deneyiniz."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Start regenerating certificates for students in this course?"
-msgstr "Bu dersteki  öğrenciler için sertifika yeniden oluşturmayı başlat?"
+msgstr "Bu dersteki öğrenciler için sertifika yeniden oluşturmayı başlat?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Error while regenerating certificates. Please try again."
@@ -3954,13 +3956,13 @@ msgstr "Veri yükleniyor..."
 #: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error getting issued certificates list."
-msgstr "Veriler sertifikalar listesini alırken hata."
+msgstr "Verilen sertifikalar listesini alırken hata."
 
 #: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
-"Sınav gözetmenli sınav sonuçlarını oluştururken hata oluştu. Lütfen tekrar "
+"Gözetmenli sınav sonuçlarını oluştururken hata oluştu. Lütfen tekrar "
 "deneyiniz."
 
 #: lms/static/js/instructor_dashboard/data_download.js
@@ -3994,7 +3996,7 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
-msgstr "Notlandırma konfigürasyonunu alırken hata"
+msgstr "Notlandırma yapılandırmasını alırken hata."
 
 #: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
@@ -4052,7 +4054,7 @@ msgstr "E-posta"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Revoke access"
-msgstr "Erişimi yetkisini geri ver"
+msgstr "Erişimi iptal et"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Group"
@@ -4121,7 +4123,7 @@ msgstr "Tüm hesaplar başarı bir şekilde oluşturulmuştur."
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
-msgstr "Kullanıcıları beta sınayıcıları oalrak ekler/çıkarırken hata oluştu."
+msgstr "Kullanıcıları beta sınayıcıları olarak ekler/çıkarırken hata oluştu."
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -4771,6 +4773,7 @@ msgstr ""
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to rescore problem to improve score for user."
 msgstr ""
+"Kullanıcı skorunu geliştirmek için yeniden problem skorlama yapılamadı."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully overrode problem score for {user}"
@@ -5401,10 +5404,6 @@ msgstr "Bir hata oluştu. Lütfen tekrar deneyin."
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr "Sipariş teslim edilemedi"
-
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-msgid "Could not retrieve payment information"
-msgstr "Ödeme bilgileri alınamadı"
 
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
@@ -7206,11 +7205,6 @@ msgstr "Eylemler"
 #: lms/templates/ccx/schedule.underscore
 msgid "Unscheduled"
 msgstr "Planlanmamış"
-
-#: cms/templates/js/course_info_update.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "Tarih"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -9049,7 +9043,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "İleri: %(nextStepTitle)s"
@@ -9187,13 +9180,11 @@ msgstr ""
 "dönebilir ve yenileyebilirsiniz."
 
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "Hesabınızı Etkinleştirin"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "Fotoğraflı Kimlik"
 
@@ -9208,7 +9199,6 @@ msgstr ""
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "Web Kamera"
 
@@ -9311,7 +9301,6 @@ msgid "Check your email for an activation message."
 msgstr "Aktivasyon mesajı için e-postanızı kontrol edin."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "Toplam"
 
@@ -9354,81 +9343,6 @@ msgid ""
 msgstr ""
 "Yüzünüzün fotoğrafını ve devlet tarafından verilmiş fotoğraflı nüfus "
 "kimliğinizin fotoğrafını webcam ile çekin."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for {courseName}."
-msgstr "Teşekkürler! {courseName} için olan ödemenizi aldık."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"Lütfen kayıtlarınız için bu sayfanın çıktısını fatura olarak alın. Aynı "
-"bilgileri içeren bir de e-posta alacaksınız."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "Sipariş No."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "Miktar"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "Lütfen Bildirin"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "Üzerinde çarpı işareti öğeler iade edilmiştir."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "Faturalandı"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "Fatura bulunamadı"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next Step: Confirm your identity"
-msgstr "Sonraki Adım: Kimliğinizi doğrulayın"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email"
-msgstr "E-postanızı kontrol ediniz"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr ""
-"Derse kayıt olmadan önce hesabınızı aktive edin. Etkinleştirme e-posta için "
-"gelen kutunuzu kontrol edin."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"photo."
-msgstr ""
-"Adınızı ve fotoğrafınızı içeren bir ehliyet, pasaport veya diğer hükümet "
-"tarafından verilen kimlik"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"Eğer kimliğinizi şimdi doğrulamazsanız, hala daha ana panelinizden dersinizi"
-" keşfedebilirsiniz. Kimliğinizi doğrulamak için %(platformName)s üzerinden "
-"periyodik hatırlatma alacaksınız."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "Kimliğinizi daha sonra mı doğrulamak istersiniz?"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
@@ -10334,6 +10248,10 @@ msgid ""
 msgstr ""
 "İçeriğinizde geçersiz kod var. Lütfen geçerli HTML olduğundan emin olmak "
 "için kontrol edin."
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Date"
+msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"

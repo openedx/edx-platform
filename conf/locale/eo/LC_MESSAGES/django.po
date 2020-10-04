@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-27 20:50+0000\n"
-"PO-Revision-Date: 2020-09-27 20:50:25.720823\n"
+"POT-Creation-Date: 2020-10-04 20:51+0000\n"
+"PO-Revision-Date: 2020-10-04 20:51:26.026355\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -59,6 +59,17 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr "Prößlém Ⱡ'σяєм ιρѕυм #"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+#: lms/templates/video.html
+msgid "Video"
+msgstr "Vïdéö Ⱡ'σяєм ιρѕ#"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
@@ -7540,6 +7551,20 @@ msgstr ""
 "{platform_name} vérïfïéd ïdéntïtý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate will be available soon!"
+msgstr ""
+"Ýöür çértïfïçäté wïll ßé äväïläßlé söön! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"After this course officially ends, you will receive an email notification "
+"with your certificate."
+msgstr ""
+"Àftér thïs çöürsé öffïçïällý énds, ýöü wïll réçéïvé än émäïl nötïfïçätïön "
+"wïth ýöür çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate is available"
 msgstr "Ýöür çértïfïçäté ïs äväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
@@ -10481,10 +10506,6 @@ msgid "Make payment"
 msgstr "Mäké päýmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Payment confirmation"
-msgstr "Päýmént çönfïrmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/verify_student/views.py
 msgid "Take photo"
 msgstr "Täké phötö Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -12178,10 +12199,33 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
+"You can only set a library to {library_type} if all existing blocks are of "
+"that type. Found incompatible block {block_id} with type {block_type}."
+msgstr ""
+"Ýöü çän önlý sét ä lïßrärý tö {library_type} ïf äll éxïstïng ßlöçks äré öf "
+"thät týpé. Föünd ïnçömpätïßlé ßlöçk {block_id} wïth týpé {block_type}. "
+"Ⱡ'σяєм ιρѕυм #"
+
+#: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
+"Block type \"{block_type}\" is not compatible with library type "
+"\"{library_type}\"."
+msgstr ""
+"Blöçk týpé \"{block_type}\" ïs nöt çömpätïßlé wïth lïßrärý týpé "
+"\"{library_type}\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/content_libraries/api.py
 msgid "Library cannot have more than {} XBlocks"
 msgstr ""
 "Lïßrärý çännöt hävé möré thän {} XBlöçks Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Complex"
+msgstr "Çömpléx Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "Administer users and author content"
@@ -13552,20 +13596,28 @@ msgstr "Àççöünt çréätïön nöt ällöwéd. Ⱡ'σяєм ιρѕυм ∂�
 #, python-brace-format
 msgid ""
 "You've successfully signed in to your {provider_name} account, but this "
-"account isn't linked with your {platform_name} account yet.Use your "
-"{platform_name} username and password to sign in to {platform_name} below, "
-"and then link your {platform_name} account with {provider_name} from your "
-"dashboard.If you don't have an account on {platform_name} yet, click "
-"{register_label_strong} at the top of the page."
+"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
+" your {platform_name} username and password to sign in to {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
+" yet, click {register_label_strong} at the top of the page."
 msgstr ""
 "Ýöü'vé süççéssfüllý sïgnéd ïn tö ýöür {provider_name} äççöünt, ßüt thïs "
-"äççöünt ïsn't lïnkéd wïth ýöür {platform_name} äççöünt ýét.Ûsé ýöür "
-"{platform_name} üsérnämé änd pässwörd tö sïgn ïn tö {platform_name} ßélöw, "
-"änd thén lïnk ýöür {platform_name} äççöünt wïth {provider_name} fröm ýöür "
-"däshßöärd.Ìf ýöü dön't hävé än äççöünt ön {platform_name} ýét, çlïçk "
-"{register_label_strong} ät thé töp öf thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт"
-" ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ι#"
+"äççöünt ïsn't lïnkéd wïth ýöür {platform_name} äççöünt ýét. {blank_lines}Ûsé"
+" ýöür {platform_name} üsérnämé änd pässwörd tö sïgn ïn tö {platform_name} "
+"ßélöw, änd thén lïnk ýöür {platform_name} äççöünt wïth {provider_name} fröm "
+"ýöür däshßöärd. {blank_lines}Ìf ýöü dön't hävé än äççöünt ön {platform_name}"
+" ýét, çlïçk {register_label_strong} ät thé töp öf thé pägé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, q#"
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "Régïstér Ⱡ'σяєм ιρѕυм ∂#"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "There was an error receiving your login information. Please email us."
@@ -13967,23 +14019,6 @@ msgid "The course key for the course we would like to be auto-cohorted."
 msgstr ""
 "Thé çöürsé kéý för thé çöürsé wé wöüld lïké tö ßé äütö-çöhörtéd. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "Oauth client name of video pipeline service."
-msgstr ""
-"Öäüth çlïént nämé öf vïdéö pïpélïné sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "edx-video-pipeline API URL."
-msgstr "édx-vïdéö-pïpélïné ÀPÌ ÛRL. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid ""
-"Username created for Video Pipeline Integration, e.g. veda_service_user."
-msgstr ""
-"Ûsérnämé çréätéd för Vïdéö Pïpélïné Ìntégrätïön, é.g. védä_sérvïçé_üsér. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Oauth client name of VEM service."
@@ -14890,14 +14925,6 @@ msgstr "{platform_name} Süppört Lévéls: Ⱡ'σяєм ιρѕυм ∂σłσя 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
 msgstr "HTML Ⱡ'σяєм ι#"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "Problem"
-msgstr "Prößlém Ⱡ'σяєм ιρѕυм #"
-
-#: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
-msgid "Video"
-msgstr "Vïdéö Ⱡ'σяєм ιρѕ#"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -21152,13 +21179,6 @@ msgstr "Höw ït Wörks Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Schools"
 msgstr "Sçhööls Ⱡ'σяєм ιρѕυм #"
 
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "Régïstér Ⱡ'σяєм ιρѕυм ∂#"
-
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "Résümé ýöür läst çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
@@ -24017,10 +24037,6 @@ msgid "Upgrade Your Enrollment For {course_name}."
 msgstr ""
 "Ûpgrädé Ýöür Énröllmént För {course_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тє#"
-
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Receipt For {course_name}"
-msgstr "Réçéïpt För {course_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Verify For {course_name}"

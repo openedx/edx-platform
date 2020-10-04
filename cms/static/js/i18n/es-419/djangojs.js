@@ -1556,7 +1556,7 @@
     "Select a cohort to manage": "Seleccione la cohorte a gestionar",
     "Select a course or select \"Not specific to a course\" for your support request.": "Seleccione un curso o seleccione \"No espec\u00edfico para un curso\" para su solicitud de soporte.",
     "Select a group type": "Seleccione un tipo de grupo",
-    "Select a prerequisite subsection and enter a minimum score percentage and minimum completion percentage to limit access to this subsection. Allowed values are 0-100": "Seleccione una sub-secci\u00f3n con prerequisito e ingrese un porcentaje de calificaci\u00f3n m\u00ednimo y un porcentaje m\u00ednimo a ser completado para limitar el acceso a esta sub-secci\u00f3n. Los valores permitidos son de 0 a 100.",
+    "Select a prerequisite subsection and enter a minimum score percentage and minimum completion percentage to limit access to this subsection. Allowed values are 0-100": "Seleccione una sub-secci\u00f3n con prerrequisito e ingrese un porcentaje de calificaci\u00f3n m\u00ednimo y un porcentaje m\u00ednimo a ser completado para limitar el acceso a esta sub-secci\u00f3n. Los valores permitidos son de 0 a 100.",
     "Select a section or problem": "Seleccione una secci\u00f3n o problema",
     "Select a session:": "Selecciona una edici\u00f3n:",
     "Select a subject for your support request.": "Elige un tema para tu petici\u00f3n de ayuda.",

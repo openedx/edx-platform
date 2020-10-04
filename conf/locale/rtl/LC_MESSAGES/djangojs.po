@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-27 20:50+0000\n"
-"PO-Revision-Date: 2020-09-27 20:50:25.804109\n"
+"POT-Creation-Date: 2020-10-04 20:51+0000\n"
+"PO-Revision-Date: 2020-10-04 20:51:26.361846\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -279,7 +279,6 @@ msgstr "صشقرهرل"
 #: common/static/common/js/discussion/views/response_comment_view.js
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
 msgid "Error"
@@ -767,7 +766,6 @@ msgstr "يثمثفث فشزمث"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "يثسذقهحفهخر"
 
@@ -3480,16 +3478,24 @@ msgstr ""
 "وثوزثقس خب غخعق بشوهمغ? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select military status"
-msgstr "سثمثذف وهمهفشقغ سفشفعس"
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
+msgstr ""
+"اشدث غخع ثدثق سثقدثي خر شذفهدث يعفغ هر فاث ع.س. شقوثي بخقذثس, قثسثقدثس, خق "
+"رشفهخرشم لعشقي?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "What is the highest level of education that you have achieved so far?"
 msgstr "صاشف هس فاث اهلاثسف مثدثم خب ثيعذشفهخر فاشف غخع اشدث شذاهثدثي سخ بشق?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select guardian education"
-msgstr "سثمثذف لعشقيهشر ثيعذشفهخر"
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
+msgstr ""
+"صاشف هس فاث اهلاثسف مثدثم خب ثيعذشفهخر فاشف شرغ خب غخعق حشقثرفس خق لعشقيهشرس"
+" اشدث شذاهثدثي?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select employment status"
@@ -3500,8 +3506,8 @@ msgid "What industry do you currently work in?"
 msgstr "صاشف هريعسفقغ يخ غخع ذعققثرفمغ صخقن هر?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select prospective industry"
-msgstr "سثمثذف حقخسحثذفهدث هريعسفقغ"
+msgid "What industry do you want to work in?"
+msgstr "صاشف هريعسفقغ يخ غخع صشرف فخ صخقن هر?"
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -5382,10 +5388,6 @@ msgstr "شر ثققخق اشس خذذعققثي. حمثشسث فقغ شلشهر.
 msgid "Could not submit order"
 msgstr "ذخعمي رخف سعزوهف خقيثق"
 
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-msgid "Could not retrieve payment information"
-msgstr "ذخعمي رخف قثفقهثدث حشغوثرف هربخقوشفهخر"
-
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
 msgstr "فشنث ش حاخفخ خب غخعق هي"
@@ -7196,11 +7198,6 @@ msgstr "شذفهخرس"
 #: lms/templates/ccx/schedule.underscore
 msgid "Unscheduled"
 msgstr "عرسذاثيعمثي"
-
-#: cms/templates/js/course_info_update.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "يشفث"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -9086,7 +9083,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "رثطف: %(nextStepTitle)s"
@@ -9233,13 +9229,11 @@ msgstr ""
 "قثفعقر شري قثبقثسا فاهس حشلث."
 
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "شذفهدشفث غخعق شذذخعرف"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "حاخفخ هي"
 
@@ -9254,7 +9248,6 @@ msgstr ""
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "صثزذشو"
 
@@ -9360,7 +9353,6 @@ msgid "Check your email for an activation message."
 msgstr "ذاثذن غخعق ثوشهم بخق شر شذفهدشفهخر وثسسشلث."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "فخفشم"
 
@@ -9401,81 +9393,6 @@ msgid ""
 msgstr ""
 "غخع صهمم عسث غخعق صثزذشو فخ فشنث ش حهذفعقث خب غخعق بشذث شري خب غخعق "
 "لخدثقروثرف-هسسعثي حاخفخ هي."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for {courseName}."
-msgstr "فاشرن غخع! صث اشدث قثذثهدثي غخعق حشغوثرف بخق {courseName}."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"حمثشسث حقهرف فاهس حشلث بخق غخعق قثذخقيس; هف سثقدثس شس غخعق قثذثهحف. غخع صهمم"
-" شمسخ قثذثهدث شر ثوشهم صهفا فاث سشوث هربخقوشفهخر."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "خقيثق رخ."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "شوخعرف"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "حمثشسث رخفث"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "ذقخسسثي خعف هفثوس اشدث زثثر قثبعريثي."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "زهممثي فخ"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "رخ قثذثهحف شدشهمشزمث"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next Step: Confirm your identity"
-msgstr "رثطف سفثح: ذخربهقو غخعق هيثرفهفغ"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email"
-msgstr "ذاثذن غخعق ثوشهم"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr ""
-"غخع رثثي فخ شذفهدشفث غخعق شذذخعرف زثبخقث غخع ذشر ثرقخمم هر ذخعقسثس. ذاثذن "
-"غخعق هرزخط بخق شر شذفهدشفهخر ثوشهم."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"photo."
-msgstr ""
-"ش يقهدثق'س مهذثرسث, حشسسحخقف, خق لخدثقروثرف-هسسعثي هي صهفا غخعق رشوث شري "
-"حاخفخ."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"هب غخع يخر'ف دثقهبغ غخعق هيثرفهفغ رخص, غخع ذشر سفهمم ثطحمخقث غخعق ذخعقسث "
-"بقخو غخعق يشسازخشقي. غخع صهمم قثذثهدث حثقهخيهذ قثوهريثقس بقخو "
-"%(platformName)s فخ دثقهبغ غخعق هيثرفهفغ."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "صشرف فخ ذخربهقو غخعق هيثرفهفغ مشفثق?"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
@@ -10392,6 +10309,10 @@ msgid ""
 msgstr ""
 "فاثقث هس هردشمهي ذخيث هر غخعق ذخرفثرف. حمثشسث ذاثذن فخ وشنث سعقث هف هس دشمهي"
 " افوم."
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Date"
+msgstr "يشفث"
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"
