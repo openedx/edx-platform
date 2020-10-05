@@ -38,7 +38,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_f
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from openedx.core.djangoapps.user_authn.message_types import PasswordReset
+from openedx.core.djangoapps.user_authn.message_types import PasswordReset, PasswordResetSuccess
 from openedx.core.djangolib.markup import HTML
 from student.forms import send_account_recovery_email_for_user
 from student.models import AccountRecovery
@@ -52,6 +52,16 @@ SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 # Maintaining this naming for backwards compatibility.
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
+
+
+def get_user_default_email_params(user):
+    """
+    Get default email params for the user.
+    """
+    site = get_current_site()
+    message_context = get_base_template_context(site)
+    user_language_pref = get_user_preference(user, LANGUAGE_KEY)
+    return [message_context, user_language_pref]
 
 
 def get_password_reset_form():
@@ -100,6 +110,31 @@ def get_password_reset_form():
     return form_desc
 
 
+def send_password_reset_success_email(user, request):
+    """
+    Send an email to user indicating that password reset was successful.
+
+    Arguments:
+        user (User): Django User object
+        request (HttpRequest): Django request object
+    """
+    message_context, user_language_preference = get_user_default_email_params(user)
+    lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    message_context.update(
+        {'login_link': '{}/login'.format(lms_root_url), 'request': request, }
+    )
+
+    msg = PasswordResetSuccess(context=message_context).personalize(
+        recipient=Recipient(user.username, user.email),
+        language=user_language_preference,
+        user_context={"name": user.profile.name},
+    )
+    try:
+        ace.send(msg)
+    except Exception:  # pylint: disable=broad-except
+        log.exception('PasswordResetSuccess: sending email to user [%s] failed.', user.username)
+
+
 def send_password_reset_email_for_user(user, request, preferred_email=None):
     """
     Send out a password reset email for the given user.
@@ -109,8 +144,7 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
         request (HttpRequest): Django request object
         preferred_email (str): Send email to this address if present, otherwise fallback to user's email address.
     """
-    site = get_current_site()
-    message_context = get_base_template_context(site)
+    message_context, user_language_preference = get_user_default_email_params(user)
     message_context.update({
         'request': request,  # Used by google_analytics_tracking_pixel
         # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
@@ -127,7 +161,7 @@ def send_password_reset_email_for_user(user, request, preferred_email=None):
 
     msg = PasswordReset().personalize(
         recipient=Recipient(user.username, preferred_email or user.email),
-        language=get_user_preference(user, LANGUAGE_KEY),
+        language=user_language_preference,
         user_context=message_context,
     )
     ace.send(msg)
@@ -443,6 +477,7 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         request.POST = request.POST.copy()
         request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
         request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
+        is_account_recovery = 'is_account_recovery' in request.GET
 
         password = request.POST['new_password1']
         response = self._validate_password(password, request)
@@ -455,17 +490,19 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         # If password reset was unsuccessful a template response is returned (status_code 200).
         # Check if form is invalid then show an error to the user.
         # Note if password reset was successful we get response redirect (status_code 302).
-        if response.status_code == 200:
+        password_reset_successful = response.status_code == 302
+        if not password_reset_successful:
             return self._handle_password_reset_failure(response)
 
         updated_user = User.objects.get(id=self.uid_int)
-        if 'is_account_recovery' in request.GET:
+        if is_account_recovery:
             self._handle_primary_email_update(updated_user)
 
         updated_user.save()
-        if response.status_code == 302 and 'is_account_recovery' in request.GET:
+        if password_reset_successful and is_account_recovery:
             self._handle_password_creation(request, updated_user)
 
+        send_password_reset_success_email(updated_user, request)
         return response
 
     def dispatch(self, *args, **kwargs):
