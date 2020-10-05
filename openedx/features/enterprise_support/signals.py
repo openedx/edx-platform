@@ -12,6 +12,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
 from integrated_channels.integrated_channel.tasks import transmit_single_learner_data
+from slumber.exceptions import HttpClientError
 
 from email_marketing.tasks import update_user
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -86,7 +87,7 @@ def handle_enterprise_learner_passing_grade(sender, user, course_id, **kwargs): 
 
 
 @receiver(UNENROLL_DONE)
-def refund_order_voucher(sender, course_enrollment=None, skip_refund=False, **kwargs):  # pylint: disable=unused-argument
+def refund_order_voucher(sender, course_enrollment, skip_refund=False, **kwargs):  # pylint: disable=unused-argument
     """
         Call the /api/v2/enterprise/coupons/create_refunded_voucher/ API to create new voucher and assign it to user.
     """
@@ -105,8 +106,14 @@ def refund_order_voucher(sender, course_enrollment=None, skip_refund=False, **kw
     client = ecommerce_api_client(service_user)
     order_number = course_enrollment.get_order_attribute_value('order_number')
     if order_number:
-        client.enterprise.coupons.create_refunded_voucher.post(
-            {
-                "order": order_number
-            }
-        )
+        error_message = u"Encountered {} from ecommerce while creating refund voucher. Order={}, enrollment={}, user={}"
+        try:
+            client.enterprise.coupons.create_refunded_voucher.post({"order": order_number})
+        except HttpClientError as ex:
+            log.info(
+                error_message.format(type(ex).__name__, order_number, course_enrollment, course_enrollment.user)
+            )
+        except Exception as ex:  # pylint: disable=broad-except
+            log.exception(
+                error_message.format(type(ex).__name__, order_number, course_enrollment, course_enrollment.user)
+            )

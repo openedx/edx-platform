@@ -10,6 +10,8 @@ from django.utils.timezone import now
 from edx_django_utils.cache import TieredCache
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
+from slumber.exceptions import HttpClientError, HttpServerError
+from testfixtures import LogCapture
 
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.signals import listen_for_passing_grade
@@ -30,7 +32,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
 
-LOGGER_NAME = "enterprise_support.signals"
+LOGGER_NAME = "openedx.features.enterprise_support.signals"
 
 TEST_EMAIL = "test@edx.org"
 
@@ -116,16 +118,8 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
 
         self.assertFalse(self._is_dsc_cache_found(self.user.id, self.course_id))
 
-    @ddt.data(
-        (True, True, 2, False),  # test if skip_refund
-        (False, True, 20, False),  # test refundable time passed
-        (False, False, 2, False),    # test not enterprise enrollment
-        (False, True, 2, True),    # success: no skip_refund, is enterprise enrollment and still in refundable window.
-    )
-    @ddt.unpack
-    def test_refund_order_voucher(self, skip_refund, enterprise_enrollment_exists, no_of_days_placed, api_called):
-        """Test refund_order_voucher signal"""
-        # import pdb; pdb.set_trace()
+    def _create_enrollment_to_refund(self, no_of_days_placed=10, enterprise_enrollment_exists=True):
+        """Create enrollment to refund. """
         date_placed = now() - timedelta(days=no_of_days_placed)
         course = CourseFactory.create(display_name='test course', run="Testing_course", start=date_placed)
         enrollment = CourseEnrollmentFactory(
@@ -150,9 +144,47 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
         if enterprise_enrollment_exists:
             self._create_enterprise_enrollment(self.user.id, course.id)
 
+        return enrollment
+
+    @ddt.data(
+        (True, True, 2, False),  # test if skip_refund
+        (False, True, 20, False),  # test refundable time passed
+        (False, False, 2, False),    # test not enterprise enrollment
+        (False, True, 2, True),    # success: no skip_refund, is enterprise enrollment and still in refundable window.
+    )
+    @ddt.unpack
+    def test_refund_order_voucher(self, skip_refund, enterprise_enrollment_exists, no_of_days_placed, api_called):
+        """Test refund_order_voucher signal"""
+        enrollment = self._create_enrollment_to_refund(no_of_days_placed, enterprise_enrollment_exists)
         with patch('openedx.features.enterprise_support.signals.ecommerce_api_client') as mock_ecommerce_api_client:
             enrollment.update_enrollment(is_active=False, skip_refund=skip_refund)
             self.assertEqual(mock_ecommerce_api_client.called, api_called)
+
+    @ddt.data(
+        (HttpClientError, 'INFO'),
+        (HttpServerError, 'ERROR'),
+        (Exception, 'ERROR'),
+    )
+    @ddt.unpack
+    def test_refund_order_voucher_with_client_errors(self, mock_error, log_level):
+        """Test refund_order_voucher signal client_error"""
+        enrollment = self._create_enrollment_to_refund()
+        with patch('openedx.features.enterprise_support.signals.ecommerce_api_client') as mock_ecommerce_api_client:
+            client_instance = mock_ecommerce_api_client.return_value
+            client_instance.enterprise.coupons.create_refunded_voucher.post.side_effect = mock_error()
+            with LogCapture(LOGGER_NAME) as logger:
+                enrollment.update_enrollment(is_active=False)
+                self.assertEqual(mock_ecommerce_api_client.called, True)
+                logger.check(
+                    (
+                        LOGGER_NAME,
+                        log_level,
+                        'Encountered {} from ecommerce while creating refund voucher. '
+                        'Order=EDX-000000001, enrollment={}, user={}'.format(
+                            mock_error.__name__, enrollment, enrollment.user
+                        ),
+                    )
+                )
 
     def test_handle_enterprise_learner_passing_grade(self):
         """
