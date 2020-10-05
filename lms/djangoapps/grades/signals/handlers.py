@@ -224,7 +224,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     context_key = LearningContextKey.from_string(kwargs['course_id'])
     if not context_key.is_course:
         return  # If it's not a course, it has no subsections, so skip the subsection grading update
-    recalculate_subsection_grade_v3.apply_async(
+    recalculate_subsection_grade_v3(
         kwargs=dict(
             user_id=kwargs['user_id'],
             anonymous_user_id=kwargs.get('anonymous_user_id'),
