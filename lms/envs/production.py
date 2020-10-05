@@ -540,7 +540,7 @@ CELERY_BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(BROKER_TRANSPORT,
                                                    BROKER_PASSWORD,
                                                    BROKER_HOSTNAME,
                                                    BROKER_VHOST)
-BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
+CELERY_BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {
     'fanout_patterns': True,
