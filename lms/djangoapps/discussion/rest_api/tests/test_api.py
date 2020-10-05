@@ -606,7 +606,6 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
             course=None,
             topic_id_list=None,
     ):
-        #TODO: Update the tests to take the new parameters into account
         """
         Register the appropriate comments service response, then call
         get_thread_list and return the result.

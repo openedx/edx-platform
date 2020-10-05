@@ -861,8 +861,6 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content.decode('utf-8'))
-        print(response_data)
-        print(self.expected_thread_data({"read": True}))
         self.assertEqual(response_data, self.expected_thread_data({"read": True}))
         self.assertEqual(
             httpretty.last_request().parsed_body,
