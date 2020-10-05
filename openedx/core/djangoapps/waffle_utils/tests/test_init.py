@@ -16,8 +16,6 @@ from .. import (
     _get_waffle_flag_custom_attributes_set,
     CourseWaffleFlag,
     WaffleFlagNamespace,
-    WaffleSwitchNamespace,
-    WaffleSwitch,
 )
 from ..models import WaffleFlagCourseOverrideModel
 
@@ -185,22 +183,3 @@ class TestCourseWaffleFlag(TestCase):
             self.assertEqual(mock_set_custom_attribute.call_count, 1)
         else:
             self.assertEqual(mock_set_custom_attribute.call_count, 0)
-
-
-class TestWaffleSwitch(TestCase):
-    """
-    Tests the WaffleSwitch.
-    """
-
-    NAMESPACE_NAME = "test_namespace"
-    WAFFLE_SWITCH_NAME = "test_switch_name"
-    TEST_NAMESPACE = WaffleSwitchNamespace(NAMESPACE_NAME)
-    WAFFLE_SWITCH = WaffleSwitch(TEST_NAMESPACE, WAFFLE_SWITCH_NAME, __name__)
-
-    def test_namespaced_switch_name(self):
-        """
-        Verify namespaced_switch_name returns the correct namespace switch name
-        """
-        expected = self.NAMESPACE_NAME + "." + self.WAFFLE_SWITCH_NAME
-        actual = self.WAFFLE_SWITCH.namespaced_switch_name
-        self.assertEqual(actual, expected)
