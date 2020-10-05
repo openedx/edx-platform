@@ -10,9 +10,9 @@ from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 class CourseCard(models.Model):
     """
     These courses are used for representing course re-runs.
-    @course_id (string):  id of the course. can be gotten through to_deprecated_string() method of CourseKey object
-    organization: if given, it will make course card private for that organization
-    is_enabled: whether to publish the course or not
+    `course_id` can be gotten through to_deprecated_string() method of CourseKey object
+    `organization` if given, it will make course card private for that organization
+    `is_enabled` whether to publish the course or not
     """
 
     class Meta:

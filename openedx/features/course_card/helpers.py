@@ -23,7 +23,7 @@ def get_course_open_date(course):
     else return course start date
 
     Arguments:
-        course (object): contains the course overview object
+        course (CourseOverview): contains the course overview details
 
     Returns:
          date: course start date
@@ -86,7 +86,7 @@ def get_future_courses(card_id):
         card_id (int): course card id
 
     Returns:
-        future_courses
+         (CourseOverview): future_courses
     """
     utc = pytz.UTC
 
@@ -123,7 +123,8 @@ def get_course_cards_list(request=None):
     """
     Helper function to get the list of all enabled course cards detail
 
-    Returns: list of enabled course cards detail
+    Returns:
+        list: list of enabled course cards detail
     """
     request = request or get_current_request()
     cards_query_set = CourseCard.objects.all() if request.user.is_staff else CourseCard.objects.filter(is_enabled=True)
@@ -143,7 +144,7 @@ def is_course_in_programs(parent_course_key):
         parent_course_key (int): parent course key
 
     Returns:
-        True if parent of first course reruns from discovery matches with parent course key
+        Boolean: True, if parent of first course reruns from discovery matches with parent course key
     """
     programs = get_programs(get_current_request().site)
 

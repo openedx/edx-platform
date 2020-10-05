@@ -1,5 +1,5 @@
 """
-Unit test helper file
+Helper file which contains the helper methods used in different Course card Unit Tests
 """
 from datetime import datetime, timedelta
 
@@ -14,17 +14,17 @@ from ..models import CourseCard
 
 def set_course_dates(course, enrollment_start, enrollment_end, course_start, course_end):
     """
-    Helper function to set the  dates required for course
+    Helper function to set the dates required for course
 
     Arguments:
-        course (:obj:Course): Contains the course object
-        enrollment_start (:int): Contains the enrollment_start days
-        enrollment_end (:int): Contains the enrollment_end days
-        course_start (:int): Contains the course_start days
-        course_end (:int): Contains the course_end days
+        course (Course): Contains the course object
+        enrollment_start (int): Contains the enrollment_start days
+        enrollment_end (int): Contains the enrollment_end days
+        course_start (int): Contains the course_start days
+        course_end (int): Contains the course_end days
 
     Returns:
-        A course (CourseOverview)
+       CourseOverview: A course CourseOverview object
     """
     course_overview = CourseOverview.get_from_id(course_id=course.id)
 
@@ -41,10 +41,7 @@ def set_course_dates(course, enrollment_start, enrollment_end, course_start, cou
 def disable_course_card(course):
     """
     Arguments:
-        course (:obj:CourseCard): Contains the course card details
-
-    Returns:
-        A course (CourseCard)
+        course (CourseCard): Contains the course card details
     """
     course_card = CourseCard.objects.get(course_id=course.id)
     course_card.is_enabled = False
@@ -58,7 +55,7 @@ def initialize_test_user(password='test', is_staff=False):
         is_staff (:boolean): is_staff or not
 
     Returns:
-        A User
+        User: A new User object with profile details
     """
     user = UserFactory(is_staff=is_staff, password=password)
     email_preference = EmailPreference(

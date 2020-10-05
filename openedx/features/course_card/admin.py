@@ -13,7 +13,8 @@ def get_parent_courses():
     """
     Getting All Courses detail from Course Reruns
 
-    Returns: tuple includes course_ids along with course display name concatenated with course_id
+    Returns:
+        tuple: A tuple includes `course_ids` along with course display name concatenated with `course_id`
     """
     course_rerun_states = CourseRerunState.objects.all()
     course_rerun_ids = [rerun.course_key for rerun in course_rerun_states]
@@ -25,9 +26,8 @@ def get_parent_courses():
 class CardModel(ModelForm):
     """
     Model form to create/update Course Card which contains course_id and is_enabled field.
-
-    course_id (string):  id of the course.
-    is_enabled: whether to publish the course or not
+    `course_id` type (string)  id of the course.
+    `is_enabled` whether to publish the course or not
     """
     def __init__(self, *args, **kwargs):
         """
@@ -55,8 +55,7 @@ class CardModelAdmin(admin.ModelAdmin):
 class CourseRerunStateModel(ModelForm):
     """
     Model form to create/update CourseRerun which contains source_course_key field.
-
-    source_course_key: (string) id of the course.
+    `source_course_key` is a string key which contains its `course_id` and course_title`  concatenated.
     """
 
     class Meta:
@@ -66,23 +65,23 @@ class CourseRerunStateModel(ModelForm):
 
 class CourseRerunStateModelAdmin(admin.ModelAdmin):
     """
-    To Integrate the CourseRerunState form with Django Admin.
+    A model admin class to Integrate the CourseRerunState form with Django Admin.
     """
     def has_delete_permission(self, request, obj=None):
         """
         Disabling the delete permission for CourseRerunState
 
         Returns:
-             False
+             Boolean: False, For Disabling the delete permission for CourseRerunState model admin
         """
         return False
 
     def get_actions(self, request):
         """
-        Disabling the delete_selected action for CourseRerunState
+        Getting the actions except `delete_selected` action for CourseRerunState
 
         Returns:
-            actions
+            list: list of actions
         """
         actions = super(CourseRerunStateModelAdmin, self).get_actions(request)
         if 'delete_selected' in actions:

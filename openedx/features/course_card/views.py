@@ -20,14 +20,14 @@ utc = pytz.UTC
 
 def get_course_start_date(course):
     """
-    this function takes course and returns start date of the course
+    This function takes course and returns start date of the course
     if start and end dates are set and start date is in future
 
     Arguments:
-         course
+       course (CourseOverview): Course details
 
     Returns:
-         Course start date
+        Date: return Course start date or None in case course start date or course not exist
     """
 
     if course and course.start:
@@ -39,11 +39,14 @@ def get_course_start_date(course):
 @csrf_exempt
 def get_course_cards(request):
     """
+    Returns the list of all Enabled course cards in case of Non staffUser
+    For staff user return all CourseCards list
+
     Arguments:
-     request
+     request (HttpRequest): User request object
 
     Returns:
-         list of active cards
+         View: A course card list view
     """
     cards_query_set = CourseCard.objects.all() if request.user.is_staff else CourseCard.objects.filter(is_enabled=True)
     course_card_ids = [cc.course_id for cc in cards_query_set]
@@ -79,12 +82,12 @@ def get_course_cards(request):
 def get_course_with_link_and_start_date(course, course_rerun_object, request):
     """
     Arguments:
-        course (:obj:CourseOverview): Contains the course details
-        course_rerun_object (:obj:CourseRerunState): Course rerun details
-        request (HTTPRequest): current request object
+        course (CourseOverview): Contains the course details
+        course_rerun_object (CourseRerunState): Course rerun details
+        request (HTTPRequest): current user request object
 
     Returns:
-        A course (CourseOverview) with updated start date and current class link.
+        CourseOverview: A course  with updated start date and current class link.
     """
     date_time_format = '%b %-d, %Y'
     current_time = datetime.utcnow().replace(tzinfo=utc)
