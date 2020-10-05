@@ -134,20 +134,18 @@ class MultiselectDropdown extends React.Component {
           // essentially what this if statement is saying:
           // if the newly focused target is NOT a child of the this element, THEN fire the onBlur function
           // and close the dropdown.
-          if(!e.currentTarget.contains(e.relatedTarget)) {
+          if (!e.currentTarget.contains(e.relatedTarget)) {
             this.props.onBlur(e);
-            this.setState({open: false})
+            this.setState({ open: false })
           }
         }}
       >
         <label id="multiselect-dropdown-label" htmlFor="multiselect-dropdown">{this.props.label}</label>
-        <div 
-          className="form-control d-flex" 
-        >
-        <button className="multiselect-dropdown-button" disabled={this.props.disabled} id="multiselect-dropdown-button" ref={this.buttonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
-          {this.renderSelected()}
-        </button>
-        {this.renderUnselect()}
+        <div className="form-control d-flex">
+          <button className="multiselect-dropdown-button" disabled={this.props.disabled} id="multiselect-dropdown-button" ref={this.setButtonRef} aria-haspopup="true" aria-expanded={this.state.open} aria-labelledby="multiselect-dropdown-label multiselect-dropdown-button" onClick={this.handleButtonClick}>
+            {this.renderSelected()}
+          </button>
+          {this.renderUnselect()}
         </div>
         <div>
           {this.renderMenu()}
