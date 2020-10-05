@@ -92,12 +92,11 @@ class CourseGradingModel(object):
         descriptor = modulestore().get_course(course_key)
         new_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
         log.info(
-            "Updated course grading policy for course %s from %s to %s. fire_signal = %s" % (
-                six.text_type(course_key),
-                previous_grading_policy_hash,
-                new_grading_policy_hash,
-                fire_signal
-            )
+            "Updated course grading policy for course %s from %s to %s. fire_signal = %s",
+            six.text_type(course_key),
+            previous_grading_policy_hash,
+            new_grading_policy_hash,
+            fire_signal
         )
 
         if fire_signal:
@@ -178,12 +177,11 @@ class CourseGradingModel(object):
         descriptor = modulestore().get_course(course_key)
         new_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
         log.info(
-            "Updated grader for course %s. Grading policy has changed from %s to %s. fire_signal = %s" % (
-                six.text_type(course_key),
-                previous_grading_policy_hash,
-                new_grading_policy_hash,
-                fire_signal
-            )
+            "Updated grader for course %s. Grading policy has changed from %s to %s. fire_signal = %s",
+            six.text_type(course_key),
+            previous_grading_policy_hash,
+            new_grading_policy_hash,
+            fire_signal
         )
         if fire_signal:
             _grading_event_and_signal(course_key, user.id)
