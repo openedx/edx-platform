@@ -2,6 +2,7 @@
 
 
 import json
+import logging
 from base64 import b64encode
 from datetime import timedelta
 from hashlib import sha1
@@ -13,6 +14,8 @@ from contentstore.signals.signals import GRADING_POLICY_CHANGED
 from track.event_transaction_utils import create_new_event_transaction_id
 from xmodule.modulestore.django import modulestore
 from models.settings.waffle import material_recompute_only
+
+log = logging.getLogger(__name__)
 
 GRADING_POLICY_CHANGED_EVENT_TYPE = 'edx.grades.grading_policy_changed'
 
@@ -68,6 +71,7 @@ class CourseGradingModel(object):
         Probably not the usual path for updates as it's too coarse grained.
         """
         descriptor = modulestore().get_course(course_key)
+        previous_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
 
         graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
         fire_signal = CourseGradingModel.must_fire_grading_event_and_signal(
@@ -84,35 +88,18 @@ class CourseGradingModel(object):
         CourseGradingModel.update_grace_period_from_json(course_key, jsondict['grace_period'], user)
 
         CourseGradingModel.update_minimum_grade_credit_from_json(course_key, jsondict['minimum_grade_credit'], user)
-        if fire_signal:
-            _grading_event_and_signal(course_key, user.id)
 
-        return CourseGradingModel.fetch(course_key)
-
-    @staticmethod
-    def update_from_json_selective(course_key, jsondict, user):
-        """
-        New version that doesn't fire change events when only name or short name are changed.
-        Decode the json into CourseGradingModel and save any changes. Returns the modified model.
-        Probably not the usual path for updates as it's too coarse grained.
-        """
         descriptor = modulestore().get_course(course_key)
-
-        graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
-        fire_signal = CourseGradingModel.must_fire_grading_event_and_signal(
-            course_key,
-            graders_parsed,
-            descriptor,
-            jsondict
+        new_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
+        log.info(
+            "Updated course grading policy for course %s from %s to %s. fire_signal = %s" % (
+                six.text_type(course_key),
+                previous_grading_policy_hash,
+                new_grading_policy_hash,
+                fire_signal
+            )
         )
-        descriptor.raw_grader = graders_parsed
-        descriptor.grade_cutoffs = jsondict['grade_cutoffs']
 
-        modulestore().update_item(descriptor, user.id)
-
-        CourseGradingModel.update_grace_period_from_json(course_key, jsondict['grace_period'], user)
-
-        CourseGradingModel.update_minimum_grade_credit_from_json(course_key, jsondict['minimum_grade_credit'], user)
         if fire_signal:
             _grading_event_and_signal(course_key, user.id)
 
@@ -169,6 +156,7 @@ class CourseGradingModel(object):
         grader which is a full model on the client but not on the server (just a dict)
         """
         descriptor = modulestore().get_course(course_key)
+        previous_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
 
         # parse removes the id; so, grab it before parse
         index = int(grader.get('id', len(descriptor.raw_grader)))
@@ -186,6 +174,17 @@ class CourseGradingModel(object):
             descriptor.raw_grader.append(grader)
 
         modulestore().update_item(descriptor, user.id)
+
+        descriptor = modulestore().get_course(course_key)
+        new_grading_policy_hash = six.text_type(hash_grading_policy(descriptor.grading_policy))
+        log.info(
+            "Updated grader for course %s. Grading policy has changed from %s to %s. fire_signal = %s" % (
+                six.text_type(course_key),
+                previous_grading_policy_hash,
+                new_grading_policy_hash,
+                fire_signal
+            )
+        )
         if fire_signal:
             _grading_event_and_signal(course_key, user.id)
 
