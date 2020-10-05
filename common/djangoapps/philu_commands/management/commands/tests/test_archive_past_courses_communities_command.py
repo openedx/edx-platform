@@ -13,7 +13,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-class ArchivePastCoursesCommunities(ModuleStoreTestCase):
+class TestArchivePastCoursesCommunities(ModuleStoreTestCase):
     """
     Tests for `archive_past_courses_communities` command.
     """
@@ -21,19 +21,20 @@ class ArchivePastCoursesCommunities(ModuleStoreTestCase):
     def setUp(self):
         """
         This function is responsible for creating courses for every test and mocking the function for tests.
-        :return:
         """
-        super(ArchivePastCoursesCommunities, self).setUp()
+        super(TestArchivePastCoursesCommunities, self).setUp()
 
         self.course_1 = CourseFactory.create(display_name='test course 1', run='Testing_course_1')
         self.course_2 = CourseFactory.create(display_name='test course 2', run='Testing_course_2')
         self.course_1.end = datetime.now(pytz.UTC) - timedelta(hours=2)
         self.course_2.end = datetime.now(pytz.UTC) - timedelta(hours=2)
 
-        self.get_visible_courses_patcher = \
-            mock.patch('philu_commands.management.commands.archive_past_courses_communities.get_visible_courses')
-        self.archive_course_community_patcher = \
-            mock.patch('philu_commands.management.commands.archive_past_courses_communities.archive_course_community')
+        get_visible_courses = 'philu_commands.management.commands.archive_past_courses_communities.get_visible_courses'
+        archive_course_community = 'philu_commands.management.commands.' \
+                                   'archive_past_courses_communities.archive_course_community'
+
+        self.get_visible_courses_patcher = mock.patch(get_visible_courses)
+        self.archive_course_community_patcher = mock.patch(archive_course_community)
 
         self.mock_archive_course_community = self.archive_course_community_patcher.start()
         self.mock_get_visible_courses = self.get_visible_courses_patcher.start()
@@ -93,6 +94,6 @@ class ArchivePastCoursesCommunities(ModuleStoreTestCase):
         This function is responsible for cleaning the patchers.
         :return:
         """
-        super(ArchivePastCoursesCommunities, self).tearDown()
+        super(TestArchivePastCoursesCommunities, self).tearDown()
         self.addCleanup(self.archive_course_community_patcher.stop)
         self.addCleanup(self.get_visible_courses_patcher.stop)
