@@ -3820,6 +3820,15 @@ ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
 ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = 'http://enterprise.catalog.app:18160'
+# Defines the usernames of service users who should be throttled
+# at a higher rate than normal users when making requests of enterprise endpoints.
+ENTERPRISE_ALL_SERVICE_USERNAMES = [
+    'ecommerce_worker',
+    'enterprise_worker',
+    'license_manager_worker',
+    'enterprise_catalog_worker',
+]
+
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
