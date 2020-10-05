@@ -184,6 +184,14 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
             multiple topic_id queries to retrieve threads from multiple topics
             at once.
 
+        * filter_own_threads: If true, only return threads authored by the current
+            user.
+
+        * thread_type: Can be 'discussion' or 'question', only return threads of
+            the selected thread type.
+
+        * flagged: If True, only return threads that have been flagged (reported)
+
         * text_search: A search string to match. Any thread whose content
             (including the bodies of comments in the thread) matches the search
             string will be returned.
@@ -299,6 +307,9 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         * has_endorsed: Boolean indicating whether this thread has been answered
 
         * response_count: The number of direct responses for a thread
+
+        * abuse_flagged_count: The number of flags(reports) on and within the
+            thread. Returns null if user is not a moderator
 
     **DELETE response values:
 
@@ -480,6 +491,10 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
         * abuse_flagged: Boolean indicating whether the requesting user has
           flagged the comment for abuse
+
+        * abuse_flagged_any_user: Boolean indicating whether any user has
+            flagged the comment for abuse. Returns null if requesting user
+            is not a moderator.
 
         * voted: Boolean indicating whether the requesting user has voted
           for the comment
