@@ -335,7 +335,6 @@ class CommentSerializer(_ContentSerializer):
     not had retrieve() called, because of the interaction between DRF's attempts
     at introspection and Comment's __getattr__.
     """
-    is_staff = False
     thread_id = serializers.CharField()
     parent_id = serializers.CharField(required=False, allow_null=True)
     endorsed = serializers.BooleanField(required=False)
