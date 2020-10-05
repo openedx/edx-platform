@@ -1,5 +1,5 @@
 """
-Views file for Course Card Application
+All views for course card application
 """
 from datetime import datetime
 

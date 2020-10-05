@@ -51,7 +51,7 @@ class CourseCardBaseClass(ModuleStoreTestCase):
 
 class CourseCardViewBaseClass(CourseCardBaseClass):
     """
-       Contains the cases for course card date view
+    Contains the cases for course card date view
     """
     def test_catalog_course_date(self):
         response = self.client.get(reverse('courses'))

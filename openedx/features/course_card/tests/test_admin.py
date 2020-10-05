@@ -1,5 +1,5 @@
 """
-Unit Tests for Course Card Admin
+Unit tests for course card admin
 """
 from course_action_state.models import CourseRerunState
 from xmodule.modulestore import ModuleStoreEnum
@@ -12,7 +12,7 @@ from .test_views import CourseCardBaseClass
 
 class CourseCardAdminBaseClass(CourseCardBaseClass):
     """
-    Contains the test case for Course Card admin
+    This class contains test cases for course card admin
     """
     def setUp(self):
         super(CourseCardAdminBaseClass, self).setUp()
