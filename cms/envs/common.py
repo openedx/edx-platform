@@ -1662,6 +1662,7 @@ OPTIONAL_APPS = (
     ('integrated_channels.sap_success_factors', None),
     ('integrated_channels.xapi', None),
     ('integrated_channels.cornerstone', None),
+    ('integrated_channels.blackboard', None),
     ('integrated_channels.canvas', None),
     ('integrated_channels.moodle', None),
 )
