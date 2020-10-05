@@ -34,6 +34,8 @@ def locked(expiry_seconds, key):
             if cache.add(cache_key, "true", expiry_seconds):
                 log.info(u'Locking task in cache with key: %s for %s seconds', cache_key, expiry_seconds)
                 return func(*args, **kwargs)
+            else:
+                log.info('Task with key %s already exists in cache', cache_key)
         return wrapper
     return task_decorator
 
