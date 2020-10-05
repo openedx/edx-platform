@@ -17,7 +17,7 @@ jobs:
         with:
           time: '900s'
       - name: Dump database
-        run: docker exec -i edx.devstack.mysql mysqldump -u'edxapp001' -p'password' edxapp > edxapp.sql
+        run: docker exec -i edx.devstack.mysql mysqldump -u'edxapp001' -p'password' --skip-dump-date edxapp > edxapp.sql
       - name: Commit dump file to repo.
         run: ./.github/workflows/mysqldbdump_pr.sh
         env:
