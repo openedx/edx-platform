@@ -16,7 +16,7 @@ from search.search_engine_base import SearchEngine
 
 from student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.libraries_index import MAX_SIZE
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX
+from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
 
@@ -167,7 +167,10 @@ class ContentLibrariesRestApiTest(APITestCase):
         yield
         self.client = old_client  # pylint: disable=attribute-defined-outside-init
 
-    def _create_library(self, slug, title, description="", org=None, library_type=COMPLEX, expect_response=200):
+    def _create_library(
+        self, slug, title, description="", org=None, library_type=COMPLEX,
+        license_type=ALL_RIGHTS_RESERVED, expect_response=200,
+    ):
         """ Create a library """
         if org is None:
             org = self.organization.short_name
@@ -177,6 +180,7 @@ class ContentLibrariesRestApiTest(APITestCase):
             "title": title,
             "description": description,
             "type": library_type,
+            "license": license_type,
             "collection_uuid": str(self.collection.uuid),
         }, expect_response)
 

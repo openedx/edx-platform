@@ -12,7 +12,7 @@ from mock import patch
 from organizations.models import Organization
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest, elasticsearch_test
-from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM
+from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
 from student.tests.factories import UserFactory
 
 
@@ -47,7 +47,9 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         Test Create, Read, Update, and Delete of a Content Library
         """
         # Create:
-        lib = self._create_library(slug="lib-crud", title="A Test Library", description="Just Testing")
+        lib = self._create_library(
+            slug="lib-crud", title="A Test Library", description="Just Testing", license_type=CC_4_BY,
+        )
         expected_data = {
             "id": "lib:CL-TEST:lib-crud",
             "org": "CL-TEST",
@@ -56,6 +58,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             "description": "Just Testing",
             "version": 0,
             "type": COMPLEX,
+            "license": CC_4_BY,
             "has_unpublished_changes": False,
             "has_unpublished_deletes": False,
         }
@@ -96,6 +99,7 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             "version": 0,
             "has_unpublished_changes": False,
             "has_unpublished_deletes": False,
+            "license": ALL_RIGHTS_RESERVED,
         }
         self.assertDictContainsEntries(lib, expected_data)
 
