@@ -68,7 +68,7 @@ def get_related_card(course):
          course (object): Course
 
     Returns:
-        course (CourseOverview): course overview object
+        CourseOverview: course overview object
     """
 
     course_rerun = CourseRerunState.objects.filter(course_key=course.id).first()
@@ -86,7 +86,7 @@ def get_future_courses(card_id):
         card_id (int): course card id
 
     Returns:
-         (CourseOverview): future_courses
+         CourseOverview: future_courses
     """
     utc = pytz.UTC
 

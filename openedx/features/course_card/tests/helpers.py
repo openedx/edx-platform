@@ -1,5 +1,5 @@
 """
-Helper file which contains the helper methods used in different Course card Unit Tests
+Helper module which contains the helper methods used in different Course card Unit Tests
 """
 from datetime import datetime, timedelta
 
