@@ -36,6 +36,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from student.models import get_user_by_username_or_email
+from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
+from lms.djangoapps.courseware.access import has_access
 
 
 def get_context(course, request, thread=None):
@@ -235,10 +237,16 @@ class ThreadSerializer(_ContentSerializer):
         """
         Returns the number of users that flagged content as abusive only if user has staff permissions
         """
-        if self.context.get('is_staff', False) is True:
-            return obj.get("abuse_flagged_count")
-        else:
-            return None
+        course = self.context.get('course', None)
+        user = self.context.get('request').user
+        if course:
+            is_moderator = bool(
+                has_permission(user, 'openclose_thread', course.id) or
+                has_access(user, 'staff', course)
+            )
+            if is_moderator:
+                return obj.get("abuse_flagged_count")
+        return None
 
     def get_pinned(self, obj):
         """
@@ -407,10 +415,15 @@ class CommentSerializer(_ContentSerializer):
         Returns a boolean indicating whether any user has flagged the
         content as abusive.
         """
-        if self.context.get('is_staff', False) is True:
-            return len(obj.get("abuse_flaggers", [])) > 0
-        else:
-            return None
+        course = self.context.get('course', None)
+        user = self.context.get('request').user
+        if course:
+            is_moderator = bool(
+                has_permission(user, 'openclose_thread', course.id) or
+                has_access(user, 'staff', course)
+            )
+            if is_moderator:
+                return len(obj.get("abuse_flaggers", [])) > 0
 
     def validate(self, attrs):
         """

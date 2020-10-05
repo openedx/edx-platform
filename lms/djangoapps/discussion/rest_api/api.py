@@ -469,7 +469,6 @@ def _serialize_discussion_entities(request, context, discussion_entities, reques
     results = []
     usernames = []
     include_profile_image = _include_profile_image(requested_fields)
-    context['is_staff'] = request.user.is_staff
     for entity in discussion_entities:
         if discussion_entity_type == DiscussionEntity.thread:
             serialized_entity = ThreadSerializer(entity, context=context).data
