@@ -143,9 +143,6 @@ if RELEASE_LINE == "master":
     }
 
 
-# just for testing as per PR comment. ( may be lms or cms mixup in comment )
-CELERY_TASK_ALWAYS_EAGER = True
-
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
