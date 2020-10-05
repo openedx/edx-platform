@@ -2562,6 +2562,10 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+
+    # ADG Features
+    'openedx.features.adg.prereq_course',
+
 ]
 
 ######################### CSRF #########################################
