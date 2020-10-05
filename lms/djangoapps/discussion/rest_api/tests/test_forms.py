@@ -68,8 +68,8 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "topic_id": set(),
                 "text_search": "",
                 "following": None,
-                "filter_own_posts": None,
-                "post_type": "",
+                "filter_own_threads": None,
+                "thread_type": "",
                 "flagged": None,
                 "view": "",
                 "order_by": "last_activity_at",
@@ -107,27 +107,27 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
         self.assert_error("topic_id", "This field cannot be empty.")
 
     @ddt.data("discussion", "question")
-    def test_post_type(self, value):
-        self.form_data["post_type"] = value
-        self.assert_field_value("post_type", value)
+    def test_thread_type(self, value):
+        self.form_data["thread_type"] = value
+        self.assert_field_value("thread_type", value)
 
-    def test_post_type_invalid(self):
-        self.form_data["post_type"] = "invalid-option"
-        self.assert_error("post_type", "Select a valid choice. invalid-option is not one of the available choices.")
+    def test_thread_type_invalid(self):
+        self.form_data["thread_type"] = "invalid-option"
+        self.assert_error("thread_type", "Select a valid choice. invalid-option is not one of the available choices.")
 
     @ddt.data("True", "true", 1, True)
-    def test_filter_own_posts_true(self, value):
-        self.form_data["filter_own_posts"] = value
-        self.assert_field_value("filter_own_posts", True)
+    def test_filter_own_threads_true(self, value):
+        self.form_data["filter_own_threads"] = value
+        self.assert_field_value("filter_own_threads", True)
 
     @ddt.data("False", "false", 0, False)
-    def test_filter_own_posts_false(self, value):
-        self.form_data["filter_own_posts"] = value
-        self.assert_field_value("filter_own_posts", False)
+    def test_filter_own_threads_false(self, value):
+        self.form_data["filter_own_threads"] = value
+        self.assert_field_value("filter_own_threads", False)
 
-    def test_invalid_filter_own_posts(self):
-        self.form_data["filter_own_posts"] = "invalid-boolean"
-        self.assert_error("filter_own_posts", "Invalid Boolean Value.")
+    def test_invalid_filter_own_threads(self):
+        self.form_data["filter_own_threads"] = "invalid-boolean"
+        self.assert_error("filter_own_threads", "Invalid Boolean Value.")
 
     @ddt.data("True", "true", 1, True)
     def test_flagged_true(self, value):

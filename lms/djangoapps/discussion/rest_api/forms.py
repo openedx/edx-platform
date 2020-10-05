@@ -47,8 +47,8 @@ class ThreadListGetForm(_PaginationForm):
     topic_id = MultiValueField(required=False)
     text_search = CharField(required=False)
     following = ExtendedNullBooleanField(required=False)
-    filter_own_posts = ExtendedNullBooleanField(required=False)
-    post_type = ChoiceField(
+    filter_own_threads = ExtendedNullBooleanField(required=False)
+    thread_type = ChoiceField(
         choices=[(choice, choice) for choice in ["discussion", "question"]],
         required=False,
     )

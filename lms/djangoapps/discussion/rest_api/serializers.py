@@ -109,19 +109,6 @@ class _ContentSerializer(serializers.Serializer):
         for field in self.non_updatable_fields:
             setattr(self, "validate_{}".format(field), self._validate_non_updatable)
 
-    def to_representation(self, obj):
-        # get the original representation
-        ret = super(_ContentSerializer, self).to_representation(obj)
-
-        # remove staff only fields if not staff
-        if self.context.get('is_staff', False) is not True:
-            for staff_only_field in self.staff_only_fields:
-                try:
-                    ret.pop(staff_only_field)
-                except KeyError:
-                    continue
-        return ret
-
     def _validate_non_updatable(self, value):
         """Ensure that a field is not edited in an update operation."""
         if self.instance:
@@ -221,7 +208,7 @@ class ThreadSerializer(_ContentSerializer):
         source="thread_type",
         choices=[(val, val) for val in ["discussion", "question"]]
     )
-    abuse_flagged_count = serializers.IntegerField(required=False)
+    abuse_flagged_count = serializers.SerializerMethodField(required=False)
     title = serializers.CharField(validators=[validate_not_blank])
     pinned = serializers.SerializerMethodField(read_only=True)
     closed = serializers.BooleanField(read_only=True)
@@ -236,7 +223,6 @@ class ThreadSerializer(_ContentSerializer):
     response_count = serializers.IntegerField(source="resp_total", read_only=True, required=False)
 
     non_updatable_fields = NON_UPDATABLE_THREAD_FIELDS
-    staff_only_fields = ['abuse_flagged_count']
 
     def __init__(self, *args, **kwargs):
         super(ThreadSerializer, self).__init__(*args, **kwargs)
@@ -244,6 +230,15 @@ class ThreadSerializer(_ContentSerializer):
         # not have the pinned field set
         if self.instance and self.instance.get("pinned") is None:
             self.instance["pinned"] = False
+
+    def get_abuse_flagged_count(self, obj):
+        """
+        Returns the number of users that flagged content as abusive only if user has staff permissions
+        """
+        if self.context.get('is_staff', False) is True:
+            return obj.get("abuse_flagged_count")
+        else:
+            return None
 
     def get_pinned(self, obj):
         """
@@ -332,6 +327,7 @@ class CommentSerializer(_ContentSerializer):
     not had retrieve() called, because of the interaction between DRF's attempts
     at introspection and Comment's __getattr__.
     """
+    is_staff = False
     thread_id = serializers.CharField()
     parent_id = serializers.CharField(required=False, allow_null=True)
     endorsed = serializers.BooleanField(required=False)
@@ -343,7 +339,6 @@ class CommentSerializer(_ContentSerializer):
     abuse_flagged_any_user = serializers.SerializerMethodField(required=False)
 
     non_updatable_fields = NON_UPDATABLE_COMMENT_FIELDS
-    staff_only_fields = ['abuse_flagged_any_user']
 
     def __init__(self, *args, **kwargs):
         remove_fields = kwargs.pop('remove_fields', None)
@@ -412,7 +407,10 @@ class CommentSerializer(_ContentSerializer):
         Returns a boolean indicating whether any user has flagged the
         content as abusive.
         """
-        return len(obj.get("abuse_flaggers", [])) > 0
+        if self.context.get('is_staff', False) is True:
+            return len(obj.get("abuse_flaggers", [])) > 0
+        else:
+            return None
 
     def validate(self, attrs):
         """

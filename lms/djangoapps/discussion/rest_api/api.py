@@ -501,8 +501,8 @@ def get_thread_list(
         topic_id_list=None,
         text_search=None,
         following=False,
-        filter_own_posts=None,
-        post_type=None,
+        filter_own_threads=None,
+        thread_type=None,
         flagged=None,
         view=None,
         order_by="last_activity_at",
@@ -574,9 +574,9 @@ def get_thread_list(
         "per_page": page_size,
         "text": text_search,
         "sort_key": cc_map.get(order_by),
-        "filter_own_posts": filter_own_posts,
+        "filter_own_threads": filter_own_threads,
         "flagged": flagged,
-        "post_type": post_type,
+        "thread_type": thread_type,
     }
 
     if view:
