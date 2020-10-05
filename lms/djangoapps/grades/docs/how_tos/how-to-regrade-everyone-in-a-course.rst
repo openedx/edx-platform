@@ -9,13 +9,13 @@ Steps to trigger course-wide re-grade
 =====================================
 
 1. Go to LMS Django Admin and add an entry in ComputeGradesSetting, in the Grades section. 
-   https://courses-internal.edx.org/admin/grades/computegradessetting/
+   ``/admin/grades/computegradessetting/``
    (this requires the persistent_grades_admin role in app-permissions)
 
 2. Put the course key of the course you wish to recompute into the ``course ids`` field.
    You can enter multiple whitespace-separated keys. Save the model.
 
-3. Go to https://tools-edx-jenkins.edx.org/job/grading/job/prod-edx-compute_grades/
+3. Go to tools-edx-jenkins and navigate to Grading/(prod,stage)-edx-compute_grades
    You must be a member of the jenkins-tools-grading-jobs github group to run the job, or you can ask a member to run the job for you.
 
 4. The job will grab the most recent ComputeGradesSetting model and enqueue a task to recompute course grades for
