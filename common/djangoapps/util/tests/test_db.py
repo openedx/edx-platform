@@ -198,7 +198,6 @@ class MigrationTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={})
-    @unittest.skip("Skipping temporarily as part of PROD-2152 to remove VEDA code from platform")
     def test_migrations_are_in_sync(self):
         """
         Tests that the migration files are in sync with the models.
