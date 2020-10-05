@@ -14,12 +14,15 @@ from ..models import CourseCard
 
 def set_course_dates(course, enrollment_start, enrollment_end, course_start, course_end):
     """
-    Args:
+    Helper function to set the  dates required for course
+
+    Arguments:
         course (:obj:Course): Contains the course object
         enrollment_start (:int): Contains the enrollment_start days
         enrollment_end (:int): Contains the enrollment_end days
         course_start (:int): Contains the course_start days
         course_end (:int): Contains the course_end days
+
     Returns:
         A course (CourseOverview)
     """
@@ -37,8 +40,9 @@ def set_course_dates(course, enrollment_start, enrollment_end, course_start, cou
 
 def disable_course_card(course):
     """
-    Args:
+    Arguments:
         course (:obj:CourseCard): Contains the course card details
+
     Returns:
         A course (CourseCard)
     """
@@ -49,9 +53,10 @@ def disable_course_card(course):
 
 def initialize_test_user(password='test', is_staff=False):
     """
-    Args:
+    Arguments:
         password (:string): password to set
         is_staff (:boolean): is_staff or not
+
     Returns:
         A User
     """

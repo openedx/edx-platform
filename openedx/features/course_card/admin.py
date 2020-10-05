@@ -12,6 +12,7 @@ from openedx.features.course_card.models import CourseCard
 def get_parent_courses():
     """
     Getting All Courses detail from Course Reruns
+
     Returns: tuple includes course_ids along with course display name concatenated with course_id
     """
     course_rerun_states = CourseRerunState.objects.all()
@@ -24,7 +25,8 @@ def get_parent_courses():
 class CardModel(ModelForm):
     """
     Model form to create/update Course Card which contains course_id and is_enabled field.
-    course_id: (string) id of the course.
+
+    course_id (string):  id of the course.
     is_enabled: whether to publish the course or not
     """
     def __init__(self, *args, **kwargs):
@@ -52,7 +54,8 @@ class CardModelAdmin(admin.ModelAdmin):
 
 class CourseRerunStateModel(ModelForm):
     """
-    Model form to create/update CourseRerun which contains source_course_key  field.
+    Model form to create/update CourseRerun which contains source_course_key field.
+
     source_course_key: (string) id of the course.
     """
 
@@ -68,14 +71,18 @@ class CourseRerunStateModelAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         """
         Disabling the delete permission for CourseRerunState
-        return: False
+
+        Returns:
+             False
         """
         return False
 
     def get_actions(self, request):
         """
         Disabling the delete_selected action for CourseRerunState
-        return: actions
+
+        Returns:
+            actions
         """
         actions = super(CourseRerunStateModelAdmin, self).get_actions(request)
         if 'delete_selected' in actions:
