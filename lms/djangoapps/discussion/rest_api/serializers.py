@@ -245,7 +245,7 @@ class ThreadSerializer(_ContentSerializer):
                 has_access(user, 'staff', course)
             )
             if is_moderator:
-                return obj.get("abuse_flagged_count")
+                return int(obj.get("abuse_flagged_count")) + len(obj.get("abuse_flaggers", []))
         return None
 
     def get_pinned(self, obj):
