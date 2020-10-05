@@ -15,6 +15,7 @@ from xblock.fields import Scope
 
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.roles import GlobalStaff
+from openedx.core.lib.teams_config import TeamsetType
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
@@ -248,6 +249,11 @@ class CourseMetadata(object):
                 did_validate = False
                 errors.append({'key': key, 'message': text_type(err), 'model': model})
 
+        team_setting_errors = cls.validate_team_settings(filtered_dict)
+        if team_setting_errors:
+            errors = errors + team_setting_errors
+            did_validate = False
+
         proctoring_errors = cls.validate_proctoring_settings(descriptor, filtered_dict, user)
         if proctoring_errors:
             errors = errors + proctoring_errors
@@ -271,6 +277,94 @@ class CourseMetadata(object):
             modulestore().update_item(descriptor, user.id)
 
         return cls.fetch(descriptor)
+
+    @classmethod
+    def validate_team_settings(cls, settings_dict):
+        """
+        Validates team settings
+
+        :param settings_dict: json dict containing all advanced settings
+        :return: a list of error objects
+        """
+        errors = []
+        teams_configuration_model = settings_dict.get('teams_configuration', {})
+        if teams_configuration_model == {}:
+            return errors
+        json_value = teams_configuration_model.get('value')
+        if json_value == '':
+            return errors
+
+        proposed_max_team_size = json_value.get('max_team_size')
+        if proposed_max_team_size != '' and proposed_max_team_size is not None and proposed_max_team_size <= 0:
+            message = 'max_team_size must be greater than zero'
+            errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+
+        proposed_topics = json_value.get('topics')
+
+        if proposed_topics is None:
+            proposed_teamsets = json_value.get('team_sets')
+            if proposed_teamsets is None:
+                return errors
+            else:
+                proposed_topics = proposed_teamsets
+
+        proposed_topic_ids = [proposed_topic['id'] for proposed_topic in proposed_topics]
+        proposed_topic_dupe_ids = {x for x in proposed_topic_ids if proposed_topic_ids.count(x) > 1}
+        if len(proposed_topic_dupe_ids) > 0:
+            message = 'duplicate ids: ' + ','.join(proposed_topic_dupe_ids)
+            errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+
+        for proposed_topic in proposed_topics:
+            topic_validation_errors = cls.validate_single_topic(proposed_topic)
+            if topic_validation_errors:
+                topic_validation_errors['model'] = teams_configuration_model
+                errors.append(topic_validation_errors)
+
+        return errors
+
+    @classmethod
+    def validate_single_topic(cls, topic_settings):
+        """
+        Helper method that validates a single teamset setting.
+        The following conditions result in errors:
+        > unrecognized extra keys
+        > max_team_size <= 0
+        > no name, id or description property
+        > unrecognized teamset type
+        :param topic_settings: the proposed settings being validated
+        :return: an error object if error exists, otherwise None
+        """
+        error_list = []
+        valid_teamset_types = [TeamsetType.open.value, TeamsetType.public_managed.value,
+                               TeamsetType.private_managed.value]
+        valid_keys = {'id', 'name', 'description', 'max_team_size', 'type'}
+        teamset_type = topic_settings.get('type', {})
+        if teamset_type:
+            if teamset_type not in valid_teamset_types:
+                error_list.append('type ' + teamset_type + " is invalid")
+        max_team_size = topic_settings.get('max_team_size', {})
+        if max_team_size and max_team_size <= 0:
+            error_list.append('max_team_size must be greater than zero')
+        teamset_id = topic_settings.get('id', {})
+        if not teamset_id:
+            error_list.append('id attribute must not be empty')
+        teamset_name = topic_settings.get('name', {})
+        if not teamset_name:
+            error_list.append('name attribute must not be empty')
+        teamset_desc = topic_settings.get('description', {})
+        if not teamset_desc:
+            error_list.append('description attribute must not be empty')
+
+        keys = set(topic_settings.keys())
+        key_difference = keys - valid_keys
+        if len(key_difference) > 0:
+            error_list.append('extra keys: ' + ','.join(key_difference))
+
+        if error_list:
+            error = {'key': 'teams_configuration', 'message': ','.join(error_list)}
+            return error
+
+        return None
 
     @classmethod
     def validate_proctoring_settings(cls, descriptor, settings_dict, user):
