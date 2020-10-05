@@ -170,9 +170,6 @@ class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
         """
         Tests that the progress chart axes have appropriate a11y (screenreader) markup.
         """
-        from django.conf import settings
-        self.assertEqual(settings.BROKER_URL, 'aaa')
-
         with self._logged_in_session():
             self.courseware_page.visit()
             # Answer the first HW problem (the unit contains 2 problems, only one will be answered correctly)
@@ -269,10 +266,6 @@ class ProgressPageA11yTest(ProgressPageBaseTest):
         """
         Test the accessibility of the progress page.
         """
-
-        from django.conf import settings
-        self.assertEqual(settings.CELERY_ALWAYS_EAGER, 'aaa')
-
         self.progress_page.a11y_audit.config.set_rules({
             "ignore": [
                 'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
