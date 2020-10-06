@@ -14,21 +14,26 @@ tar -zxvf hub.tgz
 
 cd "$REPO_NAME"
 
-git config --global user.name "${GITHUB_USER}"
-git config --global user.email "${GITHUB_EMAIL}"
+if [[ -z $(git status -s) ]]; then
+    echo "No changes to commit."
+else
+    git config --global user.name "${GITHUB_USER}"
+    git config --global user.email "${GITHUB_EMAIL}"
 
-obsolete_dump_prs=`../hub-linux*/bin/hub pr list -s open --format '%I:%H %n' | grep 'github-actions-mysqldbdump'`
+    obsolete_dump_prs=`../hub-linux*/bin/hub pr list -s open --format '%I:%H %n' | grep 'github-actions-mysqldbdump'`
 
-if [[ ! -z $obsolete_dump_prs ]]; then
- for pr in $obsolete_dump_prs; do
-   IFS=':' read pr_num branch <<< "$pr"
-     ../hub-linux*/bin/hub issue update ${pr_num} -s closed
-     ../hub-linux*/bin/hub push origin --delete ${branch}
- done
+    if [[ ! -z $obsolete_dump_prs ]]; then
+      for pr in $obsolete_dump_prs; do
+        IFS=':' read pr_num branch <<< "$pr"
+        ../hub-linux*/bin/hub issue update ${pr_num} -s closed
+        ../hub-linux*/bin/hub push origin --delete ${branch}
+      done
+    fi
+
+    git checkout -b github-actions-mysqldbdump/$GITHUB_SHA
+    git add "${DB_NAME}".sql
+    git commit  -m "MySQLdbdump" --author "GitHub Actions MySQLdbdump automation <admin@edx.org>"
+    git push --set-upstream origin github-actions-mysqldbdump/$GITHUB_SHA
+    ../hub-linux*/bin/hub pull-request -m "${DB_NAME} MySQL database dump" -m "MySQL database dump" -l mysqldbdump
+
 fi
-
-git checkout -b github-actions-mysqldbdump/$GITHUB_SHA
-git add "${DB_NAME}".sql
-git commit  -m "MySQLdbdump" --author "GitHub Actions MySQLdbdump automation <admin@edx.org>"
-git push --set-upstream origin github-actions-mysqldbdump/$GITHUB_SHA
-../hub-linux*/bin/hub pull-request -m "${DB_NAME} MySQL database dump" -m "MySQL database dump"

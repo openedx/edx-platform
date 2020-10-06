@@ -1,0 +1,26 @@
+# Used to auto approve/merge PRs for mysqldbdump
+name: Automerge mysqldbdump PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - labeled
+  pull_request_review:
+    types:
+      - submitted
+jobs:
+  approve_and_merge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'edx-deployment' && github.event.label.name == 'mysqldbdump'
+    steps:
+      - uses: hmarr/auto-approve-action@7782c7e2bdf62b4d79bdcded8332808fd2f179cd
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: automerge
+        uses: "pascalgn/automerge-action@7ab42e888a333bf77ce865bc84fedc6a365a3548"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_LABELS: "mysqldbdump"
+          MERGE_FILTER_AUTHOR: "edx-deployment"
+          MERGE_METHOD: "merge"
