@@ -7,6 +7,7 @@
       <div class="field text value">
         <label class="sr" for="<%- valueUniqueId %>"><%- display_name %></label>
         <textarea class="json text" id="<%- valueUniqueId %>"><%- value %></textarea>
+        <% // xss-lint: disable=underscore-not-escaped %>
         <span class="tip tip-stacked"><%= help %></span>
       </div>
       <% if (deprecated) { %>
