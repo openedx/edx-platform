@@ -842,25 +842,10 @@ class CourseFields(object):
         display_name=_("Teams Configuration"),
         # Translators: please don't translate "id".
         help=_(
-            'Specify the maximum team size and topics for teams inside the provided set of curly braces. '
-            'Make sure that you enclose all of the sets of topic values within a set of square brackets, '
-            'with a comma after the closing curly brace for each topic, and another comma after the '
-            'closing square brackets. '
-            'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
-            '2 topics, enter the configuration in this format: {example_format}. '
-            'If no max_size is provided, it will default to {default_max}'
-            'In "id" values, the only supported special characters are underscore, hyphen, and period.'
-            # Note that we also support space (" "), which may have been an accident, but it's in
-            # our DB now. Let's not advertise the fact, though.
-        ),
-        help_format_args=dict(
-            # Put the sample JSON into a format variable so that translators
-            # don't muck with it.
-            example_format=(
-                '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
-                '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}'
-            ),
-            default_max=str(DEFAULT_COURSE_RUN_MAX_TEAM_SIZE),
+            'Configure team sets, limit team sizes, and set visibility settings using JSON. See '
+            '<a target="&#95;blank" href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/'
+            'course_features/teams/teams_setup.html#enable-and-configure-teams">teams '
+            'configuration documentation</a> for help and examples.'
         ),
         scope=Scope.settings,
     )
