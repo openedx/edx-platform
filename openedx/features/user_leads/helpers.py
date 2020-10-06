@@ -1,8 +1,19 @@
+"""
+Helper methods of `user_leads` app
+"""
 from .constants import UTM_PARAM_NAMES
 from .models import UserLeads
 
 
 def get_utm_params(request):
+    """
+    Args:
+        request: HttpRequest object
+
+    Returns:
+        dict: utm_params
+
+    """
     request_get_params = request.GET
     utm_params = {}
 
@@ -15,6 +26,15 @@ def get_utm_params(request):
 
 
 def save_user_utm(request):
+    """
+
+    Args:
+        request: HttpRequest object
+
+    Returns:
+        None
+
+    """
     user = request.user
     origin = request.resolver_match.url_name
     utm_params = get_utm_params(request)

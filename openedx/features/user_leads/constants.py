@@ -1,3 +1,6 @@
+"""
+Constants for `user_leads` app
+"""
 UTM_DEFAULT_ORIGIN = 'registration'
 
 UTM_SOURCE_KEY = 'SOURCE'

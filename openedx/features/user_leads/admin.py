@@ -1,9 +1,15 @@
+"""
+Admin site bindings for `user_leads` models
+"""
 from django.contrib import admin
 
 from openedx.features.user_leads.models import UserLeads
 
 
-class LeadsModel(admin.ModelAdmin):
+class UserLeadsAdmin(admin.ModelAdmin):
+    """
+    Admin for `UserLeads` model
+    """
     list_display = (
         'user', 'utm_source', 'utm_content', 'utm_medium', 'utm_campaign', 'utm_term', 'date_created', 'origin'
     )
@@ -11,4 +17,4 @@ class LeadsModel(admin.ModelAdmin):
     raw_id_fields = ('user',)
 
 
-admin.site.register(UserLeads, LeadsModel)
+admin.site.register(UserLeads, UserLeadsAdmin)

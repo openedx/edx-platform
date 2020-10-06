@@ -1,3 +1,6 @@
+"""
+Test helper methods
+"""
 import random
 
 from django.test import TestCase
@@ -71,12 +74,12 @@ class UserLeadsHelpersTest(TestCase):
         request.resolver_match.url_name = self.url_name
 
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
-        self.assertTrue(existing_lead_count == 0)
+        self.assertEqual(existing_lead_count, 0)
 
         save_user_utm(request)
 
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
-        self.assertTrue(existing_lead_count == 1)
+        self.assertEqual(existing_lead_count, 1)
 
     @patch('openedx.features.user_leads.helpers.UserLeads.objects.get')
     @patch('openedx.features.user_leads.helpers.UserLeads.objects.create')
@@ -95,7 +98,7 @@ class UserLeadsHelpersTest(TestCase):
         user_lead = UserLeads(user=self.user, origin=self.url_name, **self.request_data)
         user_lead.save()
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
-        self.assertTrue(existing_lead_count == 1)
+        self.assertEqual(existing_lead_count, 1)
 
         save_user_utm(request)
 
@@ -103,7 +106,7 @@ class UserLeadsHelpersTest(TestCase):
         mocked_user_leads_create_method.assert_not_called()
 
         existing_user_lead = UserLeads.objects.filter(user=self.user, origin=self.url_name).first()
-        self.assertTrue(user_lead.pk == existing_user_lead.pk)
+        self.assertEqual(user_lead.pk, existing_user_lead.pk)
 
     @patch('openedx.features.user_leads.helpers.UserLeads.objects.get')
     @patch('openedx.features.user_leads.helpers.UserLeads.objects.create')
