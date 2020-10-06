@@ -50,8 +50,8 @@ class SubscriptionRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
     ordering = ['-created']
 
     def get_object(self, queryset=None):
-        user_id = self.request.user.id
-        self.kwargs['user'] = user_id
+        username = self.request.data.get('user', self.request.user.username)
+        self.kwargs['user__username'] = username
         user_subscription = UserSubscription.objects.filter(**self.kwargs).first()
 
         if not user_subscription:
