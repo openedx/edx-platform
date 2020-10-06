@@ -396,17 +396,17 @@ if 'DATADOG_API' in AUTH_TOKENS:
 
 # Celery Broker
 CELERY_TASK_ALWAYS_EAGER = ENV_TOKENS.get("CELERY_ALWAYS_EAGER", False)
-BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
-BROKER_HOSTNAME = ENV_TOKENS.get("CELERY_BROKER_HOSTNAME", "")
-BROKER_VHOST = ENV_TOKENS.get("CELERY_BROKER_VHOST", "")
-BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
-BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
+CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
+CELERY_BROKER_HOSTNAME = ENV_TOKENS.get("CELERY_BROKER_HOSTNAME", "")
+CELERY_BROKER_VHOST = ENV_TOKENS.get("CELERY_BROKER_VHOST", "")
+CELERY_BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
+CELERY_BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
 
-CELERY_BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(BROKER_TRANSPORT,
-                                                   BROKER_USER,
-                                                   BROKER_PASSWORD,
-                                                   BROKER_HOSTNAME,
-                                                   BROKER_VHOST)
+CELERY_BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
+                                                   CELERY_BROKER_USER,
+                                                   CELERY_BROKER_PASSWORD,
+                                                   CELERY_BROKER_HOSTNAME,
+                                                   CELERY_BROKER_VHOST)
 CELERY_BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {
