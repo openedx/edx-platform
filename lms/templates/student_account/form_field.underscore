@@ -21,7 +21,7 @@
     <% } %>
 
     <% if ( type === 'select' ) { %>
-        <select id="<%- form %>-<%- name %>"
+        <select data-hj-suppress id="<%- form %>-<%- name %>"
             name="<%- name %>"
             class="input-inline"
             <% if ( instructions ) { %>
