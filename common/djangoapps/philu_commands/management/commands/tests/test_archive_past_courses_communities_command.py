@@ -29,9 +29,9 @@ class TestArchivePastCoursesCommunities(ModuleStoreTestCase):
         self.course_1.end = datetime.now(pytz.UTC) - timedelta(hours=2)
         self.course_2.end = datetime.now(pytz.UTC) - timedelta(hours=2)
 
-        get_visible_courses = 'philu_commands.management.commands.archive_past_courses_communities.get_visible_courses'
-        archive_course_community = 'philu_commands.management.commands.' \
-                                   'archive_past_courses_communities.archive_course_community'
+        archive_past_courses_communities = 'philu_commands.management.commands.archive_past_courses_communities.'
+        get_visible_courses = archive_past_courses_communities + 'get_visible_courses'
+        archive_course_community = archive_past_courses_communities + 'archive_course_community'
 
         self.get_visible_courses_patcher = mock.patch(get_visible_courses)
         self.archive_course_community_patcher = mock.patch(archive_course_community)
