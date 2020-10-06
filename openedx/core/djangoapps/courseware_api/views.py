@@ -210,9 +210,11 @@ class CoursewareMeta:
     @property
     def user_has_passing_grade(self):
         """ Returns a boolean on if the effective_user has a passing grade in the course """
-        course = get_course_by_id(self.course_key)
-        user_grade = CourseGradeFactory().read(self.effective_user, course).percent
-        return user_grade >= course.lowest_passing_grade
+        if not self.effective_user.is_anonymous:
+            course = get_course_by_id(self.course_key)
+            user_grade = CourseGradeFactory().read(self.effective_user, course).percent
+            return user_grade >= course.lowest_passing_grade
+        return False
 
     @property
     def course_exit_page_is_active(self):
