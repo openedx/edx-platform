@@ -4,7 +4,7 @@ var Language = (function() {
         self = null;
     return {
         init: function() {
-            $settings_language_selector = $('#settings-language-value');
+            $settings_language_selector = $('#settings-language-value, input[name="radio-select-language"]');
             self = this;
             this.listenForLanguagePreferenceChange();
         },
