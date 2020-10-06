@@ -2564,7 +2564,7 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
 
     # ADG Features
-    'openedx.features.adg.prereq_course',
+    'openedx.adg.lms.course_meta',
 
 ]
 
