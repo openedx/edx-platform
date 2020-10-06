@@ -843,7 +843,7 @@ class CourseFields(object):
         # Translators: please don't translate "id".
         help=_(
             'Configure team sets, limit team sizes, and set visibility settings using JSON. See '
-            '<a target="_blank" href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/'
+            '<a target="&#95;blank" href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/'
             'course_features/teams/teams_setup.html#enable-and-configure-teams">teams '
             'configuration documentation</a> for help and examples.'
         ),
