@@ -6,18 +6,11 @@ import random
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import ResolverMatch
-
 from mock import patch
+
 from student.tests.factories import AnonymousUserFactory, UserFactory
 
-from ..constants import (
-    UTM_CAMPAIGN_KEY,
-    UTM_CONTENT_KEY,
-    UTM_MEDIUM_KEY,
-    UTM_PARAM_NAMES,
-    UTM_SOURCE_KEY,
-    UTM_TERM_KEY
-)
+from ..constants import UTM_CAMPAIGN_KEY, UTM_CONTENT_KEY, UTM_MEDIUM_KEY, UTM_PARAM_NAMES, UTM_SOURCE_KEY, UTM_TERM_KEY
 from ..helpers import get_utm_params, save_user_utm
 from ..models import UserLeads
 
