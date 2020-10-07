@@ -91,9 +91,8 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
     @mock.patch('openedx.features.assessment.helpers._log_multiple_submissions_info')
     @mock.patch('openedx.features.assessment.helpers.datetime')
     @mock.patch('openedx.features.assessment.helpers._get_submissions_to_autoscore_by_enrollment')
-    @mock.patch('openedx.features.assessment.helpers.get_config_value_from_site_or_settings')
-    def test_find_and_autoscore_submissions_successfully(self, mock_get_config_value_from_site_or_settings,
-                                                         mock_get_submissions_by_enrollment,
+    @mock.patch('openedx.features.assessment.helpers.configuration_helpers.get_value')
+    def test_find_and_autoscore_submissions_successfully(self, mock_get_value, mock_get_submissions_by_enrollment,
                                                          mock_datetime, mock_log_multiple_submissions_info,
                                                          mock_autoscore_ora_submission):
         """
@@ -102,7 +101,7 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
         """
         datetime_now = datetime.now(UTC)
         mock_datetime.now.return_value = datetime_now
-        mock_get_config_value_from_site_or_settings.return_value = 3
+        mock_get_value.return_value = 3
         enrollment1, submissions1, uuid_list_1 = self._create_enrollment_submission(
             datetime(2019, 12, 30, tzinfo=UTC).date(),
             course_id=self.source_course.id,
