@@ -75,6 +75,13 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.user_bad_passwd.password = UNUSABLE_PASSWORD_PREFIX
         self.user_bad_passwd.save()
 
+    def setup_request_session_with_token(self, request):
+        """
+        Internal helper to setup request session and add token in session.
+        """
+        process_request(request)
+        request.session[INTERNAL_RESET_SESSION_TOKEN] = self.token
+
     @patch(
         'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
         Mock(side_effect=mock_render_to_string, autospec=True)
@@ -375,7 +382,15 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     def test_reset_password_good_token(self):
         """
-        Tests good token and uidb36 in password reset
+        Tests good token and uidb36 in password reset.
+
+        Scenario:
+        When the password reset url is opened
+        Then the page is redirected to url without token
+        And token gets set in session
+        When the redirected page is visited with token in session
+        Then reset password page renders
+        And inactive user is set to active
         """
         url = reverse(
             "password_reset_confirm",
@@ -384,13 +399,28 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         good_reset_req = self.request_factory.get(url)
         process_request(good_reset_req)
         good_reset_req.user = self.user
-        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
+        redirect_response = PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
+
+        good_reset_req = self.request_factory.get(redirect_response.url)
+        self.setup_request_session_with_token(good_reset_req)
+        good_reset_req.user = self.user
+        # set-password is the new token representation in the redirect url
+        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token='set-password')
+
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
 
     def test_reset_password_good_token_with_anonymous_user(self):
         """
-        Tests good token and uidb36 in password reset for anonymous user
+        Tests good token and uidb36 in password reset for anonymous user.
+
+        Scenario:
+        When the password reset url is opened with anonymous user in request
+        Then the page is redirected to url without token
+        And token gets set in session
+        When the redirected page is visited with token in session
+        Then reset password page renders
+        And inactive user associated with token is set to active
         """
         url = reverse(
             "password_reset_confirm",
@@ -399,7 +429,14 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         good_reset_req = self.request_factory.get(url)
         process_request(good_reset_req)
         good_reset_req.user = AnonymousUser()
-        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
+        redirect_response = PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token=self.token)
+
+        good_reset_req = self.request_factory.get(redirect_response.url)
+        self.setup_request_session_with_token(good_reset_req)
+        good_reset_req.user = AnonymousUser()
+        # set-password is the new token representation in the redirect url
+        PasswordResetConfirmWrapper.as_view()(good_reset_req, uidb36=self.uidb36, token='set-password')
+
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
 
@@ -415,7 +452,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
         request_params = {'new_password1': 'password1', 'new_password2': 'password2'}
         confirm_request = self.request_factory.post(url, data=request_params)
-        process_request(confirm_request)
+        self.setup_request_session_with_token(confirm_request)
         confirm_request.user = self.user
 
         # Make a password reset request with mismatching passwords.
@@ -499,6 +536,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         )
         request_params = {'new_password1': password_dict['password'], 'new_password2': password_dict['password']}
         confirm_request = self.request_factory.post(url, data=request_params)
+        self.setup_request_session_with_token(confirm_request)
         confirm_request.user = self.user
 
         # Make a password reset request with minimum/maximum passwords characters.

@@ -308,8 +308,6 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
       We also optionally do some additional password policy checks.
     """
 
-    reset_url_token = 'set-password'
-
     def __init__(self):
         self.platform_name = PasswordResetConfirmWrapper._get_platform_name()
         self.validlink = False
@@ -332,15 +330,11 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
                 context.update(extra_context)
             return self.render_to_response(context)
 
-    def _set_token_in_session(self, request, token):
+    def _get_token_from_session(self, request):
         """
-        method to store password reset token in session received in reset password url
+        Internal method to get password reset token from session.
         """
-        if not token:
-            return
-        session = request.session
-        session[INTERNAL_RESET_SESSION_TOKEN] = token
-        session.save()
+        return request.session[INTERNAL_RESET_SESSION_TOKEN]
 
     @staticmethod
     def _get_platform_name():
@@ -486,16 +480,23 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
             return self._handle_retired_user(self.request)
 
         if self.request.method == 'POST':
+            # Get actual token from session before processing the POST request.
+            # This is needed because django's post process is not called on password reset
+            # post request and the correct token needs to be extracted from session.
+            self.token = self._get_token_from_session(self.request)
             return self.post(self.request, *args, **kwargs)
         else:
-            self._set_token_in_session(self.request, self.token)
-            token = self.reset_url_token
-            response = super(PasswordResetConfirmWrapper, self).dispatch(self.request, uidb64=self.uidb64, token=token,
-                                                                         extra_context=self.platform_name)
-            response_was_successful = response.context_data.get('validlink')
-            if response_was_successful and not self.user.is_active:
-                self.user.is_active = True
-                self.user.save()
+            response = super(PasswordResetConfirmWrapper, self).dispatch(
+                self.request,
+                uidb64=self.uidb64,
+                token=self.token,
+                extra_context=self.platform_name
+            )
+            if hasattr(response, 'context_data'):
+                response_was_successful = response.context_data.get('validlink')
+                if response_was_successful and not self.user.is_active:
+                    self.user.is_active = True
+                    self.user.save()
             return response
 
 
