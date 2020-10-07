@@ -1,23 +1,27 @@
+"""
+Unit Tests for Course Card date views
+"""
 from datetime import datetime, timedelta
 
-from pyquery import PyQuery as pq
 from django.core.urlresolvers import reverse
+from pyquery import PyQuery as pq
 
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from openedx.features.course_card.helpers import get_course_open_date
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..models import CourseCard
-from .helpers import set_course_dates, save_course_custom_settings
-
+from .helpers import save_course_custom_settings, set_course_dates
 
 TEST_COURSE_OPEN_DATE = datetime.utcnow() + timedelta(days=1)
 
 
 class CourseCardBaseClass(ModuleStoreTestCase):
-
+    """
+    Base class to setup test cases for Course Card date view
+    """
     def setUp(self):
         super(CourseCardBaseClass, self).setUp()
 
@@ -46,7 +50,9 @@ class CourseCardBaseClass(ModuleStoreTestCase):
 
 
 class CourseCardViewBaseClass(CourseCardBaseClass):
-
+    """
+    Contains the cases for course card date view
+    """
     def test_catalog_course_date(self):
         response = self.client.get(reverse('courses'))
         # We are getting 3rd span from Div with class "course-date" and get text from it.

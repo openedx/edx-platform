@@ -1,8 +1,10 @@
+"""
+Helper methods for Course Card application
+"""
 from datetime import datetime
 from logging import getLogger
 
 import pytz
-from crum import get_current_request
 from opaque_keys.edx.keys import CourseKey
 
 from course_action_state.models import CourseRerunState
@@ -19,8 +21,12 @@ def get_course_open_date(course):
     """
     check if course open date is set return that date
     else return course start date
-    :param course:
-    :return course start date:
+
+    Arguments:
+        course (CourseOverview): contains the course overview details
+
+    Returns:
+         date: course start date
     """
 
     try:
@@ -37,8 +43,12 @@ def get_course_open_date(course):
 def get_related_card_id(course_id):
     """
     Get course key from parent course
-    :param course_id:
-    :return:
+
+    Arguments:
+        course_id (int): Course id
+
+    Returns:
+        course_id (int): parent course id
     """
     if isinstance(course_id, basestring):
         course_id = CourseKey.from_string(course_id)
@@ -53,8 +63,12 @@ def get_related_card_id(course_id):
 def get_related_card(course):
     """
     Get course from parent course
-    :param course:
-    :return:
+
+    Arguments:
+         course (object): Course
+
+    Returns:
+        CourseOverview: course overview object
     """
 
     course_rerun = CourseRerunState.objects.filter(course_key=course.id).first()
@@ -66,10 +80,14 @@ def get_related_card(course):
 
 def get_future_courses(card_id):
     """
-        Get future courses for a course
-        :param card_id:
-        :return:
-        """
+    Get future courses for a course
+
+    Arguments:
+        card_id (int): course card id
+
+    Returns:
+         CourseOverview: future_courses
+    """
     utc = pytz.UTC
 
     other_children_ids = [
@@ -87,8 +105,12 @@ def get_future_courses(card_id):
 def is_course_rereun(course_id):
     """
     Check if the course is created as rerun
-    :param course_id:
-    :return:
+
+    Arguments:
+        course_id (int): course id
+
+    Returns:
+        source_course_key: if course rerun found otherwise return None
     """
     course_rerun = CourseRerunState.objects.filter(course_key=course_id).first()
     if course_rerun:
@@ -98,6 +120,12 @@ def is_course_rereun(course_id):
 
 
 def get_course_cards_list(request=None):
+    """
+    Helper function to get the list of all enabled course cards detail
+
+    Returns:
+        list: list of enabled course cards detail
+    """
     request = request or get_current_request()
     cards_query_set = CourseCard.objects.all() if request.user.is_staff else CourseCard.objects.filter(is_enabled=True)
     course_card_ids = [cc.course_id for cc in cards_query_set]
@@ -108,14 +136,15 @@ def get_course_cards_list(request=None):
 def is_course_in_programs(parent_course_key):
     """
     Helper function to check if course is part of program.
-
     Parent course(course card) of each rerun is same so we
     just compare with parent of first rerun and check if course
     is part of the program.
 
-    @param parent_course_key: parent course key
-    @return: True if parent of first course reruns from discovery matches
-             with parent course key
+    Arguments:
+        parent_course_key (int): parent course key
+
+    Returns:
+        Boolean: True, if parent of first course reruns from discovery matches with parent course key
     """
     programs = get_programs(get_current_request().site)
 
