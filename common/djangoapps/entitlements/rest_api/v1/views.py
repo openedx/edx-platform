@@ -35,8 +35,8 @@ class EntitlementsPagination(DefaultPagination):
     """
     Paginator for entitlements API.
     """
-    page_size = 50
-    max_page_size = 100
+    page_size = 100
+    max_page_size = 200
 
 
 @transaction.atomic
