@@ -194,7 +194,7 @@ class DateSummary(object):
 
         Note: this returns a span that will be localized on the client.
         """
-        locale = to_locale(get_language())
+        locale = get_language()
         user_timezone = user_timezone_locale_prefs(crum.get_current_request())['user_timezone']
         return HTML(
             u'<span class="date localized-datetime" data-format="{date_format}" data-datetime="{date_time}"'
