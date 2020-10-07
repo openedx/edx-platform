@@ -1,0 +1,106 @@
+name: Code quality with Pylint & iSort
+
+on:
+  # Trigger workflow on pull request, but only for PRs merging into master and develop branches
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches:
+      - master
+      - develop
+
+jobs:
+  quality:
+    runs-on: ubuntu-16.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: technote-space/get-diff-action@v3
+        with:
+          SUFFIX_FILTER: .py
+          DOT: '...'
+          DIFF_FILTER: 'AMRC'
+
+      - name: Set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.7
+
+      - name: Install OS packages
+        run: |
+          chmod +x philu_actions/scripts/dependency_downloader.sh
+          sudo bash philu_actions/scripts/dependency_downloader.sh
+
+      - name: Install edx-platform requirements
+        run: |
+          pip install -r requirements/edx/testing.txt
+          pip install -r requirements/philu/testing.txt
+
+      - name: Analysing code with iSort
+        id: isort-report
+        continue-on-error: true
+        run: |
+          isort ${{ env.GIT_DIFF }} --diff 2>&1 | tee report_isort.txt
+
+          body=$(cat report_isort.txt)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+
+          echo ::set-output name=icon::":x:"
+          [[ ${#body} == 0 ]] && echo ::set-output name=icon::":heavy_check_mark:" && \
+          echo ::set-output name=status::success
+        if: env.GIT_DIFF
+
+      - name: Analysing code with pylint
+        continue-on-error: true
+        run: |
+          pylint ${{ env.GIT_DIFF }} 2>&1 | tee report_pylint.txt
+
+      - name: Creating pylint report
+        id: pylint-report
+        run: |
+
+          body=$(cat report_pylint.txt)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+
+          echo ::set-output name=icon::":x:"
+          [[ $body == *".py:"* || $body == *"***********"* ]] && title="**Please fix following pylint issues:**"
+          [[ ${body:5} == "-----"* ]] && score="Pylint score" && echo ::set-output name=status::success \
+          && echo ::set-output name=icon::":heavy_check_mark:"
+
+          echo ::set-output name=score::$score
+          echo ::set-output name=title::$title
+          echo ::set-output name=body::$body
+        if: env.GIT_DIFF
+
+      - name: Post report on PR
+        uses: peter-evans/commit-comment@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body: |
+            **pylint:** ${{ steps.pylint-report.outputs.icon }}
+            **iSort:** ${{ steps.isort-report.outputs.icon }}
+
+            ${{ steps.pylint-report.outputs.title }}
+            ```
+            ${{ steps.pylint-report.outputs.score }}${{ steps.pylint-report.outputs.body }}
+            ```
+        if: env.GIT_DIFF
+
+      - name: No py file, post comment on PR
+        uses: peter-evans/commit-comment@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body: |
+            No python file in PR. **Looks good** :+1:
+        if: env.GIT_DIFF == ''
+
+      - name: Check on failures
+        if: steps.pylint-report.outputs.status != 'success' || steps.isort-report.outputs.status != 'success'
+        run: |
+          PY_FILES="${{ env.GIT_DIFF }}"
+          [[ -z "$PY_FILES" ]] || exit 1
