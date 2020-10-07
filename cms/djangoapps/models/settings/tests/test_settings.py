@@ -359,6 +359,40 @@ config_block_no_global_max_team_size = {
     }
 }
 
+config_block_course_max_team_size = {
+    "teams_configuration": {
+        "value": {
+            "max_team_size": 501,
+            "topics": [
+                {
+                    "max_team_size": 500,
+                    "name": "Topic 1 Name",
+                    "id": "topic_1_id",
+                    "description": "Topic 1 desc",
+                    "type": "public_managed"
+                },
+            ]
+        }
+    }
+}
+
+config_block_teamset_max_team_size = {
+    "teams_configuration": {
+        "value": {
+            "max_team_size": 500,
+            "topics": [
+                {
+                    "max_team_size": 501,
+                    "name": "Topic 1 Name",
+                    "id": "topic_1_id",
+                    "description": "Topic 1 desc",
+                    "type": "public_managed"
+                },
+            ]
+        }
+    }
+}
+
 
 @ddt.ddt
 class TeamsConfigurationTests(unittest.TestCase):
@@ -378,7 +412,9 @@ class TeamsConfigurationTests(unittest.TestCase):
         (config_block_missing_name, {'name attribute must not be empty'}),
         (config_block_extra_attribute, {'extra keys: foo'}),
         (config_block_unrecognized_teamset_type, {'type foo is invalid'}),
-        (config_block_no_global_max_team_size, set())
+        (config_block_no_global_max_team_size, set()),
+        (config_block_course_max_team_size, {'max_team_size cannot be greater than 500'}),
+        (config_block_teamset_max_team_size, {'max_team_size cannot be greater than 500'})
     )
     @ddt.unpack
     def test_team_settings(self, config_block, error_message):

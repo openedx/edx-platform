@@ -295,9 +295,13 @@ class CourseMetadata(object):
             return errors
 
         proposed_max_team_size = json_value.get('max_team_size')
-        if proposed_max_team_size != '' and proposed_max_team_size is not None and proposed_max_team_size <= 0:
-            message = 'max_team_size must be greater than zero'
-            errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+        if proposed_max_team_size != '' and proposed_max_team_size is not None:
+            if proposed_max_team_size <= 0:
+                message = 'max_team_size must be greater than zero'
+                errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
+            elif proposed_max_team_size > 500:
+                message = 'max_team_size cannot be greater than 500'
+                errors.append({'key': 'teams_configuration', 'message': message, 'model': teams_configuration_model})
 
         proposed_topics = json_value.get('topics')
 
@@ -343,8 +347,11 @@ class CourseMetadata(object):
             if teamset_type not in valid_teamset_types:
                 error_list.append('type ' + teamset_type + " is invalid")
         max_team_size = topic_settings.get('max_team_size', {})
-        if max_team_size and max_team_size <= 0:
-            error_list.append('max_team_size must be greater than zero')
+        if max_team_size:
+            if max_team_size <= 0:
+                error_list.append('max_team_size must be greater than zero')
+            elif max_team_size > 500:
+                error_list.append('max_team_size cannot be greater than 500')
         teamset_id = topic_settings.get('id', {})
         if not teamset_id:
             error_list.append('id attribute must not be empty')
