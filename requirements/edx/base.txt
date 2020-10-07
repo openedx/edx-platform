@@ -98,7 +98,7 @@ edx-django-release-util==0.4.4  # via -r requirements/edx/base.in
 edx-django-sites-extensions==2.5.1  # via -r requirements/edx/base.in
 edx-django-utils==3.8.0   # via -r requirements/edx/base.in, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-when
 edx-drf-extensions==6.2.0  # via -r requirements/edx/base.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
-edx-enterprise==3.8.28    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
+edx-enterprise==3.8.29    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.1  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
@@ -220,7 +220,7 @@ social-auth-core==3.3.3   # via -r requirements/edx/base.in, social-auth-app-dja
 sorl-thumbnail==12.6.3    # via -r requirements/edx/base.in, django-wiki
 sortedcontainers==2.2.2   # via -r requirements/edx/base.in, pdfminer.six
 soupsieve==2.0.1          # via beautifulsoup4
-sqlparse==0.3.1           # via -r requirements/edx/base.in, django
+sqlparse==0.4.0           # via -r requirements/edx/base.in, django
 staff-graded-xblock==1.1  # via -r requirements/edx/base.in
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, -r requirements/edx/paver.txt, code-annotations, edx-ace, edx-django-utils, edx-enterprise, edx-opaque-keys
 super-csv==1.0.2          # via -r requirements/edx/base.in, edx-bulk-grades
