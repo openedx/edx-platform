@@ -50,21 +50,37 @@ class ContentLibraryIndexerTest(ContentLibrariesRestApiTest):
 
     def test_schema_updates(self):
         """
-        Test that outdated indexes aren't retrieved
+        Test that schema updates don't effect the data retrieval
         """
+        # Create a library at a schema_version 0
         with patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SCHEMA_VERSION",
                    new=0):
             result = self._create_library(slug="test-lib-schemaupdates-1", title="Title 1", description="Description")
-            library_key = LibraryLocatorV2.from_string(result['id'])
-            self.assertEqual(len(ContentLibraryIndexer.get_items([library_key])), 1)
+            lib = ContentLibraryIndexer.get_items([result['id']])
+            # Verify that a library index is created with schema_version 0
+            self.assertEqual(lib[0]['schema_version'], 0)
 
+        # Access library while expecting schema_version 1
         with patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SCHEMA_VERSION",
                    new=1):
-            self.assertEqual(len(ContentLibraryIndexer.get_items([library_key])), 0)
+            lib = ContentLibraryIndexer.get_items([result['id']])
+            # Verify that schema_version is upgraded to 1
+            self.assertEqual(lib[0]['schema_version'], 1)
 
+        # Access library while expecting an older schema_version
+        with patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SCHEMA_VERSION",
+                   new=0):
+            lib = ContentLibraryIndexer.get_items([result['id']])
+            # Verify that schema_version isn't downgraded to 0
+            self.assertEqual(lib[0]['schema_version'], 1)
+
+        # Verify that reindex command upgrades schema_version
+        with patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SCHEMA_VERSION",
+                   new=2):
             call_command("reindex_content_library", all=True, force=True)
-
-            self.assertEqual(len(ContentLibraryIndexer.get_items([library_key])), 1)
+            lib = self.searcher.search(doc_type=ContentLibraryIndexer.DOCUMENT_TYPE,
+                                       field_dictionary={'id': [result['id']]})
+            self.assertEqual(lib['results'][0]['data']['schema_version'], 2)
 
     def test_remove_all_libraries(self):
         """
@@ -212,24 +228,6 @@ class LibraryBlockIndexerTest(ContentLibrariesRestApiTest):
             self.assertEqual(response['block_type'], block['block_type'])
             self.assertEqual(response['display_name'], block['display_name'])
             self.assertEqual(response['has_unpublished_changes'], block['has_unpublished_changes'])
-
-    def test_schema_updates(self):
-        """
-        Test that outdated indexes aren't retrieved
-        """
-        lib = self._create_library(slug="test-lib--block-schemaupdates-1", title="Title 1", description="Description")
-        with patch("openedx.core.djangoapps.content_libraries.libraries_index.LibraryBlockIndexer.SCHEMA_VERSION",
-                   new=0):
-            block = self._add_block_to_library(lib['id'], "problem", "problem1")
-            self.assertEqual(len(LibraryBlockIndexer.get_items([block['id']])), 1)
-
-        with patch("openedx.core.djangoapps.content_libraries.libraries_index.LibraryBlockIndexer.SCHEMA_VERSION",
-                   new=1):
-            self.assertEqual(len(LibraryBlockIndexer.get_items([block['id']])), 0)
-
-            call_command("reindex_content_library", all=True, force=True)
-
-            self.assertEqual(len(LibraryBlockIndexer.get_items([block['id']])), 1)
 
     def test_remove_all_items(self):
         """

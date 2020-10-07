@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from search.elastic import _translate_hits, RESERVED_CHARACTERS
 from search.search_engine_base import SearchEngine
-from opaque_keys.edx.locator import LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 
 from openedx.core.djangoapps.content_libraries.constants import DRAFT_NAME
 from openedx.core.djangoapps.content_libraries.signals import (
@@ -22,10 +22,15 @@ from openedx.core.djangoapps.content_libraries.signals import (
 from openedx.core.djangoapps.content_libraries.library_bundle import LibraryBundle
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.lib.blockstore_api import get_bundle
-
 log = logging.getLogger(__name__)
 
 MAX_SIZE = 10000  # 10000 is the maximum records elastic is able to return in a single result. Defaults to 10.
+
+
+class BadIndexException(Exception):
+    """
+    Indicates problems with indexes
+    """
 
 
 class SearchIndexerBase(ABC):
@@ -50,16 +55,19 @@ class SearchIndexerBase(ABC):
         """
 
     @classmethod
-    def index_items(cls, items):
+    def index_items(cls, items, immediate=False):
         """
         Index the specified libraries. If they already exist, replace them with new ones.
         """
         searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
         items = [cls.get_item_definition(item) for item in items]
-        return searcher.index(cls.DOCUMENT_TYPE, items, **cls.SEARCH_KWARGS)
+        SEARCH_KWARGS = cls.SEARCH_KWARGS
+        if immediate and 'refresh' in SEARCH_KWARGS:
+            SEARCH_KWARGS['refresh'] = True
+        return searcher.index(cls.DOCUMENT_TYPE, items, **SEARCH_KWARGS)
 
     @classmethod
-    def get_items(cls, ids=None, filter_terms=None, text_search=None):
+    def get_items(cls, ids=None, filter_terms=None, text_search=None, update_outdated_indexes=True):
         """
         Retrieve a list of items from the index.
         Arguments:
@@ -72,7 +80,6 @@ class SearchIndexerBase(ABC):
         if ids is not None:
             filter_terms = {
                 "id": [str(item) for item in ids],
-                "schema_version": [cls.SCHEMA_VERSION],
                 **filter_terms,
             }
 
@@ -81,6 +88,22 @@ class SearchIndexerBase(ABC):
         else:
             searcher = SearchEngine.get_search_engine(cls.INDEX_NAME)
             response = searcher.search(doc_type=cls.DOCUMENT_TYPE, field_dictionary=filter_terms, size=MAX_SIZE)
+
+        # Find items whose schema_version is older than the current application's, and reindex them
+        outdated_items = [
+            result["data"]["id"]
+            for result in response["results"]
+            if result["data"]["schema_version"] < cls.SCHEMA_VERSION
+        ]
+        if outdated_items:
+            # If indexes with an old schema_version are found, reindex and return
+            if not update_outdated_indexes:
+                # The outdated indexes weren't successfully reindexed - this shouldn't have ideally happened.
+                # Raising an error to prevent infinite recursion
+                raise BadIndexException(outdated_items)
+
+            cls.index_items(outdated_items, immediate=True)
+            return cls.get_items(ids, filter_terms, text_search, update_outdated_indexes=False)
 
         response = [result["data"] for result in response["results"]]
         return sorted(response, key=lambda i: i["id"])
@@ -189,6 +212,9 @@ class ContentLibraryIndexer(SearchIndexerBase):
 
     @classmethod
     def get_item_definition(cls, item):
+        if isinstance(item, str):
+            item = LibraryLocatorV2.from_string(item)
+
         ref = ContentLibrary.objects.get_by_key(item)
         lib_bundle = LibraryBundle(item, ref.bundle_uuid, draft_name=DRAFT_NAME)
         num_blocks = len(lib_bundle.get_top_level_usages())
@@ -235,6 +261,9 @@ class LibraryBlockIndexer(SearchIndexerBase):
     @classmethod
     def get_item_definition(cls, item):
         from openedx.core.djangoapps.content_libraries.api import get_block_display_name, _lookup_usage_key
+
+        if isinstance(item, str):
+            item = LibraryUsageLocatorV2.from_string(item)
 
         def_key, lib_bundle = _lookup_usage_key(item)
         is_child = item in lib_bundle.get_bundle_includes().keys()
