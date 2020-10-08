@@ -218,6 +218,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
             ),
             task_id=subtask_id,
             routing_key=routing_key,
+            queue=settings.HIGH_PRIORITY_QUEUE
         )
         return new_subtask
 
