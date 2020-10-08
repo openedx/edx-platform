@@ -70,7 +70,7 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         'TRACKING_BACKENDS',
         'EVENT_TRACKING_BACKENDS',
         'JWT_AUTH',
-        'CELERY_TASK_QUEUES',
+        'CELERY_QUEUES',
         'MKTG_URL_LINK_MAP',
         'MKTG_URL_OVERRIDES',
     ]
