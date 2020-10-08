@@ -44,4 +44,4 @@ class CredentialsConfig(AppConfig):
 
     def ready(self):
         # Register celery workers
-        from .tasks.v1 import tasks  # pylint: disable=unused-variable
+        from openedx.core.djangoapps.credentials.tasks.v1 import tasks  # pylint: disable=unused-variable

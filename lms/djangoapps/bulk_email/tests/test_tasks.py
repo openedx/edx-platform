@@ -33,7 +33,7 @@ from opaque_keys.edx.locator import CourseLocator
 from six.moves import range
 
 from ..models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
-from ..tasks import _get_course_email_context
+from lms.djangoapps.bulk_email.tasks import _get_course_email_context
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtask_status
 from lms.djangoapps.instructor_task.tasks import send_bulk_course_email

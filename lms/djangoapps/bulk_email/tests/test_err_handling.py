@@ -19,8 +19,8 @@ from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 from six.moves import range
 
-from bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
-from bulk_email.tasks import perform_delegate_email_batches, send_course_email
+from lms.djangoapps.bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
+from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches, send_course_email
 from lms.djangoapps.instructor_task.exceptions import DuplicateTaskException
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (

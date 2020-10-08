@@ -14,4 +14,4 @@ class CoursegraphConfig(AppConfig):
     """
     name = 'openedx.core.djangoapps.coursegraph'
 
-    from . import tasks
+    from openedx.core.djangoapps.coursegraph import tasks
