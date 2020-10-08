@@ -27,7 +27,7 @@ from ..signals import (
     email_marketing_user_field_changed,
     update_sailthru
 )
-from ..tasks import (
+from lms.djangoapps.email_marketing.tasks import (
     _create_user_list,
     _get_list_from_email_marketing_provider,
     _get_or_create_user_list,

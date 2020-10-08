@@ -14,7 +14,7 @@ from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, En
 from integrated_channels.integrated_channel.tasks import transmit_single_learner_data
 from slumber.exceptions import HttpClientError
 
-from email_marketing.tasks import update_user
+from lms.djangoapps.email_marketing.tasks import update_user
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 from openedx.features.enterprise_support.api import enterprise_enabled

@@ -24,7 +24,7 @@ from .. import events
 from ..constants import ScoreDatabaseTableEnum
 from ..course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
-from ..tasks import (
+from lms.djangoapps.grades.tasks import (
     RECALCULATE_GRADE_DELAY_SECONDS,
     recalculate_course_and_subsection_grades_for_user,
     recalculate_subsection_grade_v3

@@ -22,7 +22,7 @@ from markupsafe import escape
 from mock import Mock, patch
 
 from ..models import BulkEmailFlag, Optout
-from ..tasks import _get_course_email_context, _get_source_address
+from lms.djangoapps.bulk_email.tasks import _get_course_email_context, _get_source_address
 from course_modes.models import CourseMode
 
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory

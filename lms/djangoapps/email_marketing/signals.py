@@ -25,7 +25,7 @@ from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.signals import SAILTHRU_AUDIT_PURCHASE
 from util.model_utils import USER_FIELD_CHANGED
 
-from .tasks import update_course_enrollment
+from lms.djangoapps.email_marketing.tasks import update_course_enrollment
 
 log = logging.getLogger(__name__)
 
