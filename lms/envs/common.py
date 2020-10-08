@@ -2382,7 +2382,7 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = 'edx.lms.core.default'
 # For emails with fewer than these number of recipients, send them through
 # a different queue to avoid large courses blocking emails that are meant to be
 # sent to self and staff
-BULK_EMAIL_JOB_SIZE_THRESHOLD = 100
+BULK_EMAIL_JOB_SIZE_THRESHOLD = 1
 
 # Flag to indicate if individual email addresses should be logged as they are sent
 # a bulk email message.
