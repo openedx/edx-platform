@@ -19,12 +19,14 @@ from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
 from web_fragments.fragment import Fragment
+
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from openedx.core.djangoapps.waffle_utils import WaffleFlag
+from openedx.core.lib.graph_traversals import traverse_pre_order
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -189,6 +191,7 @@ class ProctoringFields(object):
 @XBlock.needs('user')
 @XBlock.needs('bookmarks')
 @XBlock.needs('i18n')
+@XBlock.wants('content_type_gating')
 class SequenceModule(SequenceFields, ProctoringFields, XModule):
     """
     Layout module which lays out content in a temporal sequence
@@ -279,17 +282,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             datetime.now(UTC) < date
         )
 
-    def _has_access_check(self, *args):
-        """
-        Helper method created for the following method
-        gate_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems
-        Created to simplify the relevant unit tests
-        This way the has_access call can be patched without impacting other has_access calls made during the test
-        """
-        # importing here to avoid a circular import
-        from lms.djangoapps.courseware.access import has_access
-        return has_access(*args)
-
     def gate_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems(self):
         """
         Problem:
@@ -313,39 +305,55 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         We are displaying the gating fragment within the sequence, as is done for gating for prereqs,
         rather than content type gating the entire sequence because that would remove the next/previous navigation.
 
+        When gated_sequence_fragment is not set to None, the sequence will be gated.
+
         This functionality still needs to be replicated in the frontend-app-learning courseware MFE
         The ticket to track this is https://openedx.atlassian.net/browse/REV-1220
         Note that this will break compatability with using sequences outside of edx-platform
         but we are ok with this for now
         """
-        # importing here to avoid a circular import
-        from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-
         if not self.is_time_limited:
+            self.gated_sequence_fragment = None
             return
 
         try:
             user = User.objects.get(id=self.runtime.user_id)
-            if not ContentTypeGatingConfig.enabled_for_enrollment(user=user, course_key=self.runtime.course_id):
+            course_id = self.runtime.course_id
+            content_type_gating_service = self.runtime.service(self, 'content_type_gating')
+            if not (content_type_gating_service and
+                    content_type_gating_service.enabled_for_enrollment(user=user, course_key=course_id)):
+                self.gated_sequence_fragment = None
                 return
 
-            for vertical in self.get_children():
-                for block in vertical.get_children():
-                    problem_eligible_for_content_gating = (getattr(block, 'graded', False) and
-                                                           block.has_score and
-                                                           getattr(block, 'weight', 0) != 0)
-                    if problem_eligible_for_content_gating:
-                        access = self._has_access_check(user, 'load', block, self.course_id)
-                        # If any block has been gated by content type gating inside the sequence
-                        # and the sequence is a timed exam, then gate the entire sequence.
-                        # In order to avoid scope creep, we are not handling other potential causes
-                        # of access failures as part of this work.
-                        if not access and access.error_code == 'incorrect_user_group':
-                            self.gated_sequence_fragment = access.user_fragment
-                            break
-                        self.gated_sequence_fragment = None  # Don't gate other cases
+            def leaf_filter(block):
+                # This function is used to check if this is a leaf block
+                # Blocks with children are not currently gated by content type gating
+                # Other than the outer function here
+                return (
+                    block.location.block_type not in ('chapter', 'sequential', 'vertical') and
+                    len(getattr(block, 'children', [])) == 0
+                )
+
+            def get_children(parent):
+                # This function is used to get the children of a block in the traversal below
+                if not hasattr(parent, 'children'):
+                    return []
+                else:
+                    return parent.get_children()
+
+            # If any block inside a timed exam has been gated by content type gating
+            # then gate the entire sequence.
+            # In order to avoid scope creep, we are not handling other potential causes
+            # of access failures as part of this work.
+            for block in traverse_pre_order(self, get_children, leaf_filter):
+                gate_fragment = content_type_gating_service.content_type_gate_for_block(user, block, course_id)
+                if gate_fragment is not None:
+                    self.gated_sequence_fragment = gate_fragment
+                    return
+                else:
+                    self.gated_sequence_fragment = None
         except User.DoesNotExist:
-            pass
+            self.gated_sequence_fragment = None
 
     def student_view(self, context):
         _ = self.runtime.service(self, "i18n").ugettext

@@ -45,6 +45,7 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import ContentTypeGatingPartition
+from openedx.features.content_type_gating.services import ContentTypeGatingService
 from student.models import CourseEnrollment, FBEEnrollmentExclusion
 from student.roles import CourseInstructorRole
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
@@ -1084,4 +1085,86 @@ class TestMessageDeduplication(ModuleStoreTestCase):
             course=course['course'],
             is_gated=True,
             request_factory=self.request_factory,
+        )
+
+
+@override_settings(FIELD_OVERRIDE_PROVIDERS=(
+    'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
+))
+class TestContentTypeGatingService(ModuleStoreTestCase):
+    """
+    The ContentTypeGatingService was originally created as a helper class for timed exams
+    to check whether a sequence contains content type gated blocks
+    The content_type_gate_for_block can be used to return the content type gate for a given block
+    """
+
+    def setUp(self):
+        super(TestContentTypeGatingService, self).setUp()
+
+        self.user = UserFactory.create()
+        self.request_factory = RequestFactory()
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+
+    def _create_course(self):
+        course = CourseFactory.create(run='test', display_name='test')
+        CourseModeFactory.create(course_id=course.id, mode_slug='audit')
+        CourseModeFactory.create(course_id=course.id, mode_slug='verified')
+        blocks_dict = {}
+        with self.store.bulk_operations(course.id):
+            blocks_dict['chapter'] = ItemFactory.create(
+                parent=course,
+                category='chapter',
+                display_name='Week 1'
+            )
+            blocks_dict['sequential'] = ItemFactory.create(
+                parent=blocks_dict['chapter'],
+                category='sequential',
+                display_name='Lesson 1'
+            )
+            blocks_dict['vertical'] = ItemFactory.create(
+                parent=blocks_dict['sequential'],
+                category='vertical',
+                display_name='Lesson 1 Vertical - Unit 1'
+            )
+        return {
+            'course': course,
+            'blocks': blocks_dict,
+        }
+
+    def test_content_type_gate_for_block(self):
+        ''' Verify that the method returns a content type gate when appropriate '''
+        course = self._create_course()
+        blocks_dict = course['blocks']
+        CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=course['course'].id,
+            mode='audit'
+        )
+        blocks_dict['graded_1'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            graded=True,
+            metadata=METADATA,
+        )
+        blocks_dict['not_graded_1'] = ItemFactory.create(
+            parent=blocks_dict['vertical'],
+            category='problem',
+            graded=False,
+            metadata=METADATA,
+        )
+
+        # The method returns a content type gate for blocks that should be gated
+        self.assertIn(
+            'content-paywall',
+            ContentTypeGatingService().content_type_gate_for_block(
+                self.user, blocks_dict['graded_1'], course['course'].id
+            ).content
+        )
+
+        # The method returns None for blocks that should not be gated
+        self.assertEquals(
+            None,
+            ContentTypeGatingService().content_type_gate_for_block(
+                self.user, blocks_dict['not_graded_1'], course['course'].id
+            )
         )

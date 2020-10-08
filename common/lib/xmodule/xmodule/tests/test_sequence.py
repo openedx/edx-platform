@@ -16,7 +16,6 @@ from mock import Mock, patch
 from six.moves import range
 from web_fragments.fragment import Fragment
 
-from lms.djangoapps.courseware.access_response import AccessResponse
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import UserFactory
 from xmodule.seq_module import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceModule
@@ -187,60 +186,62 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     @override_waffle_flag(TIMED_EXAM_GATING_WAFFLE_FLAG, active=True)
     @patch('xmodule.seq_module.User.objects.get', return_value=UserFactory.build())
-    @patch('openedx.features.content_type_gating.models.ContentTypeGatingConfig.enabled_for_enrollment',
-           return_value=True)
-    def test_that_timed_sequence_gating_respects_access_configurations(self, mocked_user, mocked_config):  # pylint: disable=unused-argument
+    def test_that_timed_sequence_gating_respects_access_configurations(self, mocked_user):  # pylint: disable=unused-argument
         """
         Verify that if a time limited sequence contains content type gated problems, we gate the sequence
-        Verify that if a time limited sequence contains gated problems, but not due to content type gating,
-        then sequence is not gated
-        Verify that if all problems in a time limited sequence can be accessed, the sequence is not gated
+        Verify that if a time limited sequence does not contain content type gated problems, we do not gate the sequence
         """
         # the one problem in this sequence needs to have graded set to true in order to test content type gating
         self.sequence_5_1.get_children()[0].get_children()[0].graded = True
         gated_fragment = Fragment('i_am_gated')
 
         # When a time limited sequence contains content type gated problems, the sequence itself is gated
-        content_gating_error = AccessResponse(False, error_code="incorrect_user_group", user_fragment=gated_fragment)
-        with patch.object(SequenceModule, '_has_access_check', return_value=content_gating_error):
-            view = self._get_rendered_view(
-                self.sequence_5_1,
-                extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
-                view=STUDENT_VIEW
-            )
-            self.assertIn('i_am_gated', view)
-            # check a few elements to ensure the correct page was loaded
-            self.assertIn("seq_module.html", view)
-            self.assertIn('NextSequential', view)
-            self.assertIn('PrevSequential', view)
+        self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
+            enabled_for_enrollment=Mock(return_value=True),
+            content_type_gate_for_block=Mock(return_value=gated_fragment)
+        ))
+        view = self._get_rendered_view(
+            self.sequence_5_1,
+            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+            view=STUDENT_VIEW
+        )
+        self.assertIn('i_am_gated', view)
+        # check a few elements to ensure the correct page was loaded
+        self.assertIn("seq_module.html", view)
+        self.assertIn('NextSequential', view)
+        self.assertIn('PrevSequential', view)
 
-        # When a time limited sequence contains inaccessible problems for reasons other than content type gating
-        # the sequence is not gated, because handling these cases was out of scope for this ticket
-        some_other_error = AccessResponse(False, error_code="some_other_error", user_fragment=gated_fragment)
-        with patch.object(SequenceModule, '_has_access_check', return_value=some_other_error):
-            view = self._get_rendered_view(
-                self.sequence_5_1,
-                extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
-                view=STUDENT_VIEW
-            )
-            self.assertNotIn('i_am_gated', view)
-            # check a few elements to ensure the correct page was loaded
-            self.assertIn("seq_module.html", view)
-            self.assertIn('NextSequential', view)
-            self.assertIn('PrevSequential', view)
+        # When enabled_for_enrollment is false, the sequence itself is not gated
+        self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
+            enabled_for_enrollment=Mock(return_value=False),
+            content_type_gate_for_block=Mock(return_value=gated_fragment)
+        ))
+        view = self._get_rendered_view(
+            self.sequence_5_1,
+            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+            view=STUDENT_VIEW
+        )
+        self.assertNotIn('i_am_gated', view)
+        # check a few elements to ensure the correct page was loaded
+        self.assertIn("seq_module.html", view)
+        self.assertIn('NextSequential', view)
+        self.assertIn('PrevSequential', view)
 
-        # When all problems inside a time limited sequence can be accessed, the sequence is not gated
-        with patch.object(SequenceModule, '_has_access_check', return_value=AccessResponse(True)):
-            view = self._get_rendered_view(
-                self.sequence_5_1,
-                extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
-                view=STUDENT_VIEW
-            )
-            self.assertNotIn('i_am_gated', view)
-            # check a few elements to ensure the correct page was loaded
-            self.assertIn("seq_module.html", view)
-            self.assertIn('NextSequential', view)
-            self.assertIn('PrevSequential', view)
+        # When content_type_gate_for_block returns None, the sequence itself is not gated
+        self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
+            enabled_for_enrollment=Mock(return_value=True),
+            content_type_gate_for_block=Mock(return_value=None)
+        ))
+        view = self._get_rendered_view(
+            self.sequence_5_1,
+            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+            view=STUDENT_VIEW
+        )
+        self.assertNotIn('i_am_gated', view)
+        # check a few elements to ensure the correct page was loaded
+        self.assertIn("seq_module.html", view)
+        self.assertIn('NextSequential', view)
+        self.assertIn('PrevSequential', view)
 
     @ddt.unpack
     @ddt.data(
