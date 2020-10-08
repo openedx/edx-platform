@@ -188,7 +188,8 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
     def test_autoscore_ora_submission(self, mock_select_options):
         """
         Verify that ORA submission is auto scored by Philu bot which act as staff and assessment workflow status
-        is marked to done.
+        remains same. Also verify that staff assessment and score is not created again for already scored submission,
+        if auto scoring function is called again.
         """
         mock_select_options.return_value = {'Ideas': 'Fair', 'Content': 'Fair'}, 4, 6
         submission = SubmissionFactory(
@@ -206,9 +207,19 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
         score_by_bot = Score.objects.filter(submission=submission, reset=False).order_by('-created_at').first()
 
         self.assertIsNotNone(staff_assessment)
-        self.assertIsNotNone(assessment_workflow)
-        self.assertEqual(assessment_workflow.status, 'done')
+        self.assertEqual(assessment_workflow.status, 'training')
         self.assertIsNotNone(score_by_bot)
+
+        # Call function again, and verify that staff assessment and score is not created again for same submission
+        helpers.autoscore_ora_submission(submission)
+
+        staff_assessment_count = Assessment.objects.filter(submission_uuid=uuid).count()
+        assessment_workflow = AssessmentWorkflow.objects.filter(submission_uuid=uuid).order_by('-modified').first()
+        score_by_bot_count = Score.objects.filter(submission=submission, reset=False).count()
+
+        self.assertEqual(staff_assessment_count, 1)
+        self.assertEqual(assessment_workflow.status, 'training')
+        self.assertEqual(score_by_bot_count, 1)
 
     @mock.patch('openedx.features.assessment.helpers.modulestore')
     def test_get_rubric_from_ora(self, mock_modulestore):
