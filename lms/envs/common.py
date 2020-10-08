@@ -2563,9 +2563,10 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
 
-    # ADG Features
     'openedx.adg.lms.course_meta',
 
+    # ADG Features
+    'openedx.adg.lms.applications',
 ]
 
 ######################### CSRF #########################################

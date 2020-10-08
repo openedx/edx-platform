@@ -696,6 +696,12 @@ urlpatterns += [
         r'^u/',
         include('openedx.features.learner_profile.urls'),
     ),
+
+    # Applications
+    url(
+        r'^application/',
+        include('openedx.adg.lms.applications.urls'),
+    ),
 ]
 
 if settings.FEATURES.get('ENABLE_TEAMS'):
