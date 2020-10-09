@@ -4111,3 +4111,12 @@ SUPPORT_HOW_TO_UNENROLL_LINK = ''
 
 ######################## Setting for content libraries ########################
 MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
+
+# Settings related to the taxonomy
+TAXONOMY_COURSE_METADATA_PROVIDER = 'openedx.features.taxonomy.providers.DiscoveryCourseMetadataProvider'
+
+# Settings related to the EMSI client
+EMSI_API_ACCESS_TOKEN_URL = 'https://auth.emsicloud.com/connect/token'
+EMSI_API_BASE_URL = 'https://emsiservices.com'
+EMSI_CLIENT_ID = ''
+EMSI_CLIENT_SECRET = ''
