@@ -136,7 +136,7 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
-CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
+CELERY_ROUTES = "{}celery.route_task".format(QUEUE_VARIANT)
 
 # STATIC_URL_BASE specifies the base url to use for static files
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)

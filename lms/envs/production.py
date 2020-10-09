@@ -150,7 +150,7 @@ CELERY_QUEUES = {
     HIGH_MEM_QUEUE: {},
 }
 
-CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
+CELERY_ROUTES = "{}celery.route_task".format(QUEUE_VARIANT)
 CELERYBEAT_SCHEDULE = {}  # For scheduling tasks, entries can be added to this dict
 
 # STATIC_ROOT specifies the directory where static files are

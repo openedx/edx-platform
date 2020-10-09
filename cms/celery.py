@@ -11,7 +11,7 @@ import os
 from celery import Celery
 from django.conf import settings
 
-from openedx.core.lib.celery.routers import AlternateEnvironmentRouter
+from openedx.core.lib.celery.routers import ensure_queue_env
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proj.settings')
@@ -25,29 +25,29 @@ APP.config_from_object('django.conf:settings')
 APP.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 
-class Router(AlternateEnvironmentRouter):
+def route_task(name, args, kwargs, options, task=None, **kw):  # pylint: disable=unused-argument
     """
-    An implementation of AlternateEnvironmentRouter, for routing tasks to non-cms queues.
+    Celery-defined method allowing for custom routing logic.
+
+    If None is returned from this method, default routing logic is used.
     """
+    # Defines alternate environment tasks, as a dict of form { task_name: alternate_queue }
+    alternate_env_tasks = {
+        'completion_aggregator.tasks.update_aggregators': 'lms',
+        'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache': 'lms',
+        'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2': 'lms',
+    }
 
-    @property
-    def alternate_env_tasks(self):
-        """
-        Defines alternate environment tasks, as a dict of form { task_name: alternate_queue }
-        """
-        # The tasks below will be routed to the default lms queue.
-        return {
-            'completion_aggregator.tasks.update_aggregators': 'lms',
-            'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache': 'lms',
-            'openedx.core.djangoapps.content.block_structure.tasks.update_course_in_cache_v2': 'lms',
-        }
+    # Defines the task -> alternate worker queue to be used when routing.
+    explicit_queues = {
+        'lms.djangoapps.grades.tasks.compute_all_grades_for_course': {
+            'queue': settings.POLICY_CHANGE_GRADES_ROUTING_KEY},
+    }
+    if name in explicit_queues:
+        return explicit_queues[name]
 
-    @property
-    def explicit_queues(self):
-        """
-        Defines specific queues for tasks to run in (typically outside of the cms environment),
-        as a dict of form { task_name: queue_name }.
-        """
-        return {
-            'lms.djangoapps.grades.tasks.compute_all_grades_for_course': settings.POLICY_CHANGE_GRADES_ROUTING_KEY,
-        }
+    alternate_env = alternate_env_tasks.get(name, None)
+    if alternate_env:
+        return ensure_queue_env(alternate_env)
+
+    return None
