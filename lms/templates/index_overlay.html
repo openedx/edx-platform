@@ -5,6 +5,6 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
-<h1>${Text(_(u"Welcome to {platform_name}")).format(platform_name=settings.PLATFORM_NAME)}</h1>
+<h1 style=""> ${Text(_(u"学海无涯、唯勤是岸--永昌课堂")).format(platform_name=settings.PLATFORM_NAME)}</h1>
 ## Translators: 'Open edX' is a registered trademark, please keep this untranslated. See http://open.edx.org for more information.
-<p>${Text(_("It works! Powered by Open edX{registered_trademark}")).format(registered_trademark=HTML("<sup style='font-size: 65%'>&reg;</sup>"))}</p>
+<p>${Text(_("我的职业课堂")).format(registered_trademark=HTML("<sup style='font-size: 65%'>&reg;</sup>"))}</p>

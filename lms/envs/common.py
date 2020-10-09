@@ -58,7 +58,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = _('Your Platform Name Here')
+PLATFORM_NAME = _('永昌课堂')
 PLATFORM_DESCRIPTION = _('Your Platform Description Here')
 CC_MERCHANT_NAME = PLATFORM_NAME
 
@@ -133,7 +133,7 @@ FEATURES = {
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
     # Toggles OAuth2 authentication provider
-    'ENABLE_OAUTH2_PROVIDER': False,
+    'ENABLE_OAUTH2_PROVIDER': True,
 
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
@@ -298,7 +298,7 @@ FEATURES = {
     'EXPOSE_CACHE_PROGRAMS_ENDPOINT': False,
 
     # Courseware search feature
-    'ENABLE_COURSEWARE_SEARCH': False,
+    'ENABLE_COURSEWARE_SEARCH': True,
     'ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF': False,
 
     # Dashboard search feature
@@ -314,7 +314,7 @@ FEATURES = {
     'CERTIFICATES_HTML_VIEW': False,
 
     # Course discovery feature
-    'ENABLE_COURSE_DISCOVERY': False,
+    'ENABLE_COURSE_DISCOVERY': True,
 
     # Setting for overriding default filtering facets for Course discovery
     # COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
@@ -332,7 +332,7 @@ FEATURES = {
     'SHOW_BUMPER_PERIODICITY': 7 * 24 * 3600,
 
     # Special Exams, aka Timed and Proctored Exams
-    'ENABLE_SPECIAL_EXAMS': False,
+    'ENABLE_SPECIAL_EXAMS': True,
 
     # Enable OpenBadge support. See the BADGR_* settings later in this file.
     'ENABLE_OPENBADGES': False,
@@ -2562,6 +2562,7 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+    'edx_custom_registration_form'
 ]
 
 ######################### CSRF #########################################
@@ -3572,7 +3573,7 @@ PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
 SITE_ID = 1
 
 # dir containing all themes
-COMPREHENSIVE_THEME_DIRS = []
+COMPREHENSIVE_THEME_DIRS = ['/my-open-edx-themes/edx-platform']
 
 # Theme directory locale paths
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
@@ -3581,7 +3582,7 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = []
 # set to None if you want to use openedx theme
 DEFAULT_SITE_THEME = None
 
-ENABLE_COMPREHENSIVE_THEMING = False
+ENABLE_COMPREHENSIVE_THEMING = True
 
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'

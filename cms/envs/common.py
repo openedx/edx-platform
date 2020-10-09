@@ -150,7 +150,7 @@ BLOCK_STRUCTURES_SETTINGS = dict(
 
 ############################ FEATURE CONFIGURATION #############################
 
-PLATFORM_NAME = _('Your Platform Name Here')
+PLATFORM_NAME = _('永昌课堂')
 PLATFORM_DESCRIPTION = _('Your Platform Description Here')
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
@@ -1822,7 +1822,7 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = []
 # set to None if you want to use openedx theme
 DEFAULT_SITE_THEME = None
 
-ENABLE_COMPREHENSIVE_THEMING = False
+ENABLE_COMPREHENSIVE_THEMING = True
 
 ############################ Global Database Configuration #####################
 
@@ -2085,12 +2085,12 @@ VIDEO_IMAGE_SETTINGS = dict(
     VIDEO_IMAGE_MAX_BYTES=2 * 1024 * 1024,    # 2 MB
     VIDEO_IMAGE_MIN_BYTES=2 * 1024,       # 2 KB
     # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
-    # STORAGE_KWARGS=dict(bucket='video-image-bucket'),
-    STORAGE_KWARGS=dict(
-        location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
-    ),
+    STORAGE_CLASS='qiniustorage.backends.QiniuMediaStorage',
+    STORAGE_KWARGS=dict(bucket='video-image-bucket'),
+    # STORAGE_KWARGS=dict(
+    #     location=MEDIA_ROOT,
+    #     base_url=MEDIA_URL,
+    # ),
     DIRECTORY_PREFIX='video-images/',
 )
 
@@ -2100,12 +2100,12 @@ VIDEO_IMAGE_MAX_AGE = 31536000
 VIDEO_TRANSCRIPTS_SETTINGS = dict(
     VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
     # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
-    # STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
-    STORAGE_KWARGS=dict(
-        location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
-    ),
+    STORAGE_CLASS='qiniustorage.backends.QiniuMediaStorage',
+    STORAGE_KWARGS=dict(bucket='video-transcripts-bucket'),
+    # STORAGE_KWARGS=dict(
+    #     location=MEDIA_ROOT,
+    #     base_url=MEDIA_URL,
+    # ),
     DIRECTORY_PREFIX='video-transcripts/',
 )
 

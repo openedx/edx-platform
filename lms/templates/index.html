@@ -14,11 +14,7 @@ from openedx.core.djangolib.markup import HTML, Text
         <div class="outer-wrapper">
           <div class="title">
             <div class="heading-group">
-              % if homepage_overlay_html:
-                ${homepage_overlay_html | n, decode.utf8}
-              % else:
-                <%include file="index_overlay.html" />
-              % endif
+              <%include file="index_overlay.html" />
             </div>
             % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
               <div class="course-search">

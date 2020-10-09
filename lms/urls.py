@@ -1004,3 +1004,10 @@ urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
 urlpatterns += [
     url(r'^api/course_home/', include('lms.djangoapps.course_home_api.urls')),
 ]
+
+
+# CAS
+# urlpatterns += (
+# url(r'^accounts/login/$', 'cas.views.login', name='login'),
+# url(r'^accounts/logout/$', 'cas.views.logout', name='logout'),
+# )
