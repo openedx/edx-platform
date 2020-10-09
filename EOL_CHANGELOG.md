@@ -1,5 +1,8 @@
 # Changelog EOL
 
+## 09/10/2020 Changes on edx-proctoring
+- Alert time remaining and show student progress (lms/templates/courseware/proctored-exam-status.underscore)
+
 ### 23/09/2020 Update send email message at instructor view
 - Update success message. Append the email targets (lms/static/js/instructor_dashboard/send_email.js)
 
