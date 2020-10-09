@@ -87,5 +87,4 @@ class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):
         model = LinkedInAddToProfileConfiguration
 
     enabled = True
-    company_identifier = "0_0dPSPyS070e0HsE9HNz_13_d11_"
-    trk_partner_name = 'unittest'
+    company_identifier = "1337"

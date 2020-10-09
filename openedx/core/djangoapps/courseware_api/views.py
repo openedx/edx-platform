@@ -21,6 +21,8 @@ from rest_framework.views import APIView
 
 from course_modes.models import CourseMode
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
+from lms.djangoapps.certificates.api import get_certificate_url
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
@@ -41,7 +43,7 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import generate_course_expired_message
 from openedx.features.discounts.utils import generate_offer_html
-from student.models import CourseEnrollment, CourseEnrollmentCelebration
+from student.models import CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
 
@@ -53,15 +55,16 @@ class CoursewareMeta:
     Encapsulates courseware and enrollment metadata.
     """
     def __init__(self, course_key, request, username=''):
+        self.request = request
         self.overview = course_detail(
-            request,
-            username or request.user.username,
+            self.request,
+            username or self.request.user.username,
             course_key,
         )
-        self.original_user_is_staff = has_access(request.user, 'staff', self.overview).has_access
+        self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
         self.course_key = course_key
         self.course_masquerade, self.effective_user = setup_masquerade(
-            request,
+            self.request,
             course_key,
             staff_access=self.original_user_is_staff,
         )
@@ -244,6 +247,32 @@ class CoursewareMeta:
             else:
                 return IDVerificationService.get_verify_location('verify_student_verify_now', self.course_key)
 
+    @property
+    def linkedin_add_to_profile_url(self):
+        """
+        Returns a URL to add a certificate to a LinkedIn profile (will autofill fields).
+
+        Requires LinkedIn sharing to be enabled, either via a site configuration or a
+        LinkedInAddToProfileConfiguration object being enabled.
+        """
+        if self.effective_user.is_anonymous:
+            return
+
+        linkedin_config = LinkedInAddToProfileConfiguration.current()
+        if linkedin_config.is_enabled():
+            try:
+                user_certificate = GeneratedCertificate.eligible_certificates.get(
+                    user=self.effective_user, course_id=self.course_key
+                )
+            except GeneratedCertificate.DoesNotExist:
+                return
+            cert_url = self.request.build_absolute_uri(
+                get_certificate_url(course_id=self.course_key, uuid=user_certificate.verify_uuid)
+            )
+            return linkedin_config.add_to_profile_url(
+                self.overview.display_name, user_certificate.mode, cert_url, certificate=user_certificate,
+            )
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
@@ -294,6 +323,7 @@ class CoursewareInformation(RetrieveAPIView):
         * certificate_data: data regarding the effective user's certificate for the given course
         * verify_identity_url: URL for a learner to verify their identity. Only returned for learners enrolled in a
             verified mode. Will update to reverify URL if necessary.
+        * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
 
     **Parameters:**
 

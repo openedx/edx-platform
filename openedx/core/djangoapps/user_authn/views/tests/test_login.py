@@ -18,9 +18,7 @@ from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
-from freezegun import freeze_time
 from mock import patch
-from six.moves import range
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
