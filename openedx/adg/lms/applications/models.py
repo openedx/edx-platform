@@ -82,14 +82,10 @@ class Education(TimeStampedModel):
     name_of_school = models.CharField(verbose_name=_('Name of School / University'), max_length=255, )
     degree = models.CharField(verbose_name=_('Degree Received'), choices=DEGREE_TYPES, max_length=2, )
     ares_of_study = models.CharField(verbose_name=_('Area of Study'), max_length=255, blank=True)
-    date_started_month = models.CharField(verbose_name=_('Date Started'), choices=month_choices, max_length=2, )
-    date_started_year = models.IntegerField(verbose_name=_('Date Started'), choices=year_choices, )
-    date_completed_month = models.CharField(
-        verbose_name=_('Date Completed'), choices=month_choices, blank=True, max_length=2,
-    )
-    date_completed_year = models.IntegerField(
-        verbose_name=_('Date Completed'), choices=year_choices, blank=True, null=True,
-    )
+    date_started_month = models.CharField(choices=month_choices, max_length=2, )
+    date_started_year = models.IntegerField(choices=year_choices, )
+    date_completed_month = models.CharField(choices=month_choices, blank=True, max_length=2, )
+    date_completed_year = models.IntegerField(choices=year_choices, blank=True, null=True, )
     is_in_progress = models.BooleanField(verbose_name=_('In Progress'), default=False, )
 
     class Meta:
@@ -112,14 +108,10 @@ class WorkExperience(TimeStampedModel):
     )
     name_of_organization = models.CharField(verbose_name=_('Name of Organization'), max_length=255, )
     job_position_title = models.CharField(verbose_name=_('Job Position / Title'), max_length=255, )
-    date_started_month = models.CharField(verbose_name=_('Date Started'), choices=month_choices, max_length=2, )
-    date_started_year = models.IntegerField(verbose_name=_('Date Started'), choices=year_choices,)
-    date_completed_month = models.CharField(
-        verbose_name=_('Date Completed'), choices=month_choices, blank=True, max_length=2,
-    )
-    date_completed_year = models.IntegerField(
-        verbose_name=_('Date Completed'), choices=year_choices, blank=True, null=True,
-    )
+    date_started_month = models.CharField(choices=month_choices, max_length=2, )
+    date_started_year = models.IntegerField(choices=year_choices, )
+    date_completed_month = models.CharField(choices=month_choices, blank=True, max_length=2, )
+    date_completed_year = models.IntegerField(choices=year_choices, blank=True, null=True, )
     is_current_position = models.BooleanField(verbose_name=_('Current Position'), default=False, )
     job_responsibilities = models.TextField(verbose_name=_('Job Responsibilities'), blank=True, )
 

@@ -1,5 +1,5 @@
 """
-Registering models with for applications app.
+Registering models for applications app.
 """
 from django.contrib import admin
 

@@ -697,7 +697,7 @@ urlpatterns += [
         include('openedx.features.learner_profile.urls'),
     ),
 
-    # Applications
+    # ADG Applications app
     url(
         r'^application/',
         include('openedx.adg.lms.applications.urls'),
