@@ -48,7 +48,7 @@ RETRY_DELAY_SECONDS = 40
 SUBSECTION_GRADE_TIMEOUT_SECONDS = 300
 
 
-@task(base=LoggedPersistOnFailureTask, routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY)
+@task(base=LoggedPersistOnFailureTask)
 def compute_all_grades_for_course(**kwargs):
     """
     Compute grades for all students in the specified course.
@@ -69,7 +69,7 @@ def compute_all_grades_for_course(**kwargs):
                 'batch_size': batch_size,
             })
             compute_grades_for_course_v2.apply_async(
-                kwargs=kwargs, routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY
+                kwargs=kwargs, queue=settings.POLICY_CHANGE_GRADES_ROUTING_KEY
             )
 
 
@@ -131,7 +131,6 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
     time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
     max_retries=2,
     default_retry_delay=RETRY_DELAY_SECONDS,
-    routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY
 )
 def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint: disable=unused-argument
     """
@@ -171,8 +170,7 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
     base=LoggedPersistOnFailureTask,
     time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
     max_retries=2,
-    default_retry_delay=RETRY_DELAY_SECONDS,
-    routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY
+    default_retry_delay=RETRY_DELAY_SECONDS
 )
 def recalculate_subsection_grade_v3(self, **kwargs):
     """

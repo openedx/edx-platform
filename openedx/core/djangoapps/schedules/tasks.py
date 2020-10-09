@@ -143,7 +143,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
         raise NotImplementedError
 
 
-@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True)
 def _recurring_nudge_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -153,7 +153,7 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
     )
 
 
-@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True)
 def _upgrade_reminder_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -163,7 +163,7 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
     )
 
 
-@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True)
 def _course_update_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
