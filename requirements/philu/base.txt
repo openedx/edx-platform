@@ -3,7 +3,7 @@ w3lib==1.21.0
 -e git+https://github.com/philanthropy-u/pynodebb.git#egg=pynodebb
 SurveyGizmo==1.2.3
 mandrill==1.0.57
-pyminizip==0.2.1
+pyminizip==0.2.3
 channels==1.1.8
 asgi-redis==1.4.3
 imgkit==1.0.1
