@@ -326,7 +326,8 @@ class CourseEndDate(DateSummary):
     def description(self):
         if self.current_time <= self.date:
             mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_id)
-            if is_active and CourseMode.is_eligible_for_certificate(mode):
+            has_verified_mode = CourseMode.mode_for_course(self.course_id, CourseMode.VERIFIED)
+            if is_active and CourseMode.is_eligible_for_certificate(mode) and has_verified_mode:
                 return _('To earn a certificate, you must complete all requirements before this date.')
             else:
                 return _('After this date, course content will be archived.')

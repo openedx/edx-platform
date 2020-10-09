@@ -517,6 +517,18 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             'To earn a certificate, you must complete all requirements before this date.'
         )
 
+    def test_course_end_date_for_masters_only_mode(self):
+        course = create_course_run(days_till_start=-1)
+        CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).delete()
+        CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.AUDIT).delete()
+        user = create_user()
+        CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.MASTERS)
+        block = CourseEndDate(course, user)
+        self.assertEqual(
+            block.description,
+            'After this date, course content will be archived.'
+        )
+
     def test_course_end_date_for_non_certificate_eligible_mode(self):
         course = create_course_run(days_till_start=-1)
         user = create_user()
@@ -614,6 +626,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         # Enroll learner in the audit mode and verify the course only has 1 mode (audit)
         CourseEnrollmentFactory(course_id=course.id, user=audit_user, mode=CourseMode.AUDIT)
         CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).delete()
+        CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.MASTERS).delete()
         all_course_modes = CourseMode.modes_for_course(course.id)
         self.assertEqual(len(all_course_modes), 1)
         self.assertEqual(all_course_modes[0].slug, CourseMode.AUDIT)
@@ -1097,6 +1110,11 @@ def create_course_run(
     CourseModeFactory(
         course_id=course.id,
         mode_slug=CourseMode.VERIFIED,
+        expiration_datetime=now + timedelta(days=days_till_upgrade_deadline)
+    )
+    CourseModeFactory(
+        course_id=course.id,
+        mode_slug=CourseMode.MASTERS,
         expiration_datetime=now + timedelta(days=days_till_upgrade_deadline)
     )
 
