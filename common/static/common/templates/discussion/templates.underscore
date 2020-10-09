@@ -261,7 +261,7 @@
           }
       )
   %>
-  <p class="posted-details">
+  <p data-hj-suppress class="posted-details">
     <%
     var time_ago = interpolate(
       '<span class="timeago" title="%(time)s">%(time)s</span>',
