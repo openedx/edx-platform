@@ -200,6 +200,12 @@ def _get_and_map_code_owner(row, owner_map):
     theme = row.get('owner.theme')
     squad = row.get('owner.squad')
     assert squad, 'Csv row is missing required owner.squad: %s' % row
+
+    # use lower case names only
+    squad = squad.lower()
+    if theme:
+        theme = theme.lower()
+
     owner = '{}-{}'.format(theme, squad) if theme else squad
     theme = theme or squad
 
