@@ -1,3 +1,37 @@
+
+<style>
+    .proctored_exam_status .exam-timer {
+        overflow: hidden;
+    }
+
+    .proctored_exam_status .exam-timer .turn_in_exam {
+        margin-top: 5px;
+    }
+
+    .proctored_exam_status .exam-timer .exam-text {
+        width: 100%;
+    }
+
+    .proctored_exam_status .exam-timer .exam-alert {
+        display: none;
+        width: 100%;
+        background-color: #ff7338;
+        color: white;
+        padding: 5px;
+        margin-top: 5px;
+        cursor: default;
+        text-align: center;
+    }
+
+    html.darkenPage {
+        background-color: black;
+    }
+
+    html.darkenPage body {
+        opacity: 0.3;
+    }
+</style>
+
 <div class="exam-timer">
     <%
         function gtLtEscape(str) {
@@ -7,23 +41,32 @@
         }
     %>
     <div id="turn_in_exam_id" class="pull-right turn_in_exam" role="region" aria-label="<%- gettext('Exam timer and end exam button')%>">
-        <span>
-            <% if(attempt_status !== 'ready_to_submit') {%>
-                <button class="exam-button-turn-in-exam btn btn-pl-primary btn-primary">
-                    <%- gettext("End My Exam") %>
+        <div>
+            <span>
+                <% if(attempt_status !== 'ready_to_submit') {%>
+                    <button class="hide-exam-button-turn-in-exam exam-button-turn-in-exam btn btn-pl-primary btn-primary" style="display: none;">
+                    </button>
+                    <button class="eol-exam-button-turn-in-exam exam-button-turn-in-exam btn btn-pl-primary btn-primary">
+                        <%- gettext("End My Exam") %>
+                    </button>
+                <% } %>
+            </span>
+                    
+            <span class="sr timer-announce" aria-live="assertive"></span>
+            <span class="exam-timer-clock">
+                <h3 id="time_remaining_id">
+                    <b>
+                    </b>
+                </h3>
+                <button role="button" id="toggle_timer" class="btn btn-primary" aria-label="<%- gettext("Hide Timer") %>" aria-pressed="false">
+                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
                 </button>
-            <% } %>
-        </span>
-        <span class="sr timer-announce" aria-live="assertive"></span>
-        <span class="exam-timer-clock">
-            <h3 id="time_remaining_id">
-                <b>
-                </b>
-            </h3>
-            <button role="button" id="toggle_timer" class="btn btn-primary" aria-label="<%- gettext("Hide Timer") %>" aria-pressed="false">
-                <i class="fa fa-eye-slash" aria-hidden="true"></i>
-            </button>
-        </span>
+            </span>
+        </div>
+        <div class="exam-alert">
+            <span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span> Debes finalizar tu examen pronto
+        </div>
+        
     </div>
     <div class='exam-text js-exam-text' data-show-long="true">
         <% // xss-lint: disable=underscore-not-escaped %>
@@ -37,3 +80,52 @@
         </button>
     </div>
 </div>
+
+<script type="text/javascript">
+    const EOL_ALERT_TIME = 10 * 60; // 10 minutes
+    var eol_proctored_exam_alertExamEnding = (secondsLeft) => {
+        if(secondsLeft < EOL_ALERT_TIME) {
+            $('.exam-alert').show();
+        } else {
+            var time_remaining = secondsLeft - EOL_ALERT_TIME;
+            window.setTimeout(() => {
+                $('.exam-alert').show();
+                var _alert = window.alert;
+                window.alert = function(args) {
+                    document.querySelector("html").classList.add("darkenPage");
+                    setTimeout(function() {
+                        _alert(args);
+                        document.querySelector("html").classList.remove("darkenPage");
+                    });
+                }
+                alert("Quedan " + (EOL_ALERT_TIME/60) + " minutos para enviar todas tus respuestas y finalizar el examen.");
+            }, time_remaining * 1000);
+        }
+        
+    };
+
+    var eol_proctored_exam_get_progress = (username, course_id, content_id, block_types_filter) => {
+        var url = `/api/courses/v1/blocks/${ content_id }/?course_id=${ course_id }&username=${ username }&block_types_filter=${ block_types_filter }&depth=all&return_type=list&requested_fields=completion`;
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: "GET",
+            xhrFields: {
+                withCredentials: true
+            },
+            crossDomain: true,
+            success: function(data){
+                // data.completion -> {0, 1}
+                let completed = data.reduce((a,b) => a + b.completion, 0);
+                let total = data.length;
+                let confirm_message = `Has enviado ${completed} de los ${total} ejercicios de este examen. Al continuar, perderás el avance de los ejercicios no enviados.`;
+                if(total == completed || confirm(confirm_message)) {
+                    $('.hide-exam-button-turn-in-exam').trigger( "click" );
+                }
+            },
+            error: function() {
+                console.log("Error inesperado ha ocurrido.");
+            }
+        });
+    };
+</script>
