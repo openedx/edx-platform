@@ -1,8 +1,7 @@
 name: mysqldbdump
 on:
-  push:
-    branches:
-      - 'master'
+  schedule:
+    - cron: '0 8 * * *'
 jobs:
   mysqldbdump:
     name: mysqldbdump
