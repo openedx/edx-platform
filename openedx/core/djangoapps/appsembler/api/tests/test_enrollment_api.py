@@ -374,6 +374,32 @@ class EnrollmentApiPostTest(BaseEnrollmentApiTestCase):
         assert response.data['action'] == [u'"{}" is not a valid choice.'.format(
             'None' if not action else action)]
 
+    def test_enroll_learner_by_username(self):
+        """
+        Enroll a learner in a course by username.
+
+        Fixes: RED-1438
+        """
+        co = self.my_course_overviews[0]
+        registered_user = UserFactory.create()
+        UserOrganizationMappingFactory(user=registered_user, organization=self.my_site_org)
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(registered_user, co.id)
+        assert mode is None and is_active is None, "email: {}".format(registered_user.email)
+
+        payload = {
+            'action': 'enroll',
+            'auto_enroll': True,
+            'identifiers': [registered_user.username],
+            'email_learners': True,
+            'courses': [str(co.id)],
+        }
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': payload,
+        })
+        assert response.status_code == status.HTTP_201_CREATED, response.content
+        assert 'invalidIdentifier' not in response.content, 'Ensure enrollment is successful by username'
+        assert CourseEnrollment.is_enrolled(registered_user, co.id), 'Enrollment is successful by username'
+
 
 @ddt.ddt
 @mock.patch(APPSEMBLER_API_VIEWS_MODULE + '.EnrollmentViewSet.throttle_classes', [])
@@ -429,6 +455,29 @@ class EnrollmentApiUnenrollPostTest(BaseEnrollmentApiTestCase):
         message = 'Enrollments should all be deleted'
         assert not CourseEnrollment.is_enrolled(self.reg_users[0], self.first_course.id), message
         assert not CourseEnrollment.is_enrolled(self.reg_users[1], self.first_course.id), message
+
+    def test_unenroll_learner_by_username(self):
+        """
+        Test successful unenroll on my site for by username.
+
+        Fixes: RED-1438
+        """
+        learner = self.reg_users[0]
+        payload = {
+            'action': 'unenroll',
+            # Enroll both of the registered users and new ones
+            'identifiers': [learner.username],
+            'courses': [
+                str(self.first_course.id)
+            ],
+        }
+        response = self.call_enrollment_api('post', self.my_site, self.caller, {
+            'data': payload,
+        })
+        assert response.status_code == status.HTTP_200_OK, response.content
+        assert 'invalidIdentifier' not in response.content, 'Should not fail for usernames'
+        message = 'Enrollments should all be deleted'
+        assert not CourseEnrollment.is_enrolled(learner, self.first_course.id), message
 
     def test_unenroll_on_other_site(self):
         payload = {
