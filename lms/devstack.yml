@@ -98,9 +98,25 @@ CACHES:
         KEY_PREFIX: 1001c6274ca4_general
         LOCATION:
         - edx.devstack.memcached:11211
+<<<<<<< HEAD
 CAS_ATTRIBUTE_CALLBACK: ''
 CAS_EXTRA_LOGIN_PARAMS: ''
 CAS_SERVER_URL: ''
+=======
+CC_PROCESSOR:
+    CyberSource:
+        MERCHANT_ID: ''
+        ORDERPAGE_VERSION: '7'
+        PURCHASE_ENDPOINT: ''
+        SERIAL_NUMBER: ''
+        SHARED_SECRET: ''
+    CyberSource2:
+        ACCESS_KEY: ''
+        PROFILE_ID: ''
+        PURCHASE_ENDPOINT: ''
+        SECRET_KEY: ''
+CC_PROCESSOR_NAME: CyberSource2
+>>>>>>> Remove CAS settings; part of DEPR-6
 CELERY_BROKER_HOSTNAME: localhost
 CELERY_BROKER_PASSWORD: celery
 CELERY_BROKER_TRANSPORT: amqp
