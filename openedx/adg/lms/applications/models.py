@@ -33,7 +33,7 @@ class UserApplication(TimeStampedModel):
     user = models.OneToOneField(User, related_name='application', on_delete=models.CASCADE, )
     city = models.CharField(verbose_name=_('City'), max_length=255, )
     organization = models.CharField(verbose_name=_('Organization'), max_length=255, blank=True, )
-    linkedin_url = models.URLField(max_length=255, blank=True, )
+    linkedin_url = models.URLField(verbose_name=_('LinkedIn URL'), max_length=255, blank=True, )
     resume = models.FileField(
         max_length=500, blank=True, null=True, upload_to='files/resume/',
         validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
@@ -55,7 +55,24 @@ class UserApplication(TimeStampedModel):
         return 'UserApplication {id}, for user {email}'.format(id=self.id, email=self.user.email)
 
 
-class Education(TimeStampedModel):
+class UserStartAndEndDates(TimeStampedModel):
+    month_choices = month_choices(default_title='Month')
+    year_choices = year_choices(default_title='Year')
+
+    user_application = models.ForeignKey(
+        'UserApplication', related_name='%(app_label)s_%(class)ss', related_query_name='%(app_label)s_%(class)s',
+        on_delete=models.CASCADE,
+    )
+    date_started_month = models.IntegerField(choices=month_choices, )
+    date_started_year = models.IntegerField(choices=year_choices, )
+    date_completed_month = models.IntegerField(choices=month_choices, blank=True, null=True, )
+    date_completed_year = models.IntegerField(choices=year_choices, blank=True, null=True, )
+
+    class Meta(object):
+        abstract = True
+
+
+class Education(UserStartAndEndDates):
     """
     Model for user education qualification for application submission.
     """
@@ -73,19 +90,9 @@ class Education(TimeStampedModel):
         (DOCTORAL_DEGREE, _('Doctoral Degree')),
     ]
 
-    month_choices = month_choices()
-    year_choices = year_choices()
-
-    user_application = models.ForeignKey(
-        'UserApplication', related_name='education_set', related_query_name="education", on_delete=models.CASCADE,
-    )
     name_of_school = models.CharField(verbose_name=_('Name of School / University'), max_length=255, )
     degree = models.CharField(verbose_name=_('Degree Received'), choices=DEGREE_TYPES, max_length=2, )
     ares_of_study = models.CharField(verbose_name=_('Area of Study'), max_length=255, blank=True)
-    date_started_month = models.CharField(choices=month_choices, max_length=2, )
-    date_started_year = models.IntegerField(choices=year_choices, )
-    date_completed_month = models.CharField(choices=month_choices, blank=True, max_length=2, )
-    date_completed_year = models.IntegerField(choices=year_choices, blank=True, null=True, )
     is_in_progress = models.BooleanField(verbose_name=_('In Progress'), default=False, )
 
     class Meta:
@@ -95,23 +102,12 @@ class Education(TimeStampedModel):
         return 'Education {id}, for {degree}'.format(id=self.id, degree=self.degree)
 
 
-class WorkExperience(TimeStampedModel):
+class WorkExperience(UserStartAndEndDates):
     """
     Model for user work experience for application submission.
     """
-    month_choices = month_choices()
-    year_choices = year_choices()
-
-    user_application = models.ForeignKey(
-        'UserApplication', related_name='work_experiences', related_query_name="work_experience",
-        on_delete=models.CASCADE,
-    )
     name_of_organization = models.CharField(verbose_name=_('Name of Organization'), max_length=255, )
     job_position_title = models.CharField(verbose_name=_('Job Position / Title'), max_length=255, )
-    date_started_month = models.CharField(choices=month_choices, max_length=2, )
-    date_started_year = models.IntegerField(choices=year_choices, )
-    date_completed_month = models.CharField(choices=month_choices, blank=True, max_length=2, )
-    date_completed_year = models.IntegerField(choices=year_choices, blank=True, null=True, )
     is_current_position = models.BooleanField(verbose_name=_('Current Position'), default=False, )
     job_responsibilities = models.TextField(verbose_name=_('Job Responsibilities'), blank=True, )
 
