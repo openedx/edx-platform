@@ -8,11 +8,17 @@ from django.test.client import RequestFactory
 from django.urls import ResolverMatch
 from mock import patch
 
+from openedx.features.user_leads.constants import (
+    UTM_CAMPAIGN_KEY,
+    UTM_CONTENT_KEY,
+    UTM_MEDIUM_KEY,
+    UTM_PARAM_NAMES,
+    UTM_SOURCE_KEY,
+    UTM_TERM_KEY
+)
+from openedx.features.user_leads.helpers import get_utm_params, save_user_utm
+from openedx.features.user_leads.models import UserLeads
 from student.tests.factories import AnonymousUserFactory, UserFactory
-
-from ..constants import UTM_CAMPAIGN_KEY, UTM_CONTENT_KEY, UTM_MEDIUM_KEY, UTM_PARAM_NAMES, UTM_SOURCE_KEY, UTM_TERM_KEY
-from ..helpers import get_utm_params, save_user_utm
-from ..models import UserLeads
 
 
 class UserLeadsHelpersTest(TestCase):

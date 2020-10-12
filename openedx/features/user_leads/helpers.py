@@ -7,12 +7,13 @@ from .models import UserLeads
 
 def get_utm_params(request):
     """
-    Args:
-        request: HttpRequest object
+    Get utm parameters from `GET` request
+
+    Arguments:
+        request (HttpRequest): HttpRequest object
 
     Returns:
         dict: utm_params
-
     """
     request_get_params = request.GET
     utm_params = {}
@@ -27,13 +28,13 @@ def get_utm_params(request):
 
 def save_user_utm(request):
     """
+    Save user utm params in `UserLeads` model
 
-    Args:
-        request: HttpRequest object
+    Arguments:
+        request (HttpRequest): HttpRequest object
 
     Returns:
         None
-
     """
     user = request.user
     origin = request.resolver_match.url_name
