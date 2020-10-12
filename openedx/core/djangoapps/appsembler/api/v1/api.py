@@ -56,7 +56,7 @@ def enrollment_learners_context(identifiers):
             email = user.email
             language = get_user_email_language(user)
 
-        yield user, email, identifier, language
+        yield user, identifier, email, language
 
 
 def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
