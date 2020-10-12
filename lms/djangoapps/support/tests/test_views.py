@@ -108,7 +108,8 @@ class SupportViewManageUserTests(SupportViewTestCase):
         )
         url = reverse('support:manage_user_detail') + test_user.username
         response = self.client.post(url, data={
-            'username_or_email': test_user.username
+            'username_or_email': test_user.username,
+            'comment': 'Test comment'
         })
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['success_msg'], 'User Disabled Successfully')
