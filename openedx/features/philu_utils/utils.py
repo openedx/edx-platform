@@ -1,3 +1,6 @@
+"""
+Utility methods related to PhilU
+"""
 from logging import getLogger
 
 from django.core.validators import ValidationError
@@ -6,12 +9,18 @@ from django.utils.translation import ugettext as _
 log = getLogger(__name__)
 
 
-def validate_file_size(file, max_allowed_size):
+def validate_file_size(_file, max_allowed_size):
     """
-    Validate maximum allowed file upload size, raise validation error if file size exceeds.
-    :param max_allowed_size: maximum allowed file size in bytes
+    Validate maximum allowed file size to upload
+
+    Arguments:
+        _file (File/Image): file that needs to be validated
+        max_allowed_size (int): maximum allowed file size in bytes
+
+    Raises:
+        ValidationError: If file size exceeds
     """
-    size = getattr(file, 'size', None)
+    size = getattr(_file, 'size', None)
 
     if not max_allowed_size:
         raise Exception(
@@ -24,9 +33,17 @@ def validate_file_size(file, max_allowed_size):
         )
 
 
-def bytes_to_mb(bytes):
-    """Convert size from bytes to MB"""
-    return bytes / 1024 / 1024
+def bytes_to_mb(bytes_):
+    """
+    Convert size from bytes to MB
+
+    Args:
+        bytes_ (int): size in bytes
+
+    Returns:
+        int: size in MB
+    """
+    return bytes_ / 1024 / 1024
 
 
 def get_anonymous_user(user, course_id):

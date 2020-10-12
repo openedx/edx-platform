@@ -1,3 +1,6 @@
+"""
+Constants for `xmodules`
+"""
 XBLOCKS_EXCEPT_PROBLEM = [
     'audio',
     'video',

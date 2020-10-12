@@ -1,3 +1,6 @@
+"""
+Unit tests of backend storage
+"""
 import os.path
 
 from boto import connect_s3
@@ -11,6 +14,9 @@ from openedx.features.philu_utils.backend_storage import CustomS3Storage, ScormX
 
 
 class CustomS3StorageTest(MockS3Mixin, TestCase):
+    """
+    Unit test class to test CustomS3Storage backend
+    """
     aws_bucket_name = getattr(settings, 'FILE_UPLOAD_STORAGE_BUCKET_NAME', None)
     aws_access_key_id = getattr(settings, 'AWS_ACCESS_KEY_ID', None)
     aws_secret_access_key = getattr(settings, 'AWS_SECRET_ACCESS_KEY', None)

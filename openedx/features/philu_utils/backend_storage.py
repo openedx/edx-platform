@@ -1,15 +1,17 @@
+"""
+Storage backends to upload files and ScormXBlock on S3 bucket
+"""
 import os
 import tempfile
 from datetime import datetime
 from logging import getLogger
 
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
-from django.utils.translation import ugettext_lazy as _
-
 from boto import connect_s3
 from boto.s3.key import Key
 from botocore.exceptions import ClientError
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+from django.utils.translation import ugettext_lazy as _
 
 from .constants import AWS_S3_PATH
 
@@ -37,7 +39,7 @@ class CustomS3Storage(FileSystemStorage):
             aws_secret_access_key=self.aws_secret_access_key,
         )
 
-    def _get_available_name(self, name, max_length=None):
+    def _get_available_name(self, name, max_length=None):  # pylint: disable=unused-argument
         """Truncate name if it is more than allowed max length and get alternate name if name already exists"""
         if self._exists(name):
             _, file_name = os.path.split(name)
