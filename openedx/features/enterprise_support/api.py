@@ -533,13 +533,34 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     Wrap the enterprise app check to determine if the user needs to grant
     data sharing permissions before accessing a course.
     """
+    LOGGER.info(
+        u'Determining if user [{username}] must consent to data sharing for course [{course_id}]'.format(
+            username=user.username,
+            course_id=course_id
+        )
+    )
+
     consent_cache_key = get_data_consent_share_cache_key(user.id, course_id)
     data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
     if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value == 0:
+        LOGGER.info(
+            u'Consent from user [{username}] is not needed for course [{course_id}]. The DSC cache was checked,'
+            u'and the value was 0.'.format(
+                username=user.username,
+                course_id=course_id
+            )
+        )
         return False
 
     enterprise_learner_details = get_enterprise_learner_data_from_db(user)
     if not enterprise_learner_details:
+        LOGGER.info(
+            u'Consent from user [{username}] is not needed for course [{course_id}]. The user is not linked to an'
+            u'enterprise.'.format(
+                username=user.username,
+                course_id=course_id
+            )
+        )
         consent_needed = False
     else:
         client = ConsentApiClient(user=request.user)
@@ -555,6 +576,23 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
             )
             for learner in enterprise_learner_details
         )
+        if consent_needed:
+            LOGGER.info(
+                u'Consent from user [{username}] is needed for course [{course_id}]. The user''s current enterprise'
+                u'required data sharing consent, and it has not been given.'.format(
+                    username=user.username,
+                    course_id=course_id
+                )
+            )
+        else:
+            LOGGER.info(
+                u'Consent from user [{username}] is not needed for course [{course_id}]. The user''s current enterprise'
+                u'does not require data sharing consent.'.format(
+                    username=user.username,
+                    course_id=course_id
+                )
+            )
+
     if not consent_needed:
         # Set an ephemeral item in the cache to prevent us from needing
         # to make a Consent API request every time this function is called.
@@ -600,6 +638,13 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
                  If None, return to request.path instead.
     """
     user = user or request.user
+
+    LOGGER.info(
+        u'Getting enterprise consent url for user [{username}] and course [{course_id}].'.format(
+            username=user.username,
+            course_id=course_id
+        )
+    )
 
     if not consent_needed_for_course(request, user, course_id, enrollment_exists=enrollment_exists):
         return None
