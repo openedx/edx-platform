@@ -102,6 +102,8 @@ def plugin_settings(settings):
         'oauth',
         'status',
         '/heartbeat',
+        '/accounts/manage_user_standing',
+        '/accounts/disable_account_ajax',
     ]
 
     settings.USE_S3_FOR_CUSTOMER_THEMES = True
