@@ -53,26 +53,19 @@ for temporarily instrumenting/monitoring waffle flag usage.
 
 """
 from functools import lru_cache
-import logging
-import re
-import traceback
-from abc import ABCMeta
 from contextlib import contextmanager
 from weakref import WeakSet
 
-import crum
 from django.conf import settings
 from edx_django_utils.monitoring import set_custom_attribute
 from opaque_keys.edx.keys import CourseKey
-from waffle import flag_is_active, switch_is_active
 
-from openedx.core.lib.cache_utils import get_cache as get_request_cache
-
-from edx_toggles.toggles import BaseNamespace
+from edx_toggles.toggles import WaffleFlag as BaseWaffleFlag
+from edx_toggles.toggles import WaffleFlagNamespace as BaseWaffleFlagNamespace
 from edx_toggles.toggles import WaffleSwitch as BaseWaffleSwitch
 from edx_toggles.toggles import WaffleSwitchNamespace as BaseWaffleSwitchNamespace
 
-log = logging.getLogger(__name__)
+from openedx.core.lib.cache_utils import get_cache as get_request_cache
 
 
 class WaffleSwitchNamespace(BaseWaffleSwitchNamespace):
@@ -96,15 +89,16 @@ def _get_waffle_namespace_request_cache():
 
 
 class WaffleSwitch(BaseWaffleSwitch):
+    """
+    Waffle switch class that benefits from the additional features of the WaffleSwitchNamespace.
+    """
+
     NAMESPACE_CLASS = WaffleSwitchNamespace
 
 
-class WaffleFlagNamespace(BaseNamespace):
+class WaffleFlagNamespace(BaseWaffleFlagNamespace):
     """
-    Provides a single namespace for a set of waffle flags.
-
-    All namespaced flag values are stored in a single request cache containing
-    all flags for all namespaces.
+    Namespace class that implements request-based caching. Also, setup some custom value-checking and processing.
     """
 
     @property
@@ -114,62 +108,15 @@ class WaffleFlagNamespace(BaseNamespace):
         """
         return _get_waffle_namespace_request_cache().setdefault("flags", {})
 
-    def is_flag_active(self, flag_name):
-        """
-        Returns and caches whether the provided flag is active.
-
-        If the flag value is already cached in the request, it is returned.
-
-        Note: A waffle flag's default is False if not defined. If you think you
-            need the default to be True, see the module docstring for
-            alternatives.
-
-        Arguments:
-            flag_name (String): The name of the flag to check.
-        """
-        namespaced_flag_name = self._namespaced_name(flag_name)
-        value = self._get_flag_active(namespaced_flag_name)
+    def _get_flag_active(self, namespaced_flag_name):
+        value = super()._get_flag_active(namespaced_flag_name)
         _set_waffle_flag_attribute(namespaced_flag_name, value)
         return value
 
-    def _get_flag_active(self, namespaced_flag_name):
-        """
-        Return the value of the flag activation without touching the _waffle_flag_attribute.
-        """
-        # Check namespace cache
-        value = self._cached_flags.get(namespaced_flag_name)
-        if value is not None:
-            return value
-
-        # Check in context of request
-        request = crum.get_current_request()
-        value = self._get_flag_active_request(namespaced_flag_name, request)
-        if value is not None:
-            return value
-
-        # Check value in the absence of any context
-        log.warning(
-            u"%sFlag '%s' accessed without a request",
-            self.log_prefix,
-            namespaced_flag_name,
-        )
-        # Return the Flag's Everyone value if not in a request context.
-        # Note: this skips the cache as the value might be different
-        # in a normal request context. This case seems to occur when
-        # a page redirects to a 404, or for celery workers.
-        value = is_flag_active_for_everyone(namespaced_flag_name)
+    def _get_flag_active_default(self, namespaced_flag_name):
+        value = super()._get_flag_active_default(namespaced_flag_name)
         set_custom_attribute("warn_flag_no_request_return_value", value)
         return value
-
-    def _get_flag_active_request(self, namespaced_flag_name, request):
-        """
-        Get flag value in the context of the current request.
-        """
-        if request:
-            value = flag_is_active(request, namespaced_flag_name)
-            self._cached_flags[namespaced_flag_name] = value
-            return value
-        return None
 
 
 # .. toggle_name: WAFFLE_FLAG_CUSTOM_ATTRIBUTES
@@ -236,81 +183,14 @@ def _set_waffle_flag_attribute(name, value):
         set_custom_attribute(attribute_name, flag_attribute_data[name])
 
 
-def is_flag_active_for_everyone(namespaced_flag_name):
-    """
-    Returns True if the waffle flag is configured as active for Everyone,
-    False otherwise.
-    """
-    # Import is placed here to avoid model import at project startup.
-    from waffle.models import Flag
-
-    try:
-        waffle_flag = Flag.objects.get(name=namespaced_flag_name)
-        return waffle_flag.everyone is True
-    except Flag.DoesNotExist:
-        return False
-
-
-class WaffleFlag:
+class WaffleFlag(BaseWaffleFlag):
     """
     Waffle flag class that implements custom override method.
 
     This class should be removed in favour of edx_toggles.toggles.WaffleFlag once we get rid of the WaffleFlagNamespace
     class and the `override` method.
     """
-
     NAMESPACE_CLASS = WaffleFlagNamespace
-
-    # use a WeakSet so these instances can be garbage collected if need be
-    _class_instances = WeakSet()
-
-    def __init__(self, waffle_namespace, flag_name, module_name=None):
-        """
-        Initializes the waffle flag instance.
-
-        Arguments:
-            waffle_namespace (WaffleFlagNamespace | String): Namespace for this flag.
-            flag_name (String): The name of the flag (without namespacing).
-            module_name (String): The name of the module where the flag is created. This should be ``__name__`` in most
-            cases.
-        """
-        if isinstance(waffle_namespace, str):
-            waffle_namespace = self.NAMESPACE_CLASS(name=waffle_namespace)
-
-        self.waffle_namespace = waffle_namespace
-        self.flag_name = flag_name
-        self._module_name = module_name or ""
-        self._class_instances.add(self)
-
-    @classmethod
-    def get_instances(cls):
-        """ Returns a WeakSet of the instantiated instances of WaffleFlag. """
-        return cls._class_instances
-
-    @property
-    def module_name(self):
-        """
-        Returns the module name. This is cached to work with the WeakSet instances.
-        """
-        return self._module_name
-
-    @module_name.setter
-    def module_name(self, value):
-        self._module_name = value
-
-    @property
-    def namespaced_flag_name(self):
-        """
-        Returns the fully namespaced flag name.
-        """
-        # pylint: disable=protected-access
-        return self.waffle_namespace._namespaced_name(self.flag_name)
-
-    def is_enabled(self):
-        """
-        Returns whether or not the flag is enabled.
-        """
-        return self.waffle_namespace.is_flag_active(self.flag_name)
 
     @contextmanager
     def override(self, active=True):
