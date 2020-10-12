@@ -18,6 +18,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.lib.cache_utils import get_cache
 from xmodule.modulestore.django import modulestore
 
+
 NAMESPACE_CHOICES = {
     'ENTRANCE_EXAM': 'entrance_exams'
 }
@@ -33,7 +34,6 @@ REQUEST_CACHE_NAME = "milestones"
 # .. toggle_creation_date: 2014-11-21
 # TODO this should be moved to edx/edx-milestones
 ENABLE_MILESTONES_APP = SettingDictToggle("FEATURES", "MILESTONES_APP", default=False, module_name=__name__)
-ENABLE_ENTRANCE_EXAMS = SettingDictToggle("FEATURES", "ENTRANCE_EXAMS", default=False, module_name=__name__)
 
 
 def get_namespace_choices():
@@ -41,14 +41,6 @@ def get_namespace_choices():
     Return the enum to the caller
     """
     return NAMESPACE_CHOICES
-
-
-def is_entrance_exams_enabled():
-    """
-    Checks to see if the Entrance Exams feature is enabled
-    Use this operation instead of checking the feature flag all over the place
-    """
-    return ENABLE_ENTRANCE_EXAMS.is_enabled()
 
 
 def is_prerequisite_courses_enabled():

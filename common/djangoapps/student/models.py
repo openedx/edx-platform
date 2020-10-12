@@ -76,7 +76,7 @@ from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from student.signals import ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED, UNENROLL_DONE
 from track import contexts, segment
-from util.milestones_helpers import is_entrance_exams_enabled
+from openedx.core.toggles import ENTRANCE_EXAMS
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
 
@@ -2659,7 +2659,7 @@ class EntranceExamConfiguration(models.Model):
         Return True if given user can skip entrance exam for given course otherwise False.
         """
         can_skip = False
-        if is_entrance_exams_enabled():
+        if ENTRANCE_EXAMS.is_enabled():
             try:
                 record = EntranceExamConfiguration.objects.get(user=user, course_id=course_key)
                 can_skip = record.skip_entrance_exam

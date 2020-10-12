@@ -18,6 +18,8 @@ from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
+from openedx.core import toggles as core_toggles
+
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
@@ -220,7 +222,7 @@ urlpatterns.append(url(r'^admin/password_change/$', handler404))
 urlpatterns.append(url(r'^admin/', admin.site.urls))
 
 # enable entrance exams
-if settings.FEATURES.get('ENTRANCE_EXAMS'):
+if core_toggles.ENTRANCE_EXAMS.is_enabled():
     urlpatterns.append(url(r'^course/{}/entrance_exam/?$'.format(settings.COURSE_KEY_PATTERN),
                        contentstore_views.entrance_exam))
 
