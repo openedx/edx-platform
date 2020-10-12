@@ -2589,7 +2589,7 @@ INSTALLED_APPS = [
     'django_countries',
 
     # edX Mobile API
-    'mobile_api',
+    'lms.djangoapps.mobile_api.apps.MobileApiConfig',
     'social_django',
 
     # Surveys
