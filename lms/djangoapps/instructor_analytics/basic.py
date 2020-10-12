@@ -84,7 +84,7 @@ def issued_certificates(course_key, features):
     return generated_certificates
 
 
-def enrolled_students_features(course_key, features):
+def enrolled_students_features(course_key, features):  # pylint: disable=too-many-statements
     """
     Return list of student features as dictionaries.
 
@@ -107,6 +107,14 @@ def enrolled_students_features(course_key, features):
         courseenrollment__course_id=course_key,
         courseenrollment__is_active=1,
     ).order_by('username').select_related('profile')
+
+    if configuration_helpers.get_value('HIDE_MASTER_COURSE_STAFF_FROM_PROFILE_REPORT', False):
+        # Avoid circular import.
+        from lms.djangoapps.ccx.utils import exclude_master_course_staff_users
+        students = exclude_master_course_staff_users(
+            users=students,
+            course_key=course_key,
+        )
 
     if include_cohort_column:
         students = students.prefetch_related('course_groups')
