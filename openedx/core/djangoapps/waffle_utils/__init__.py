@@ -195,7 +195,7 @@ class CourseWaffleFlag(WaffleFlag):
         is_enabled_for_course = self._get_course_override_value(course_key)
         if is_enabled_for_course is not None:
             # pylint: disable=protected-access
-            self.namespace._monitor_value(
+            self.NAMESPACE_CLASS._monitor_value(
                 self.namespaced_flag_name, is_enabled_for_course
             )
             return is_enabled_for_course

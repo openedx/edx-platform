@@ -7,13 +7,14 @@ import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+# Note that we really shouldn't import from edx_toggles' internal API
+import edx_toggles.toggles.internal.waffle
 from edx_django_utils.cache import RequestCache
 from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
 from waffle.testutils import override_flag
 
 from .. import (
-    _get_waffle_flag_custom_attributes_set,
     CourseWaffleFlag,
     WaffleFlagNamespace,
 )
@@ -45,7 +46,7 @@ class TestCourseWaffleFlag(TestCase):
         RequestCache.clear_all_namespaces()
 
     @override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=[NAMESPACED_FLAG_NAME])
-    @patch('openedx.core.djangoapps.waffle_utils.set_custom_attribute')
+    @patch.object(edx_toggles.toggles.internal.waffle, 'set_custom_attribute')
     @ddt.data(
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on, 'waffle_enabled': False, 'result': True},
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off, 'waffle_enabled': True, 'result': False},
@@ -57,7 +58,6 @@ class TestCourseWaffleFlag(TestCase):
         Tests various combinations of a flag being set in waffle and overridden
         for a course.
         """
-        _get_waffle_flag_custom_attributes_set.cache_clear()
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
             with override_flag(self.NAMESPACED_FLAG_NAME, active=data['waffle_enabled']):
                 # check twice to test that the result is properly cached
@@ -89,7 +89,7 @@ class TestCourseWaffleFlag(TestCase):
         self._assert_waffle_flag_attribute(mock_set_custom_attribute, expected_flag_value=expected_flag_value)
 
     @override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=[NAMESPACED_FLAG_NAME])
-    @patch('openedx.core.djangoapps.waffle_utils.set_custom_attribute')
+    @patch.object(edx_toggles.toggles.internal.waffle, 'set_custom_attribute')
     def test_undefined_waffle_flag(self, mock_set_custom_attribute):
         """
         Test flag with undefined waffle flag.
@@ -100,7 +100,6 @@ class TestCourseWaffleFlag(TestCase):
             __name__,
         )
 
-        _get_waffle_flag_custom_attributes_set.cache_clear()
         with patch.object(
             WaffleFlagCourseOverrideModel,
             'override_value',
@@ -151,13 +150,12 @@ class TestCourseWaffleFlag(TestCase):
         {'expected_count': 1, 'waffle_flag_attribute_setting': [NAMESPACED_FLAG_NAME]},
         {'expected_count': 2, 'waffle_flag_attribute_setting': [NAMESPACED_FLAG_NAME, NAMESPACED_FLAG_2_NAME]},
     )
-    @patch('openedx.core.djangoapps.waffle_utils.set_custom_attribute')
+    @patch.object(edx_toggles.toggles.internal.waffle, 'set_custom_attribute')
     def test_waffle_flag_attribute_for_various_settings(self, data, mock_set_custom_attribute):
         """
         Test that custom attributes are recorded when waffle flag accessed.
         """
         with override_settings(WAFFLE_FLAG_CUSTOM_ATTRIBUTES=data['waffle_flag_attribute_setting']):
-            _get_waffle_flag_custom_attributes_set.cache_clear()
             test_course_flag = CourseWaffleFlag(self.TEST_NAMESPACE, self.FLAG_NAME, __name__)
             test_course_flag.is_enabled(self.TEST_COURSE_KEY)
             test_course_flag_2 = CourseWaffleFlag(self.TEST_NAMESPACE, self.FLAG_2_NAME, __name__)
