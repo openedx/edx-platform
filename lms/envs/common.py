@@ -4123,7 +4123,7 @@ RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from
 # .. setting_name: CCX_MAX_STUDENTS_ALLOWED
 # .. setting_default: 200
 # .. setting_description: Maximum number of students allowed in a CCX (Custom Courses for edX), This is an arbitrary
-# .. hard limit, chosen so that a CCX does not compete with public MOOCs.
+#   hard limit, chosen so that a CCX does not compete with public MOOCs.
 CCX_MAX_STUDENTS_ALLOWED = 200
 
 # Financial assistance settings
