@@ -226,7 +226,7 @@ def check_verify_status_by_course(user, course_enrollments):
 POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in', 'purchase_workflow')
 
 
-def get_next_url_for_login_page(request):
+def get_next_url_for_login_page(request, include_host=False):
     """
     Determine the URL to redirect to following login/registration/third_party_auth
 
@@ -249,6 +249,7 @@ def get_next_url_for_login_page(request):
         request_params=request_params,
         request_is_https=request.is_secure(),
     )
+    root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     if not redirect_to:
         if settings.ROOT_URLCONF == 'lms.urls':
             login_redirect_url = configuration_helpers.get_value('DEFAULT_REDIRECT_AFTER_LOGIN')
@@ -270,15 +271,25 @@ def get_next_url_for_login_page(request):
 
         elif settings.ROOT_URLCONF == 'cms.urls':
             redirect_to = reverse('home')
+            scheme = "https" if settings.HTTPS == "on" else "http"
+            root_url = '{}://{}'.format(scheme, settings.CMS_BASE)
 
     if any(param in request_params for param in POST_AUTH_PARAMS):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
         params = [(param, request_params[param]) for param in POST_AUTH_PARAMS if param in request_params]
+
         params.append(('next', redirect_to))  # After auto-enrollment, user will be sent to payment page or to this URL
         redirect_to = '{}?{}'.format(reverse('finish_auth'), urllib.parse.urlencode(params))
         # Note: if we are resuming a third party auth pipeline, then the next URL will already
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
+
+    if include_host:
+        (scheme, netloc, path, query, fragment) = list(urllib.parse.urlsplit(redirect_to))
+        if not netloc:
+            parse_root_url = urllib.parse.urlsplit(root_url)
+            redirect_to = urllib.parse.urlunsplit((parse_root_url.scheme, parse_root_url.netloc,
+                                                   path, query, fragment))
 
     # Append a tpa_hint query parameter, if one is configured
     tpa_hint = configuration_helpers.get_value(
