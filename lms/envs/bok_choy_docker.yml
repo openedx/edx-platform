@@ -32,10 +32,6 @@ CACHES:
     KEY_FUNCTION: util.memcache.safe_key
     KEY_PREFIX: integration_static_files
     LOCATION: ['edx.devstack.memcached:11211']
-CC_PROCESSOR:
-  CyberSource2: {ACCESS_KEY: abcd123, PROFILE_ID: edx, PURCHASE_ENDPOINT: /shoppingcart/payment_fake,
-    SECRET_KEY: abcd123}
-CC_PROCESSOR_NAME: CyberSource2
 CELERY_BROKER_HOSTNAME: localhost
 CELERY_BROKER_PASSWORD: celery
 CELERY_BROKER_TRANSPORT: amqp

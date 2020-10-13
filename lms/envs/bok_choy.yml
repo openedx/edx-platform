@@ -47,10 +47,6 @@ CACHES:
 # Capture the console log via template includes, until webdriver supports log capture again
 CAPTURE_CONSOLE_LOG: True
 
-CC_PROCESSOR:
-  CyberSource2: {ACCESS_KEY: abcd123, PROFILE_ID: edx, PURCHASE_ENDPOINT: /shoppingcart/payment_fake,
-    SECRET_KEY: abcd123}
-CC_PROCESSOR_NAME: CyberSource2
 CELERY_BROKER_HOSTNAME: localhost
 CELERY_BROKER_PASSWORD: celery
 CELERY_BROKER_TRANSPORT: amqp
