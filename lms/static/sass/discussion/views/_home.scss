@@ -17,7 +17,7 @@
   }
 
   .label {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     display: block;
   }
@@ -38,7 +38,7 @@
   }
 
   .home-description {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     margin-bottom: ($baseline/2);
   }
@@ -64,7 +64,7 @@
       width: 70%;
 
       .profile-stat {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         display: inline-block;
         width: 32.5%;

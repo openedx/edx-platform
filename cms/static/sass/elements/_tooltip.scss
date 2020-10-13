@@ -2,8 +2,8 @@
   @include transition(opacity $tmg-f3 ease-out 0s);
   @include font-size(12);
 
-  @extend %t-regular;
-  @extend %ui-depth5;
+  @extend %t-regular !optional;
+   @extend %ui-depth5 !optional;
 
   position: absolute;
   top: 0;

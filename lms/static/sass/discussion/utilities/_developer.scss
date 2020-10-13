@@ -43,7 +43,7 @@
       color: $white;
 
       em {
-        @extend %t-weight5;
+        @extend %t-weight5 !optional;
 
         font-style: italic;
       }
@@ -53,7 +53,7 @@
     .link-jump {
       @include transition(none);
 
-      @extend %t-weight5;
+      @extend %t-weight5 !optional;
     }
   }
 
@@ -66,7 +66,7 @@
     .control {
       @include transition(none);
 
-      @extend %t-weight5;
+      @extend %t-weight5 !optional;
 
       padding: ($baseline/4) ($baseline/2);
       color: $white;

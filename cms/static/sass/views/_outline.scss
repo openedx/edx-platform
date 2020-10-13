@@ -76,15 +76,15 @@
   }
 
   .content-primary {
-    @extend .ui-col-wide;
+    @extend .ui-col-wide !optional;
 
     .no-content {
-      @extend %no-content;
+      @extend %no-content !optional;
     }
   }
 
   .content-supplementary {
-    @extend .ui-col-narrow;
+    @extend .ui-col-narrow !optional;
   }
 
 
@@ -121,7 +121,7 @@
   // forms
   .new-section-name,
   .new-subsection-name-input {
-    @extend %t-copy-base;
+    @extend %t-copy-base !optional;
 
     display: inline-block;
     width: 515px;
@@ -130,7 +130,7 @@
   }
 
   .new-subsection-name-input {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
   }
 
   .new-section-name-save,
@@ -153,7 +153,7 @@
   // buttons
   .new-subsection-item,
   .new-unit-item {
-    @extend %ui-btn-flat-outline;
+    @extend %ui-btn-flat-outline !optional;
 
     width: 100%;
     margin: 0 0 ($baseline/2) 0;
@@ -175,7 +175,7 @@
   // UI: general action list styles (section and subsection)
   // --------------------
   .expand-collapse {
-    @extend %expand-collapse;
+    @extend %expand-collapse !optional;
   }
 
   // course status
@@ -186,7 +186,7 @@
     .status-release,
     .status-highlights-enabled,
     .status-studio-frontend {
-      @extend %t-copy-base;
+      @extend %t-copy-base !optional;
 
       display: inline-block;
       color: $color-copy-base;
@@ -217,7 +217,7 @@
 
     .status-release-value,
     .status-highlights-enabled-value {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       font-size: smaller;
     }
@@ -233,15 +233,15 @@
     }
 
     .status-highlights-enabled-value.button {
-      @extend %btn-primary-blue;
-      @extend %sizing;
+      @extend %btn-primary-blue !optional;
+      @extend %sizing !optional;
 
       padding: 5px 8px;
       margin-top: 2px;
     }
 
     .status-actions {
-      @extend %actions-list;
+      @extend %actions-list !optional;
 
       @include transition(opacity $tmg-f1 ease-in-out 0);
 
@@ -315,11 +315,11 @@
 
       // header
       .section-header {
-        @extend %outline-item-header;
+        @extend %outline-item-header !optional;
 
         .incontext-editor-input {
-          @extend %t-strong;
-          @extend %t-title5;
+          @extend %t-strong !optional;
+          @extend %t-title5 !optional;
         }
       }
 
@@ -362,8 +362,8 @@
         @include text-align(right);
 
         .actions-list {
-          @extend %actions-list;
-          @extend %t-action2;
+          @extend %actions-list !optional;
+          @extend %t-action2 !optional;
         }
       }
 
@@ -379,15 +379,15 @@
 
       // content
       .section-content {
-        @extend %outline-item-content-shown;
+        @extend %outline-item-content-shown !optional;
       }
 
       // CASE: is-collapsible
       &.is-collapsible {
-        @extend %ui-expand-collapse;
+        @extend %ui-expand-collapse !optional;
 
         .ui-toggle-expansion {
-          @extend %t-icon3;
+          @extend %t-icon3 !optional;
 
           color: $gray-l3;
         }
@@ -396,7 +396,7 @@
       // STATE: is-collapsed
       &.is-collapsed {
         .section-content {
-          @extend %outline-item-content-hidden;
+          @extend %outline-item-content-hidden !optional;
         }
       }
 
@@ -417,10 +417,10 @@
 
       // header
       .subsection-header {
-        @extend %outline-item-header;
+        @extend %outline-item-header !optional;
 
         .incontext-editor-input {
-          @extend %t-title6;
+          @extend %t-title6 !optional;
         }
       }
 
@@ -464,13 +464,13 @@
         @include text-align(right);
 
         .actions-list {
-          @extend %actions-list;
-          @extend %t-action2;
+          @extend %actions-list !optional;
+          @extend %t-action2 !optional;
 
           margin-right: ($baseline/2);
 
           .proctoring-configuration-button {
-            @extend %ui-btn-flat-outline;
+            @extend %ui-btn-flat-outline !optional;
           }
         }
       }
@@ -487,15 +487,15 @@
 
       // content
       .subsection-content {
-        @extend %outline-item-content-shown;
+        @extend %outline-item-content-shown !optional;
       }
 
       // CASE: is-collapsible
       &.is-collapsible {
-        @extend %ui-expand-collapse;
+        @extend %ui-expand-collapse !optional;
 
         .ui-toggle-expansion {
-          @extend %t-icon4;
+          @extend %t-icon4 !optional;
 
           color: $gray-l3;
         }
@@ -504,7 +504,7 @@
       // STATE: is-collapsed
       &.is-collapsed {
         .subsection-content {
-          @extend %outline-item-content-hidden;
+          @extend %outline-item-content-hidden !optional;
         }
       }
     }
@@ -522,7 +522,7 @@
 
       // header
       .unit-header {
-        @extend %outline-item-header;
+        @extend %outline-item-header !optional;
       }
 
       .unit-header-details {
@@ -541,8 +541,8 @@
         @include text-align(right);
 
         .actions-list {
-          @extend %actions-list;
-          @extend %t-action2;
+          @extend %actions-list !optional;
+          @extend %t-action2 !optional;
         }
       }
     }
@@ -552,7 +552,7 @@
       margin-top: ($baseline*0.75);
 
       .button-new {
-        @extend %ui-btn-flat-outline;
+        @extend %ui-btn-flat-outline !optional;
 
         padding: ($baseline/2) $baseline;
         display: block;
@@ -627,7 +627,7 @@
     position: relative;
 
     .draggable-drop-indicator {
-      @extend %ui-depth3;
+      @extend %ui-depth3 !optional;
 
       @include transition(opacity $tmg-f2 linear 0s);
       @include size(100%, auto);
@@ -637,7 +637,7 @@
       opacity: 0;
 
       .fa-caret-right {
-        @extend %t-icon5;
+        @extend %t-icon5 !optional;
 
         position: absolute;
         top: -12px;
@@ -718,7 +718,7 @@
         }
 
         label {
-          @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
 
           @include transition(color $tmg-f3 ease-in-out 0s);
 
@@ -733,7 +733,7 @@
 
         input,
         textarea {
-          @extend %t-copy-base;
+          @extend %t-copy-base !optional;
 
           @include transition(all $tmg-f2 ease-in-out 0s);
 
@@ -807,7 +807,7 @@
     }
 
     .outline-subsection .subsection-title {
-      @extend %t-title8;
+      @extend %t-title8 !optional;
 
       margin-bottom: ($baseline/4);
       font-weight: 600;
@@ -822,13 +822,13 @@
     }
 
     .outline-unit .unit-title {
-      @extend %t-title7;
+      @extend %t-title7 !optional;
 
       color: $color-heading-base;
     }
 
     .outline-unit .unit-status {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       text-align: right;
     }

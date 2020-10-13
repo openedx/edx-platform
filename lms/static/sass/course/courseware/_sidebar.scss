@@ -14,12 +14,12 @@
 
   // reseting bolded fonts for the course index
   .group-heading {
-    @extend %t-regular;
+    @extend %t-regular !optional;
   }
 
   // we're targetting the .class now, instead of the #id
   .accordion {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     .course-navigation {
       .button-chapter {
@@ -41,7 +41,7 @@
         -webkit-font-smoothing: subpixel-antialiased; // this brings back our nice, dark blue
 
         .group-heading {
-          @extend %t-title6;
+          @extend %t-title6 !optional;
 
           position: relative;
           display: block;
@@ -67,7 +67,7 @@
 
         &.active {
           .group-heading {
-            @extend %t-strong;
+            @extend %t-strong !optional;
 
             color: $body-color;
           }
@@ -96,14 +96,14 @@
           overflow: hidden;
 
           .menu-item {
-            @extend %t-strong;
+            @extend %t-strong !optional;
 
             margin: ($baseline/5) 0;
             background: inherit;
 
             a {
-              @extend %t-action3;
-              @extend %t-strong;
+              @extend %t-action3 !optional;
+              @extend %t-strong !optional;
 
               position: relative;
               display: block;
@@ -116,8 +116,8 @@
 
               p {
                 &.subtitle {
-                  @extend %t-action4;
-                  @extend %t-regular;
+                  @extend %t-action4 !optional;
+                  @extend %t-regular !optional;
 
                   display: block;
                   margin: 0;
@@ -170,7 +170,7 @@
 
             &.active {
               a {
-                @extend %t-ultrastrong;
+                @extend %t-ultrastrong !optional;
 
                 background: $gray-l4;
               }
@@ -185,5 +185,5 @@
     }
   }
 
-  @extend %ui-print-excluded;
+  @extend %ui-print-excluded !optional;
 }

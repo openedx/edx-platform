@@ -67,8 +67,8 @@
     background-color: $white;
 
     .enrollment-change-title {
-      @extend %t-title6;
-      @extend %t-strong;
+      @extend %t-title6 !optional;
+      @extend %t-strong !optional;
 
       @include text-align(left);
 
@@ -85,7 +85,7 @@
       label,
       select,
       input {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         display: inline;
         font-style: normal;
@@ -93,8 +93,8 @@
     }
 
     .enrollment-change-errors {
-      @extend %t-copy-sub1;
-      @extend %t-light;
+      @extend %t-copy-sub1 !optional;
+      @extend %t-light !optional;
 
       color: $red;
     }
@@ -107,7 +107,7 @@
 
     .enrollment-change-submit,
     .enrollment-change-cancel {
-      @extend %t-action4;
+      @extend %t-action4 !optional;
 
       margin: ($baseline/4) auto;
       text-transform: none;
@@ -128,19 +128,19 @@
 }
 
 .enrollment-results {
-  @extend %t-copy-sub2;
+  @extend %t-copy-sub2 !optional;
 
   .enrollment-table {
     display: inline-block;
   }
 
   th {
-    @extend %t-title7;
+    @extend %t-title7 !optional;
   }
 
   .change-enrollment-btn,
   .change-enrollment-btn:hover {
-    @extend %t-action4;
+    @extend %t-action4 !optional;
 
     margin: ($baseline/4) auto;
     padding: ($baseline/4) 1px;
@@ -159,7 +159,7 @@
   }
 
   th {
-    @extend %t-title7;
+    @extend %t-title7 !optional;
 
     text-align: center;
   }
@@ -170,7 +170,7 @@
 
   .disable-account-btn,
   .disable-account-btn:hover {
-    @extend %t-action4;
+    @extend %t-action4 !optional;
 
     letter-spacing: normal;
     text-transform: none;
@@ -191,7 +191,7 @@
   }
 
   th {
-    @extend %t-title7;
+    @extend %t-title7 !optional;
 
     text-align: center;
   }

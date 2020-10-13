@@ -22,14 +22,14 @@
       }
 
       .msg-actions {
-        @extend %t-copy-base;
+        @extend %t-copy-base !optional;
 
         display: inline-block;
         width: flex-grid(3, 12);
 
         .btn {
-          @extend %btn-primary-blue;
-          @extend %t-weight4;
+          @extend %btn-primary-blue !optional;
+          @extend %t-weight4 !optional;
 
           text-shadow: none;
         }

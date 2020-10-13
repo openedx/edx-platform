@@ -18,7 +18,7 @@
     }
 
     .content {
-      @extend %t-copy-base;
+      @extend %t-copy-base !optional;
 
       @include clearfix();
 
@@ -58,8 +58,8 @@
       color: $white;
 
       h1 {
-        @extend %t-title2;
-        @extend %t-strong;
+        @extend %t-title2 !optional;
+        @extend %t-strong !optional;
 
         float: none;
         margin: 0 0 ($baseline/2) 0;
@@ -74,13 +74,13 @@
       }
 
       .logo {
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         margin-left: ($baseline/2);
       }
 
       .tagline {
-        @extend %t-title4;
+        @extend %t-title4 !optional;
 
         margin: 0;
         color: $blue-l3;
@@ -165,7 +165,7 @@
               .icon {
                 @include border-top-radius(3px);
 
-                @extend %t-icon4;
+                @extend %t-icon4 !optional;
 
                 display: inline-block;
                 padding: ($baseline/2);
@@ -198,26 +198,26 @@
           margin-top: -($baseline/4);
 
           h3 {
-            @extend %t-title4;
-            @extend %t-strong;
+            @extend %t-title4 !optional;
+            @extend %t-strong !optional;
 
             margin: 0 0 ($baseline/2) 0;
           }
 
           > p {
-            @extend %t-copy-lead1;
+            @extend %t-copy-lead1 !optional;
 
             color: $gray-d1;
           }
 
           strong {
-            @extend %t-strong;
+            @extend %t-strong !optional;
 
             color: $gray-d2;
           }
 
           .list-proofpoints {
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
 
             @include clearfix();
 
@@ -240,15 +240,15 @@
               color: $gray-d1;
 
               .title {
-                @extend %t-copy-base;
-                @extend %t-strong;
+                @extend %t-copy-base !optional;
+                @extend %t-strong !optional;
 
                 margin: 0 0 ($baseline/4) 0;
                 color: $gray-d3;
               }
 
               &:hover {
-                @extend %ui-fake-link;
+                @extend %ui-fake-link !optional;
 
                 box-shadow: 0 1px ($baseline/10) $shadow-l1;
                 background: $blue-l5;
@@ -334,8 +334,8 @@
           &.action-primary {
             @include blue-button;
 
-            @extend %t-action1;
-            @extend %t-strong;
+            @extend %t-action1 !optional;
+            @extend %t-strong !optional;
 
             padding: ($baseline*0.75) ($baseline/2);
             text-align: center;
@@ -343,7 +343,7 @@
           }
 
           &.action-secondary {
-            @extend %t-action3;
+            @extend %t-action3 !optional;
 
             margin-top: ($baseline/2);
           }

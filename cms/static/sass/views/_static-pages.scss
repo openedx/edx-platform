@@ -15,7 +15,7 @@
     margin-right: flex-gutter();
 
     .add-pages {
-      @extend %no-content;
+      @extend %no-content !optional;
 
       margin: ($baseline*1.5) 0;
       color: $gray-d1;
@@ -26,7 +26,7 @@
       box-shadow: none;
 
       .copy {
-        @extend %t-copy-base;
+        @extend %t-copy-base !optional;
 
         opacity: 1;
       }
@@ -135,7 +135,7 @@
     }
 
     .wrapper-component-editor {
-      @extend %ui-depth4;
+      @extend %ui-depth4 !optional;
 
       position: relative;
       background: $lightBluishGrey2;
@@ -207,7 +207,7 @@
     }
 
     .drag-handle {
-      @extend %ui-depth1;
+      @extend %ui-depth1 !optional;
 
       @include right(0);
 
@@ -305,7 +305,7 @@
     background: $white;
 
     &.is-fixed {
-      @extend %ui-disabled;
+      @extend %ui-disabled !optional;
 
       @include transition(opacity $tmg-f2 ease-in-out 0s);
 
@@ -317,11 +317,11 @@
       width: 80%;
 
       .title {
-        @extend %t-title4;
+        @extend %t-title4 !optional;
       }
 
       .title-sub {
-        @extend %t-title7;
+        @extend %t-title7 !optional;
 
         color: $gray-l2;
       }
@@ -349,7 +349,7 @@
   .xblock-student_view {
     @include transition(background-color $tmg-s3 linear 0s);
 
-    @extend %t-title4;
+    @extend %t-title4 !optional;
 
     padding: 20px 20px 22px;
     background: $white;
@@ -365,8 +365,8 @@
     box-shadow: 0 1px 2px $shadow-l1;
 
     .page-name {
-      @extend %t-title5;
-      @extend %t-strong;
+      @extend %t-title5 !optional;
+      @extend %t-strong !optional;
     }
 
     .item-actions {
@@ -382,7 +382,7 @@
   }
 
   .static-page-details {
-    @extend %ui-window;
+    @extend %ui-window !optional;
 
     padding: 32px 40px;
 
@@ -392,7 +392,7 @@
   }
 
   .page-display-name-input {
-    @extend %t-copy-lead1;
+    @extend %t-copy-lead1 !optional;
 
     width: 100%;
   }
@@ -402,7 +402,7 @@
 
     @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
 
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     width: 100%;
     height: 360px;

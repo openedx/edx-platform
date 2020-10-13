@@ -48,7 +48,7 @@ $asterisk-icon: '\f069'; // .fa-asterisk
 @mixin status-icon($color: $gray, $fontAwesomeIcon: "\f00d") {
   .status-icon {
     &::after {
-      @extend %use-font-awesome;
+      @extend %use-font-awesome !optional;
 
       color: $color;
       font-size: 1.2em;
@@ -92,7 +92,7 @@ h2 {
 }
 
 .feedback-hint-incorrect {
-  @extend %feedback-hint;
+  @extend %feedback-hint !optional;
 
   .icon {
     color: $incorrect;
@@ -101,7 +101,7 @@ h2 {
 
 .feedback-hint-partially-correct,
 .feedback-hint-correct {
-  @extend %feedback-hint;
+  @extend %feedback-hint !optional;
 
   .icon {
     color: $correct;
@@ -280,7 +280,7 @@ div.problem {
 // ====================
 div.problem {
   .choicegroup {
-    @extend %choicegroup-base;
+    @extend %choicegroup-base !optional;
 
     .field {
       position: relative;
@@ -454,7 +454,7 @@ div.problem {
       margin-bottom: 0;
 
       &::before {
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         display: inline;
         content: "Answer: ";
@@ -669,7 +669,7 @@ div.problem {
   }
 
   dl dt {
-    @extend %t-strong;
+    @extend %t-strong !optional;
 
   }
 
@@ -715,7 +715,7 @@ div.problem {
     }
 
     th {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       text-align: left;
     }
@@ -918,7 +918,7 @@ div.problem {
       resize: none;
 
       &.CodeMirror-cursor {
-        @extend %ui-depth1;
+        @extend %ui-depth1 !optional;
 
         position: absolute;
         visibility: hidden;
@@ -1072,7 +1072,7 @@ div.problem {
     margin: 0;
 
     &:first-child {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       margin-bottom: 0;
     }
@@ -1087,7 +1087,7 @@ div.problem {
       font-weight: normal;
 
       &:first-child {
-        @extend %t-strong;
+        @extend %t-strong !optional;
       }
     }
   }
@@ -1238,7 +1238,7 @@ div.problem {
     border: 1px solid $gray-l3;
 
     h3 {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       padding: 9px;
       border-bottom: 1px solid #e3e3e3;
@@ -1280,7 +1280,7 @@ div.problem {
       margin-bottom: 12px;
 
       h3 {
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         color: #aaa;
         font-style: normal;
@@ -1340,7 +1340,7 @@ div.problem {
       }
 
       .shortform {
-        @extend %t-strong;
+        @extend %t-strong !optional;
       }
 
       .longform {
@@ -1491,7 +1491,7 @@ div.problem {
     border-radius: 1em;
 
     .annotation-header {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       padding: .5em 1em;
       border-bottom: 1px solid $gray-l3;
@@ -1533,7 +1533,7 @@ div.problem {
         margin: 1em 0 0 0;
 
         .tag {
-          @extend %ui-fake-link;
+           @extend %ui-fake-link !optional;
 
           display: inline-block;
           margin-left: ($baseline*2);
@@ -1578,7 +1578,7 @@ div.problem {
       pre { background-color: $gray-l3; color: $black; }
 
       &::before {
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         display: block;
         content: "debug input value";
@@ -1592,7 +1592,7 @@ div.problem {
 // ====================
 div.problem {
   .choicetextgroup {
-    @extend %choicegroup-base;
+    @extend %choicegroup-base !optional;
 
     input[type="text"]{
       margin-bottom: 0.5em;

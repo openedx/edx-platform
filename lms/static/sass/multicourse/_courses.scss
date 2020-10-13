@@ -26,7 +26,7 @@ $facet-background-color: #007db8;
 .find-courses,
 .university-profile {
   .discovery-button:not(:disabled) {
-    @extend %t-action2;
+    @extend %t-action2 !optional;
 
     @include text-align(left);
 
@@ -228,7 +228,7 @@ $facet-background-color: #007db8;
     @include rtl() { $layout-direction: "RTL"; }
 
     .search-status-label {
-      @extend %t-title3;
+      @extend %t-title3 !optional;
 
       @include span-columns(9);
 
@@ -256,7 +256,7 @@ $facet-background-color: #007db8;
     .wrapper-search-input {
       @include span-columns(3);
 
-      @extend %ui-depth0;
+      @extend %ui-depth0 !optional;
 
       position: relative;
 
@@ -279,9 +279,9 @@ $facet-background-color: #007db8;
   }
 
   .discovery-input {
-    @extend %ui-depth1;
-    @extend %t-copy-sub1;
-    @extend %t-demi-strong;
+    @extend %ui-depth1 !optional;
+    @extend %t-copy-sub1 !optional;
+    @extend %t-demi-strong !optional;
 
     @include border-radius(3px);
     @include padding-right(55px);
@@ -294,7 +294,7 @@ $facet-background-color: #007db8;
 
     //STATE: focus
     &:focus {
-      @extend %no-outline;
+      @extend %no-outline !optional;
 
       box-shadow: none;
       border-color: $m-blue-d6;
@@ -302,9 +302,9 @@ $facet-background-color: #007db8;
   }
 
   .discovery-submit {
-    @extend %ui-depth2;
-    @extend %t-icon3;
-    @extend %t-strong;
+    @extend %ui-depth2 !optional;
+    @extend %t-icon3 !optional;
+    @extend %t-strong !optional;
 
     @include margin-left(-2px);
     @include right(0);
@@ -380,7 +380,7 @@ $facet-background-color: #007db8;
       background: $courseware-button-border-color;
 
       .facet-option {
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         color: $gray-d2;
         text-decoration: none;
@@ -394,8 +394,8 @@ $facet-background-color: #007db8;
     .clear-filters {
       @include line-height(29.73);
 
-      @extend %t-icon5;
-      @extend %t-strong;
+      @extend %t-icon5 !optional;
+      @extend %t-strong !optional;
 
       margin: ($baseline/2);
       width: auto;
@@ -419,7 +419,7 @@ $facet-background-color: #007db8;
 
     box-sizing: border-box;
 
-    @extend %ui-depth1;
+    @extend %ui-depth1 !optional;
 
     position: relative;
     margin: ($baseline*2) 0 ($baseline*3.5) 0;
@@ -470,8 +470,8 @@ $facet-background-color: #007db8;
 
     .header-search-facets,
     .header-facet {
-      @extend %t-title6;
-      @extend %t-strong;
+      @extend %t-title6 !optional;
+      @extend %t-strong !optional;
 
       margin: 0;
       padding: ($baseline/2);
@@ -484,7 +484,7 @@ $facet-background-color: #007db8;
     }
 
     .facet-list {
-      @extend %ui-no-list;
+      @extend %ui-no-list !optional;
 
       @include clearfix();
 
@@ -510,8 +510,8 @@ $facet-background-color: #007db8;
       @include transition(all $tmg-f2 ease-out 0s);
       @include clearfix();
 
-      @extend %t-action3;
-      @extend %text-truncated;
+      @extend %t-action3 !optional;
+      @extend %text-truncated !optional;
 
       opacity: 1;
       border-radius: 0;
@@ -575,8 +575,8 @@ $facet-background-color: #007db8;
       @include clearfix();
 
       button {
-        @extend %t-icon6;
-        @extend %t-strong;
+        @extend %t-icon6 !optional;
+        @extend %t-strong !optional;
 
         padding: ($baseline/4) ($baseline/2);
         color: $facet-background-color;

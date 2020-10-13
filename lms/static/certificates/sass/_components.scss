@@ -47,15 +47,15 @@
 }
 
 .depth-base-focus {
-  @extend %depth-base-focus;
+  @extend %depth-base-focus !optional;
 }
 
 .depth-well {
-  @extend %depth-well;
+  @extend %depth-well !optional;
 }
 
 .depth-card {
-  @extend %depth-card;
+  @extend %depth-card !optional;
 }
 
 // ------------------------------
@@ -74,7 +74,7 @@
 // #HEADER APP
 // ------------------------------
 .wrapper-header {
-  @extend %divider-2;
+  @extend %divider-2 !optional;
 
   border-bottom-color: $gray-x-back;
   background: $white;
@@ -170,7 +170,7 @@
 
 // brief accomplishment
 .accomplishment-brief {
-  @extend %depth-card;
+  @extend %depth-card !optional;
 
   .accomplishment-type-symbol,
   .accomplishment-details {
@@ -217,7 +217,7 @@
 }
 
 .accomplishment-rendering {
-  @extend %depth-card;
+  @extend %depth-card !optional;
 
   position: relative;
   top: -(map-get($spacing-vertical, base));
@@ -251,39 +251,39 @@
 
   // statement
   .accomplishment-statement {
-    @extend %rendering-section;
+    @extend %rendering-section !optional;
 
     @include text-align(center);
   }
 
   .accomplishment-statement-lead {
-    @extend .hd-2;
+    @extend .hd-2 !optional;
   }
 
   .accomplishment-recipient {
-    @extend %rendering-accomplishment-line;
+    @extend %rendering-accomplishment-line !optional;
   }
 
   .accomplishment-summary {
-    @extend %rendering-accomplishment-line;
-    @extend %copy-lead;
+    @extend %rendering-accomplishment-line !optional;
+    @extend %copy-lead !optional;
 
     margin-bottom: map-get($spacing-vertical, mid-small);
   }
 
   .accomplishment-course {
-    @extend %rendering-accomplishment-line;
+    @extend %rendering-accomplishment-line !optional;
 
     font-weight: 600;
   }
 
   .accomplishment-course-description {
-    @extend %rendering-accomplishment-line;
+    @extend %rendering-accomplishment-line !optional;
   }
 
   .accomplishment-statement-detail {
-    @extend %rendering-accomplishment-line;
-    @extend %copy-lead;
+    @extend %rendering-accomplishment-line !optional;
+    @extend %copy-lead !optional;
   }
 
   // organizations
@@ -292,12 +292,12 @@
   }
 
   .accomplishment-orgs-title {
-    @extend %rendering-hd-section;
+    @extend %rendering-hd-section !optional;
   }
 
   // signatories
   .accomplishment-signatories {
-    @extend %rendering-section;
+    @extend %rendering-section !optional;
 
     .signatory-signature {
       display: block;
@@ -317,7 +317,7 @@
     }
 
     .signatory-credentials {
-      @extend %copy-micro;
+      @extend %copy-micro !optional;
 
       margin-top: 0;
 
@@ -330,7 +330,7 @@
   }
 
   .accomplishment-signatories-title {
-    @extend %rendering-hd-section;
+    @extend %rendering-hd-section !optional;
   }
 }
 
@@ -340,7 +340,7 @@
 
   .metadata {
     .label {
-      @extend %copy-meta;
+      @extend %copy-meta !optional;
 
       margin-bottom: map-get($spacing-vertical, xx-small);
       padding: 0 rem(8);
@@ -353,7 +353,7 @@
     }
 
     .value {
-      @extend %copy-base;
+      @extend %copy-base !optional;
 
       font-weight: 600;
       color: $gray-dark;
@@ -369,7 +369,7 @@
   }
 
   .recipient-img {
-    @extend %img-cropped;
+    @extend %img-cropped !optional;
 
     width: rem(100);
 
@@ -382,7 +382,7 @@
   }
 
   .recipient-details {
-    @extend %copy-base;
+    @extend %copy-base !optional;
 
     font-weight: 600;
     max-width: calc(100% - (#{rem(100)} + #{map-get($spacing-horizontal, small)} + 5px));
@@ -403,7 +403,7 @@
 }
 
 .accomplishment-metadata-title {
-  @extend %hd-subsection;
+  @extend %hd-subsection !optional;
 
   border-bottom-color: $gray-back;
 }
@@ -412,7 +412,7 @@
 // #ACCOMPLISHMENT RELATED
 // ------------------------------
 .accomplishment-related-title {
-  @extend %hd-subsection;
+  @extend %hd-subsection !optional;
 }
 
 // ------------------------------
@@ -574,7 +574,7 @@
   vertical-align: middle;
 
   .badges-modal {
-    @extend %copy-large;
+    @extend %copy-large !optional;
 
     box-sizing: content-box;
     position: fixed;
@@ -604,7 +604,7 @@
       display: table;
 
       a {
-        @extend %link;
+        @extend %link !optional;
       }
     }
 

@@ -7,7 +7,7 @@
   .post-actions-list,
   .response-actions-list,
   .comment-actions-list {
-    @extend %ui-no-list;
+    @extend %ui-no-list !optional;
 
     @include text-align(right);
 
@@ -52,8 +52,8 @@
 
   // UI: general actions dropdown layout
   .actions-dropdown {
-    @extend %ui-no-list;
-    @extend %ui-depth1;
+    @extend %ui-no-list !optional;
+    @extend %ui-depth1 !optional;
 
     @include right(0);
 
@@ -148,7 +148,7 @@
     }
 
     .action-label {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       display: none;
       vertical-align: middle;
@@ -286,7 +286,7 @@
 
     // UI: secondary action
     .action-list-item {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       @include text-align(right);
 

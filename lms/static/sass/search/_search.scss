@@ -7,7 +7,7 @@
   }
 
   .search-field {
-    @extend %t-weight2;
+    @extend %t-weight2 !optional;
 
     box-sizing: border-box;
     top: 5px;
@@ -20,7 +20,7 @@
   .cancel-button,
   .search-button:hover,
   .cancel-button:hover {
-    @extend %t-regular;
+    @extend %t-regular !optional;
 
     box-sizing: border-box;
 
@@ -122,7 +122,7 @@
     }
 
     .search-results-ellipsis {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       color: theme-color("dark");
 
@@ -144,7 +144,7 @@
 .courseware-search-bar {
   width: flex-grid(7);
 
-  @extend %ui-print-excluded;
+  @extend %ui-print-excluded !optional;
 }
 
 .dashboard-search-bar {
@@ -152,7 +152,7 @@
   display: block;
 
   label {
-    @extend %t-regular;
+    @extend %t-regular !optional;
 
     font-family: $font-family-sans-serif;
     color: theme-color("dark");
@@ -182,7 +182,7 @@
     }
 
     h2 {
-      @extend %t-title5;
+      @extend %t-title5 !optional;
 
       @include float(left);
       @include clear(left);

@@ -28,7 +28,7 @@
     background: $container-bg;
     box-shadow: 0 1px 2px $shadow-l2;
 
-    @extend %ui-print-excluded;
+    @extend %ui-print-excluded !optional;
   }
 }
 
@@ -136,10 +136,10 @@ input[type="submit"],
 input[type="button"],
 button,
 .button {
-  @extend .gray-button;
+  @extend .gray-button !optional;
 
   form & {
-    @extend .gray-button;
+    @extend .gray-button !optional;
   }
 }
 

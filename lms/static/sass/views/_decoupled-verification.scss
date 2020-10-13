@@ -194,7 +194,7 @@
     }
 
     .photo-tip {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       color: black;
       margin-bottom: 20px;

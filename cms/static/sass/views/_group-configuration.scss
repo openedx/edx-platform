@@ -14,8 +14,8 @@
     width: flex-grid(9, 12);
 
     .notice-moduledisabled {
-      @extend %ui-well;
-      @extend %t-copy-base;
+      @extend %ui-well !optional;
+      @extend %t-copy-base !optional;
 
       background-color: $white;
       padding: ($baseline*1.5) $baseline;
@@ -23,7 +23,7 @@
     }
 
     .no-content {
-      @extend %no-content;
+      @extend %no-content !optional;
 
       color: $gray-d1;
     }
@@ -32,19 +32,19 @@
       margin-bottom: ($baseline*1.5);
 
       .title {
-        @extend %t-title4;
-        @extend %t-strong;
+        @extend %t-title4 !optional;
+        @extend %t-strong !optional;
 
         margin-bottom: ($baseline/2);
       }
 
       .copy {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
       }
     }
 
     .wrapper-collection {
-      @extend %ui-window;
+      @extend %ui-window !optional;
 
       position: relative;
       outline: none;
@@ -63,9 +63,9 @@
         padding-bottom: 0;
 
         .title {
-          @extend %cont-truncated;
-          @extend %t-title5;
-          @extend %t-strong;
+          @extend %cont-truncated !optional;
+          @extend %t-title5 !optional;
+          @extend %t-strong !optional;
 
           @include margin-right($baseline*14);
 
@@ -85,7 +85,7 @@
             .ui-toggle-expansion {
               @include transition(rotate 0.15s ease-in-out 0.25s);
 
-              @extend %t-action1;
+              @extend %t-action1 !optional;
 
               @include margin-left(-$baseline);
 
@@ -102,7 +102,7 @@
             }
 
             &.is-selectable {
-              @extend %ui-fake-link;
+              @extend %ui-fake-link !optional;
 
               &:hover {
                 color: $blue;
@@ -117,7 +117,7 @@
       }
 
       .collection-info {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         @include margin-left($baseline);
 
@@ -184,7 +184,7 @@
         margin-bottom: ($baseline*0.75);
 
         .item {
-          @extend %t-copy-lead1;
+          @extend %t-copy-lead1 !optional;
 
           padding: ($baseline/7) 0 ($baseline/4);
           border-top: 1px solid $gray-l4;
@@ -222,11 +222,11 @@
             vertical-align: middle;
 
             .edit {
-              @extend %ui-btn-non-blue;
+              @extend %ui-btn-non-blue !optional;
             }
 
             .delete {
-              @extend %ui-btn-non;
+              @extend %ui-btn-non !optional;
 
               &.is-disabled {
                 background-color: $gray-l3;
@@ -238,7 +238,7 @@
       }
 
       .collection-references {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         @include padding($baseline, $baseline*1.5, $baseline, $baseline*2.5);
 
@@ -252,7 +252,7 @@
             padding: ($baseline/4) 0;
 
             a {
-              @extend %t-strong;
+              @extend %t-strong !optional;
             }
 
             .fa-warning {
@@ -271,7 +271,7 @@
       }
 
       .usage-validation {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         @include padding($baseline, $baseline*1.5, $baseline, $baseline*1.5);
 
@@ -305,7 +305,7 @@
         }
 
         .tip {
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
 
           @include transition(color, 0.15s, ease-in-out);
 
@@ -320,7 +320,7 @@
 
 
         .collection-fields {
-          @extend %cont-no-list;
+          @extend %cont-no-list !optional;
 
           margin-bottom: $baseline;
         }
@@ -329,12 +329,12 @@
           @include margin(0, 0, $baseline*0.75, 0);
 
           &:last-child {
-            @extend %wipe-last-child;
+            @extend %wipe-last-child !optional;
           }
 
           &.required {
             label {
-              @extend %t-strong;
+              @extend %t-strong !optional;
             }
 
             label::after {
@@ -355,7 +355,7 @@
           }
 
           label {
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
 
             @include transition(color, 0.15s, ease-in-out);
             @include margin(0, 0, $baseline/4, 0);
@@ -368,7 +368,7 @@
           //this section is borrowed from _account.scss - we should clean up and unify later
           input,
           textarea {
-            @extend %t-copy-base;
+            @extend %t-copy-base !optional;
 
             height: 100%;
             width: 100%;
@@ -417,7 +417,7 @@
         }
 
         label.required {
-          @extend %t-strong;
+          @extend %t-strong !optional;
 
           &::after {
             @include margin-left($baseline/4);
@@ -430,7 +430,7 @@
           label {
             width: 50%;
 
-            @extend %t-title5;
+            @extend %t-title5 !optional;
 
             display: inline-block;
             vertical-align: bottom;
@@ -445,7 +445,7 @@
             color: $gray-l1;
 
             .group-configuration-value {
-              @extend %t-strong;
+              @extend %t-strong !optional;
 
               @include margin-left($baseline*0.5);
 
@@ -471,13 +471,13 @@
 
           // add a group is below with groups styling
           .action-primary {
-            @extend %btn-primary-blue;
+            @extend %btn-primary-blue !optional;
 
             padding: ($baseline/4) $baseline;
           }
 
           .action-secondary {
-            @extend %btn-secondary-gray;
+            @extend %btn-secondary-gray !optional;
 
             padding: ($baseline/4) $baseline;
           }
@@ -494,22 +494,22 @@
         }
 
         .copy {
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
 
           @include margin($baseline, 0, $baseline/2, 0);
 
           color: $gray;
 
           strong {
-            @extend %t-strong;
+            @extend %t-strong !optional;
           }
         }
       }
 
       .action-add-item {
-        @extend %ui-btn-flat-outline;
-        @extend %t-action2;
-        @extend %t-strong;
+        @extend %ui-btn-flat-outline !optional;
+        @extend %t-action2 !optional;
+        @extend %t-strong !optional;
 
         @include margin($baseline*1.5, 0, 0, 0);
 
@@ -521,7 +521,7 @@
 
     // add/new collection
     .action-add {
-      @extend %ui-btn-flat-outline;
+      @extend %ui-btn-flat-outline !optional;
 
       display: block;
       width: 100%;
@@ -552,7 +552,7 @@
     .experiment-groups {
       .group-configuration-details {
         .group-configuration-info {
-          @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
 
           @include margin-left($baseline);
 
@@ -574,7 +574,7 @@
           margin-bottom: ($baseline*0.75);
 
           .group {
-            @extend %t-copy-lead1;
+            @extend %t-copy-lead1 !optional;
 
             padding: ($baseline/7) 0 ($baseline/4);
             border-top: 1px solid $gray-l4;
@@ -649,7 +649,7 @@
           .action-close {
             @include transition(color $tmg-f2 ease-in-out);
 
-            @extend %t-action1;
+            @extend %t-action1 !optional;
 
             display: inline-block;
             border: 0;

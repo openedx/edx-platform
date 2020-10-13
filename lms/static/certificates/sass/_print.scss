@@ -69,7 +69,7 @@
   // reset body/view properties
   html,
   body {
-    @extend %print-black-on-white;
+    @extend %print-black-on-white !optional;
   }
 
   body {
@@ -106,14 +106,14 @@
   .accomplishment-metadata .accomplishment-recipient,
   .deco-corner,
   .accomplishment-date .label {
-    @extend %print-hide;
+    @extend %print-hide !optional;
   }
 
   // remove layout wrappers' padding
   .wrapper-introduction,
   .wrapper-accomplishment-rendering,
   .wrapper-accomplishment-metadata {
-    @extend %print-layout-wrapper;
+    @extend %print-layout-wrapper !optional;
   }
 }
 
@@ -186,7 +186,7 @@
 
   // accomplishment
   .accomplishment-main {
-    @extend %print-no-background;
+    @extend %print-no-background !optional;
   }
 
   .accomplishment-rendering {
@@ -215,7 +215,7 @@
     }
 
     .accomplishment-statement {
-      @extend %print-rendering-section;
+      @extend %print-rendering-section !optional;
 
       @include make-col(8);
 
@@ -249,7 +249,7 @@
     }
 
     .accomplishment-signatories {
-      @extend %print-rendering-section;
+      @extend %print-rendering-section !optional;
 
       @include make-col(12);
       @include margin-right(0);

@@ -2,7 +2,7 @@
   color: $black;
 
   .user-info {
-    @extend .sidebar;
+    @extend .sidebar !optional;
 
     border-left: 1px solid #d3d3d3;
     border-radius: 0 4px 4px 0;
@@ -14,7 +14,7 @@
     }
 
     header {
-      @extend .bottom-border;
+      @extend .bottom-border !optional;
 
       margin: 0;
       padding: lh(0.5);
@@ -26,7 +26,7 @@
     }
 
     ul {
-      @extend %ui-no-list;
+      @extend %ui-no-list !optional;
 
       li {
         border-bottom: 1px solid #d3d3d3;
@@ -130,10 +130,10 @@
   }
 
   .course-info {
-    @extend .content;
+    @extend .content !optional;
 
     header {
-      @extend .clearfix;
+      @extend .clearfix !optional;
       @extend h1.top-header;
 
       margin-bottom: lh();
@@ -238,13 +238,13 @@
               display: inline-block;
 
               .fa-times {
-                @extend %t-icon6;
+                @extend %t-icon6 !optional;
 
                 color: $alert-color;
               }
 
               .fa-check {
-                @extend %t-icon6;
+                @extend %t-icon6 !optional;
 
                 color: theme-color("success");
               }
@@ -264,7 +264,7 @@
       padding-left: 0;
 
       > section {
-        @extend .clearfix;
+        @extend .clearfix !optional;
 
         border-bottom: 1px solid #e3e3e3;
         display: table;

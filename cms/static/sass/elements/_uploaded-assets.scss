@@ -3,7 +3,7 @@
     @include clearfix();
 
     .assets-title {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       margin-top: ($baseline*2);
       margin-bottom: ($baseline*2);
@@ -14,7 +14,7 @@
     }
 
     .meta {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       display: inline-block;
       vertical-align: top;
@@ -24,12 +24,12 @@
       .count-current-shown,
       .count-total,
       .sort-order {
-        @extend %t-strong;
+        @extend %t-strong !optional;
       }
     }
 
     .pagination {
-      @extend %pagination;
+      @extend %pagination !optional;
     }
 
     .assets-table {
@@ -39,7 +39,7 @@
 
       th,
       .video-head-col {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         background-color: $gray-l5;
         padding: 0 ($baseline/2) ($baseline*0.75) ($baseline/2);
@@ -53,7 +53,7 @@
         }
 
         .current-sort {
-          @extend %t-strong;
+          @extend %t-strong !optional;
 
           border-bottom: 1px solid $gray-l3;
         }
@@ -84,7 +84,7 @@
           border-top: 1px solid $gray-l4;
 
           .name-col {
-            @extend %t-strong;
+            @extend %t-strong !optional;
           }
 
           .video-status {
@@ -138,7 +138,7 @@
 
         .name-col {
           .title {
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
 
             display: inline-block;
             max-width: 200px;
@@ -149,7 +149,7 @@
         .date-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
 
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
 
           color: $gray-d1;
         }
@@ -163,7 +163,7 @@
           .embeddable-xml-input {
             @include transition(all $tmg-f2 ease-in-out 0s);
 
-            @extend %t-copy-sub2;
+            @extend %t-copy-sub2 !optional;
 
             box-shadow: none;
             border: 1px solid transparent;

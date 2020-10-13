@@ -169,7 +169,7 @@ th {
 // modal - image zoom, fill window
 .wrapper-modal-image {
   .modal-ui-icon {
-    @extend %ui-fake-link;
+     @extend %ui-fake-link !optional;
 
     position: absolute;
     display: block;
@@ -190,7 +190,7 @@ th {
   }
 
   .image-link {
-    @extend %ui-fake-link;
+     @extend %ui-fake-link !optional;
 
     position: relative;
     display: block;
@@ -207,8 +207,8 @@ th {
   }
 
   .image-modal {
-    @extend %ui-fake-link;
-    @extend %ui-depth5;
+     @extend %ui-fake-link !optional;
+     @extend %ui-depth5 !optional;
 
     position: fixed;
     top: 0;

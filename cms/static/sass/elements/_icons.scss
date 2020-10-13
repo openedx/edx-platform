@@ -22,8 +22,8 @@
 }
 
 %ui-badge {
-  @extend %t-title9;
-  @extend %t-strong;
+   @extend %t-title9 !optional;
+  @extend %t-strong !optional;
 
   position: relative;
   border-bottom-right-radius: ($baseline/10);
@@ -39,7 +39,7 @@
   &.is-hanging {
     box-sizing: border-box;
 
-    @extend %ui-depth2;
+    @extend %ui-depth2 !optional;
 
     top: -($baseline/4);
 

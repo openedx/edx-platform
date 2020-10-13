@@ -18,10 +18,10 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
   vertical-align: top;
 
   .bookmarks-list-button {
-    @extend %ui-clear-button;
+    @extend %ui-clear-button !optional;
 
     // set styles
-    @extend %btn-pl-default-base;
+    @extend %btn-pl-default-base !optional;
 
     @include font-size(13);
 
@@ -48,7 +48,7 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
   .bookmark-button-wrapper {
     margin-bottom: ($baseline * 1.5);
 
-    @extend %ui-print-excluded;
+    @extend %ui-print-excluded !optional;
   }
 
   .bookmark-button {

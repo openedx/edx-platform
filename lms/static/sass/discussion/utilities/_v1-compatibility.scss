@@ -62,7 +62,7 @@
 }
 
 %t-copy-sub1 {
-  @extend %t-copy;
+  @extend %t-copy !optional;
 
   @include line-height(14);
 
@@ -70,7 +70,7 @@
 }
 
 %t-copy-sub2 {
-  @extend %t-copy;
+  @extend %t-copy !optional;
 
   @include line-height(12);
 

@@ -26,7 +26,7 @@
 
 .text-me-fragment {
   h2 {
-    @extend %t-title4;
+    @extend %t-title4 !optional;
 
     letter-spacing: normal;
     font-family: $font-family-sans-serif;
@@ -34,8 +34,8 @@
   }
 
   h3 {
-    @extend %t-title6;
-    @extend %t-light;
+    @extend %t-title6 !optional;
+    @extend %t-light !optional;
 
     margin: 0;
     letter-spacing: normal;
@@ -69,7 +69,7 @@
       }
 
       .action-primary {
-        @extend %btn-primary-blue;
+        @extend %btn-primary-blue !optional;
 
         padding: 1ex 1em;
         text-transform: none;

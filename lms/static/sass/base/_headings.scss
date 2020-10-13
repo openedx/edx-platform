@@ -95,7 +95,7 @@ $headings-base-color:                       $gray-d2;
 .hd-6,
 .hd-7,
 .hd-8 {
-  @extend %reset-headings;
+  @extend %reset-headings !optional;
 }
 
 
@@ -105,7 +105,7 @@ $headings-base-color:                       $gray-d2;
 // canned heading classes
 @for $i from 1 through $headings-count {
   .hd-#{$i} {
-    @extend %hd-#{$i};
+    @extend %hd-#{$i} !optional;
   }
 }
 
@@ -113,7 +113,7 @@ $headings-base-color:                       $gray-d2;
 
 .xblock .xblock {
   h2 {
-    @extend %hd-2;
+    @extend %hd-2 !optional;
 
     font-weight: $headings-font-weight-bold;
     // override external modules and xblocks that use inline CSS

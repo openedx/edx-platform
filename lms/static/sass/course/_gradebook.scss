@@ -12,7 +12,7 @@ $table-border-color: #c8c8c8;
 
 div.gradebook-wrapper {
   section.gradebook-content {
-    @extend .content;
+    @extend .content !optional;
 
     display: block;
     width: 100%;
@@ -101,7 +101,7 @@ div.gradebook-wrapper {
 
       .left-shadow,
       .right-shadow {
-        @extend %ui-depth4;
+        @extend %ui-depth4 !optional;
 
         position: absolute;
         top: 0;
@@ -216,7 +216,7 @@ div.gradebook-wrapper {
     }
 
     h1 {
-      @extend .top-header;
+      @extend .top-header !optional;
     }
   }
 

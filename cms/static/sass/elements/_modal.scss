@@ -2,7 +2,7 @@
 // ====================
 
 .modal-cover {
-  @extend %ui-depth3;
+  @extend %ui-depth3 !optional;
 
   display: none;
   position: fixed;
@@ -14,7 +14,7 @@
 }
 
 .modal {
-  @extend %ui-depth4;
+   @extend %ui-depth4 !optional;
 
   display: none;
   position: fixed;
@@ -40,8 +40,8 @@
   }
 
   h2 {
-    @extend %t-title5;
-    @extend %t-light;
+    @extend %t-title5 !optional;
+    @extend %t-light !optional;
 
     margin: 0 ($baseline/2) ($baseline*1.5);
     color: #646464;
@@ -68,7 +68,7 @@
 
 // lean modal alternative
 #lean_overlay {
-  @extend %ui-depth4;
+   @extend %ui-depth4 !optional;
 
   position: fixed;
   top: 0;

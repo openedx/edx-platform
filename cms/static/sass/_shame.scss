@@ -44,7 +44,7 @@
 // yes we have no boldness today - need to fix the resets
 body strong,
 body b {
-  @extend %t-ultrastrong;
+    @extend %t-ultrastrong !optional;
 }
 
 // ====================
@@ -69,11 +69,11 @@ body b {
 */
 
 .modal-content.cheatsheet-is-shown {
-  overflow: visible !important;
-
-  .CodeMirror {
     overflow: visible !important;
-  }
+
+    .CodeMirror {
+        overflow: visible !important;
+    }
 }
 
 // ====================
@@ -101,7 +101,7 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
 
 // masthead button hidden states
 .mast.has-actions .nav-actions .button.is-hidden {
-  @extend .is-hidden;
+    @extend %is-hidden !optional;
 }
 
 // ====================
@@ -117,7 +117,7 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
 
 // xmodule editor tab font-weight override
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .editor-tabs .inner_tab_wrap a.tab {
-  font-weight: normal !important;
+    font-weight: normal !important;
 }
 
 // ====================
@@ -131,10 +131,10 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler {
   text-align: center;
   color: $gray;
 
-  .button,
-  .action {
-    @extend %btn-primary-green;
-  }
+    .button,
+    .action {
+        @extend %btn-primary-green !optional;
+    }
 }
 
 // ====================

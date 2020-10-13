@@ -4,7 +4,7 @@
 @import 'neat/neat'; // lib - Neat
 
 .wrapper-footer {
-  @extend %ui-print-excluded;
+  @extend %ui-print-excluded !optional;
 
   box-shadow: 0 -1px 5px 0 $shadow-l1;
   border-top: 1px solid tint($m-gray, 50%);
@@ -248,7 +248,7 @@
   .wrapper-footer footer {
     width: 960px;
 
-    @extend %ui-print-excluded;
+    @extend %ui-print-excluded !optional;
 
     .colophon-about img {
       margin-top: ($baseline*1.5);

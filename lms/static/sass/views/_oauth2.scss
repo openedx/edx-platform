@@ -21,7 +21,7 @@
   font-family: $font-family-sans-serif;
 
   h1 {
-    @extend %t-title4;
+    @extend %t-title4 !optional;
 
     margin-bottom: 0;
     margin-left: 0;
@@ -32,7 +32,7 @@
   }
 
   p {
-    @extend %t-copy-base;
+    @extend %t-copy-base !optional;
 
     margin: $baseline/2 0;
   }
@@ -42,13 +42,13 @@
   }
 
   .btn-authorization-allow {
-    @extend %btn-primary-blue;
+    @extend %btn-primary-blue !optional;
 
     margin-left: 20px;
     line-height: 0.7em;
   }
 
   .btn-authorization-cancel {
-    @extend %btn-secondary-blue-outline;
+    @extend %btn-secondary-blue-outline !optional;
   }
 }

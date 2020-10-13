@@ -88,7 +88,7 @@ li[class*=forum-nav-thread-label-] {
   .post-actions-list,
   .response-actions-list,
   .comment-actions-list {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
   }
 
   // Override global span

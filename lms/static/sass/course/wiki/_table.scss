@@ -44,6 +44,6 @@ div.history-controls {
   margin-top: $baseline;
 
   input[type="submit"] {
-    @extend .light-button;
+    @extend .light-button !optional;
   }
 }

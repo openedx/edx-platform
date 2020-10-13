@@ -288,7 +288,7 @@
       }
 
       .instructor-info-action {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         @include float(right);
 
@@ -305,7 +305,7 @@
           color: $white;
         }
 
-        @extend %ui-print-excluded;
+        @extend %ui-print-excluded !optional;
       }
     }
   }
@@ -465,7 +465,7 @@
       text-align: center;
 
       &::after {
-        @extend %faded-hr-divider;
+        @extend %faded-hr-divider !optional;
 
         content: "";
         display: block;
@@ -632,7 +632,7 @@
         .pre-requisite {
           max-width: 39%;
 
-          @extend %text-truncated;
+          @extend %text-truncated !optional;
         }
 
         .tip {

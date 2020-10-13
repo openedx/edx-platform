@@ -2,7 +2,7 @@
 // ====================
 
 .wrapper-header {
-  @extend %ui-depth3;
+  @extend %ui-depth3 !optional;
 
   position: relative;
   width: 100%;
@@ -72,8 +72,8 @@
   // basic layout - nav items
   nav {
     > ol > .nav-item {
-      @extend %t-action3;
-      @extend %t-strong;
+      @extend %t-action3 !optional;
+      @extend %t-strong !optional;
 
       display: inline-block;
       vertical-align: middle;
@@ -95,8 +95,8 @@
   // basic layout - dropdowns
   .nav-dd {
     .title {
-      @extend %t-action2;
-      @extend %ui-btn-dd-nav-primary;
+      @extend %t-action2 !optional;
+      @extend %ui-btn-dd-nav-primary !optional;
 
       @include transition(all $tmg-f2 ease-in-out 0s);
 
@@ -147,7 +147,7 @@
 
     .course-org,
     .course-number {
-      @extend %t-action4;
+      @extend %t-action4 !optional;
 
       display: inline-block;
       vertical-align: middle;
@@ -164,8 +164,8 @@
     }
 
     .course-title {
-      @extend %t-action2;
-      @extend %t-strong;
+      @extend %t-action2 !optional;
+      @extend %t-strong !optional;
 
       display: block;
       width: 100%;
@@ -328,8 +328,8 @@
       .action-signup {
         @include blue-button();
 
-        @extend %t-action3;
-        @extend %t-strong;
+        @extend %t-action3 !optional;
+        @extend %t-strong !optional;
 
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;
@@ -338,8 +338,8 @@
       .action-signin {
         @include white-button();
 
-        @extend %t-action3;
-        @extend %t-strong;
+        @extend %t-action3 !optional;
+        @extend %t-strong !optional;
 
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;

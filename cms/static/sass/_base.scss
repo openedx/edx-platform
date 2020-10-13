@@ -26,7 +26,7 @@ html {
 }
 
 body {
-  @extend %t-copy-base;
+  @extend %t-copy-base !optional;
 
   min-width: $fg-min-width;
   background: $uxpl-grayscale-x-back;
@@ -56,8 +56,8 @@ a {
 }
 
 h1 {
-  @extend %t-title4;
-  @extend %t-light;
+   @extend %t-title4 !optional;
+  @extend %t-light !optional;
 }
 
 .waiting {
@@ -78,16 +78,16 @@ h1 {
 // +Typography - Basic
 // ====================
 .page-header {
-  @extend %t-title3;
-  @extend %t-strong;
+   @extend %t-title3 !optional;
+  @extend %t-strong !optional;
 
   display: block;
   color: $gray-d3;
 
   .navigation,
   .subtitle {
-    @extend %t-title7;
-    @extend %t-regular;
+    @extend %t-title7 !optional;
+    @extend %t-regular !optional;
 
     position: relative;
     top: ($baseline/4);
@@ -97,29 +97,29 @@ h1 {
 }
 
 .section-header {
-  @extend %t-title4;
-  @extend %t-strong;
+   @extend %t-title4 !optional;
+  @extend %t-strong !optional;
 
   .subtitle {
-    @extend %t-title7;
+    @extend %t-title7 !optional;
   }
 }
 
 .area-header {
-  @extend %t-title6;
-  @extend %t-strong;
+   @extend %t-title6 !optional;
+  @extend %t-strong !optional;
 
   .subtitle {
-    @extend %t-title8;
+    @extend %t-title8 !optional;
   }
 }
 
 .area-subheader {
-  @extend %t-title7;
-  @extend %t-strong;
+  @extend %t-title7 !optional;
+  @extend %t-strong !optional;
 
   .subtitle {
-    @extend %t-title9;
+     @extend %t-title9 !optional;
   }
 }
 
@@ -195,45 +195,45 @@ h1 {
 .title-4,
 .title-5,
 .title-6 {
-  @extend %t-strong;
+  @extend %t-strong !optional;
 }
 
 .title-1 {
-  @extend %t-title3;
+   @extend %t-title3 !optional;
 
   margin-bottom: ($baseline*1.5);
 }
 
 .title-2 {
-  @extend %t-title4;
+   @extend %t-title4 !optional;
 
   margin-bottom: $baseline;
 }
 
 .title-3 {
-  @extend %t-title5;
+  @extend %t-title5 !optional;
 
   margin-bottom: ($baseline/2);
 }
 
 .title-4 {
-  @extend %t-title7;
-  @extend %t-regular;
+  @extend %t-title7 !optional;
+  @extend %t-regular !optional;
 
   margin-bottom: $baseline;
 }
 
 .title-5 {
-  @extend %t-title7;
-  @extend %t-regular;
+  @extend %t-title7 !optional;
+  @extend %t-regular !optional;
 
   color: $gray-l1;
   margin-bottom: $baseline;
 }
 
 .title-6 {
-  @extend %t-title7;
-  @extend %t-regular;
+  @extend %t-title7 !optional;
+  @extend %t-regular !optional;
 
   color: $gray-l2;
   margin-bottom: $baseline;
@@ -329,14 +329,14 @@ dl {
       }
 
       .navigation-link {
-        @extend %cont-truncated;
+       @extend %cont-truncated !optional;
 
         display: inline-block;
         vertical-align: bottom; // correct for extra padding in FF
         max-width: 250px;
 
         &.navigation-current {
-          @extend %ui-disabled;
+          @extend %ui-disabled !optional;
 
           color: $gray;
           max-width: 250px;
@@ -367,14 +367,14 @@ dl {
   // CASE: wizard-based mast
   .mast-wizard {
     .page-header-sub {
-      @extend %t-title4;
+       @extend %t-title4 !optional;
 
       color: $gray;
       font-weight: 300;
     }
 
     .page-header-super {
-      @extend %t-title4;
+       @extend %t-title4 !optional;
 
       float: left;
       width: flex-grid(12, 12);
@@ -397,7 +397,7 @@ dl {
 .content {
   @include clearfix();
 
-  @extend %t-copy-base;
+  @extend %t-copy-base !optional;
 
   max-width: $fg-max-width;
   min-width: $fg-min-width;
@@ -412,7 +412,7 @@ dl {
     padding-bottom: ($baseline/2);
 
     .title-sub {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       display: block;
       margin: 0;
@@ -420,7 +420,7 @@ dl {
     }
 
     .title-1 {
-      @extend %t-title3;
+       @extend %t-title3 !optional;
 
       margin: 0;
       padding: 0;
@@ -439,17 +439,17 @@ dl {
 // ====================
 .content-primary {
   .title-1 {
-    @extend %t-title3;
+     @extend %t-title3 !optional;
   }
 
   .title-2 {
-    @extend %t-title4;
+     @extend %t-title4 !optional;
 
     margin: 0 0 ($baseline/2) 0;
   }
 
   .title-3 {
-    @extend %t-title6;
+     @extend %t-title6 !optional;
 
     margin: 0 0 ($baseline/2) 0;
   }
@@ -464,7 +464,7 @@ dl {
     }
 
     .tip {
-      @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
       @include text-align(right);
       @include float(right);
@@ -532,7 +532,7 @@ dl {
 .new-policy-item {
   @include grey-button();
 
-  @extend %t-action5;
+    @extend %t-action5 !optional;
 
   margin: ($baseline/2);
   padding: 3px ($baseline/2) 4px ($baseline/2);
@@ -563,7 +563,7 @@ dl {
 // +UI - Misc
 // ====================
 hr.divide {
-  @extend %cont-text-sr;
+    @extend %cont-text-sr !optional;
 }
 
 .item-details {
@@ -572,7 +572,7 @@ hr.divide {
 }
 
 .details {
-  @extend %t-copy-sub1;
+  @extend %t-copy-sub1 !optional;
 
   display: none;
   margin-bottom: ($baseline*1.5);
@@ -586,7 +586,7 @@ hr.divide {
   .header {
     @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
 
-    @extend %t-title7;
+    @extend %t-title7 !optional;
 
     padding: 6px 14px;
     border-bottom: 1px solid $mediumGrey;
@@ -600,15 +600,15 @@ hr.divide {
     display: block;
     margin-bottom: 6px;
 
-    @extend %t-strong;
+    @extend %t-strong !optional;
 
     &.inline-label {
       display: inline;
     }
 
     .description {
-      @extend %t-copy-sub2;
-      @extend %t-regular;
+        @extend %t-copy-sub2 !optional;
+        @extend %t-regular !optional;
 
       display: block;
       font-style: italic;
@@ -629,28 +629,28 @@ hr.divide {
 // UI - semantically hide text
 .sr,
 .sr-only {
-  @extend %cont-text-sr;
+    @extend %cont-text-sr !optional;
 }
 
 // UI - faking a link's behavior
 .fake-link {
-  @extend %ui-fake-link;
+  @extend %ui-fake-link !optional;
 }
 
 // UI - disabled
 .is-disabled {
-  @extend %ui-disabled;
+    @extend %ui-disabled !optional;
 }
 
 // ui - semantic + visual divider
 hr.divider {
-  @extend %cont-text-sr;
+    @extend %cont-text-sr !optional;
 }
 
 // ui - skipnav
 .nav-skip,
 .transcript-skip {
-  @extend %t-action3;
+  @extend %t-action3 !optional;
 
   display: inline-block;
   position: absolute;
@@ -697,11 +697,11 @@ hr.divider {
     text-align: center;
 
     .label {
-      @extend %cont-text-sr;
+        @extend %cont-text-sr !optional;
     }
 
     .icon {
-      @extend %t-action1;
+      @extend %t-action1 !optional;
 
       color: $white;
     }
@@ -722,15 +722,15 @@ hr.divider {
   }
 
   .title {
-    @extend %t-title5;
-    @extend %t-strong;
+    @extend %t-title5 !optional;
+    @extend %t-strong !optional;
 
     margin: 0 0 ($baseline/2) 0;
     color: $gray-d3;
   }
 
   .description {
-    @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
     margin-top: ($baseline/2);
     color: $gray-l1;

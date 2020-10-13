@@ -68,8 +68,8 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
 // --------------------
 .edx-notes-visibility {
   .edx-notes-visibility-error {
-    @extend %t-copy-sub2;
-    @extend %text-truncated;
+    @extend %t-copy-sub2 !optional;
+    @extend %text-truncated !optional;
 
     position: relative;
     bottom: -($baseline/20); // needed to sync up with current rogue/more complex calc utility alignment
@@ -100,8 +100,8 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
 
 // CASE: annotator error in toggling notes (vendor customization)
 .annotator-notice {
-  @extend %t-weight4;
-  @extend %t-copy-sub1;
+  @extend %t-weight4 !optional;
+  @extend %t-copy-sub1 !optional;
 
   padding: ($baseline/4) $baseline;
   background: $black-t3;
@@ -110,8 +110,8 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
 // CASE: annotator error in toggling notes
 // vendor customization
 .annotator-notice {
-  @extend %t-weight4;
-  @extend %t-copy-sub1;
+  @extend %t-weight4 !optional;
+  @extend %t-copy-sub1 !optional;
 
   padding: ($baseline/2) $baseline;
   background: $gray-d4;
@@ -130,13 +130,13 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
   // +individual note (in context)
   // --------------------
   .annotator-outer {
-    @extend %ui-depth4;
-    @extend %notes-reset-font;
+    @extend %ui-depth4 !optional;
+    @extend %notes-reset-font !optional;
   }
 
   // bubble
   .annotator-widget.annotator-widget {
-    @extend %notes-bubble;
+    @extend %notes-bubble !optional;
   }
 
   .annotator-listing {
@@ -145,7 +145,7 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
 
     .annotator-widget {
       &::after {
-        @extend %bubble;
+        @extend %bubble !optional;
       }
     }
   }
@@ -153,7 +153,7 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
   .annotator-editor {
     .annotator-widget {
       &::after {
-        @extend %bubble;
+        @extend %bubble !optional;
 
         background: $gray-l5;
       }
@@ -169,18 +169,18 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
   // --------------------
   // adding
   .annotator-adder {
-    @extend %notes-reset-background;
-    @extend %ui-depth4;
+    @extend %notes-reset-background !optional;
+    @extend %ui-depth4 !optional;
 
     button {
-      @extend %notes-bubble;
+      @extend %notes-bubble !optional;
 
       position: relative;
       display: block;
 
       &::after {
-        @extend %notes-reset-icon;
-        @extend %shame-link-base;
+        @extend %notes-reset-icon !optional;
+        @extend %shame-link-base !optional;
 
         @include font-size(30);
 
@@ -194,7 +194,7 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
 
       // using annotatorJS triangle styling for adder
       &::before {
-        @extend %bubble;
+        @extend %bubble !optional;
 
         @include left(10px);
 
@@ -209,7 +209,7 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
       @include text-align(left);
       @include clearfix();
 
-      @extend %ui-depth1;
+      @extend %ui-depth1 !optional;
 
       position: relative;
       padding: 8px;
@@ -221,7 +221,7 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
       // actions
       .annotator-save,
       .annotator-cancel {
-        @extend %notes-reset-background;
+        @extend %notes-reset-background !optional;
 
         padding: ($baseline/4) ($baseline/2) !important;
         border: none;
@@ -247,8 +247,8 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
 
     .annotator-item {
       textarea {
-        @extend %notes-reset-font;
-        @extend %t-demi-strong;
+        @extend %notes-reset-font !optional;
+        @extend %t-demi-strong !optional;
 
         padding: ($baseline/5) !important;
         font-size: 14px !important;
@@ -285,7 +285,7 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
       // STATE: disabled
       &:disabled,
       &.is-disabled {
-        @extend %ui-disabled;
+        @extend %ui-disabled !optional;
 
         opacity: 0.5;
         cursor: not-allowed;
@@ -312,7 +312,7 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
 
     // poorly scoped selector for content of a note's comment
     div:first-of-type {
-      @extend %notes-reset-font;
+      @extend %notes-reset-font !optional;
 
       padding: ($baseline/4) !important;
       font-size: 14px !important;
@@ -339,9 +339,9 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
         vertical-align: middle;
 
         &::before {
-          @extend %notes-reset-icon;
-          @extend %shame-link-base;
-          @extend %t-icon4;
+          @extend %notes-reset-icon !optional;
+          @extend %shame-link-base !optional;
+          @extend %t-icon4 !optional;
 
           position: absolute;
         }
@@ -386,18 +386,18 @@ $notes-annotator-background-dark: rgba(122, 122, 122, 0.6); // taken from annota
 // +necessary, but ugly overrides
 // --------------------
 .edx-notes-wrapper .annotator-wrapper.annotator-wrapper .annotator-outer.annotator-viewer .annotator-controls button {
-  @extend %notes-reset-background;
+  @extend %notes-reset-background !optional;
 
   opacity: 1;
 }
 
 .edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer button.annotator-save {
-  @extend %btn-inherited-primary;
-  @extend %t-action2;
+  @extend %btn-inherited-primary !optional;
+  @extend %t-action2 !optional;
 }
 
 .edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer button.annotator-cancel {
-  @extend %shame-link-base;
-  @extend %t-action2;
-  @extend %t-regular;
+  @extend %shame-link-base !optional;
+  @extend %t-action2 !optional;
+  @extend %t-regular !optional;
 }

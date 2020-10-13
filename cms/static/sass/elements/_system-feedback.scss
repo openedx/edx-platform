@@ -3,7 +3,7 @@
 
 // messages
 .message {
-  @extend %t-copy-sub1;
+  @extend %t-copy-sub1 !optional;
 
   display: block;
 }
@@ -13,7 +13,7 @@
 
   box-sizing: border-box;
 
-  @extend %t-strong;
+  @extend %t-strong !optional;
 
   display: none;
   border-bottom: 2px solid $yellow-d2;
@@ -23,7 +23,7 @@
   color: $white;
 
   .feedback-symbol {
-    @extend %t-icon5;
+    @extend %t-icon5 !optional;
 
     position: relative;
     top: 1px;
@@ -56,7 +56,7 @@
   box-sizing: border-box;
 
   .copy {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
   }
 }
 
@@ -143,13 +143,13 @@
     .nav-actions .action-primary {
       @include blue-button();
 
-      @extend %t-action4;
+      @extend %t-action4 !optional;
 
       border-color: $blue-d2;
     }
 
     button {
-      @extend %btn-no-style;
+      @extend %btn-no-style !optional;
 
       color: $blue;
 
@@ -164,14 +164,14 @@
     .nav-actions .action-primary {
       @include orange-button();
 
-      @extend %t-action4;
+      @extend %t-action4 !optional;
 
       border-color: $orange-d2;
       color: $gray-d4;
     }
 
     button {
-      @extend %btn-no-style;
+      @extend %btn-no-style !optional;
 
       color: $orange;
 
@@ -186,13 +186,13 @@
     .nav-actions .action-primary {
       @include red-button();
 
-      @extend %t-action4;
+      @extend %t-action4 !optional;
 
       border-color: $red-d2;
     }
 
     button {
-      @extend %btn-no-style;
+      @extend %btn-no-style !optional;
 
       color: $red-l1;
 
@@ -207,13 +207,13 @@
     .nav-actions .action-primary {
       @include blue-button();
 
-      @extend %t-action4;
+      @extend %t-action4 !optional;
 
       border-color: $blue-d2;
     }
 
     button {
-      @extend %btn-no-style;
+      @extend %btn-no-style !optional;
 
       color: $blue;
 
@@ -228,13 +228,13 @@
     .nav-actions .action-primary {
       @include green-button();
 
-      @extend %t-action4;
+      @extend %t-action4 !optional;
 
       border-color: $green-d2;
     }
 
     button {
-      @extend %btn-no-style;
+      @extend %btn-no-style !optional;
 
       color: $green;
 
@@ -249,13 +249,13 @@
     .nav-actions .action-primary {
       @include pink-button();
 
-      @extend %t-action4;
+      @extend %t-action4 !optional;
 
       border-color: $pink-d2;
     }
 
     button {
-      @extend %btn-no-style;
+      @extend %btn-no-style !optional;
 
       color: $pink;
 
@@ -268,7 +268,7 @@
 
 // prompts
 .wrapper-prompt {
-  @extend %ui-depth5;
+  @extend %ui-depth5 !optional;
 
   @include transition(all $tmg-f3 ease-in-out  0s);
 
@@ -319,12 +319,12 @@
       }
 
       .action-primary {
-        @extend %t-action4;
-        @extend %t-strong;
+        @extend %t-action4 !optional;
+        @extend %t-strong !optional;
       }
 
       .action-secondary {
-        @extend %t-action4;
+        @extend %t-action4 !optional;
       }
     }
   }
@@ -367,7 +367,7 @@
 
 // notifications
 .wrapper-notification {
-  @extend %ui-depth5;
+  @extend %ui-depth5 !optional;
 
   @include clearfix();
 
@@ -484,7 +484,7 @@
   max-width: $fg-max-width;
 
   strong {
-    @extend %t-strong;
+    @extend %t-strong !optional;
   }
 
   .feedback-symbol,
@@ -497,7 +497,7 @@
   .feedback-symbol {
     @include transition (color $tmg-f1 ease-in-out 0s);
 
-    @extend %t-icon3;
+    @extend %t-icon3 !optional;
 
     width: flex-grid(1, 12);
     height: ($baseline*1.25);
@@ -508,13 +508,13 @@
   }
 
   .copy {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     width: flex-grid(10, 12);
     color: $gray-l2;
 
     .title {
-      @extend %t-title7;
+      @extend %t-title7 !optional;
 
       margin-bottom: 0;
       color: $white;
@@ -556,13 +556,13 @@
     .action-primary {
       @include blue-button();
 
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       border-color: $blue-d2;
     }
 
     .action-secondary {
-      @extend %t-action4;
+      @extend %t-action4 !optional;
     }
   }
 
@@ -591,11 +591,11 @@
     }
 
     .title {
-      @extend %cont-truncated;
+      @extend %cont-truncated !optional;
     }
 
     .copy p {
-      @extend %cont-text-sr;
+      @extend %cont-text-sr !optional;
     }
   }
 }
@@ -604,7 +604,7 @@
 
 // alerts
 .wrapper-alert {
-  @extend %ui-depth2;
+  @extend %ui-depth2 !optional;
 
   box-sizing: border-box;
   box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
@@ -677,7 +677,7 @@
   color: $white;
 
   strong {
-    @extend %t-strong;
+    @extend %t-strong !optional;
   }
 
   .feedback-symbol,
@@ -688,7 +688,7 @@
   .feedback-symbol {
     @include transition (color $tmg-f1 ease-in-out 0s);
 
-    @extend %t-icon3;
+    @extend %t-icon3 !optional;
 
     width: flex-grid(1, 12);
     margin: ($baseline/4) flex-gutter() 0 0;
@@ -701,7 +701,7 @@
     color: $gray-l2;
 
     .title {
-      @extend %t-title7;
+      @extend %t-title7 !optional;
 
       margin-bottom: 0;
       color: $white;
@@ -739,12 +739,12 @@
         }
 
         .action-primary {
-          @extend %t-action4;
-          @extend %t-strong;
+          @extend %t-action4 !optional;
+          @extend %t-strong !optional;
         }
 
         .action-secondary {
-          @extend %t-action4;
+          @extend %t-action4 !optional;
         }
       }
     }
@@ -762,11 +762,11 @@
     text-align: center;
 
     .label {
-      @extend %cont-text-sr;
+      @extend %cont-text-sr !optional;
     }
 
     .icon {
-      @extend %t-icon6;
+      @extend %t-icon6 !optional;
 
       color: $white;
       width: auto;
@@ -782,7 +782,7 @@
   // with dismiss (to sunset action-alert-clos)
   .action-dismiss {
     .button {
-      @extend %btn-secondary-white;
+      @extend %btn-secondary-white !optional;
 
       padding: ($baseline/4) ($baseline/2);
     }
@@ -794,13 +794,13 @@
     }
 
     .icon {
-      @extend %t-icon4;
+      @extend %t-icon4 !optional;
 
       margin-right: ($baseline/4);
     }
 
     .button-copy {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
     }
   }
 }
@@ -859,7 +859,7 @@
 // block-level messages and validation
 .wrapper-message {
   .message {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     background-color: $gray-d2;
     padding: ($baseline/2) ($baseline*0.75);
@@ -870,7 +870,7 @@
     }
 
     &.information {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       background-color: $gray-l5;
       color: $gray-d2;
@@ -913,7 +913,7 @@
     background-color: $gray-d1;
 
     .actions-list {
-      @extend %actions-list;
+      @extend %actions-list !optional;
     }
   }
 }
@@ -930,7 +930,7 @@ body.uxdesign.alerts {
   }
 
   .content-primary {
-    @extend %ui-window;
+    @extend %ui-window !optional;
 
     width: flex-grid(12, 12);
 
@@ -978,7 +978,7 @@ body.uxdesign.alerts {
 // artifact styles
 .main-wrapper {
   .alert {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     padding: 15px 20px;
     margin-bottom: ($baseline*1.5);
@@ -996,7 +996,7 @@ body.uxdesign.alerts {
     }
 
     strong {
-      @extend %t-strong;
+      @extend %t-strong !optional;
     }
 
     .alert-action {
@@ -1027,8 +1027,8 @@ body.error {
   }
 
   h1 {
-    @extend %t-title1;
-    @extend %t-light;
+    @extend %t-title1 !optional;
+    @extend %t-light !optional;
 
     float: none;
     margin: 0;
@@ -1036,7 +1036,7 @@ body.error {
   }
 
   .description {
-    @extend %t-copy-lead2;
+    @extend %t-copy-lead2 !optional;
 
     margin-bottom: 50px;
   }
@@ -1044,7 +1044,7 @@ body.error {
   .back-button {
     @include blue-button();
 
-    @extend %t-action1;
+    @extend %t-action1 !optional;
 
     padding: 14px 40px 18px;
   }

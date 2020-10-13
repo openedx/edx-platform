@@ -36,8 +36,8 @@
 
 // primary button
 %m-btn-base {
-  @extend %m-btn;
-  @extend %m-btn-edged;
+  @extend %m-btn !optional;
+  @extend %m-btn-edged !optional;
 
   border: none;
   padding: ($baseline/2) ($baseline);
@@ -60,7 +60,7 @@
 
 // primary button
 %m-btn-primary {
-  @extend %m-btn-base;
+  @extend %m-btn-base !optional;
 
   box-shadow: 0 2px 1px 0 $action-primary-shadow;
   background: $action-primary-bg;
@@ -99,7 +99,7 @@
 
 // secondary button
 %m-btn-secondary {
-  @extend %m-btn-base;
+  @extend %m-btn-base !optional;
 
   box-shadow: 0 2px 1px 0 $action-secondary-shadow;
   background: $action-secondary-bg;
@@ -201,7 +201,7 @@ footer .references {
 // modal semantic button resetting - overriding the poorly scoped button mixin styling
 .close-modal,
 button.close-modal {
-  @extend %ui-reset-button;
+  @extend %ui-reset-button !optional;
 
   &:focus {
     border: none !important;
@@ -232,12 +232,12 @@ button.close-modal {
   }
 
   .action-primary {
-    @extend %t-action4;
+    @extend %t-action4 !optional;
   }
 
   .action-secondary {
-    @extend %btn-no-style;
-    @extend %t-strong;
+    @extend %btn-no-style !optional;
+    @extend %t-strong !optional;
 
     box-shadow: none;
     text-shadow: none;

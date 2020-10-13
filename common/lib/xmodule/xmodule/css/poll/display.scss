@@ -58,7 +58,7 @@ div.poll_question {
       }
 
       .button {
-        @extend %ui-fake-link;
+         @extend %ui-fake-link !optional;
 
         -webkit-appearance: none;
         -webkit-background-clip: padding-box;
@@ -133,7 +133,7 @@ div.poll_question {
       }
 
       .text {
-        @extend %ui-fake-link;
+         @extend %ui-fake-link !optional;
 
         display: inline;
         float: left;

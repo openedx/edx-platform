@@ -7,16 +7,16 @@
   margin-bottom: $baseline;
 
   .title {
-    @extend %t-title4;
-    @extend %t-strong;
+    @extend %t-title4 !optional;
+    @extend %t-strong !optional;
   }
 
   .copy {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
   }
 
   strong {
-    @extend %t-strong;
+    @extend %t-strong !optional;
   }
 
   // CASE: has links alongside
@@ -32,7 +32,7 @@
     }
 
     .nav-introduction-supplementary {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       @include float(right);
 
@@ -42,7 +42,7 @@
       @include text-align(right);
 
       .icon {
-        @extend %t-action3;
+        @extend %t-action3 !optional;
 
         display: inline-block;
         vertical-align: middle;
@@ -54,7 +54,7 @@
 
 // notices - in-context: to be used as notices to users within the context of a form/action
 .notice-incontext {
-  @extend %ui-well;
+  @extend %ui-well !optional;
 
   border-radius: ($baseline/10);
   position: relative;
@@ -62,14 +62,14 @@
   margin-bottom: $baseline;
 
   .title {
-    @extend %t-title6;
-    @extend %t-strong;
+    @extend %t-title6 !optional;
+    @extend %t-strong !optional;
 
     margin-bottom: ($baseline/2);
   }
 
   .copy {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     @include transition(opacity $tmg-f2 ease-in-out 0s);
 
@@ -82,7 +82,7 @@
   }
 
   strong {
-    @extend %t-strong;
+    @extend %t-strong !optional;
   }
 
   &.has-status {
@@ -103,8 +103,8 @@
       margin-top: ($baseline*0.75);
 
       .action-primary {
-        @extend %btn-primary-blue;
-        @extend %t-action3;
+        @extend %btn-primary-blue !optional;
+        @extend %t-action3 !optional;
       }
     }
   }
@@ -157,8 +157,8 @@
   &.has-actions {
     .list-actions {
       .action-primary {
-        @extend %btn-primary-blue;
-        @extend %t-action3;
+        @extend %btn-primary-blue !optional;
+        @extend %t-action3 !optional;
       }
     }
   }
@@ -179,8 +179,8 @@
   &.has-actions {
     .list-actions {
       .action-primary {
-        @extend %btn-primary-green;
-        @extend %t-action3;
+        @extend %btn-primary-green !optional;
+        @extend %t-action3 !optional;
       }
     }
   }
@@ -207,7 +207,7 @@
 
 // informational bits (rename once UI pattern is further defined)
 .bit {
-  @extend %t-copy-sub1;
+  @extend %t-copy-sub1 !optional;
 
   margin: 0 0 $baseline 0;
   border-bottom: 1px solid $gray-l4;
@@ -222,8 +222,8 @@
 
   h3,
   .title {
-    @extend %t-title7;
-    @extend %t-strong;
+    @extend %t-title7 !optional;
+    @extend %t-strong !optional;
 
     margin: 0 0 ($baseline/4) 0;
     color: $gray-d2;
@@ -242,16 +242,16 @@
   .external-help-button {
     display: inline-block;
 
-    @extend %ui-btn-flat-outline;
-    @extend %sizing;
+    @extend %ui-btn-flat-outline !optional;
+    @extend %sizing !optional;
   }
 
   // actions
   .list-actions {
-    @extend %cont-no-list;
+    @extend %cont-no-list !optional;
 
     .action-item {
-      @extend %wipe-last-child;
+      @extend %wipe-last-child !optional;
 
       margin-bottom: ($baseline/4);
       border-bottom: 1px dotted $gray-l4;
@@ -261,10 +261,10 @@
 
   // details
   .list-details {
-    @extend %cont-no-list;
+    @extend %cont-no-list !optional;
 
     .item-detail {
-      @extend %wipe-last-child;
+      @extend %wipe-last-child !optional;
 
       margin-bottom: ($baseline/4);
       border-bottom: 1px dotted $gray-l4;
@@ -275,10 +275,10 @@
   // navigation
   .nav-related,
   .nav-page {
-    @extend %cont-no-list;
+    @extend %cont-no-list !optional;
 
     .nav-item {
-      @extend %wipe-last-child;
+      @extend %wipe-last-child !optional;
 
       margin-bottom: ($baseline/4);
       border-bottom: 1px dotted $gray-l5;

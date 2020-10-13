@@ -1,48 +1,48 @@
 .entitlement-actions-wrapper {
-  @extend .wrapper-action-more;
+  @extend .wrapper-action-more !optional;
 
   .entitlement-action {
-    @extend .action;
+    @extend .action !optional;
   }
 
   .entitlement-action-more {
-    @extend .action-more;
+    @extend .action-more !optional;
   }
 
   .entitlement-actions-dropdown {
-    @extend .actions-dropdown;
+    @extend .actions-dropdown !optional;
 
     .entitlement-actions-dropdown-list {
-      @extend .actions-dropdown-list;
+      @extend .actions-dropdown-list !optional;
 
       .entitlement-actions-item {
-        @extend .actions-item;
+        @extend .actions-item !optional;
       }
     }
   }
 }
 
 .entitlement-unenrollment-modal {
-  @extend .modal;
+  @extend .modal !optional;
 
   margin-top: -3*$baseline;
 
   .entitlement-unenrollment-modal-inner-wrapper {
-    @extend .inner-wrapper;
+    @extend .inner-wrapper !optional;
 
     height: 98%;
     overflow-y: scroll;
 
     .entitlement-unenrollment-modal-close-btn {
-      @extend .close-modal;
+      @extend .close-modal !optional;
     }
 
     .entitlement-unenrollment-modal-header {
-      @extend .unenroll-header;
+      @extend .unenroll-header !optional;
     }
 
     .entitlement-unenrollment-modal-error-text {
-      @extend .modal-form-error;
+      @extend .modal-form-error !optional;
 
       background: tint($red, 95%);
       margin-left: $baseline;

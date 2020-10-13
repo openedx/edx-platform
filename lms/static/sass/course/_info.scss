@@ -39,7 +39,7 @@ $notification-background: rgb(255, 255, 255) !default;
     border-radius: 2px;
 
     .last-accessed-link {
-      @extend %t-title6;
+      @extend %t-title6 !optional;
 
       color: $very-light-text;
     }
@@ -50,7 +50,7 @@ div.info-wrapper {
   background-color: $homepage-background;
 
   section.updates {
-    @extend .content;
+    @extend .content !optional;
 
     @include padding-left($baseline);
 
@@ -80,7 +80,7 @@ div.info-wrapper {
       }
 
       .show-older-updates {
-        @extend %btn-pl-white-base;
+        @extend %btn-pl-white-base !optional;
 
         padding: ($baseline/2);
 
@@ -102,7 +102,7 @@ div.info-wrapper {
 
       > li,
       article {
-        @extend .clearfix;
+        @extend .clearfix !optional;
 
         padding: $baseline;
         list-style-type: none;
@@ -118,7 +118,7 @@ div.info-wrapper {
         }
 
         .date {
-          @extend %t-title9;
+          @extend %t-title9 !optional;
 
           margin-bottom: ($baseline/4);
           text-transform: none;
@@ -130,7 +130,7 @@ div.info-wrapper {
 
 
         .toggle-visibility-button {
-          @extend %t-title9;
+          @extend %t-title9 !optional;
 
           @include float(right);
 
@@ -193,7 +193,7 @@ div.info-wrapper {
     padding: 20px 30px;
     margin: 0;
 
-    @extend .sidebar;
+    @extend .sidebar !optional;
 
     background: rgba(0, 0, 0, 0);
     box-shadow: none;
@@ -222,8 +222,8 @@ div.info-wrapper {
     .handouts-header {
       @include text-align(left);
 
-      @extend %t-strong;
-      @extend %t-title6;
+      @extend %t-strong !optional;
+      @extend %t-title6 !optional;
 
       margin-bottom: 0;
       padding: 12px 26px 10px 0;

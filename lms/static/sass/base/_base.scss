@@ -122,7 +122,7 @@ a:visited:not(.btn) {
   &:disabled,
   &.is-disabled,
   &.disabled {
-    @extend %ui-disabled;
+    @extend %ui-disabled !optional;
 
     opacity: 0.5;
     cursor: not-allowed;
@@ -245,7 +245,7 @@ mark {
 
 // UI - disabled state
 .is-disabled {
-  @extend %ui-disabled;
+  @extend %ui-disabled !optional;
 }
 
 // UI - is hidden
@@ -255,20 +255,20 @@ mark {
 
 // UI - is deprecated
 .is-deprecated {
-  @extend %ui-deprecated;
+  @extend %ui-deprecated !optional;
 }
 
 // UI - semantically hide text
 .sr,
 .sr-only {
-  @extend %text-sr;
-  @extend %a11y-ensure-contrast;
+  @extend %text-sr !optional;
+  @extend %a11y-ensure-contrast !optional;
 }
 
 // UI - skipnav
 .nav-skip,
 .transcript-skip {
-  @extend %ui-print-excluded;
+  @extend %ui-print-excluded !optional;
 
   display: inline-block;
   position: absolute;

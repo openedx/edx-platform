@@ -31,7 +31,7 @@
     }
 
     .course-original-title-id {
-      @extend %t-title5;
+      @extend %t-title5 !optional;
     }
   }
 
@@ -55,7 +55,7 @@
     }
 
     label {
-      @extend %t-title7;
+      @extend %t-title7 !optional;
 
       display: block;
       font-weight: 700;
@@ -74,7 +74,7 @@
     }
 
     .rerun-course-name {
-      @extend %t-title5;
+      @extend %t-title5 !optional;
 
       font-weight: 300;
     }
@@ -119,13 +119,13 @@
       .action-primary {
         @include blue-button;
 
-        @extend %t-action2;
+        @extend %t-action2 !optional;
       }
 
       .action-secondary {
         @include grey-button;
 
-        @extend %t-action2;
+        @extend %t-action2 !optional;
       }
     }
   }

@@ -51,9 +51,9 @@
     }
   }
 
-  .nav-label {
-    @extend %cont-text-sr;
-  }
+    .nav-label {
+        @extend %cont-text-sr !optional;
+    }
 
   .pagination-form,
   .current-page,
@@ -62,11 +62,11 @@
     display: inline-block;
   }
 
-  .current-page,
-  .page-number-input,
-  .total-pages {
-    @extend %t-copy-base;
-    @extend %t-strong;
+    .current-page,
+    .page-number-input,
+    .total-pages {
+        @extend %t-copy-base !optional;
+        @extend %t-strong !optional;
 
     width: ($baseline*2.5);
     margin: 0 ($baseline*0.75);
@@ -75,31 +75,31 @@
     color: $gray-d2;
   }
 
-  .current-page {
-    @extend %ui-depth1;
+    .current-page {
+        @extend %ui-depth1 !optional;
 
     position: absolute;
 
     @include left(-($baseline/4));
   }
 
-  .page-divider {
-    @extend %t-title4;
-    @extend %t-regular;
+    .page-divider {
+        @extend %t-title4 !optional;
+        @extend %t-regular !optional;
 
     vertical-align: middle;
     color: $gray;
   }
 
-  .pagination-form {
-    @extend %ui-depth2;
+    .pagination-form {
+        @extend %ui-depth2 !optional;
 
     position: relative;
 
-    .page-number-label,
-    .submit-pagination-form {
-      @extend %cont-text-sr;
-    }
+        .page-number-label,
+        .submit-pagination-form {
+            @extend %cont-text-sr !optional;
+        }
 
     .page-number-input {
       @include transition(all $tmg-f2 ease-in-out 0s);

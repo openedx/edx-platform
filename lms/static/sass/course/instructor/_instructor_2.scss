@@ -1,7 +1,7 @@
 @mixin idashbutton ($color) {
   @include button(simple, $color);
 
-  @extend .button-reset;
+  @extend .button-reset !optional;
 
   margin-bottom: 1em;
   padding: 8px 17px;
@@ -146,7 +146,7 @@
   }
 
   .btn-blue {
-    @extend %btn-primary-blue;
+    @extend %btn-primary-blue !optional;
 
     margin-bottom: 0;
     padding: ($baseline/2.5) ($baseline/2);
@@ -221,7 +221,7 @@
 // instructor dashboard 2
 // ====================
 .instructor-dashboard-content-2 {
-  @extend .content;
+  @extend .content !optional;
 
   display: block; // override the table-cell display set in .content
   width: 100%;
@@ -263,7 +263,7 @@
   }
 
   .instructor-dashboard-title {
-    @extend .top-header;
+    @extend .top-header !optional;
 
     display: inline-block;
     margin-bottom: ($baseline*0.75);
@@ -285,12 +285,12 @@
   }
 
   .instructor-nav {
-    @extend %ui-no-list;
+    @extend %ui-no-list !optional;
 
     border-bottom: 1px solid $gray-l3;
 
     .nav-item {
-      @extend %t-copy-base;
+      @extend %t-copy-base !optional;
 
       display: inline-block;
 
@@ -353,14 +353,14 @@
   }
 
   .message-title {
-    @extend %t-title6;
-    @extend %t-weight4;
+    @extend %t-title6 !optional;
+    @extend %t-weight4 !optional;
 
     margin-bottom: ($baseline/4);
   }
 
   .message-copy {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
   }
 
   .message-actions {
@@ -444,7 +444,7 @@
     }
 
     .description {
-      @extend %t-title7;
+      @extend %t-title7 !optional;
 
       @include float(right);
       @include text-align(right);
@@ -456,8 +456,8 @@
   }
 
   .subsection-title {
-    @extend %hd-lv5;
-    @extend %t-weight4;
+    @extend %hd-lv5 !optional;
+    @extend %t-weight4 !optional;
 
     margin-bottom: ($baseline/2);
   }
@@ -672,7 +672,7 @@
   }
 
   .batch-enrollment-ccx {
-    @extend .batch-enrollment;
+    @extend .batch-enrollment !optional;
 
     float: left;
     width: 100%;
@@ -693,7 +693,7 @@
     position: relative;
 
     .hint {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       display: block;
       position: absolute;
@@ -777,7 +777,7 @@
 
         .label,
         .form-label {
-          @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
 
           color: $lighter-base-font-color;
         }
@@ -808,7 +808,7 @@
 
           th,
           td {
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
 
             vertical-align: middle;
             padding: ($baseline/2) ($baseline/4);
@@ -857,7 +857,7 @@
   }
 
   .member-lists-management-ccx {
-    @extend .member-lists-management;
+    @extend .member-lists-management !optional;
 
     float: left;
     width: 100%;
@@ -881,14 +881,14 @@
 
       .label,
       .form-label {
-        @extend %t-title7;
-        @extend %t-weight4;
+        @extend %t-title7 !optional;
+        @extend %t-weight4 !optional;
 
         margin-bottom: ($baseline/2);
       }
 
       .tip {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         margin-top: ($baseline/4);
         color: $gray-l2;
@@ -926,7 +926,7 @@
     }
 
     .form-cancel {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
     }
   }
 
@@ -957,7 +957,7 @@
     .action-create {
       @include idashbutton($primary);
 
-      @extend %t-weight4;
+      @extend %t-weight4 !optional;
 
       @include float(right);
       @include text-align(right);
@@ -988,13 +988,13 @@
   // create or edit cohort
   .cohort-management-settings,
   .cohort-management-edit {
-    @extend %cohort-management-form;
+    @extend %cohort-management-form !optional;
 
     margin-bottom: $baseline;
 
     .form-title {
-      @extend %t-title5;
-      @extend %t-weight4;
+      @extend %t-title5 !optional;
+      @extend %t-weight4 !optional;
 
       padding: $baseline;
       background: $gray-l5;
@@ -1050,15 +1050,15 @@
     }
 
     .title-value {
-      @extend %t-title5;
-      @extend %t-weight4;
+      @extend %t-title5 !optional;
+      @extend %t-weight4 !optional;
 
       @include margin-right($baseline/4);
     }
 
     .group-count {
-      @extend %t-title7;
-      @extend %t-weight4;
+      @extend %t-title7 !optional;
+      @extend %t-weight4 !optional;
     }
 
     .action-edit-name {
@@ -1078,7 +1078,7 @@
   .cohort-management-group-setup {
     @include clearfix();
 
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     color: $gray-l2;
 
@@ -1098,17 +1098,17 @@
   }
 
   .cohort-management-group-add {
-    @extend %cohort-management-form;
+    @extend %cohort-management-form !optional;
 
     border: 1px solid $gray-l5;
 
     .message-title {
-      @extend %t-title7;
+      @extend %t-title7 !optional;
     }
 
     .form-title {
-      @extend %t-title6;
-      @extend %t-weight4;
+      @extend %t-title6 !optional;
+      @extend %t-weight4 !optional;
 
       margin-bottom: ($baseline/4);
       padding: 0;
@@ -1117,7 +1117,7 @@
     }
 
     .form-introduction {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       margin-bottom: $baseline;
 
@@ -1145,7 +1145,7 @@
   // cohort the discussion topics.
   .toggle-cohort-management-secondary,
   .toggle-cohort-management-discussions {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     background: transparent;
     border: none;
@@ -1162,11 +1162,11 @@
 
   .cohort-management-file-upload {
     .message-title {
-      @extend %t-title7;
+      @extend %t-title7 !optional;
     }
 
     .form-introduction {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       margin-bottom: $baseline;
 
@@ -1177,7 +1177,7 @@
   }
 
   .file-upload-form {
-    @extend %cohort-management-form;
+    @extend %cohort-management-form !optional;
 
     .form-fields {
       margin-bottom: $baseline;
@@ -1195,7 +1195,7 @@
   }
 
   .cohort-management-supplemental {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     margin-top: $baseline;
     padding: ($baseline/2) $baseline;
@@ -1289,7 +1289,7 @@
       }
 
       .cohort-details-name {
-        @extend %t-action1;
+        @extend %t-action1 !optional;
 
         display: block;
         width: 100%;
@@ -1310,8 +1310,8 @@
   }
 
   .wrapper-tabs { // This applies to the tab-like interface that toggles between the student management and the group settings
-    @extend %ui-no-list;
-    @extend %ui-depth1;
+    @extend %ui-no-list !optional;
+    @extend %ui-depth1 !optional;
 
     position: relative;
     top: 1px;
@@ -1413,7 +1413,7 @@
   }
 
   .discussions-management-supplemental {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     margin-top: $baseline;
     padding: ($baseline/2) $baseline;
@@ -1452,7 +1452,7 @@
     }
 
     .discussions-wrapper {
-      @extend %ui-no-list;
+      @extend %ui-no-list !optional;
 
       padding: 0 ($baseline/2);
 
@@ -1463,8 +1463,8 @@
   }
 
   .wrapper-tabs {
-    @extend %ui-no-list;
-    @extend %ui-depth1;
+    @extend %ui-no-list !optional;
+    @extend %ui-depth1 !optional;
 
     position: relative;
     top: 1px;
@@ -1904,7 +1904,7 @@ input[name="subject"] {
     .add {
       @include button(simple, $primary);
 
-      @extend .button-reset;
+      @extend .button-reset !optional;
 
       font-size: em(13);
 
@@ -2156,7 +2156,7 @@ input[name="subject"] {
     input[type="button"]#lookup_regcode {
       @include button(simple, $primary);
 
-      @extend .button-reset;
+      @extend .button-reset !optional;
 
       display: block;
       height: auto;
@@ -2168,7 +2168,7 @@ input[name="subject"] {
     input[name="generate-registration-codes-csv"] {
       @include button(simple, $primary);
 
-      @extend .button-reset;
+      @extend .button-reset !optional;
     }
 
     .modal-form-error {
@@ -2519,7 +2519,7 @@ input[name="subject"] {
     .add {
       @include button(simple, $primary);
 
-      @extend .button-reset;
+      @extend .button-reset !optional;
 
       font-size: em(13);
 
@@ -2547,7 +2547,7 @@ input[name="subject"] {
     .add {
       @include button(simple, $primary);
 
-      @extend .button-reset;
+      @extend .button-reset !optional;
 
       font-size: em(13);
     }
@@ -2579,7 +2579,7 @@ input[name="subject"] {
     .add {
       @include button(simple, $primary);
 
-      @extend .button-reset;
+      @extend .button-reset !optional;
 
       font-size: em(13);
     }
@@ -2612,7 +2612,7 @@ input[name="subject"] {
       }
 
       th {
-        @extend %t-action2;
+        @extend %t-action2 !optional;
 
         text-align: left;
         border-bottom: 1px solid $border-color-1;
@@ -2853,7 +2853,7 @@ input[name="subject"] {
 
   .certificates-wrapper {
     .message {
-      @extend %exception-message;
+      @extend %exception-message !optional;
     }
   }
 
@@ -2912,7 +2912,7 @@ input[name="subject"] {
       }
 
       .message {
-        @extend %exception-message;
+        @extend %exception-message !optional;
       }
     }
   }
@@ -2928,7 +2928,7 @@ input[name="subject"] {
       word-wrap: break-word;
 
       th {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         background-color: $gray-l5;
         padding: ($baseline*0.75) ($baseline/2) ($baseline*0.75) ($baseline/2);
@@ -2993,7 +2993,7 @@ input[name="subject"] {
     }
 
     .message {
-      @extend %exception-message;
+      @extend %exception-message !optional;
     }
   }
 

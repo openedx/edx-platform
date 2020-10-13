@@ -60,7 +60,7 @@ $annotatable--body-font-size: em(14);
 }
 
 .annotatable-span {
-  @extend %ui-fake-link;
+   @extend %ui-fake-link !optional;
 
   display: inline;
 

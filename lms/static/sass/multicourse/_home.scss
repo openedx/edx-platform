@@ -27,7 +27,7 @@ $course-search-input-height: ($button-size);
     .outer-wrapper {
       @include clearfix();
 
-      @extend .animation-home-header-pop-up;
+      @extend .animation-home-header-pop-up !optional;
 
       position: relative;
       margin: 0 auto;
@@ -118,8 +118,8 @@ $course-search-input-height: ($button-size);
           @include padding-right($button-size);
           @include padding-left($baseline*0.5);
 
-          @extend %ui-depth1;
-          @extend %t-title5;
+          @extend %ui-depth1 !optional;
+          @extend %t-title5 !optional;
 
           border: 2px solid $gray-l3;
           border-radius: 3px;
@@ -132,7 +132,7 @@ $course-search-input-height: ($button-size);
 
           // STATE: focus
           &:focus {
-            @extend %no-outline;
+            @extend %no-outline !optional;
 
             border-color: $m-blue-d1;
           }
@@ -142,9 +142,9 @@ $course-search-input-height: ($button-size);
           @include right($baseline*1.5);
           @include border-radius(1px, 3px, 3px, 1px);
 
-          @extend %ui-depth2;
-          @extend %t-icon3;
-          @extend %t-strong;
+          @extend %ui-depth2 !optional;
+          @extend %t-icon3 !optional;
+          @extend %t-strong !optional;
 
           position: absolute;
           border: 2px solid $m-blue-d1;
@@ -293,14 +293,14 @@ $course-search-input-height: ($button-size);
     width: flex-grid(12);
 
     &::before {
-      @extend %faded-hr-divider-medium;
+      @extend %faded-hr-divider-medium !optional;
 
       content: "";
       display: block;
     }
 
     &::after {
-      @extend %faded-hr-divider-medium;
+      @extend %faded-hr-divider-medium !optional;
 
       content: "";
       display: block;
@@ -308,7 +308,7 @@ $course-search-input-height: ($button-size);
 
 
     hr {
-      @extend %faded-hr-divider-light;
+      @extend %faded-hr-divider-light !optional;
 
       border: none;
       margin: 0;
@@ -316,7 +316,7 @@ $course-search-input-height: ($button-size);
       z-index: 2;
 
       &::after {
-        @extend %faded-hr-divider;
+        @extend %faded-hr-divider !optional;
 
         bottom: 0;
         content: "";
@@ -339,7 +339,7 @@ $course-search-input-height: ($button-size);
         overflow: hidden;
 
         &::before {
-          @extend %faded-vertical-divider;
+          @extend %faded-vertical-divider !optional;
 
           content: "";
           display: block;
@@ -353,7 +353,7 @@ $course-search-input-height: ($button-size);
         }
 
         &::after {
-          @extend %faded-vertical-divider-light;
+          @extend %faded-vertical-divider-light !optional;
 
           content: "";
           display: block;

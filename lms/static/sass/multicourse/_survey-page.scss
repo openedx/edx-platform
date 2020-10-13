@@ -21,8 +21,8 @@
 
   .header-survey {
     .title {
-      @extend %t-title4;
-      @extend %t-weight4;
+      @extend %t-title4 !optional;
+      @extend %t-weight4 !optional;
 
       margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l4;
@@ -30,14 +30,14 @@
     }
 
     .course-info {
-      @extend %t-title;
+      @extend %t-title !optional;
 
       padding-bottom: ($baseline/4);
     }
 
     .course-org,
     .course-number {
-      @extend %t-title8;
+      @extend %t-title8 !optional;
 
       display: inline-block;
       color: $gray-l1;
@@ -48,7 +48,7 @@
     }
 
     .course-name {
-      @extend %t-title5;
+      @extend %t-title5 !optional;
 
       display: block;
     }
@@ -68,7 +68,7 @@
     margin-bottom: $baseline;
     font-style: italic;
 
-    @extend %t-copy-base;
+    @extend %t-copy-base !optional;
   }
 
   .message.submission-error {
@@ -81,15 +81,15 @@
     background-color: tint($error-color, 85%);
 
     .message-title {
-      @extend %t-title5;
-      @extend %t-weight4;
+      @extend %t-title5 !optional;
+      @extend %t-weight4 !optional;
 
       margin-bottom: ($baseline/2);
       color: $error-color;
     }
 
     .message-copy {
-      @extend %ui-no-list;
+      @extend %ui-no-list !optional;
 
       line-height: 1.3;
 
@@ -104,7 +104,7 @@
   }
 
   .list-input {
-    @extend %ui-no-list;
+    @extend %ui-no-list !optional;
 
     .field {
       margin-bottom: $baseline;
@@ -116,7 +116,7 @@
       }
 
       .tip {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         display: block;
         margin-top: ($baseline/4);
@@ -132,22 +132,22 @@
   }
 
   .action-primary {
-    @extend %m-btn-primary;
-    @extend %t-copy-base;
+    @extend %m-btn-primary !optional;
+    @extend %t-copy-base !optional;
 
     @include padding-left($baseline*2);
   }
 
   .action-cancel {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     @include margin-left($baseline);
   }
 
   // override basic label styles
   label {
-    @extend %t-copy-base;
-    @extend %t-weight4;
+    @extend %t-copy-base !optional;
+    @extend %t-weight4 !optional;
 
     display: block;
     font-style: normal;
@@ -158,19 +158,19 @@
   input,
   select,
   textarea {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
   }
 
   .bit {
     margin-bottom: $baseline;
 
     .title {
-      @extend %t-title7;
-      @extend %t-weight4;
+      @extend %t-title7 !optional;
+      @extend %t-weight4 !optional;
     }
 
     p {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       color: $gray;
     }

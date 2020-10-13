@@ -1,6 +1,6 @@
 // JM MOSFET AMPLIFIER
 section.tool-wrapper {
-  @extend .clearfix;
+  @extend .clearfix !optional;
 
   background: #073642;
   border-bottom: 1px solid darken(#002b36, 10%);
@@ -74,7 +74,7 @@ section.tool-wrapper {
   }
 
   div#controlls-container {
-    @extend .clearfix;
+    @extend .clearfix !optional;
 
     background: darken(#073642, 2%);
     border-right: 1px solid darken(#002b36, 6%);
@@ -87,7 +87,7 @@ section.tool-wrapper {
 
     div.graph-controls {
       div.music-wrapper {
-        @extend .clearfix;
+        @extend .clearfix !optional;
 
         border-bottom: 1px solid darken(#073642, 10%);
         box-shadow: 0 1px 0 lighten(#073642, 2%);
@@ -121,7 +121,7 @@ section.tool-wrapper {
       }
 
       div.inputs-wrapper {
-        @extend .clearfix;
+        @extend .clearfix !optional;
 
         border-bottom: 1px solid darken(#073642, 10%);
         box-shadow: 0 1px 0 lighten(#073642, 2%);
@@ -203,7 +203,7 @@ section.tool-wrapper {
 
     div.schematic-sliders {
       div.top-sliders {
-        @extend .clearfix;
+        @extend .clearfix !optional;
 
         border-bottom: 1px solid darken(#073642, 10%);
         box-shadow: 0 1px 0 lighten(#073642, 2%);

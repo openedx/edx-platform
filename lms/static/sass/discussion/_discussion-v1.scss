@@ -57,14 +57,14 @@
 .discussion-module,
 .wmd-prompt-dialog {
   .btn {
-    @extend %pattern-library-btn;
+    @extend %pattern-library-btn !optional;
 
     background-color: $forum-color-background;
     color: $forum-color-active-thread;
   }
 
   .btn-brand {
-    @extend %pattern-library-btn;
+    @extend %pattern-library-btn !optional;
 
     background-color: $forum-color-active-thread;
     color: $forum-color-active-text;

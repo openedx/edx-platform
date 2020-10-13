@@ -22,8 +22,8 @@
     margin-right: flex-gutter();
 
     .notice-moduledisabled {
-      @extend %ui-well;
-      @extend %t-copy-base;
+      @extend %ui-well !optional;
+      @extend %t-copy-base !optional;
 
       background-color: $white;
       padding: ($baseline*1.5) $baseline;
@@ -31,21 +31,21 @@
     }
 
     .no-content {
-      @extend %no-content;
+      @extend %no-content !optional;
     }
 
     .wrapper-certificates {
       .title {
-        @extend %t-title4;
-        @extend %t-strong;
+        @extend %t-title4 !optional;
+        @extend %t-strong !optional;
       }
 
       .copy {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
       }
 
       .instructions {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         margin-bottom: $baseline;
       }
@@ -56,7 +56,7 @@
     }
 
     .actual-course-title {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       margin-bottom: $baseline;
     }
@@ -82,7 +82,7 @@
 // ====================
 .view-certificates {
   .wrapper-collection {
-    @extend %ui-window;
+    @extend %ui-window !optional;
 
     position: relative;
     outline: none;
@@ -102,7 +102,7 @@
     }
 
     .collection-info {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       &.certificate-info-inline {
         margin: ($baseline/2) 0;
@@ -127,7 +127,7 @@
       margin-bottom: ($baseline*0.75);
 
       .item {
-        @extend %t-copy-lead1;
+        @extend %t-copy-lead1 !optional;
 
         padding: ($baseline/7) 0 ($baseline/4);
         border-top: 1px solid $gray-l4;
@@ -163,15 +163,15 @@
           margin-right: ($baseline/4);
 
           .edit {
-            @extend %ui-btn-non-blue;
+            @extend %ui-btn-non-blue !optional;
           }
 
           .edit-signatory {
-            @extend %ui-btn-non-blue;
+            @extend %ui-btn-non-blue !optional;
           }
 
           .delete {
-            @extend %ui-btn-non;
+            @extend %ui-btn-non !optional;
 
             &.is-disabled {
               background-color: $gray-l3;
@@ -183,7 +183,7 @@
     }
 
     .collection-references {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       box-shadow: 0 2px 2px 0 $shadow inset;
       padding: $baseline ($baseline*1.5) $baseline ($baseline*2.5);
@@ -196,7 +196,7 @@
           padding: ($baseline/4) 0;
 
           a {
-            @extend %t-strong;
+            @extend %t-strong !optional;
           }
 
           .fa-warning {
@@ -226,12 +226,12 @@
         padding: $baseline ($baseline*1.5);
 
         label {
-          @extend %t-strong;
+          @extend %t-strong !optional;
         }
       }
 
       .action-add-signatory {
-        @extend %ui-btn-flat-outline;
+        @extend %ui-btn-flat-outline !optional;
 
         display: block;
         width: 100%;
@@ -240,13 +240,13 @@
       }
 
       .disableClick {
-        @extend %ui-disabled;
+        @extend %ui-disabled !optional;
 
         color: $gray-l1;
       }
 
       .tip {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         @include transition(color, 0.15s, ease-in-out);
 
@@ -261,7 +261,7 @@
 
 
       .collection-fields {
-        @extend %cont-no-list;
+        @extend %cont-no-list !optional;
 
         margin-bottom: $baseline;
       }
@@ -270,12 +270,12 @@
         margin: 0 0 ($baseline*0.75) 0;
 
         &:last-child {
-          @extend %wipe-last-child;
+          @extend %wipe-last-child !optional;
         }
 
         &.required {
           label {
-            @extend %t-strong;
+            @extend %t-strong !optional;
           }
 
           label::after {
@@ -295,7 +295,7 @@
         }
 
         label {
-          @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
 
           @include transition(color, 0.15s, ease-in-out);
 
@@ -309,7 +309,7 @@
         //this section is borrowed from _account.scss - we should clean up and unify later
         input,
         textarea {
-          @extend %t-copy-base;
+          @extend %t-copy-base !optional;
 
           height: 100%;
           width: 100%;
@@ -358,7 +358,7 @@
       }
 
       label.required {
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         &::after {
           margin-left: ($baseline/4);
@@ -370,7 +370,7 @@
         label {
           width: 50%;
 
-          @extend %t-title5;
+          @extend %t-title5 !optional;
 
           display: inline-block;
           vertical-align: bottom;
@@ -384,7 +384,7 @@
           color: $gray-l1;
 
           .certificate-value {
-            @extend %t-strong;
+            @extend %t-strong !optional;
 
             white-space: nowrap;
             margin-left: ($baseline*0.5);
@@ -407,13 +407,13 @@
         }
 
         .action-primary {
-          @extend %btn-primary-blue;
+          @extend %btn-primary-blue !optional;
 
           padding: ($baseline/4) $baseline;
         }
 
         .action-secondary {
-          @extend %btn-secondary-gray;
+          @extend %btn-secondary-gray !optional;
 
           padding: ($baseline/4) $baseline;
         }
@@ -436,21 +436,21 @@
       }
 
       .copy {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         margin: ($baseline) 0 ($baseline/2) 0;
         color: $gray;
 
         strong {
-          @extend %t-strong;
+          @extend %t-strong !optional;
         }
       }
     }
 
     .action-add-item {
-      @extend %ui-btn-flat-outline;
-      @extend %t-action2;
-      @extend %t-strong;
+      @extend %ui-btn-flat-outline !optional;
+      @extend %t-action2 !optional;
+      @extend %t-strong !optional;
 
       display: block;
       width: 100%;
@@ -461,7 +461,7 @@
 
   // add/new collection
   .action-add {
-    @extend %ui-btn-flat-outline;
+    @extend %ui-btn-flat-outline !optional;
 
     display: block;
     width: 100%;
@@ -496,8 +496,8 @@
   .certificate-details,
   .certificate-edit {
     .title {
-      @extend %t-title4;
-      @extend %t-strong;
+      @extend %t-title4 !optional;
+      @extend %t-strong !optional;
 
       margin-bottom: ($baseline/2);
     }
@@ -545,7 +545,7 @@
       .action-close {
         @include transition(color $tmg-f2 ease-in-out);
 
-        @extend %t-action1;
+        @extend %t-action1 !optional;
 
         display: inline-block;
         border: 0;
@@ -568,12 +568,12 @@
 .view-certificates .certificates {
   .signatory-details,
   .signatory-edit {
-    @extend %ui-window;
+    @extend %ui-window !optional;
 
     border-color: $gray-l4;
 
     .signatory-panel-header {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       background-color: $gray-l5;
       padding: ($baseline/2) ($baseline*0.75);
@@ -617,7 +617,7 @@
     }
 
     .tip {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       @include transition(color, 0.15s, ease-in-out);
 
@@ -630,12 +630,12 @@
       margin-bottom: $baseline;
 
       &:last-child {
-        @extend %wipe-last-child;
+        @extend %wipe-last-child !optional;
       }
 
       &.required {
         label {
-          @extend %t-strong;
+          @extend %t-strong !optional;
         }
 
         label::after {
@@ -655,7 +655,7 @@
       }
 
       label {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         @include transition(color, 0.15s, ease-in-out);
 
@@ -669,7 +669,7 @@
       //TO-DO: this section is borrowed from _account.scss - we should clean up and unify later
       input,
       textarea {
-        @extend %t-copy-base;
+        @extend %t-copy-base !optional;
 
         height: 100%;
         width: 100%;
@@ -732,7 +732,7 @@
         }
 
         .action-upload-signature {
-          @extend %ui-btn-flat-outline;
+          @extend %ui-btn-flat-outline !optional;
 
           float: right;
           width: flex-grid(4, 12);

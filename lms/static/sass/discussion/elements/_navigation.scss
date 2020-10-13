@@ -159,17 +159,17 @@
 }
 
 .forum-nav-filter-main-control {
-  @extend %forum-nav-select;
+  @extend %forum-nav-select !optional;
 }
 
 .forum-nav-filter-cohort-control {
-  @extend %forum-nav-select;
+  @extend %forum-nav-select !optional;
 
   max-width: 60%;
 }
 
 .forum-nav-sort-control {
-  @extend %forum-nav-select;
+  @extend %forum-nav-select !optional;
 }
 
 // -----------
@@ -276,7 +276,7 @@
 }
 
 .forum-nav-thread-wrapper-0 {
-  @extend %forum-nav-thread-wrapper;
+  @extend %forum-nav-thread-wrapper !optional;
 
   @include margin-right($baseline/5);
 
@@ -296,7 +296,7 @@
 }
 
 .forum-nav-thread-wrapper-1 {
-  @extend %forum-nav-thread-wrapper;
+  @extend %forum-nav-thread-wrapper !optional;
 
   margin: 0 ($baseline / 4);
   // 125 is the width we need to save for the "X new" comments indicator - and we want to clip the preview
@@ -306,7 +306,7 @@
 }
 
 .forum-nav-thread-wrapper-2 {
-  @extend %forum-nav-thread-wrapper;
+  @extend %forum-nav-thread-wrapper !optional;
 
   @include text-align(right);
 
@@ -335,12 +335,12 @@
 }
 
 .forum-nav-thread-votes-count {
-  @extend %forum-nav-thread-wrapper-2-content;
+  @extend %forum-nav-thread-wrapper-2-content !optional;
 }
 
 .forum-nav-thread-comments-count {
-  @extend %forum-nav-thread-wrapper-2-content;
-  @extend %t-weight4;
+  @extend %forum-nav-thread-wrapper-2-content !optional;
+  @extend %t-weight4 !optional;
 
   position: relative;
 
@@ -382,7 +382,7 @@
 }
 
 .forum-nav-load-more-link {
-  @extend %forum-nav-load-more-content;
+  @extend %forum-nav-load-more-content !optional;
 
   color: $link-color;
   width: 100%;
@@ -397,5 +397,5 @@
 }
 
 .forum-nav-loading {
-  @extend %forum-nav-load-more-content;
+  @extend %forum-nav-load-more-content !optional;
 }

@@ -316,8 +316,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       }
 
       %video-control {
-        @extend %t-strong;
-        @extend %t-title7;
+        @extend %t-strong !optional;
+        @extend %t-title7 !optional;
 
         display: inline-block;
         vertical-align: middle;
@@ -343,7 +343,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       }
 
       .control {
-        @extend %video-control;
+        @extend %video-control !optional;
 
         .icon {
           width: 1em;
@@ -387,7 +387,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         }
 
         .ui-slider-handle {
-          @extend %ui-fake-link;
+          @extend %ui-fake-link !optional;
 
           @include transform-origin(bottom left);
           @include transition(all 0.7s ease-in-out 0s);
@@ -437,8 +437,8 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         }
 
         .vidtime {
-          @extend %t-strong;
-          @extend %t-title7;
+          @extend %t-strong !optional;
+          @extend %t-title7 !optional;
 
           @include padding-left(lh(0.75));
 
@@ -481,7 +481,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
           .menu {
             @include transition(none);
 
-            @extend %ui-depth1;
+            @extend %ui-depth1 !optional;
 
             position: absolute;
             display: none;
@@ -498,7 +498,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
             list-style: none;
 
             li {
-              @extend %ui-fake-link;
+              @extend %ui-fake-link !optional;
 
               color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
 
@@ -639,7 +639,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
           .volume-slider-container {
             @include transition(none);
 
-            @extend %ui-depth1;
+            @extend %ui-depth1 !optional;
 
             display: none;
             position: absolute;
@@ -660,7 +660,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
               background: $cool-dark;
 
               .ui-slider-handle {
-                @extend %ui-fake-link;
+                @extend %ui-fake-link !optional;
 
                 @include transition(height $tmg-s2 ease-in-out 0s, width $tmg-s2 ease-in-out 0s);
                 @include left(-5px);
@@ -763,7 +763,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       list-style: none;
 
       li {
-        @extend %ui-fake-link;
+        @extend %ui-fake-link !optional;
 
         margin-bottom: 8px;
         border: 0;
@@ -832,11 +832,11 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     }
 
     .subtitles {
-      @extend .is-hidden;
+      @extend .is-hidden !optional;
     }
 
     .subtitles.html5 {
-      @extend %ui-depth0;
+      @extend %ui-depth0 !optional;
 
       background-color: rgba(243, 243, 243, 0.8);
       height: 100%;
@@ -851,7 +851,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
   }
 
   &.video-fullscreen {
-    @extend %ui-depth4;
+    @extend %ui-depth4 !optional;
 
     background: rgba(#000, 0.95);
     border: 0;
@@ -914,7 +914,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       }
 
       .video-controls {
-        @extend %ui-depth4;
+        @extend %ui-depth4 !optional;
 
         position: absolute;
         bottom: 0;
@@ -958,7 +958,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
   }
 
   .video-pre-roll {
-    @extend %ui-depth3;
+    @extend %ui-depth3 !optional;
 
     position: absolute;
     top: 0;

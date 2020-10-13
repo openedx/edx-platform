@@ -3,7 +3,7 @@ div.syllabus {
   text-align: center;
 
   h1 {
-    @extend .top-header;
+    @extend .top-header !optional;
   }
 
   .notes {

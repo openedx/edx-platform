@@ -34,7 +34,7 @@ a.light-button, // only used in askbot as classes
 .gray-button {
   @include simple($gray-l5);
 
-  @extend .button-reset;
+  @extend .button-reset !optional;
 
   font-size: em(13);
 }
@@ -42,7 +42,7 @@ a.light-button, // only used in askbot as classes
 .blue-button {
   @include simple($blue);
 
-  @extend .button-reset;
+  @extend .button-reset !optional;
 
   font-size: em(13);
 }
@@ -50,7 +50,7 @@ a.light-button, // only used in askbot as classes
 .pink-button {
   @include simple($pink);
 
-  @extend .button-reset;
+  @extend .button-reset !optional;
 
   font-size: em(13);
 }
@@ -176,7 +176,7 @@ a.light-button, // only used in askbot as classes
 }
 
 .topbar {
-  @extend .clearfix;
+  @extend .clearfix !optional;
 
   border-bottom: 1px solid $border-color;
 

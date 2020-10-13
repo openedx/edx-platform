@@ -13,7 +13,7 @@ $proctoring-banner-text-size: 14px;
   }
 
   .preview-menu {
-    @extend %inner-wrapper;
+    @extend %inner-wrapper !optional;
 
     width: auto;
 
@@ -64,7 +64,7 @@ $proctoring-banner-text-size: 14px;
 .proctored_exam_status {
   // STATE: Fixed to viewport (used for scrolling)
   &.is-fixed {
-    @extend %ui-depth4;
+    @extend %ui-depth4 !optional;
 
     box-shadow: 0 3px 3px $shadow-d1;
     position: fixed;
@@ -169,9 +169,9 @@ $proctoring-banner-text-size: 14px;
     }
 
     .exam-button-turn-in-exam {
-      @extend %btn-pl-primary-base;
-      @extend %t-action3;
-      @extend %t-weight4;
+      @extend %btn-pl-primary-base !optional;
+      @extend %t-action3 !optional;
+      @extend %t-weight4 !optional;
 
       margin-right: $baseline;
       border: 0;
@@ -193,7 +193,7 @@ $proctoring-banner-text-size: 14px;
       border-radius: 3px;
 
       #toggle_timer {
-        @extend .exam-button-turn-in-exam;
+        @extend .exam-button-turn-in-exam !optional;
 
         padding: ($baseline/5) ($baseline/3);
         border-bottom-left-radius: 0;

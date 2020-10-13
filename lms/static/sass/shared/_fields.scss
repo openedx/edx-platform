@@ -107,7 +107,7 @@
 }
 
 .u-field-message {
-  @extend %t-copy-sub1;
+  @extend %t-copy-sub1 !optional;
 
   @include padding-left($baseline/2);
 

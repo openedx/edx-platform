@@ -26,7 +26,7 @@ div.lti {
       text-align: right;
 
       .link_lti_new_window {
-        @extend .gray-button;
+        @extend .gray-button !optional;
 
         @include font-size(13);
         @include line-height(14);

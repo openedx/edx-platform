@@ -70,7 +70,7 @@
   -moz-flex-wrap: wrap;
 
   h2 {
-    @extend %t-title4;
+    @extend %t-title4 !optional;
 
     margin-top: $baseline;
     letter-spacing: normal;
@@ -79,8 +79,8 @@
   }
 
   h3 {
-    @extend %t-title6;
-    @extend %t-light;
+    @extend %t-title6 !optional;
+    @extend %t-light !optional;
 
     margin: 0;
     letter-spacing: normal;
@@ -90,7 +90,7 @@
 
   a,
   label {
-    @extend %expand-clickable-area;
+    @extend %expand-clickable-area !optional;
   }
 
   a {
@@ -122,7 +122,7 @@ ul.fa-ul{
   max-width: 500px;
 
   .instructions {
-    @extend %t-copy-base;
+    @extend %t-copy-base !optional;
   }
 
   /* Temp. fix until applied globally */
@@ -212,7 +212,7 @@ ul.fa-ul{
   }
 
   %nav-btn-base {
-    @extend %btn-secondary-blue-outline;
+    @extend %btn-secondary-blue-outline !optional;
 
     width: 100%;
     height: ($baseline*2);
@@ -222,8 +222,8 @@ ul.fa-ul{
   }
 
   .nav-btn {
-    @extend %nav-btn-base;
-    @extend %t-strong;
+    @extend %nav-btn-base !optional;
+    @extend %t-strong !optional;
   }
 
   .form-type,
@@ -235,11 +235,11 @@ ul.fa-ul{
   }
 
   .toggle-form {
-    @extend %t-action1;
+    @extend %t-action1 !optional;
   }
 
   .note {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     display: block;
     margin: ($baseline/2) ($baseline/2) 0 ($baseline/2);
@@ -289,7 +289,7 @@ ul.fa-ul{
   }
 
   .form-label {
-    @extend %bold-label;
+    @extend %bold-label !optional;
 
     padding: 0 0 0 ($baseline/4);
   }
@@ -380,7 +380,7 @@ ul.fa-ul{
     }
 
     .field-link {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       display: block;
       margin-bottom: 5px;
@@ -487,7 +487,7 @@ ul.fa-ul{
 
     .tip,
     .label-optional {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       color: $uxpl-gray-base;
     }
@@ -518,7 +518,7 @@ ul.fa-ul{
   }
 
   .action-primary {
-    @extend %btn-primary-blue;
+    @extend %btn-primary-blue !optional;
 
     padding: 1ex 1em;
     text-transform: none;
@@ -527,13 +527,13 @@ ul.fa-ul{
     margin-top: $baseline;
 
     .icon {
-      @extend %sso-icon;
+      @extend %sso-icon !optional;
     }
   }
 
   .login-provider {
-    @extend %btn-secondary-grey-outline;
-    @extend %t-action4;
+    @extend %btn-secondary-grey-outline !optional;
+    @extend %t-action4 !optional;
 
     @include padding(0, 0, 0, $baseline*2);
     @include text-align(left);
@@ -548,7 +548,7 @@ ul.fa-ul{
     text-transform: none;
 
     .icon {
-      @extend %sso-icon;
+      @extend %sso-icon !optional;
 
       @include left(0);
 
@@ -681,9 +681,9 @@ ul.fa-ul{
   }
 
   .button-secondary-login {
-    @extend %nav-btn-base;
-    @extend %t-action4;
-    @extend %t-regular;
+    @extend %nav-btn-base !optional;
+    @extend %t-action4 !optional;
+    @extend %t-regular !optional;
 
     font-size: 1rem;
     font-weight: 600;
@@ -704,7 +704,7 @@ ul.fa-ul{
     background: tint($yellow, 20%);
 
     .message-title {
-      @extend %t-title5;
+      @extend %t-title5 !optional;
 
       font-family: $font-family-sans-serif;
       margin: 0 0 ($baseline/4) 0;
@@ -713,7 +713,7 @@ ul.fa-ul{
 
     .message-copy,
     .message-copy p {
-      @extend %t-copy-base;
+      @extend %t-copy-base !optional;
 
       font-family: $font-family-sans-serif;
       margin: 0 !important;
@@ -772,7 +772,7 @@ ul.fa-ul{
 
   .institution-list {
     .institution {
-      @extend %t-copy-base;
+      @extend %t-copy-base !optional;
     }
   }
 

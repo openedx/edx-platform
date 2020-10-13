@@ -21,7 +21,7 @@
 
   .ui-loading-indicator,
   .ui-loading-error {
-    @extend .ui-loading-base;
+    @extend .ui-loading-base !optional;
     // center horizontally
     @include margin-left(auto);
     @include margin-right(auto);
@@ -43,7 +43,7 @@
     border-bottom: 4px solid $m-gray-l4;
 
     .header-title {
-      @extend %t-title4;
+      @extend %t-title4 !optional;
 
       margin-bottom: ($baseline/2);
       padding-top: ($baseline*2);
@@ -74,8 +74,8 @@
       }
 
       button {
-        @extend %ui-clear-button;
-        @extend %btn-no-style;
+        @extend %ui-clear-button !optional;
+        @extend %btn-no-style !optional;
 
         @include appearance(none);
 
@@ -112,8 +112,8 @@
 // +Settings Section
 .account-settings-sections {
   .section-header {
-    @extend %t-title5;
-    @extend %t-strong;
+    @extend %t-title5 !optional;
+    @extend %t-strong !optional;
 
     padding-top: ($baseline/2)*3;
     color: $dark-gray1;
@@ -132,7 +132,7 @@
     }
 
     .account-settings-header-subtitle-warning {
-      @extend .account-settings-header-subtitle;
+      @extend .account-settings-header-subtitle !optional;
 
       color: $alert-color;
     }
@@ -202,10 +202,10 @@
           }
 
           .u-field-link {
-            @extend %ui-clear-button;
+            @extend %ui-clear-button !optional;
 
             // set styles
-            @extend %btn-pl-default-base;
+            @extend %btn-pl-default-base !optional;
 
             @include font-size(18);
 
@@ -257,8 +257,8 @@
             padding: 0;
 
             .u-field-link {
-              @extend %ui-clear-button;
-              @extend %btn-pl-default-base;
+              @extend %ui-clear-button !optional;
+              @extend %btn-pl-default-base !optional;
 
               @include font-size(14);
 
@@ -272,7 +272,7 @@
         }
 
         .u-field-order-lines {
-          @extend .u-field-order;
+          @extend .u-field-order !optional;
 
           padding: 5px 0 0;
           font-weight: 100;
@@ -492,10 +492,10 @@
 
     .account-deletion-details {
       .btn-outline-primary {
-        @extend %ui-clear-button;
+        @extend %ui-clear-button !optional;
 
         // set styles
-        @extend %btn-pl-default-base;
+        @extend %btn-pl-default-base !optional;
 
         @include font-size(18);
 
@@ -536,7 +536,7 @@
         }
 
         .paragon__btn:not(.cancel-btn) {
-          @extend %btn-primary-blue;
+          @extend %btn-primary-blue !optional;
         }
       }
 
@@ -566,10 +566,10 @@
       .delete-confirmation-wrapper {
         .paragon__modal-footer {
           .paragon__btn-outline-primary {
-            @extend %ui-clear-button;
+            @extend %ui-clear-button !optional;
 
             // set styles
-            @extend %btn-pl-default-base;
+            @extend %btn-pl-default-base !optional;
 
             @include margin-left(25px);
 
@@ -653,7 +653,7 @@
       margin-top: 10px;
 
       .btn-alert-primary {
-        @extend %btn-primary-blue;
+        @extend %btn-primary-blue !optional;
 
         @include font-size(18);
 
@@ -665,10 +665,10 @@
       }
 
       .btn-alert-secondary {
-        @extend %ui-clear-button;
+        @extend %ui-clear-button !optional;
 
         // set styles
-        @extend %btn-pl-default-base;
+        @extend %btn-pl-default-base !optional;
 
         @include font-size(18);
 

@@ -382,7 +382,7 @@
     }
 
     &::before {
-      @extend %ui-depth4;
+      @extend %ui-depth4 !optional;
 
       content: 'click to edit schematic';
       position: absolute;
@@ -457,7 +457,7 @@
   }
 
   .modal {
-    @extend %ui-depth4;
+    @extend %ui-depth4 !optional;
 
     width: 960px;
     min-height: 500px;
@@ -978,7 +978,7 @@
 }
 
 .modal-backdrop {
-  @extend %ui-depth3;
+  @extend %ui-depth3 !optional;
 
   position: fixed;
   top: 0;

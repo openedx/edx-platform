@@ -32,7 +32,7 @@ $white: rgb(255, 255, 255);
   }
 
   hr {
-    @extend %faded-hr-divider-light;
+    @extend %faded-hr-divider-light !optional;
 
     border: none;
     margin: 0;
@@ -40,7 +40,7 @@ $white: rgb(255, 255, 255);
     z-index: 2;
 
     &::after {
-      @extend %faded-hr-divider;
+      @extend %faded-hr-divider !optional;
 
       bottom: 0;
       content: "";

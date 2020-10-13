@@ -10,17 +10,17 @@
   }
 
   .content-primary {
-    @extend .ui-col-wide;
+    @extend .ui-col-wide !optional;
   }
 
   .content-supplementary {
-    @extend .ui-col-narrow;
+    @extend .ui-col-narrow !optional;
   }
 
   // ELEM: content
   .content {
     .introduction {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       margin: 0 0 ($baseline*2) 0;
     }
@@ -50,7 +50,7 @@
         margin-top: 0;
 
         .action-primary {
-          @extend %btn-primary-green;
+          @extend %btn-primary-green !optional;
 
           padding: ($baseline/2) $baseline;
         }
@@ -76,7 +76,7 @@
 
   .user-list {
     .user-item {
-      @extend %ui-window;
+      @extend %ui-window !optional;
 
       @include clearfix();
 
@@ -97,12 +97,12 @@
 
       // ELEM: item - flag
       .flag-role {
-        @extend %ui-badge;
+        @extend %ui-badge !optional;
 
         color: $white;
 
         .msg-you {
-          @extend %t-strong;
+          @extend %t-strong !optional;
 
           margin-left: ($baseline/5);
           text-transform: none;
@@ -144,8 +144,8 @@
         .user-username {
           @include transition(color $tmg-f2 ease-in-out 0s);
 
-          @extend %t-title4;
-          @extend %t-strong;
+          @extend %t-title4 !optional;
+          @extend %t-strong !optional;
 
           @include margin(0, ($baseline/2), ($baseline/10), 0);
 
@@ -153,7 +153,7 @@
         }
 
         .user-email {
-          @extend %t-title6;
+          @extend %t-title6 !optional;
         }
       }
 
@@ -176,8 +176,8 @@
             @include blue-button;
             @include transition(all 0.15s);
 
-            @extend %t-action2;
-            @extend %t-strong;
+            @extend %t-action2 !optional;
+            @extend %t-strong !optional;
 
             display: inline-block;
             padding: ($baseline/5) $baseline;
@@ -187,15 +187,15 @@
             @include grey-button;
             @include transition(all 0.15s);
 
-            @extend %t-action2;
-            @extend %t-strong;
+            @extend %t-action2 !optional;
+            @extend %t-strong !optional;
 
             display: inline-block;
             padding: ($baseline/5) $baseline;
           }
 
           .notoggleforyou {
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
 
             color: $gray-l2;
           }
@@ -213,7 +213,7 @@
         }
 
         .delete {
-          @extend %ui-btn-non;
+          @extend %ui-btn-non !optional;
         }
 
         // HACK: nasty reset needed due to base.scss

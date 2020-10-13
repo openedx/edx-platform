@@ -5,7 +5,7 @@
   .post-label {
     @include margin($baseline/4, $baseline/2, 0, 0);
 
-    @extend %t-light;
+    @extend %t-light !optional;
 
     font-size: $forum-small-font-size;
     display: inline;

@@ -12,7 +12,7 @@
   .wrapper-inner {
     @include linear-gradient($gray-d3 0%, $gray-d3 98%, $black 100%);
 
-    @extend %ui-depth0;
+        @extend %ui-depth0 !optional;
 
     display: none;
     width: 100% !important;
@@ -20,9 +20,9 @@
     padding: 0 $baseline !important;
   }
 
-  // sock - actions
-  .list-cta {
-    @extend %ui-depth1;
+    // sock - actions
+    .list-cta {
+        @extend %ui-depth1 !optional;
 
     position: absolute;
     top: -($baseline*0.75);
@@ -30,16 +30,16 @@
     margin: 0 auto;
     text-align: center;
 
-    .cta-show-sock {
-      @extend %ui-btn-pill;
-      @extend %t-action4;
+        .cta-show-sock {
+            @extend %ui-btn-pill !optional;
+            @extend %t-action4 !optional;
 
       background: $gray-l5;
       padding: ($baseline/2) $baseline;
       color: $gray-d2;
 
-      .icon {
-        @extend %t-icon6;
+            .icon {
+                @extend %t-icon6 !optional;
 
         @include margin-right($baseline/4);
       }
@@ -55,7 +55,7 @@
   .sock {
     @include clearfix();
 
-    @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
     max-width: $fg-max-width;
     min-width: $fg-min-width;
@@ -64,27 +64,27 @@
     padding: ($baseline*2) 0;
     color: $gray-l3;
 
-    // support body
-    header {
-      .title {
-        @extend %t-title4;
-      }
-    }
+        // support body
+        header {
+            .title {
+                @extend %t-title4 !optional;
+            }
+        }
 
     // shared elements
     .support,
     .feedback {
       box-sizing: border-box;
 
-      .title {
-        @extend %t-title6;
+            .title {
+                @extend %t-title6 !optional;
 
         color: $white;
         margin-bottom: ($baseline/2);
       }
 
-      .copy {
-        @extend %t-copy-sub2;
+            .copy {
+                @extend %t-copy-sub2 !optional;
 
         margin: 0 0 $baseline 0;
       }
@@ -102,13 +102,13 @@
             @include margin-right(0);
           }
 
-          .action {
-            @extend %t-action4;
+                    .action {
+                        @extend %t-action4 !optional;
 
             display: block;
 
-            .icon {
-              @extend %t-icon4;
+                        .icon {
+                            @extend %t-icon4 !optional;
 
               vertical-align: middle;
 
@@ -116,17 +116,17 @@
             }
           }
 
-          .tip {
-            @extend %cont-text-sr;
-          }
-        }
+                    .tip {
+                        @extend %cont-text-sr !optional;
+                    }
+                }
 
-        .action-primary {
-          @extend %btn-primary-blue;
-          @extend %t-action3;
+                .action-primary {
+                    @extend %btn-primary-blue !optional;
+                    @extend %t-action3 !optional;
+                }
+            }
         }
-      }
-    }
 
     // studio support content
     .support {

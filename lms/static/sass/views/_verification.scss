@@ -5,7 +5,7 @@
 
 // MISC: extends - button
 %btn-verify-primary {
-  @extend %btn-primary-green;
+  @extend %btn-primary-green !optional;
 }
 
 // ====================
@@ -27,7 +27,7 @@
     }
 
     .title-expand {
-      @extend %ui-fake-link;
+      @extend %ui-fake-link !optional;
 
       color: $m-blue-d2;
 
@@ -67,7 +67,7 @@
   h4,
   h5,
   h6 {
-    @extend %t-title;
+    @extend %t-title !optional;
 
     color: $m-gray-d4;
   }
@@ -119,7 +119,7 @@
   }
 
   label {
-    @extend %t-weight4;
+    @extend %t-weight4 !optional;
 
     font-family: $font-family-sans-serif;
     font-style: normal;
@@ -143,7 +143,7 @@
   button[type="submit"] {
     @include font-size(16);
 
-    @extend %t-weight4;
+    @extend %t-weight4 !optional;
 
     text-transform: none;
     text-shadow: none;
@@ -175,7 +175,7 @@
   .wrapper-photos,
   .field-group,
   .list-info {
-    @extend %ui-no-list;
+    @extend %ui-no-list !optional;
   }
 
   // ====================
@@ -196,19 +196,19 @@
 
   // elements: common copy
   .title {
-    @extend %t-title5;
-    @extend %t-weight1;
+    @extend %t-title5 !optional;
+    @extend %t-weight1 !optional;
   }
 
   .copy {
-    @extend %t-weight1;
+    @extend %t-weight1 !optional;
   }
 
   // ====================
 
   // elements - controls
   .action-primary {
-    @extend %btn-verify-primary;
+    @extend %btn-verify-primary !optional;
     // needed for override due to .register a:link styling
     border: 0 !important;
     color: $white !important;
@@ -216,14 +216,14 @@
 
   // elements - controls
   .action-primary-blue {
-    @extend %btn-primary-blue;
+    @extend %btn-primary-blue !optional;
     // needed for override due to .register a:link styling
     border: 0 !important;
     color: $white !important;
   }
 
   .action-confirm {
-    @extend %btn-verify-primary;
+    @extend %btn-verify-primary !optional;
     // needed for override due to .register a:link styling
     border: 0 !important;
     color: $white !important;
@@ -238,7 +238,7 @@
   // UI: reports/tables
   .wrapper-report {
     .report {
-      @extend %ui-window;
+      @extend %ui-window !optional;
 
       width: flex-grid(12, 12);
       border-color: $m-gray-t3;
@@ -249,7 +249,7 @@
       }
 
       td {
-        @extend %t-weight3;
+        @extend %t-weight3 !optional;
 
         vertical-align: middle;
         padding: ($baseline*0.75) $baseline;
@@ -257,7 +257,7 @@
       }
 
       th {
-        @extend %t-weight2;
+        @extend %t-weight2 !optional;
 
         padding: ($baseline/2) $baseline;
       }
@@ -268,8 +268,8 @@
         }
 
         th[scope="col"] {
-          @extend %t-title7;
-          @extend %t-weight2;
+          @extend %t-title7 !optional;
+          @extend %t-weight2 !optional;
 
           vertical-align: middle;
           color: $m-gray-d3;
@@ -290,7 +290,7 @@
   }
 
   .report-receipt-provider {
-    @extend %ui-window;
+    @extend %ui-window !optional;
 
     padding: ($baseline*0.75) $baseline;
 
@@ -318,7 +318,7 @@
         @include text-align(center);
 
         button {
-          @extend %btn-pl-primary-base;
+          @extend %btn-pl-primary-base !optional;
 
           white-space: nowrap;
         }
@@ -330,13 +330,13 @@
   // UI: help
   .help-item {
     .title {
-      @extend %hd-lv4;
+      @extend %hd-lv4 !optional;
 
       margin-bottom: ($baseline/4);
     }
 
     .copy {
-      @extend %copy-detail;
+      @extend %copy-detail !optional;
     }
 
     strong {
@@ -373,19 +373,19 @@
       width: flex-grid(11, 12);
 
       .title {
-        @extend %t-title6;
-        @extend %t-weight4;
+        @extend %t-title6 !optional;
+        @extend %t-weight4 !optional;
       }
 
       .copy {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
       }
     }
 
     .msg-icon {
       width: flex-grid(1, 12);
 
-      @extend %t-icon2;
+      @extend %t-icon2 !optional;
 
       @include margin-right(flex-gutter());
 
@@ -464,7 +464,7 @@
         @include text-align(right);
 
         .sts-track-value {
-          @extend %copy-badge;
+          @extend %copy-badge !optional;
 
           display: inline-block;
           background: $verified-color-lvl3;
@@ -489,8 +489,8 @@
       .sts-course-org,
       .sts-course-number,
       .sts-course-name {
-        @extend %t-title5;
-        @extend %t-weight4;
+        @extend %t-title5 !optional;
+        @extend %t-weight4 !optional;
 
         @include font-size(14);
         @include line-height(14);
@@ -547,7 +547,7 @@
   .progress-sts {
     @include size($baseline/4);
 
-    @extend %ui-depth1;
+    @extend %ui-depth1 !optional;
 
     position: absolute;
     top: 43px;
@@ -582,7 +582,7 @@
     }
 
     .progress-step {
-      @extend %ui-depth2;
+      @extend %ui-depth2 !optional;
 
       position: relative;
       display: table-cell;
@@ -605,8 +605,8 @@
         background: $white;
 
         .step-number {
-          @extend %t-title7;
-          @extend %t-weight4;
+          @extend %t-title7 !optional;
+          @extend %t-weight4 !optional;
 
           @include line-height(0);
           @include margin(16px, auto, 0, auto);
@@ -616,8 +616,8 @@
       }
 
       .step-name {
-        @extend %t-title7;
-        @extend %t-weight4;
+        @extend %t-title7 !optional;
+        @extend %t-weight4 !optional;
 
         color: $m-gray-l1;
       }
@@ -679,13 +679,13 @@
       width: flex-grid(12, 12);
 
       > .title {
-        @extend %hd-lv2;
+        @extend %hd-lv2 !optional;
 
         color: $m-blue-d1;
       }
 
       .instruction {
-        @extend %t-copy-lead1;
+        @extend %t-copy-lead1 !optional;
 
         margin-bottom: $baseline;
       }
@@ -699,11 +699,11 @@
       }
 
       .title {
-        @extend %hd-lv3;
+        @extend %hd-lv3 !optional;
       }
 
       .copy {
-        @extend %copy-detail;
+        @extend %copy-detail !optional;
       }
     }
 
@@ -713,7 +713,7 @@
       @include outer-container;
 
       .title {
-        @extend %hd-lv3;
+        @extend %hd-lv3 !optional;
 
         margin-bottom: 10px;
       }
@@ -768,7 +768,7 @@
             }
 
             .help-item-emphasis {
-              @extend %t-weight4;
+              @extend %t-weight4 !optional;
             }
           }
 
@@ -784,7 +784,7 @@
       }
 
       .task {
-        @extend %ui-window;
+        @extend %ui-window !optional;
 
         @include float(left);
         @include margin-right(flex-gutter());
@@ -803,12 +803,12 @@
 
         .control {
           .action {
-            @extend %btn-primary-blue;
+            @extend %btn-primary-blue !optional;
 
             padding: ($baseline/2) ($baseline*0.75);
 
             .icon {
-              @extend %t-icon4;
+              @extend %t-icon4 !optional;
 
               padding: ($baseline*0.25) ($baseline*0.5);
               display: block;
@@ -828,7 +828,7 @@
           // STATE: approved
           &.approved {
             .action {
-              @extend %btn-verify-primary;
+              @extend %btn-verify-primary !optional;
 
               padding: ($baseline/2) ($baseline*0.75);
             }
@@ -880,7 +880,7 @@
           @include text-align(right);
 
           .action-retakephotos a {
-            @extend %btn-primary-blue;
+            @extend %btn-primary-blue !optional;
 
             @include font-size(14);
 
@@ -900,7 +900,7 @@
       color: $black;
 
       .page-title {
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         border-bottom: 2px solid $m-gray-d3;
         padding-bottom: ($baseline*0.75);
@@ -920,7 +920,7 @@
           p {
             @include line-height(22);
 
-            @extend %t-strong;
+            @extend %t-strong !optional;
 
             margin-top: 0;
             color: $black;
@@ -935,7 +935,7 @@
             .product-info {
               @include font-size(22);
 
-              @extend %t-strong;
+              @extend %t-strong !optional;
 
               color: $blue;
             }
@@ -1022,14 +1022,14 @@
         }
 
         > .title {
-          @extend %hd-lv3;
+          @extend %hd-lv3 !optional;
         }
 
         .copy {
-          @extend %copy-base;
+          @extend %copy-base !optional;
 
           strong {
-            @extend %t-weight5;
+            @extend %t-weight5 !optional;
 
             color: $m-gray-d4;
           }
@@ -1056,7 +1056,7 @@
             }
 
             .placeholder-photo {
-              @extend %ui-window;
+              @extend %ui-window !optional;
 
               padding: ($baseline*0.75) $baseline;
 
@@ -1072,11 +1072,11 @@
             @include margin-left($baseline);
 
             .title {
-              @extend %hd-lv5;
+              @extend %hd-lv5 !optional;
             }
 
             .copy {
-              @extend %copy-detail;
+              @extend %copy-detail !optional;
             }
 
             // help - general list
@@ -1122,7 +1122,7 @@
           @include text-align(right);
 
           .action-editname a {
-            @extend %btn-primary-blue;
+            @extend %btn-primary-blue !optional;
 
             @include font-size(14);
 
@@ -1166,7 +1166,7 @@
 
             .contribution-option-other1 label,
             .contribution-option-other2 label {
-              @extend %text-sr;
+              @extend %text-sr !optional;
             }
           }
         }
@@ -1229,8 +1229,8 @@
     border-top: ($baseline/5) solid $m-gray-l4;
 
     .copy {
-      @extend %t-copy-lead1;
-      @extend %t-weight4;
+      @extend %t-copy-lead1 !optional;
+      @extend %t-weight4 !optional;
 
       @include left(calc(50% - 46px));
 
@@ -1248,7 +1248,7 @@
 
   // UI: nav - wizard
   .nav-wizard {
-    @extend %ui-well;
+    @extend %ui-well !optional;
 
     @include clearfix();
 
@@ -1258,7 +1258,7 @@
     padding: ($baseline*0.75) $baseline;
 
     .help-inline {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       @include float(left);
 
@@ -1276,7 +1276,7 @@
       background: $m-gray-l4;
 
       .action-primary {
-        @extend %btn-primary-disabled;
+        @extend %btn-primary-disabled !optional;
       }
     }
   }
@@ -1313,7 +1313,7 @@
       }
 
       .label-value {
-        @extend %t-weight4;
+        @extend %t-weight4 !optional;
       }
 
       .denomination-name {
@@ -1335,7 +1335,7 @@
   // help - faq
   .list-faq {
     .faq-question {
-      @extend %hd-lv3;
+      @extend %hd-lv3 !optional;
 
       border-bottom: 1px solid $m-gray-l4;
       padding-bottom: ($baseline/4);
@@ -1353,13 +1353,13 @@
     width: flex-grid(12, 12);
 
     > .title {
-      @extend %hd-lv2;
+      @extend %hd-lv2 !optional;
 
       color: $m-blue-d1;
     }
 
     .instruction {
-      @extend %t-copy-lead1;
+      @extend %t-copy-lead1 !optional;
 
       margin-bottom: $baseline;
     }
@@ -1418,7 +1418,7 @@
     }
 
     .sts-track {
-      @extend %text-sr;
+      @extend %text-sr !optional;
     }
 
     .form-register-choose {
@@ -1466,26 +1466,26 @@
       }
 
       .title {
-        @extend %t-title5;
-        @extend %t-weight5;
+        @extend %t-title5 !optional;
+        @extend %t-weight5 !optional;
 
         margin-bottom: ($baseline/2);
         width: calc(100% - 30px);
       }
 
       .copy {
-        @extend %t-copy-base;
+        @extend %t-copy-base !optional;
       }
 
       .wrapper-copy-inline {
-        @extend %t-copy-base;
+        @extend %t-copy-base !optional;
 
         display: inline-block;
         width: 100%;
       }
 
       .copy-inline {
-        @extend %t-copy-base;
+        @extend %t-copy-base !optional;
 
         display: inline-block;
       }
@@ -1494,7 +1494,7 @@
         @include fill-parent;
 
         input {
-          @extend %t-weight4;
+          @extend %t-weight4 !optional;
 
           padding: ($baseline/2) ($baseline*0.75);
           width: 100%;
@@ -1523,7 +1523,7 @@
       }
 
       .action-select input {
-        @extend %btn-primary-blue;
+        @extend %btn-primary-blue !optional;
       }
     }
 
@@ -1552,14 +1552,14 @@
       .action-intro {
         @include fill-parent;
 
-        @extend %copy-detail;
+        @extend %copy-detail !optional;
 
         @include text-align(left);
       }
 
       .action-select input,
       .action-select button {
-        @extend %btn-verify-primary;
+        @extend %btn-verify-primary !optional;
       }
 
       .action-select button[name="verified_mode"] {
@@ -1569,7 +1569,7 @@
 
       // extra register options/info
       .title-expand {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         font-weight: 500 !important;
         display: inline-block;
@@ -1585,15 +1585,15 @@
       @include span-columns(4);
 
       .title {
-        @extend %hd-lv4;
-        @extend %t-weight4;
+        @extend %hd-lv4 !optional;
+        @extend %t-weight4 !optional;
 
         margin-top: $baseline;
         margin-bottom: ($baseline/2);
       }
 
       .copy {
-        @extend %copy-detail;
+        @extend %copy-detail !optional;
       }
     }
 
@@ -1607,8 +1607,8 @@
       margin: $baseline 0;
 
       .label {
-        @extend %hd-lv4;
-        @extend %t-weight4;
+        @extend %hd-lv4 !optional;
+        @extend %t-weight4 !optional;
 
         margin-bottom: ($baseline/2);
       }
@@ -1664,7 +1664,7 @@
 
         .contribution-option-other1 label,
         .contribution-option-other2 label {
-          @extend %text-sr;
+          @extend %text-sr !optional;
         }
       }
     }
@@ -1769,7 +1769,7 @@
       text-align: center;
 
       .req {
-        @extend %ui-window;
+        @extend %ui-window !optional;
 
         @include margin-right(flex-gutter());
 
@@ -1785,8 +1785,8 @@
         }
 
         .title {
-          @extend %t-title5;
-          @extend %t-weight4;
+          @extend %t-title5 !optional;
+          @extend %t-weight4 !optional;
 
           padding: $baseline;
           border-bottom: 1px solid $verified-color-lvl4;
@@ -1802,7 +1802,7 @@
           border-radius: ($baseline*10);
 
           *[class^="icon"] {
-            @extend %t-icon1;
+            @extend %t-icon1 !optional;
 
             color: $white;
           }
@@ -1813,12 +1813,12 @@
           }
 
           .fa-stack-2x {
-            @extend %ui-depth1;
+            @extend %ui-depth1 !optional;
           }
 
           .fa-stack-1x {
-            @extend %ui-depth2;
-            @extend %t-icon5;
+            @extend %ui-depth2 !optional;
+            @extend %t-icon5 !optional;
 
             position: absolute;
 
@@ -1862,14 +1862,14 @@
         }
 
         .copy-super {
-          @extend %t-copy-base;
+          @extend %t-copy-base !optional;
 
           margin-bottom: ($baseline/2);
           color: $verified-color-lvl1;
         }
 
         .copy-sub {
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
         }
 
         .actions {
@@ -1885,8 +1885,8 @@
         border-color: $m-pink-l3;
 
         .title {
-          @extend %t-title5;
-          @extend %t-weight4;
+          @extend %t-title5 !optional;
+          @extend %t-weight4 !optional;
 
           border-bottom-color: $m-pink-l3;
           background: tint($m-pink, 95%);
@@ -1898,13 +1898,13 @@
         }
 
         .copy-super {
-          @extend %t-copy-lead1;
+          @extend %t-copy-lead1 !optional;
 
           color: $m-pink;
         }
 
         .copy-sub {
-          @extend %t-copy-base;
+          @extend %t-copy-base !optional;
         }
       }
 
@@ -2039,14 +2039,14 @@
         width: flex-grid(6, 12);
 
         .title {
-          @extend %hd-lv4;
+          @extend %hd-lv4 !optional;
 
           margin-bottom: ($baseline/4);
         }
 
         .copy {
-          @extend %t-copy-sub1;
-          @extend %t-weight3;
+          @extend %t-copy-sub1 !optional;
+          @extend %t-weight3 !optional;
         }
 
         .list-actions {
@@ -2054,7 +2054,7 @@
         }
 
         .action-verify label {
-          @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
         }
       }
 
@@ -2075,7 +2075,7 @@
 
       .step-match {
         label {
-          @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
         }
       }
     }
@@ -2183,13 +2183,13 @@
         }
 
         > .title {
-          @extend %hd-lv3;
+          @extend %hd-lv3 !optional;
 
           margin-bottom: $baseline;
         }
 
         .copy {
-          @extend %copy-base;
+          @extend %copy-base !optional;
 
           margin-bottom: $baseline;
         }
@@ -2200,7 +2200,7 @@
     .course-info {
       .options {
         .action-course {
-          @extend %btn-primary-blue;
+          @extend %btn-primary-blue !optional;
 
           @include font-size(14);
 
@@ -2210,7 +2210,7 @@
 
       .course-actions {
         .action-dashboard {
-          @extend %btn-primary-blue;
+          @extend %btn-primary-blue !optional;
         }
       }
     }
@@ -2245,7 +2245,7 @@
 
   .reverify-success-step {
     .title {
-      @extend %t-title4;
+      @extend %t-title4 !optional;
 
       text-align: left;
       text-transform: none;
@@ -2282,7 +2282,7 @@
   @include padding(($baseline*1.5), ($baseline*1.5), ($baseline*2), ($baseline*1.5));
 
   .title {
-    @extend %t-title4;
+    @extend %t-title4 !optional;
 
     text-align: left;
     text-transform: none;
@@ -2293,7 +2293,7 @@
   }
 
   .action-primary {
-    @extend %btn-primary-blue;
+    @extend %btn-primary-blue !optional;
   }
 }
 
@@ -2321,7 +2321,7 @@
 // STATE: already verified
 .register.is-verified {
   .nav-wizard .price-value {
-    @extend %t-weight4;
+    @extend %t-weight4 !optional;
 
     @include font-size(16);
 
@@ -2517,13 +2517,13 @@
 
     .view {
       .title {
-        @extend %hd-lv2;
+        @extend %hd-lv2 !optional;
 
         color: $m-blue-d1;
       }
 
       .instruction {
-        @extend %t-copy-lead1;
+        @extend %t-copy-lead1 !optional;
 
         margin-bottom: $baseline;
       }

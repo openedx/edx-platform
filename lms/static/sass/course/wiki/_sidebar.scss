@@ -1,5 +1,5 @@
 div#wiki_panel {
-  @extend .sidebar;
+  @extend .sidebar !optional;
 
   overflow: auto;
 
@@ -16,7 +16,7 @@ div#wiki_panel {
   }
 
   div#wiki_create_form {
-    @extend .clearfix;
+    @extend .clearfix !optional;
 
     padding: lh(0.5) lh() lh(0.5) 0;
 

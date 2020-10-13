@@ -52,8 +52,8 @@
         }
 
         .collapse-setting {
-          @extend %t-action3;
-          @extend %t-strong;
+          @extend %t-action3 !optional;
+          @extend %t-strong !optional;
 
           display: block;
           width: 100%;
@@ -138,11 +138,11 @@
         margin-top: ($baseline/2);
 
         .transcripts-message {
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
         }
 
         .transcripts-message-status {
-          @extend %t-strong;
+          @extend %t-strong !optional;
 
           color: $green;
 
@@ -152,14 +152,14 @@
 
           .icon,
           [class*=" fa-"] {
-            @extend %t-icon4;
+            @extend %t-icon4 !optional;
 
             margin-right: ($baseline/4);
           }
         }
 
         .transcripts-error-message {
-          @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
 
           background: $red;
           color: $white;
@@ -178,8 +178,8 @@
       }
 
       .action {
-        @extend %btn-primary-blue;
-        @extend %t-action3;
+        @extend %btn-primary-blue !optional;
+        @extend %t-action3 !optional;
 
         margin-bottom: ($baseline/2);
       }
@@ -197,7 +197,7 @@
     }
 
     .progress-bar {
-      @extend %t-copy-lead1;
+      @extend %t-copy-lead1 !optional;
 
       display: block;
       height: 30px;
@@ -261,7 +261,7 @@
               }
 
               .list-settings-buttons {
-                @extend %cont-truncated;
+                @extend %cont-truncated !optional;
 
                 padding: ($baseline/2) 0;
                 border-bottom: 1px solid $gray-l4;
@@ -288,9 +288,9 @@
         }
 
         .create-setting {
-          @extend %ui-btn-flat-outline;
-          @extend %t-action3;
-          @extend %t-strong;
+          @extend %ui-btn-flat-outline !optional;
+          @extend %t-action3 !optional;
+          @extend %t-strong !optional;
 
           display: block;
           padding: ($baseline/2);
@@ -301,9 +301,9 @@
         }
 
         .upload-setting {
-          @extend %ui-btn-flat-outline;
-          @extend %t-action3;
-          @extend %t-strong;
+          @extend %ui-btn-flat-outline !optional;
+          @extend %t-action3 !optional;
+          @extend %t-strong !optional;
 
           display: inline-block;
           padding: ($baseline/2);
@@ -312,9 +312,9 @@
         }
 
         .download-setting {
-          @extend %ui-btn-non;
-          @extend %t-action4;
-          @extend %t-strong;
+          @extend %ui-btn-non !optional;
+          @extend %t-action4 !optional;
+          @extend %t-strong !optional;
 
           display: inline-block;
           padding: ($baseline/2);
@@ -330,7 +330,7 @@
         .remove-setting {
           @include transition(color 0.25s ease-in-out);
 
-          @extend %t-action1;
+          @extend %t-action1 !optional;
 
           display: inline-block;
           background: transparent;

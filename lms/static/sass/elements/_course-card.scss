@@ -11,7 +11,7 @@
   padding: $baseline/2 0;
 
   .section {
-    @extend .grid-manual;
+    @extend .grid-manual !optional;
 
     padding: $baseline/2 $baseline;
   }

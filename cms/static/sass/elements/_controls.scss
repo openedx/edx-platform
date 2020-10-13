@@ -18,10 +18,10 @@
 // +General Action - Extend
 // ====================
 %action {
-  @extend %ui-fake-link;
+  @extend %ui-fake-link !optional;
 
   &.is-disabled {
-    @extend %ui-disabled;
+      @extend %ui-disabled !optional;
 
     -webkit-filter: grayscale(65%);
     opacity: 0.65;
@@ -31,7 +31,7 @@
 // +General Type and Size - Extend
 // ====================
 %sizing {
-  @extend %t-action4;
+  @extend %t-action4 !optional;
 
   padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
 }
@@ -41,7 +41,7 @@
 // ====================
 // gray primary button
 %btn-primary-gray {
-  @extend %ui-btn-primary;
+    @extend %ui-btn-primary !optional;
 
   background: $gray-l1;
   border-color: $gray-l2;
@@ -67,7 +67,7 @@
 
 // blue primary button
 %btn-primary-blue {
-  @extend %ui-btn-primary;
+    @extend %ui-btn-primary !optional;
 
   background: theme-color("primary");
   border-color: theme-color("primary");
@@ -94,7 +94,7 @@
 
 // green primary button
 %btn-primary-green {
-  @extend %ui-btn-primary;
+    @extend %ui-btn-primary !optional;
 
   background: $uxpl-green-base;
   border-color: $uxpl-green-base;
@@ -123,7 +123,7 @@
 // ====================
 // gray secondary button
 %btn-secondary-gray {
-  @extend %ui-btn-secondary;
+    @extend %ui-btn-secondary !optional;
 
   border-color: $gray-l3;
   color: $gray-d1;
@@ -148,7 +148,7 @@
 
 // blue secondary button
 %btn-secondary-blue {
-  @extend %ui-btn-secondary;
+    @extend %ui-btn-secondary !optional;
 
   border-color: $blue-l3;
   color: theme-color("primary");
@@ -169,7 +169,7 @@
 
 // white secondary button
 %btn-secondary-white {
-  @extend %ui-btn-secondary;
+    @extend %ui-btn-secondary !optional;
 
   border-color: $white-t2;
   color: $white-t3;
@@ -194,7 +194,7 @@
 
 // green secondary button
 %btn-secondary-green {
-  @extend %ui-btn-secondary;
+    @extend %ui-btn-secondary !optional;
 
   border-color: $green-l4;
   color: $green-l2;
@@ -263,8 +263,8 @@
 // +UI Dropdown Button - Extend
 // ====================
 %ui-btn-dd {
-  @extend %ui-btn;
-  @extend %ui-btn-pill;
+  @extend %ui-btn !optional;
+  @extend %ui-btn-pill !optional;
 
   padding: ($baseline/4) ($baseline/2);
   border-width: 1px;
@@ -274,7 +274,7 @@
 
   &:hover,
   &:active {
-    @extend %ui-fake-link;
+    @extend %ui-fake-link !optional;
 
     border-color: $gray-l3;
   }
@@ -290,7 +290,7 @@
 // +UI Nav Dropdown Button - Extend
 // ====================
 %ui-btn-dd-nav-primary {
-  @extend %ui-btn-dd;
+    @extend %ui-btn-dd !optional;
 
   background: $white;
   border-color: $white;
@@ -417,7 +417,7 @@
     @include transition(all $tmg-f2 ease-in-out 0s);
     @include margin-right($baseline/4);
 
-    @extend %t-action1;
+    @extend %t-action1 !optional;
 
     display: inline-block;
     color: $gray-l3;
@@ -451,7 +451,7 @@
     // STATE: hover/active
     &:hover,
     &:active {
-      @extend %ui-fake-link;
+      @extend %ui-fake-link !optional;
 
       color: theme-color("primary");
     }
@@ -486,7 +486,7 @@
   position: relative;
 
   .draggable-drop-indicator {
-    @extend %ui-depth3;
+    @extend %ui-depth3 !optional;
 
     @include transition(opacity $tmg-f2 linear 0s);
     @include size(100%, auto);
@@ -496,7 +496,7 @@
     opacity: 0;
 
     .fa-caret-right {
-      @extend %t-icon5;
+        @extend %t-icon5 !optional;
 
       position: absolute;
       top: -12px;
@@ -516,7 +516,7 @@
 
 // UI: is dragging - drag state
 .is-dragging {
-  @extend %ui-depth4;
+   @extend %ui-depth4 !optional;
 
   left: -($baseline/4);
   box-shadow: 0 1px 2px 0 $shadow-d1;

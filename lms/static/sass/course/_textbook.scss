@@ -17,8 +17,8 @@ div.book-wrapper {
   }
 
   section.book-sidebar {
-    @extend .sidebar;
-    @extend .tran;
+    @extend .sidebar !optional;
+    @extend .tran !optional;
 
     box-sizing: border-box;
     padding: ($baseline/2) 0;
@@ -100,22 +100,22 @@ div.book-wrapper {
   }
 
   .book {
-    @extend .content;
+    @extend .content !optional;
 
     padding: 0;
     width: 76%;
 
     nav {
-      @extend .clearfix;
+      @extend .clearfix !optional;
 
       a {
-        @extend .block-link;
+        @extend .block-link !optional;
 
         padding: 0 lh();
       }
 
       ul {
-        @extend .clearfix;
+        @extend .clearfix !optional;
 
         li {
           position: absolute;

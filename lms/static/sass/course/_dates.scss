@@ -1,5 +1,5 @@
 .date-wrapper {
-  @extend .content;
+  @extend .content !optional;
 
   font-family: $helvetica;
 

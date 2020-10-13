@@ -132,9 +132,9 @@ nav {
       border-width: 11px;
     }
 
-    .nav-item {
-      @extend %t-action3;
-      @extend %t-regular;
+        .nav-item {
+            @extend %t-action3 !optional;
+            @extend %t-regular !optional;
 
       display: block;
       margin: 0 0 ($baseline/4) 0;
@@ -248,7 +248,7 @@ $seq-nav-height: 40px;
 }
 
 .sequence-nav {
-  @extend .topbar;
+    @extend %topbar !optional;
 
   background-color: #fff;
   margin: 0 auto;
@@ -263,8 +263,8 @@ $seq-nav-height: 40px;
     display: none;
   }
 
-  .sequence-list-wrapper {
-    @extend %ui-depth2;
+    .sequence-list-wrapper {
+        @extend %ui-depth2 !optional;
 
     position: relative;
     height: 100%;
@@ -291,9 +291,9 @@ $seq-nav-height: 40px;
         @include border-right-style(solid);
       }
 
-      button {
-        @extend %ui-fake-link;
-        @extend %ui-clear-button;
+            button {
+                @extend %ui-fake-link !optional;
+                @extend %ui-clear-button !optional;
 
         width: 100%;
         height: ($seq-nav-height - 1);
@@ -350,7 +350,7 @@ $seq-nav-height: 40px;
         .sequence-tooltip {
           @include text-align(left);
 
-          @extend %ui-depth2;
+                    @extend %ui-depth2 !optional;
 
           margin-top: 12px;
           background: $seq-nav-tooltip-color;
@@ -397,7 +397,7 @@ $seq-nav-height: 40px;
 }
 
 .sequence-nav-button {
-  @extend %ui-depth3;
+    @extend %ui-depth3 !optional;
 
   display: block;
   top: 0;

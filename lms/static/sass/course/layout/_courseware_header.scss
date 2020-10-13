@@ -3,7 +3,7 @@
 
   box-sizing: border-box;
 
-  @extend %ui-print-excluded;
+  @extend %ui-print-excluded !optional;
 
   border-bottom: none;
   margin: 0 auto;
@@ -11,7 +11,7 @@
   width: 100%;
 
   .course-material {
-    @extend %inner-wrapper;
+    @extend %inner-wrapper !optional;
 
     @include media-breakpoint-down(md) {
       overflow-x: scroll;
@@ -46,8 +46,8 @@
       a:visited {
         @include padding(($baseline/2), ($baseline*0.75), 13px, ($baseline*0.75));
 
-        @extend %t-title7;
-        @extend %t-regular;
+        @extend %t-title7 !optional;
+        @extend %t-regular !optional;
 
         color: theme-color("dark");
         display: block;

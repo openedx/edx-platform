@@ -56,7 +56,7 @@
   }
 
   .nav-label {
-    @extend %text-sr;
+    @extend %text-sr !optional;
   }
 
   .pagination-form,
@@ -69,8 +69,8 @@
   .current-page,
   .page-number-input,
   .total-pages {
-    @extend %t-copy-base;
-    @extend %t-strong;
+    @extend %t-copy-base !optional;
+    @extend %t-strong !optional;
 
     width: ($baseline*2.5);
     vertical-align: middle;
@@ -81,7 +81,7 @@
   }
 
   .current-page {
-    @extend %ui-depth1;
+    @extend %ui-depth1 !optional;
 
     position: absolute;
 
@@ -89,21 +89,21 @@
   }
 
   .page-divider {
-    @extend %t-title4;
-    @extend %t-regular;
+    @extend %t-title4 !optional;
+    @extend %t-regular !optional;
 
     vertical-align: middle;
     color: $gray-l2;
   }
 
   .pagination-form {
-    @extend %ui-depth2;
+    @extend %ui-depth2 !optional;
 
     position: relative;
 
     .page-number-label,
     .submit-pagination-form {
-      @extend %text-sr;
+      @extend %text-sr !optional;
     }
 
     .page-number-input {
@@ -136,7 +136,7 @@
 
 // styles for search/pagination metadata and sorting
 .listing-tools {
-  @extend %t-copy-sub1;
+  @extend %t-copy-sub1 !optional;
 
   color: $gray-d1;
 
@@ -147,8 +147,8 @@
   }
 
   .listing-sort-select {
-    @extend %t-copy-sub1;
-    @extend %t-regular;
+    @extend %t-copy-sub1 !optional;
+    @extend %t-regular !optional;
 
     border: 0;
   }

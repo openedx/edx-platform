@@ -14,7 +14,7 @@
   .content {
     @include clearfix();
 
-    @extend %t-copy-base;
+    @extend %t-copy-base !optional;
 
     max-width: $fg-max-width;
     min-width: $fg-min-width;
@@ -29,15 +29,15 @@
       padding-bottom: ($baseline/2);
 
       h1 {
-        @extend %t-title3;
-        @extend %t-strong;
+        @extend %t-title3 !optional;
+        @extend %t-strong !optional;
 
         margin: 0;
         padding: 0;
       }
 
       .action {
-        @extend %t-action3;
+        @extend %t-action3 !optional;
 
         position: absolute;
 
@@ -48,7 +48,7 @@
     }
 
     .introduction {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       margin: 0 0 $baseline 0;
     }
@@ -60,7 +60,7 @@
   }
 
   .content-primary {
-    @extend .ui-col-wide;
+    @extend .ui-col-wide !optional;
 
     form {
       box-sizing: border-box;
@@ -78,8 +78,8 @@
           @include blue-button();
           @include transition(all $tmg-f3 linear 0s);
 
-          @extend %t-action2;
-          @extend %t-strong;
+          @extend %t-action2 !optional;
+          @extend %t-strong !optional;
 
           display: block;
           width: 100%;
@@ -89,7 +89,7 @@
       }
 
       .list-input {
-        @extend %cont-no-list;
+        @extend %cont-no-list !optional;
 
         .field {
           margin: 0 0 ($baseline*0.75) 0;
@@ -100,7 +100,7 @@
 
           &.required {
             label {
-              @extend %t-strong;
+              @extend %t-strong !optional;
             }
 
             label::after {
@@ -116,7 +116,7 @@
           }
 
           label {
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
 
             @include transition(color $tmg-f3 ease-in-out 0s);
 
@@ -129,7 +129,7 @@
 
           input,
           textarea {
-            @extend %t-copy-base;
+            @extend %t-copy-base !optional;
 
             height: 100%;
             width: 100%;
@@ -186,7 +186,7 @@
           }
 
           .tip {
-            @extend %t-copy-sub2;
+            @extend %t-copy-sub2 !optional;
 
             @include transition(color $tmg-f3 ease-in-out 0s);
 
@@ -232,10 +232,10 @@
   }
 
   .content-supplementary {
-    @extend .ui-col-narrow;
+    @extend .ui-col-narrow !optional;
 
     .bit {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       margin: 0 0 $baseline 0;
       border-bottom: 1px solid $gray-l4;
@@ -249,8 +249,8 @@
       }
 
       h3 {
-        @extend %t-title7;
-        @extend %t-strong;
+        @extend %t-title7 !optional;
+        @extend %t-strong !optional;
 
         margin: 0 0 ($baseline/4) 0;
         color: $gray-d2;
@@ -262,7 +262,7 @@
     position: relative;
 
     .action-forgotpassword {
-      @extend %t-action3;
+      @extend %t-action3 !optional;
 
       position: absolute;
       top: 0;

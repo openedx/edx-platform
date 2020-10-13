@@ -18,8 +18,8 @@
 }
 
 .help-tab {
-  @extend %ui-depth2;
-  @extend %ui-print-excluded;
+  @extend %ui-depth2 !optional;
+  @extend %ui-print-excluded !optional;
 
   transform: rotate(-90deg);
   transform-origin: top left;

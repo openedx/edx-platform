@@ -60,7 +60,7 @@ $seq-nav-height: 50px;
 // ====================
 
 .sequence-nav {
-  @extend .topbar;
+  @extend .topbar !optional;
 
   margin: 0 auto $baseline;
   position: relative;
@@ -75,7 +75,7 @@ $seq-nav-height: 50px;
   }
 
   .sequence-list-wrapper {
-    @extend %ui-depth2;
+    @extend %ui-depth2 !optional;
 
     position: relative;
     height: 100%;
@@ -103,8 +103,8 @@ $seq-nav-height: 50px;
       }
 
       button {
-        @extend %ui-fake-link;
-        @extend %ui-clear-button;
+        @extend %ui-fake-link !optional;
+        @extend %ui-clear-button !optional;
 
         width: 100%;
         height: ($seq-nav-height - 1);
@@ -161,7 +161,7 @@ $seq-nav-height: 50px;
         .sequence-tooltip {
           @include text-align(left);
 
-          @extend %ui-depth2;
+          @extend %ui-depth2 !optional;
 
           margin-top: 12px;
           background: $seq-nav-tooltip-color;
@@ -208,7 +208,7 @@ $seq-nav-height: 50px;
 }
 
 .sequence-nav-button {
-  @extend %ui-depth3;
+  @extend %ui-depth3 !optional;
 
   display: block;
   top: 0;

@@ -17,10 +17,10 @@
 // #INVALID
 // ------------------------------
 .wrapper-content.status-invalid {
-  @extend %layout-wrapper;
+  @extend %layout-wrapper !optional;
 
   .wrapper-content-grid {
-    @extend %layout;
+    @extend %layout !optional;
   }
 
   .content-main {

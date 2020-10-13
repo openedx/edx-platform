@@ -215,7 +215,7 @@
 }
 
 %shame-link-text {
-  @extend %shame-link-base;
+  @extend %shame-link-base !optional;
 
   &:hover,
   &:focus {

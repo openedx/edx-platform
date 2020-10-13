@@ -247,7 +247,7 @@ footer#footer-edx-v3 {
   .legal-links,
   .social-media-links,
   .mobile-app-links {
-    @extend %ui-no-list;
+    @extend %ui-no-list !optional;
 
     .list-item {
       display: inline-block;
@@ -343,7 +343,7 @@ footer#footer-edx-v3 {
   .legal-notices,
   .footer-logo,
   .external-links {
-    @extend %ui-print-excluded;
+    @extend %ui-print-excluded !optional;
   }
 
   @media print {
@@ -863,5 +863,5 @@ footer#footer-edx-v3 {
   }
 
 
-  @extend %ui-print-excluded;
+  @extend %ui-print-excluded !optional;
 }

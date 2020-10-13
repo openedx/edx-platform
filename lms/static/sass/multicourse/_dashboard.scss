@@ -26,7 +26,7 @@
         margin-bottom: $baseline/2;
 
         .header-courses {
-          @extend %t-title5;
+          @extend %t-title5 !optional;
 
           @include padding-right($baseline/2);
         }
@@ -34,7 +34,7 @@
 
       // UI: course list
       .listing-courses {
-        @extend %ui-no-list;
+        @extend %ui-no-list !optional;
 
         .course-item {
           margin-bottom: $baseline;
@@ -60,7 +60,7 @@
         @include transition(all 0.15s linear 0s);
         @include clearfix();
 
-        @extend %ui-depth2;
+        @extend %ui-depth2 !optional;
 
         .details {
           @include clearfix();
@@ -97,7 +97,7 @@
               text-align: center;
 
               .label {
-                @extend %text-sr;
+                @extend %text-sr !optional;
               }
 
               .deco-graphic {
@@ -108,9 +108,9 @@
               }
 
               .sts-enrollment-value {
-                @extend %ui-depth1;
-                @extend %copy-badge;
-                @extend %t-demi-strong;
+                @extend %ui-depth1 !optional;
+                @extend %copy-badge !optional;
+                @extend %t-demi-strong !optional;
 
                 font-size: 0.6em;
                 line-height: 1.5em;
@@ -141,8 +141,8 @@
               span {
                 font: -apple-system-short-headline !important;
 
-                @extend %t-title3;
-                @extend %t-regular;
+                @extend %t-title3 !optional;
+                @extend %t-regular !optional;
 
                 display: inline-block;
                 margin-bottom: ($baseline/2);
@@ -150,7 +150,7 @@
 
                 // Responsive behavior
                 @include media-breakpoint-down(sm) {
-                  @extend %t-title4;
+                  @extend %t-title4 !optional;
                 }
               }
             }
@@ -160,7 +160,7 @@
                 font: -apple-system-short-subheadline !important;
                 color: $gray-d1;
 
-                @extend %t-title7;
+                @extend %t-title7 !optional;
 
                 display: inline-block;
               }
@@ -171,7 +171,7 @@
                 .info-date-block {
                   font: -apple-system-short-subheadline !important;
 
-                  @extend %t-title7;
+                  @extend %t-title7 !optional;
 
                   color: $gray; // WCAG 2.0 AA compliant
 
@@ -185,7 +185,7 @@
                 }
 
                 .change-session {
-                  @extend %t-title7;
+                  @extend %t-title7 !optional;
 
                   @include margin(0, 0, 0, $baseline/4);
 
@@ -288,8 +288,8 @@
               }
 
               .actions-dropdown {
-                @extend %ui-no-list;
-                @extend %ui-depth1;
+                @extend %ui-no-list !optional;
+                @extend %ui-depth1 !optional;
 
                 display: none;
                 position: absolute;
@@ -306,7 +306,7 @@
                 }
 
                 .actions-dropdown-list {
-                  @extend %ui-no-list;
+                  @extend %ui-no-list !optional;
 
                   box-sizing: border-box;
                   display: table;
@@ -350,7 +350,7 @@
                 }
 
                 .actions-item {
-                  @extend %t-title7;
+                  @extend %t-title7 !optional;
 
                   display: block;
                   margin: 0;
@@ -411,12 +411,12 @@
           .enter-course {
             font: -apple-system-short-subheadline !important;
 
-            @extend %btn-pl-white-base;
+            @extend %btn-pl-white-base !optional;
 
             @include float(right);
 
             &.archived {
-              @extend %btn-pl-default-base;
+              @extend %btn-pl-default-base !optional;
             }
           }
 
@@ -440,7 +440,7 @@
           // course enrollment status message
           .sts-enrollment {
             .label {
-              @extend %text-sr;
+              @extend %text-sr !optional;
             }
 
             // status message
@@ -462,11 +462,11 @@
           // course enrollment status message
           .sts-enrollment {
             .label {
-              @extend %text-sr;
+              @extend %text-sr !optional;
             }
 
             .deco-graphic {
-              @extend %ui-depth3;
+              @extend %ui-depth3 !optional;
 
               width: 40px;
               position: absolute;
@@ -624,7 +624,7 @@
   }
 
   .message {
-    @extend %ui-depth1;
+    @extend %ui-depth1 !optional;
 
     border-radius: 3px;
     display: none;
@@ -661,8 +661,8 @@
 
     .message-title,
     .message-copy .title {
-      @extend %t-title6;
-      @extend %t-weight4;
+      @extend %t-title6 !optional;
+      @extend %t-weight4 !optional;
 
       line-height: 1em;
       margin-bottom: ($baseline/4);
@@ -670,7 +670,7 @@
 
     .message-copy,
     .message-copy .copy {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       margin: 2px 0 0;
     }
@@ -773,7 +773,7 @@
       }
 
       .action-upgrade {
-        @extend %btn-primary-green;
+        @extend %btn-primary-green !optional;
 
         @include clearfix();
 
@@ -817,26 +817,26 @@
         }
 
         .copy {
-          @extend %t-action3;
-          @extend %t-weight4;
+          @extend %t-action3 !optional;
+          @extend %t-weight4 !optional;
 
           @include margin-right($baseline);
         }
 
         .copy-sub {
-          @extend %t-action4;
+          @extend %t-action4 !optional;
 
           opacity: 0.875;
         }
       }
 
       .action-view-consent {
-        @extend %btn-pl-white-base;
+        @extend %btn-pl-white-base !optional;
 
         @include float(right);
 
         &.archived {
-          @extend %btn-pl-default-base;
+          @extend %btn-pl-default-base !optional;
         }
       }
     }
@@ -851,14 +851,14 @@
       }
 
       .message-copy {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         margin: 0;
       }
 
       .credit-action {
         .credit-btn {
-          @extend %btn-pl-yellow-base;
+          @extend %btn-pl-yellow-base !optional;
 
           @include float(right);
           @include margin-right(5px);
@@ -994,7 +994,7 @@
           }
 
           .action-certificate .btn {
-            @extend %btn-inherited-primary;
+            @extend %btn-inherited-primary !optional;
 
             box-sizing: border-box;
             padding: 7px $baseline*0.75;
@@ -1029,7 +1029,7 @@
       }
 
       .certificate-explanation {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         margin-top: ($baseline/2);
         border-top: 1px solid $gray-l4;
@@ -1052,7 +1052,7 @@
         position: relative;
 
         .btn {
-          @extend %btn-pl-green-base;
+          @extend %btn-pl-green-base !optional;
 
           @include float(right);
         }
@@ -1194,17 +1194,17 @@
   }
 
   .status-data-message {
-    @extend %t-copy-sub1;
-    @extend %t-weight4;
+    @extend %t-copy-sub1 !optional;
+    @extend %t-weight4 !optional;
 
     margin-bottom: ($baseline/2);
   }
 
   .list-actions {
-    @extend %ui-no-list;
+    @extend %ui-no-list !optional;
 
     .action {
-      @extend %t-weight4;
+      @extend %t-weight4 !optional;
 
       display: block;
 
@@ -1213,13 +1213,13 @@
   }
 
   .status-note {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     position: relative;
     padding-top: $baseline/2;
 
     p {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
     }
 
     .deco-arrow {
@@ -1243,8 +1243,8 @@
     }
 
     .action-reverify {
-      @extend %btn-primary-error;
-      @extend %t-weight4;
+      @extend %btn-primary-error !optional;
+      @extend %t-weight4 !optional;
 
       display: block;
 
@@ -1270,8 +1270,8 @@
     }
 
     .action-reverify {
-      @extend %btn-primary-error;
-      @extend %t-weight4;
+      @extend %btn-primary-error !optional;
+      @extend %t-weight4 !optional;
 
       display: block;
 
@@ -1353,18 +1353,18 @@
 }
 
 .msg__title {
-  @extend %hd-lv5;
+  @extend %hd-lv5 !optional;
 
   color: $lighter-base-font-color;
 }
 
 .msg__copy {
-  @extend %copy-metadata;
+  @extend %copy-metadata !optional;
 
   color: $lighter-base-font-color;
 
   p {
-    @extend %t-copy;
+    @extend %t-copy !optional;
   }
 }
 
@@ -1411,7 +1411,7 @@ a.disable-look {
 }
 
 a.fade-cover {
-  @extend .cover;
+  @extend .cover !optional;
 
   opacity: 0.5;
 }
@@ -1435,8 +1435,8 @@ a.fade-cover {
       border-bottom: thin solid $gray;
 
       &.title {
-        @extend %t-title5;
-        @extend %t-weight4;
+        @extend %t-title5 !optional;
+        @extend %t-weight4 !optional;
 
         font-family: $font-family-sans-serif;
 

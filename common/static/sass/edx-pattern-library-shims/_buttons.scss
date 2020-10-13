@@ -31,7 +31,7 @@
   // STATE: is disabled
   &:disabled,
   &.is-disabled {
-    @extend %state-disabled;
+    @extend %state-disabled !optional;
   }
 
   .icon {
@@ -45,7 +45,7 @@
   }
 
   &.btn-small {
-    @extend %btn-small;
+    @extend %btn-small !optional;
   }
 }
 
@@ -53,7 +53,7 @@
 // #DEFAULT
 // ----------------------------
 .btn-default {
-  @extend %btn-shims;
+  @extend %btn-shims !optional;
 
   border-color: $btn-default-border-color;
   background: $btn-default-background;
@@ -89,7 +89,7 @@
 // #PRIMARY
 // ----------------------------
 .btn-primary {
-  @extend %btn-shims;
+  @extend %btn-shims !optional;
 
   border-color: $btn-brand-border-color;
   background: $btn-brand-background;
@@ -126,7 +126,7 @@
 // #UPGRADE
 // ----------------------------
 .btn-upgrade {
-  @extend %btn-shims;
+  @extend %btn-shims !optional;
 
   border-color: $btn-upgrade-border-color;
   background: $btn-upgrade-background;
@@ -155,5 +155,5 @@
 // #BRAND
 // ----------------------------
 .btn-brand {
-  @extend .btn-primary;
+  @extend .btn-primary !optional;
 }

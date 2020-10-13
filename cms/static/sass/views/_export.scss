@@ -10,18 +10,18 @@
   }
 
   .content-primary {
-    @extend .ui-col-wide;
+    @extend .ui-col-wide !optional;
   }
 
   .content-supplementary {
-    @extend .ui-col-narrow;
+    @extend .ui-col-narrow !optional;
   }
 
 
   // UI: introduction
   .introduction {
     .title {
-      @extend %cont-text-sr;
+      @extend %cont-text-sr !optional;
     }
   }
 
@@ -29,17 +29,17 @@
   .export-controls {
     box-sizing: border-box;
 
-    @extend %ui-window;
+    @extend %ui-window !optional;
 
     padding: $baseline ($baseline*1.5) ($baseline*1.5) ($baseline*1.5);
 
     .title {
-      @extend %t-title4;
+      @extend %t-title4 !optional;
     }
 
     .action-export {
-      @extend %btn-primary-blue;
-      @extend %t-action1;
+      @extend %btn-primary-blue !optional;
+      @extend %t-action1 !optional;
 
       display: block;
       margin: $baseline 0;
@@ -48,7 +48,7 @@
 
     .action {
       .icon {
-        @extend %t-icon2;
+        @extend %t-icon2 !optional;
 
         display: inline-block;
         vertical-align: middle;
@@ -74,8 +74,8 @@
       width: flex-grid(4, 9);
 
       .item-detail {
-        @extend %t-copy-sub1;
-        @extend %wipe-last-child;
+        @extend %t-copy-sub1 !optional;
+        @extend %wipe-last-child !optional;
 
         padding-bottom: ($baseline/4);
         border-bottom: 1px solid $gray-l4;
@@ -107,7 +107,7 @@
     }
 
     > .title {
-      @extend %t-title4;
+      @extend %t-title4 !optional;
 
       margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l3;
@@ -125,7 +125,7 @@
         .icon {
           @include transition(opacity $tmg-f1 ease-in-out 0);
 
-          @extend %t-icon4;
+          @extend %t-icon4 !optional;
 
           position: absolute;
           top: ($baseline/2);
@@ -139,12 +139,12 @@
         margin-left: ($baseline*3);
 
         .title {
-          @extend %t-title5;
-          @extend %t-strong;
+          @extend %t-title5 !optional;
+          @extend %t-strong !optional;
         }
 
         .copy {
-          @extend %t-copy-base;
+          @extend %t-copy-base !optional;
 
           color: $gray-l2;
         }
@@ -170,7 +170,7 @@
             display: none;
 
             .action-primary {
-              @extend %btn-primary-blue;
+              @extend %btn-primary-blue !optional;
             }
           }
         }

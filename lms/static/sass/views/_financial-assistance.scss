@@ -1,5 +1,5 @@
 %fa-copy {
-  @extend %t-copy-base;
+  @extend %t-copy-base !optional;
 
   padding: ($baseline/2) 0;
   margin: 0;
@@ -12,7 +12,7 @@
   max-width: 1180px;
 
   h1 {
-    @extend %t-title4;
+    @extend %t-title4 !optional;
 
     @include text-align(left);
 
@@ -23,15 +23,15 @@
   }
 
   h2 {
-    @extend %t-title6;
-    @extend %t-strong;
+    @extend %t-title6 !optional;
+    @extend %t-strong !optional;
 
     margin-top: ($baseline/2);
     text-transform: none;
   }
 
   p {
-    @extend %fa-copy;
+    @extend %fa-copy !optional;
 
     font-size: 0.875em;
   }
@@ -129,7 +129,7 @@
     }
 
     .title {
-      @extend %fa-copy;
+      @extend %fa-copy !optional;
 
       padding: 0;
 
@@ -139,7 +139,7 @@
     }
 
     .data {
-      @extend %fa-copy;
+      @extend %fa-copy !optional;
 
       padding: 0;
       color: $black;
@@ -148,7 +148,7 @@
   }
 
   .financial-assistance-form {
-    @extend .login-register;
+    @extend .login-register !optional;
 
     max-width: 800px;
 

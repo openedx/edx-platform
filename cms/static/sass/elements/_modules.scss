@@ -10,8 +10,8 @@
   background-color: $white;
 
   .bar-mod-title {
-    @extend %t-title6;
-    @extend %t-strong;
+     @extend %t-title6 !optional;
+    @extend %t-strong !optional;
 
     display: block;
     padding: ($baseline/2) ($baseline*0.75);
@@ -19,14 +19,14 @@
   }
 
   .bar-mod-content {
-    @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
     border-bottom: 1px solid $gray-l4;
     padding: ($baseline*0.75) ($baseline*0.75) $baseline ($baseline*0.75);
 
-    .title {
-      @extend %t-title8;
-      @extend %t-strong;
+      .title {
+          @extend %t-title8 !optional;
+          @extend %t-strong !optional;
 
       margin-bottom: ($baseline/4);
       color: $gray-d2;
@@ -34,7 +34,7 @@
     }
 
     .meta {
-      @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
       color: $gray-d2;
     }
@@ -44,7 +44,7 @@
 // blue bar and title bg version
 // --------------------
 %bar-module-blue {
-  @extend %bar-module;
+    @extend %bar-module !optional;
 
   border-top: 5px solid $blue;
 
@@ -56,7 +56,7 @@
 // green bar and title bg version
 // --------------------
 %bar-module-green {
-  @extend %bar-module;
+    @extend %bar-module !optional;
 
   border-top: 5px solid $green;
 
@@ -68,7 +68,7 @@
 // yellow bar and title bg version
 // --------------------
 %bar-module-yellow {
-  @extend %bar-module;
+    @extend %bar-module !optional;
 
   border-top: 5px solid $orange-l2;
 
@@ -80,7 +80,7 @@
 // red bar and title bg version
 // --------------------
 %bar-module-red {
-  @extend %bar-module;
+    @extend %bar-module !optional;
 
   border-top: 5px solid $red-l2;
 
@@ -91,7 +91,7 @@
 
 // black bar and title bg version
 %bar-module-black {
-  @extend %bar-module;
+    @extend %bar-module !optional;
 
   border-top: 5px solid $black;
 
@@ -116,8 +116,8 @@
     text-align: center;
 
     h5 {
-      @extend %t-title5;
-      @extend %t-strong;
+      @extend %t-title5 !optional;
+      @extend %t-strong !optional;
 
       margin-bottom: ($baseline*0.75);
       color: $uxpl-green-base;
@@ -133,7 +133,7 @@
 
       // green button
       .add-xblock-component-button {
-        @extend %t-action3;
+        @extend %t-action3 !optional;
 
         @include margin-right($baseline*0.75);
 
@@ -147,7 +147,7 @@
         padding: 0;
         text-align: center;
 
-        @extend %btn-primary-green;
+        @extend %btn-primary-green !optional;
 
         .name {
           box-sizing: border-box;
@@ -239,7 +239,7 @@
       @include clearfix();
       @include transition(none);
 
-      @extend %t-demi-strong;
+        @extend %t-demi-strong !optional;
 
       display: block;
       width: 100%;
@@ -310,7 +310,7 @@
     }
 
     a {
-      @extend %t-action3;
+      @extend %t-action3 !optional;
 
       display: block;
       padding: ($baseline*0.75) ($baseline*1.25);
@@ -339,7 +339,7 @@ $outline-indent-width: $baseline;
     margin-top: ($baseline*0.75);
 
     .button-new {
-      @extend %ui-btn-flat-outline;
+        @extend %ui-btn-flat-outline !optional;
 
       padding: ($baseline/2) $baseline;
       display: block;
@@ -356,13 +356,13 @@ $outline-indent-width: $baseline;
 
 
 %outline-item-status {
-  @extend %t-copy-sub2;
-  @extend %t-strong;
+    @extend %t-copy-sub2 !optional;
+    @extend %t-strong !optional;
 
   color: $gray-d1;
 
-  .icon {
-    @extend %t-icon5;
+    .icon {
+        @extend %t-icon5 !optional;
 
     @include margin-right($baseline/4);
   }
@@ -464,8 +464,8 @@ $outline-indent-width: $baseline;
   .outline-section {
     @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s, padding-left $tmg-f2 linear 0s);
 
-    @extend %ui-window;
-    @extend %outline-complex-item;
+      @extend %ui-window !optional;
+      @extend %outline-complex-item !optional;
 
     border-left: 1px solid $color-draft;
     margin-bottom: $baseline;
@@ -509,15 +509,15 @@ $outline-indent-width: $baseline;
 
     // header - title
     .section-title {
-      @extend %t-title5;
-      @extend %t-strong;
+      @extend %t-title5 !optional;
+      @extend %t-strong !optional;
 
       color: $color-heading-base;
     }
 
     // status
     .section-status {
-      @extend %outline-item-status;
+        @extend %outline-item-status !optional;
     }
 
     // status - release
@@ -561,7 +561,7 @@ $outline-indent-width: $baseline;
   .outline-subsection {
     @include transition(border-left-color $tmg-f2 linear 0s);
 
-    @extend %outline-complex-item;
+      @extend %outline-complex-item !optional;
 
     margin-bottom: ($baseline/2);
     border: 1px solid $gray-l4;
@@ -609,14 +609,14 @@ $outline-indent-width: $baseline;
 
     // header - title
     .subsection-title {
-      @extend %t-title6;
+       @extend %t-title6 !optional;
 
       color: $color-heading-base;
     }
 
     // status
     .subsection-status {
-      @extend %outline-item-status;
+        @extend %outline-item-status !optional;
     }
 
     // STATE: hover/active
@@ -667,21 +667,21 @@ $outline-indent-width: $baseline;
 
   // outline: units
   .outline-unit {
-    @extend %outline-complex-item;
+      @extend %outline-complex-item !optional;
 
     margin-bottom: ($baseline/2);
     border: 1px solid $gray-l4;
     padding: ($baseline/4) ($baseline/2);
 
-    // header - title
-    .unit-title {
-      @extend %t-title7;
+      // header - title
+      .unit-title {
+          @extend %t-title7 !optional;
 
       color: $color-heading-base;
     }
 
     .unit-status {
-      @extend %outline-item-status;
+        @extend %outline-item-status !optional;
     }
 
     // STATE: hover/active
@@ -702,22 +702,22 @@ $outline-indent-width: $baseline;
 
   // outline: sections
   .outline-section {
-    @extend %outline-simple-item;
+      @extend %outline-simple-item !optional;
 
     margin-bottom: $baseline;
     padding: ($baseline/2);
 
-    // header - title
-    .section-title {
-      @extend %t-title5;
-      @extend %t-strong;
+      // header - title
+      .section-title {
+          @extend %t-title5 !optional;
+          @extend %t-strong !optional;
 
       color: $color-heading-base;
     }
 
     // status
     .section-status {
-      @extend %outline-item-status;
+        @extend %outline-item-status !optional;
     }
 
     // status - release
@@ -764,40 +764,40 @@ $outline-indent-width: $baseline;
 
   // outline: subsections
   .outline-subsection {
-    @extend %outline-simple-item;
+      @extend %outline-simple-item !optional;
 
     margin-bottom: ($baseline/2);
     padding: ($baseline/2);
 
-    // header - title
-    .subsection-title {
-      @extend %t-title6;
+      // header - title
+      .subsection-title {
+          @extend %t-title6 !optional;
 
       color: $color-heading-base;
     }
 
     // status
     .subsection-status {
-      @extend %outline-item-status;
+        @extend %outline-item-status !optional;
     }
   }
 
   // outline: units
   .outline-unit {
-    @extend %outline-simple-item;
+      @extend %outline-simple-item !optional;
 
     margin-bottom: ($baseline/4);
     padding: ($baseline/4) ($baseline/2);
 
-    // header - title
-    .unit-title {
-      @extend %t-title7;
+      // header - title
+      .unit-title {
+          @extend %t-title7 !optional;
 
       color: $color-heading-base;
     }
 
     .unit-status {
-      @extend %outline-item-status;
+        @extend %outline-item-status !optional;
     }
   }
 }

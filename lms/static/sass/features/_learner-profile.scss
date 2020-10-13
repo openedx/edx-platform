@@ -3,7 +3,7 @@
 
 .learner-achievements {
   .learner-message {
-    @extend %no-content;
+    @extend %no-content !optional;
 
     margin: $baseline*0.75 0;
 
@@ -53,20 +53,20 @@
   }
 
   .card-supertitle {
-    @extend %t-title6;
+    @extend %t-title6 !optional;
 
     color: $lightest-base-font-color;
   }
 
   .card-title {
-    @extend %t-title5;
-    @extend %t-strong;
+    @extend %t-title5 !optional;
+    @extend %t-strong !optional;
 
     margin-bottom: $baseline/2;
   }
 
   .card-text {
-    @extend %t-title8;
+    @extend %t-title8 !optional;
 
     color: $lightest-base-font-color;
   }
@@ -126,7 +126,7 @@
   }
 
   .ui-loading-indicator {
-    @extend .ui-loading-base;
+    @extend .ui-loading-base !optional;
 
     padding-bottom: $baseline;
 
@@ -275,7 +275,7 @@
         display: table-row;
 
         button {
-          @extend %btn-secondary-blue-outline;
+          @extend %btn-secondary-blue-outline !optional;
 
           margin-top: 1em;
           background: $blue;
@@ -296,7 +296,7 @@
       }
 
       .u-field-account_privacy {
-        @extend .container;
+        @extend .container !optional;
 
         display: table-cell;
         border: none;
@@ -311,7 +311,7 @@
         }
 
         .btn-change-privacy {
-          @extend %btn-primary-blue;
+          @extend %btn-primary-blue !optional;
 
           padding-top: 4px;
           padding-bottom: 5px;
@@ -321,7 +321,7 @@
       }
 
       .u-field-title {
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         width: auto;
         color: $body-color;
@@ -350,7 +350,7 @@
   }
 
   .wrapper-profile-sections {
-    @extend .container;
+    @extend .container !optional;
 
     @include padding($baseline*1.5, 5%, $baseline*1.5, 5%);
 
@@ -371,15 +371,15 @@
     padding: $baseline 5% 0;
 
     .header {
-      @extend %t-title4;
-      @extend %t-ultrastrong;
+      @extend %t-title4 !optional;
+      @extend %t-ultrastrong !optional;
 
       display: inline-block;
       color: #222;
     }
 
     .subheader {
-      @extend %t-title6;
+      @extend %t-title6 !optional;
     }
   }
 
@@ -457,7 +457,7 @@
 
           &:not(.u-field-readonly) {
             &.u-field-value {
-              @extend %t-weight3;
+              @extend %t-weight3 !optional;
             }
 
             &:not(:last-child) {
@@ -481,8 +481,8 @@
           }
 
           &:first-child {
-            @extend %t-title4;
-            @extend %t-weight4;
+            @extend %t-title4 !optional;
+            @extend %t-weight4 !optional;
 
             font-size: em(24);
           }
@@ -547,7 +547,7 @@
     }
 
     .u-field-title {
-      @extend %t-title6;
+      @extend %t-title6 !optional;
 
       display: inline-block;
       margin-top: 0;
@@ -558,7 +558,7 @@
     }
 
     .u-field-value {
-      @extend %t-copy-base;
+      @extend %t-copy-base !optional;
 
       width: 100%;
       overflow: auto;
@@ -613,7 +613,7 @@
         text-align: center;
         line-height: 1.5em;
 
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         color: $body-color;
       }
@@ -638,7 +638,7 @@
 
       .u-field-footer {
         .field-textarea-character-count {
-          @extend %t-weight1;
+          @extend %t-weight1 !optional;
 
           @include float(right);
 
@@ -659,11 +659,11 @@
   }
 
   .page-content-nav {
-    @extend %page-content-nav;
+    @extend %page-content-nav !optional;
   }
 
   .badge-set-display {
-    @extend .container;
+    @extend .container !optional;
 
     padding: 0;
 
@@ -701,16 +701,16 @@
       }
 
       .badge-details {
-        @extend %t-copy-sub1;
-        @extend %t-regular;
+        @extend %t-copy-sub1 !optional;
+        @extend %t-regular !optional;
 
         max-width: 70%;
         display: inline-block;
         color: $gray-d1;
 
         .badge-name {
-          @extend %t-strong;
-          @extend %t-copy-base;
+          @extend %t-strong !optional;
+          @extend %t-copy-base !optional;
 
           color: $gray-d3;
         }
@@ -721,7 +721,7 @@
         }
 
         .badge-date-stamp {
-          @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
         }
 
         .find-button-container {
@@ -734,8 +734,8 @@
         }
 
         .share-button {
-          @extend %t-action3;
-          @extend %button-reset;
+          @extend %t-action3 !optional;
+          @extend %button-reset !optional;
 
           background: $gray-l6;
           color: $gray-d1;
@@ -783,7 +783,7 @@
   // #BADGES MODAL
   // ------------------------------
   .badges-overlay {
-    @extend %ui-depth1;
+    @extend %ui-depth1 !optional;
 
     position: fixed;
     top: 0;
@@ -794,8 +794,8 @@
     vertical-align: middle;
 
     .badges-modal {
-      @extend %t-copy-lead1;
-      @extend %ui-depth2;
+      @extend %t-copy-lead1 !optional;
+      @extend %ui-depth2 !optional;
 
       color: $lighter-base-font-color;
       box-sizing: content-box;
@@ -821,8 +821,8 @@
       }
 
       .close {
-        @extend %button-reset;
-        @extend %t-strong;
+        @extend %button-reset !optional;
+        @extend %t-strong !optional;
 
         color: $lighter-base-font-color;
         position: absolute;

@@ -14,7 +14,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
     width: 100%;
 
     .courses-listing {
-      @extend %ui-no-list;
+      @extend %ui-no-list !optional;
 
       .courses-listing-item {
         margin: 0 0 ($baseline*1.5) 0;
@@ -41,7 +41,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
         &::before {
           @include left(0);
 
-          @extend %ui-depth1;
+          @extend %ui-depth1 !optional;
 
           position: absolute;
           top: 0;
@@ -62,7 +62,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
 
           box-sizing: border-box;
 
-          @extend %ui-depth2;
+          @extend %ui-depth2 !optional;
 
           position: absolute;
           top: ($baseline*2.75);
@@ -91,7 +91,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
         .course-organization,
         .course-code,
         .course-date {
-          @extend %t-icon6;
+          @extend %t-icon6 !optional;
 
           color: $gray-d2;
         }
@@ -118,7 +118,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
         .course-title {
           @include line-height(16);
 
-          @extend %t-icon4;
+          @extend %t-icon4 !optional;
 
           margin: ($baseline*0.25) 0 ($baseline*1.75) 0;
           padding: 0 ($baseline*0.75);

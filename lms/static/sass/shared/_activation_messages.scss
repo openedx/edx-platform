@@ -6,11 +6,11 @@
     padding: ($baseline/2);
 
     &.invalid {
-      @extend %error-message-colors;
+      @extend %error-message-colors !optional;
     }
 
     &.valid {
-      @extend %success-message-colors;
+      @extend %success-message-colors !optional;
     }
   }
 

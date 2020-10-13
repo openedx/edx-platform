@@ -38,7 +38,7 @@ $light-border: 1px solid $gray-l5;
 .cart-errors {
   @include text-align(center);
 
-  @extend %t-copy-base;
+  @extend %t-copy-base !optional;
 
   display: none;
   margin-bottom: $baseline;
@@ -49,7 +49,7 @@ $light-border: 1px solid $gray-l5;
 }
 
 #expiry-msg {
-  @extend %t-copy-sub1;
+  @extend %t-copy-sub1 !optional;
 
   margin-top: ($baseline*0.15);
   border-top: $light-border;
@@ -62,7 +62,7 @@ $light-border: 1px solid $gray-l5;
   .title {
     @include text-align(left);
 
-    @extend %t-title4;
+    @extend %t-title4 !optional;
 
     border-bottom: $light-border;
   }
@@ -82,7 +82,7 @@ $light-border: 1px solid $gray-l5;
     width: calc(100% - #{$enrollment-details-width-difference});
 
     .sub-title {
-      @extend %t-title5;
+      @extend %t-title5 !optional;
 
       color: $gray-l1;
     }
@@ -96,20 +96,20 @@ $light-border: 1px solid $gray-l5;
     .course-dates {
       @include float(right);
 
-      @extend %t-copy-lead1;
+      @extend %t-copy-lead1 !optional;
     }
 
     .course-title h1 {
       @include text-align(left);
 
-      @extend %t-title4;
-      @extend %t-strong;
+      @extend %t-title4 !optional;
+      @extend %t-strong !optional;
 
       color: $black-t3;
     }
 
     .enrollment-text {
-      @extend %t-copy-base;
+      @extend %t-copy-base !optional;
 
       line-height: normal;
       color: $gray-l1;
@@ -136,7 +136,7 @@ $light-border: 1px solid $gray-l5;
     @include border-radius(3px);
     @include text-align(center);
 
-    @extend %t-copy-lead2;
+    @extend %t-copy-lead2 !optional;
 
     display: inline-block;
     background-clip: padding-box;
@@ -158,7 +158,7 @@ $light-border: 1px solid $gray-l5;
     @include float(right);
     @include border-radius(3px);
 
-    @extend %t-copy-lead2;
+    @extend %t-copy-lead2 !optional;
 
     display: inline-block;
     box-shadow: 0 1px 0 0 $blue2 inset;
@@ -186,8 +186,8 @@ $light-border: 1px solid $gray-l5;
   a.blue {
     @include border-radius(3px);
 
-    @extend %t-copy-lead2;
-    @extend %t-regular;
+    @extend %t-copy-lead2 !optional;
+    @extend %t-regular !optional;
 
     display: inline-block;
     margin: ($baseline/2) 0 $baseline 0;
@@ -208,8 +208,8 @@ $light-border: 1px solid $gray-l5;
   input[type="text"],
   input[type="email"],
   select {
-    @extend %t-action2;
-    @extend %t-strong;
+    @extend %t-action2 !optional;
+    @extend %t-strong !optional;
 
     border: $input-border;
     padding: ($baseline*0.4) ($baseline*0.6);
@@ -240,7 +240,7 @@ $light-border: 1px solid $gray-l5;
   h1 {
     @include text-align(left);
 
-    @extend %t-title4;
+    @extend %t-title4 !optional;
 
     margin: ($baseline/2) 0 0 0;
     padding: ($baseline*1.5) 0;
@@ -249,7 +249,7 @@ $light-border: 1px solid $gray-l5;
   }
 
   .steps {
-    @extend %ui-no-list;
+    @extend %ui-no-list !optional;
 
     border-top: $steps-border;
     border-bottom: $steps-border;
@@ -266,7 +266,7 @@ $light-border: 1px solid $gray-l5;
 
       //STATE: active
       &.active {
-        @extend %t-regular;
+        @extend %t-regular !optional;
 
         border-bottom: $steps-border;
       }
@@ -328,7 +328,7 @@ $light-border: 1px solid $gray-l5;
 
       h3,
       h3 span {
-        @extend %t-title6;
+        @extend %t-title6 !optional;
 
         padding: 0;
         color: $light-gray2;
@@ -349,7 +349,7 @@ $light-border: 1px solid $gray-l5;
 
       .course-registration-title,
       .course-dates-title {
-        @extend %t-title6;
+        @extend %t-title6 !optional;
 
         display: block;
         padding: 0;
@@ -358,7 +358,7 @@ $light-border: 1px solid $gray-l5;
 
       .course-display-name,
       .course-display-dates {
-        @extend %t-title4;
+        @extend %t-title4 !optional;
 
         display: block;
         color: $dark-gray2;
@@ -371,7 +371,7 @@ $light-border: 1px solid $gray-l5;
       h1 {
         @include float(left);
 
-        @extend %t-title4;
+        @extend %t-title4 !optional;
 
         padding: 0 0 ($baseline/2) 0;
         width: ($baseline*35);
@@ -384,7 +384,7 @@ $light-border: 1px solid $gray-l5;
         }
 
         span {
-          @extend %t-copy-base;
+          @extend %t-copy-base !optional;
         }
       }
 
@@ -404,8 +404,8 @@ $light-border: 1px solid $gray-l5;
         .col-1 {
           @include float(left);
 
-          @extend %t-copy-base;
-          @extend %t-regular;
+          @extend %t-copy-base !optional;
+          @extend %t-regular !optional;
 
           padding-top: ($baseline*0.55);
           width: ($baseline*22.5);
@@ -415,7 +415,7 @@ $light-border: 1px solid $gray-l5;
             span {
               @include padding-left($baseline);
 
-              @extend %t-copy-lead2;
+              @extend %t-copy-lead2 !optional;
 
               color: $dark-gray1;
             }
@@ -443,8 +443,8 @@ $light-border: 1px solid $gray-l5;
             position: relative;
 
             label {
-              @extend %t-copy-base;
-              @extend %t-strong;
+              @extend %t-copy-base !optional;
+              @extend %t-strong !optional;
 
               cursor: text;
               color: $light-gray2;
@@ -462,8 +462,8 @@ $light-border: 1px solid $gray-l5;
               input[type="text"] {
                 @include text-align(center);
 
-                @extend %t-copy-lead2;
-                @extend %t-strong;
+                @extend %t-copy-lead2 !optional;
+                @extend %t-strong !optional;
 
                 box-shadow: none;
                 border: none;
@@ -475,7 +475,7 @@ $light-border: 1px solid $gray-l5;
 
                 //STATE: focus
                 &:focus {
-                  @extend %no-outline;
+                  @extend %no-outline !optional;
                 }
               }
             }
@@ -492,7 +492,7 @@ $light-border: 1px solid $gray-l5;
               text-shadow: none;
 
               i {
-                @extend %t-icon3;
+                @extend %t-icon3 !optional;
 
                 color: $dark-gray2;
 
@@ -503,7 +503,7 @@ $light-border: 1px solid $gray-l5;
 
               //CASE: has class inc
               &.inc {
-                @extend %no-outline;
+                @extend %no-outline !optional;
 
                 top: ($baseline*0.45);
                 width: auto;
@@ -511,7 +511,7 @@ $light-border: 1px solid $gray-l5;
 
               //CASE: has class dec
               &.dec {
-                @extend %no-outline;
+                @extend %no-outline !optional;
 
                 top: ($baseline*1.5);
                 width: auto;
@@ -543,13 +543,13 @@ $light-border: 1px solid $gray-l5;
               @include float(right);
               @include padding($baseline*1.25, $baseline*1.75, $baseline*1.25, 0);
 
-              @extend %t-action2;
+              @extend %t-action2 !optional;
 
               display: inline-block;
 
               // STATE: focus
               &:focus {
-                @extend %no-outline;
+                @extend %no-outline !optional;
               }
             }
 
@@ -583,7 +583,7 @@ $light-border: 1px solid $gray-l5;
             i {
               @include line-height(27.02);
 
-              @extend %t-icon3;
+              @extend %t-icon3 !optional;
 
               color: $dark-gray2;
             }
@@ -610,8 +610,8 @@ $light-border: 1px solid $gray-l5;
       @include clearfix();
 
       a {
-        @extend %t-copy-lead1;
-        @extend %t-strong;
+        @extend %t-copy-lead1 !optional;
+        @extend %t-strong !optional;
 
         display: inline-block;
         cursor: pointer;
@@ -629,8 +629,8 @@ $light-border: 1px solid $gray-l5;
         b {
           @include padding-left($baseline);
 
-          @extend %t-copy-lead2;
-          @extend %t-strong;
+          @extend %t-copy-lead2 !optional;
+          @extend %t-strong !optional;
 
           letter-spacing: 0;
         }
@@ -643,8 +643,8 @@ $light-border: 1px solid $gray-l5;
       display: inline-block;
 
       input[type="text"] {
-        @extend %t-copy-base;
-        @extend %t-strong;
+        @extend %t-copy-base !optional;
+        @extend %t-strong !optional;
 
         border: $input-border;
         padding: ($baseline*0.4) ($baseline*0.6);
@@ -665,7 +665,7 @@ $light-border: 1px solid $gray-l5;
       }
 
       .error-text {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         display: block;
         padding-bottom: 0;
@@ -685,7 +685,7 @@ $light-border: 1px solid $gray-l5;
       .green {
         @include margin-right($baseline);
 
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         color: $green1;
       }
@@ -708,8 +708,8 @@ $light-border: 1px solid $gray-l5;
     }
 
     button[type="submit"] {
-      @extend %t-action2;
-      @extend %t-strong;
+      @extend %t-action2 !optional;
+      @extend %t-strong !optional;
 
       float: none;
       padding: ($baseline*0.35) $baseline;
@@ -740,7 +740,7 @@ $light-border: 1px solid $gray-l5;
       .billing-detail-label {
         @include margin-right($baseline);
 
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         display: inline-block;
         width: ($baseline*9.5);
@@ -748,7 +748,7 @@ $light-border: 1px solid $gray-l5;
       }
 
       .billing-detail-value {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         display: inline-block;
         margin: 0;
@@ -789,8 +789,8 @@ $light-border: 1px solid $gray-l5;
         label {
           @include padding($baseline*0.4, $baseline*0.75, $baseline*0.4, $baseline*0.3);
 
-          @extend %t-copy-base;
-          @extend %t-regular;
+          @extend %t-copy-base !optional;
+          @extend %t-regular !optional;
 
           display: inline-block;
           margin-bottom: 0;
@@ -814,8 +814,8 @@ $light-border: 1px solid $gray-l5;
         @include margin-left($baseline*0.75);
         @include padding($baseline*0.75, $baseline*3, $baseline*1.1, $baseline*1.5);
 
-        @extend %t-copy-lead2;
-        @extend %t-strong;
+        @extend %t-copy-lead2 !optional;
+        @extend %t-strong !optional;
 
         width: auto;
         height: ($baseline*3.35);
@@ -836,7 +836,7 @@ $light-border: 1px solid $gray-l5;
       p {
         @include text-align(right);
 
-        @extend %t-copy-base;
+        @extend %t-copy-base !optional;
 
         padding: ($baseline*0.65) 0;
       }
@@ -848,7 +848,7 @@ $light-border: 1px solid $gray-l5;
       .fa-caret-right {
         @include right($baseline*1.5);
 
-        @extend %t-icon3;
+        @extend %t-icon3 !optional;
 
         position: absolute;
         top: ($baseline*1.1);
@@ -860,15 +860,15 @@ $light-border: 1px solid $gray-l5;
   .disclaimer {
     @include text-align(right);
 
-    @extend %t-light;
+    @extend %t-light !optional;
 
     padding: ($baseline/2) 0;
     color: $light-gray2;
   }
 
   h3 {
-    @extend %t-title6;
-    @extend %t-regular;
+    @extend %t-title6 !optional;
+    @extend %t-regular !optional;
 
     padding: ($baseline*1.5) $baseline;
     color: $dark-gray1;
@@ -879,7 +879,7 @@ $light-border: 1px solid $gray-l5;
     width: 100%;
 
     h3 {
-      @extend %t-title5;
+      @extend %t-title5 !optional;
 
       margin-bottom: ($baseline/4);
       padding: ($baseline*0.6) 0;
@@ -909,8 +909,8 @@ $light-border: 1px solid $gray-l5;
         margin-bottom: ($baseline*0.75);
 
         label {
-          @extend %t-copy-base;
-          @extend %t-regular;
+          @extend %t-copy-base !optional;
+          @extend %t-regular !optional;
 
           display: block;
           color: $dark-gray2;
@@ -918,7 +918,7 @@ $light-border: 1px solid $gray-l5;
         }
 
         input {
-          @extend %t-copy-base;
+          @extend %t-copy-base !optional;
 
           margin-bottom: ($baseline/4);
           width: 100%;
@@ -933,7 +933,7 @@ $light-border: 1px solid $gray-l5;
   }
 
   .error-text {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     display: block;
     padding-bottom: 0;
@@ -981,7 +981,7 @@ $light-border: 1px solid $gray-l5;
     padding: $baseline;
 
     h2 {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       margin-bottom: 0;
       color: $dark-gray1;
@@ -993,7 +993,7 @@ $light-border: 1px solid $gray-l5;
         letter-spacing: 0;
 
         .blue-link {
-          @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
 
           color: $blue2;
 
@@ -1013,7 +1013,7 @@ $light-border: 1px solid $gray-l5;
     color: $dark-gray1;
 
     h2 {
-      @extend %t-title5;
+      @extend %t-title5 !optional;
     }
   }
 
@@ -1076,7 +1076,7 @@ $light-border: 1px solid $gray-l5;
 
         // CASE: has first child
         &:first-child {
-          @extend %t-copy-lead1;
+          @extend %t-copy-lead1 !optional;
 
           @include text-align(left);
 
@@ -1091,7 +1091,7 @@ $light-border: 1px solid $gray-l5;
             @include border-radius(3px);
             @include text-align(center);
 
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
 
             display: inline-block;
             padding: ($baseline/10) ($baseline/2);
@@ -1133,8 +1133,8 @@ $light-border: 1px solid $gray-l5;
   h2 {
     @include text-align(center);
 
-    @extend %t-title5;
-    @extend %t-strong;
+    @extend %t-title5 !optional;
+    @extend %t-strong !optional;
 
     margin-top: $baseline;
     margin-bottom: ($baseline/4);
@@ -1146,7 +1146,7 @@ $light-border: 1px solid $gray-l5;
   p {
     @include text-align(center);
 
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     text-shadow: 0 1px 1px $white;
     color: $gray-l1;
@@ -1155,8 +1155,8 @@ $light-border: 1px solid $gray-l5;
   a.blue {
     @include border-radius(3px);
 
-    @extend %t-copy-lead2;
-    @extend %t-regular;
+    @extend %t-copy-lead2 !optional;
+    @extend %t-regular !optional;
 
     display: inline-block;
     margin: ($baseline/2) 0 $baseline 0;

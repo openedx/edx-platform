@@ -15,7 +15,7 @@
 // custom tool tip style.
 @mixin tooltip-hover-style ($margin-top) {
   p {
-    @extend %ui-depth2;
+    @extend %ui-depth2 !optional;
 
     background: $dark-gray;
     border-radius: ($baseline/5);

@@ -2,7 +2,7 @@
 // ====================
 
 .calc-main {
-  @extend %ui-print-excluded;
+  @extend %ui-print-excluded !optional;
 
   bottom: -129px;
   left: 0;
@@ -66,7 +66,7 @@
     }
 
     form {
-      @extend .clearfix;
+      @extend .clearfix !optional;
 
       box-sizing: border-box;
       padding: lh();
@@ -126,7 +126,7 @@
       }
 
       .input-wrapper {
-        @extend .clearfix;
+        @extend .clearfix !optional;
 
         float: left;
         margin: 0;

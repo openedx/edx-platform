@@ -21,14 +21,14 @@
 // post article
 .discussion-article {
   .posted-details {
-    @extend %t-copy-sub2;
-    @extend %t-light;
+    @extend %t-copy-sub2 !optional;
+    @extend %t-light !optional;
 
     margin: ($baseline/5) 0;
     color: $forum-color-copy-light;
 
     .username {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       display: inline;
     }
@@ -73,14 +73,14 @@
 
   // response body
   .response-body {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
   }
 }
 
 // comments layout
 .discussion-comment {
   .response-body {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     @include padding(($baseline / 2), ($baseline * 1.5), 0, 0);
 
@@ -174,7 +174,7 @@
 
   // post body
   .post-body {
-    @extend %t-copy-sub1;
+    @extend %t-copy-sub1 !optional;
 
     padding: ($baseline/2) 0;
     max-width: calc(100% - #{$actions-dropdown-offset});
@@ -182,8 +182,8 @@
 
   // post context
   .post-context {
-    @extend %t-copy-sub2;
-    @extend %t-light;
+    @extend %t-copy-sub2 !optional;
+    @extend %t-light !optional;
 
     color: $forum-color-copy-light;
 
@@ -229,7 +229,7 @@
         .inline-comment-count {
           @include margin-right($baseline/2);
 
-          @extend %ui-depth2;
+          @extend %ui-depth2 !optional;
 
           @include float(right);
 

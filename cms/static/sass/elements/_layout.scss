@@ -65,8 +65,8 @@
 
         // buttons
         .button {
-          @extend %btn-primary-blue;
-          @extend %sizing;
+            @extend %btn-primary-blue !optional;
+            @extend %sizing !optional;
 
           .action-button-text {
             display: inline-block;
@@ -81,8 +81,8 @@
           // CASE: new/create button
           &.new-button,
           &.button-new {
-            @extend %btn-primary-green;
-            @extend %sizing;
+              @extend %btn-primary-green !optional;
+              @extend %sizing !optional;
           }
         }
       }
@@ -102,7 +102,7 @@
       }
 
       .navigation-item {
-        @extend %cont-truncated;
+       @extend %cont-truncated !optional;
 
         display: inline-block;
         vertical-align: bottom; // correct for extra padding in FF
@@ -110,7 +110,7 @@
         color: $gray-d2;
 
         &.navigation-current {
-          @extend %ui-disabled;
+            @extend %ui-disabled !optional;
 
           color: $gray;
           max-width: 250px;
@@ -145,14 +145,14 @@
   // CASE: wizard-based mast
   .mast-wizard {
     .page-header-sub {
-      @extend %t-title4;
+       @extend %t-title4 !optional;
 
       color: $gray;
       font-weight: 300;
     }
 
     .page-header-super {
-      @extend %t-title4;
+       @extend %t-title4 !optional;
 
       float: left;
       width: flex-grid(12, 12);
@@ -174,7 +174,7 @@
 .content {
   @include clearfix();
 
-  @extend %t-copy-base;
+  @extend %t-copy-base !optional;
 
   max-width: $fg-max-width;
   min-width: $fg-min-width;
@@ -189,7 +189,7 @@
     padding-bottom: ($baseline/2);
 
     .title-sub {
-      @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
       display: block;
       margin: 0;
@@ -197,8 +197,8 @@
     }
 
     .title-1 {
-      @extend %t-title3;
-      @extend %t-strong;
+       @extend %t-title3 !optional;
+      @extend %t-strong !optional;
 
       margin: 0;
       padding: 0;
@@ -235,17 +235,17 @@
 // layout - primary content
 .content-primary {
   .title-1 {
-    @extend %t-title3;
+     @extend %t-title3 !optional;
   }
 
   .title-2 {
-    @extend %t-title4;
+     @extend %t-title4 !optional;
 
     margin: 0 0 ($baseline/2) 0;
   }
 
   .title-3 {
-    @extend %t-title6;
+     @extend %t-title6 !optional;
 
     margin: 0 0 ($baseline/2) 0;
   }
@@ -260,7 +260,7 @@
     }
 
     .tip {
-      @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
       width: flex-grid(7, 12);
       float: right;

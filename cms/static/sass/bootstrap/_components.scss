@@ -60,7 +60,7 @@
 
   // sock - actions
   .list-cta {
-    @extend %ui-depth1;
+    @extend %ui-depth1 !optional;
 
     position: absolute;
     top: -($baseline*0.75);
@@ -70,8 +70,8 @@
     list-style: none;
 
     .cta-show-sock {
-      @extend %ui-btn-pill;
-      @extend %t-action4;
+      @extend %ui-btn-pill !optional;
+      @extend %t-action4 !optional;
 
       background: theme-color("light");
       padding: ($baseline/2) $baseline;
@@ -92,7 +92,7 @@
   .sock {
     @include clearfix();
 
-    @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
     max-width: $studio-max-width;
     width: flex-grid(12);
@@ -100,10 +100,10 @@
     padding: ($baseline*2) 0;
     color: $gray-500;
 
-    // support body
-    header {
-      .title {
-        @extend %t-title4;
+      // support body
+      header {
+          .title {
+         @extend %t-title4 !optional;
       }
     }
 
@@ -115,14 +115,14 @@
     .support,
     .feedback {
       .title {
-        @extend %t-title6;
+         @extend %t-title6 !optional;
 
         color: $white;
         margin-bottom: ($baseline/2);
       }
 
       .copy {
-        @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
 
         margin: 0 0 $baseline 0;
       }
@@ -140,12 +140,12 @@
           }
 
           .action {
-            @extend %t-action4;
+            @extend %t-action4 !optional;
 
             display: block;
 
             .icon {
-              @extend %t-icon4;
+                @extend %t-icon4 !optional;
 
               vertical-align: middle;
               margin-right: $baseline/4;
@@ -153,13 +153,13 @@
           }
 
           .tip {
-            @extend %cont-text-sr;
+              @extend %cont-text-sr !optional;
           }
         }
 
         .action-primary {
-          @extend %btn-primary-blue;
-          @extend %t-action3;
+          @extend %btn-primary-blue !optional;
+          @extend %t-action3 !optional;
         }
       }
     }

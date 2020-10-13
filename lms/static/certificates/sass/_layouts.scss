@@ -24,14 +24,14 @@
 
 // app header
 .wrapper-header {
-  @extend %layout-wrapper;
+  @extend %layout-wrapper !optional;
 
   padding-top: map-get($spacing-vertical, small);
   padding-bottom: map-get($spacing-vertical, small);
 }
 
 .header-app {
-  @extend %layout;
+  @extend %layout !optional;
 
   .logo {
     display: block;
@@ -56,13 +56,13 @@
 
 // banner
 .wrapper-banner {
-  @extend %layout-wrapper;
+  @extend %layout-wrapper !optional;
 
   padding-top: map-get($spacing-vertical, small);
   padding-bottom: map-get($spacing-vertical, small);
 
   .banner {
-    @extend %layout;
+    @extend %layout !optional;
   }
 }
 
@@ -128,15 +128,15 @@
 
 // app footer
 .wrapper-footer {
-  @extend %layout-wrapper;
+  @extend %layout-wrapper !optional;
 }
 
 .footer-app {
-  @extend %layout;
+  @extend %layout !optional;
 }
 
 .footer-app-copyright {
-  @extend %copy-micro;
+  @extend %copy-micro !optional;
 
   @include media-breakpoint-up(md) {
     @include make-col(6);
@@ -154,7 +154,7 @@
 
   .list {
     .nav-item {
-      @extend %copy-meta;
+      @extend %copy-meta !optional;
 
       display: block;
       font-weight: 600;
@@ -171,7 +171,7 @@
     }
 
     .action {
-      @extend %link;
+      @extend %link !optional;
     }
   }
 
@@ -187,23 +187,23 @@
 // ------------------------------
 .layout-accomplishment {
   .wrapper-introduction {
-    @extend %layout-wrapper;
+    @extend %layout-wrapper !optional;
 
     margin-bottom: map-get($spacing-vertical, large);
 
     .introduction {
-      @extend %layout;
+      @extend %layout !optional;
     }
   }
 
   .wrapper-accomplishment-rendering {
-    @extend %layout-wrapper;
+    @extend %layout-wrapper !optional;
 
     margin-bottom: map-get($spacing-vertical, small);
   }
 
   .accomplishment-rendering {
-    @extend %layout;
+    @extend %layout !optional;
 
     position: relative;
     top: -(map-get($spacing-vertical, base));
@@ -310,10 +310,10 @@
   }
 
   .wrapper-accomplishment-metadata {
-    @extend %layout-wrapper;
+    @extend %layout-wrapper !optional;
 
     .accomplishment-metadata {
-      @extend %layout;
+      @extend %layout !optional;
 
       .accomplishment-metadata-title {
         @include make-col(12);
@@ -321,14 +321,14 @@
     }
 
     .wrapper-metadata {
-      @extend %layout;
+      @extend %layout !optional;
 
       @include make-container();
 
       padding: 0;
 
       .metadata {
-        @extend %divider-2;
+        @extend %divider-2 !optional;
 
         @include make-col(12);
 
@@ -352,10 +352,10 @@
   }
 
   .wrapper-accomplishment-related {
-    @extend %layout-wrapper;
+    @extend %layout-wrapper !optional;
 
     .accomplishment-related {
-      @extend %layout;
+      @extend %layout !optional;
     }
 
     .accomplishment-brief {
@@ -373,10 +373,10 @@
   }
 
   .wrapper-about {
-    @extend %layout-wrapper;
+    @extend %layout-wrapper !optional;
 
     .about {
-      @extend %layout;
+      @extend %layout !optional;
     }
 
     .about-item {
@@ -393,7 +393,7 @@
       }
 
       a {
-        @extend %link;
+        @extend %link !optional;
       }
 
       .about-edx-title,
@@ -406,7 +406,7 @@
 
       .about-copy,
       .about-edx-copy {
-        @extend %copy-meta;
+        @extend %copy-meta !optional;
 
         margin: 0 rem(8);
 

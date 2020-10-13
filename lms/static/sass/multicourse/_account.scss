@@ -130,7 +130,7 @@
 
       // CASE: normal typographical headings
       h1 {
-        @extend %heading-2;
+        @extend %heading-2 !optional;
 
         @include text-align(left);
 
@@ -147,7 +147,7 @@
 
         .title-super,
         .title-sub {
-          @extend %t-weight1;
+          @extend %t-weight1 !optional;
 
           display: block;
           letter-spacing: 0;
@@ -191,7 +191,7 @@
   label,
   input,
   textarea {
-    @extend %body-text;
+    @extend %body-text !optional;
   }
 
   h1,
@@ -265,7 +265,7 @@
       }
 
       h3 {
-        @extend %heading-4;
+        @extend %heading-4 !optional;
 
         margin: 0 0 ($baseline/4) 0;
       }
@@ -279,7 +279,7 @@
       }
 
       .btn-login-action {
-        @extend %btn-secondary-grey-outline;
+        @extend %btn-secondary-grey-outline !optional;
 
         padding: ($baseline/10) ($baseline*0.75);
 
@@ -291,7 +291,7 @@
   // forms
   form {
     .instructions {
-      @extend %body-text-emphasized;
+      @extend %body-text-emphasized !optional;
 
       margin-bottom: $baseline;
     }
@@ -507,8 +507,8 @@
     @include clearfix();
 
     button[type="submit"] {
-      @extend %m-btn-primary;
-      @extend %t-action2;
+      @extend %m-btn-primary !optional;
+      @extend %t-action2 !optional;
 
       &:disabled,
       &.is-disabled {
@@ -544,8 +544,8 @@
     border-top: ($baseline/5) solid $m-gray-l4;
 
     .copy {
-      @extend %t-copy-lead1;
-      @extend %t-weight4;
+      @extend %t-copy-lead1 !optional;
+      @extend %t-weight4 !optional;
 
       position: absolute;
       top: -($baseline);
@@ -561,7 +561,7 @@
 
   // downplay required note
   .instructions .note {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     display: block;
     font-weight: normal;
@@ -573,14 +573,14 @@
     margin-bottom: $baseline;
 
     button[type="submit"] {
-      @extend %btn-secondary-blue-outline;
+      @extend %btn-secondary-blue-outline !optional;
 
       width: flex-grid(4, 8);
 
       @include margin-right($baseline/2);
 
       .icon {
-        @extend %sso-icon;
+        @extend %sso-icon !optional;
 
         @include margin-right($baseline/2);
 
@@ -642,7 +642,7 @@
     background: tint($yellow, 20%);
 
     .message-title {
-      @extend %heading-4;
+      @extend %heading-4 !optional;
 
       margin: 0 0 ($baseline/4) 0;
       font-size: em(14);
@@ -650,7 +650,7 @@
     }
 
     .message-copy {
-      @extend %body-text;
+      @extend %body-text !optional;
 
       margin: 0 !important;
       padding: 0;
@@ -768,7 +768,7 @@
       }
 
       h2 {
-        @extend %heading-2;
+        @extend %heading-2 !optional;
 
         @include text-align(left);
       }
@@ -818,7 +818,7 @@
   }
 
   .modal-form-error {
-    @extend %body-text;
+    @extend %body-text !optional;
 
     box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
     box-sizing: border-box;

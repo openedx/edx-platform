@@ -2,7 +2,7 @@
 @import 'neat/neat'; // lib - Neat
 
 .header-global {
-  @extend %ui-depth1;
+  @extend %ui-depth1 !optional;
 
   border-bottom: 1px solid $header-border-color;
   box-shadow: 0 1px 5px 0 $shadow-l1;
@@ -122,7 +122,7 @@
   .user {
     @include float(right);
 
-    @extend %ui-print-excluded;
+    @extend %ui-print-excluded !optional;
 
     padding-left: 0;
     margin: 0;
@@ -363,7 +363,7 @@
       display: inline-block;
 
       .btn {
-        @extend %m-btn-primary;
+        @extend %m-btn-primary !optional;
       }
     }
   }
@@ -394,7 +394,7 @@
 
 // CASE: marketing/course discovery
 .header-global-new {
-  @extend %ui-depth1;
+  @extend %ui-depth1 !optional;
 
   /* Temp. fix until applied globally */
   box-sizing: border-box;

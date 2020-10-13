@@ -8,16 +8,16 @@
   }
 
   .content-primary {
-    @extend .ui-col-wide;
+    @extend .ui-col-wide !optional;
 
     .no-textbook-content {
-      @extend %no-content;
+      @extend %no-content !optional;
 
       color: $gray-d1;
     }
 
     .textbook {
-      @extend %ui-window;
+      @extend %ui-window !optional;
 
       position: relative;
 
@@ -30,8 +30,8 @@
         }
 
         .textbook-title {
-          @extend %t-title4;
-          @extend %t-strong;
+          @extend %t-title4 !optional;
+          @extend %t-strong !optional;
 
           @include margin-right($baseline*14);
         }
@@ -39,7 +39,7 @@
         .ui-toggle-expansion {
           @include transition(rotate 0.15s ease-in-out 0.25s);
 
-          @extend %t-action1;
+          @extend %t-action1 !optional;
 
           display: inline-block;
           width: ($baseline*0.75);
@@ -47,7 +47,7 @@
         }
 
         &.is-selectable {
-          @extend %ui-fake-link;
+          @extend %ui-fake-link !optional;
 
           &:hover {
             color: theme-color("primary");
@@ -62,7 +62,7 @@
           margin-left: $baseline;
 
           .chapter {
-            @extend %t-copy-sub2;
+            @extend %t-copy-sub2 !optional;
 
             margin-bottom: ($baseline/4);
             border-bottom: 1px solid $gray-l4;
@@ -101,17 +101,17 @@
             .view {
               @include blue-button;
 
-              @extend %t-action4;
+              @extend %t-action4 !optional;
             }
 
             .edit {
               @include blue-button;
 
-              @extend %t-action4;
+              @extend %t-action4 !optional;
             }
 
             .delete {
-              @extend %ui-btn-non;
+              @extend %ui-btn-non !optional;
             }
           }
         }
@@ -156,8 +156,8 @@
             @include blue-button;
             @include transition(all 0.15s);
 
-            @extend %t-action2;
-            @extend %t-strong;
+            @extend %t-action2 !optional;
+            @extend %t-strong !optional;
 
             display: inline-block;
             padding: ($baseline/5) $baseline;
@@ -168,8 +168,8 @@
             @include grey-button;
             @include transition(all 0.15s);
 
-            @extend %t-action2;
-            @extend %t-strong;
+            @extend %t-action2 !optional;
+            @extend %t-strong !optional;
 
             display: inline-block;
             padding: ($baseline/5) $baseline;
@@ -178,19 +178,19 @@
         }
 
         .copy {
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
 
           margin: ($baseline) 0 ($baseline/2) 0;
           color: $gray;
 
           strong {
-            @extend %t-strong;
+            @extend %t-strong !optional;
           }
         }
 
         .chapters-fields,
         .textbook-fields {
-          @extend %cont-no-list;
+          @extend %cont-no-list !optional;
 
           .field {
             margin: 0 0 ($baseline*0.75) 0;
@@ -201,7 +201,7 @@
 
             &.required {
               label {
-                @extend %t-strong;
+                @extend %t-strong !optional;
               }
 
               label::after {
@@ -217,7 +217,7 @@
             }
 
             label {
-              @extend %t-copy-sub1;
+              @extend %t-copy-sub1 !optional;
 
               @include transition(color, 0.15s, ease-in-out);
 
@@ -229,14 +229,14 @@
             }
 
             &.add-textbook-name label {
-              @extend %t-title5;
+              @extend %t-title5 !optional;
             }
 
 
             //this section is borrowed from _account.scss - we should clean up and unify later
             input,
             textarea {
-              @extend %t-copy-base;
+              @extend %t-copy-base !optional;
 
               height: 100%;
               width: 100%;
@@ -289,7 +289,7 @@
             }
 
             .tip {
-              @extend %t-copy-sub2;
+              @extend %t-copy-sub2 !optional;
 
               @include transition(color, 0.15s, ease-in-out);
 
@@ -333,7 +333,7 @@
               }
 
               .action-upload {
-                @extend %ui-btn-flat-outline;
+                @extend %ui-btn-flat-outline !optional;
 
                 position: absolute;
                 top: 3px;
@@ -345,7 +345,7 @@
             .action-close {
               @include transition(color $tmg-f2 ease-in-out);
 
-              @extend %t-action1;
+              @extend %t-action1 !optional;
 
               display: inline-block;
               float: right;
@@ -364,8 +364,8 @@
 
 
         .action-add-chapter {
-          @extend %ui-btn-flat-outline;
-          @extend %t-action1;
+          @extend %ui-btn-flat-outline !optional;
+          @extend %t-action1 !optional;
 
           display: block;
           width: 100%;
@@ -377,6 +377,6 @@
   }
 
   .content-supplementary {
-    @extend .ui-col-narrow;
+    @extend .ui-col-narrow !optional;
   }
 }

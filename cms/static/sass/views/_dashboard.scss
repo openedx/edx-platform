@@ -21,11 +21,11 @@
   }
 
   .content-primary {
-    @extend .ui-col-wide;
+    @extend .ui-col-wide !optional;
   }
 
   .content-supplementary {
-    @extend .ui-col-narrow;
+    @extend .ui-col-narrow !optional;
   }
 
   // ====================
@@ -55,8 +55,8 @@
 
         .action-create-course,
         .action-create-library {
-          @extend %btn-primary-green;
-          @extend %t-action3;
+          @extend %btn-primary-green !optional;
+          @extend %t-action3 !optional;
         }
       }
     }
@@ -69,8 +69,8 @@
     overflow: hidden;
 
     .ui-toggle-control {
-      @extend %ui-depth2;
-      @extend %btn-secondary-gray;
+      @extend %ui-depth2 !optional;
+      @extend %btn-secondary-gray !optional;
 
       @include clearfix();
 
@@ -84,7 +84,7 @@
       }
 
       .label {
-        @extend %t-action3;
+        @extend %t-action3 !optional;
 
         float: left;
         width: flex-grid(8, 9);
@@ -92,7 +92,7 @@
       }
 
       .fa-times-circle {
-        @extend %t-action1;
+        @extend %t-action1 !optional;
 
         @include transform(rotate(45deg));
         @include transform-origin(center center);
@@ -104,7 +104,7 @@
     }
 
     .ui-toggle-target {
-      @extend %ui-depth1;
+      @extend %ui-depth1 !optional;
 
       @include transition(opacity $tmg-f1 ease-in-out 0s);
 
@@ -137,8 +137,8 @@
     margin-top: $baseline;
 
     .title {
-      @extend %t-title7;
-      @extend %t-strong;
+      @extend %t-title7 !optional;
+      @extend %t-strong !optional;
 
       margin-bottom: ($baseline/4);
       color: $gray-d1;
@@ -149,8 +149,8 @@
       margin-top: ($baseline*0.75);
 
       .action-primary {
-        @extend %btn-primary-blue;
-        @extend %t-action3;
+        @extend %btn-primary-blue !optional;
+        @extend %t-action3 !optional;
       }
 
       // specific - request button
@@ -162,7 +162,7 @@
         .fa-cog {
           @include transition(all $tmg-f1 ease-in-out $tmg-f1);
 
-          @extend %t-icon4;
+          @extend %t-icon4 !optional;
 
           position: absolute;
           top: ($baseline/2);
@@ -199,7 +199,7 @@
 
     .status-update {
       .label {
-        @extend %cont-text-sr;
+        @extend %cont-text-sr !optional;
       }
 
       .value {
@@ -229,8 +229,8 @@
       }
 
       .value-formal {
-        @extend %t-title5;
-        @extend %t-strong;
+        @extend %t-title5 !optional;
+        @extend %t-strong !optional;
 
         margin: ($baseline/2);
 
@@ -240,7 +240,7 @@
       }
 
       .value-description {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         position: relative;
         color: $white;
@@ -251,7 +251,7 @@
     // CASE: rights are not requested yet
     &.is-unrequested {
       .title {
-        @extend %cont-text-sr;
+        @extend %cont-text-sr !optional;
       }
     }
 
@@ -329,7 +329,7 @@
   .libraries,
   .archived-courses {
     .title {
-      @extend %t-title6;
+      @extend %t-title6 !optional;
 
       margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l3;
@@ -338,7 +338,7 @@
     }
 
     .title {
-      @extend %t-title6;
+      @extend %t-title6 !optional;
 
       margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l3;
@@ -380,19 +380,19 @@
           }
 
           .icon {
-            @extend %t-icon4;
+            @extend %t-icon4 !optional;
 
             margin-right: ($baseline/2);
           }
 
           .copy {
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
           }
         }
       }
 
       .status-message {
-        @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
         background-color: $gray-l5;
         box-shadow: 0 2px 2px 0 $shadow inset;
@@ -415,7 +415,7 @@
             text-align: right;
 
             .button {
-              @extend %btn-secondary-white;
+              @extend %btn-secondary-white !optional;
 
               padding: ($baseline/4) ($baseline/2);
             }
@@ -427,13 +427,13 @@
             }
 
             .icon {
-              @extend %t-icon4;
+              @extend %t-icon4 !optional;
 
               margin-right: ($baseline/4);
             }
 
             .button-copy {
-              @extend %t-copy-sub1;
+              @extend %t-copy-sub1 !optional;
             }
           }
         }
@@ -463,7 +463,7 @@
 
     // encompassing course link
     .course-link {
-      @extend %ui-depth2;
+      @extend %ui-depth2 !optional;
 
       width: flex-grid(6, 9);
 
@@ -472,7 +472,7 @@
 
     // course title
     .course-title {
-      @extend %t-title4;
+      @extend %t-title4 !optional;
 
       @include margin(0, ($baseline*2), ($baseline/4), 0);
 
@@ -481,7 +481,7 @@
 
     // course metadata
     .course-metadata {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       @include transition(opacity $tmg-f1 ease-in-out 0);
 
@@ -498,7 +498,7 @@
         }
 
         .label {
-          @extend %cont-text-sr;
+          @extend %cont-text-sr !optional;
         }
       }
 
@@ -508,7 +508,7 @@
     }
 
     .course-actions {
-      @extend %ui-depth3;
+      @extend %ui-depth3 !optional;
 
       position: static;
       width: flex-grid(3, 9);
@@ -527,7 +527,7 @@
       }
 
       .button {
-        @extend %t-action3;
+        @extend %t-action3 !optional;
       }
 
       // view live button
@@ -583,7 +583,7 @@
     }
 
     .wrapper-course {
-      @extend %ui-window;
+      @extend %ui-window !optional;
 
       position: relative;
     }
@@ -603,7 +603,7 @@
 
     // course details (replacement for course-link when a course cannot be linked)
     .course-details {
-      @extend %ui-depth2;
+      @extend %ui-depth2 !optional;
 
       display: inline-block;
       vertical-align: middle;
@@ -666,8 +666,8 @@
     }
 
     label {
-      @extend %t-title7;
-      @extend %t-strong;
+      @extend %t-title7 !optional;
+      @extend %t-strong !optional;
 
       display: block;
     }
@@ -689,8 +689,8 @@
     }
 
     .new-course-name {
-      @extend %t-title5;
-      @extend %t-light;
+      @extend %t-title5 !optional;
+      @extend %t-light !optional;
     }
 
     .new-course-save {
@@ -719,7 +719,7 @@
     }
 
     .message-status {
-      @extend %t-strong;
+      @extend %t-strong !optional;
 
       display: block;
       margin-bottom: 0;

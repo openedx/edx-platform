@@ -9,7 +9,7 @@
   // basic modal content
   // ------------------------
   .modal-window {
-    @extend %ui-depth3;
+    @extend %ui-depth3 !optional;
 
     box-sizing: border-box;
     position: absolute;
@@ -29,15 +29,15 @@
     }
 
     .title {
-      @extend %t-title5;
-      @extend %t-demi-strong;
+        @extend %t-title5 !optional;
+        @extend %t-demi-strong !optional;
 
       margin: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
       color: $black;
     }
 
     .message {
-      @extend %t-copy-sub1;
+        @extend %t-copy-sub1 !optional;
 
       margin: 0 0 $baseline 0;
       color: $gray-d2;
@@ -72,7 +72,7 @@
       }
 
       .icon {
-        @extend %t-icon4;
+          @extend %t-icon4 !optional;
 
         @include margin-right($baseline/2);
 
@@ -80,7 +80,7 @@
       }
 
       .copy {
-        @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
 
         max-width: 85%;
         color: $white;
@@ -119,8 +119,8 @@
           margin-right: $baseline;
 
           .settings-tab-button {
-            @extend %t-copy-sub1;
-            @extend %t-regular;
+              @extend %t-copy-sub1 !optional;
+              @extend %t-regular !optional;
 
             background-image: none;
             background-color: $white;
@@ -146,7 +146,7 @@
     }
 
     .modal-section-title {
-      @extend %t-title6;
+       @extend %t-title6 !optional;
 
       margin: 0 0 ($baseline/2) 0;
       border-bottom: ($baseline/10) solid $gray-l4;
@@ -155,8 +155,8 @@
     }
 
     .modal-subsection-title {
-      @extend %t-title8;
-      @extend %t-strong;
+        @extend %t-title8 !optional;
+        @extend %t-strong !optional;
 
       margin-bottom: ($baseline/4);
       text-transform: uppercase;
@@ -175,13 +175,13 @@
       }
 
       .list-actions {
-        @extend %actions-list;
+          @extend %actions-list !optional;
 
         margin-left: ($baseline/4);
 
-        .action-button {
-          @extend %t-icon4;
-        }
+          .action-button {
+              @extend %t-icon4 !optional;
+          }
       }
     }
 
@@ -192,7 +192,7 @@
       padding: ($baseline*0.75) 2% ($baseline/2) 2%;
 
       .action-item {
-        @extend %t-action3;
+        @extend %t-action3 !optional;
 
         display: inline-block;
         margin-right: ($baseline*0.75);
@@ -205,7 +205,7 @@
       .action-primary {
         @include blue-button();
 
-        @extend %t-action3;
+        @extend %t-action3 !optional;
 
         border-color: $blue-d1;
         color: $white;
@@ -283,8 +283,8 @@
             .editor-button,
             .settings-button,
             .plugins-button {
-              @extend %btn-secondary-gray;
-              @extend %t-copy-sub1;
+                @extend %btn-secondary-gray !optional;
+                @extend %t-copy-sub1 !optional;
 
               border: 0;
               padding: ($baseline/4) ($baseline/2);
@@ -435,8 +435,8 @@
         padding: ($baseline/2);
 
         .component-name {
-          @extend %t-title5;
-          @extend %t-strong;
+          @extend %t-title5 !optional;
+          @extend %t-strong !optional;
 
           display: inline-block;
           vertical-align: middle;
@@ -463,9 +463,9 @@
             padding: 0;
 
             a.tab {
-              @extend %btn-secondary-gray;
-              @extend %t-copy-sub1;
-              @extend %t-regular;
+                @extend %btn-secondary-gray !optional;
+                @extend %t-copy-sub1 !optional;
+                @extend %t-regular !optional;
 
               background-image: none;
               box-shadow: none;
@@ -495,7 +495,7 @@
   }
 
   .modal-window-overlay {
-    @extend %ui-depth3;
+    @extend %ui-depth3 !optional;
 
     position: fixed;
     top: 0;
@@ -558,8 +558,8 @@
       }
 
       .note {
-        @extend %t-copy-sub2;
-        @extend %t-regular;
+          @extend %t-copy-sub2 !optional;
+          @extend %t-regular !optional;
 
         display: block;
         color: $error-color;
@@ -568,24 +568,24 @@
 
     // CASE: no groups configured for visibility
     .is-not-configured {
-      @extend %no-content;
+        @extend %no-content !optional;
 
       padding: ($baseline);
 
       @include text-align(left); // reset for %no-content's default styling
 
-      .title {
-        @extend %t-title6;
+        .title {
+            @extend %t-title6 !optional;
 
         font-weight: 600;  // needed for poorly scoped .title rule in modals
         margin: 0 0 ($baseline/2) 0; // needed for poorly scoped .title rule in modals
       }
 
       .copy {
-        @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
 
-        p {
-          @extend %wipe-last-child;
+          p {
+              @extend %wipe-last-child !optional;
 
           margin-bottom: $baseline;
         }
@@ -615,14 +615,14 @@
 
     .list-fields {
       .field-message {
-        @extend %t-copy-sub1;
+          @extend %t-copy-sub1 !optional;
 
         color: $gray-d1;
         margin-bottom: ($baseline/4);
       }
 
       label {
-        @extend %t-title6;
+         @extend %t-title6 !optional;
 
         font-weight: font-weight(semi-bold);
       }
@@ -652,7 +652,7 @@
 
         input,
         textarea {
-          @extend %t-copy-base;
+          @extend %t-copy-base !optional;
 
           @include transition(all $tmg-f2 ease-in-out 0s);
 
@@ -685,7 +685,7 @@
         }
 
         .tip {
-          @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
 
           @include transition(color, 0.15s, ease-in-out);
 
@@ -761,7 +761,7 @@
     .edit-settings-timed-examination,
     .edit-unit-access {
       .checkbox-cosmetic .input-checkbox {
-        @extend %cont-text-sr;
+          @extend %cont-text-sr !optional;
 
         // CASE: unchecked
         ~ .tip-warning {
@@ -782,8 +782,8 @@
       }
 
       .note {
-        @extend %t-copy-sub2;
-        @extend %t-regular;
+          @extend %t-copy-sub2 !optional;
+          @extend %t-regular !optional;
 
         margin: 14px 0 0 21px;
         display: block;
@@ -795,7 +795,7 @@
       margin-bottom: $baseline;
 
       .checkbox-cosmetic .input-checkbox {
-        @extend %cont-text-sr;
+          @extend %cont-text-sr !optional;
 
         // CASE: unchecked
         ~ .tip-warning {

@@ -3,7 +3,7 @@
 
 // JQUI calendar
 .ui-datepicker {
-  @extend %t-copy-sub2;
+  @extend %t-copy-sub2 !optional;
 
   border-color: $darkGrey;
   border-radius: 2px;
@@ -97,7 +97,7 @@
 }
 
 .ui-widget {
-  @extend %t-copy-base;
+  @extend %t-copy-base !optional;
 }
 
 .ui-widget-header {
@@ -126,7 +126,7 @@
   }
 
   a {
-    @extend %t-regular;
+    @extend %t-regular !optional;
 
     float: none;
   }

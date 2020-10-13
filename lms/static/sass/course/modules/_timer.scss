@@ -2,7 +2,7 @@
 // ====================
 
 div.timer-main {
-  @extend %ui-depth2;
+  @extend %ui-depth2 !optional;
 
   position: fixed;
   top: 0;

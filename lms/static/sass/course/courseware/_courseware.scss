@@ -16,7 +16,7 @@ html.video-fullscreen {
 }
 
 .wrap-instructor-info {
-  @extend %ui-print-excluded;
+  @extend %ui-print-excluded !optional;
 
   margin: ($baseline/2) ($baseline/4) 0 0;
   display: none;
@@ -31,7 +31,7 @@ html.video-fullscreen {
   }
 
   .instructor-info-action {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     @include float(right);
     @include margin-left($baseline/2);
@@ -43,7 +43,7 @@ html.video-fullscreen {
     color: $staff-color;
     text-transform: uppercase;
 
-    @extend %ui-print-excluded;
+    @extend %ui-print-excluded !optional;
 
     &:hover {
       background-color: $staff-color;
@@ -68,7 +68,7 @@ html.video-fullscreen {
   .xblock-license {
     @include text-align(right);
 
-    @extend %t-title7;
+    @extend %t-title7 !optional;
 
     display: block;
     width: auto;
@@ -129,7 +129,7 @@ html.video-fullscreen {
 
   .course-content,
   .courseware-results-wrapper {
-    @extend .content;
+    @extend .content !optional;
 
     line-height: 1.6;
 
@@ -194,7 +194,7 @@ html.video-fullscreen {
 
         @include text-align(left);
 
-        @extend %t-copy-base;
+        @extend %t-copy-base !optional;
 
         width: 100%;
 
@@ -236,7 +236,7 @@ html.video-fullscreen {
       }
 
       .exam-action-button {
-        @extend %t-weight4;
+        @extend %t-weight4 !optional;
 
         @include margin-right($baseline);
 
@@ -245,7 +245,7 @@ html.video-fullscreen {
         text-shadow: none;
 
         &.btn-pl-primary {
-          @extend %btn-pl-primary-base;
+          @extend %btn-pl-primary-base !optional;
 
           border: 0;
 
@@ -305,7 +305,7 @@ html.video-fullscreen {
     }
 
     div.proctored-exam {
-      @extend .timed-exam;
+      @extend .timed-exam !optional;
 
       .proctored-exam-message {
         border-top: ($baseline/10) solid $uxpl-gray-background;
@@ -389,15 +389,15 @@ html.video-fullscreen {
       background-color: rgb(242, 244, 245);
 
       .msg-title {
-        @extend %t-title5;
-        @extend %t-strong;
+        @extend %t-title5 !optional;
+        @extend %t-strong !optional;
       }
 
       .msg-content {
         color: $gray-l1;
 
         strong {
-          @extend %t-strong;
+          @extend %t-strong !optional;
         }
       }
 
@@ -467,7 +467,7 @@ html.video-fullscreen {
     }
 
     .faq-proctoring-exam {
-      @extend .footer-sequence;
+      @extend .footer-sequence !optional;
 
       border-bottom: none;
 
@@ -497,7 +497,7 @@ html.video-fullscreen {
     }
 
     .path {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       margin-top: -($baseline);
       margin-bottom: $baseline;
@@ -630,7 +630,7 @@ html.video-fullscreen {
       }
 
       .vert {
-        @extend .clearfix;
+        @extend .clearfix !optional;
 
         border-bottom: 1px solid #ddd;
         margin-bottom: ($baseline*0.75);

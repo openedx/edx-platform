@@ -233,9 +233,9 @@
 
 // primary button
 %ui-btn-primary {
-  @extend %ui-btn;
-  @extend %ui-btn-pill;
-  @extend %t-strong;
+  @extend %ui-btn !optional;
+  @extend %ui-btn-pill !optional;
+  @extend %t-strong !optional;
 
   padding: ($baseline/2) $baseline;
   border-width: 1px;
@@ -264,8 +264,8 @@
 
 // secondary button
 %ui-btn-secondary {
-  @extend %ui-btn;
-  @extend %ui-btn-pill;
+  @extend %ui-btn !optional;
+  @extend %ui-btn-pill !optional;
 
   border-width: 1px;
   border-style: solid;
@@ -278,8 +278,8 @@
 %ui-btn-flat-outline {
   @include transition(all 0.15s);
 
-  @extend %t-strong;
-  @extend %t-action4;
+  @extend %t-strong !optional;
+  @extend %t-action4 !optional;
 
   text-align: center;
   border-radius: ($baseline/4);
@@ -308,7 +308,7 @@
 %ui-btn-non {
   @include transition(all 0.15s);
 
-  @extend %ui-btn-pill;
+  @extend %ui-btn-pill !optional;
 
   @include transition(all $tmg-f2 linear 0s);
 
@@ -328,7 +328,7 @@
 
 // button with no button shell until hover for understated actions
 %ui-btn-non-blue {
-  @extend %ui-btn-non;
+  @extend %ui-btn-non !optional;
 
   &:hover,
   &:focus {
@@ -345,7 +345,7 @@
 }
 
 %no-content {
-  @extend %ui-well;
+  @extend %ui-well !optional;
 
   padding: ($baseline*2);
   background-color: $gray-l4;
@@ -354,8 +354,8 @@
 
   .button,
   .action {
-    @extend %btn-primary-green;
-    @extend %t-action3;
+    @extend %btn-primary-green !optional;
+    @extend %t-action3 !optional;
 
     margin-left: $baseline;
 
@@ -368,8 +368,8 @@
 .ui-loading {
   @include animation(fadeIn $tmg-f2 linear 1);
 
-  @extend %ui-well;
-  @extend %t-copy-base;
+  @extend %ui-well !optional;
+  @extend %t-copy-base !optional;
 
   opacity: 0.6;
   background-color: $white;
@@ -377,7 +377,7 @@
   text-align: center;
 
   .spin {
-    @extend %anim-rotateCW;
+    @extend %anim-rotateCW !optional;
 
     display: inline-block;
   }

@@ -8,16 +8,16 @@
   }
 
   .content-primary {
-    @extend .ui-col-wide;
+    @extend .ui-col-wide !optional;
   }
 
   .content-supplementary {
-    @extend .ui-col-narrow;
+    @extend .ui-col-narrow !optional;
   }
 
   .nav-actions {
     .fa-cloud-upload {
-      @extend %t-copy;
+      @extend %t-copy !optional;
 
       vertical-align: bottom;
       margin-right: ($baseline/5);
@@ -25,7 +25,7 @@
   }
 
   .no-asset-content {
-    @extend %ui-well;
+    @extend %ui-well !optional;
 
     padding: ($baseline*2);
     background-color: $gray-l4;
@@ -33,8 +33,8 @@
     color: $gray;
 
     .new-button {
-      @extend %btn-primary-green;
-      @extend %t-action3;
+      @extend %btn-primary-green !optional;
+      @extend %t-action3 !optional;
 
       @include margin-left($baseline);
 
@@ -52,7 +52,7 @@
     }
 
     .meta {
-      @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
       display: inline-block;
       vertical-align: top;
@@ -63,7 +63,7 @@
       .count-total,
       .filter-column,
       .sort-order {
-        @extend %t-strong;
+        @extend %t-strong !optional;
       }
     }
 
@@ -116,7 +116,7 @@
       }
 
       .nav-label {
-        @extend .sr;
+        @extend .sr !optional;
       }
 
       .pagination-form,
@@ -129,8 +129,8 @@
       .current-page,
       .page-number-input,
       .total-pages {
-        @extend %t-copy-base;
-        @extend %t-strong;
+        @extend %t-copy-base !optional;
+        @extend %t-strong !optional;
 
         width: ($baseline*2.5);
         margin: 0 ($baseline*0.75);
@@ -140,7 +140,7 @@
       }
 
       .current-page {
-        @extend %ui-depth1;
+        @extend %ui-depth1 !optional;
 
         position: absolute;
 
@@ -148,8 +148,8 @@
       }
 
       .page-divider {
-        @extend %t-title4;
-        @extend %t-regular;
+        @extend %t-title4 !optional;
+        @extend %t-regular !optional;
 
         vertical-align: middle;
         color: $gray;
@@ -157,13 +157,13 @@
 
 
       .pagination-form {
-        @extend %ui-depth2;
+        @extend %ui-depth2 !optional;
 
         position: relative;
 
         .page-number-label,
         .submit-pagination-form {
-          @extend .sr;
+          @extend .sr !optional;
         }
 
         .page-number-input {
@@ -203,7 +203,7 @@
       word-wrap: break-word;
 
       th {
-        @extend %t-copy-sub2;
+        @extend %t-copy-sub2 !optional;
 
         background-color: $gray-l5;
         padding: 0 ($baseline/2) ($baseline*0.75) ($baseline/2);
@@ -218,7 +218,7 @@
         }
 
         .current-sort {
-          @extend %t-strong;
+          @extend %t-strong !optional;
 
           border-bottom: 1px solid $gray-l3;
         }
@@ -238,11 +238,11 @@
           .wrapper-nav-sub {
             top: 35px;
 
-            @extend %ui-depth2;
+            @extend %ui-depth2 !optional;
 
             > ol > .nav-item {
-              @extend %t-action3;
-              @extend %t-strong;
+              @extend %t-action3 !optional;
+              @extend %t-strong !optional;
 
               display: inline-block;
               vertical-align: middle;
@@ -336,7 +336,7 @@
         .thumb-col {
           padding: ($baseline/2) $baseline;
 
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
 
           color: $gray-l2;
 
@@ -352,7 +352,7 @@
 
         .name-col {
           .title {
-            @extend %t-copy-sub1;
+            @extend %t-copy-sub1 !optional;
 
             display: inline-block;
             max-width: 200px;
@@ -361,7 +361,7 @@
         }
 
         .type-col {
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
 
           color: $gray-d1;
         }
@@ -369,7 +369,7 @@
         .date-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
 
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
 
           color: $gray-l2;
         }
@@ -377,7 +377,7 @@
         .embed-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
 
-          @extend %t-copy-sub2;
+          @extend %t-copy-sub2 !optional;
 
           padding-left: ($baseline*0.75);
           color: $gray-l2;
@@ -390,7 +390,7 @@
           .embeddable-xml-input {
             @include transition(all $tmg-f2 ease-in-out 0s);
 
-            @extend %t-copy-sub2;
+            @extend %t-copy-sub2 !optional;
 
             box-shadow: none;
             border: 1px solid transparent;
@@ -417,7 +417,7 @@
 
   // UI: assets - calls-to-action
   .actions-list {
-    @extend %actions-list;
+    @extend %actions-list !optional;
 
     .action-item {
 
@@ -495,8 +495,8 @@
     }
 
     .title {
-      @extend %t-title3;
-      @extend %t-light;
+      @extend %t-title3 !optional;
+      @extend %t-light !optional;
 
       float: none;
       margin: ($baseline*2) 0 ($baseline*1.5);
@@ -509,7 +509,7 @@
     .choose-file-button {
       @include blue-button();
 
-      @extend %t-action2;
+      @extend %t-action2 !optional;
 
       padding: 10px 82px 12px;
     }
@@ -532,7 +532,7 @@
     }
 
     .progress-fill {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       width: 0%;
       height: ($baseline*1.5);
@@ -553,7 +553,7 @@
       padding: 0;
 
       .icon {
-        @extend %t-action1;
+        @extend %t-action1 !optional;
       }
 
       &:hover {
@@ -568,7 +568,7 @@
       margin: ($baseline*1.5) 0 ($baseline*4);
 
       label {
-        @extend %t-strong;
+        @extend %t-strong !optional;
 
         display: block;
         margin-bottom: ($baseline/2);

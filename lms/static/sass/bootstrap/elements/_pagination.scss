@@ -52,7 +52,7 @@
   }
 
   .nav-label {
-    @extend .sr-only;
+    @extend .sr-only !optional;
   }
 
   .pagination-form,
@@ -90,7 +90,7 @@
 
     .page-number-label,
     .submit-pagination-form {
-      @extend .sr-only;
+      @extend .sr-only !optional;
     }
 
     .page-number-input {

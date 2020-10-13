@@ -141,8 +141,8 @@ $bp-screen-md: 768px !default;
   }
 
   .alert-title {
-    @extend %hd-5;
-    @extend %headings-emphasized;
+    @extend %hd-5 !optional;
+    @extend %headings-emphasized !optional;
 
     @media (min-width: $bp-screen-md) {
       // shift the section up to make the alert more compact
@@ -151,7 +151,7 @@ $bp-screen-md: 768px !default;
   }
 
   .alert-copy {
-    @extend %copy-base;
+    @extend %copy-base !optional;
 
     @media (min-width: $bp-screen-md) {
       // shift the message down to be in line with the icon
@@ -160,7 +160,7 @@ $bp-screen-md: 768px !default;
   }
 
   .alert-copy-with-title {
-    @extend %copy-base;
+    @extend %copy-base !optional;
   }
 
   .alert-action {

@@ -30,7 +30,7 @@
       @include transition(all 0.15s linear 0s);
 
       .status {
-        @extend %ui-depth3;
+        @extend %ui-depth3 !optional;
 
         background: $link-color;
         color: white;

@@ -18,26 +18,26 @@
 // +skip navigation
 // --------------------
 %nav-skip {
-  @extend %text-sr;
+  @extend %text-sr !optional;
 }
 
 .nav-contents,
 .nav-skip,
 .transcript-skip {
-  @extend %nav-skip;
+  @extend %nav-skip !optional;
 }
 
 // +utility navigation (course utiltiies)
 // --------------------
 .nav-utilities {
-  @extend %ui-depth3;
+  @extend %ui-depth3 !optional;
 
   position: fixed;
   right: ($baseline/4);
   bottom: 0;
 
   .wrapper-utility {
-    @extend %wipe-last-child;
+    @extend %wipe-last-child !optional;
 
     display: inline-block;
     vertical-align: bottom;
@@ -89,7 +89,7 @@
 
   // specific utility navigation - student notes toggling
   .action-toggle-notes {
-    @extend %no-outline;
+    @extend %no-outline !optional;
 
     // STATE: is active/in use
     &.is-active {
@@ -100,8 +100,8 @@
   // +toggling utilities
   // --------------------
   .action-toggle-message {
-    @extend %t-title8;
-    @extend %t-strong;
+    @extend %t-title8 !optional;
+    @extend %t-strong !optional;
 
     position: absolute;
     bottom: 0;
@@ -144,7 +144,7 @@
   border-bottom: 1px solid $gray-l5;
 
   .nav-item {
-    @extend %button-reset;
+    @extend %button-reset !optional;
 
     display: inline-block;
     padding: ($baseline*0.75);

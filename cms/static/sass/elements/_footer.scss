@@ -8,7 +8,7 @@
   padding: $baseline;
 
   footer.primary {
-    @extend %t-copy-sub2;
+      @extend %t-copy-sub2 !optional;
 
     @include clearfix();
 
@@ -61,7 +61,7 @@
           .icon {
             @include transition(top $tmg-f2 ease-in-out $tmg-f2);
 
-            @extend %t-action3;
+            @extend %t-action3 !optional;
 
             display: inline-block;
             vertical-align: middle;
