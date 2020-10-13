@@ -186,7 +186,7 @@ def _map_edx_platform_apps(app_csv, owner_map, owner_to_paths_map):
 
 def _get_and_map_code_owner(row, owner_map):
     """
-    From a csv row, takes the theme and squad, create ownership maps, and return the code_owner.
+    From a csv row, takes the theme and squad, update ownership maps, and return the code_owner.
 
     Will also warn if the squad appears in multiple themes.
 
