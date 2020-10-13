@@ -2562,11 +2562,19 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+]
 
-    # ADG Features
+######################### ADG APPS #####################################
+
+ADG_INSTALLED_APPS = [
+
     'openedx.adg.lms.course_meta',
 
+    # ADG Features app
+    'openedx.adg.lms.applications',
 ]
+
+INSTALLED_APPS.extend(ADG_INSTALLED_APPS)
 
 ######################### CSRF #########################################
 
