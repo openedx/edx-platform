@@ -21,49 +21,56 @@
 }
 
 %t-light {
-  font-weight: 300;
+    font-weight: 300;
 }
 
 %t-ultralight {
-  font-weight: 200;
+    font-weight: 200;
+}
+
+@mixin t-title {
+    font-family: $f-sans-serif;
 }
 
 // headings/titles
 %t-title {
-  font-family: $f-sans-serif;
+    @include t-title
 }
 
 %t-title1 {
-  @extend %t-title;
+    @extend %t-title;
 
-  @include font-size(60);
-  @include line-height(60);
+    @include font-size(60);
+    @include line-height(60);
 }
 
 %t-title2 {
-  @extend %t-title;
+    @include t-title;
 
-  @include font-size(48);
-  @include line-height(48);
+    @include font-size(48);
+    @include line-height(48);
 }
 
 %t-title3 {
-  @include font-size(36);
-  @include line-height(36);
+    @include font-size(36);
+    @include line-height(36);
+}
+
+@mixin t-title4 {
+    @include t-title;
+    @include font-size(24);
+    @include line-height(24);
 }
 
 %t-title4 {
-  @extend %t-title;
-
-  @include font-size(24);
-  @include line-height(24);
+    @include t-title4;
 }
 
 %t-title5 {
-  @extend %t-title;
+    @extend %t-title;
 
-  @include font-size(18);
-  @include line-height(18);
+    @include font-size(18);
+    @include line-height(18);
 }
 
 %t-title6 {

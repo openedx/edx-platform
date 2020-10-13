@@ -150,7 +150,7 @@
 
                 // Responsive behavior
                 @include media-breakpoint-down(sm) {
-                  @extend %t-title4;
+                    @include t-title4;
                 }
               }
             }
