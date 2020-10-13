@@ -337,7 +337,7 @@ FEATURES = {
     # .. toggle_use_cases: opt_in, circuit_breaker
     # .. toggle_creation_date: 2015-04-10
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6636
-      'CUSTOM_COURSES_EDX': False,
+    'CUSTOM_COURSES_EDX': False,
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
