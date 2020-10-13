@@ -14,7 +14,7 @@ def validate_file_size(_file, max_allowed_size):
     Validate maximum allowed file size to upload
 
     Arguments:
-        _file (File/Image): file that needs to be validated
+        _file (File): file that needs to be validated
         max_allowed_size (int): maximum allowed file size in bytes
 
     Raises:
