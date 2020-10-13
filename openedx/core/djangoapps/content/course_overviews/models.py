@@ -24,6 +24,7 @@ from six import text_type  # pylint: disable=ungrouped-imports
 from six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error
 from simple_history.models import HistoricalRecords
 
+from openedx.core.djangoapps.cache_toolbox import cache_model
 from lms.djangoapps.discussion import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
@@ -359,7 +360,7 @@ class CourseOverview(TimeStampedModel):
                 course from the module store.
         """
         try:
-            course_overview = cls.objects.select_related('image_set').get(id=course_id)
+            course_overview = cls.get_cached(course_id)
             if course_overview.version < cls.VERSION:
                 # Reload the overview from the modulestore to update the version
                 course_overview = cls.load_from_module_store(course_id)
@@ -859,6 +860,9 @@ class CourseOverview(TimeStampedModel):
     def __str__(self):
         """Represent ourselves with the course key."""
         return six.text_type(self.id)
+
+
+cache_model(CourseOverview)
 
 
 class CourseOverviewTab(models.Model):
