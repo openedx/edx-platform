@@ -1,186 +1,110 @@
 """
-Utilities for waffle.
+Extra utilities for waffle: most classes are defined in edx_toggles.toggles, but we keep here some extra classes for
+usage within edx-platform. These classes cover course override use cases.
 
-Includes namespacing, caching, and course overrides for waffle flags.
 
 Usage:
 
-For Waffle Flags, first set up the namespace, and then create flags using the
-namespace.  For example::
-
    WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='my_namespace')
-
    # Use CourseWaffleFlag when you are in the context of a course.
    SOME_COURSE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_course_feature', __name__)
-   # Use WaffleFlag when outside the context of a course.
-   SOME_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_feature', __name__)
 
-You can check these flags in code using the following::
+You can check this flag in code using the following::
 
-    SOME_FLAG.is_enabled()
     SOME_COURSE_FLAG.is_enabled(course_key)
-
-To test these WaffleFlags, see testutils.py.
-
-In the above examples, you will use Django Admin "waffle" section to configure
-for a flag named: my_namespace.some_course_feature
-
-You could also use the Django Admin "waffle_utils" section to configure a course
-override for this same flag (e.g. my_namespace.some_course_feature).
-
-For Waffle Switches, first set up the namespace, and then create the flag name.
-For example::
-
-    WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
-
-    ESTIMATE_FIRST_ATTEMPTED = 'estimate_first_attempted'
-
-You can then use the switch as follows::
-
-    WAFFLE_SWITCHES.is_enabled(waffle.ESTIMATE_FIRST_ATTEMPTED)
 
 To test WaffleSwitchNamespace, use the provided context managers.  For example:
 
     with WAFFLE_SWITCHES.override(waffle.ESTIMATE_FIRST_ATTEMPTED, active=True):
         ...
 
-For long-lived flags, you may want to change the default for devstack, sandboxes,
-or new Open edX releases. For help with this, see:
-openedx/core/djangoapps/waffle_utils/docs/decisions/0001-refactor-waffle-flag-default.rst
-
 Also see ``WAFFLE_FLAG_CUSTOM_ATTRIBUTES`` and docstring for _set_waffle_flag_attribute
 for temporarily instrumenting/monitoring waffle flag usage.
 
 """
-from functools import lru_cache
+import logging
 from contextlib import contextmanager
-from weakref import WeakSet
 
-from django.conf import settings
-from edx_django_utils.monitoring import set_custom_attribute
 from opaque_keys.edx.keys import CourseKey
 
 from edx_toggles.toggles import WaffleFlag as BaseWaffleFlag
-from edx_toggles.toggles import WaffleFlagNamespace as BaseWaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlagNamespace
 from edx_toggles.toggles import WaffleSwitch as BaseWaffleSwitch
 from edx_toggles.toggles import WaffleSwitchNamespace as BaseWaffleSwitchNamespace
 
-from openedx.core.lib.cache_utils import get_cache as get_request_cache
+log = logging.getLogger(__name__)
 
 
 class WaffleSwitchNamespace(BaseWaffleSwitchNamespace):
     """
-    A waffle switch namespace class that implements request-based caching.
+    Waffle switch namespace that implements custom overriding methods. We should eventually get rid of this class.
     """
 
-    @property
-    def _cached_switches(self):
+    @contextmanager
+    def override(self, switch_name, active=True):
         """
-        Returns a dictionary of all namespaced switches in the request cache.
+        Overrides the active value for the given switch for the duration of this
+        contextmanager.
+        Note: The value is overridden in the request cache AND in the model.
         """
-        return _get_waffle_namespace_request_cache().setdefault("switches", {})
+        previous_active = self.is_enabled(switch_name)
+        try:
+            self.override_for_request(switch_name, active)
+            with self.override_in_model(switch_name, active):
+                yield
+        finally:
+            self.override_for_request(switch_name, previous_active)
 
+    def override_for_request(self, switch_name, active=True):
+        """
+        Overrides the active value for the given switch for the remainder of
+        this request (as this is not a context manager).
+        Note: The value is overridden in the request cache, not in the model.
+        """
+        namespaced_switch_name = self._namespaced_name(switch_name)
+        self._cached_switches[namespaced_switch_name] = active
+        log.info(
+            "%sSwitch '%s' set to %s for request.",
+            self.log_prefix,
+            namespaced_switch_name,
+            active,
+        )
 
-def _get_waffle_namespace_request_cache():
-    """
-    Returns a request cache shared by all Waffle namespace objects.
-    """
-    return get_request_cache("WaffleNamespace")
+    @contextmanager
+    def override_in_model(self, switch_name, active=True):
+        """
+        Overrides the active value for the given switch for the duration of this
+        contextmanager.
+        Note: The value is overridden in the model, not the request cache.
+        Note: This should probably be moved to a test class.
+        """
+        # Import is placed here to avoid model import at project startup.
+        # pylint: disable=import-outside-toplevel
+        from waffle.testutils import override_switch as waffle_override_switch
+
+        namespaced_switch_name = self._namespaced_name(switch_name)
+        with waffle_override_switch(namespaced_switch_name, active):
+            log.info(
+                "%sSwitch '%s' set to %s in model.",
+                self.log_prefix,
+                namespaced_switch_name,
+                active,
+            )
+            yield
 
 
 class WaffleSwitch(BaseWaffleSwitch):
     """
-    Waffle switch class that benefits from the additional features of the WaffleSwitchNamespace.
+    This class should be removed in favour of edx_toggles.toggles.WaffleSwitch once we get rid of the
+    WaffleSwitchNamespace class.
     """
 
     NAMESPACE_CLASS = WaffleSwitchNamespace
 
-
-class WaffleFlagNamespace(BaseWaffleFlagNamespace):
-    """
-    Namespace class that implements request-based caching. Also, setup some custom value-checking and processing.
-    """
-
-    @property
-    def _cached_flags(self):
-        """
-        Returns a dictionary of all namespaced flags in the request cache.
-        """
-        return _get_waffle_namespace_request_cache().setdefault("flags", {})
-
-    def _get_flag_active(self, namespaced_flag_name):
-        value = super()._get_flag_active(namespaced_flag_name)
-        _set_waffle_flag_attribute(namespaced_flag_name, value)
-        return value
-
-    def _get_flag_active_default(self, namespaced_flag_name):
-        value = super()._get_flag_active_default(namespaced_flag_name)
-        set_custom_attribute("warn_flag_no_request_return_value", value)
-        return value
-
-
-# .. toggle_name: WAFFLE_FLAG_CUSTOM_ATTRIBUTES
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: A list of waffle flags to track with custom attributes having
-#   values of (True, False, or Both).
-# .. toggle_use_cases: opt_in
-# .. toggle_creation_date: 2020-06-17
-# .. toggle_warnings: Intent is for temporary research (1 day - several weeks) of a flag's usage.
-@lru_cache(maxsize=None)
-def _get_waffle_flag_custom_attributes_set():
-    attributes = getattr(settings, "WAFFLE_FLAG_CUSTOM_ATTRIBUTES", None) or []
-    return set(attributes)
-
-
-def _set_waffle_flag_attribute(name, value):
-    """
-    For any flag name in settings.WAFFLE_FLAG_CUSTOM_ATTRIBUTES, add name/value
-    to cached values and set custom attribute if the value changed.
-
-    The name of the custom attribute will have the prefix ``flag_`` and the
-    suffix will match the name of the flag.
-    The value of the custom attribute could be False, True, or Both.
-
-    The value Both would mean that the flag had both a True and False
-    value at different times during the transaction. This is most
-    likely due to having a course override, as is the case with
-    CourseWaffleFlag.
-
-    An example NewRelic query to see the values of a flag in different
-    environments, if your waffle flag was named ``my.waffle.flag`` might
-    look like::
-
-      SELECT count(*) FROM Transaction
-      WHERE flag_my.waffle.flag IS NOT NULL
-      FACET appName, flag_my.waffle.flag
-
-    Important: Remember to configure ``WAFFLE_FLAG_CUSTOM_ATTRIBUTES`` for
-    LMS, Studio and Workers in order to see waffle flag usage in all
-    edx-platform environments.
-    """
-    if name not in _get_waffle_flag_custom_attributes_set():
-        return
-
-    flag_attribute_data = _get_waffle_namespace_request_cache().setdefault(
-        "flag_attribute", {}
-    )
-    is_value_changed = True
-    if name not in flag_attribute_data:
-        # New flag
-        flag_attribute_data[name] = str(value)
-    else:
-        # Existing flag
-        if flag_attribute_data[name] == str(value):
-            # Same value
-            is_value_changed = False
-        else:
-            # New value
-            flag_attribute_data[name] = "Both"
-
-    if is_value_changed:
-        attribute_name = "flag_{}".format(name)
-        set_custom_attribute(attribute_name, flag_attribute_data[name])
+    @contextmanager
+    def override(self, active=True):
+        with self.waffle_namespace.override(self.switch_name, active):
+            yield
 
 
 class WaffleFlag(BaseWaffleFlag):
@@ -190,7 +114,6 @@ class WaffleFlag(BaseWaffleFlag):
     This class should be removed in favour of edx_toggles.toggles.WaffleFlag once we get rid of the WaffleFlagNamespace
     class and the `override` method.
     """
-    NAMESPACE_CLASS = WaffleFlagNamespace
 
     @contextmanager
     def override(self, active=True):
@@ -271,6 +194,9 @@ class CourseWaffleFlag(WaffleFlag):
             )
         is_enabled_for_course = self._get_course_override_value(course_key)
         if is_enabled_for_course is not None:
-            _set_waffle_flag_attribute(self.namespaced_flag_name, is_enabled_for_course)
+            # pylint: disable=protected-access
+            self.namespace._monitor_value(
+                self.namespaced_flag_name, is_enabled_for_course
+            )
             return is_enabled_for_course
         return super().is_enabled()
