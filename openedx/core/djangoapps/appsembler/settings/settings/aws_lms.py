@@ -96,7 +96,15 @@ def plugin_settings(settings):
 
     # This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
     # from the redirect mechanics.
-    settings.MAIN_SITE_REDIRECT_WHITELIST = ['api', 'admin', 'oauth', 'status', '/heartbeat']
+    settings.MAIN_SITE_REDIRECT_WHITELIST = [
+        'api',
+        'admin',
+        'oauth',
+        'status',
+        '/heartbeat',
+        '/accounts/manage_user_standing',
+        '/accounts/disable_account_ajax',
+    ]
 
     settings.USE_S3_FOR_CUSTOMER_THEMES = True
 
