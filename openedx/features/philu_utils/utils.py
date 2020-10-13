@@ -37,7 +37,7 @@ def bytes_to_mb(bytes_):
     """
     Convert size from bytes to MB
 
-    Args:
+    Arguments:
         bytes_ (int): size in bytes
 
     Returns:

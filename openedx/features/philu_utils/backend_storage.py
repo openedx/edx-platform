@@ -43,7 +43,7 @@ class CustomS3Storage(FileSystemStorage):
         """
         Get alternate name if name already exists
 
-        Args:
+        Arguments:
             name (str): Name of the file
 
         Returns:
