@@ -92,7 +92,8 @@ def main(repo_csv, app_csv, dep_csv):
     Final output only includes paths which might contain views.
 
     """
-    # Maps theme names to a list of code owners (theme+squad), and squads to code owners (theme+squad)
+    # Maps theme name to a list of code owners in the theme, and squad to full code owner name.
+    # Code owner is a string combining theme and squad information.
     owner_map = {'theme_to_owners_map': {}, 'squad_to_theme_map': {}}
     # Maps owner names to a list of dotted module paths.
     # For example: { 'team-red': [ 'openedx.core.djangoapps.api_admin', 'openedx.core.djangoapps.auth_exchange' ] }
