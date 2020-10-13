@@ -8,15 +8,16 @@ from logging import getLogger
 from django.conf import settings
 from django.contrib.auth.models import User
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from pytz import utc
-from submissions.models import Score, Submission
-
 from openassessment.assessment.api.staff import STAFF_TYPE
 from openassessment.assessment.models import Assessment, AssessmentPart
 from openassessment.assessment.serializers import rubric_from_dict
 from openassessment.workflow.models import AssessmentWorkflow
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from pytz import utc
+from submissions.models import Submission
+
+from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 from openedx.core.lib.url_utils import unquote_slashes
+from openedx.features.philu_utils.sites import get_site
 from openedx.features.philu_utils.utils import get_anonymous_user
 from xmodule.modulestore.django import modulestore
 
@@ -25,7 +26,7 @@ from .constants import DAYS_TO_WAIT_AUTO_ASSESSMENT, NO_PENDING_ORA, ORA_BLOCK_T
 log = getLogger(__name__)
 
 
-def find_and_autoscore_submissions(enrollments, submission_uuids):
+def find_and_autoscore_submissions(enrollments, submission_uuids, site_id):
     """
     Find ORA submissions corresponding to provided enrollments and submission uuids. Autoscore all resulting
     submissions.
@@ -37,7 +38,11 @@ def find_and_autoscore_submissions(enrollments, submission_uuids):
     Returns:
         None
     """
-    days_to_wait = configuration_helpers.get_value('DAYS_TO_WAIT_AUTO_ASSESSMENT', DAYS_TO_WAIT_AUTO_ASSESSMENT)
+    days_to_wait = get_config_value_from_site_or_settings('DAYS_TO_WAIT_AUTO_ASSESSMENT', get_site(site_id))
+
+    if not days_to_wait:
+        days_to_wait = DAYS_TO_WAIT_AUTO_ASSESSMENT
+
     delta_datetime = datetime.now(utc) - timedelta(days=days_to_wait)
     submissions_to_autoscore = []
 
