@@ -16,12 +16,11 @@ fi
 
 EDX_PPA="deb http://ppa.edx.org ${SHORT_DIST} main"
 
-apt-get update -y
 apt-key update -y
 
 # Required for add-apt-repository
 apt-get install -y software-properties-common
-if [[ "${SHORT_DIST}" != bionic ]]; then
+if [[ "${SHORT_DIST}" != bionic ]] && [[ "${SHORT_DIST}" != xenial ]] && [[ "${SHORT_DIST}" != focal ]] ;then
     apt-get install -y python-software-properties
 fi
 
@@ -40,15 +39,6 @@ fi
 apt-get update -y
 
 pip install --upgrade pip=="${PIP_VERSION}"
-
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.4 multiverse" |
-    sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-sudo apt-get update -y # Upgrade the OS
-sudo apt-get install -y python2.7 python2.7-dev python-pip python-apt python-yaml python-jinja2 build-essential \
-    sudo git-core libmysqlclient-dev libffi-dev libssl-dev python-software-properties pkg-config gfortran \
-    libatlas-dev libblas-dev liblapack-dev curl git python-virtualenv python-scipy python-numpy python-dev gfortran \
-    libfreetype6-dev libpng12-dev gcc libjpeg-dev libtiff5-dev zlib1g-dev libxml2-dev libxslt-dev yui-compressor \
-    graphviz libgraphviz-dev g++ graphviz-dev libgeos-dev libreadline6 libreadline6-dev nodejs mysql-client \
-    virtualenvwrapper libgeos-ruby1.8 lynx-cur libxmlsec1-dev swig software-properties-common \
-    python-software-properties libsqlite3-dev mysql-server mongodb-org
-sudo apt-get update -y # Upgrade the OS
+sudo apt-get update -y
+sudo apt-get install -y python-apt python-jinja2 build-essential sudo git-core libmysqlclient-dev libffi-dev \
+libssl-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl
