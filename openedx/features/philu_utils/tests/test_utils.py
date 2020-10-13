@@ -1,11 +1,17 @@
+"""
+Test utility methods
+"""
 from django.core.validators import ValidationError
 from django.test import TestCase
 from mock import Mock
 
-from ..utils import bytes_to_mb, validate_file_size
+from openedx.features.philu_utils.utils import bytes_to_mb, validate_file_size
 
 
 class UtilityTest(TestCase):
+    """
+    Unit test class to test utility methods
+    """
 
     def test_validate_file_size_success(self):
         """Test valid file size"""

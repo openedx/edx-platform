@@ -1,3 +1,6 @@
+"""
+Helper methods for `xmodules`
+"""
 from .constants import DATE_FORMAT, XBLOCKS_EXCEPT_PROBLEM
 
 

@@ -1,3 +1,6 @@
+"""
+Unit test model factory methods
+"""
 import pytest
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey

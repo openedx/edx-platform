@@ -1,3 +1,6 @@
+"""
+Test helper methods of `xmodules`
+"""
 from datetime import datetime
 
 import pytest
