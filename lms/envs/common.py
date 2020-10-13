@@ -325,7 +325,6 @@ FEATURES = {
     # True.
     'INDIVIDUAL_DUE_DATES': False,
 
-    # Enable Custom Courses for EdX
     # .. toggle_name: CUSTOM_COURSES_EDX
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
