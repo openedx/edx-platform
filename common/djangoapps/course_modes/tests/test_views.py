@@ -319,7 +319,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         else:
             self.fail("Must provide a valid redirect URL name")
 
-        with mock_payment_processors(expect_called=(course_mode == "verified")):
+        with mock_payment_processors(expect_called=None):
             self.assertRedirects(response, redirect_url)
 
     def test_choose_mode_audit_enroll_on_post(self):
