@@ -1,13 +1,14 @@
+"""
+Test helper methods
+"""
 import random
 
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import ResolverMatch
-
 from mock import patch
-from student.tests.factories import AnonymousUserFactory, UserFactory
 
-from ..constants import (
+from openedx.features.user_leads.constants import (
     UTM_CAMPAIGN_KEY,
     UTM_CONTENT_KEY,
     UTM_MEDIUM_KEY,
@@ -15,8 +16,9 @@ from ..constants import (
     UTM_SOURCE_KEY,
     UTM_TERM_KEY
 )
-from ..helpers import get_utm_params, save_user_utm
-from ..models import UserLeads
+from openedx.features.user_leads.helpers import get_utm_params, save_user_utm
+from openedx.features.user_leads.models import UserLeads
+from student.tests.factories import AnonymousUserFactory, UserFactory
 
 
 class UserLeadsHelpersTest(TestCase):
@@ -71,12 +73,12 @@ class UserLeadsHelpersTest(TestCase):
         request.resolver_match.url_name = self.url_name
 
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
-        self.assertTrue(existing_lead_count == 0)
+        self.assertEqual(existing_lead_count, 0)
 
         save_user_utm(request)
 
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
-        self.assertTrue(existing_lead_count == 1)
+        self.assertEqual(existing_lead_count, 1)
 
     @patch('openedx.features.user_leads.helpers.UserLeads.objects.get')
     @patch('openedx.features.user_leads.helpers.UserLeads.objects.create')
@@ -95,7 +97,7 @@ class UserLeadsHelpersTest(TestCase):
         user_lead = UserLeads(user=self.user, origin=self.url_name, **self.request_data)
         user_lead.save()
         existing_lead_count = UserLeads.objects.filter(user=self.user, origin=self.url_name).count()
-        self.assertTrue(existing_lead_count == 1)
+        self.assertEqual(existing_lead_count, 1)
 
         save_user_utm(request)
 
@@ -103,7 +105,7 @@ class UserLeadsHelpersTest(TestCase):
         mocked_user_leads_create_method.assert_not_called()
 
         existing_user_lead = UserLeads.objects.filter(user=self.user, origin=self.url_name).first()
-        self.assertTrue(user_lead.pk == existing_user_lead.pk)
+        self.assertEqual(user_lead.pk, existing_user_lead.pk)
 
     @patch('openedx.features.user_leads.helpers.UserLeads.objects.get')
     @patch('openedx.features.user_leads.helpers.UserLeads.objects.create')
