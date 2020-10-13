@@ -3,6 +3,7 @@ from logging import getLogger
 from datetime import date
 
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
@@ -41,6 +42,7 @@ class UserSubscription(TimeStampedModel):
         blank=True
     )
     course_enrollments = models.ManyToManyField(CourseEnrollment, blank=True)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     def __str__(self):
         return "Subscription of type {subscription_type} with ID {subscription_id} for User {user_email}".format(
@@ -84,16 +86,18 @@ class UserSubscription(TimeStampedModel):
             return self.expiration_date >= date.today() and course_enrollments_count < self.max_allowed_courses
 
     @classmethod
-    def get_valid_subscriptions(self, user_id=None):
+    def get_valid_subscriptions(self, site, username=None):
         """
         Get valid subscriptions of a user.
 
         Returns:
             queryset: Returns latest valid user subscription.
         """
-        filter_params = dict()
-        if user_id:
-            filter_params['user'] = user_id
+        filter_params = {
+            'site': site
+        }
+        if user:
+            filter_params['user__username'] = username
 
         user_subscriptions = self.objects.filter(**filter_params)
         valid_user_subscriptions = filter(lambda subscription: subscription.is_valid, user_subscriptions)

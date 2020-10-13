@@ -795,7 +795,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     enrollment_attributes=enrollment_attributes
                 )
 
-            track_subscription_enrollment(subscription_id, username, unicode(course_id))
+            track_subscription_enrollment(subscription_id, user, course_id, request.site)
             cohort_name = request.data.get('cohort')
             if cohort_name is not None:
                 cohort = get_cohort_by_name(course_id, cohort_name)

@@ -12,7 +12,8 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
     Admin interface for the "UserSubscription" object.
     """
     search_fields = ['user__email', 'user__username']
-    list_display = ['username', 'subscription_type', 'expiration_date', 'max_allowed_courses', 'enrolled_course_ids']
+    list_display = ['username', 'subscription_type', 'expiration_date', 'max_allowed_courses', 'enrolled_course_ids', 'site']
+    list_filter = ['subscription_type', 'site']
     filter_horizontal = ['course_enrollments', ]
 
     def username(self, obj):
