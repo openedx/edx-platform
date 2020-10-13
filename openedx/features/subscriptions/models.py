@@ -96,7 +96,7 @@ class UserSubscription(TimeStampedModel):
         filter_params = {
             'site': site
         }
-        if user:
+        if username:
             filter_params['user__username'] = username
 
         user_subscriptions = self.objects.filter(**filter_params)
