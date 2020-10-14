@@ -20,6 +20,7 @@ from django.utils.encoding import smart_str
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from organizations import api as organizations_api
 
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.utils import badges_enabled
@@ -48,7 +49,6 @@ from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
-from common.djangoapps.util import organizations_helpers as organization_api
 from common.djangoapps.util.date_utils import strftime_localized
 from common.djangoapps.util.views import handle_500
 
@@ -428,7 +428,7 @@ def _update_organization_context(context, course):
     """
     partner_long_name, organization_logo = None, None
     partner_short_name = course.display_organization if course.display_organization else course.org
-    organizations = organization_api.get_course_organizations(course_id=course.id)
+    organizations = organizations_api.get_course_organizations(course_key=course.id)
     if organizations:
         #TODO Need to add support for multiple organizations, Currently we are interested in the first one.
         organization = organizations[0]

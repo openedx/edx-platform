@@ -293,8 +293,6 @@ FEATURES = {
     # Special Exams, aka Timed and Proctored Exams
     'ENABLE_SPECIAL_EXAMS': False,
 
-    'ORGANIZATIONS_APP': False,
-
     # Show the language selector in the header
     'SHOW_HEADER_LANGUAGE_SELECTOR': False,
 
@@ -1513,6 +1511,9 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
 
     'ratelimitbackend',
+
+    # Database-backed Organizations App (http://github.com/edx/edx-organizations)
+    'organizations',
 ]
 
 
@@ -1640,9 +1641,6 @@ OPTIONAL_APPS = (
 
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
-
-    # Organizations App (http://github.com/edx/edx-organizations)
-    ('organizations', None),
 
     # Enterprise App (http://github.com/edx/edx-enterprise)
     ('enterprise', None),
@@ -2294,3 +2292,20 @@ VERIFY_STUDENT = {
     # The variable represents the window within which a verification is considered to be "expiring soon."
     "EXPIRING_SOON_WINDOW": 28,
 }
+
+######################## Organizations ########################
+
+# .. toggle_name: ORGANIZATIONS_AUTOCREATE
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: True
+# .. toggle_description: When enabled, creating a course run or content library with
+#   an "org slug" that does not map to an Organization in the database will trigger the
+#   creation of a new Organization, with its name and short_name set to said org slug.
+#   When disabled, creation of such content with an unknown org slug will instead
+#   result in a validation error.
+#   If you want the Organization table to be an authoritative information source in
+#   Studio, then disable this; however, if you want the table to just be a reflection of
+#   the orgs referenced in Studio content, then leave it enabled.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2020-11-02
+ORGANIZATIONS_AUTOCREATE = True
