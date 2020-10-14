@@ -8,12 +8,10 @@ certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
 edx-opaque-keys==2.1.1    # via -r requirements/edx/paver.in
 idna==2.10                # via requests
-importlib-metadata==1.7.0  # via -c requirements/edx/../constraints.txt, path
 lazy==1.4                 # via -r requirements/edx/paver.in
 libsass==0.10.0           # via -r requirements/edx/paver.in
 markupsafe==1.1.1         # via -r requirements/edx/paver.in
 mock==3.0.5               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
-more-itertools==8.5.0     # via zipp
 path==13.1.0              # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
 pathtools==0.1.2          # via watchdog
 paver==1.3.4              # via -r requirements/edx/paver.in
@@ -27,4 +25,3 @@ stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requi
 urllib3==1.25.10          # via requests
 watchdog==0.10.3          # via -r requirements/edx/paver.in
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.in
-zipp==1.0.0               # via -c requirements/edx/../constraints.txt, importlib-metadata
