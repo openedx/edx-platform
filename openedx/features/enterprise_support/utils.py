@@ -10,6 +10,7 @@ from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
+from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
 from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomer
 from social_django.models import UserSocialAuth
 
@@ -323,7 +324,7 @@ def get_enterprise_learner_portal(request):
 
         queryset = EnterpriseCustomerUser.objects.filter(**kwargs).prefetch_related(
             'enterprise_customer',
-            'enterprise_customer___branding_configuration',
+            'enterprise_customer__branding_configuration',
         )
 
         if not enterprise_customer_uuid:
@@ -341,13 +342,27 @@ def get_enterprise_learner_portal(request):
         learner_portal_data = {
             'name': enterprise_customer.name,
             'slug': enterprise_customer.slug,
-            'logo': enterprise_customer.branding_configuration.logo,
+            'logo': enterprise_branding_configuration(enterprise_customer).get('logo'),
         }
 
         # Cache the result in the user's request session
         request.session[learner_portal_session_key] = json.dumps(learner_portal_data)
         return learner_portal_data
     return None
+
+
+def enterprise_branding_configuration(enterprise_customer_obj):
+    """
+    Given an instance of ``EnterpriseCustomer``, returns a related
+    branding_configuration serialized dictionary if it exists, otherwise an empty dictionary.
+    """
+    # We can use hasattr() on one-to-one relationships to avoid exception-catching:
+    # https://docs.djangoproject.com/en/2.2/topics/db/examples/one_to_one/
+    if not hasattr(enterprise_customer_obj, 'branding_configuration'):
+        return {}
+
+    branding_config = enterprise_customer_obj.branding_configuration
+    return EnterpriseCustomerBrandingConfigurationSerializer(branding_config).data
 
 
 def get_enterprise_learner_generic_name(request):
