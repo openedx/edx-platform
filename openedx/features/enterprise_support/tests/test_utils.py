@@ -3,7 +3,6 @@ Test the enterprise support utils.
 """
 
 import json
-
 import mock
 import ddt
 
