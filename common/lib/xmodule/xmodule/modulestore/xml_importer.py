@@ -828,20 +828,30 @@ def _update_and_import_module(
     ## current state.
     ## If this is brought back in, also uncomment the tests in
     ## cms/djangoapps/contentstore/views/tests/test_import_export.py
-    # if block.location.block_type == 'library_content':
-    #     # if library exists, update source_library_version and children
-    #     # according to this existing library and library content block.
-    #     if store.get_library(block.source_library_key):
-    #         # Update library content block's children on draft branch
-    #         with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-    #             LibraryToolsService(store, user_id).update_children(
-    #                 block,
-    #                 version=block.source_library_version,
-    #             )
+    if block.location.block_type == 'library_content':
+        # if library exists, update source_library_version and children
+        # according to this existing library and library content block.
+        if store.get_library(block.source_library_key):
+            # If the library content block is already in the course, then don't refresh
+            # the children when we re-import it. This is to avoid AA-310, where the IDs of
+            # the children might be affected, losing student user state.
+            #
+            # Note that while this method is run on import, it's also run when adding
+            # the library content from Studio for the first time.
+            with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.published_only):
+                if store.has_item(block.location):
+                    return block
 
-    #         # Publish it if importing the course for branch setting published_only.
-    #         if store.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
-    #             store.publish(block.location, user_id)
+            # Update library content block's children on draft branch
+            with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
+                LibraryToolsService(store, user_id).update_children(
+                    block,
+                    version=block.source_library_version,
+                )
+
+            # Publish it if importing the course for branch setting published_only.
+            if store.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
+                store.publish(block.location, user_id)
 
     return block
 
