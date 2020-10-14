@@ -3,7 +3,6 @@ Test the enterprise support utils.
 """
 
 import json
-from urllib.parse import urljoin
 
 import mock
 import ddt

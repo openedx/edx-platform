@@ -4,14 +4,12 @@ Utility methods for Enterprise
 
 
 import json
-from urllib.parse import urljoin
 
 from crum import get_current_request
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
-from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
 from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomer
 from social_django.models import UserSocialAuth
 
