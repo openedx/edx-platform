@@ -1374,6 +1374,8 @@ EDLY_USER_INFO_COOKIE_NAME = 'edly-user-info'
 EDLY_COOKIE_SECRET_KEY = 'EDLY-COOKIE-SECRET-KEY'
 EDLY_JWT_ALGORITHM = 'HS256'
 
+ENABLE_SUBSCRIPTIONS_ON_RUNTIME_SWITCH = 'enable_subscriptions'
+
 # Clickjacking protection can be disbaled by setting this to 'ALLOW'
 X_FRAME_OPTIONS = 'DENY'
 
