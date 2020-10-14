@@ -3,12 +3,16 @@ Test the enterprise support utils.
 """
 
 import json
+from urllib.parse import urljoin
+
 import mock
 import ddt
 
+from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from lms.djangoapps.branding.api import get_logo_url
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.enterprise_support.utils import ENTERPRISE_HEADER_LINKS, get_enterprise_learner_portal
@@ -76,7 +80,7 @@ class TestEnterpriseUtils(TestCase):
         self.assertDictEqual(portal, {
             'name': enterprise_customer_user.enterprise_customer.name,
             'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
+            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo,
         })
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
@@ -98,7 +102,7 @@ class TestEnterpriseUtils(TestCase):
         self.assertDictEqual(portal, {
             'name': enterprise_customer_user.enterprise_customer.name,
             'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': None,
+            'logo': settings.LMS_ROOT_URL + get_logo_url(),
         })
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
@@ -132,7 +136,7 @@ class TestEnterpriseUtils(TestCase):
         self.assertDictEqual(portal, {
             'name': enterprise_customer_user.enterprise_customer.name,
             'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
+            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo,
         })
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
