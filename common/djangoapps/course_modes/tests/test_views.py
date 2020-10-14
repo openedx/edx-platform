@@ -19,10 +19,10 @@ from mock import patch
 from course_modes.models import CourseMode, Mode
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
+from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -119,7 +119,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Check whether we were correctly redirected
         purchase_workflow = "?purchase_workflow=single"
         start_flow_url = reverse('verify_student_start_flow', args=[six.text_type(self.course.id)]) + purchase_workflow
-        self.assertRedirects(response, start_flow_url)
+        with mock_payment_processors():
+            self.assertRedirects(response, start_flow_url)
 
     def test_no_id_redirect_otto(self):
         # Create the course modes
@@ -267,7 +268,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # we're redirected immediately to the start of the payment flow.
         purchase_workflow = "?purchase_workflow=single"
         start_flow_url = reverse('verify_student_start_flow', args=[six.text_type(self.course.id)]) + purchase_workflow
-        self.assertRedirects(response, start_flow_url)
+        with mock_payment_processors():
+            self.assertRedirects(response, start_flow_url)
 
         # Now enroll in the course
         CourseEnrollmentFactory(
@@ -317,7 +319,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         else:
             self.fail("Must provide a valid redirect URL name")
 
-        self.assertRedirects(response, redirect_url)
+        with mock_payment_processors(expect_called=None):
+            self.assertRedirects(response, redirect_url)
 
     def test_choose_mode_audit_enroll_on_post(self):
         audit_mode = 'audit'

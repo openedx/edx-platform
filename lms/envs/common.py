@@ -285,15 +285,6 @@ FEATURES = {
     # .. toggle_warnings: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
     'SKIP_EMAIL_VALIDATION': False,
 
-    # Toggle the availability of the shopping cart page
-    'ENABLE_SHOPPING_CART': False,
-
-    # Toggle storing detailed billing information
-    'STORE_BILLING_INFO': False,
-
-    # Enable flow for payments for course registration (DIFFERENT from verified student flow)
-    'ENABLE_PAID_COURSE_REGISTRATION': False,
-
     # .. toggle_name: ENABLE_COSMETIC_DISPLAY_PRICE
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -898,9 +889,6 @@ CONTEXT_PROCESSORS = [
 
     # Hack to get required link URLs to password reset templates
     'edxmako.shortcuts.marketing_link_context_processor',
-
-    # Shoppingcart processor (detects if request.user has a cart)
-    'shoppingcart.context_processor.user_has_cart_context_processor',
 
     # Timezone processor (sends language and time_zone preference)
     'lms.djangoapps.courseware.context_processor.user_timezone_locale_prefs',
@@ -1575,23 +1563,8 @@ EMBARGO_SITE_REDIRECT_URL = None
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'billing@example.com'
 
-##### Using cybersource by default #####
-
-CC_PROCESSOR_NAME = 'CyberSource2'
-CC_PROCESSOR = {
-    'CyberSource2': {
-        "PURCHASE_ENDPOINT": '',
-        "SECRET_KEY": '',
-        "ACCESS_KEY": '',
-        "PROFILE_ID": '',
-    }
-}
-
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
 PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
-
-# Members of this group are allowed to generate payment reports
-PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
 
 ################################# EdxNotes config  #########################
 
