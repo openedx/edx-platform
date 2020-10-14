@@ -1,26 +1,6 @@
 """
-Extra utilities for waffle: most classes are defined in edx_toggles.toggles, but we keep here some extra classes for
-usage within edx-platform. These classes cover course override use cases.
-
-
-Usage:
-
-   WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='my_namespace')
-   # Use CourseWaffleFlag when you are in the context of a course.
-   SOME_COURSE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_course_feature', __name__)
-
-You can check this flag in code using the following::
-
-    SOME_COURSE_FLAG.is_enabled(course_key)
-
-To test WaffleSwitchNamespace, use the provided context managers.  For example:
-
-    with WAFFLE_SWITCHES.override(waffle.ESTIMATE_FIRST_ATTEMPTED, active=True):
-        ...
-
-Also see ``WAFFLE_FLAG_CUSTOM_ATTRIBUTES`` and docstring for _set_waffle_flag_attribute
-for temporarily instrumenting/monitoring waffle flag usage.
-
+Extra utilities for waffle: most classes are defined in edx_toggles.toggles (https://edx-toggles.readthedocs.io/), but
+we keep here some extra classes for usage within edx-platform. These classes cover course override use cases.
 """
 import logging
 from contextlib import contextmanager
@@ -38,6 +18,13 @@ log = logging.getLogger(__name__)
 class WaffleSwitchNamespace(BaseWaffleSwitchNamespace):
     """
     Waffle switch namespace that implements custom overriding methods. We should eventually get rid of this class.
+
+    To test WaffleSwitchNamespace, use the provided context managers.  For example:
+
+        with WAFFLE_SWITCHES.override(waffle.ESTIMATE_FIRST_ATTEMPTED, active=True):
+            ...
+
+    Note: this should eventually be deprecated in favour of a dedicated `override_waffle_switch` context manager.
     """
 
     @contextmanager
@@ -130,7 +117,8 @@ class WaffleFlag(BaseWaffleFlag):
 
 class CourseWaffleFlag(WaffleFlag):
     """
-    Represents a single waffle flag that can be forced on/off for a course.
+    Represents a single waffle flag that can be forced on/off for a course. This class should be used instead of
+    WaffleFlag when in the context of a course.
 
     Uses a cached waffle namespace.
 
