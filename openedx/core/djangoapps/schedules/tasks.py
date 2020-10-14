@@ -5,7 +5,7 @@ import logging
 import six
 from six.moves import range
 
-from celery import task
+from celery import task, current_app
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
@@ -181,6 +181,7 @@ class ScheduleRecurringNudge(BinnedScheduleMessageBaseTask):
 
     def make_message_type(self, day_offset):
         return message_types.RecurringNudge(abs(day_offset))
+ScheduleRecurringNudge = current_app.register_task(ScheduleRecurringNudge())
 
 
 class ScheduleUpgradeReminder(BinnedScheduleMessageBaseTask):
@@ -192,6 +193,7 @@ class ScheduleUpgradeReminder(BinnedScheduleMessageBaseTask):
 
     def make_message_type(self, day_offset):
         return message_types.UpgradeReminder()
+ScheduleUpgradeReminder = current_app.register_task(ScheduleUpgradeReminder())
 
 
 class ScheduleCourseUpdate(BinnedScheduleMessageBaseTask):
@@ -203,6 +205,7 @@ class ScheduleCourseUpdate(BinnedScheduleMessageBaseTask):
 
     def make_message_type(self, day_offset):
         return message_types.CourseUpdate()
+ScheduleCourseUpdate = current_app.register_task(ScheduleCourseUpdate())
 
 
 class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
@@ -244,6 +247,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
                 str(course_key),
                 override_recipient_email,
             ).send()
+ScheduleCourseNextSectionUpdate = current_app.register_task(ScheduleCourseNextSectionUpdate())
 
 
 def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
