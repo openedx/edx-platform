@@ -3,6 +3,7 @@ Course API Views
 """
 
 
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.paginator import InvalidPage
 from edx_django_utils.monitoring import function_trace
@@ -115,16 +116,28 @@ class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
         permissions.
         """
         requested_params = self.request.query_params.copy()
+        cache_key = ':'.join(map(str, requested_params.values()))
+
+        if not requested_params.get('username'):
+            cached_details = cache.get(cache_key)
+            if cached_details:
+                return cached_details
+
         requested_params.update({'course_key': self.kwargs['course_key_string']})
         form = CourseDetailGetForm(requested_params, initial={'requesting_user': self.request.user})
         if not form.is_valid():
             raise ValidationError(form.errors)
 
-        return course_detail(
+        details = course_detail(
             self.request,
             form.cleaned_data['username'],
             form.cleaned_data['course_key'],
         )
+
+        if not requested_params.get('username'):
+            cache.set(cache_key, details)
+
+        return details
 
 
 class CourseListUserThrottle(UserRateThrottle):

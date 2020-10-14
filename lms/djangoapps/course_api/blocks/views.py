@@ -4,10 +4,10 @@ CourseBlocks API views
 
 
 import six
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import Http404
-from django.utils.cache import patch_response_headers
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -208,35 +208,39 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             usage_key_string - The usage key for a block.
         """
 
-        # validate request parameters
         requested_params = request.query_params.copy()
+        cache_key = ':'.join(map(str, requested_params.values()))
+
+        if not requested_params.get('username'):
+            cached_blocks = cache.get(cache_key)
+            if cached_blocks:
+              return Response(cached_blocks)
+
+        # validate request parameters
         requested_params.update({'usage_key': usage_key_string})
         params = BlockListGetForm(requested_params, initial={'requesting_user': request.user})
         if not params.is_valid():
             raise ValidationError(params.errors)
 
         try:
-            response = Response(
-                get_blocks(
-                    request,
-                    params.cleaned_data['usage_key'],
-                    params.cleaned_data['user'],
-                    params.cleaned_data['depth'],
-                    params.cleaned_data.get('nav_depth'),
-                    params.cleaned_data['requested_fields'],
-                    params.cleaned_data.get('block_counts', []),
-                    params.cleaned_data.get('student_view_data', []),
-                    params.cleaned_data['return_type'],
-                    params.cleaned_data.get('block_types_filter', None),
-                    hide_access_denials=hide_access_denials,
-                )
+            blocks = get_blocks(
+                request,
+                params.cleaned_data['usage_key'],
+                params.cleaned_data['user'],
+                params.cleaned_data['depth'],
+                params.cleaned_data.get('nav_depth'),
+                params.cleaned_data['requested_fields'],
+                params.cleaned_data.get('block_counts', []),
+                params.cleaned_data.get('student_view_data', []),
+                params.cleaned_data['return_type'],
+                params.cleaned_data.get('block_types_filter', None),
+                hide_access_denials=hide_access_denials,
             )
-            # If the username is an empty string, and not None, then we are requesting
-            # data about the anonymous view of a course, which can be cached. In this
-            # case we add the usual caching headers to the response.
-            if params.cleaned_data.get('username', None) == '':
-                patch_response_headers(response)
-            return response
+
+            if not requested_params.get('username'):
+                cache.set(cache_key, blocks)
+
+            return Response(blocks)
         except ItemNotFoundError as exception:
             raise Http404(u"Block not found: {}".format(text_type(exception)))
 
