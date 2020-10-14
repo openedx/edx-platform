@@ -66,7 +66,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         sourced_block = self.make_block("library_sourced", course, user_id=self.user.id)
 
         # Import the unit block from the library to the course
-        self.tools.import_from_blockstore(sourced_block, unit_block_id)
+        self.tools.import_from_blockstore(sourced_block, [unit_block_id])
 
         # Verify imported block with its children
         self.assertEqual(len(sourced_block.children), 1)
@@ -86,7 +86,7 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
 
         # Check that reimporting updates the target block
         self._set_library_block_olx(html_block_id, '<html><a href="/static/test.txt">Foo bar</a></html>')
-        self.tools.import_from_blockstore(sourced_block, unit_block_id)
+        self.tools.import_from_blockstore(sourced_block, [unit_block_id])
 
         self.assertEqual(len(sourced_block.children), 1)
         imported_unit_block = self.store.get_item(sourced_block.children[0])
