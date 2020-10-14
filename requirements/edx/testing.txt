@@ -59,7 +59,7 @@ distlib==0.3.1            # via virtualenv
 django-appconf==1.0.4     # via -r requirements/edx/base.txt, django-statici18n
 django-celery-results==1.2.1  # via -r requirements/edx/base.txt
 django-classy-tags==2.0.0  # via -r requirements/edx/base.txt, django-sekizai
-django-config-models==2.0.2  # via -r requirements/edx/base.txt, edx-enterprise
+django-config-models==2.0.3  # via -r requirements/edx/base.txt, edx-enterprise
 django-cookies-samesite==0.8.0  # via -r requirements/edx/base.txt
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-enterprise
@@ -129,7 +129,7 @@ enmerkar==0.7.1           # via -r requirements/edx/base.txt, enmerkar-underscor
 event-tracking==1.0.0     # via -r requirements/edx/base.txt, edx-proctoring, edx-search
 execnet==1.7.1            # via pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
-faker==4.9.0              # via factory-boy
+faker==4.14.0             # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 fs-s3fs==0.1.8            # via -r requirements/edx/base.txt, django-pyfs
