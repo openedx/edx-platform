@@ -36,6 +36,7 @@ RUN apt-get update && \
     libxml2-dev \
     libxmlsec1-dev \
     libxslt1-dev \
+    lynx \
     ntp \
     pkg-config \
     python3-dev \
