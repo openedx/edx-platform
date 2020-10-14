@@ -331,15 +331,15 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 # Other than the outer function here
                 return (
                     block.location.block_type not in ('chapter', 'sequential', 'vertical') and
-                    len(getattr(block, 'children', [])) == 0
+                    not block.has_children
                 )
 
             def get_children(parent):
                 # This function is used to get the children of a block in the traversal below
-                if not hasattr(parent, 'children'):
-                    return []
-                else:
+                if parent.has_children:
                     return parent.get_children()
+                else:
+                    return []
 
             # If any block inside a timed exam has been gated by content type gating
             # then gate the entire sequence.
