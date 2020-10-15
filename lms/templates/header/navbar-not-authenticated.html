@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six import text_type
 
-from openedx.core.djangoapps.user_api.accounts.toggles import should_redirect_to_logistration_mircrofrontend
+from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
 %>
 
 <%
@@ -51,7 +51,7 @@ from openedx.core.djangoapps.user_api.accounts.toggles import should_redirect_to
         % if allow_public_account_creation:
           % if should_redirect_to_logistration_mfe:
             <div class="mobile-nav-item hidden-mobile nav-item">
-                <a class="register-btn btn" href="${settings.ACCOUNT_MICROFRONTEND_URL}/register${login_query()}">${_("Register")}</a>
+                <a class="register-btn btn" href="${settings.LOGISTRATION_MICROFRONTEND_URL}/register${login_query()}">${_("Register")}</a>
             </div>
           % else:
             <div class="mobile-nav-item hidden-mobile nav-item">
@@ -61,7 +61,7 @@ from openedx.core.djangoapps.user_api.accounts.toggles import should_redirect_to
         % endif
         % if should_redirect_to_logistration_mfe:
           <div class="mobile-nav-item hidden-mobile nav-item">
-              <a class="sign-in-btn btn" href="${settings.ACCOUNT_MICROFRONTEND_URL}/login${login_query()}">${_("Sign in")}</a>
+              <a class="sign-in-btn btn" href="${settings.LOGISTRATION_MICROFRONTEND_URL}/login${login_query()}">${_("Sign in")}</a>
           </div>
         % else:
           <div class="mobile-nav-item hidden-mobile nav-item">
