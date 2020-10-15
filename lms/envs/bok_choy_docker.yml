@@ -131,7 +131,7 @@ REGISTRATION_EXTENSION_FORM: openedx.core.djangoapps.user_api.tests.test_helpers
 REGISTRATION_EXTRA_FIELDS: {city: hidden, country: required, gender: optional, goals: optional,
   honor_code: required, level_of_education: optional, mailing_address: optional, terms_of_service: hidden,
   year_of_birth: optional}
-SECRET_KEY: ''
+SECRET_KEY: 'bokchoy_docker_secret_key'
 SERVER_EMAIL: devops@example.com
 SESSION_COOKIE_DOMAIN: null
 SITE_NAME: localhost:8003
