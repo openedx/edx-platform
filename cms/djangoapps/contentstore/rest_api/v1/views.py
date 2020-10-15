@@ -7,17 +7,16 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.lib.xmodule.xmodule.course_module import get_available_providers
 from cms.djangoapps.contentstore.views.course import get_course_and_check_access
+from common.lib.xmodule.xmodule.course_module import get_available_providers
+from contentstore.rest_api.v1.serializers import (
+    LimitedProctoredExamSettingsSerializer,
+    ProctoredExamConfigurationSerializer,
+    ProctoredExamSettingsSerializer
+)
 from models.settings.course_metadata import CourseMetadata
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.modulestore.django import modulestore
-
-from contentstore.rest_api.v1.serializers import (
-    ProctoredExamConfigurationSerializer,
-    ProctoredExamSettingsSerializer,
-    LimitedProctoredExamSettingsSerializer,
-)
 
 
 @view_auth_classes()

@@ -5,8 +5,6 @@ import re
 from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 
-from contentstore.course_group_config import GroupConfiguration
-from course_modes.models import CourseMode
 from django.conf import settings
 from django.urls import resolve
 from django.utils.translation import ugettext as _
@@ -14,11 +12,13 @@ from django.utils.translation import ugettext_lazy
 from eventtracking import tracker
 from search.search_engine_base import SearchEngine
 from six import add_metaclass, string_types, text_type
+
+from contentstore.course_group_config import GroupConfiguration
+from course_modes.models import CourseMode
+from openedx.core.lib.courses import course_image_url
 from xmodule.annotator_mixin import html_to_text
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
-
-from openedx.core.lib.courses import course_image_url
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the

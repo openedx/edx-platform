@@ -7,8 +7,9 @@ import six
 from django.utils import http
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from ..helpers import xblock_studio_url, xblock_type_display_name
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
+
+from ..helpers import xblock_studio_url, xblock_type_display_name
 
 
 class HelpersTestCase(CourseTestCase):

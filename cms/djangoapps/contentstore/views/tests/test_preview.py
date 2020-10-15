@@ -12,7 +12,6 @@ from django.test.client import Client, RequestFactory
 from xblock.core import XBlock, XBlockAside
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
-from ..preview import _preview_module_system, get_preview_fragment
 from student.tests.factories import UserFactory
 from xblock_config.models import StudioConfig
 from xmodule.modulestore import ModuleStoreEnum
@@ -20,6 +19,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.test_asides import AsideTestType
+
+from ..preview import _preview_module_system, get_preview_fragment
 
 
 @ddt.ddt

@@ -10,11 +10,11 @@ from mock import Mock, patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from six.moves import range
 
-from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
 from cms.djangoapps.contentstore.views.item import _duplicate_item
 from cms.djangoapps.contentstore.views.preview import _load_preview_module
 from cms.djangoapps.contentstore.views.tests.test_library import LIBRARY_REST_URL
+from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
+from contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
 from course_creators.views import add_user_with_status_granted
 from student import auth
 from student.auth import has_studio_read_access, has_studio_write_access

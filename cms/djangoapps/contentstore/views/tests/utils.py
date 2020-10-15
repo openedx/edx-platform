@@ -6,8 +6,9 @@ Utilities for view tests.
 import json
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from ..helpers import xblock_studio_url
 from xmodule.modulestore.tests.factories import ItemFactory
+
+from ..helpers import xblock_studio_url
 
 
 class StudioPageTestCase(CourseTestCase):

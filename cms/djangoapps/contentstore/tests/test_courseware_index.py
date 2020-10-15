@@ -56,7 +56,6 @@ from xmodule.partitions.partitions import UserPartition
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
-
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
     "chapter": "sequential",

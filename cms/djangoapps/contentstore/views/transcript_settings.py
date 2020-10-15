@@ -11,9 +11,6 @@ from django.core.files.base import ContentFile
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
-from opaque_keys.edx.keys import CourseKey
-
-from .videos import TranscriptProvider
 from edxval.api import (
     create_or_update_video_transcript,
     delete_video_transcript,
@@ -22,11 +19,15 @@ from edxval.api import (
     get_video_transcript_data,
     update_transcript_credentials_state_for_org
 )
+from opaque_keys.edx.keys import CourseKey
+
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
 from student.auth import has_studio_write_access
 from util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript, TranscriptsGenerationException
+
+from .videos import TranscriptProvider
 
 __all__ = [
     'transcript_credentials_handler',

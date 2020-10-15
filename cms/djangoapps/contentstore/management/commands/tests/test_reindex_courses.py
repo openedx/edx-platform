@@ -3,8 +3,8 @@
 
 import ddt
 import mock
-from django.core.management import CommandError, call_command
 import six
+from django.core.management import CommandError, call_command
 from six import text_type
 
 from contentstore.courseware_index import SearchIndexingError

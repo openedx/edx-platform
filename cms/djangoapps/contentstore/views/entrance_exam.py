@@ -16,14 +16,15 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from .helpers import create_xblock, remove_entrance_exam_graders
-from .item import delete_item
 from models.settings.course_metadata import CourseMetadata
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student.auth import has_course_author_access
 from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from .helpers import create_xblock, remove_entrance_exam_graders
+from .item import delete_item
 
 __all__ = ['entrance_exam', ]
 

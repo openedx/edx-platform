@@ -12,11 +12,11 @@ from datetime import datetime
 from math import ceil
 from tempfile import NamedTemporaryFile, mkdtemp
 
+from ccx_keys.locator import CCXLocator
 from celery import group
 from celery.task import task
 from celery.utils.log import get_task_logger
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
-from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User

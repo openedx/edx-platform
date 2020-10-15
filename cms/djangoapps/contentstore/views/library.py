@@ -19,8 +19,6 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from six import text_type
 
-from ..utils import add_instructor, reverse_library_url
-from .item import create_xblock_info
 from course_creators.views import get_course_creator_status
 from edxmako.shortcuts import render_to_response
 from student.auth import (
@@ -37,8 +35,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError
 
 from ..config.waffle import REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND
-
+from ..utils import add_instructor, reverse_library_url
 from .component import CONTAINER_TEMPLATES, get_component_templates
+from .item import create_xblock_info
 from .user import user_with_role
 
 __all__ = ['library_handler', 'manage_library_users']

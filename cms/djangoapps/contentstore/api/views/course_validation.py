@@ -6,8 +6,8 @@ from pytz import UTC
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from contentstore.course_info_model import get_course_updates
 from cms.djangoapps.contentstore.views.certificates import CertificateManager
+from contentstore.course_info_model import get_course_updates
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY
 from xmodule.modulestore.django import modulestore

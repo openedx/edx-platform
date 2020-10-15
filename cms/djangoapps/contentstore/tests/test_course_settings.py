@@ -21,11 +21,15 @@ from mock import Mock, patch
 from pytz import UTC
 
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
-from course_modes.models import CourseMode
-from cms.djangoapps.models.settings.course_grading import GRADING_POLICY_CHANGED_EVENT_TYPE, CourseGradingModel, hash_grading_policy
+from cms.djangoapps.models.settings.course_grading import (
+    GRADING_POLICY_CHANGED_EVENT_TYPE,
+    CourseGradingModel,
+    hash_grading_policy
+)
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
 from cms.djangoapps.models.settings.waffle import MATERIAL_RECOMPUTE_ONLY_FLAG
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.roles import CourseInstructorRole, CourseStaffRole

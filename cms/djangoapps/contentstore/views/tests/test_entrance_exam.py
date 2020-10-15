@@ -15,6 +15,12 @@ from opaque_keys.edx.keys import UsageKey
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_url
+from models.settings.course_grading import CourseGradingModel
+from models.settings.course_metadata import CourseMetadata
+from student.tests.factories import UserFactory
+from util import milestones_helpers
+from xmodule.modulestore.django import modulestore
+
 from ..entrance_exam import (
     add_entrance_exam_milestone,
     create_entrance_exam,
@@ -23,11 +29,6 @@ from ..entrance_exam import (
     update_entrance_exam
 )
 from ..helpers import GRADER_TYPES, create_xblock
-from models.settings.course_grading import CourseGradingModel
-from models.settings.course_metadata import CourseMetadata
-from student.tests.factories import UserFactory
-from util import milestones_helpers
-from xmodule.modulestore.django import modulestore
 
 
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})

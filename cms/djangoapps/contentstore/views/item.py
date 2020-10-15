@@ -32,27 +32,6 @@ from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
-from ..utils import (
-    ancestor_has_staff_lock,
-    find_release_date_source,
-    find_staff_lock_source,
-    get_split_group_display_name,
-    get_user_partition_info,
-    get_visibility_partition_info,
-    has_children_visible_to_specific_partition_groups,
-    is_currently_visible_to_students,
-    is_self_paced
-)
-from .helpers import (
-    create_xblock,
-    get_parent_xblock,
-    is_unit,
-    usage_key_with_run,
-    xblock_primary_child_category,
-    xblock_studio_url,
-    xblock_type_display_name
-)
-from .preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
@@ -76,6 +55,28 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
+
+from ..utils import (
+    ancestor_has_staff_lock,
+    find_release_date_source,
+    find_staff_lock_source,
+    get_split_group_display_name,
+    get_user_partition_info,
+    get_visibility_partition_info,
+    has_children_visible_to_specific_partition_groups,
+    is_currently_visible_to_students,
+    is_self_paced
+)
+from .helpers import (
+    create_xblock,
+    get_parent_xblock,
+    is_unit,
+    usage_key_with_run,
+    xblock_primary_child_category,
+    xblock_studio_url,
+    xblock_type_display_name
+)
+from .preview import get_preview_fragment
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
