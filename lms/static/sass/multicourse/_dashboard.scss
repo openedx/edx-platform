@@ -3,6 +3,8 @@
 
 // +Dashboard
 // ====================
+@import "lms/static/sass/elements/_typography.scss";
+
 .dashboard {
   @include clearfix();
 
@@ -150,7 +152,7 @@
 
                 // Responsive behavior
                 @include media-breakpoint-down(sm) {
-                  @extend %t-title4 !optional;
+                  @include t-title4
                 }
               }
             }

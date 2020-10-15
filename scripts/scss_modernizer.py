@@ -48,18 +48,19 @@ def process_files(directory):
 
 
 if __name__ == '__main__':
-    file_to_process = sys.argv[1]
-    updated_data_a = process_file(file_to_process)
-    update_file(file_to_process, updated_data_a)
 
-    # print("processing LMS...")
-    # process_files("lms")
-    #
-    # print("processing themes...")
-    # process_files("themes")
-    #
-    # print("processing CMS...")
-    # process_files("cms")
-    #
-    # print("processing common...")
-    # process_files("common")
+    # file_to_process = sys.argv[1]
+    # updated_data_a = process_file(file_to_process)
+    # update_file(file_to_process, updated_data_a)
+
+    print("processing LMS...")
+    process_files("lms")
+
+    print("processing themes...")
+    process_files("themes")
+
+    print("processing CMS...")
+    process_files("cms")
+
+    print("processing common...")
+    process_files("common")

@@ -4,6 +4,8 @@
 // Scale - (6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72)
 
 // weights
+@import "themes/red-theme/lms/static/sass/partials/lms/theme/_variables.scss";
+
 %t-ultrastrong {
   font-weight: 700;
 }
@@ -28,9 +30,13 @@
   font-weight: 200;
 }
 
+@mixin t-title{
+     font-family: $font-family-sans-serif;
+}
+
 // headings/titles
 %t-title {
-  font-family: $font-family-sans-serif;
+    @include t-title
 }
 
 %t-title1 {
@@ -54,11 +60,14 @@
   @include line-height(36);
 }
 
-%t-title4 {
-  @extend %t-title !optional;
+@mixin t-title4{
+    @include t-title;
+    @include font-size(24);
+    @include line-height(24);
+}
 
-  @include font-size(24);
-  @include line-height(24);
+%t-title4 {
+  @include t-title4
 }
 
 %t-title5 {
