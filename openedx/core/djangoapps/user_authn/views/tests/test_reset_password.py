@@ -35,7 +35,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH
 from openedx.core.djangoapps.user_authn.views.password_reset import (
-    SETTING_CHANGE_INITIATED, password_reset,
+    SETTING_CHANGE_INITIATED, password_reset, password_reset_logistration,
     PasswordResetConfirmWrapper)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import TEST_PASSWORD, UserFactory
@@ -713,3 +713,72 @@ class PasswordResetTokenValidateViewTest(UserAPITestCase):
 
         self.user = User.objects.get(pk=self.user.pk)
         self.assertFalse(self.user.is_active)
+
+
+@ddt.ddt
+@unittest.skipUnless(
+    settings.ROOT_URLCONF == "lms.urls",
+    "reset password tests should only run in LMS"
+)
+class ResetPasswordAPITests(CacheIsolationTestCase):
+    """Tests of the logistration API's password reset endpoint. """
+    request_factory = RequestFactory()
+    ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        super(ResetPasswordAPITests, self).setUp()
+        self.user = UserFactory.create()
+        self.user.save()
+        self.token = default_token_generator.make_token(self.user)
+        self.uidb36 = int_to_base36(self.user.id)
+
+    def create_reset_request(self, uidb36, token, new_password2='new_password1'):
+        """Helper to create reset password post request"""
+
+        request_param = {'new_password1': 'new_password1', 'new_password2': new_password2}
+        post_request = self.request_factory.post(
+            reverse(
+                "logistration_password_reset",
+                kwargs={"uidb36": uidb36, "token": token}
+            ),
+            request_param
+        )
+        return post_request
+
+    @ddt.data(
+        (None, None, True),
+        (None, 'invalid_token', False),
+    )
+    @ddt.unpack
+    def test_password_reset_request(self, uidb36, token, status):
+        """Tests password reset request with valid/invalid token"""
+
+        uidb36 = uidb36 or self.uidb36
+        token = token or self.token
+
+        post_request = self.create_reset_request(uidb36, token)
+        post_request.user = AnonymousUser()
+        json_response = password_reset_logistration(post_request, uidb36=uidb36, token=token)
+        json_response = json.loads(json_response.content.decode('utf-8'))
+        self.assertEqual(json_response.get('reset_status'), status)
+
+    def test_none_token_in_password_reset_request(self):
+        """
+        Test that user should not be able to reset password through no token/uidb36
+        """
+        uidb36 = None
+        token = None
+
+        post_request = self.create_reset_request(self.uidb36, self.token)
+        post_request.user = AnonymousUser()
+        self.assertRaises(Exception, password_reset_logistration(post_request, uidb36=uidb36, token=token))
+
+    def test_password_mismatch_in_reset_request(self):
+        """
+        Test that user should not be able to reset password with password mismatch
+        """
+        post_request = self.create_reset_request(self.uidb36, self.token, 'new_password2')
+        post_request.user = AnonymousUser()
+        json_response = password_reset_logistration(post_request, uidb36=self.uidb36, token=self.token)
+        json_response = json.loads(json_response.content.decode('utf-8'))
+        self.assertFalse(json_response.get('reset_status'))
