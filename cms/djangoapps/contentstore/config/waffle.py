@@ -27,6 +27,12 @@ def waffle_flags():
 
 
 # Flags
+ENABLE_IN_CONTEXT_IMAGE_SELECTION = CourseWaffleFlag(
+    waffle_namespace=waffle_flags(),
+    flag_name=u'enable_in_context_image_selection',
+    flag_undefined_default=False
+)
+
 ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name=u'enable_checklists_quality',

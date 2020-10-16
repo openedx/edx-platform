@@ -57,6 +57,22 @@ def i_click_on_edit_icon(step):
     world.edit_component()
 
 
+@step('I add an image with static link "(.*)" via the Image Plugin Icon$')
+def i_click_on_image_plugin_icon(step, path):
+    use_plugin(
+        '.mce-i-image',
+        lambda: world.css_fill('.mce-textbox', path, 0)
+    )
+
+
+@step('the link is shown as "(.*)" in the Image Plugin$')
+def check_link_in_image_plugin(step, path):
+    use_plugin(
+        '.mce-i-image',
+        lambda: assert_equal(path, world.css_find('.mce-textbox')[0].value)
+    )
+
+
 @step('I add a link with static link "(.*)" via the Link Plugin Icon$')
 def i_click_on_link_plugin_icon(step, path):
     def fill_in_link_fields():
