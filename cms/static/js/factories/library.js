@@ -5,7 +5,6 @@ import * as PagedContainerPage from 'js/views/pages/paged_container';
 import * as LibraryContainerView from 'js/views/library_container';
 import * as ComponentTemplates from 'js/collections/component_template';
 import * as xmoduleLoader from 'xmodule';
-import './base';
 import 'cms/js/main';
 import 'xblock/cms.runtime.v1';
 
