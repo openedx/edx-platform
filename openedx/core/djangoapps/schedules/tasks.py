@@ -97,6 +97,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
     for each Bin.
     """
     num_bins = resolvers.DEFAULT_NUM_BINS
+    task_instance = None
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
@@ -117,7 +118,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
                 override_recipient_email,
             )
             cls.log_info(u'Launching task with args = %r', task_args)
-            cls().apply_async(
+            cls.task_instance.apply_async(
                 task_args,
                 retry=False,
             )
@@ -181,7 +182,9 @@ class ScheduleRecurringNudge(BinnedScheduleMessageBaseTask):
 
     def make_message_type(self, day_offset):
         return message_types.RecurringNudge(abs(day_offset))
-ScheduleRecurringNudge = current_app.register_task(ScheduleRecurringNudge())
+# Save the task instance on the class object so that it's accessible via the cls argument to enqueue
+ScheduleRecurringNudge.task_instance = current_app.register_task(ScheduleRecurringNudge())
+ScheduleRecurringNudge = ScheduleRecurringNudge.task_instance
 
 
 class ScheduleUpgradeReminder(BinnedScheduleMessageBaseTask):
@@ -193,7 +196,9 @@ class ScheduleUpgradeReminder(BinnedScheduleMessageBaseTask):
 
     def make_message_type(self, day_offset):
         return message_types.UpgradeReminder()
-ScheduleUpgradeReminder = current_app.register_task(ScheduleUpgradeReminder())
+# Save the task instance on the class object so that it's accessible via the cls argument to enqueue
+ScheduleUpgradeReminder.task_instance = current_app.register_task(ScheduleUpgradeReminder())
+ScheduleUpgradeReminder = ScheduleUpgradeReminder.task_instance
 
 
 class ScheduleCourseUpdate(BinnedScheduleMessageBaseTask):
@@ -205,7 +210,9 @@ class ScheduleCourseUpdate(BinnedScheduleMessageBaseTask):
 
     def make_message_type(self, day_offset):
         return message_types.CourseUpdate()
-ScheduleCourseUpdate = current_app.register_task(ScheduleCourseUpdate())
+# Save the task instance on the class object so that it's accessible via the cls argument to enqueue
+ScheduleCourseUpdate.task_instance = current_app.register_task(ScheduleCourseUpdate())
+ScheduleCourseUpdate = ScheduleCourseUpdate.task_instance
 
 
 class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
@@ -213,6 +220,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
     log_prefix = COURSE_NEXT_SECTION_UPDATE_LOG_PREFIX
     resolver = resolvers.CourseNextSectionUpdate
     async_send_task = _course_update_schedule_send
+    task_instance = None
 
     @classmethod
     def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
@@ -231,7 +239,7 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
                 override_recipient_email,
             )
             cls.log_info(u'Launching task with args = %r', task_args)
-            cls().apply_async(
+            cls.task_instance.apply_async(
                 task_args,
                 retry=False,
             )
@@ -247,7 +255,9 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
                 str(course_key),
                 override_recipient_email,
             ).send()
-ScheduleCourseNextSectionUpdate = current_app.register_task(ScheduleCourseNextSectionUpdate())
+# Save the task instance on the class object so that it's accessible via the cls argument to enqueue
+ScheduleCourseNextSectionUpdate.task_instance = current_app.register_task(ScheduleCourseNextSectionUpdate())
+ScheduleCourseNextSectionUpdate = ScheduleCourseNextSectionUpdate.task_instance
 
 
 def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
