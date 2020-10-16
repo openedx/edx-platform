@@ -431,7 +431,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2948 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2952 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -615,6 +615,25 @@ CREATE TABLE `blackboard_blackboardenterprisecustomerconfiguration` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `blackboard_blackboar_enterprise_customer__39f883b0_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `blackboard_blackboardlearnerdatatransmissionaudit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `blackboard_blackboardlearnerdatatransmissionaudit` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `blackboard_user_email` varchar(255) NOT NULL,
+  `completed_timestamp` varchar(10) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `course_completed` tinyint(1) NOT NULL,
+  `enterprise_course_enrollment_id` int(10) unsigned NOT NULL,
+  `grade` decimal(3,2) DEFAULT NULL,
+  `total_hours` double DEFAULT NULL,
+  `created` datetime(6) NOT NULL,
+  `error_message` longtext NOT NULL,
+  `status` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `blackboard_blackboardlearne_enterprise_course_enrollmen_941ea543` (`enterprise_course_enrollment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `blackboard_historicalblackboardenterprisecustomerconfiguration`;
@@ -2805,7 +2824,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=838 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=839 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2816,7 +2835,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=785 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=787 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
