@@ -985,44 +985,44 @@ class TestCourseExportImport(LibraryTestCase):
         dest_child = self.store.get_item(dest_child_location)
         self.assertEqual(source_child.display_name, dest_child.display_name)
 
-    # @ddt.data(True, False)
-    # def test_library_content_on_course_export_import(self, publish_item):
-    #     """
-    #     Verify that library contents in destination and source courses are same after importing
-    #     the source course into destination course.
-    #     """
-    #     self._setup_source_course_with_library_content(publish=publish_item)
+    @ddt.data(True, False)
+    def test_library_content_on_course_export_import(self, publish_item):
+        """
+        Verify that library contents in destination and source courses are same after importing
+        the source course into destination course.
+        """
+        self._setup_source_course_with_library_content(publish=publish_item)
 
-    #     # Create a course to import source course.
-    #     dest_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
+        # Create a course to import source course.
+        dest_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
 
-    #     # Export the source course.
-    #     export_course_to_xml(
-    #         self.store,
-    #         contentstore(),
-    #         self.source_course.location.course_key,
-    #         self.export_dir,
-    #         'exported_source_course',
-    #     )
+        # Export the source course.
+        export_course_to_xml(
+            self.store,
+            contentstore(),
+            self.source_course.location.course_key,
+            self.export_dir,
+            'exported_source_course',
+        )
 
-    #     # Now, import it back to dest_course.
-    #     import_course_from_xml(
-    #         self.store,
-    #         self.user.id,
-    #         self.export_dir,
-    #         ['exported_source_course'],
-    #         static_content_store=contentstore(),
-    #         target_id=dest_course.location.course_key,
-    #         load_error_modules=False,
-    #         raise_on_failure=True,
-    #         create_if_not_present=True,
-    #     )
+        # Now, import it back to dest_course.
+        import_course_from_xml(
+            self.store,
+            self.user.id,
+            self.export_dir,
+            ['exported_source_course'],
+            static_content_store=contentstore(),
+            target_id=dest_course.location.course_key,
+            load_error_modules=False,
+            raise_on_failure=True,
+            create_if_not_present=True,
+        )
 
-    #     self.assert_problem_display_names(
-    #         self.source_course.location,
-    #         dest_course.location,
-    #         publish_item
-    #     )
+        self.assert_problem_display_names(
+            self.source_course.location,
+            dest_course.location,
+            publish_item
+        )
 
 
 @ddt.ddt
