@@ -140,7 +140,7 @@ edx-opaque-keys[django]==0.4.4
 git+https://github.com/appsembler/edx-organizations.git@0.4.12-appsembler5  # edx-organizations==0.4.12
 edx-proctoring==1.4.0
 edx-rest-api-client==1.7.1
--e git+https://github.com/appsembler/edx-search.git@appsembler-beta-release-2020-01-07_4#egg=edx-search  # edx-search==1.2.1
+git+https://github.com/appsembler/edx-search.git@appsembler-beta-release-2020-01-07_4  # edx-search==1.2.1
 edx-submissions==2.0.12
 edx-user-state-client==1.0.4
 edxval==0.1.16
