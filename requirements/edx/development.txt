@@ -28,7 +28,7 @@ git+https://github.com/edx/lettuce.git@7a04591c78ac56dac3eb3e91ca94b15cce844133#
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 -e .
-git+https://github.com/edx/edx-ora2.git@2.1.18#egg=ora2==2.1.18
+git+https://github.com/edx/edx-ora2.git@2.1.17#egg=ora2==2.1.18
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
