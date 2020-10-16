@@ -69,7 +69,7 @@ from .serializers import (
     TopicSerializer
 )
 from .utils import emit_team_event
-from .waffle import are_team_submissions_enabled
+from .toggles import are_team_submissions_enabled
 
 TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12

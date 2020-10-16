@@ -352,18 +352,6 @@ FEATURES = {
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
     ### ORA Feature Flags ###
-
-    # .. toggle_name: ENABLE_ORA_TEAM_SUBMISSIONS
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to enable team-based ORA submissions.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2020-03-03
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-4951
-    # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-    'ENABLE_ORA_TEAM_SUBMISSIONS': False,
-
     # .. toggle_name: ENABLE_ORA_ALL_FILE_URLS
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
