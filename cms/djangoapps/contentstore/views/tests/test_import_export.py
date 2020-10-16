@@ -13,14 +13,10 @@ from uuid import uuid4
 import ddt
 import lxml
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
 from django.test.utils import override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
-from storages.backends.s3boto import S3BotoStorage
-from user_tasks.models import UserTaskStatus
 
 from contentstore.tests.test_libraries import LibraryTestCase
 from contentstore.tests.utils import CourseTestCase
@@ -136,9 +132,6 @@ class ImportTestCase(CourseTestCase):
     """
     Unit tests for importing a course or Library
     """
-
-    CREATE_USER = True
-
     def setUp(self):
         super(ImportTestCase, self).setUp()
         self.url = reverse_course_url('import_handler', self.course.id)
@@ -695,75 +688,6 @@ class ExportTestCase(CourseTestCase):
         client, _ = self.create_non_staff_authed_user_client()
         resp = client.get(reverse_course_url('export_output_handler', self.course.id))
         self.assertEqual(resp.status_code, 403)
-
-    def _mock_artifact(self, spec=None, file_url=None):
-        """
-        Creates a Mock of the UserTaskArtifact model for testing exports handler
-        code without touching the database.
-        """
-        mock_artifact = Mock()
-        mock_artifact.file.name = 'testfile.tar.gz'
-        mock_artifact.file.storage = Mock(spec=spec)
-        mock_artifact.file.storage.url.return_value = file_url
-        return mock_artifact
-
-    @patch('contentstore.views.import_export._latest_task_status')
-    @patch('user_tasks.models.UserTaskArtifact.objects.get')
-    def test_export_status_handler_other(
-            self,
-            mock_get_user_task_artifact,
-            mock_latest_task_status,
-    ):
-        """
-        Verify that the export status handler generates the correct export path
-        for storage providers other than ``FileSystemStorage`` and
-        ``S3BotoStorage``
-        """
-        mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
-        mock_get_user_task_artifact.return_value = self._mock_artifact(
-            file_url='/path/to/testfile.tar.gz',
-        )
-        resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
-        self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
-
-    @patch('contentstore.views.import_export._latest_task_status')
-    @patch('user_tasks.models.UserTaskArtifact.objects.get')
-    def test_export_status_handler_s3(
-            self,
-            mock_get_user_task_artifact,
-            mock_latest_task_status,
-    ):
-        """
-        Verify that the export status handler generates the correct export path
-        for the ``S3BotoStorage`` storage provider
-        """
-        mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
-        mock_get_user_task_artifact.return_value = self._mock_artifact(
-            spec=S3BotoStorage,
-            file_url='/s3/file/path/testfile.tar.gz',
-        )
-        resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
-        self.assertEqual(result['ExportOutput'], '/s3/file/path/testfile.tar.gz')
-
-    @patch('contentstore.views.import_export._latest_task_status')
-    @patch('user_tasks.models.UserTaskArtifact.objects.get')
-    def test_export_status_handler_filesystem(
-            self,
-            mock_get_user_task_artifact,
-            mock_latest_task_status,
-    ):
-        """
-        Verify that the export status handler generates the correct export path
-        for the ``FileSystemStorage`` storage provider
-        """
-        mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
-        mock_get_user_task_artifact.return_value = self._mock_artifact(spec=FileSystemStorage)
-        resp = self.client.get(self.status_url)
-        result = json.loads(resp.content)
-        file_export_output_url = reverse_course_url('export_output_handler', self.course.id)
-        self.assertEqual(result['ExportOutput'], file_export_output_url)
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
