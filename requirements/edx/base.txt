@@ -87,7 +87,7 @@ docopt==0.6.2             # via xmodule
 docutils==0.16            # via botocore
 drf-jwt==1.17.2           # via edx-drf-extensions
 drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, edx-api-doc-tools
-edx-ace==0.1.15           # via -r requirements/edx/base.in
+edx-ace==0.1.16           # via -r requirements/edx/base.in
 edx-analytics-data-api-client==0.16.1  # via -r requirements/edx/base.in
 edx-api-doc-tools==1.4.0  # via -r requirements/edx/base.in
 edx-bulk-grades==0.8.1    # via -r requirements/edx/base.in, staff-graded-xblock
