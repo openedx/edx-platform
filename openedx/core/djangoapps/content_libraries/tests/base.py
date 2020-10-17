@@ -269,7 +269,7 @@ class ContentLibrariesRestApiTest(APITestCase):
             query_params_dict = {}
         return self._api(
             'get',
-            URL_LIB_BLOCKS.format(lib_key=lib_key) + '?' + urlencode(query_params_dict),
+            URL_LIB_BLOCKS.format(lib_key=lib_key) + '?' + urlencode(query_params_dict, doseq=True),
             None,
             expect_response
         )

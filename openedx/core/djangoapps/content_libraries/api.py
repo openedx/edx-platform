@@ -364,8 +364,8 @@ def get_library(library_key):
 
 
 def create_library(
-    collection_uuid, library_type, org, slug, title, description, allow_public_learning, allow_public_read,
-    library_license,
+        collection_uuid, library_type, org, slug, title, description, allow_public_learning, allow_public_read,
+        library_license,
 ):
     """
     Create a new content library.
@@ -490,13 +490,13 @@ def set_library_group_permissions(library_key, group, access_level):
 
 
 def update_library(
-    library_key,
-    title=None,
-    description=None,
-    allow_public_learning=None,
-    allow_public_read=None,
-    library_type=None,
-    library_license=None,
+        library_key,
+        title=None,
+        description=None,
+        allow_public_learning=None,
+        allow_public_read=None,
+        library_type=None,
+        library_license=None,
 ):
     """
     Update a library's metadata
@@ -505,6 +505,7 @@ def update_library(
     A value of None means "don't change".
     """
     ref = ContentLibrary.objects.get_by_key(library_key)
+
     # Update MySQL model:
     changed = False
     if allow_public_learning is not None:
@@ -514,7 +515,15 @@ def update_library(
         ref.allow_public_read = allow_public_read
         changed = True
     if library_type is not None:
-        if library_type != COMPLEX:
+        if library_type not in (COMPLEX, ref.type):
+            lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
+            (has_unpublished_changes, has_unpublished_deletes) = lib_bundle.has_changes()
+            if has_unpublished_changes or has_unpublished_deletes:
+                raise IncompatibleTypesError(
+                    _(
+                        'You may not change a library\'s type to {library_type} if it still has unpublished changes.'
+                    ).format(library_type=library_type)
+                )
             for block in get_library_blocks(library_key):
                 if block.usage_key.block_type != library_type:
                     raise IncompatibleTypesError(
@@ -572,7 +581,7 @@ def delete_library(library_key):
         raise
 
 
-def get_library_blocks(library_key, text_search=None):
+def get_library_blocks(library_key, text_search=None, block_types=None):
     """
     Get the list of top-level XBlocks in the specified library.
 
@@ -585,6 +594,8 @@ def get_library_blocks(library_key, text_search=None):
                 'library_key': [str(library_key)],
                 'is_child': [False],
             }
+            if block_types:
+                filter_terms['block_type'] = block_types
             metadata = [
                 {
                     **item,
@@ -609,9 +620,11 @@ def get_library_blocks(library_key, text_search=None):
             # have only a single usage in the library, which is part of the definition of top level block.
             def_key = lib_bundle.definition_for_usage(usage_key)
             display_name = get_block_display_name(def_key)
-            if (text_search is None or
-                    text_search.lower() in display_name.lower() or
-                    text_search.lower() in str(usage_key).lower()):
+            text_match = (text_search is None or
+                          text_search.lower() in display_name.lower() or
+                          text_search.lower() in str(usage_key).lower())
+            type_match = (block_types is None or usage_key.block_type in block_types)
+            if text_match and type_match:
                 metadata.append({
                     "id": usage_key,
                     "def_key": def_key,

@@ -127,13 +127,40 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         self.assertEqual(lib['type'], start_type)
         for block_type, block_slug in xblock_specs:
             self._add_block_to_library(lib['id'], block_type, block_slug)
-        result = self._update_library(lib["id"], type=target_type, expect_response=expect_response)
+        self._commit_library_changes(lib['id'])
+        result = self._update_library(lib['id'], type=target_type, expect_response=expect_response)
         if expect_response == 200:
             self.assertEqual(result['type'], target_type)
             self.assertIn('type', result)
         else:
             lib = self._get_library(lib['id'])
             self.assertEqual(lib['type'], start_type)
+
+    def test_no_convert_on_unpublished(self):
+        """
+        Verify that you can't change a library's type, even if it would normally be valid,
+        when there are unpublished changes. This is so that a reversion of blocks won't cause an inconsistency.
+        """
+        lib = self._create_library(
+            slug='resolute', title="A complex library", description="Unconvertable", library_type=COMPLEX,
+        )
+        self._add_block_to_library(lib['id'], "video", 'vid-block')
+        result = self._update_library(lib['id'], type=VIDEO, expect_response=400)
+        self.assertIn('type', result)
+
+    def test_no_convert_on_pending_deletes(self):
+        """
+        Verify that you can't change a library's type, even if it would normally be valid,
+        when there are unpublished changes. This is so that a reversion of blocks won't cause an inconsistency.
+        """
+        lib = self._create_library(
+            slug='still-alive', title="A complex library", description="Unconvertable", library_type=COMPLEX,
+        )
+        block = self._add_block_to_library(lib['id'], "video", 'vid-block')
+        self._commit_library_changes(lib['id'])
+        self._delete_library_block(block['id'])
+        result = self._update_library(lib['id'], type=VIDEO, expect_response=400)
+        self.assertIn('type', result)
 
     def test_library_validation(self):
         """
@@ -349,14 +376,26 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
         with override_settings(FEATURES={**settings.FEATURES, 'ENABLE_CONTENT_LIBRARY_INDEX': is_indexing_enabled}):
             lib = self._create_library(slug="test-lib-blocks" + str(is_indexing_enabled), title="Title")
             block1 = self._add_block_to_library(lib["id"], "problem", "foo-bar")
+            self._add_block_to_library(lib["id"], "video", "vid-baz")
+            self._add_block_to_library(lib["id"], "html", "html-baz")
             self._add_block_to_library(lib["id"], "problem", "foo-baz")
             self._add_block_to_library(lib["id"], "problem", "bar-baz")
 
             self._set_library_block_olx(block1["id"], "<problem display_name=\"DisplayName\"></problem>")
 
-            self.assertEqual(len(self._get_library_blocks(lib["id"])), 3)
+            self.assertEqual(len(self._get_library_blocks(lib["id"])), 5)
             self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Foo'})), 2)
             self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Display'})), 1)
+            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Video'})), 1)
+            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Foo', 'block_type': 'video'})), 0)
+            self.assertEqual(len(self._get_library_blocks(lib["id"], {'text_search': 'Baz', 'block_type': 'video'})), 1)
+            self.assertEqual(len(
+                self._get_library_blocks(lib["id"], {'text_search': 'Baz', 'block_type': ['video', 'html']})),
+                2,
+            )
+            self.assertEqual(len(self._get_library_blocks(lib["id"], {'block_type': 'video'})), 1)
+            self.assertEqual(len(self._get_library_blocks(lib["id"], {'block_type': 'problem'})), 3)
+            self.assertEqual(len(self._get_library_blocks(lib["id"], {'block_type': 'squirrel'})), 0)
 
     @ddt.data(
         ('video-problem', VIDEO, 'problem', 400),
@@ -478,8 +517,6 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
                 {"username": author.username, "group_name": None, "access_level": "author"},
                 reader_grant,
             ]
-            from pprint import pprint
-            pprint(team_response)
             for entry, expected in zip(team_response, expected_response):
                 self.assertDictContainsEntries(entry, expected)
 

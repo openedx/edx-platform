@@ -485,6 +485,12 @@ class LibraryBlocksView(APIView):
                 str,
                 description="The string used to filter libraries by searching in title, id, org, or description",
             ),
+            apidocs.query_parameter(
+                'block_type',
+                str,
+                description="The block type to search for. If omitted or blank, searches for all types. "
+                            "May be specified multiple times to match multiple types."
+            )
         ],
     )
     @convert_exceptions
@@ -494,9 +500,10 @@ class LibraryBlocksView(APIView):
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
         text_search = request.query_params.get('text_search', None)
+        block_types = request.query_params.getlist('block_type') or None
 
         api.require_permission_for_library_key(key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        result = api.get_library_blocks(key, text_search=text_search)
+        result = api.get_library_blocks(key, text_search=text_search, block_types=block_types)
 
         # Verify `pagination` param to maintain compatibility with older
         # non pagination-aware clients
