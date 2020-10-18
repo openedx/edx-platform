@@ -1,6 +1,9 @@
 """
 Celery needs to be loaded when the cms modules are so that task
 registration and discovery can work correctly.
+
+Import sorting is intentionally disabled in this module.
+isort:skip_file
 """
 
 
