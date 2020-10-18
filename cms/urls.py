@@ -247,7 +247,7 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
     ]
 
 # Maintenance Dashboard
-urlpatterns.append(url(r'^maintenance/', include('maintenance.urls', namespace='maintenance')))
+urlpatterns.append(url(r'^maintenance/', include('cms.djangoapps.maintenance.urls', namespace='maintenance')))
 
 if settings.DEBUG:
     try:
