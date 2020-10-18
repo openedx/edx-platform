@@ -8,7 +8,7 @@ from openedx.core.djangoapps.waffle_utils import (
     CourseWaffleFlag,
     WaffleFlag,
     WaffleFlagNamespace,
-    WaffleSwitchNamespace,
+    WaffleSwitchNamespace
 )
 
 # Namespace

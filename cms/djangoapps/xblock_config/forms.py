@@ -7,8 +7,8 @@ import logging
 
 from django import forms
 
-from openedx.core.lib.courses import clean_course_id
 from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
+from openedx.core.lib.courses import clean_course_id
 
 log = logging.getLogger(__name__)
 

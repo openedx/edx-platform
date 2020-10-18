@@ -2,8 +2,9 @@
 
 from django.urls import re_path
 
-from . import views
 from openedx.core.constants import COURSE_ID_PATTERN
+
+from . import views
 
 app_name = 'v1'
 

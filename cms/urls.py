@@ -10,15 +10,14 @@ from django.utils.translation import ugettext_lazy as _
 from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
 
-from cms.djangoapps.contentstore import views as contentstore_views
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.lang_pref.views
+from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
+from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
-from openedx.core.apidocs import api_info
-
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')

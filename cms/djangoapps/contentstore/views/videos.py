@@ -5,11 +5,11 @@ Views related to the video upload feature
 
 import codecs
 import csv
+import io
 import json
 import logging
 from contextlib import closing
 from datetime import datetime, timedelta
-import io
 from uuid import uuid4
 
 import six
@@ -41,9 +41,6 @@ from edxval.api import (
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from ..models import VideoUploadConfig
-from ..utils import reverse_course_url
-from ..video_utils import validate_video_image
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
@@ -55,6 +52,9 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNam
 from util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript
 
+from ..models import VideoUploadConfig
+from ..utils import reverse_course_url
+from ..video_utils import validate_video_image
 from .course import get_course_and_check_access
 
 __all__ = [
