@@ -31,7 +31,31 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
+from edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.waffle_utils import WaffleSwitch
+from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
+from static_replace import replace_static_urls
+from student.auth import has_studio_read_access, has_studio_write_access
+from util.date_utils import get_default_time_display
+from util.json_request import JsonResponse, expect_json
+from util.milestones_helpers import is_entrance_exams_enabled
+from xblock_django.user_service import DjangoXBlockUserService
+from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
+from xmodule.tabs import CourseTabList
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
+
 from ..utils import (
     ancestor_has_staff_lock,
     find_release_date_source,
@@ -53,29 +77,6 @@ from .helpers import (
     xblock_type_display_name
 )
 from .preview import get_preview_fragment
-from edxmako.shortcuts import render_to_string
-from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch
-from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
-from static_replace import replace_static_urls
-from student.auth import has_studio_read_access, has_studio_write_access
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse, expect_json
-from util.milestones_helpers import is_entrance_exams_enabled
-from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
-from xblock_django.user_service import DjangoXBlockUserService
-from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.library_tools import LibraryToolsService
-from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
-from xmodule.modulestore.inheritance import own_metadata
-from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
-from xmodule.tabs import CourseTabList
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'

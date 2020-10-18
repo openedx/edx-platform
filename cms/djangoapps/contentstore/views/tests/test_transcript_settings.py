@@ -13,9 +13,10 @@ from mock import ANY, Mock, patch
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from ..transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from student.roles import CourseStaffRole
+
+from ..transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
 
 
 @ddt.ddt

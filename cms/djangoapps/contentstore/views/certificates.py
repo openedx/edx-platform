@@ -39,13 +39,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from six import text_type
 
-from ..utils import (
-    get_lms_link_for_certificate_web_view,
-    reverse_course_url,
-    get_proctored_exam_settings_url
-)
-from .assets import delete_asset
-from .exception import AssetNotFoundException
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from student.auth import has_studio_write_access
@@ -54,6 +47,10 @@ from util.db import MYSQL_MAX_INT, generate_int_id
 from util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
+
+from ..utils import get_lms_link_for_certificate_web_view, get_proctored_exam_settings_url, reverse_course_url
+from .assets import delete_asset
+from .exception import AssetNotFoundException
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100

@@ -6,6 +6,7 @@ from unittest import TestCase
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
+
 from ..course import TextbookValidationError, validate_textbook_json, validate_textbooks_json
 
 

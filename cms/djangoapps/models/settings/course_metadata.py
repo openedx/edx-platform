@@ -4,18 +4,19 @@ Django module for Course Metadata class -- manages advanced settings and related
 
 
 from datetime import datetime
+
+import pytz
 import six
 from crum import get_current_user
-from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
-import pytz
 from six import text_type
 from xblock.fields import Scope
 
+from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.roles import GlobalStaff
-from openedx.core.lib.teams_config import TeamsetType
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 

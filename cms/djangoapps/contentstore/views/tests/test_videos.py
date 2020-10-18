@@ -33,6 +33,17 @@ from waffle.testutils import override_flag
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
+from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from openedx.core.djangoapps.video_pipeline.config.waffle import (
+    DEPRECATE_YOUTUBE,
+    ENABLE_DEVSTACK_VIDEO_UPLOADS,
+    waffle_flags
+)
+from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from xmodule.modulestore.tests.factories import CourseFactory
+
 from ..videos import (
     ENABLE_VIDEO_UPLOAD_PAGINATION,
     KEY_EXPIRATION_IN_SECONDS,
@@ -44,16 +55,6 @@ from ..videos import (
     _get_default_video_image_url,
     convert_video_status
 )
-from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
-from openedx.core.djangoapps.video_pipeline.config.waffle import (
-    DEPRECATE_YOUTUBE,
-    ENABLE_DEVSTACK_VIDEO_UPLOADS,
-    waffle_flags
-)
-from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration
-from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 def override_switch(switch, active):

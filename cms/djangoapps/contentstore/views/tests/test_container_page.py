@@ -15,10 +15,11 @@ from pytz import UTC
 
 import cms.djangoapps.contentstore.views.component as views
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
-from .utils import StudioPageTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from .utils import StudioPageTestCase
 
 
 class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):

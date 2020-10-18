@@ -11,7 +11,12 @@ from django.contrib import admin
 from django.core.mail import send_mail
 from django.dispatch import receiver
 
-from cms.djangoapps.course_creators.models import CourseCreator, send_admin_notification, send_user_notification, update_creator_state
+from cms.djangoapps.course_creators.models import (
+    CourseCreator,
+    send_admin_notification,
+    send_user_notification,
+    update_creator_state
+)
 from cms.djangoapps.course_creators.views import update_course_creator_group
 from edxmako.shortcuts import render_to_string
 

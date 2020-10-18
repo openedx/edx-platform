@@ -34,17 +34,6 @@ from xblock.validation import ValidationMessage
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import item as item_module
-from ..component import component_handler, get_component_templates
-from ..item import (
-    ALWAYS,
-    VisibilityState,
-    _get_module_info,
-    _get_source_index,
-    _xblock_type_and_display_name,
-    add_container_page_publishing_info,
-    create_xblock_info,
-    highlights_setting
-)
 from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from student.tests.factories import UserFactory
 from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
@@ -64,6 +53,18 @@ from xmodule.partitions.partitions import (
 )
 from xmodule.partitions.tests.test_partitions import MockPartitionService
 from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
+
+from ..component import component_handler, get_component_templates
+from ..item import (
+    ALWAYS,
+    VisibilityState,
+    _get_module_info,
+    _get_source_index,
+    _xblock_type_and_display_name,
+    add_container_page_publishing_info,
+    create_xblock_info,
+    highlights_setting
+)
 
 
 class AsideTest(XBlockAside):
