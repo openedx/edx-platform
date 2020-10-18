@@ -17,7 +17,7 @@ from openedx.core.pytest_hooks import DeferPlugin
 
 
 # Patch the xml libs before anything else.
-from safe_lxml import defuse_xml_libs
+from safe_lxml import defuse_xml_libs  # isort:skip
 defuse_xml_libs()
 
 
