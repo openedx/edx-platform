@@ -122,7 +122,7 @@ class CookieTests(TestCase):
         self._copy_cookies_to_request(response, self.request)
         self.assertTrue(cookies_api.are_logged_in_cookies_set(self.request))
 
-        cookies_api.delete_logged_in_cookies(response)
+        cookies_api.delete_logged_in_cookies(self.request, response)
         self._copy_cookies_to_request(response, self.request)
         self.assertFalse(cookies_api.are_logged_in_cookies_set(self.request))
 

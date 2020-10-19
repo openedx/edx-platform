@@ -79,7 +79,7 @@ class LogoutView(TemplateView):
         response = super(LogoutView, self).dispatch(request, *args, **kwargs)
 
         # Clear the cookie used by the edx.org marketing site
-        delete_logged_in_cookies(response)
+        delete_logged_in_cookies(request, response)
 
         return response
 

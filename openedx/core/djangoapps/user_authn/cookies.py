@@ -64,7 +64,7 @@ def are_logged_in_cookies_set(request):
     ) and request.COOKIES[settings.EDXMKTG_LOGGED_IN_COOKIE_NAME]
 
 
-def delete_logged_in_cookies(response):
+def delete_logged_in_cookies(request, response):
     """
     Delete cookies indicating that the user is logged in.
     Arguments:
@@ -73,10 +73,13 @@ def delete_logged_in_cookies(response):
         HttpResponse
     """
     for cookie_name in ALL_LOGGED_IN_COOKIE_NAMES:
-        response.delete_cookie(
+        response.set_cookie(
             cookie_name,
+            max_age=0,
+            expires='Thu, 01-Jan-1970 00:00:00 GMT',
+            domain=settings.SESSION_COOKIE_DOMAIN,
             path='/',
-            domain=settings.SESSION_COOKIE_DOMAIN
+            secure=request.is_secure(),
         )
 
     return response
