@@ -2,7 +2,6 @@ import waffle
 from django.conf import settings
 
 from courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
-from lms.djangoapps.courseware.masquerade import get_course_masquerade
 from openedx.features.subscriptions.models import UserSubscription
 
 from student.models import User
