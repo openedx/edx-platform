@@ -354,13 +354,12 @@ def get_enterprise_learner_portal(request):
 def enterprise_branding_configuration(enterprise_customer_obj):
     """
     Given an instance of ``EnterpriseCustomer``, returns a related
-    branding_configuration serialized dictionary if it exists, otherwise an empty dictionary.
-    """
-    # We can use hasattr() on one-to-one relationships to avoid exception-catching:
-    # https://docs.djangoproject.com/en/2.2/topics/db/examples/one_to_one/
-    if not hasattr(enterprise_customer_obj, 'branding_configuration'):
-        return {}
+    branding_configuration serialized dictionary if it exists, otherwise
+    the serialized default EnterpriseCustomerBrandingConfiguration object.
 
+    EnterpriseCustomerBrandingConfigurationSerializer will use default values
+    for any empty branding config fields.
+    """
     branding_config = enterprise_customer_obj.safe_branding_configuration
     return EnterpriseCustomerBrandingConfigurationSerializer(branding_config).data
 

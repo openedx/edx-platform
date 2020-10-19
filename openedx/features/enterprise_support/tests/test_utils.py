@@ -98,7 +98,7 @@ class TestEnterpriseUtils(TestCase):
         self.assertDictEqual(portal, {
             'name': enterprise_customer_user.enterprise_customer.name,
             'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': None,
+            'logo': enterprise_customer_user.enterprise_customer.safe_branding_configuration.safe_logo_url,
         })
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
