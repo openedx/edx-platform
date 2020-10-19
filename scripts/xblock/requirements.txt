@@ -8,4 +8,4 @@ certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
 idna==2.10                # via requests
 requests==2.24.0          # via -r scripts/xblock/requirements.in
-urllib3==1.25.10          # via requests
+urllib3==1.25.11          # via requests
