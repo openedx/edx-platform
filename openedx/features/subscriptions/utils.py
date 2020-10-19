@@ -27,6 +27,9 @@ def is_course_accessible_with_subscription(user, course):
     """
     Check if user has access to a course enrolled through subscription.
     """
+    if user.is_anonymous:
+        return ACCESS_GRANTED
+
     course_enrolled_subscriptions = UserSubscription.objects.filter(user=user, course_enrollments__course__id=course.id)
     if not course_enrolled_subscriptions:
         return ACCESS_GRANTED
