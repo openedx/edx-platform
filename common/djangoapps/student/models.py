@@ -2545,24 +2545,11 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
     }
 
     company_identifier = models.TextField(
-        help_text=_(
-            u"The company identifier for the LinkedIn Add-to-Profile button "
-            u"e.g 0_0dPSPyS070e0HsE9HNz_13_d11_"
-        )
-    )
-
-    # Deprecated
-    dashboard_tracking_code = models.TextField(default=u"", blank=True)
-
-    trk_partner_name = models.CharField(
-        max_length=10,
-        default="",
         blank=True,
         help_text=_(
-            u"Short identifier for the LinkedIn partner used in the tracking code.  "
-            u"(Example: 'edx')  "
-            u"If no value is provided, tracking codes will not be sent to LinkedIn."
-        )
+            'Your organization ID (if your organization has an existing page on LinkedIn) e.g 1337. '
+            'If not provided, will default to sending Platform Name (e.g. edX) instead.'
+        ),
     )
 
     def is_enabled(self, *key_fields):
