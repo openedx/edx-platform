@@ -1,3 +1,6 @@
+import waffle
+from django.conf import settings
+
 from courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
 from openedx.features.subscriptions.models import UserSubscription
 
@@ -23,16 +26,24 @@ def track_subscription_enrollment(subscription_id, user, course_id, site):
             valid_user_subscription.course_enrollments.add(enrollment)
             valid_user_subscription.save()
 
+
 def is_course_accessible_with_subscription(user, course):
     """
     Check if user has access to a course enrolled through subscription.
     """
+    if not waffle.switch_is_active(settings.ENABLE_SUBSCRIPTIONS_ON_RUNTIME_SWITCH):
+        return ACCESS_GRANTED
+
+    if not user or not user.is_authenticated:
+        return ACCESS_GRANTED
+
     course_enrolled_subscriptions = UserSubscription.objects.filter(user=user, course_enrollments__course__id=course.id)
     if not course_enrolled_subscriptions:
         return ACCESS_GRANTED
+    else:
+        for subscription in course_enrolled_subscriptions:
+            if subscription.is_active:
+                return ACCESS_GRANTED
 
-    for subscription in course_enrolled_subscriptions:
-        if subscription.is_active:
-            return ACCESS_GRANTED
+        return ACCESS_DENIED
 
-    return ACCESS_DENIED

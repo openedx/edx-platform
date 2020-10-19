@@ -12,7 +12,6 @@ Note: The access control logic in this file does NOT check for enrollment in
 """
 import logging
 from datetime import datetime
-import waffle
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -338,15 +337,6 @@ def _has_access_course(user, action, courselike):
         # ).or(
         #     _has_staff_access_to_descriptor, user, courselike, courselike.id
         # )
-        if waffle.switch_is_active(settings.ENABLE_SUBSCRIPTIONS_ON_RUNTIME_SWITCH):
-            user_has_active_subscription = is_course_accessible_with_subscription(user, courselike)
-            if not user_has_active_subscription:
-                staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
-                if staff_access:
-                    return staff_access
-                else:
-                    return user_has_active_subscription
-
         visible_to_nonstaff = _visible_to_nonstaff_users(courselike)
         if not visible_to_nonstaff:
             staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
@@ -378,6 +368,14 @@ def _has_access_course(user, action, courselike):
                 return staff_access
             else:
                 return has_not_expired
+
+        user_has_active_subscription = is_course_accessible_with_subscription(user, courselike)
+        if not user_has_active_subscription:
+            staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
+            if staff_access:
+                return staff_access
+            else:
+                return user_has_active_subscription
 
         return ACCESS_GRANTED
 
