@@ -2,7 +2,7 @@ import waffle
 from django.conf import settings
 
 from courseware.access_utils import ACCESS_DENIED, ACCESS_GRANTED
-from lms.djangoapps.courseware.access import _has_staff_access_to_descriptor
+from lms.djangoapps.courseware.masquerade import get_course_masquerade
 from openedx.features.subscriptions.models import UserSubscription
 
 from student.models import User
@@ -32,18 +32,19 @@ def is_course_accessible_with_subscription(user, course):
     """
     Check if user has access to a course enrolled through subscription.
     """
-    if waffle.switch_is_active(settings.ENABLE_SUBSCRIPTIONS_ON_RUNTIME_SWITCH):
+    if not waffle.switch_is_active(settings.ENABLE_SUBSCRIPTIONS_ON_RUNTIME_SWITCH):
         return ACCESS_GRANTED
 
     if not user or not user.is_authenticated:
-        return ACCESS_DENIED
+        return ACCESS_GRANTED
 
     course_enrolled_subscriptions = UserSubscription.objects.filter(user=user, course_enrollments__course__id=course.id)
     if not course_enrolled_subscriptions:
         return ACCESS_GRANTED
+    else:
+        for subscription in course_enrolled_subscriptions:
+            if subscription.is_active:
+                return ACCESS_GRANTED
 
-    for subscription in course_enrolled_subscriptions:
-        if subscription.is_active:
-            return ACCESS_GRANTED
+        return ACCESS_DENIED
 
-    return _has_staff_access_to_descriptor(user, course, course.id)
