@@ -117,25 +117,25 @@ CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 ###################################### CELERY  ################################
 
 # Don't use a connection pool, since connections are dropped by ELB.
-BROKER_POOL_LIMIT = 0
-BROKER_CONNECTION_TIMEOUT = 1
+CELERY_BROKER_POOL_LIMIT = 0
+CELERY_BROKER_CONNECTION_TIMEOUT = 1
 
 # For the Result Store, use the django cache named 'celery'
 CELERY_RESULT_BACKEND = 'django-cache'
 
 # When the broker is behind an ELB, use a heartbeat to refresh the
 # connection and to detect if it has been dropped.
-BROKER_HEARTBEAT = ENV_TOKENS.get('BROKER_HEARTBEAT', 60.0)
-BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
+CELERY_BROKER_HEARTBEAT = ENV_TOKENS.get('BROKER_HEARTBEAT', 60.0)
+CELERY_BROKER_HEARTBEAT_CHECKRATE = ENV_TOKENS.get('BROKER_HEARTBEAT_CHECKRATE', 2)
 
 # Each worker should only fetch one message at a time
-CELERYD_PREFETCH_MULTIPLIER = 1
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 
 # Rename the exchange and queues for each variant
 
 QUEUE_VARIANT = CONFIG_PREFIX.lower()
 
-CELERY_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
+CELERY_TASK_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
 
 HIGH_PRIORITY_QUEUE = 'edx.{0}core.high'.format(QUEUE_VARIANT)
 DEFAULT_PRIORITY_QUEUE = 'edx.{0}core.default'.format(QUEUE_VARIANT)
@@ -284,6 +284,8 @@ CELERY_QUEUES.update(
         if alternate not in list(CELERY_QUEUES.keys())
     }
 )
+
+CELERY_TASK_QUEUES = CELERY_QUEUES
 
 # following setting is for backward compatibility
 if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):
