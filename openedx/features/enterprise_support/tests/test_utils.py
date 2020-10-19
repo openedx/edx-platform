@@ -76,7 +76,7 @@ class TestEnterpriseUtils(TestCase):
         self.assertDictEqual(portal, {
             'name': enterprise_customer_user.enterprise_customer.name,
             'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
+            'logo': enterprise_customer_user.enterprise_customer.safe_branding_configuration.safe_logo_url,
         })
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
@@ -132,7 +132,7 @@ class TestEnterpriseUtils(TestCase):
         self.assertDictEqual(portal, {
             'name': enterprise_customer_user.enterprise_customer.name,
             'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
+            'logo': enterprise_customer_user.enterprise_customer.safe_branding_configuration.safe_logo_url,
         })
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)

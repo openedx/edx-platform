@@ -361,7 +361,7 @@ def enterprise_branding_configuration(enterprise_customer_obj):
     if not hasattr(enterprise_customer_obj, 'branding_configuration'):
         return {}
 
-    branding_config = enterprise_customer_obj.branding_configuration
+    branding_config = enterprise_customer_obj.safe_branding_configuration
     return EnterpriseCustomerBrandingConfigurationSerializer(branding_config).data
 
 
