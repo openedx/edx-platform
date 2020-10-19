@@ -85,9 +85,7 @@ def get_enterprise_sidebar_context(enterprise_customer, is_proxy_login):
     }
     """
     platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-
-    branding_configuration = enterprise_customer.get('branding_configuration', {})
-    logo_url = branding_configuration.get('logo', '') if isinstance(branding_configuration, dict) else ''
+    logo_url = enterprise_customer.safe_branding_configuration.safe_logo_url
 
     if is_proxy_login:
         branded_welcome_template = configuration_helpers.get_value(
