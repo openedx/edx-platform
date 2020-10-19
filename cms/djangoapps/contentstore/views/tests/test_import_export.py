@@ -141,7 +141,6 @@ class ImportTestCase(CourseTestCase):
     """
     Unit tests for importing a course or Library
     """
-
     CREATE_USER = True
 
     def setUp(self):

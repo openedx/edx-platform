@@ -813,8 +813,9 @@ def _update_and_import_module(
     fields = _update_module_references(module, source_course_id, dest_course_id)
     asides = module.get_asides() if isinstance(module, XModuleMixin) else None
 
-    with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.published_only):
-        block_already_in_published = store.has_item(module.location)
+    if module.location.block_type == 'library_content':
+        with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.published_only):
+            lib_content_block_already_published = store.has_item(module.location)
 
     block = store.import_xblock(
         user_id, dest_course_id, module.location.block_type,
@@ -826,11 +827,11 @@ def _update_and_import_module(
     # modulestore that is eventually going to store the data.
     # Ticket: https://openedx.atlassian.net/browse/PLAT-1046
 
-    # Special case handlign for library content blocks. The fact that this is
+    # Special case handling for library content blocks. The fact that this is
     # in Modulestore code is _bad_ and breaks abstraction barriers, but is too
     # much work to factor out at this point.
     if block.location.block_type == 'library_content':
-        # if library exists, update source_library_version and children
+        # If library exists, update source_library_version and children
         # according to this existing library and library content block.
         if store.get_library(block.source_library_key):
             # If the library content block is already in the course, then don't
@@ -848,7 +849,7 @@ def _update_and_import_module(
             # Future imports ignore what's in the library so as not to disrupt
             # course state. You _can_ still update to the library via the Studio
             # UI for updating to the latest version of a library for this block.
-            if block_already_in_published:
+            if lib_content_block_already_published:
                 return block
 
             # Update library content block's children on draft branch
