@@ -76,7 +76,11 @@ def get_enterprise_sidebar_context(enterprise_customer, is_proxy_login):
     """
     Get context information for enterprise sidebar for the given enterprise customer.
 
-    Enterprise Sidebar Context has the following key-value pairs.
+    Args:
+        enterprise_customer (dict): customer data from enterprise-customer endpoint, cached
+        is_proxy_login (bool): If True, use proxy login welcome template
+
+    Returns: Enterprise Sidebar Context with the following key-value pairs.
     {
         'enterprise_name': 'Enterprise Name',
         'enterprise_logo_url': 'URL of the enterprise logo image',
@@ -85,7 +89,9 @@ def get_enterprise_sidebar_context(enterprise_customer, is_proxy_login):
     }
     """
     platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
-    logo_url = enterprise_customer.safe_branding_configuration.safe_logo_url
+
+    branding_configuration = enterprise_customer.get('branding_configuration', {})
+    logo_url = branding_configuration.get('logo', '') if isinstance(branding_configuration, dict) else ''
 
     if is_proxy_login:
         branded_welcome_template = configuration_helpers.get_value(
