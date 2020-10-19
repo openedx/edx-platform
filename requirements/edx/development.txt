@@ -98,7 +98,7 @@ docopt==0.6.2             # via -r requirements/edx/testing.txt, xmodule
 docutils==0.16            # via -r requirements/edx/testing.txt, botocore, m2r, sphinx
 drf-jwt==1.17.2           # via -r requirements/edx/testing.txt, edx-drf-extensions
 drf-yasg==1.17.0          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-api-doc-tools
-edx-ace==0.1.16           # via -r requirements/edx/testing.txt
+edx-ace==0.1.17           # via -r requirements/edx/testing.txt
 edx-analytics-data-api-client==0.16.1  # via -r requirements/edx/testing.txt
 edx-api-doc-tools==1.4.0  # via -r requirements/edx/testing.txt
 edx-bulk-grades==0.8.1    # via -r requirements/edx/testing.txt, staff-graded-xblock
