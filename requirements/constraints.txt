@@ -86,6 +86,9 @@ oauthlib==3.0.1
 # path 13.2.0 drops support for Python 3.5
 path<13.2.0
 
+# pillow 8.0.0 drops support for Python 3.5
+pillow<8.0.0
+
 # ARCHBOM-1141: pip-tools upgrade requires pip upgrade
 pip-tools<5.0.0
 
