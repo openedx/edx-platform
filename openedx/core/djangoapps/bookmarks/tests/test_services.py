@@ -29,9 +29,11 @@ class BookmarksServiceTests(BookmarksTestsBase):
         with self.assertNumQueries(1):
             bookmarks_data = self.bookmark_service.bookmarks(course_key=self.course.id)
 
-        self.assertEqual(len(bookmarks_data), 2)
-        self.assert_bookmark_data_is_valid(self.bookmark_2, bookmarks_data[0])
-        self.assert_bookmark_data_is_valid(self.bookmark_1, bookmarks_data[1])
+        self.assertEqual(len(bookmarks_data), 4)
+        self.assert_bookmark_data_is_valid(self.bookmark_4, bookmarks_data[0])
+        self.assert_bookmark_data_is_valid(self.bookmark_3, bookmarks_data[1])
+        self.assert_bookmark_data_is_valid(self.bookmark_2, bookmarks_data[2])
+        self.assert_bookmark_data_is_valid(self.bookmark_1, bookmarks_data[3])
 
     def test_is_bookmarked(self):
         """

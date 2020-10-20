@@ -7,7 +7,7 @@ import ddt
 import six
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from mock import patch
+from mock import Mock, patch
 from opaque_keys.edx.keys import UsageKey
 
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
@@ -79,7 +79,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         # Without course key.
         with self.assertNumQueries(1):
             bookmarks_data = api.get_bookmarks(user=self.user)
-            self.assertEqual(len(bookmarks_data), count + 3)
+            self.assertEqual(len(bookmarks_data), count + 5)
         # Assert them in ordered manner.
         self.assert_bookmark_data_is_valid(bookmarks[-1], bookmarks_data[0])
         self.assert_bookmark_data_is_valid(self.bookmark_1, bookmarks_data[-1])
@@ -88,7 +88,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         # Without course key, with optional fields.
         with self.assertNumQueries(1):
             bookmarks_data = api.get_bookmarks(user=self.user, fields=self.ALL_FIELDS)
-            self.assertEqual(len(bookmarks_data), count + 3)
+            self.assertEqual(len(bookmarks_data), count + 5)
         self.assert_bookmark_data_is_valid(bookmarks[-1], bookmarks_data[0])
         self.assert_bookmark_data_is_valid(self.bookmark_1, bookmarks_data[-1])
 
@@ -117,7 +117,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         Verifies that create_bookmark create & returns data as expected.
         """
-        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
+        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 4)
 
         with self.assertNumQueries(9):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
@@ -131,14 +131,14 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
             component_usage_id=six.text_type(self.vertical_2.location),
         )
 
-        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 3)
+        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 5)
 
     @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
     def test_create_bookmark_do_not_create_duplicates(self, mock_tracker):
         """
         Verifies that create_bookmark do not create duplicate bookmarks.
         """
-        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 2)
+        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 4)
 
         with self.assertNumQueries(9):
             bookmark_data = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
@@ -152,14 +152,14 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
             component_usage_id=six.text_type(self.vertical_2.location),
         )
 
-        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 3)
+        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 5)
 
         mock_tracker.reset_mock()
 
         with self.assertNumQueries(5):
             bookmark_data_2 = api.create_bookmark(user=self.user, usage_key=self.vertical_2.location)
 
-        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 3)
+        self.assertEqual(len(api.get_bookmarks(user=self.user, course_key=self.course.id)), 5)
         self.assertEqual(bookmark_data, bookmark_data_2)
 
         self.assert_no_events_were_emitted(mock_tracker)
@@ -206,7 +206,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         """
         Verifies that delete_bookmark removes bookmark as expected.
         """
-        self.assertEqual(len(api.get_bookmarks(user=self.user)), 3)
+        self.assertEqual(len(api.get_bookmarks(user=self.user)), 5)
 
         with self.assertNumQueries(3):
             api.delete_bookmark(user=self.user, usage_key=self.sequential_1.location)
@@ -221,9 +221,48 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         )
 
         bookmarks_data = api.get_bookmarks(user=self.user)
-        self.assertEqual(len(bookmarks_data), 2)
+        self.assertEqual(len(bookmarks_data), 4)
         self.assertNotEqual(six.text_type(self.sequential_1.location), bookmarks_data[0]['usage_id'])
         self.assertNotEqual(six.text_type(self.sequential_1.location), bookmarks_data[1]['usage_id'])
+
+    @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
+    def test_delete_bookmarks_with_vertical_block_type(self, mock_tracker):
+        self.assertEqual(len(api.get_bookmarks(user=self.user)), 5)
+
+        api.delete_bookmarks(usage_key=self.vertical_3.location)
+
+        self.assert_bookmark_event_emitted(
+            mock_tracker,
+            event_name='edx.bookmark.removed',
+            course_id=six.text_type(self.course_id),
+            bookmark_id=self.bookmark_3.resource_id,
+            component_type=self.vertical_1.location.block_type,
+            component_usage_id=six.text_type(self.vertical_3.location),
+        )
+
+        self.assertEqual(len(api.get_bookmarks(self.user)), 4)
+
+    @patch('openedx.core.djangoapps.bookmarks.api.modulestore')
+    @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
+    def test_delete_bookmarks_with_chapter_block_type(self, mock_tracker, mocked_modulestore):
+        mocked_modulestore().get_item().get_children = Mock(
+            return_value=[Mock(get_children=Mock(return_value=[Mock(
+                location=self.chapter_2.location)]))])
+
+        api.delete_bookmarks(usage_key=self.chapter_2.location)
+
+        self.assertEqual(mocked_modulestore.call_count, 2)
+        self.assertEqual(mocked_modulestore().get_item.call_count, 2)
+        mocked_modulestore().get_item().get_children.assert_called()
+        self.assert_bookmark_event_emitted(
+            mock_tracker,
+            event_name='edx.bookmark.removed',
+            course_id=six.text_type(self.course_id),
+            bookmark_id=self.bookmark_4.resource_id,
+            component_type=self.chapter_2.location.block_type,
+            component_usage_id=six.text_type(self.chapter_2.location),
+        )
+        self.assertEqual(len(api.get_bookmarks(self.user)), 4)
 
     @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
     def test_delete_bookmark_raises_error(self, mock_tracker):
