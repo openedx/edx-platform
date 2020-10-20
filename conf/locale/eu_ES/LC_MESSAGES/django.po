@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-27 20:43+0000\n"
+"POT-Creation-Date: 2020-10-18 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2019\n"
 "Language-Team: Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -85,6 +85,17 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Eztabaida"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr "Ariketa"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+#: lms/templates/video.html
+msgid "Video"
+msgstr "Bideoa"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
@@ -140,8 +151,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Name"
 msgstr "Izena"
 
@@ -149,12 +158,6 @@ msgstr "Izena"
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video ID"
 msgstr "Bideoaren IDa"
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/shoppingcart/receipt.html
-msgid "Status"
-msgstr "Egoera"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is listed as the duration for a video that has not
@@ -296,11 +299,6 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Honor"
-msgstr "Portaera"
-
-#: common/djangoapps/course_modes/models.py
 msgid ""
 "Professional education modes are not allowed to have expiration_datetime "
 "set."
@@ -313,18 +311,11 @@ msgid ""
 "set a price greater than or equal to {min_price}."
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This will look like '$50', where {currency_symbol} is a symbol
 #. such as '$' and {price} is a
 #. numerical amount in that currency. Adjust this display as needed for your
 #. language.
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: currency_symbol is a symbol indicating type of currency, ex
-#. "$".
-#. This string would look like this when all variables are in:
-#. "$500.00"
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/shoppingcart/shopping_cart.html
 #, python-brace-format
 msgid "{currency_symbol}{price}"
 msgstr "{currency_symbol}{price}"
@@ -692,6 +683,10 @@ msgid ""
 "follows:                     username, email, new_email"
 msgstr ""
 
+#: common/djangoapps/student/models.py
+msgid "Add a reason"
+msgstr ""
+
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
 msgstr "eta"
@@ -792,7 +787,7 @@ msgstr "Matrikulazio-ekintza ez da egokia"
 
 #: common/djangoapps/student/views/management.py
 msgid "Please enter a username"
-msgstr "Mesedez, idatzi erabiltzaile-izena"
+msgstr "Idatzi erabiltzaile-izena"
 
 #: common/djangoapps/student/views/management.py
 msgid "Please choose an option"
@@ -825,7 +820,7 @@ msgstr ""
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
 msgid "{html_start}This account has already been activated.{html_end}"
-msgstr ""
+msgstr "{html_start}Kontu hau dagoeneko aktibatu da.{html_end}"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -1377,8 +1372,8 @@ msgstr[1] ""
 msgid "Your password must contain no more than %(max_length)d character."
 msgid_plural ""
 "Your password must contain no more than %(max_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pasahitzak ezin du izan %(max_length)d karaktere baino gehiago."
+msgstr[1] "Pasahitzak ezin du izan %(max_length)d karaktere baino gehiago."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1391,8 +1386,8 @@ msgstr[1] ""
 #, python-format
 msgid "Your password must contain at least %(min_alphabetic)d letter."
 msgid_plural "Your password must contain at least %(min_alphabetic)d letters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pasahitzak gutxienez %(min_alphabetic)d letra izan behar du."
+msgstr[1] "Pasahitzak gutxienez %(min_alphabetic)d letra izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1511,8 +1506,8 @@ msgstr[1] ""
 #, python-format
 msgid "%(num)d symbol"
 msgid_plural "%(num)d symbols"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ikur %(num)d"
+msgstr[1] "%(num)d ikur"
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -1566,7 +1561,7 @@ msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Question {}"
-msgstr ""
+msgstr "Galdera {}"
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2014,7 +2009,7 @@ msgstr "XML datuak oharpenerako"
 #: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "The display name for this component."
-msgstr ""
+msgstr "Modulu honetarako erakutsi behar den izena."
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
@@ -2069,7 +2064,8 @@ msgstr "Beti"
 msgid "Never"
 msgstr "Inoiz ez"
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_base.py lms/templates/courseware/dates.html
+#: lms/templates/vert_module.html
 msgid "Past Due"
 msgstr "Gainditua"
 
@@ -2113,7 +2109,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "After All Attempts"
-msgstr ""
+msgstr "Saiakera guztien ondoren"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "After All Attempts or Correct"
@@ -2274,7 +2270,7 @@ msgstr "Bidali"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Submitting"
-msgstr ""
+msgstr "Bidaltzen"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
@@ -3213,17 +3209,12 @@ msgid "Teams Configuration"
 msgstr "Taldeen ezarpenak"
 
 #: common/lib/xmodule/xmodule/course_module.py
-#, python-brace-format
 msgid ""
-"Specify the maximum team size and topics for teams inside the provided set "
-"of curly braces. Make sure that you enclose all of the sets of topic values "
-"within a set of square brackets, with a comma after the closing curly brace "
-"for each topic, and another comma after the closing square brackets. For "
-"example, to specify that teams should have a maximum of 5 participants and "
-"provide a list of 2 topics, enter the configuration in this format: "
-"{example_format}. If no max_size is provided, it will default to "
-"{default_max}In \"id\" values, the only supported special characters are "
-"underscore, hyphen, and period."
+"Configure team sets, limit team sizes, and set visibility settings using "
+"JSON. See <a target=\"&#95;blank\" "
+"href=\"https://edx.readthedocs.io/projects/edx-partner-course-"
+"staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
+"teams\">teams configuration documentation</a> for help and examples."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3356,7 +3347,7 @@ msgstr "Ikastaroko irakaslea"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enter the details for Course Instructor"
-msgstr ""
+msgstr "Idatzi ikastaroko irakasleari bruuzko xehetasunak"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Add Unsupported Problems and Tools"
@@ -3602,17 +3593,22 @@ msgid "Enter the names of the advanced components to use in your library."
 msgstr "Idatzi zure liburutegian erabiliko diren osagai aurreratuen izenak."
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
-msgid "Library Block"
+msgid "Library Blocks List"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlock that you wish to use."
+msgid "Enter the IDs of the library XBlocks that you wish to use."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+#, python-brace-format
+msgid "A maximum of {0} components may be added."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
 msgid ""
-"No XBlock has been configured for this component. Enter the target ID below "
-"or in the editor"
+"No XBlock has been configured for this component. Use the editor to select "
+"the target blocks."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
@@ -4231,7 +4227,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/courseware/views/views.py
-#: lms/djangoapps/shoppingcart/reports.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html
 #: lms/templates/courseware/course_navigation.html
@@ -4239,6 +4234,19 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Course"
 msgstr "Ikastaroa"
+
+#: common/lib/xmodule/xmodule/templates/library-sourced-block-studio-view.html
+msgid "Save and Import"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/templates/library-sourced-block-studio-view.html
+#: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/videos_index_pagination.html
+msgid "Cancel"
+msgstr "Utzi"
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 #, python-brace-format
@@ -4802,13 +4810,15 @@ msgstr ""
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
-msgstr ""
+msgstr "Sartu berreskuratzeko posta elektronikoa"
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.txt
 #, python-format
 msgid "You've registered this recovery email address for %(platform_name)s."
 msgstr ""
+"Berreskuratzeko posta elektronikoa erregistratu duzu%(platform_name)s "
+"plataformarako."
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.txt
@@ -4822,12 +4832,13 @@ msgstr ""
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Confirm Email"
-msgstr ""
+msgstr "Egiazttau posta elektronikoa"
 
 #: common/templates/student/edx_ace/recoveryemailcreate/email/subject.txt
 #, python-format
 msgid "Confirm your recovery email for %(platform_name)s"
 msgstr ""
+"Egiaztatu berreskuratzeko posta elektronikoa %(platform_name)splataformarako"
 
 #: lms/djangoapps/badges/events/course_complete.py
 #, python-brace-format
@@ -4978,7 +4989,7 @@ msgstr ""
 
 #: lms/djangoapps/branding/api.py themes/red-theme/lms/templates/footer.html
 msgid "News"
-msgstr "Berriak"
+msgstr "Albisteak"
 
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
@@ -5095,13 +5106,13 @@ msgstr "sortuta"
 #. Translators: This string represents task was executed for all learners.
 #: lms/djangoapps/certificates/models.py
 msgid "All learners"
-msgstr ""
+msgstr "Ikasle guztiak"
 
 #. Translators: This string represents task was executed for students having
 #. exceptions.
 #: lms/djangoapps/certificates/models.py
 msgid "For exceptions"
-msgstr ""
+msgstr "Salbuespenetarako"
 
 #: lms/djangoapps/certificates/models.py
 msgid ""
@@ -5499,7 +5510,7 @@ msgstr ""
 msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
-#: lms/djangoapps/commerce/utils.py lms/djangoapps/shoppingcart/models.py
+#: lms/djangoapps/commerce/utils.py
 msgid "[Refund] User-Requested Refund"
 msgstr ""
 
@@ -5584,7 +5595,7 @@ msgstr "Ikastaroaren orria automatikoki sortu da."
 #: lms/djangoapps/course_wiki/views.py
 #, python-brace-format
 msgid "Welcome to the {platform_name} Wiki"
-msgstr "Ongietorri {platform_name} Wiki-ra"
+msgstr "Ongi etorri {platform_name} plataformako wikira"
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
@@ -5637,15 +5648,15 @@ msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Open Response Assessment"
-msgstr ""
+msgstr "Erantzun irekiko ebaluazioa"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Self Assessment"
-msgstr ""
+msgstr "Autoebaluazioa"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Peer Assessment"
-msgstr ""
+msgstr "Ikaskideen arteko ebaluazioa"
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Staff Assessment"
@@ -5915,7 +5926,7 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "sign in"
-msgstr ""
+msgstr "erregistratu"
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
@@ -5982,6 +5993,16 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate will be available soon!"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"After this course officially ends, you will receive an email notification "
+"with your certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate is available"
 msgstr "Zure ziurtagiria eskuragarri dago"
 
@@ -5997,12 +6018,13 @@ msgid "{sign_in_link} or {register_link}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
-msgstr "Hasi saioa"
+msgstr "Erregistratu"
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
@@ -6018,7 +6040,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
-msgstr ""
+msgstr "Kokapen baliogabea."
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
@@ -6230,7 +6252,7 @@ msgid "Added Course"
 msgstr "Gehitutako ikastaroa"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
-#: cms/templates/index.html lms/templates/shoppingcart/receipt.html
+#: cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Course Name"
 msgstr "Ikastaroaren izena"
@@ -6658,14 +6680,12 @@ msgstr "Taldea"
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "City"
 msgstr "Hiria"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
 msgstr "Estatua"
@@ -7427,691 +7447,6 @@ msgstr ""
 msgid "One of user or external_user_key must not be null."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Order Payment Confirmation"
-msgstr "Ordainketa-aginduaren konfirmazioa"
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"Confirmation and Registration Codes for the following courses: "
-"{course_name_list}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Trying to add a different currency into the cart"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Internal reference code for this invoice."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Customer's reference code for this invoice."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid ""
-"The amount of the transaction.  Use positive amounts for payments and "
-"negative amounts for refunds."
-msgstr ""
-"Transakzioaren zenbatekoa. Erabili zenbaki positiboak ordainketetarako eta "
-"zenbaki negatiboak jasotzekoetarako."
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Lower-case ISO currency codes"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Optional: provide additional information for this transaction"
-msgstr "Aukerakoa: eman informazio osagarria transakzio honetarako"
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid ""
-"The status of the payment or refund. 'started' means that payment is "
-"expected, but money has not yet been transferred. 'completed' means that the"
-" payment or refund was received. 'cancelled' means that payment or refund "
-"was expected, but was cancelled before money was transferred. "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "The number of items sold."
-msgstr "Saldutako elementu-kopurua"
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "The price per item sold, including discounts."
-msgstr "Saldutako elementuen prezioa, deskontuak barne."
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Registration for Course: {course_name}"
-msgstr "Ikastaro honetarako erregistroa: {course_name}"
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"Please visit your {link_start}dashboard{link_end} to see your new course."
-msgstr ""
-"Mesedez joan zure {link_start}aginte-panelera{link_end} zure ikastaro berria"
-" ikusteko."
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Enrollment codes for Course: {course_name}"
-msgstr "Ikastaro honetarako matrikulazio-kodeak: {course_name}"
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Mode {mode} does not exist for {course_id}"
-msgstr ""
-
-#. Translators: In this particular case, mode_name refers to a
-#. particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)
-#. by which a user could enroll in the given course.
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "{mode_name} for course {course}"
-msgstr "{mode_name} {course} ikastarorako"
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"To receive a refund you may unenroll from the course on your edX Dashboard "
-"({dashboard_url}) up to 14 days after your payment or 14 days after your "
-"course starts (up to six months after your payment).\n"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"If you haven't verified your identity yet, please start the verification "
-"process ({verification_url})."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid ""
-"You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date.\n"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
-" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"We greatly appreciate this generous contribution and your support of the "
-"{platform_name} mission.  This receipt was prepared to support charitable "
-"contributions for tax purposes.  We confirm that neither goods nor services "
-"were provided in exchange for this gift."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Could not find a course with the ID '{course_id}'"
-msgstr "Ezin da '{course_id}' IDa duen ikastarorik aurkitu"
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Donation for {course}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Donation for {platform_name}"
-msgstr ""
-
-#. Translators: this text appears when an unfamiliar error code occurs during
-#. payment,
-#. for which we don't know a user-friendly message to display in advance.
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "UNKNOWN REASON"
-msgstr "ARRAZOI EZEZAGUNA"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid "The payment processor did not return a required parameter: {parameter}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"The payment processor returned a badly-typed value {value} for parameter "
-"{parameter}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The payment processor accepted an order whose number is not in our system."
-msgstr ""
-"Ordainketa-prozesatzaileak onartu egin du gure sisteman ez dagoen zenbakia "
-"duen agindua."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"The amount charged by the processor {charged_amount} "
-"{charged_amount_currency} is different than the total cost of the order "
-"{total_cost} {total_cost_currency}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor did not accept your payment.  The decision they"
-" returned was {decision}, and the reason was {reason}.  You were not "
-"charged. Please try a different form of payment.  Contact us with payment-"
-"related questions at {email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a payment confirmation that had "
-"inconsistent data! We apologize that we cannot verify whether the charge "
-"went through and take further action on your order. The specific error "
-"message is: {msg} Your credit card may possibly have been charged.  Contact "
-"us with payment-specific questions at {email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Due to an error your purchase was charged for a different amount than"
-" the order total! The specific error message is: {msg}. Your credit card has"
-" probably been charged. Contact us with payment-specific questions at "
-"{email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a corrupted message regarding your"
-" charge, so we are unable to validate that the message actually came from "
-"the payment processor. The specific error message is: {msg}. We apologize "
-"that we cannot verify whether the charge went through and take further "
-"action on your order. Your credit card may possibly have been charged. "
-"Contact us with payment-specific questions at {email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a message saying that you have "
-"cancelled this transaction. The items in your shopping cart will exist for "
-"future purchase. If you feel that this is in error, please contact us with "
-"payment-specific questions at {email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"We're sorry, but this payment was declined. The items in your shopping cart "
-"have been saved. If you have any questions about this transaction, please "
-"contact us at {email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Your payment could not be processed because an unexpected exception "
-"occurred. Please contact us at {email} for assistance."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Successful transaction."
-msgstr "Transakzio egokia."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request is missing one or more required fields."
-msgstr "Eskariak hutsik ditu derrigorrezko eremu bat edo gehiago."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "One or more fields in the request contains invalid data."
-msgstr "Eskariaren eremu batek edo gehiagok datu baliogabeak dituzte."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The merchant reference code for this authorization request matches the merchant reference code of another\n"
-"            authorization request that you sent within the past 15 minutes.\n"
-"            Possible action: Resend the request with a unique merchant reference code.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Only a partial amount was approved."
-msgstr "Kopuruaren zati bat bakarrik onartu da."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "General system failure."
-msgstr "Errore orokorra sisteman."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The request was received but there was a server timeout. This error does not include timeouts between the\n"
-"            client and the server.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The request was received, but a service did not finish running in time."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by CyberSource\n"
-"            because it did not pass the Address Verification System (AVS).\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The issuing bank has questions about the request. You do not receive an\n"
-"            authorization code programmatically, but you might receive one verbally by calling the processor.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            Expired card. You might also receive this if the expiration date you\n"
-"            provided does not match the date the issuing bank has on file.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            General decline of the card. No other information provided by the issuing bank.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Insufficient funds in the account. Possible action: retry with another form "
-"of payment."
-msgstr ""
-"Ez dago nahikoa diru kontuan. Egin daitekeena: saiatu berriz ordaintzeko "
-"beste era batekin."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Stolen or lost card."
-msgstr "Lapurtu edo galdutako txartela."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Issuing bank unavailable. Possible action: retry again after a few minutes."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            Inactive card or card not authorized for card-not-present transactions.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "CVN did not match."
-msgstr "CVN-a ez dator bat."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The card has reached the credit limit. Possible action: retry with another "
-"form of payment."
-msgstr ""
-"Txartelak gainditu egin du kreditu-muga. Egin daitekeena: saiatu berriz "
-"ordaintzeko beste era batekin."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Invalid card verification number (CVN). Possible action: retry with another "
-"form of payment."
-msgstr ""
-"Txartela ziurtatzeko zenbakia (CVN) ez da baliagarria. Egin daitekeena: "
-"saiatu berriz ordaintzeko beste era batekin."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The customer matched an entry on the processors negative file."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Account frozen. Possible action: retry with another form of payment."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by\n"
-"            CyberSource because it did not pass the CVN check.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Invalid account number. Possible action: retry with another form of payment."
-msgstr ""
-"Kontu zenbakia ez da baliogarria. Egin daitekeena: saiatu berriz ordaintzeko"
-" beste era batekin."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The card type is not accepted by the payment processor.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"General decline by the processor.  Possible action: retry with another form "
-"of payment."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"There is a problem with the information in your CyberSource account.  Please"
-" let us know at {0}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The requested capture amount exceeds the originally authorized amount."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Processor Failure.  Possible action: retry the payment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The authorization has already been reversed."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The authorization has already been captured."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The requested transaction amount must match the previous transaction amount."
-msgstr ""
-"Eskatutako transakzioaren zenbatekoak bat etorri behar du aurreko "
-"transakzioaren zenbatekoarekin."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The card type sent is invalid or does not correlate with the credit card number.\n"
-"            Possible action: retry with the same card or another form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"            Bidalitako txartel-mota ez da baliagarria edo ez dator bat kreditu-txartel zenbakiarekin.\n"
-"            Egin daitekeena: saiatu berriz txartel berarekin edo ordaintzeko beste era batean.\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request ID is invalid."
-msgstr "Eskaeraren ID-a ez da baliagarria."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            You requested a capture, but there is no corresponding, unused authorization record. Occurs if there was\n"
-"            not a previously successful authorization request or if the previously successful authorization has already\n"
-"            been used by another capture request.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The transaction has already been settled or reversed."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            Either the capture or credit is not voidable because the capture or credit information has already been\n"
-"            submitted to your processor, or you requested a void for a type of transaction that cannot be voided.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "You requested a credit for a capture that was previously voided."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The request was received, but there was a timeout at the payment processor."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Stand-alone credits are not allowed."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The cardholder is enrolled for payer authentication"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Payer authentication could not be authenticated"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by CyberSource based\n"
-"            on your legacy Smart Authorization settings.\n"
-"            Possible action: retry with a different form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order Number"
-msgstr "Eskaera-zenbakia"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Customer Name"
-msgstr "Bezeroaren izena"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Original Transaction"
-msgstr "Jatorrizko transakzioaren data"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Refund"
-msgstr "Jasotzeko data"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Amount of Refund"
-msgstr "Jasotzeko kopurua"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Service Fees (if any)"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Purchase Time"
-msgstr "Erosketa-ordua"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order ID"
-msgstr "Eskaeraren ID-a"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "Kantitatea"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Unit Cost"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Cost"
-msgstr "Denerako kostua"
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Currency"
-msgstr "Moneta"
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: wiki/plugins/attachments/forms.py
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-msgid "Description"
-msgstr "Deskribapena"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Comments"
-msgstr "Iruzkinak"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "University"
-msgstr "Unibertsitatea"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Announce Date"
-msgstr "Ikastaroa iragartzeko data"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Start Date"
-msgstr "Ikastaroaren hasiera-data"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Close Date"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Period"
-msgstr "Ikastaroan matrikulatzeko epea"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Enrolled"
-msgstr "Denerako matrikulak"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Audit Enrollment"
-msgstr "Ikuskatu matrikulazioa"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Honor Code Enrollment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Verified Enrollment"
-msgstr "Egiaztatutako matrikulazioa"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Gross Revenue"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Gross Revenue over the Minimum"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Verified Students Contributing More than the Minimum"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Refunds"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Dollars Refunded"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Transactions"
-msgstr "Transakzio-kopurua"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Payments Collected"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Successful Refunds"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Amount of Refunds"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You must be logged-in to add to a shopping cart"
-msgstr "Sartu egin behar duzu erosketa-saskia gehitzeko"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "The course you requested does not exist."
-msgstr "Ez dago eskatu duzun ikastaroa."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "The course {course_id} is already in your cart."
-msgstr "{course_id} ikastaroa dagoeneko zure saskian dago."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "You are already registered in course {course_id}."
-msgstr "Dagoeneko erresgistratuta zaude {course_id} ikastaroan."
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Course added to cart."
-msgstr "Ikastaroa saskira gehitu da."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "Discount does not exist against code '{code}'."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "This enrollment code ({enrollment_code}) is no longer valid."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "This enrollment code ({enrollment_code}) is not valid."
-msgstr "Matrikulazio-kode hau ({enrollment_code}) ez da baliagarria."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid ""
-"Code '{registration_code}' is not valid for any course in the shopping cart."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid ""
-"Cart item quantity should not be greater than 1 when applying activation "
-"code"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Only one coupon redemption is allowed against an order"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "success"
-msgstr "ondo"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You do not have permission to view this page."
-msgstr "Ez duzu baimenik orri hau ikusteko."
-
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
 msgstr ""
@@ -8326,10 +7661,6 @@ msgstr ""
 #: lms/djangoapps/verify_student/views.py
 msgid "Make payment"
 msgstr "Egin ordainketa"
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Payment confirmation"
-msgstr "Ordainketaren konfirmazioa"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Take photo"
@@ -8804,14 +8135,6 @@ msgid ""
 "application. Otherwise, to withhold these permissions, please click the "
 "'Cancel' button."
 msgstr ""
-
-#: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/user_api/admin.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/videos_index_pagination.html
-msgid "Cancel"
-msgstr "Utzi"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid "Allow"
@@ -9429,7 +8752,7 @@ msgstr "Joan %(platform_name)s plataformako Hasiera-orrira"
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/widgets/header.html
 msgid "Sign In"
-msgstr "Hasi saioa"
+msgstr "Erregistratu"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -9730,7 +9053,53 @@ msgid "Cannot change or remove the access level for the only admin."
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
+"You can only set a library to {library_type} if all existing blocks are of "
+"that type. Found incompatible block {block_id} with type {block_type}."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
+"Block type \"{block_type}\" is not compatible with library type "
+"\"{library_type}\"."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/api.py
 msgid "Library cannot have more than {} XBlocks"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Complex"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "All Rights Reserved."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-NonCommercial 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-NonCommercial-ShareAlike 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-NoDerivatives 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-ShareAlike 4.0"
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
@@ -10132,7 +9501,7 @@ msgstr "Guztiak"
 
 #: openedx/core/djangoapps/schedules/admin.py
 msgid "Experience"
-msgstr ""
+msgstr "Esperientzia"
 
 #: openedx/core/djangoapps/schedules/admin.py
 #: cms/templates/maintenance/_force_publish_course.html
@@ -10146,7 +9515,7 @@ msgstr "Ikastaroaren IDa"
 #: openedx/core/djangoapps/schedules/apps.py
 #: openedx/core/djangoapps/schedules/models.py
 msgid "Schedules"
-msgstr ""
+msgstr "Ordutegiak"
 
 #: openedx/core/djangoapps/schedules/models.py
 msgid "Indicates if this schedule is actively used"
@@ -10206,7 +9575,7 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
 msgid "Welcome to week %(week_num)s"
-msgstr ""
+msgstr "Ongi etorri %(week_num)sastera"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 #, python-brace-format
@@ -10268,7 +9637,7 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
 msgid "Keep learning"
-msgstr ""
+msgstr "Jarraitu ikasten"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
@@ -10289,7 +9658,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 msgid "Keep learning today"
-msgstr ""
+msgstr "Jarraitu ikasten gaur"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #, python-brace-format
@@ -10311,17 +9680,17 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
-msgstr ""
+msgstr "Hasi ikasten orain"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
 #, python-format
 msgid "Keep learning on %(platform_name)s"
-msgstr ""
+msgstr "Jarraitu ikasten %(platform_name)splataforman"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/subject.txt
 #, python-format
 msgid "Keep learning in %(course_name)s"
-msgstr ""
+msgstr "Jarraitu ikasten %(course_name)s ikastaroan"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.txt
@@ -10469,7 +9838,7 @@ msgstr ""
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your full name."
-msgstr ""
+msgstr "Idatzi izen osoa."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "The email addresses do not match."
@@ -10509,7 +9878,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your mailing address."
-msgstr ""
+msgstr "Idatzi posta elektronikoaren helbidea."
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
 #, python-brace-format
@@ -10727,6 +10096,8 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at %(platform_name)s."
 msgstr ""
+"Mezu hau jaso duzu %(platform_name)splataformako erabiltzaile-kontuaren "
+"pasahitza berrezartzeko eskaria egin duzulako."
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
@@ -10754,6 +10125,33 @@ msgstr "Mesedez, jo hurrengo orrira eta aukeratu pasahitz berria:"
 msgid "Password reset on %(platform_name)s"
 msgstr ""
 
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
+msgid "Password Reset Success"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
+#, python-format
+msgid "Hello %(name)s,"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
+#, python-format
+msgid ""
+"This is to confirm that you have successfully changed your password "
+"associated with %(platform_name)s account. Please sign-in to your account."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
+#, python-format
+msgid "Hello %(name)s, "
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/subject.txt
+#, python-format
+msgid "Password reset completed on %(platform_name)s"
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Superuser creation not allowed"
 msgstr ""
@@ -10771,12 +10169,20 @@ msgstr "Ez dago baimenduta kontua sortzea."
 #, python-brace-format
 msgid ""
 "You've successfully signed in to your {provider_name} account, but this "
-"account isn't linked with your {platform_name} account yet.Use your "
-"{platform_name} username and password to sign in to {platform_name} below, "
-"and then link your {platform_name} account with {provider_name} from your "
-"dashboard.If you don't have an account on {platform_name} yet, click "
-"{register_label_strong} at the top of the page."
+"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
+" your {platform_name} username and password to sign in to {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
+" yet, click {register_label_strong} at the top of the page."
 msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "Erregistratu"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "There was an error receiving your login information. Please email us."
@@ -11053,6 +10459,12 @@ msgid ""
 "process your personal data in accordance                   with the "
 "{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
+"Kontua sortzean,  "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   onartzen dituzu, bai eta {platform_name} eta bere "
+"langileek zure datu pribatuak kudeatuko dituztela  "
+"{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end} kontuan "
+"hartuta."
 
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
@@ -11082,19 +10494,6 @@ msgstr "Baztertu"
 
 #: openedx/core/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
-msgstr ""
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "Oauth client name of video pipeline service."
-msgstr ""
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "edx-video-pipeline API URL."
-msgstr ""
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid ""
-"Username created for Video Pipeline Integration, e.g. veda_service_user."
 msgstr ""
 
 #: openedx/core/djangoapps/video_pipeline/models.py
@@ -11206,7 +10605,7 @@ msgstr ""
 
 #: openedx/features/calendar_sync/plugins.py
 msgid "Subscribe to calendar updates"
-msgstr ""
+msgstr "Harpidetu egutegiaren eguneraketetara"
 
 #: openedx/features/calendar_sync/utils.py
 #, python-brace-format
@@ -11374,7 +10773,7 @@ msgstr ""
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "Welcome to {course_display_name}"
-msgstr ""
+msgstr "Ongi etorri {course_display_name} ikastarora"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 msgid ""
@@ -11403,7 +10802,7 @@ msgstr ""
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
 msgid "{choice}"
-msgstr ""
+msgstr "{choice}"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -11440,7 +10839,7 @@ msgstr ""
 
 #: openedx/features/discounts/models.py
 msgid "Disabled"
-msgstr ""
+msgstr "Desgaituta"
 
 #: openedx/features/discounts/utils.py
 #, python-brace-format
@@ -11784,14 +11183,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
 msgstr "HTML"
-
-#: cms/djangoapps/contentstore/views/component.py
-msgid "Problem"
-msgstr "Ariketa"
-
-#: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
-msgid "Video"
-msgstr "Bideoa"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -12188,6 +11579,10 @@ msgstr "Iraupena"
 msgid "Date Added"
 msgstr "Data gehitu da"
 
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Status"
+msgstr ""
+
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
 #: cms/djangoapps/contentstore/views/videos.py
@@ -12417,7 +11812,7 @@ msgid "next"
 msgstr "hurrengoa"
 
 #: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
+#: lms/templates/problem.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Reset"
@@ -13196,7 +12591,6 @@ msgid "Next Hint"
 msgstr "Hurrengo aholkua"
 
 #: lms/templates/problem_notifications.html
-#: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Review"
 msgstr "Berrikusi"
 
@@ -13716,7 +13110,7 @@ msgstr "Deskargatu materialak"
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
-msgstr ""
+msgstr "{num} {total}tik"
 
 #: lms/templates/word_cloud.html
 msgid "Your words were:"
@@ -14347,7 +13741,7 @@ msgstr "Ireki kalkulagailua"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Enter equation"
-msgstr ""
+msgstr "Idatzi ekuazioa"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Calculator Input Field"
@@ -15049,7 +14443,6 @@ msgstr "Ikastaro honetan matrikulatuta zaude"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "Ikusi ikastaroa"
@@ -15222,11 +14615,11 @@ msgstr "{course.display_number_with_default} Ikastaroaren informazioa"
 
 #: lms/templates/courseware/dates.html
 msgid "Important Dates"
-msgstr ""
+msgstr "Data garrantzitsuak"
 
 #: lms/templates/courseware/dates.html
 msgid "Today"
-msgstr ""
+msgstr "Gaur"
 
 #: lms/templates/courseware/dates.html
 msgid "Verified Only"
@@ -15250,8 +14643,6 @@ msgstr "Bilatu ikasleak"
 
 #: lms/templates/courseware/gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Total"
 msgstr "Denerakoa"
 
@@ -15287,7 +14678,7 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Welcome to {course_title}!"
-msgstr ""
+msgstr "Ongi etorri {course_title} ikastarora!"
 
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
@@ -15302,7 +14693,7 @@ msgstr "Ikusi eguneraketak Studio-n"
 
 #: lms/templates/courseware/info.html
 msgid "Course Updates and News"
-msgstr ""
+msgstr "Ikastaroaren eguneraketak eta albisteak"
 
 #: lms/templates/courseware/info.html
 msgid "Handout Navigation"
@@ -15358,8 +14749,6 @@ msgid "YouTube Video"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/shopping_cart.html
 msgid "View Courses"
 msgstr "Ikusi ikastaroak"
 
@@ -15431,7 +14820,7 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Starts on {}"
-msgstr ""
+msgstr "Ondoko datan hasiko da: {}"
 
 #: lms/templates/courseware/progress.html
 msgid "{course_number} Progress"
@@ -16780,13 +16169,6 @@ msgstr "Nola dabil"
 msgid "Schools"
 msgstr "Eskolak"
 
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "Erregistratu"
-
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr ""
@@ -16814,6 +16196,13 @@ msgstr "Kupoiaren kodea"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Discount Percentage"
 msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: wiki/plugins/attachments/forms.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "Description"
+msgstr "Deskribapena"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Add expiration date"
@@ -16978,6 +16367,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "Entzulea"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Honor"
+msgstr "Portaera"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
@@ -17375,7 +16768,6 @@ msgid "The organization that purchased enrollments in the course"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/billing_details.html
 msgid "Organization Contact"
 msgstr "Erakundearen kontaktua"
 
@@ -17478,7 +16870,6 @@ msgid "Change the status of an enrollment code."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Enrollment Code"
 msgstr "Matrikulazio-kodea"
 
@@ -17840,6 +17231,10 @@ msgid "Course Price"
 msgstr "Ikastaroaren prezioa"
 
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Currency"
+msgstr "Moneta"
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Set Price"
 msgstr "Zehaztu prezioa"
 
@@ -17883,15 +17278,15 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner email address or username"
-msgstr ""
+msgstr "Ikaslearen posta elektronikoa edo erabiltzaile-izena"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Enrollment Status"
-msgstr ""
+msgstr "Ikusi matrikulazioaren egoera"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
-msgstr ""
+msgstr "Ikusi ikasle jakin baten kalifikazioak eta aurrerapena"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username"
@@ -17899,7 +17294,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Progress Page"
-msgstr ""
+msgstr "Ikusi aurrerapen-orria"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Adjust a learner's grade for a specific problem"
@@ -18067,7 +17462,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid "Note"
-msgstr ""
+msgstr "Oharra"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
 msgid ""
@@ -18163,7 +17558,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Mobile phone number"
-msgstr ""
+msgstr "Telefono mugikorraren zenbakia"
 
 #: lms/templates/learner_dashboard/text-me-fragment.html
 msgid "Send me a text with the link"
@@ -18236,7 +17631,6 @@ msgid "Graded"
 msgstr "Kalifikatuta"
 
 #: lms/templates/peer_grading/peer_grading.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Available"
 msgstr "Eskuragarri"
 
@@ -18376,6 +17770,7 @@ msgstr "Zure pasaitza berrezartzea osatu da"
 msgid ""
 "Your password has been reset. {start_link}Sign-in to your account.{end_link}"
 msgstr ""
+"Pasahitza berrezarri da. {start_link}Hasi saioa zure kontuan.{end_link}"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Reset Your {platform_name} Password"
@@ -18403,425 +17798,6 @@ msgid ""
 msgstr ""
 "Zuk adierazitako e-posta helbidera pasahitza berrezartzeko argibideak bidali"
 " dizkizugu. Laster jaso behar zenituzke."
-
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Billing Details"
-msgstr "Fakturaren xehetasunak"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid ""
-"You can proceed to payment at any point in time. Any additional information "
-"you provide will be included in your receipt."
-msgstr ""
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Purchasing Organizational Details"
-msgstr ""
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Purchasing organization"
-msgstr ""
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Purchase order number (if any)"
-msgstr "Erosketa-aginduaren zenbakia (balego)"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "E-posta helbidea"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "email@example.com"
-msgstr "e-posta@adibidea.com"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Additional Receipt Recipient"
-msgstr ""
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid ""
-"If no additional billing details are populated the payment confirmation will"
-" be sent to the user making the purchase."
-msgstr ""
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Payment processing occurs on a separate secure site."
-msgstr ""
-
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Your Shopping cart is currently empty."
-msgstr "Erosketa-saskia une honetan hutsik dago."
-
-#: lms/templates/shoppingcart/cybersource_form.html
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Payment"
-msgstr "Ordainketa"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "Download CSV Reports"
-msgstr "Deskargatu CSV txostenak"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "Download CSV Data"
-msgstr "Deskargatu CSV datuak"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid ""
-"There was an error in your date input.  It should be formatted as YYYY-MM-DD"
-msgstr ""
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "These reports are delimited by start and end dates."
-msgstr "Txosten hauek hasiera eta bukaera data dute."
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "Start Date: "
-msgstr "Hasiera-data"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "End Date: "
-msgstr "Amaiera-data:"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid ""
-"These reports are delimited alphabetically by university name.  i.e., "
-"generating a report with 'Start Letter' A and 'End Letter' C will generate "
-"reports for all universities starting with A, B, and C."
-msgstr ""
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "Start Letter: "
-msgstr "Lehenengo hizkia:"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "End Letter: "
-msgstr "Azken hizkia:"
-
-#: lms/templates/shoppingcart/error.html
-msgid "Payment Error"
-msgstr "Ordainketa-errorea"
-
-#: lms/templates/shoppingcart/error.html
-msgid "There was an error processing your order!"
-msgstr "Errorea gertatu da eskaera prozesatzean!"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Thank you for your purchase!"
-msgstr "Eskerrik asko zure erosketagatik!"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "View Dashboard"
-msgstr "Ikusi aginte-panela"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid ""
-"You have successfully been enrolled for {course_names}. The following "
-"receipt has been emailed to {receipient_emails}"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
-msgid ""
-"You have successfully purchased <b>{number} course registration code</b> for"
-" {course_names}."
-msgid_plural ""
-"You have successfully purchased <b>{number} course registration codes</b> "
-"for {course_names}."
-msgstr[0] ""
-msgstr[1] ""
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "The following receipt has been emailed to {receipient_emails}"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
-msgid ""
-"Please send each professional one of these unique registration codes to "
-"enroll into the course. The confirmation/receipt email you will receive has "
-"an example email template with directions for the individuals enrolling."
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Enrollment Link"
-msgstr "Matrikularako esteka"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Used"
-msgstr "Erabilia"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Invalid"
-msgstr "Baliogabea"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "Faktura"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Date of purchase"
-msgstr "Erosketa-data"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Print Receipt"
-msgstr "Inprimatu ordainagiria"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Billed To Details"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Company Name"
-msgstr "Enpresaren izena"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "N/A"
-msgstr "Ez da aplikatzen"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Purchase Order Number"
-msgstr "Erosketa-aginduaren zenbakia:"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Company Contact Name"
-msgstr "Enpresako kontaktuaren izena"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Company Contact Email"
-msgstr "Enpresako kontaktuaren e-posta"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Recipient Name"
-msgstr "Hartzailearen izena"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Recipient Email"
-msgstr "Hartzailearen e-posta"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Card Type"
-msgstr "Txartel-mota"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Credit Card Number"
-msgstr "Kreditu-txartelaren zenbakia"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Address 1"
-msgstr "1. helbidea"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Address 2"
-msgstr "2. helbidea"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "State"
-msgstr "Egoera"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Registration for:"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Price per student:"
-msgstr "Prezioa ikasleko:"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Discount Applied:"
-msgstr "Aplikatutako deskontua:"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Students"
-msgstr "Ikasleak"
-
-#. Translators: Please keep the "<del>" and "</del>" tags around your
-#. translation of the word "this" in your translation.
-#: lms/templates/shoppingcart/receipt.html
-msgid "Note: items with strikethough like <del>this</del> have been refunded."
-msgstr ""
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "Confirm Enrollment"
-msgstr "Konfirmatu matrikulazioa"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "{site_name} -  Confirm Enrollment"
-msgstr "{site_name} -  Konfirmatu matrikulazioa"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "{course_number} {course_title} Cover Image"
-msgstr ""
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "Confirm your enrollment for: {span_start}course dates{span_end}"
-msgstr "Baieztatu zure matrikula:  {span_start}ikastaro-datak{span_end}"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "{course_name}"
-msgstr "{course_name}"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid ""
-"You've clicked a link for an enrollment code that has already been used. "
-"Check your {link_start}course dashboard{link_end} to see if you're enrolled "
-"in the course, or contact your company's administrator."
-msgstr ""
-"Dagoeneko erabili den matrikulazio-kode baten estekari sakatu diozu. Aztertu"
-" zure {link_start}ikastaroko aginte-panela{link_end} ikastaroan "
-"matrikulatuta zauden ikusteko, edo jarri harremanetan zure konpainiako "
-"kudeatzailearekin."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid ""
-"You have successfully enrolled in {course_name}. This course has now been "
-"added to your dashboard."
-msgstr ""
-"Egoki matrikulatu zara {course_name}-n. Orain ikastaro hau zure aginte-"
-"panelera gehitu da."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid ""
-"You're already enrolled for this course. Visit your "
-"{link_start}dashboard{link_end} to see the course."
-msgstr ""
-"Dagoeneko matrikulatuta zaude ikastaro honetan. Hoan zure  "
-"{link_start}aginte-panelera{link_end} ikastaroa ikusteko."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "The course you are enrolling for is full."
-msgstr "Matrikulatu nahi duzun ikastaroa beteta dago."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "The course you are enrolling for is closed."
-msgstr "Matrikulatu nahi duzun ikastaroa itxita dago."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "There was an error processing your redeem code."
-msgstr ""
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid ""
-"You're about to activate an enrollment code for {course_name} by "
-"{site_name}. This code can only be used one time, so you should only "
-"activate this code if you're its intended recipient."
-msgstr ""
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "Activate Course Enrollment"
-msgstr "Aktibatu ikastaro matrikulazioa"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid ""
-"{course_names} has been removed because the enrollment period has closed."
-msgid_plural ""
-"{course_names} have been removed because the enrollment period has closed."
-msgstr[0] ""
-"{course_names} kendu egin dira matrikulazio-aldia itxi egin delako."
-msgstr[1] ""
-"{course_names} kendu egin dira matrikulazio-aldia itxi egin delako."
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Shopping Cart"
-msgstr "Erosketa-saskia"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Cover Image"
-msgstr ""
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Students:"
-msgstr "Ikasleak:"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Input quantity and press enter."
-msgstr ""
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Increase"
-msgstr ""
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Decrease"
-msgstr ""
-
-#: lms/templates/shoppingcart/shopping_cart.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-msgid "Remove"
-msgstr "Ezabatu"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Discount or activation code"
-msgstr ""
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "discount or activation code"
-msgstr "deskonturako edo aktibaziorako kodea"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Apply"
-msgstr "Aplikatu"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "code has been applied"
-msgstr "kodea aplikatu da"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "TOTAL:"
-msgstr "DENERA:"
-
-#. Translators: currency_symbol is a symbol indicating type of currency, ex
-#. "$". currency_abbr is
-#. an abbreviation for the currency, ex "USD". This string would look like
-#. this
-#. when all variables are in:
-#. "$500.00 USD"
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "{currency_symbol}{price} {currency_abbr}"
-msgstr "{currency_symbol}{price} {currency_abbr}"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid ""
-"After this purchase is complete, a receipt is generated with relative "
-"billing details and registration codes for students."
-msgstr ""
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid ""
-"After this purchase is complete, {username} will be enrolled in this course."
-msgstr ""
-"Erosketa hau osatzen denean, {username} matrikulatu egingo da ikastaro "
-"honetan."
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Empty Cart"
-msgstr "Saskia hutsik"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Shopping cart"
-msgstr "Erosketa-saskia"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "{platform_name} -  Shopping Cart"
-msgstr "{platform_name} -  Erosketa-saskia"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Confirmation"
-msgstr "Konfirmazioa"
 
 #: lms/templates/static_templates/404.html
 msgid ""
@@ -19058,10 +18034,6 @@ msgid "Upgrade Your Enrollment For {course_name}."
 msgstr ""
 
 #: lms/templates/verify_student/pay_and_verify.html
-msgid "Receipt For {course_name}"
-msgstr "{course_name}-rako ordainagiria"
-
-#: lms/templates/verify_student/pay_and_verify.html
 msgid "Verify For {course_name}"
 msgstr ""
 
@@ -19186,7 +18158,7 @@ msgstr "Zenbait eskubide erreserbatuta"
 
 #: openedx/features/course_experience/templates/course_experience/course-dates-fragment.html
 msgid "Upcoming Dates"
-msgstr ""
+msgstr "Datozen ekitaldiak"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Goal: "
@@ -19286,11 +18258,11 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Upgrade ({course_price})"
-msgstr ""
+msgstr "Eguneratu ({course_price})"
 
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "This course does not have any updates."
-msgstr ""
+msgstr "Ikastaro honek ez du eguneraketarik."
 
 #: openedx/features/course_experience/templates/course_experience/latest-update-fragment.html
 msgid "Latest Update"
@@ -19302,7 +18274,7 @@ msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Show More"
-msgstr ""
+msgstr "Erakutsi gehiago"
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"
@@ -21892,6 +20864,10 @@ msgid "Dates that control when your course can be viewed"
 msgstr ""
 
 #: cms/templates/settings.html
+msgid "Course Start Date"
+msgstr "Ikastaroaren hasiera-data"
+
+#: cms/templates/settings.html
 msgid "First day the course begins"
 msgstr ""
 
@@ -21905,7 +20881,7 @@ msgstr "(UTC)"
 
 #: cms/templates/settings.html
 msgid "Course End Date"
-msgstr ""
+msgstr "Ikastaroaren amaiera-data"
 
 #: cms/templates/settings.html
 msgid "Last day your course is active"
@@ -22664,7 +21640,7 @@ msgstr ""
 
 #: cms/templates/widgets/deprecated-course-key-warning.html
 msgid "Support will be removed in an upcoming release."
-msgstr ""
+msgstr "Laguntza hurrengo bertsio batean ezabatuko da."
 
 #: cms/templates/widgets/deprecated-course-key-warning.html
 msgid "Support will be removed on {expiration_date}."
@@ -23270,6 +22246,10 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
 msgstr "Ezabatu!"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid "Remove"
+msgstr "Ezabatu"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
