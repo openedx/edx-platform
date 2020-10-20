@@ -112,6 +112,24 @@ class BookmarksTestsBase(ModuleStoreTestCase):
                 'usage_key': self.sequential_2.location,
             }),
         )
+        self.bookmark_3 = BookmarkFactory.create(
+            user=self.user,
+            course_key=self.course_id,
+            usage_key=self.vertical_3.location,
+            xblock_cache=XBlockCache.create({
+                'display_name': self.vertical_3.display_name,
+                'usage_key': self.vertical_3.location,
+            }),
+        )
+        self.bookmark_4 = BookmarkFactory.create(
+            user=self.user,
+            course_key=self.course_id,
+            usage_key=self.chapter_2.location,
+            xblock_cache=XBlockCache.create({
+                'display_name': self.chapter_2.display_name,
+                'usage_key': self.chapter_2.location,
+            }),
+        )
 
         self.other_course = CourseFactory.create(display_name='An Introduction to API Testing 2')
 
