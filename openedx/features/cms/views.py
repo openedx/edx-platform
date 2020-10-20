@@ -1,12 +1,12 @@
 import json
-from pytz import utc
 from copy import deepcopy
 from datetime import datetime
+from logging import getLogger
 
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from logging import getLogger
+from django.views.decorators.csrf import ensure_csrf_cookie
+from pytz import utc
 
 from cms.djangoapps.contentstore.views.course import get_courses_accessible_to_user
 from contentstore.tasks import rerun_course
@@ -15,11 +15,12 @@ from course_action_state.models import CourseRerunState, CourseRerunUIStateManag
 from edxmako.shortcuts import render_to_response
 from openedx.features.course_card.helpers import get_related_card_id
 from student.auth import has_studio_write_access
-from util.json_request import expect_json, JsonResponse
+from util.json_request import JsonResponse, expect_json
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
-from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError
+
 from . import helpers
 from .constants import ERROR_MESSAGES
 

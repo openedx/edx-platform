@@ -1,17 +1,17 @@
 import json
 
-from course_action_state.models import CourseRerunState
+from opaque_keys.edx.locator import CourseLocator
+
 from cms.djangoapps.contentstore.tasks import rerun_course as rerun_course_task
 from cms.djangoapps.contentstore.utils import add_instructor
-from opaque_keys.edx.locator import CourseLocator
+from course_action_state.models import CourseRerunState
+from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.features.course_card.helpers import get_related_card_id
-
 from xmodule.course_module import CourseFields
+from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.factories import XModuleFactory
-from xmodule.modulestore import EdxJSONEncoder
-from lms.djangoapps.courseware.courses import get_course_by_id
 
 
 class CourseRerunFactory(XModuleFactory):

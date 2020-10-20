@@ -1,22 +1,22 @@
-import mock
-
-from mock import patch
-from pytz import UTC
-from dateutil.parser import parse
 from datetime import datetime
 
+import mock
+from dateutil.parser import parse
+from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+from openassessment.xblock.defaults import DEFAULT_DUE, DEFAULT_START
+from pytz import UTC
+
 from custom_settings.models import CustomSettings
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.features.cms import helpers
-from openassessment.xblock.defaults import DEFAULT_START, DEFAULT_DUE
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.course_module import CourseFields
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from . import helpers as test_helpers
-from .factories import CourseRerunFactory
 from ..constants import ERROR_MESSAGES
+from .factories import CourseRerunFactory
 
 
 class CourseRerunAutomationTestCase(ModuleStoreTestCase):

@@ -1,21 +1,21 @@
-import mock
-from pytz import UTC
 from datetime import datetime
 
+import mock
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
 from django.test.client import Client
-from django.contrib.auth.models import AnonymousUser
+from opaque_keys.edx.locator import CourseLocator
+from pytz import UTC
 
+from cms.djangoapps.contentstore.views.course import get_in_process_course_actions
 from openedx.core.djangolib.testing.philu_utils import configure_philu_theme
 from openedx.features.cms import views as rerun_views
-from opaque_keys.edx.locator import CourseLocator
-from cms.djangoapps.contentstore.views.course import get_in_process_course_actions
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.course_module import CourseFields
+from xmodule.modulestore.exceptions import DuplicateCourseError
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from . import helpers as test_helpers
 from ..constants import ERROR_MESSAGES

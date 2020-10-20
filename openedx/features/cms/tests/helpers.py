@@ -1,14 +1,15 @@
 import time
-
 from datetime import datetime
+
 from pytz import UTC
 
-from .factories import CourseRerunFactory
-from openedx.features.cms import helpers
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from cms.djangoapps.contentstore.tests.test_courseware_index import COURSE_CHILD_STRUCTURE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from lms.djangoapps.courseware.courses import get_course_by_id
+from openedx.features.cms import helpers
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from .factories import CourseRerunFactory
 
 RUBRIC_ASSESSMENTS = [
     {
