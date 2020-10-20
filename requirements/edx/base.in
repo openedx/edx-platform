@@ -84,6 +84,7 @@ edx-drf-extensions
 edx-enterprise
 edx-milestones
 edx-name-affirmation
+edx-opaque-keys
 edx-organizations
 edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
@@ -165,3 +166,6 @@ XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
+webob                               # WSGI request and response objects. Used in openedx/core/lib/xmodule.
+docopt                              # Language for description of command-line interfaces. Used in openedx/core/lib/xmodule.
+path.py                             # Treat path objects as first-class entities. Used in openedx/core/lib/xmodule.
