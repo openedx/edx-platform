@@ -4,7 +4,6 @@ Views for login / logout and associated functionality
 Much of this file was broken out from views.py, previous history can be found there.
 """
 
-
 import json
 import logging
 
@@ -32,7 +31,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
-from openedx.core.djangoapps.user_authn.cookies import refresh_jwt_cookies, set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.cookies import get_response_with_refreshed_jwt_cookies, set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.user_authn.utils import should_redirect_to_logistration_mircrofrontend
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
@@ -526,8 +525,7 @@ def login_refresh(request):
         return JsonResponse('Unauthorized', status=401)
 
     try:
-        response = JsonResponse({'success': True})
-        return refresh_jwt_cookies(request, response, request.user)
+        return get_response_with_refreshed_jwt_cookies(request, request.user)
     except AuthFailedError as error:
         log.exception(error.get_response())
         return JsonResponse(error.get_response(), status=400)
