@@ -41,6 +41,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import TEST_PASSWORD, UserFactory
 from student.tests.test_configuration_overrides import fake_get_value
 from student.tests.test_email import mock_render_to_string
+from student.models import AccountRecovery
 
 from util.password_policy_validators import create_validator_config
 from util.testing import EventTestMixin
@@ -720,27 +721,30 @@ class PasswordResetTokenValidateViewTest(UserAPITestCase):
     settings.ROOT_URLCONF == "lms.urls",
     "reset password tests should only run in LMS"
 )
-class ResetPasswordAPITests(CacheIsolationTestCase):
+class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
     """Tests of the logistration API's password reset endpoint. """
     request_factory = RequestFactory()
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(ResetPasswordAPITests, self).setUp()
+        super(ResetPasswordAPITests, self).setUp('openedx.core.djangoapps.user_authn.views.password_reset.tracker')
         self.user = UserFactory.create()
         self.user.save()
         self.token = default_token_generator.make_token(self.user)
         self.uidb36 = int_to_base36(self.user.id)
+        self.secondary_email = 'secondary@test.com'
+        AccountRecovery.objects.create(user=self.user, secondary_email=self.secondary_email)
 
-    def create_reset_request(self, uidb36, token, new_password2='new_password1'):
+    def create_reset_request(self, uidb36, token, is_account_recovery, new_password2='new_password1'):
         """Helper to create reset password post request"""
 
         request_param = {'new_password1': 'new_password1', 'new_password2': new_password2}
+        query_param = "?track=pwreset&is_account_recovery=true" if is_account_recovery else "?track=pwreset"
         post_request = self.request_factory.post(
             reverse(
                 "logistration_password_reset",
                 kwargs={"uidb36": uidb36, "token": token}
-            ),
+            ) + query_param,
             request_param
         )
         return post_request
@@ -756,7 +760,7 @@ class ResetPasswordAPITests(CacheIsolationTestCase):
         uidb36 = uidb36 or self.uidb36
         token = token or self.token
 
-        post_request = self.create_reset_request(uidb36, token)
+        post_request = self.create_reset_request(uidb36, token, False)
         post_request.user = AnonymousUser()
         json_response = password_reset_logistration(post_request, uidb36=uidb36, token=token)
         json_response = json.loads(json_response.content.decode('utf-8'))
@@ -769,7 +773,7 @@ class ResetPasswordAPITests(CacheIsolationTestCase):
         uidb36 = None
         token = None
 
-        post_request = self.create_reset_request(self.uidb36, self.token)
+        post_request = self.create_reset_request(self.uidb36, self.token, False)
         post_request.user = AnonymousUser()
         self.assertRaises(Exception, password_reset_logistration(post_request, uidb36=uidb36, token=token))
 
@@ -777,8 +781,49 @@ class ResetPasswordAPITests(CacheIsolationTestCase):
         """
         Test that user should not be able to reset password with password mismatch
         """
-        post_request = self.create_reset_request(self.uidb36, self.token, 'new_password2')
+        post_request = self.create_reset_request(self.uidb36, self.token, False, 'new_password2')
         post_request.user = AnonymousUser()
         json_response = password_reset_logistration(post_request, uidb36=self.uidb36, token=self.token)
         json_response = json.loads(json_response.content.decode('utf-8'))
         self.assertFalse(json_response.get('reset_status'))
+
+    def test_account_recovery_using_forgot_password(self):
+        """
+        Test that with is_account_recovery query param available, primary
+        email is updated with linked secondary email.
+        """
+        post_request = self.create_reset_request(self.uidb36, self.token, True)
+        post_request.user = AnonymousUser()
+        password_reset_logistration(post_request, uidb36=self.uidb36, token=self.token)
+
+        updated_user = User.objects.get(id=self.user.id)
+        self.assertEqual(updated_user.email, self.secondary_email)
+
+        self.assert_event_emitted(
+            SETTING_CHANGE_INITIATED,
+            user_id=self.user.id,
+            setting=u'email',
+            old=self.user.email,
+            new=updated_user.email
+        )
+
+    def test_password_reset_email_sent_on_account_recovery_email(self):
+        """
+        Test that with is_account_recovery query param available, password
+        reset email is sent to newly updated email address.
+        """
+        post_request = self.create_reset_request(self.uidb36, self.token, True)
+        post_request.user = AnonymousUser()
+        post_request.site = Mock(domain='example.com')
+        password_reset_logistration(post_request, uidb36=self.uidb36, token=self.token)
+        updated_user = User.objects.get(id=self.user.id)
+
+        from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+        sent_message = mail.outbox[0]
+        body = sent_message.body
+
+        self.assertIn('Password reset completed', sent_message.subject)
+        self.assertIn('This is to confirm that you have successfully changed your password', body)
+        self.assertEqual(sent_message.from_email, from_email)
+        self.assertEqual(len(sent_message.to), 1)
+        self.assertIn(updated_user.email, sent_message.to[0])

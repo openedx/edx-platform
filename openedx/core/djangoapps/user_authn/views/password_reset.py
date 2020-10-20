@@ -711,6 +711,26 @@ def password_reset_logistration(request, **kwargs):
             form.save()
             reset_status = True
 
+            if 'is_account_recovery' in request.GET:
+                try:
+                    old_primary_email = user.email
+                    user.email = user.account_recovery.secondary_email
+                    user.account_recovery.delete()
+                    # emit an event that the user changed their secondary email to the primary email
+                    tracker.emit(
+                        SETTING_CHANGE_INITIATED,
+                        {
+                            "setting": "email",
+                            "old": old_primary_email,
+                            "new": user.email,
+                            "user_id": user.id,
+                        }
+                    )
+                    user.save()
+                    send_password_reset_success_email(user, request)
+                except ObjectDoesNotExist:
+                    log.error('Account recovery process initiated without AccountRecovery instance for user {username}'
+                              .format(username=user.username))
     except ValidationError as err:
         AUDIT_LOG.exception("Password validation failed")
         error_status = {
