@@ -56,7 +56,7 @@ from .transcripts_utils import (
     VideoTranscriptsMixin,
     clean_video_id,
     get_html5_ids,
-    get_transcript_for_video,
+    get_transcript,
     subs_filename
 )
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
@@ -597,12 +597,7 @@ class VideoBlock(
         possible_sub_ids = [self.sub, self.youtube_id_1_0] + get_html5_ids(self.html5_sources)
         for sub_id in possible_sub_ids:
             try:
-                get_transcript_for_video(
-                    self.location,
-                    subs_id=sub_id,
-                    file_name=sub_id,
-                    language=u'en'
-                )
+                _, sub_id, _ = get_transcript(self, lang=u'en', output_format=Transcript.TXT)
                 transcripts_info['transcripts'] = dict(transcripts_info['transcripts'], en=sub_id)
                 break
             except NotFoundError:
@@ -1033,10 +1028,7 @@ class VideoBlock(
         def _update_transcript_for_index(language=None):
             """ Find video transcript - if not found, don't update index """
             try:
-                transcripts = self.get_transcripts_info()
-                transcript = self.get_transcript(
-                    transcripts, transcript_format='txt', lang=language
-                )[0].replace("\n", " ")
+                transcript = get_transcript(self, lang=language, output_format=Transcript.TXT)[0].replace("\n", " ")
                 transcript_index_name = "transcript_{}".format(language if language else self.transcript_language)
                 video_body.update({transcript_index_name: transcript})
             except NotFoundError:
