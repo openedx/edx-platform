@@ -250,7 +250,7 @@ class TestRecommenderResourceBase(TestRecommender):
         """
         resource = {"id": resource_id}
         edited_recommendations = {
-            key: value + "edited" for key, value in self.test_recommendations[self.resource_id].iteritems()
+            key: value + " edited" for key, value in self.test_recommendations[self.resource_id].iteritems()
         }
         resource.update(edited_recommendations)
         return resource
