@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-27 20:43+0000\n"
+"POT-Creation-Date: 2020-10-18 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -81,6 +81,15 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "დისკუსია"
+
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Video"
+msgstr "ვიდეო"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
@@ -133,8 +142,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Name"
 msgstr "სახელი"
 
@@ -142,12 +149,6 @@ msgstr "სახელი"
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video ID"
 msgstr "ვიდეოს ID"
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/shoppingcart/receipt.html
-msgid "Status"
-msgstr "სტატუსი"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is listed as the duration for a video that has not
@@ -300,11 +301,6 @@ msgstr ""
 "(მარაგის შესანახი ერთეული). "
 
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Honor"
-msgstr "საპატიო"
-
-#: common/djangoapps/course_modes/models.py
 msgid ""
 "Professional education modes are not allowed to have expiration_datetime "
 "set."
@@ -318,18 +314,11 @@ msgid ""
 "set a price greater than or equal to {min_price}."
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This will look like '$50', where {currency_symbol} is a symbol
 #. such as '$' and {price} is a
 #. numerical amount in that currency. Adjust this display as needed for your
 #. language.
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-#. Translators: currency_symbol is a symbol indicating type of currency, ex
-#. "$".
-#. This string would look like this when all variables are in:
-#. "$500.00"
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/shoppingcart/shopping_cart.html
 #, python-brace-format
 msgid "{currency_symbol}{price}"
 msgstr "{currency_symbol}{price}"
@@ -705,6 +694,10 @@ msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
 "follows:                     username, email, new_email"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Add a reason"
 msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
@@ -3367,17 +3360,12 @@ msgid "Teams Configuration"
 msgstr "გუნდების კონფიგურაცია"
 
 #: common/lib/xmodule/xmodule/course_module.py
-#, python-brace-format
 msgid ""
-"Specify the maximum team size and topics for teams inside the provided set "
-"of curly braces. Make sure that you enclose all of the sets of topic values "
-"within a set of square brackets, with a comma after the closing curly brace "
-"for each topic, and another comma after the closing square brackets. For "
-"example, to specify that teams should have a maximum of 5 participants and "
-"provide a list of 2 topics, enter the configuration in this format: "
-"{example_format}. If no max_size is provided, it will default to "
-"{default_max}In \"id\" values, the only supported special characters are "
-"underscore, hyphen, and period."
+"Configure team sets, limit team sizes, and set visibility settings using "
+"JSON. See <a target=\"&#95;blank\" "
+"href=\"https://edx.readthedocs.io/projects/edx-partner-course-"
+"staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
+"teams\">teams configuration documentation</a> for help and examples."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3796,17 +3784,22 @@ msgstr ""
 "შეიყვანეთ."
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
-msgid "Library Block"
+msgid "Library Blocks List"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
-msgid "Enter the IDs of the library XBlock that you wish to use."
+msgid "Enter the IDs of the library XBlocks that you wish to use."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_sourced_block.py
+#, python-brace-format
+msgid "A maximum of {0} components may be added."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
 msgid ""
-"No XBlock has been configured for this component. Enter the target ID below "
-"or in the editor"
+"No XBlock has been configured for this component. Use the editor to select "
+"the target blocks."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
@@ -4510,7 +4503,6 @@ msgstr "მთავარი"
 
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/courseware/views/views.py
-#: lms/djangoapps/shoppingcart/reports.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html
 #: lms/templates/courseware/course_navigation.html
@@ -4518,6 +4510,16 @@ msgstr "მთავარი"
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Course"
 msgstr "კურსი"
+
+#: common/lib/xmodule/xmodule/templates/library-sourced-block-studio-view.html
+msgid "Save and Import"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/templates/library-sourced-block-studio-view.html
+#: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/user_api/admin.py
+msgid "Cancel"
+msgstr "გაუქმება"
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 #, python-brace-format
@@ -5864,7 +5866,7 @@ msgstr "შეკვეთის მიღების გვერდის მ
 msgid "Automatically approve valid refund requests, without manual processing"
 msgstr ""
 
-#: lms/djangoapps/commerce/utils.py lms/djangoapps/shoppingcart/models.py
+#: lms/djangoapps/commerce/utils.py
 msgid "[Refund] User-Requested Refund"
 msgstr "[Refund] მომხმარებლის მოთხოვნილი ანაზღაურება"
 
@@ -6357,6 +6359,16 @@ msgstr ""
 "მიერ დამოწმებული იდენტობა."
 
 #: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate will be available soon!"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"After this course officially ends, you will receive an email notification "
+"with your certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate is available"
 msgstr "თქვენი სერტიფიკატი ხელმისაწვდომია"
 
@@ -6372,6 +6384,7 @@ msgid "{sign_in_link} or {register_link}."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
@@ -6617,7 +6630,7 @@ msgid "Added Course"
 msgstr "დამატებული კურსი"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
-#: cms/templates/index.html lms/templates/shoppingcart/receipt.html
+#: cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Course Name"
 msgstr "კურსის სახელწოდება"
@@ -7062,14 +7075,12 @@ msgstr "გუნდი"
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "City"
 msgstr "ქალაქი"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Country"
 msgstr "ქვეყანა"
@@ -7896,786 +7907,6 @@ msgstr ""
 msgid "One of user or external_user_key must not be null."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Order Payment Confirmation"
-msgstr "შეკვეთის გადახდის დადასტურება"
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"Confirmation and Registration Codes for the following courses: "
-"{course_name_list}"
-msgstr ""
-"შემდეგი კურსების დადასტურებისა და რეგისტრაციის კოდები: {course_name_list}"
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Trying to add a different currency into the cart"
-msgstr "კალათაში განსხვავებული ვალუტის დამატების მცდელობა"
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Internal reference code for this invoice."
-msgstr "ანგარიშფაქტურის შიდა  კოდური მონაცემები."
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Customer's reference code for this invoice."
-msgstr "მომხმარებლის ანგარიშფაქტურის კოდი."
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid ""
-"The amount of the transaction.  Use positive amounts for payments and "
-"negative amounts for refunds."
-msgstr ""
-"ტრანზაქციების რაოდენობა. გადახდებისთვის გამოიყენეთ დადებითი, ხოლო "
-"დაბრუნებისთვის უარყოფითი მაჩვენებელი."
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Lower-case ISO currency codes"
-msgstr "ვალუტის ქვედა რეგისტრის კოდები ISO სტანდარტით"
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Optional: provide additional information for this transaction"
-msgstr "არასავალდებულო: ტრანზაქციის შესახებ დამატებითი ინფორმაცია"
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid ""
-"The status of the payment or refund. 'started' means that payment is "
-"expected, but money has not yet been transferred. 'completed' means that the"
-" payment or refund was received. 'cancelled' means that payment or refund "
-"was expected, but was cancelled before money was transferred. "
-msgstr ""
-"გადახდის ან ანაზღაურების სტატუსი. 'დაწყებულია' ნიშნავს, რომ გადახდის პროცესი"
-" მიმდინარეობს, თუმცა ფული ჯერ არ გადარიცხულა. 'დასრულებულია' ნიშნავს, რომ "
-"გადახდა ან ანაზღაურება მიღებულია. 'გაუქმებულია' ნიშნავს, რომ გადახდის ან "
-"ანაზღაურების პროცესი დაწყებული იყო, მაგრამ ფულის გადარიცხვამდე შეწყდა."
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "The number of items sold."
-msgstr "გაყიდული ერთეულების რაოდენობა."
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "The price per item sold, including discounts."
-msgstr "გაყიდული ერთეულის ფასი, ფასადკლების გათვალისწინებით."
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Registration for Course: {course_name}"
-msgstr "რეგისტრაცია კურსზე: {course_name}"
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"Please visit your {link_start}dashboard{link_end} to see your new course."
-msgstr ""
-"თქვენი ახალი კურსის სანახავად, გთხოვთ, ეწვიოთ {link_start}მართვის "
-"პანელს{link_end}."
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Enrollment codes for Course: {course_name}"
-msgstr "რეგისტრაციის კოდები კურსისთვის: {course_name}"
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Mode {mode} does not exist for {course_id}"
-msgstr "{course_id}-თვის არ არსებობს {mode} რეჟიმი"
-
-#. Translators: In this particular case, mode_name refers to a
-#. particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)
-#. by which a user could enroll in the given course.
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "{mode_name} for course {course}"
-msgstr "{course} კურსის {mode_name} "
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"To receive a refund you may unenroll from the course on your edX Dashboard "
-"({dashboard_url}) up to 14 days after your payment or 14 days after your "
-"course starts (up to six months after your payment).\n"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"If you haven't verified your identity yet, please start the verification "
-"process ({verification_url})."
-msgstr ""
-"თუ ჯერ არ შეგიმოწმებიათ თქვენი პირადობა, გთხოვთ, გდაიწყეთ შემოწმების პროცესი"
-" ({verification_url})."
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid ""
-"You can unenroll in the course and receive a full refund for 2 days after "
-"the course start date.\n"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"{refund_reminder_msg}For help unenrolling, Please see How do I unenroll from"
-" a course? ({how_to_unenroll_link}) in our edX HelpCenter."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid ""
-"We greatly appreciate this generous contribution and your support of the "
-"{platform_name} mission.  This receipt was prepared to support charitable "
-"contributions for tax purposes.  We confirm that neither goods nor services "
-"were provided in exchange for this gift."
-msgstr ""
-"ძალიან ვაფასებთ {platform_name} მისიის მხარდასაჭერად თქვენს გულუხვ შენატანსა"
-" და ძალისმხევას. ეს ჩეკი მომზადდა საგადასახადო მიზნებისთვის, საქველმოქმედო "
-"შემოწირულობის მხარდასაჭერად. ვადასტურებთ, რომ საჩუქრის სანაცვლოდ "
-"მომსახურების ან საქონლის მიწოდება არ განხორციელებულა."
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Could not find a course with the ID '{course_id}'"
-msgstr "კურსი '{course_id}' მითითებული ID-ით ვერ მოიძებნა"
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Donation for {course}"
-msgstr "შემოწირულობა {course}-თვის "
-
-#: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
-msgid "Donation for {platform_name}"
-msgstr "შემოწირულობა {platform_name}-თვის"
-
-#. Translators: this text appears when an unfamiliar error code occurs during
-#. payment,
-#. for which we don't know a user-friendly message to display in advance.
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "UNKNOWN REASON"
-msgstr "უცნობი მიზეზი"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid "The payment processor did not return a required parameter: {parameter}"
-msgstr "გადახდის პროცესორმა არ დააბრუნა სავალდებულო პარამეტრი: {parameter}"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"The payment processor returned a badly-typed value {value} for parameter "
-"{parameter}."
-msgstr ""
-"გადახდის პროცესორმა პარამეტრისთვის {parameter} შეცდომით აკრეფილი მნიშვნელობა"
-" {value} დააბრუნა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The payment processor accepted an order whose number is not in our system."
-msgstr ""
-"გადახდის პროცესორმა მიიღო შეკვეთა, რომლის ნომერიც ჩვენს სისტემაში არ "
-"ფიქსირდება."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"The amount charged by the processor {charged_amount} "
-"{charged_amount_currency} is different than the total cost of the order "
-"{total_cost} {total_cost_currency}."
-msgstr ""
-"პროცესორის მიერ ჩამოჭრილი თანხა {charged_amount} {charged_amount_currency} "
-"არ ემთხვევა ამ შეკვეთის სრულ ღირებულებას {total_cost} {total_cost_currency}."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor did not accept your payment.  The decision they"
-" returned was {decision}, and the reason was {reason}.  You were not "
-"charged. Please try a different form of payment.  Contact us with payment-"
-"related questions at {email}."
-msgstr ""
-"ვწუხვართ! ჩვენმა პროცესორმა არ მიიღო თქვენი გადახდა. გადაწყვეტილების "
-"საფუძველი იყო {decision}, მიზეზი - {reason}. თანხა არ ჩამოგეჭრათ.  გთხოვთ, "
-"სცადეთ გადახდის სხვა მეთოდი. გადახდასთან დაკავშირებული კითხვებით "
-"დაგვიკავშირდით {email}-ზე."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a payment confirmation that had "
-"inconsistent data! We apologize that we cannot verify whether the charge "
-"went through and take further action on your order. The specific error "
-"message is: {msg} Your credit card may possibly have been charged.  Contact "
-"us with payment-specific questions at {email}."
-msgstr ""
-"ვწუხვართ! შეუსაბამო მონაცემების გამო, ჩვენმა პროცესორმა უკან დაგვიბრუნა "
-"გადახდის დადასტურება! ბოდიშს გიხდით, რადგან ვერ ვადგენთ თანხა ჩამოგეჭრათ თუ "
-"არა და შესაბამისად ვერ განვაგრძობთ თქვენი შეკვეთის დამუშავებას. შეცდომის "
-"განმსაზღვრელი შეტყობინება არის: {msg}. შესაძლოა, საკრედიტო ბარათიდან თანხა "
-"ჩამოგეჭრათ. კონკრეტულ გადახდასთან დაკავშირებული კითხვებით დაგვიკავშირდით "
-"{email}-ზე."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Due to an error your purchase was charged for a different amount than"
-" the order total! The specific error message is: {msg}. Your credit card has"
-" probably been charged. Contact us with payment-specific questions at "
-"{email}."
-msgstr ""
-"ვწუხვართ! შეცდომის გამო, თქვენს შესყიდვაზე დაირიცხა შეკვეთის სრული "
-"ღირებულებისგან განსხვავებული თანხა! კონკრეტული შეცდომის შეტყობინებაა: {msg}."
-"  სავარაუდოდ, საკრედიტო ბარათიდან თანხა ჩამოგეჭრათ. კონკრეტულ გადახდასთან "
-"დაკავშირებული კითხვებით დაგვიკავშირდით {email}-ზე."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a corrupted message regarding your"
-" charge, so we are unable to validate that the message actually came from "
-"the payment processor. The specific error message is: {msg}. We apologize "
-"that we cannot verify whether the charge went through and take further "
-"action on your order. Your credit card may possibly have been charged. "
-"Contact us with payment-specific questions at {email}."
-msgstr ""
-"ვწუხვართ! თქვენს დარიცხვასთან დაკავშირებით ჩვენმა პროცესორმა დაზიანებული "
-"შეტყობინება დაგვიბრუნა, რის გამოც ვერ ვადასტურებთ, რომ შეტყობინება ნამდვილად"
-" პროცესორისგან მივიღეთ. შეცდომის განმსაზღვრელი შეტყობინებაა: {msg}. ბოდიშს "
-"გიხდით, რადგან ვერ ვადგენთ თანხა ჩამოგეჭრათ თუ არა და შესაბამისად ვერ "
-"განვაგრძობთ თქვენი შეკვეთის დამუშავებას. შესაძლოა, საკრედიტო ბარათიდან თანხა"
-" ჩამოგეჭრათ. კონკრეტულ გადახდასთან დაკავშირებული კითხვებით დაგვიკავშირდით "
-"{email}-ზე."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a message saying that you have "
-"cancelled this transaction. The items in your shopping cart will exist for "
-"future purchase. If you feel that this is in error, please contact us with "
-"payment-specific questions at {email}."
-msgstr ""
-"ვწუხვართ! ჩვენი გადახდის პროცესორისგან მივიღეთ შეტყობინება, რომ თქვენ "
-"გააუქმეთ ეს ტრანზაქცია. საყიდლების კალათაში ნივთი მომავალ შესყიდვამდე "
-"დარჩება. თუ ფიქრობთ, რომ ეს შეცდომაა, გთხოვთ კონკრეტულ გადახდასთან "
-"დაკავშირებული კითხვებით დაგვიკავშირდით {email}-ზე."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"We're sorry, but this payment was declined. The items in your shopping cart "
-"have been saved. If you have any questions about this transaction, please "
-"contact us at {email}."
-msgstr ""
-"ვწუხვართ, მაგრამ ეს გადახდა უარყოფილია. ნივთი შენახულია თქვენი საყიდლების "
-"კალათაში. ამ ტრანზაქციასთან დაკავშირებული შეკითხვებით გთხოვთ დაგვიკავშირდით "
-"{email}-ზე."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Your payment could not be processed because an unexpected exception "
-"occurred. Please contact us at {email} for assistance."
-msgstr ""
-"ვწუხვართ! მოულოდნელი გამონაკლისის გამო თქვენი გადახდა ვერ მუშავდება. "
-"დახმარებისთვის, გთხოვთ დაგვიკავშირდით {email}."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Successful transaction."
-msgstr "წარმატებული ტრანზაქცია."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request is missing one or more required fields."
-msgstr "მოთხოვნაში გამოტოვებულია ერთი ან მეტი სავალდებულო ველი."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "One or more fields in the request contains invalid data."
-msgstr "მოთხოვნაში ერთი ან მეტი ველი არასწორ მონაცემებს შეიცავს."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The merchant reference code for this authorization request matches the merchant reference code of another\n"
-"            authorization request that you sent within the past 15 minutes.\n"
-"            Possible action: Resend the request with a unique merchant reference code.\n"
-"            "
-msgstr ""
-"\n"
-"ავტორიზაციის მოთხოვნის სავაჭრო პარამეტრების კოდი ემთხვევა სავაჭრო პარამეტრების სხვა კოდის\n"
-"ავტორიზაციის მოთხოვნას, რომელიც ბოლო 15 წუთის განმავლობაში გამოგზავნეთ.\n"
-"შესაძლო ქმედება: ხელახლა გამოგზავნეთ მოთხოვნა სავაჭრო პარამეტრების უნიკალური კოდით."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Only a partial amount was approved."
-msgstr "რაოდენობის მხოლოდ ნაწილი დამტკიცდა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "General system failure."
-msgstr "ძირითადი სისტემური შეცდომა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The request was received but there was a server timeout. This error does not include timeouts between the\n"
-"            client and the server.\n"
-"            "
-msgstr ""
-"\n"
-"მოთხოვნა მიღებულია, მაგრამ სერვერი დროებით შეჩერებულია. ეს შეცდომა არ მოიცავს დროებით შეჩერებას \n"
-"კლიენტსა და სერვერს შორის."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The request was received, but a service did not finish running in time."
-msgstr "მოთხოვნა მიღებულია, მაგრამ მომსახურება დროულად ვერ დასრულდა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by CyberSource\n"
-"            because it did not pass the Address Verification System (AVS).\n"
-"            "
-msgstr ""
-"\n"
-"ავტორიზაციის მოთხოვნა დამტკიცდა გამცემი ბანკის მიერ, მაგრამ CyberSource-მა უარყო\n"
-"რადგან მისამართის შემოწმების სისტემა (AVS) არ ქონდა გავლილი."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The issuing bank has questions about the request. You do not receive an\n"
-"            authorization code programmatically, but you might receive one verbally by calling the processor.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"გამცემ ბანკს თქვენს მოთხოვნასთან დაკავშირებით კითხვები აქვს. პროგრამულად არ მიიღებთ\n"
-"ავტორიზაციის კოდს, მაგრამ შესაძლოა პროცესორთან დარეკვით, სიტყვიერად შეგატყობინონ.\n"
-"შესაძლო ქმედება: სცადეთ გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            Expired card. You might also receive this if the expiration date you\n"
-"            provided does not match the date the issuing bank has on file.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"ვადაგასული ბარათი. ასევე, შესაძლოა ეს შეტყობინება მიიღოთ თუ თქვენს მიერ მითითებული ვადის გასვლის თარიღი\n"
-"არ ემთხვევა  გამცემი ბანკის მიერ ფაილზე მითითებულ თარიღს.\n"
-"შესაძლო ქმედება: სცადეთ გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            General decline of the card. No other information provided by the issuing bank.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"ბარათის სრული უარყოფა. გამცემ ბანკს სხვა ინფორმაცია არ მოუწოდებია. \n"
-"შესაძლო ქმედება: სცადეთ გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Insufficient funds in the account. Possible action: retry with another form "
-"of payment."
-msgstr ""
-"ანგარიშზე არასაკმარისი თანხა. შესაძლო ქმედება: სცადეთ გადახდის სხვა "
-"საშუალება."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Stolen or lost card."
-msgstr "მოპარული ან დაკარგული ბარათი."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Issuing bank unavailable. Possible action: retry again after a few minutes."
-msgstr ""
-"გამცემი ბანკი მიუწვდომელია. შესაძლო ქმედება: კვლავ სცადეთ რამდენიმე წუთში."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            Inactive card or card not authorized for card-not-present transactions.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"ბარათი გაუქმებულია ან ბარათზე არ არის ავტორიზებული ბარათის წარდგენის გარეშე ტრანზაქციების განხორციელება. \n"
-"შესაძლო ქმედება: სცადეთ გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "CVN did not match."
-msgstr "CVN კოდი არ ემთხვევა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The card has reached the credit limit. Possible action: retry with another "
-"form of payment."
-msgstr ""
-"ბარათი კრედიტის ლიმიტს მიუახლოვდა. შესაძლო ქმედება: კვლავ სცადეთ გადახდის "
-"სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Invalid card verification number (CVN). Possible action: retry with another "
-"form of payment."
-msgstr ""
-"ბარათის დამოწმების არასწორი ნომერი (CVN). შესაძელო ქმედება: კვლავ სცადეთ "
-"გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The customer matched an entry on the processors negative file."
-msgstr "მომხმარებელი დაემთხვა პროცესორის უარყოფით ფაილში ჩანაწერს."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Account frozen. Possible action: retry with another form of payment."
-msgstr ""
-"ანგარიში გაყინულია. სავარაუდო მოქმედება: კვლავ სცადეთ გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by\n"
-"            CyberSource because it did not pass the CVN check.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"ავტორიზაციის მოთხოვნა დამტკიცდა გამცემი ბანკისგან, მაგრამ CyberSource-მა უარყო,\n"
-"რადგან CVN შემოწმება არ ჰქონდა გავლილი.\n"
-"შესაძლო ქმედება:  სცადეთ გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Invalid account number. Possible action: retry with another form of payment."
-msgstr ""
-"ანგარიშის არასწორი ნომერი. შესაძლო ქმედება: სცადეთ გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The card type is not accepted by the payment processor.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"ამ ტიპის ბარათს გადახდის პროცესორი არ იღებს. \n"
-"შესაძლო ქმედება: სცადეთ გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"General decline by the processor.  Possible action: retry with another form "
-"of payment."
-msgstr ""
-"პროცესორისგან სრულად უარყოფილია. შესაძლო ქმედება: სცადეთ გადახდის სხვა "
-"ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"There is a problem with the information in your CyberSource account.  Please"
-" let us know at {0}"
-msgstr ""
-"თქვენს CyberSource ანგარიშზე ინფორმაციული პრობლემაა. გთხოვთ, დაგვიკავშირდით "
-"{0}"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The requested capture amount exceeds the originally authorized amount."
-msgstr "მოთხოვნილი თანხა აჭარბებს საწყის ეტაპზე დამტკიცებულ რაოდენობას."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Processor Failure.  Possible action: retry the payment"
-msgstr "პროცესორის შეცდომა. შესაძლო ქმედება: გაიმეორეთ გადახდა"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The authorization has already been reversed."
-msgstr "ავტორიზაცია უკვე გაუქმებულია."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The authorization has already been captured."
-msgstr "ავტორიზაცია უკვე მიღებულია."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The requested transaction amount must match the previous transaction amount."
-msgstr ""
-"ტრანზაქციისთვის მოთხოვნილი რაოდენობა უნდა ემთხვეოდეს წინა ტრანზაქციის "
-"რაოდენობას."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The card type sent is invalid or does not correlate with the credit card number.\n"
-"            Possible action: retry with the same card or another form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"გამოგზავნილი ბარათის ტიპი გაუქმებულია ან არ ემთხვევა საკრედიტო ბარათის ნომერს.\n"
-"შესაძლო ქმედება: სცადეთ იგივე ბარათი ან  გადახდის სხვა ფორმა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request ID is invalid."
-msgstr "მოთხოვნის ID არასწორია."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            You requested a capture, but there is no corresponding, unused authorization record. Occurs if there was\n"
-"            not a previously successful authorization request or if the previously successful authorization has already\n"
-"            been used by another capture request.\n"
-"            "
-msgstr ""
-"\n"
-"თქვენ მოითხოვეთ თანხა, მაგრამ შესაბამისი ავტორიზაციის გამოუყენებელი ჩანაწერი არ არსებობს. როგორც ჩანს, ადგილი ჰქონდა\n"
-"ავტორიზაციის წარუმატებელ მოთხოვნას ან ავტორიზაციის წარმატებულ მოთხოვნას, რომელიც უკვე გამოყენებულია გადახდის სხვა მოთხოვნის მიერ."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The transaction has already been settled or reversed."
-msgstr "ტრანზაქცია უკვე დასრულებული ან გაუქმებულია."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            Either the capture or credit is not voidable because the capture or credit information has already been\n"
-"            submitted to your processor, or you requested a void for a type of transaction that cannot be voided.\n"
-"            "
-msgstr ""
-"\n"
-"გადახდა ან კრედიტი გაუქმებას არ ექვემდებარება, რადგან გადახდა ან საკრედიტო ინფორმაცია უკვე\n"
-"გაგზავნილია თქვენი გადახდის პროცესორთან დასამუშავებლად ან თქვენ მოითხოვეთ ისეთი ტრანზაქციის გაუქმება, რომელიც ვერ გაბათილდება."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "You requested a credit for a capture that was previously voided."
-msgstr "თქვენ მოითხოვეთ კრედიტი თანხისთვის, რაომლის ტრანზაქციაც უკვე გაუქმდა."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The request was received, but there was a timeout at the payment processor."
-msgstr ""
-"მოთხოვნა მიღებულია, მაგრამ გადახდის პროცესორმა ვერ მოასწრო მისი დამუშავება."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Stand-alone credits are not allowed."
-msgstr "ავტონომიური კრედიტები დაშვებული არ არის."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The cardholder is enrolled for payer authentication"
-msgstr "ბარათის მფლობელი დარეგისტრირდა გადამხდელის იდენტიფიკაციაზე"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Payer authentication could not be authenticated"
-msgstr "ვერ ხერხდება გადამხდელის იდენტიფიკაცია"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by CyberSource based\n"
-"            on your legacy Smart Authorization settings.\n"
-"            Possible action: retry with a different form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"ავტორიზაციის მოთხოვნა დაამტკიცა გამცემმა ბანკმა, მაგრამ უარყო CyberSource -მა\n"
-"ჭკვიანი ავტორიზაციის მოძველებული პარამეტრების საფუძველზე.\n"
-"შესაძლო ქმედება: სცადეთ გადახდის სხვა მეთოდი."
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order Number"
-msgstr "შეკვეთის ნომერი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Customer Name"
-msgstr "მომხმარებლის სახელი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Original Transaction"
-msgstr "საწყისი ტრანზაქციის თარიღი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Refund"
-msgstr "თანხის დაბრუნების თარიღი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Amount of Refund"
-msgstr "დაბრუნებული თანხის რაოდენობა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Service Fees (if any)"
-msgstr "მომსახურების ღირებულება (არსებობის შემთხვევაში)"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Purchase Time"
-msgstr "შესყიდვის დრო"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order ID"
-msgstr "გადახდის ID"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr "რაოდენობა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Unit Cost"
-msgstr "ერთეულის ფასი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Cost"
-msgstr "სრული ღირებულება"
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Currency"
-msgstr "ვალუტა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: wiki/plugins/attachments/forms.py
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-msgid "Description"
-msgstr "აღწერა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Comments"
-msgstr "კომენტარები"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "University"
-msgstr "უნივერსიტეტი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Announce Date"
-msgstr "კურსის გამოცხადების თარიღი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Start Date"
-msgstr "კურსის დაწყების თარიღი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Close Date"
-msgstr "კურსზე რეგისტრაციის დასრულების თარიღი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Period"
-msgstr "კურსზე რეგისტრაციის პერიოდი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Enrolled"
-msgstr "ჩარიცხულთა სრული რაოდენობა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Audit Enrollment"
-msgstr "თავისუფალ მსმენელად ჩარიცხვა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Honor Code Enrollment"
-msgstr "ღირსების კოდექსზე რეგისტრაცია"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Verified Enrollment"
-msgstr "დამოწმებული ჩარიცხვა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Gross Revenue"
-msgstr "მთლიანი შემოსავალი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Gross Revenue over the Minimum"
-msgstr "მთლიანი შემოსავლის მინიმუმი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Verified Students Contributing More than the Minimum"
-msgstr "დამოწმებული მსმენელების რაოდენობის წვლილი მინიმუმზე მეტია"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Refunds"
-msgstr "თანხის დაბრუნების რაოდენობა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Dollars Refunded"
-msgstr "დაბრუნებული დოლარი"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Transactions"
-msgstr "ტრანზაქციების რაოდენობა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Payments Collected"
-msgstr "შეგროვებულ გადახდათა სრული ოდენობა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Successful Refunds"
-msgstr "თანხის დაბრუნების წარმატებული ოპერაციების რაოდენობა"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Amount of Refunds"
-msgstr "დაბრუნებული თანხის სრული ოდენობა"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You must be logged-in to add to a shopping cart"
-msgstr "საყიდლების კალათაში დასამატებლად საჭიროა სისტემაში შესვლა"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "The course you requested does not exist."
-msgstr "თქვენ მიერ მოთხოვნილი კურსი არ არსებობს."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "The course {course_id} is already in your cart."
-msgstr "{course_id} კურსი უკვე თქვენს კალათშია."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "You are already registered in course {course_id}."
-msgstr "თქვენ უკვე დარეგისტრირებული ხართ {course_id} კურსზე."
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Course added to cart."
-msgstr "კურსი დამტებულია კალათში."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "Discount does not exist against code '{code}'."
-msgstr "'{code}' კოდის შესატყვისი ფასდაკლება არ არსებობს."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "This enrollment code ({enrollment_code}) is no longer valid."
-msgstr "რეგისტრაციის კოდი ({enrollment_code}) აღარ არის მოქმედი."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "This enrollment code ({enrollment_code}) is not valid."
-msgstr "რეგისტრაციის კოდი ({enrollment_code}) არ არის მოქმედი."
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid ""
-"Code '{registration_code}' is not valid for any course in the shopping cart."
-msgstr ""
-"კოდი '{registration_code}' საყიდლების კალათაში არსებული არცერთი კურსისთვის "
-"არ არის მოქმედი."
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid ""
-"Cart item quantity should not be greater than 1 when applying activation "
-"code"
-msgstr ""
-"აქტივაციის კოდის გამოყენებისას, კალათაში ნივთების რაოდენობა არ უნდა "
-"აღემტებოდეს 1-ს"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Only one coupon redemption is allowed against an order"
-msgstr "შეკვეთაზე ნებადართულია მხოლოდ ერთი კუპონის გამოყენება"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "success"
-msgstr "წარმატება"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You do not have permission to view this page."
-msgstr "თქვენ არ გაქვთ ამ გვერდის ნახვის უფლება."
-
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
 msgstr "სერტიფიკატების დათვალიერება და ხელახლა გენერირება."
@@ -8890,10 +8121,6 @@ msgstr "შესავალი"
 #: lms/djangoapps/verify_student/views.py
 msgid "Make payment"
 msgstr "გადაიხადეთ"
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Payment confirmation"
-msgstr "გადახდის დადასტურება"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Take photo"
@@ -9362,11 +8589,6 @@ msgstr ""
 "ზემოთ მოცემული აპლიკაციისთვის ამ უფლებების მისანიჭებლად დააწკაპუნეთ ღილაკზე "
 "„დაშვება“. ამ უფლებების მინიჭებისგან თავის შეკავების შემთხვევაში, "
 "დააწკაპუნეთ ღილაკზე „გაუქმება“."
-
-#: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/user_api/admin.py
-msgid "Cancel"
-msgstr "გაუქმება"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid "Allow"
@@ -10254,7 +9476,53 @@ msgid "Cannot change or remove the access level for the only admin."
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
+"You can only set a library to {library_type} if all existing blocks are of "
+"that type. Found incompatible block {block_id} with type {block_type}."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
+"Block type \"{block_type}\" is not compatible with library type "
+"\"{library_type}\"."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/api.py
 msgid "Library cannot have more than {} XBlocks"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Complex"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "All Rights Reserved."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-NonCommercial 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-NonCommercial-ShareAlike 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-NoDerivatives 4.0"
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Creative Commons Attribution-ShareAlike 4.0"
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/models.py
@@ -11317,6 +10585,33 @@ msgstr "გთხოვთ, გადადით შემდეგ გვე�
 msgid "Password reset on %(platform_name)s"
 msgstr ""
 
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
+msgid "Password Reset Success"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
+#, python-format
+msgid "Hello %(name)s,"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
+#, python-format
+msgid ""
+"This is to confirm that you have successfully changed your password "
+"associated with %(platform_name)s account. Please sign-in to your account."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.txt
+#, python-format
+msgid "Hello %(name)s, "
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/subject.txt
+#, python-format
+msgid "Password reset completed on %(platform_name)s"
+msgstr ""
+
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
 msgid "Superuser creation not allowed"
 msgstr ""
@@ -11334,12 +10629,19 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "You've successfully signed in to your {provider_name} account, but this "
-"account isn't linked with your {platform_name} account yet.Use your "
-"{platform_name} username and password to sign in to {platform_name} below, "
-"and then link your {platform_name} account with {provider_name} from your "
-"dashboard.If you don't have an account on {platform_name} yet, click "
-"{register_label_strong} at the top of the page."
+"account isn't linked with your {platform_name} account yet. {blank_lines}Use"
+" your {platform_name} username and password to sign in to {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard. {blank_lines}If you don't have an account on {platform_name}"
+" yet, click {register_label_strong} at the top of the page."
 msgstr ""
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Register"
+msgstr "დარეგისტრირება"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 msgid "There was an error receiving your login information. Please email us."
@@ -11646,19 +10948,6 @@ msgstr "უგულვებელყოფა"
 #: openedx/core/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "კურსის გასაღები, რომელზეც ჯგუფებად ავტომატური განაწილება გვსურს."
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "Oauth client name of video pipeline service."
-msgstr ""
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid "edx-video-pipeline API URL."
-msgstr ""
-
-#: openedx/core/djangoapps/video_pipeline/models.py
-msgid ""
-"Username created for Video Pipeline Integration, e.g. veda_service_user."
-msgstr ""
 
 #: openedx/core/djangoapps/video_pipeline/models.py
 msgid "Oauth client name of VEM service."
@@ -12360,14 +11649,6 @@ msgid "HTML"
 msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
-msgid "Problem"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
-msgid "Video"
-msgstr "ვიდეო"
-
-#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "ცარიელი"
 
@@ -12779,6 +12060,10 @@ msgstr "ხანგრძლივობა"
 msgid "Date Added"
 msgstr "დამატების თარიღით"
 
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Status"
+msgstr ""
+
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
 #: cms/djangoapps/contentstore/views/videos.py
@@ -13011,7 +12296,7 @@ msgid "next"
 msgstr "მომდევნო"
 
 #: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
+#: lms/templates/problem.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Reset"
@@ -13806,7 +13091,6 @@ msgid "Next Hint"
 msgstr "მომდევნო მინიშნება"
 
 #: lms/templates/problem_notifications.html
-#: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Review"
 msgstr "განხილვა"
 
@@ -15833,7 +15117,6 @@ msgstr "თქვენ ჩაირიცხეთ ამ კურსზე"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
 #: themes/edx.org/lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
 msgstr "იხილეთ კურსი"
@@ -16035,8 +15318,6 @@ msgstr "სტუდენტების მოძებნა"
 
 #: lms/templates/courseware/gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Total"
 msgstr "სულ"
 
@@ -16143,8 +15424,6 @@ msgid "YouTube Video"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/shopping_cart.html
 msgid "View Courses"
 msgstr "კურსების ნახვა"
 
@@ -17661,13 +16940,6 @@ msgstr "როგორ მუშაობს"
 msgid "Schools"
 msgstr "სკოლები"
 
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Register"
-msgstr "დარეგისტრირება"
-
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr ""
@@ -17695,6 +16967,13 @@ msgstr "კუპონის კოდი"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Discount Percentage"
 msgstr "ფასდაკლების პროცენტი"
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: wiki/plugins/attachments/forms.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "Description"
+msgstr "აღწერა"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Add expiration date"
@@ -17880,6 +17159,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "თავისუფალი მსმენელი"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Honor"
+msgstr "საპატიო"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
@@ -18308,7 +17591,6 @@ msgid "The organization that purchased enrollments in the course"
 msgstr "ირგანიზაცია რომელმაც შეისყიდა კურსზე ჩარიცხვები"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/billing_details.html
 msgid "Organization Contact"
 msgstr "კავშირი ორგანიზაციასთან"
 
@@ -18413,7 +17695,6 @@ msgid "Change the status of an enrollment code."
 msgstr "შეცვალე ჩარიცხვის კოდის სტატუსი. "
 
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Enrollment Code"
 msgstr "ჩარიცხვის კოდი"
 
@@ -18817,6 +18098,10 @@ msgstr "გთხოვთ კურსის მეთოდის დეტა
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Course Price"
 msgstr "კურსის ღირებულება"
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Currency"
+msgstr "ვალუტა"
 
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Set Price"
@@ -19246,7 +18531,6 @@ msgid "Graded"
 msgstr "შეფასებული"
 
 #: lms/templates/peer_grading/peer_grading.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Available"
 msgstr "ხელმისაწვდომი"
 
@@ -19418,447 +18702,6 @@ msgid ""
 msgstr ""
 "ჩვენ იმეილით გამოგიგზავნეთ ინსტრუქციები თქვენი პაროლის დასაყენებლად, თქვენს "
 "მიერ გაგზავნილ ელფოსტაზე. თქვენ მას მალე მიიღებთ."
-
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Billing Details"
-msgstr "ბილინგის დეტალები"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid ""
-"You can proceed to payment at any point in time. Any additional information "
-"you provide will be included in your receipt."
-msgstr ""
-"თქვენ შეგიძლიათ შეუდგეთ გადახდას დროის ნებისმიერ მომენტში. თქვენი მხრიდან "
-"მოწოდებული ნებისმიერი დამატებითი ინფორმაცია აისახება თქვენს ქვითარზე."
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Purchasing Organizational Details"
-msgstr "საორგანიზაციო დეტალების შესყიდვა"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Purchasing organization"
-msgstr "ორგანიზაციის შესყიდვა"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Purchase order number (if any)"
-msgstr "შესყიდვის შეკვეთის ნომერი (ასეთის არსებობის შემთხვევაში)"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "ელფოსტის მისამართი"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "email@example.com"
-msgstr "email@example.com"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Additional Receipt Recipient"
-msgstr "მიმღების დამატებითი ქვითარი"
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid ""
-"If no additional billing details are populated the payment confirmation will"
-" be sent to the user making the purchase."
-msgstr ""
-"თუ ბილინგის დამატებითი დეტალები არ არის შევსებული, გადახდის დადასტურება "
-"გაეგზავნება მომხმარებელს, რომელმაც განახორციელა შეძენა."
-
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Payment processing occurs on a separate secure site."
-msgstr "გადახდის დამუშავება განცალკევებულ უსაფრთხო გვერდზე მოხდება."
-
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Your Shopping cart is currently empty."
-msgstr "თქვენი საყიდლების კალათა ამჟამად ცარიელია."
-
-#: lms/templates/shoppingcart/cybersource_form.html
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Payment"
-msgstr "გადახდა"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "Download CSV Reports"
-msgstr "CSV ანგარიშების ჩამოტვირთვა"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "Download CSV Data"
-msgstr "CSV მონაცემების ჩამოტვირთვა"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid ""
-"There was an error in your date input.  It should be formatted as YYYY-MM-DD"
-msgstr ""
-"თქვენს მიერ თარიღის შეყვანისას დაფიქსირდა შეცდომა. უნდა დაფორმატდეს "
-"ამგვარად, წელი-თვე-რიცხვი"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "These reports are delimited by start and end dates."
-msgstr "მოცემული ანგარიშები იყოფა დაწყების და დასრულების თარიღებად."
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "Start Date: "
-msgstr "დაწყების თარიღი:"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "End Date: "
-msgstr " დასრულების თარიღი:"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid ""
-"These reports are delimited alphabetically by university name.  i.e., "
-"generating a report with 'Start Letter' A and 'End Letter' C will generate "
-"reports for all universities starting with A, B, and C."
-msgstr ""
-"მოცემული ანგარიშები გამიჯნულია ანბანურად უნივერისტეტის სახელის მიხედვით. "
-"მაგ: ანგარიშის გენერირება \"პირველი ასო\" A და \"ბოლო ასო\" C -თი ყველა "
-"უნივერსიტეტისთვის, რომელიც  A, B, და C-თი იწყება, დააგენერირებს ანგარიშებს."
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "Start Letter: "
-msgstr "წერილის დასაწყისი:"
-
-#: lms/templates/shoppingcart/download_report.html
-msgid "End Letter: "
-msgstr "წერილის დასასრული:"
-
-#: lms/templates/shoppingcart/error.html
-msgid "Payment Error"
-msgstr "გადახდის შეცდომა"
-
-#: lms/templates/shoppingcart/error.html
-msgid "There was an error processing your order!"
-msgstr "თქვენი შეკვეთის დამუშავებისას დაფიქსირდა შეცდომა!"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Thank you for your purchase!"
-msgstr "გმადლობთ შეძენისთვის!"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "View Dashboard"
-msgstr "მართვის დაფის ნახვა"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid ""
-"You have successfully been enrolled for {course_names}. The following "
-"receipt has been emailed to {receipient_emails}"
-msgstr ""
-"თქვენ წარმატებით ჩაირიცხეთ {course_names}-ზე. მომდევნო ქვითარი გაიგზავნა "
-"ელფოსტის საშუალებით {receipient_emails}-ზე."
-
-#: lms/templates/shoppingcart/receipt.html
-msgid ""
-"You have successfully purchased <b>{number} course registration code</b> for"
-" {course_names}."
-msgid_plural ""
-"You have successfully purchased <b>{number} course registration codes</b> "
-"for {course_names}."
-msgstr[0] ""
-"თქვენ წარმატებით შეიძინეთ <b>{number} კურსის რეგისტრაციის კოდები</b> for "
-"{course_names}-სთვის."
-msgstr[1] ""
-"თქვენ წარმატებით შეიძინეთ <b>{number} კურსის რეგისტრაციის კოდები</b> for "
-"{course_names}-სთვის."
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "The following receipt has been emailed to {receipient_emails}"
-msgstr "შემდეგი ქვითარი გაიგზავნა ელფოსტის საშუალებით {receipient_emails}-ზე"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid ""
-"Please send each professional one of these unique registration codes to "
-"enroll into the course. The confirmation/receipt email you will receive has "
-"an example email template with directions for the individuals enrolling."
-msgstr ""
-"გთხოვთ თითოეულ სპეციალისტს გაუგზავნოთ  რეგისტრაციის ამ უნიკალური კოდებიდან "
-"ერთ-ერთი კურსზე ჩასარიცხად. დადასტურების/ქვითრის მიღების შეტყობინებას "
-"რომელსაც მიიღებთ, მოყვება ინდივიდუალური რეგისტრაციისთვის შეტყობინების "
-"შაბლონი დირექტივებთან ერთად."
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Enrollment Link"
-msgstr "ჩარიცხვის ბმული"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Used"
-msgstr "გამოყენებული"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Invalid"
-msgstr "არასწორი"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Invoice"
-msgstr "ანგარიშფაქტურა"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Date of purchase"
-msgstr "ყიდვის თარიღი"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Print Receipt"
-msgstr "ქვითრის ამობეჭდვა"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Billed To Details"
-msgstr "დეტალური ანგარიში"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Company Name"
-msgstr "კომპანიის სახელი"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "N/A"
-msgstr "მონაცემები არ არის"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Purchase Order Number"
-msgstr "შესყიდვის შეკვეთის ნომერი"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Company Contact Name"
-msgstr "კომპანიის საკონტაქტო სახელი"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Company Contact Email"
-msgstr "კომპანიის საკონტაქტო ელფოსტა"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Recipient Name"
-msgstr "მიმღების სახელი"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Recipient Email"
-msgstr "მიმღების ელფოსტა"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Card Type"
-msgstr "ბარათის ტიპი"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Credit Card Number"
-msgstr "საკრედიტო ბარათის ნომერი"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Address 1"
-msgstr "მისამართი 1"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Address 2"
-msgstr "მისამართი 2"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "State"
-msgstr "სახელმწიფო"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Registration for:"
-msgstr "რეგისტრაცია:"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Price per student:"
-msgstr "ფასი თითოეულ სტუდენტზე"
-
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Discount Applied:"
-msgstr "გამოყენებული ფასდაკლება:"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Students"
-msgstr "სტუდენტები"
-
-#. Translators: Please keep the "<del>" and "</del>" tags around your
-#. translation of the word "this" in your translation.
-#: lms/templates/shoppingcart/receipt.html
-msgid "Note: items with strikethough like <del>this</del> have been refunded."
-msgstr ""
-"გაითვალისწინეთ: <del>ამის მსგავს</del> გადახაზული ერთეულებში გადახდილი თანხა"
-" უკან ბრუნდება."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "Confirm Enrollment"
-msgstr "ჩარიცხვის დადასტურება"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "{site_name} -  Confirm Enrollment"
-msgstr "{site_name} -  ჩარიცხვის დადასტურება"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "{course_number} {course_title} Cover Image"
-msgstr "{course_number} {course_title} ყდის ფოტო"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "Confirm your enrollment for: {span_start}course dates{span_end}"
-msgstr ""
-"დაადასტურეთ თქვენი ჩარიცხვა: {span_start}-ზე, კურსის თარიღები{span_end}"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "{course_name}"
-msgstr "{course_name}"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid ""
-"You've clicked a link for an enrollment code that has already been used. "
-"Check your {link_start}course dashboard{link_end} to see if you're enrolled "
-"in the course, or contact your company's administrator."
-msgstr ""
-"თქვენ ჩარიცხვის კოდისთვის დააწკაპუნეთ ბმულზე, რომელიც უკვე გამოყენებულია. "
-"შეამოწმეთ თქვენი {link_start}-ის კურსის მართვის დაფა{link_end} რათა ნახოთ "
-"ჩარიცხული ხართ თუ არა კურსზე, ან დაუკავშირდით თქვენი კომპანიის "
-"ადმინისტრატორს."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid ""
-"You have successfully enrolled in {course_name}. This course has now been "
-"added to your dashboard."
-msgstr ""
-"თქვენ წარმატებით ჩაირიცხეთ {course_name}-ზე. ეს კურსი ახლა დაემატა თქვენი "
-"მართვის დაფას."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid ""
-"You're already enrolled for this course. Visit your "
-"{link_start}dashboard{link_end} to see the course."
-msgstr ""
-"თქვენ უკვე ჩაირიცხეთ ამ კურსზე. კურსის სანახავად, ეწვიეთ თქვენს "
-"{link_start}-ის მართვის დაფას{link_end}."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "The course you are enrolling for is full."
-msgstr "კურსი რომელზეც ირიცხებით შევსებულია."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "The course you are enrolling for is closed."
-msgstr "კურის რომელზეც ირიცხებით დაიხურა."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "There was an error processing your redeem code."
-msgstr "თქვენი კოდის აღდგენის დამუშავებისას დაფიქსირდა შეცდომა."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid ""
-"You're about to activate an enrollment code for {course_name} by "
-"{site_name}. This code can only be used one time, so you should only "
-"activate this code if you're its intended recipient."
-msgstr ""
-"თქვენ აპირებთ გაააქტიუროთ ჩარიცხვის კოდი {course_name}-სთვის {site_name}-ის "
-"მეშვეობით. ამ კოდის გამოყენება მხოლოდ ერთხელ შეიძლება, ასე რომ თქვენ ეს კოდი"
-" მხოლოდ მაშინ უნდა გაააქტიუროთ თუ მისი გამიზნული მიმღები ხართ."
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "Activate Course Enrollment"
-msgstr "კურსის ჩარიცხვის გააქტიურება"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid ""
-"{course_names} has been removed because the enrollment period has closed."
-msgid_plural ""
-"{course_names} have been removed because the enrollment period has closed."
-msgstr[0] "{course_names} წაიშალა რადგან ჩარიცხვის პერიოდი დაიხურა."
-msgstr[1] "{course_names} წაიშალა რადგან ჩარიცხვის პერიოდი დაიხურა."
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Shopping Cart"
-msgstr "საყიდლების კალათი"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Cover Image"
-msgstr "ყდის ფოტოსურათი"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Students:"
-msgstr "სტუდენტები:"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Input quantity and press enter."
-msgstr "შეყვანეთ რაოდენობა და დააჭირეთ შეყვანას."
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Increase"
-msgstr "გაზრდა"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Decrease"
-msgstr "შემცირება"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Remove"
-msgstr "წაშლა"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Discount or activation code"
-msgstr "ფასდაკლების ან აქტივაციის კოდი"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "discount or activation code"
-msgstr "ფასდაკლების ან აქტივაციის კოდი"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Apply"
-msgstr "გამოყენება"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "code has been applied"
-msgstr "კოდი გამოყენებულია"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "TOTAL:"
-msgstr "ჯამი:"
-
-#. Translators: currency_symbol is a symbol indicating type of currency, ex
-#. "$". currency_abbr is
-#. an abbreviation for the currency, ex "USD". This string would look like
-#. this
-#. when all variables are in:
-#. "$500.00 USD"
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "{currency_symbol}{price} {currency_abbr}"
-msgstr "{currency_symbol}{price} {currency_abbr}"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid ""
-"After this purchase is complete, a receipt is generated with relative "
-"billing details and registration codes for students."
-msgstr ""
-"ამ შეძენის დასრულების შემდეგ,  სტუდენტებისათვის დაგენერირდება ქვითარი "
-"შესაბამისი გადახდის დეტალებითა და რეგისტრაციის კოდებით."
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid ""
-"After this purchase is complete, {username} will be enrolled in this course."
-msgstr "ამ შეძენის დასრულების შემდეგ, {username} ჩაირიცხება ამ კურსზე."
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Empty Cart"
-msgstr "ცარიელი კალათა"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Shopping cart"
-msgstr "საყიდლების კალათა"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "{platform_name} -  Shopping Cart"
-msgstr "{platform_name} - საყიდლების კალათა"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Confirmation"
-msgstr "დადასტურება"
 
 #: lms/templates/static_templates/404.html
 msgid ""
@@ -20102,10 +18945,6 @@ msgstr ""
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Upgrade Your Enrollment For {course_name}."
 msgstr "განაახლეთ თქვენი რეგისტრაცია {course_name}-სთვის."
-
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Receipt For {course_name}"
-msgstr "ქვითარი {course_name}-სთვის"
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Verify For {course_name}"
@@ -23282,6 +22121,10 @@ msgid "Dates that control when your course can be viewed"
 msgstr "ვადები, რომელიც მიუთითებს, როდის შეიძლება თქვენი კურსის ნახვა"
 
 #: cms/templates/settings.html
+msgid "Course Start Date"
+msgstr ""
+
+#: cms/templates/settings.html
 msgid "First day the course begins"
 msgstr "კურსის დაწყების პირველი დღე"
 
@@ -24757,6 +23600,10 @@ msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid "Remove"
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
