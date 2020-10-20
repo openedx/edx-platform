@@ -2835,7 +2835,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=787 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=788 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6556,8 +6556,6 @@ CREATE TABLE `student_linkedinaddtoprofileconfiguration` (
   `change_date` datetime(6) NOT NULL,
   `enabled` tinyint(1) NOT NULL,
   `company_identifier` longtext NOT NULL,
-  `dashboard_tracking_code` longtext NOT NULL,
-  `trk_partner_name` varchar(10) NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `student_linkedinaddt_changed_by_id_dc1c453f_fk_auth_user` (`changed_by_id`),
