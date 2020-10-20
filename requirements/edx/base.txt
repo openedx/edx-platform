@@ -18,7 +18,6 @@
 -e common/lib/symmath  # via -r requirements/edx/local.in
 -e openedx/core/lib/xblock_builtin/xblock_discussion  # via -r requirements/edx/local.in
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive  # via -r requirements/edx/github.in
--e common/lib/xmodule  # via -r requirements/edx/local.in
 amqp==2.6.1               # via kombu
 analytics-python==1.2.9   # via -r requirements/edx/base.in
 aniso8601==8.0.0          # via edx-tincan-py35
