@@ -1,3 +1,6 @@
+"""
+Constants for CMS application
+"""
 ERROR_MESSAGES = {
     'course_end_date_missing': 'This course does not have an end date.',
     'enrollment_start_date_missing': 'This course does not have an enrollment start date.',

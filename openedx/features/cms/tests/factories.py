@@ -1,3 +1,6 @@
+"""
+Tests data factories for CMS application
+"""
 import json
 
 from opaque_keys.edx.locator import CourseLocator
@@ -25,7 +28,9 @@ class CourseRerunFactory(XModuleFactory):
     # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, **kwargs):
-
+        """
+        creating a sample course run for testing
+        """
         source_course_id = kwargs.pop('source_course_id', None)
         run = kwargs.pop('run', None)
         user = kwargs.pop('user', None)

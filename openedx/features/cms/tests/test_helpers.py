@@ -1,8 +1,14 @@
+"""
+Unit test for CMS helpers
+"""
+
+
 from datetime import datetime
 
 import mock
-from dateutil.parser import parse
 from mock import patch
+
+from dateutil.parser import parse
 from opaque_keys.edx.locator import CourseLocator
 from openassessment.xblock.defaults import DEFAULT_DUE, DEFAULT_START
 from pytz import UTC
@@ -23,9 +29,6 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
     """
     Class for test cases related to course re-run (course automation, in general)
     """
-
-    def setUp(self):
-        super(CourseRerunAutomationTestCase, self).setUp()
 
     def test_initialize_course_settings_custom_tags(self):
         """
@@ -258,8 +261,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         helpers.set_advanced_settings_due_date(mock.ANY, source_course, mock.ANY)
         assert not mock_calculate_date_by_delta.called
 
-    @patch('cms.djangoapps.contentstore.tasks.apply_post_rerun_creation_tasks')
-    def test_set_rerun_module_dates(self, mock_apply_post_rerun_creation_tasks):
+    def test_set_rerun_module_dates(self):
         """
         Testing start date of chapters (sequence) and start & due date of sub-sequences
         (sequential) by creating a re-run of source course
@@ -495,7 +497,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
             CourseLocator('organization', 'CS101', '4_1.31_20091001_20100101'): 5
         }
 
-        def side_effect_run_mapper(run_dict, course, run_number):
+        def side_effect_run_mapper(run_number):
             """
             This mapper is a helper function for mock, it used dict to map
             run_number to complete run pattern
@@ -694,7 +696,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
 
         run_dict['release_number'] = ""
 
-        with self.assertRaises(Exception) as error:
+        with self.assertRaises(Exception):
             helpers.create_new_run_id(run_dict, course, run_number)
 
     def test_get_course_group_parent_course_without_reruns(self):
@@ -765,6 +767,3 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         expected_latest_courses_id = [course.id for course in expected_latest_course]
 
         self.assertItemsEqual(latest_courses_id, expected_latest_courses_id)
-
-    def tearDown(self):
-        super(CourseRerunAutomationTestCase, self).tearDown()

@@ -1,3 +1,6 @@
+"""
+Helper methods for CMS application
+"""
 from dateutil.parser import parse
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey

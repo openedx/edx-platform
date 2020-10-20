@@ -1,3 +1,6 @@
+"""
+Unit tests for CMS application views
+"""
 from datetime import datetime
 
 import mock
@@ -406,6 +409,8 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
         destination_course_key = CourseLocator(
             org='TesOrg', course='Test101', run='TestKey_1.1_100'
         )
+
+        # pylint: disable=protected-access
         rerun_views._rerun_course(source_course.id, destination_course_key, self.user, fields)
 
         # Get all course summaries from the store
