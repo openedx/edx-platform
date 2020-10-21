@@ -1,3 +1,6 @@
+"""
+PhilU custom auth backends
+"""
 from social_core.backends.facebook import FacebookOAuth2
 from social_core.backends.google import GoogleOAuth2
 from social_core.backends.linkedin import LinkedinOAuth2
@@ -5,12 +8,15 @@ from social_core.exceptions import AuthCanceled
 
 
 # TODO: Remove this when edx version is upgraded to ironwood/hawthorne
-class CustomFacebookOAuth(FacebookOAuth2):
+class CustomFacebookOAuth(FacebookOAuth2):  # pylint: disable=abstract-method
     REDIRECT_STATE = False
 
 
 # TODO: Remove this when edx version is upgraded to ironwood/hawthorne
-class CustomGoogleOAuth(GoogleOAuth2):
+class CustomGoogleOAuth(GoogleOAuth2):  # pylint: disable=abstract-method
+    """
+    Custom Google OAuth Backend
+    """
 
     def get_user_id(self, details, response):
         """Use google email as unique id"""
@@ -58,7 +64,10 @@ class CustomGoogleOAuth(GoogleOAuth2):
 # LinkedinOauth has been customized and updated from the latest version of python-social-auth. This was done because
 # updating the package in question breaks other packages' dependencies.
 # TODO: Remove this when edx version is upgraded to ironwood/hawthorne
-class CustomLinkedinOAuth(LinkedinOAuth2):
+class CustomLinkedinOAuth(LinkedinOAuth2):  # pylint: disable=abstract-method
+    """
+    Custom LinkedIn OAuth Backend
+    """
     AUTHORIZATION_URL = \
         'https://www.linkedin.com/oauth/v2/authorization'
     ACCESS_TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken'
@@ -99,7 +108,10 @@ class CustomLinkedinOAuth(LinkedinOAuth2):
 
         return response
 
-    def email_data(self, access_token, *args, **kwargs):
+    def email_data(self, access_token, *args, **kwargs):  # pylint: disable=unused-argument
+        """
+        Get user email data from LinkedIn
+        """
         response = self.get_json(
             self.user_emails_url(),
             headers=self.user_data_headers(access_token)
@@ -144,7 +156,7 @@ class CustomLinkedinOAuth(LinkedinOAuth2):
                 'last_name': last_name,
                 'email': email}
 
-    def user_data_headers(self, access_token):
+    def user_data_headers(self, access_token):  # pylint: disable=arguments-differ
         headers = {}
         lang = self.setting('FORCE_PROFILE_LANGUAGE')
         if lang:

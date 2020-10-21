@@ -1,3 +1,6 @@
+"""
+Context processors for `philu_overrides` app
+"""
 from lms.djangoapps.onboarding.helpers import (
     get_org_metric_update_prompt,
     get_org_oef_update_prompt,
@@ -55,14 +58,14 @@ def get_global_alert_messages(request):
     }
 
 
-def add_nodebb_endpoint(request):
+def add_nodebb_endpoint(request):  # pylint: disable=unused-argument
     """
     Add our NODEBB_ENDPOINT to the template context so that it can be referenced by any client side code.
     """
     return NODEBB_END_POINT_DICT
 
 
-def get_cdn_link(request):
+def get_cdn_link(request):  # pylint: disable=unused-argument
     """
     Return CDN url link to templates
     """
