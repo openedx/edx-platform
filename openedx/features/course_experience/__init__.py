@@ -4,7 +4,7 @@ Unified course experience settings and helper methods.
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleFlag
 
 
 # Namespace for course experience waffle flags.
@@ -20,7 +20,7 @@ UNIFIED_COURSE_TAB_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'unified_cours
 DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_course_sock')
 
 # Waffle flag to let learners access a course before its start date.
-COURSE_PRE_START_ACCESS_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_access')
+COURSE_PRE_START_ACCESS_FLAG = WaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_access')
 
 # Waffle flag to enable a review page link from the unified home page.
 SHOW_REVIEWS_TOOL_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_reviews_tool')

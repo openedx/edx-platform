@@ -216,7 +216,8 @@ function($, _, Backbone, AjaxHelpers, Utils, Editor, VideoList, MetadataModel, A
 
 
         it('Initialize', function(done) {
-            var view = createVideoListView(this.mockServer), callArgs;
+            var view = createVideoListView(this.mockServer),
+                callArgs;
             waitsForResponse(this.mockServer)
                 .then(function() {
                     expect(abstractEditor.initialize).toHaveBeenCalled();

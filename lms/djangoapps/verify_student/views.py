@@ -520,7 +520,7 @@ class PayAndVerifyView(View):
             if ecommerce_service.is_enabled(user):
                 url = ecommerce_service.get_checkout_page_url(
                     sku,
-                    enterprise_customer_catalog_uuid=self.request.GET.get('enterprise_customer_catalog_uuid')
+                    catalog=self.request.GET.get('catalog')
                 )
 
         # Redirect if necessary, otherwise implicitly return None

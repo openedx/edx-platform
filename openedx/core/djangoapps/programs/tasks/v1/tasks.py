@@ -173,7 +173,7 @@ def award_program_certificates(self, username):
             try:
                 award_program_certificate(credentials_client, username, program_uuid)
                 LOGGER.info('Awarded certificate for program %s to user %s', program_uuid, username)
-            except exceptions.HttpNotFoundError:
+            except exceptions.HttpClientError:
                 LOGGER.exception(
                     'Certificate for program %s not configured, unable to award certificate to %s',
                     program_uuid, username

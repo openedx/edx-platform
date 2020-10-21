@@ -202,13 +202,49 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(response.data[0]['course']['start_type'], expected_type)
         self.assertEqual(response.data[0]['course']['start_display'], expected_display)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
-    def test_no_certificate(self):
+    @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True, 'ENABLE_MKTG_SITE': True})
+    def test_discussion_url(self):
         self.login_and_enroll()
 
         response = self.api_response()
-        certificate_data = response.data[0]['certificate']
-        self.assertDictEqual(certificate_data, {})
+        response_discussion_url = response.data[0]['course']['discussion_url']
+        self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
+
+    def test_org_query(self):
+        self.login()
+
+        # Create list of courses with various organizations
+        courses = [
+            CourseFactory.create(org='edX', mobile_available=True),
+            CourseFactory.create(org='edX', mobile_available=True),
+            CourseFactory.create(org='edX', mobile_available=True, visible_to_staff_only=True),
+            CourseFactory.create(org='Proversity.org', mobile_available=True),
+            CourseFactory.create(org='MITx', mobile_available=True),
+            CourseFactory.create(org='HarvardX', mobile_available=True),
+        ]
+
+        # Enroll in all the courses
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(data={'org': 'edX'})
+
+        # Test for 3 expected courses
+        self.assertEqual(len(response.data), 3)
+
+        # Verify only edX courses are returned
+        for entry in response.data:
+            self.assertEqual(entry['course']['org'], 'edX')
+
+
+@attr(shard=9)
+@override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
+class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, MilestonesTestCaseMixin):
+    """
+    Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
+    """
+    REVERSE_INFO = {'name': 'courseenrollment-detail', 'params': ['username']}
+    ENABLED_SIGNALS = ['course_published']
 
     def verify_pdf_certificate(self):
         """
@@ -230,10 +266,18 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         certificate_data = response.data[0]['certificate']
         self.assertEquals(certificate_data['url'], certificate_url)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    def test_no_certificate(self):
+        self.login_and_enroll()
+
+        response = self.api_response()
+        certificate_data = response.data[0]['certificate']
+        self.assertDictEqual(certificate_data, {})
+
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': False, 'ENABLE_MKTG_SITE': True})
     def test_pdf_certificate_with_html_cert_disabled(self):
         """
-        Tests PDF certificates with CERTIFICATES_HTML_VIEW set to False.
+        Tests PDF certificates with CERTIFICATES_HTML_VIEW set to True.
         """
         self.verify_pdf_certificate()
 
@@ -279,40 +323,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 course_id=self.course.id,
             )
         )
-
-    @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True, 'ENABLE_MKTG_SITE': True})
-    def test_discussion_url(self):
-        self.login_and_enroll()
-
-        response = self.api_response()
-        response_discussion_url = response.data[0]['course']['discussion_url']  # pylint: disable=E1101
-        self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
-
-    def test_org_query(self):
-        self.login()
-
-        # Create list of courses with various organizations
-        courses = [
-            CourseFactory.create(org='edX', mobile_available=True),
-            CourseFactory.create(org='edX', mobile_available=True),
-            CourseFactory.create(org='edX', mobile_available=True, visible_to_staff_only=True),
-            CourseFactory.create(org='Proversity.org', mobile_available=True),
-            CourseFactory.create(org='MITx', mobile_available=True),
-            CourseFactory.create(org='HarvardX', mobile_available=True),
-        ]
-
-        # Enroll in all the courses
-        for course in courses:
-            self.enroll(course.id)
-
-        response = self.api_response(data={'org': 'edX'})
-
-        # Test for 3 expected courses
-        self.assertEqual(len(response.data), 3)
-
-        # Verify only edX courses are returned
-        for entry in response.data:
-            self.assertEqual(entry['course']['org'], 'edX')
 
 
 @attr(shard=9)

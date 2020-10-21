@@ -13,7 +13,6 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
 
-from openedx.core.djangoapps.content.course_structures.tests import SignalDisconnectTestMixin
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
@@ -30,7 +29,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 @ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, SEARCH_ENGINE=None)
-class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
+class ContentStoreImportTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy and test_import_course courses.
     NOTE: refactor using CourseFactory so they do not.

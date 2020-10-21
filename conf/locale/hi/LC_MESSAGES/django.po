@@ -16,7 +16,7 @@
 # Sarina Canelake <sarina@edx.org>, 2014
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/).
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -46,7 +46,7 @@
 # plankton rules <planktonrules0@gmail.com>, 2016
 # Sarina Canelake <sarina@edx.org>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -59,7 +59,7 @@
 # Ned Batchelder <ned@edx.org>, 2015
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -71,9 +71,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-25 13:22+0000\n"
-"PO-Revision-Date: 2018-03-13 13:51+0000\n"
-"Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
+"POT-Creation-Date: 2018-07-10 06:59+0000\n"
+"PO-Revision-Date: 2018-07-10 07:01+0000\n"
+"Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
 "Language: hi\n"
 "MIME-Version: 1.0\n"
@@ -2440,6 +2440,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Question"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Correct Answer"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
@@ -8711,6 +8715,30 @@ msgid "Your Platform Description Here"
 msgstr ""
 
 #: lms/envs/common.py
+msgid "Read access"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Write access"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Know your email address"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Know your name and username"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Retrieve your grades for your enrolled courses"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Retrieve your course certificates"
+msgstr ""
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr ""
@@ -8836,9 +8864,8 @@ msgstr ""
 #: lms/templates/logout.html
 #, python-format
 msgid ""
-"\n"
-"          If you are not redirected within 5 seconds, <a href=\"%(target)s\">click here to go to the home page</a>.\n"
-"        "
+"If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
+"here to go to the home page</a>."
 msgstr ""
 
 #: lms/templates/main_django.html cms/templates/base.html
@@ -8853,6 +8880,12 @@ msgstr ""
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
 "The above application requests the following permissions from your account:"
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"These permissions will be granted for data from your courses associated with"
+" the following content providers:"
 msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
@@ -9077,14 +9110,12 @@ msgid "Create new merged version"
 msgstr "नया जोड़ा गया संस्करण बनाएं"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
+#: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
-"\n"
-"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
-"  "
+"You need to <a href=\"%(login_url)s\">log in</a> or <a "
+"href=\"%(signup_url)s\">sign up</a> to use this function."
 msgstr ""
-"\n"
-"इस फ़ंक्शन को इस्तेमाल करने के लिए आपको <a href=\"%(login_url)s\">लॉग इन</a> या <a href=\"%(signup_url)s\">साइन अप</a> करना पड़ेगा।"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
@@ -9198,13 +9229,9 @@ msgstr "उद्धरण"
 #: lms/templates/wiki/includes/editor_widget.html
 #, python-format
 msgid ""
-"\n"
-"        Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
-"    "
+"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
+" help."
 msgstr ""
-"\n"
-"\n"
-"मार्कडाउन सिन्टैक्स की अनुमति है। सहायता के लिए %(start_link)sछलपत्रक%(end_link)s देखें।"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/wiki_plugin.py
@@ -9837,10 +9864,6 @@ msgstr ""
 msgid "Content Provider"
 msgstr ""
 
-#: openedx/core/djangoapps/oauth_dispatch/models.py
-msgid "The short_name of an existing Organization."
-msgstr ""
-
 #: openedx/core/djangoapps/password_policy/apps.py
 msgid "Password Policy"
 msgstr ""
@@ -9988,7 +10011,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
-msgid "Welcome to week %(week_num)s "
+msgid "Welcome to week %(week_num)s"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
@@ -13260,7 +13283,7 @@ msgid "Terms of Service for {platform_name} APIs"
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
-msgid "Effective Date: April 12th, 2016"
+msgid "Effective Date: May 24th, 2018"
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -23034,9 +23057,9 @@ msgstr "फ़ाइल को नष्ट किया गया: %s"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"\n"
-"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
-"    "
+"The file may be referenced on other articles. Deleting it means that they "
+"will loose their references to this file. The following articles reference "
+"this file:"
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
@@ -23045,9 +23068,8 @@ msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"\n"
-"    You can remove a reference to a file, but it will retain its references on other articles.\n"
-"    "
+"You can remove a reference to a file, but it will retain its references on "
+"other articles."
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
@@ -23089,9 +23111,13 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"\n"
-"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
-"  "
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
+"that this attachment is in use on other articles, you may distort contents. "
+"However, do not hestitate to take advantage of this and make replacements "
+"for the listed articles where necessary. This way of working is more "
+"efficient...."
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -23101,9 +23127,9 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"\n"
-"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
-"  "
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>."
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -23469,10 +23495,7 @@ msgstr ""
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid ""
-"\n"
-"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
-"      "
+msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
 msgstr ""
 
 #: wiki/templates/wiki/dir.html
@@ -23481,10 +23504,7 @@ msgstr ""
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid ""
-"\n"
-"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
-"      "
+msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
 msgstr ""
 
 #: wiki/templates/wiki/dir.html

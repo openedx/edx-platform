@@ -9,8 +9,9 @@ This management command will manually trigger the receivers we care about.
 (We don't want to trigger all receivers for these signals, since these are busy
 signals.)
 """
-from __future__ import print_function
+from __future__ import print_function, division
 import logging
+import math
 import time
 import sys
 
@@ -24,7 +25,7 @@ from pytz import UTC
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
-from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
+from openedx.core.djangoapps.programs.signals import handle_course_cert_changed
 
 
 log = logging.getLogger(__name__)
@@ -43,6 +44,26 @@ def parsetime(timestr):
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=UTC)
     return dt
+
+
+def paged_query(queryset, delay, page_size):
+    """
+    A generator that iterates through a queryset but only resolves chunks of it at once, to avoid overwhelming memory
+    with a giant query. Also adds an optional delay between yields, to help with load.
+    """
+    count = queryset.count()
+    pages = int(math.ceil(count / page_size))
+
+    for page in range(pages):
+        page_start = page * page_size
+        page_end = page_start + page_size
+        subquery = queryset[page_start:page_end]
+
+        if delay and page:
+            time.sleep(delay)
+
+        for i, item in enumerate(subquery, start=1):
+            yield page_start + i, item
 
 
 class Command(BaseCommand):
@@ -99,7 +120,13 @@ class Command(BaseCommand):
             '--delay',
             type=float,
             default=0,
-            help="Number of seconds to sleep between processing certificates, so that we don't flood our queues.",
+            help="Number of seconds to sleep between processing queries, so that we don't flood our queues.",
+        )
+        parser.add_argument(
+            '--page-size',
+            type=int,
+            default=100,
+            help="Number of items to query at once.",
         )
 
     def handle(self, *args, **options):
@@ -133,23 +160,21 @@ class Command(BaseCommand):
         grades = PersistentCourseGrade.objects.filter(**grade_filter_args).order_by('modified')
 
         if options['dry_run']:
-            self.print_dry_run(list(certs), list(grades))
+            self.print_dry_run(certs, grades)
         else:
-            self.send_notifications(certs, grades, delay=options['delay'])
+            self.send_notifications(certs, grades, delay=options['delay'], page_size=options['page_size'])
 
         log.info('notify_credentials finished')
 
-    def send_notifications(self, certs, grades, delay=0):
+    def send_notifications(self, certs, grades, delay=0, page_size=0):
         """ Run actual handler commands for the provided certs and grades. """
 
         # First, do certs
-        for i, cert in enumerate(certs, start=1):
+        for i, cert in paged_query(certs, delay, page_size):
             log.info(
-                "Handling credential changes (%d of %d) for certificate %s",
-                i, len(certs), certstr(cert),
+                "Handling credential changes %d for certificate %s",
+                i, certstr(cert),
             )
-            if delay:
-                time.sleep(delay)
 
             signal_args = {
                 'sender': None,
@@ -158,18 +183,15 @@ class Command(BaseCommand):
                 'mode': cert.mode,
                 'status': cert.status,
             }
-            handle_course_cert_awarded(**signal_args)
             handle_course_cert_changed(**signal_args)
             handle_cert_change(**signal_args)
 
         # Then do grades
-        for i, grade in enumerate(grades, start=1):
+        for i, grade in paged_query(grades, delay, page_size):
             log.info(
-                "Handling grade changes (%d of %d) for grade %s",
-                i, len(grades), gradestr(grade),
+                "Handling grade changes %d for grade %s",
+                i, gradestr(grade),
             )
-            if delay:
-                time.sleep(delay)
 
             user = User.objects.get(id=grade.user_id)
             send_grade_if_interesting(user, grade.course_id, None, None, grade.letter_grade, grade.percent_grade)
@@ -201,14 +223,14 @@ class Command(BaseCommand):
         print("DRY-RUN: This command would have handled changes for...")
         ITEMS_TO_SHOW = 10
 
-        print(len(certs), "Certificates:")
+        print(certs.count(), "Certificates:")
         for cert in certs[:ITEMS_TO_SHOW]:
             print("   ", certstr(cert))
-        if len(certs) > ITEMS_TO_SHOW:
-            print("    (+ {} more)".format(len(certs) - ITEMS_TO_SHOW))
+        if certs.count() > ITEMS_TO_SHOW:
+            print("    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
 
-        print(len(grades), "Grades:")
+        print(grades.count(), "Grades:")
         for grade in grades[:ITEMS_TO_SHOW]:
             print("   ", gradestr(grade))
-        if len(grades) > ITEMS_TO_SHOW:
-            print("    (+ {} more)".format(len(grades) - ITEMS_TO_SHOW))
+        if grades.count() > ITEMS_TO_SHOW:
+            print("    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))

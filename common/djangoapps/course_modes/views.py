@@ -9,13 +9,13 @@ import urllib
 import waffle
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
 from django.utils.translation import get_language, to_locale
+from django.utils.translation import ugettext as _
 from django.views.generic.base import View
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey

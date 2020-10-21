@@ -27,22 +27,10 @@ class EdxNotesTab(EnrolledTab):
         if not super(EdxNotesTab, cls).is_enabled(course, user=user):
             return False
 
-        if not settings.FEATURES.get("ENABLE_EDXNOTES") or is_harvard_notes_enabled(course):
+        if not settings.FEATURES.get("ENABLE_EDXNOTES"):
             return False
 
         if user and not user.is_authenticated:
             return False
 
         return course.edxnotes
-
-
-def is_harvard_notes_enabled(course):
-    """
-    Returns True if Harvard Annotation Tool is enabled for the course,
-    False otherwise.
-
-    Checks for 'textannotation', 'imageannotation', 'videoannotation' in the list
-    of advanced modules of the course.
-    """
-    modules = set(['textannotation', 'imageannotation', 'videoannotation'])
-    return bool(modules.intersection(course.advanced_modules))

@@ -18,10 +18,10 @@ XQUEUE_STUB_URL = os.environ.get('xqueue_url', 'http://localhost:8040')
 ORA_STUB_URL = os.environ.get('ora_url', 'http://localhost:8041')
 
 # Get the URL of the comments service stub used in the test
-COMMENTS_STUB_URL = os.environ.get('comments_url', 'http://localhost:4567')
+COMMENTS_STUB_URL = os.environ.get('comments_url', 'http://{}:4567'.format(HOSTNAME))
 
 # Get the URL of the EdxNotes service stub used in the test
-EDXNOTES_STUB_URL = os.environ.get('edxnotes_url', 'http://localhost:8042')
+EDXNOTES_STUB_URL = os.environ.get('edxnotes_url', 'http://{}:8042'.format(HOSTNAME))
 
 # Get the URL of the Catalog service stub used in the test
 CATALOG_STUB_URL = os.environ.get('catalog_url', 'http://localhost:8091')

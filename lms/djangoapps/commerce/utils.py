@@ -10,7 +10,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import CourseKey
 
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
@@ -111,10 +113,10 @@ class EcommerceService(object):
             http://localhost:8002/basket/add/?sku=5H3HG5&sku=57FHHD&bundle=3bdf1dd1-49be-4a15-9145-38901f578c5a
         """
         program_uuid = kwargs.get('program_uuid')
-        enterprise_catalog_uuid = kwargs.get('enterprise_customer_catalog_uuid')
+        enterprise_catalog_uuid = kwargs.get('catalog')
         query_params = {'sku': skus}
         if enterprise_catalog_uuid:
-            query_params.update({'enterprise_customer_catalog_uuid': enterprise_catalog_uuid})
+            query_params.update({'catalog': enterprise_catalog_uuid})
 
         url = '{checkout_page_path}?{query_params}'.format(
             checkout_page_path=self.get_absolute_ecommerce_url(self.config.basket_checkout_page),
@@ -208,13 +210,14 @@ def refund_entitlement(course_entitlement):
         return False
 
 
-def refund_seat(course_enrollment):
+def refund_seat(course_enrollment, change_mode=False):
     """
     Attempt to initiate a refund for any orders associated with the seat being unenrolled,
     using the commerce service.
 
     Arguments:
         course_enrollment (CourseEnrollment): a student enrollment
+        change_mode (Boolean): change the course mode to free mode or not
 
     Returns:
         A list of the external service's IDs for any refunds that were initiated
@@ -244,6 +247,10 @@ def refund_seat(course_enrollment):
             mode=course_enrollment.mode,
             user=enrollee,
         )
+        if change_mode and CourseMode.can_auto_enroll(course_id=CourseKey.from_string(course_key_str)):
+            course_enrollment.update_enrollment(mode=CourseMode.auto_enroll_mode(course_id=course_key_str),
+                                                is_active=False, skip_refund=True)
+            course_enrollment.save()
     else:
         log.info('No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
 

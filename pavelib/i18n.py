@@ -38,7 +38,7 @@ def i18n_extract(options):
     cmd = "i18n_tool extract"
 
     if verbose:
-        cmd += " -vv"
+        cmd += " -v"
 
     sh(cmd)
 

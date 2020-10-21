@@ -88,6 +88,24 @@ def load_courses(options):
 
 
 @task
+@timed
+def update_fixtures():
+    """
+    Use the correct domain for the current test environment in each Site
+    fixture.  This currently differs between devstack cms, devstack lms,
+    and Jenkins.
+    """
+    msg = colorize('green', "Updating the Site fixture domains...")
+    print msg
+
+    sh(
+        " ./manage.py lms --settings={settings} update_fixtures".format(
+            settings=Env.SETTINGS
+        )
+    )
+
+
+@task
 @cmdopts([BOKCHOY_IMPORTS_DIR, BOKCHOY_IMPORTS_DIR_DEPR, PA11Y_FETCH_COURSE])
 @timed
 def get_test_course(options):
@@ -142,7 +160,7 @@ def reset_test_database():
 
 
 @task
-@needs(['reset_test_database', 'clear_mongo', 'load_bok_choy_data', 'load_courses'])
+@needs(['reset_test_database', 'clear_mongo', 'load_bok_choy_data', 'load_courses', 'update_fixtures'])
 @might_call('start_servers')
 @cmdopts([BOKCHOY_FASTTEST], share_with=['start_servers'])
 @timed
@@ -236,6 +254,7 @@ class BokChoyTestSuite(TestSuite):
         else:
             # load data in db_fixtures
             load_bok_choy_data()  # pylint: disable=no-value-for-parameter
+            update_fixtures()
 
         msg = colorize('green', "Confirming servers have started...")
         print msg

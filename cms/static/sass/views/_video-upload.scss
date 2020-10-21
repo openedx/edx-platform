@@ -1,5 +1,6 @@
 .view-video-uploads {
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
   }
 
@@ -8,6 +9,7 @@
       @extend %t-copy;
 
       vertical-align: bottom;
+
       @include margin-right($baseline/45);
     }
   }
@@ -18,11 +20,11 @@
   }
 
   .button-link {
-    background:none;
-    border:none;
-    padding:0;
+    background: none;
+    border: none;
+    padding: 0;
     color: $ui-link-color;
-    cursor:pointer
+    cursor: pointer;
   }
 
   .video-transcripts-wrapper {
@@ -41,8 +43,8 @@
     margin-top: ($baseline/2);
 
     .transcript-upload-status-container {
-
-      .video-transcript-detail-status, .more-details-action {
+      .video-transcript-detail-status,
+      .more-details-action {
         @include font-size(12);
         @include line-height(12);
         @include margin-left($baseline/4);
@@ -72,9 +74,9 @@
     width: 352px;
     transition: all 0.3s ease;
     background-color: $white;
-    -webkit-box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
-    -moz-box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
-    box-shadow: -3px 0px 3px 0px rgba(153,153,153,0.3);
+    -webkit-box-shadow: -3px 0 3px 0 rgba(153, 153, 153, 0.3);
+    -moz-box-shadow: -3px 0 3px 0 rgba(153, 153, 153, 0.3);
+    box-shadow: -3px 0 3px 0 rgba(153, 153, 153, 0.3);
 
     .action-close-wrapper {
       .action-close-course-video-settings {
@@ -84,19 +86,21 @@
         border: transparent;
         height: ($baseline*2.4);
         color: $text-dark-black-blue;
+
         @include font-size(16);
         @include text-align(left);
       }
     }
 
     .course-video-settings-wrapper {
-      margin-top: ($baseline*1.60);
+      margin-top: ($baseline*1.6);
       padding: ($baseline) ($baseline*0.8);
 
       .course-video-settings-title {
         color: $black-t4;
         margin: ($baseline*1.6) 0 ($baseline*0.8) 0;
         font-weight: font-weight(semi-bold);
+
         @include font-size(24);
       }
 
@@ -105,7 +109,9 @@
         margin-bottom: ($baseline*0.8);
         max-height: ($baseline*2.4);
         color: $black;
+
         @include font-size(16);
+
         .icon {
           @include margin-right($baseline/4);
         }
@@ -123,6 +129,7 @@
 
       .organization-credentials-content {
         margin-top: ($baseline*1.6);
+
         .org-credentials-wrapper input {
           width: 65%;
           margin-top: ($baseline*0.8);
@@ -132,15 +139,18 @@
 
       .transcript-preferance-wrapper {
         margin-top: ($baseline*1.6);
+
         .icon.fa-info-circle {
           @include margin-left($baseline*0.75);
         }
       }
+
       .transcript-preferance-wrapper.error .transcript-preferance-label {
         color: $color-error;
       }
 
-      .error-info, .error-icon .fa-info-circle {
+      .error-info,
+      .error-icon .fa-info-circle {
         color: $color-error;
       }
 
@@ -150,13 +160,18 @@
       }
 
       .transcript-preferance-label {
-        color: $black-t4;
         @include font-size(15);
+
+        color: $black-t4;
         font-weight: font-weight(semi-bold);
         display: block;
       }
 
-      .transcript-provider-group, .transcript-turnaround, .transcript-fidelity, .video-source-language, .selected-transcript-provider {
+      .transcript-provider-group,
+      .transcript-turnaround,
+      .transcript-fidelity,
+      .video-source-language,
+      .selected-transcript-provider {
         margin-top: ($baseline*0.8);
       }
 
@@ -167,17 +182,22 @@
       }
 
       .transcript-provider-group {
-        input[type=radio]  {
+        input[type=radio] {
           margin: 0 ($baseline/2);
         }
+
         label {
           font-weight: normal;
           color: $black-t4;
+
           @include font-size(15);
         }
       }
 
-      .transcript-turnaround-wrapper, .transcript-fidelity-wrapper, .video-source-language-wrapper, .transcript-languages-wrapper {
+      .transcript-turnaround-wrapper,
+      .transcript-fidelity-wrapper,
+      .video-source-language-wrapper,
+      .transcript-languages-wrapper {
         display: none;
       }
 
@@ -187,36 +207,46 @@
 
       .transcript-languages-container .languages-container {
         margin-top: ($baseline*0.8);
+
         .transcript-language-container {
           padding: ($baseline/4);
           background-color: $gray-l6;
           border-top: solid 1px $gray-l4;
           border-bottom: solid 1px $gray-l4;
+
           .remove-language-action {
             display: inline-block;
+
             @include float(right);
           }
         }
       }
+
       .transcript-language-menu-container {
         margin-top: ($baseline*0.8);
+
         .add-language-action {
           display: inline-block;
+
           .action-add-language {
             @include margin-left($baseline/4);
           }
+
           .error-info {
             display: inline-block;
           }
         }
       }
-      .transcript-language-menu, .video-source-language {
+
+      .transcript-language-menu,
+      .video-source-language {
         width: 60%;
       }
     }
 
     .transcription-account-details {
       margin-top: ($baseline*0.8);
+
       span {
         @include font-size(15);
       }
@@ -233,8 +263,10 @@
 
     .course-video-settings-footer {
       margin-top: ($baseline*1.6);
+
       .last-updated-text {
         @include font-size(12);
+
         display: block;
         margin-top: ($baseline/2);
       }
@@ -279,11 +311,11 @@
       }
 
       &:hover .upload-text-link {
-        text-decoration:underline;
+        text-decoration: underline;
       }
 
-      .fa-cloud-upload{
-        font-size:7em;
+      .fa-cloud-upload {
+        font-size: 7em;
         vertical-align: top;
 
         @include margin-right(0.1em);
@@ -300,8 +332,8 @@
 
         .video-uploads-header {
           font-size: 1.5em;
-          margin-bottom: .25em;
-          font-weight: 600
+          margin-bottom: 0.25em;
+          font-weight: 600;
         }
 
         .video-max-file-size-text {
@@ -335,12 +367,14 @@
           font-size: 90%;
         }
 
-        .video-detail-status, .more-details-action {
+        .video-detail-status,
+        .more-details-action {
           @include font-size(12);
           @include line-height(12);
         }
 
-        .more-details-action, .upload-failure {
+        .more-details-action,
+        .upload-failure {
           display: none;
         }
 
@@ -393,7 +427,8 @@
             background-color: $color-error;
           }
 
-          .more-details-action, .upload-failure {
+          .more-details-action,
+          .upload-failure {
             display: inline-block;
             color: $color-error;
           }
@@ -458,11 +493,13 @@
         width: 17%;
       }
 
-      .thumbnail-col, .video-id-col {
+      .thumbnail-col,
+      .video-id-col {
         width: 15%;
       }
 
-      .date-col, .status-col {
+      .date-col,
+      .status-col {
         width: 10%;
       }
 
@@ -532,7 +569,8 @@
       &:hover,
       &:focus,
       &.focused {
-        img, .video-duration {
+        img,
+        .video-duration {
           @include transition(all 0.3s linear);
 
           opacity: 0.1;
@@ -592,7 +630,7 @@
       position: absolute;
       text-align: center;
       top: 50%;
-      left: 5px;;
+      left: 5px;
       right: 5px;
 
       @include transform(translateY(-50%));

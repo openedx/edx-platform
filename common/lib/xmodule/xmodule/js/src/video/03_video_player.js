@@ -447,7 +447,6 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
         this.videoPlayer.goToStartTime = false;
 
         this.videoPlayer.seekTo(time);
-        this.trigger('videoProgressSlider.focusSlider');
 
         this.el.trigger('seek', [time, oldTime, type]);
     }
