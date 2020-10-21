@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from wiki.core.exceptions import NoRootURL
 from wiki.models import Article, URLPath
 
-from course_wiki.utils import course_wiki_slug
+from lms.djangoapps.course_wiki.utils import course_wiki_slug
 from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import Text

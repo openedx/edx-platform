@@ -4,7 +4,7 @@ a user has on an article.
 """
 
 
-from course_wiki.utils import user_is_article_course_staff
+from lms.djangoapps.course_wiki.utils import user_is_article_course_staff
 
 
 def CAN_DELETE(article, user):  # pylint: disable=invalid-name
