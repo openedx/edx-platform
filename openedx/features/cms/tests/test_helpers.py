@@ -6,8 +6,6 @@ Unit test for CMS helpers
 from datetime import datetime
 
 import mock
-from mock import patch
-
 from dateutil.parser import parse
 from opaque_keys.edx.locator import CourseLocator
 from openassessment.xblock.defaults import DEFAULT_DUE, DEFAULT_START
@@ -70,7 +68,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         # If parent course id is not provided or is none method returns none
         self.assertIsNone(helpers.initialize_course_settings(None, re_run_course_id))
 
-    @patch('openedx.features.cms.helpers.calculate_date_by_delta')
+    @mock.patch('openedx.features.cms.helpers.calculate_date_by_delta')
     def test_initialize_course_settings_with_open_date_and_custom_tags(
             self, mock_calculate_date_by_delta):
         """
@@ -114,8 +112,8 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         self.assertEqual(updated_custom_settings.course_open_date,
                          datetime(2019, 12, 1, tzinfo=UTC))
 
-    @patch('openedx.features.cms.helpers.set_rerun_course_dates')
-    @patch('openedx.features.cms.helpers.initialize_course_settings')
+    @mock.patch('openedx.features.cms.helpers.set_rerun_course_dates')
+    @mock.patch('openedx.features.cms.helpers.initialize_course_settings')
     def test_apply_post_rerun_creation_tasks_with_new_course_start_date(
             self, mock_set_rerun_course_dates, mock_initialize_course_settings):
         """
@@ -135,8 +133,8 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         assert mock_initialize_course_settings.called
         assert mock_set_rerun_course_dates.called
 
-    @patch('openedx.features.cms.helpers.set_rerun_course_dates')
-    @patch('openedx.features.cms.helpers.initialize_course_settings')
+    @mock.patch('openedx.features.cms.helpers.set_rerun_course_dates')
+    @mock.patch('openedx.features.cms.helpers.initialize_course_settings')
     def test_apply_post_rerun_creation_tasks_with_default_course_start_date(
             self, mock_initialize_course_settings, mock_set_rerun_course_dates):
         """
@@ -156,10 +154,10 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         assert mock_initialize_course_settings.called
         assert not mock_set_rerun_course_dates.called
 
-    @patch('openedx.features.cms.helpers.set_rerun_ora_dates')
-    @patch('openedx.features.cms.helpers.set_rerun_module_dates')
-    @patch('openedx.features.cms.helpers.set_advanced_settings_due_date')
-    @patch('openedx.features.cms.helpers.set_rerun_schedule_dates')
+    @mock.patch('openedx.features.cms.helpers.set_rerun_ora_dates')
+    @mock.patch('openedx.features.cms.helpers.set_rerun_module_dates')
+    @mock.patch('openedx.features.cms.helpers.set_advanced_settings_due_date')
+    @mock.patch('openedx.features.cms.helpers.set_rerun_schedule_dates')
     def test_set_rerun_course_dates_with_load_factor(self, mock_set_rerun_schedule_dates,
                                                      mock_set_advanced_settings_due_date,
                                                      mock_set_rerun_module_dates,
@@ -183,10 +181,10 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         assert mock_set_rerun_module_dates.called
         assert mock_set_rerun_ora_dates.called
 
-    @patch('openedx.features.cms.helpers.set_rerun_ora_dates')
-    @patch('openedx.features.cms.helpers.set_rerun_module_dates')
-    @patch('openedx.features.cms.helpers.set_advanced_settings_due_date')
-    @patch('openedx.features.cms.helpers.set_rerun_schedule_dates')
+    @mock.patch('openedx.features.cms.helpers.set_rerun_ora_dates')
+    @mock.patch('openedx.features.cms.helpers.set_rerun_module_dates')
+    @mock.patch('openedx.features.cms.helpers.set_advanced_settings_due_date')
+    @mock.patch('openedx.features.cms.helpers.set_rerun_schedule_dates')
     def test_set_rerun_course_dates_with_empty_course(self, mock_set_rerun_schedule_dates,
                                                       mock_set_advanced_settings_due_date,
                                                       mock_set_rerun_module_dates,
@@ -209,7 +207,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         assert not mock_set_rerun_module_dates.called
         assert not mock_set_rerun_ora_dates.called
 
-    @patch('openedx.features.cms.helpers.calculate_date_by_delta')
+    @mock.patch('openedx.features.cms.helpers.calculate_date_by_delta')
     def test_set_rerun_schedule_dates(self, mock_calculate_date_by_delta):
         re_run_course = CourseFactory.create(
             org='org',
@@ -231,7 +229,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         self.assertEqual(updated_dest_course.enrollment_start, datetime(2019, 10, 1, tzinfo=UTC))
         self.assertEqual(updated_dest_course.enrollment_end, datetime(2019, 10, 10, tzinfo=UTC))
 
-    @patch('openedx.features.cms.helpers.calculate_date_by_delta')
+    @mock.patch('openedx.features.cms.helpers.calculate_date_by_delta')
     def test_set_advanced_settings_due_date(self, mock_calculate_date_by_delta):
         """
         Testing adding valid course due date
@@ -250,7 +248,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         assert mock_calculate_date_by_delta.called
         self.assertEqual(re_run_course.due, datetime(2020, 10, 1, tzinfo=UTC))
 
-    @patch('openedx.features.cms.helpers.calculate_date_by_delta')
+    @mock.patch('openedx.features.cms.helpers.calculate_date_by_delta')
     def test_set_advanced_settings_due_date_source_course_without_due_date(
             self, mock_calculate_date_by_delta):
         """
@@ -477,8 +475,8 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         self.assertEqual(parse(ora2_staff_assessment['start']), datetime(2019, 7, 31, tzinfo=UTC))
         self.assertEqual(parse(ora2_staff_assessment['due']), datetime(2019, 8, 31, tzinfo=UTC))
 
-    @patch('openedx.features.cms.helpers.create_new_run_id')
-    @patch('openedx.features.cms.helpers.calculate_next_rerun_number')
+    @mock.patch('openedx.features.cms.helpers.create_new_run_id')
+    @mock.patch('openedx.features.cms.helpers.calculate_next_rerun_number')
     def test_update_course_re_run_details_for_multiple_rerun(
             self, mock_calculate_next_rerun_number, mock_create_new_run_id):
         """
@@ -649,7 +647,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         # If run is as per required pattern, just increment run number
         self.assertEqual(run_number, 6)
 
-    @patch('openedx.features.cms.helpers.get_course_group')
+    @mock.patch('openedx.features.cms.helpers.get_course_group')
     def test_calculate_next_rerun_number_for_invalid_number_of_underscores(
             self, mock_get_course_group):
         course = CourseFactory.create(
@@ -666,7 +664,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         # run number will be calculated from group count
         self.assertEqual(run_number, 11)
 
-    @patch('openedx.features.cms.helpers.get_course_group')
+    @mock.patch('openedx.features.cms.helpers.get_course_group')
     def test_calculate_next_rerun_number_run_number_not_digit(self, mock_get_course_group):
         # Run number is not digit i.e. xyz
         course = CourseFactory.create(
@@ -683,7 +681,7 @@ class CourseRerunAutomationTestCase(ModuleStoreTestCase):
         # run number will be calculated from group count
         self.assertEqual(run_number, 11)
 
-    @patch('openedx.features.cms.helpers.calculate_date_by_delta')
+    @mock.patch('openedx.features.cms.helpers.calculate_date_by_delta')
     def test_create_new_run_id(self, mock_calculate_date_by_delta):
         mock_calculate_date_by_delta.return_value = datetime(2019, 12, 20, tzinfo=UTC)
         run_dict = {"release_number": "1.33", "start": datetime(2019, 10, 1, tzinfo=UTC)}
