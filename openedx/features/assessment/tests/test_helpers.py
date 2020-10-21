@@ -11,12 +11,12 @@ from django.contrib.auth.models import User
 from django.db.models import signals
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
-from submissions.models import Score
-
 from openassessment.assessment.models import Assessment
 from openassessment.workflow import api as workflow_api
 from openassessment.workflow.models import AssessmentWorkflow
+from pytz import UTC
+from submissions.models import Score
+
 from openedx.features.assessment import helpers
 from openedx.features.assessment.constants import NO_PENDING_ORA
 from openedx.features.assessment.tests.factories import SubmissionFactory
@@ -87,21 +87,28 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
 
         return enrollment, submissions, submission_uuids
 
+    @data(3, None)
     @mock.patch('openedx.features.assessment.helpers.autoscore_ora_submission')
     @mock.patch('openedx.features.assessment.helpers._log_multiple_submissions_info')
     @mock.patch('openedx.features.assessment.helpers.datetime')
     @mock.patch('openedx.features.assessment.helpers._get_submissions_to_autoscore_by_enrollment')
-    @mock.patch('openedx.features.assessment.helpers.configuration_helpers.get_value')
-    def test_find_and_autoscore_submissions_successfully(self, mock_get_value, mock_get_submissions_by_enrollment,
-                                                         mock_datetime, mock_log_multiple_submissions_info,
+    @mock.patch('openedx.features.assessment.helpers.get_config_value_from_site_or_settings')
+    @mock.patch('openedx.features.assessment.helpers.get_site')
+    def test_find_and_autoscore_submissions_successfully(self, days_to_wait, mock_get_site,
+                                                         mock_get_config_value_from_site_or_settings,
+                                                         mock_get_submissions_by_enrollment, mock_datetime,
+                                                         mock_log_multiple_submissions_info,
                                                          mock_autoscore_ora_submission):
         """
         Verify that all ORA submissions corresponded to provided enrollments and submission uuids. Also check autoscore
         function called for each resulting submission.
         """
+        DAYS_TO_WAIT_AUTO_ASSESSMENT = 3
         datetime_now = datetime.now(UTC)
         mock_datetime.now.return_value = datetime_now
-        mock_get_value.return_value = 3
+        mock_get_config_value_from_site_or_settings.return_value = days_to_wait if days_to_wait else \
+            DAYS_TO_WAIT_AUTO_ASSESSMENT
+        mock_get_site.return_value = None
         enrollment1, submissions1, uuid_list_1 = self._create_enrollment_submission(
             datetime(2019, 12, 30, tzinfo=UTC).date(),
             course_id=self.source_course.id,
@@ -114,11 +121,13 @@ class AssessmentHelperModuleStoreTestCase(CourseAssessmentMixin, ModuleStoreTest
         enrollment = [enrollment1, enrollment2, ]
         submissions = submissions1 + submissions2
         submission_uuids = uuid_list_1 + uuid_list_2
-        delta_datetime = datetime_now - timedelta(days=3)
+        delta_datetime = datetime_now - timedelta(days=DAYS_TO_WAIT_AUTO_ASSESSMENT)
 
-        helpers.find_and_autoscore_submissions(enrollment, submission_uuids)
+        helpers.find_and_autoscore_submissions(enrollment, submission_uuids, mock.ANY)
 
-        mock_log_multiple_submissions_info.assert_called_once_with(submissions, 3, delta_datetime)
+        mock_log_multiple_submissions_info.assert_called_once_with(
+            submissions, DAYS_TO_WAIT_AUTO_ASSESSMENT, delta_datetime
+        )
         self.assertEqual(mock_autoscore_ora_submission.call_count, len(submissions))
 
     @data(
