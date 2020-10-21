@@ -322,7 +322,6 @@ def create_new_run_id(run_dict, course, run_number):
     if not run_dict.get('release_number'):
         raise_rerun_creation_exception(run_dict, ERROR_MESSAGES['release_number_missing'], exception_class=Exception)
 
-
     course_end_date = calculate_date_by_delta(run_dict['start'], course.start, course.end)
 
     new_run_id = "{}_{}_{}_{}".format(
