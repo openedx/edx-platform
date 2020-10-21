@@ -1548,8 +1548,3 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
 from openedx.core.djangoapps.plugins import plugin_apps, plugin_settings, constants as plugin_constants
 INSTALLED_APPS.extend(plugin_apps.get_apps(plugin_constants.ProjectType.CMS))
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.COMMON)
-
-# Course exports streamed in blocks of this size. 8192 or 8kb is the default
-# setting for the FileWrapper class used to iterate over the export file data.
-# See: https://docs.python.org/2/library/wsgiref.html#wsgiref.util.FileWrapper
-COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE = 8192

@@ -13,9 +13,8 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files import File
-from django.core.files.storage import FileSystemStorage
 from django.db import transaction
-from django.http import Http404, HttpResponse, HttpResponseNotFound, StreamingHttpResponse
+from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
@@ -23,7 +22,6 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
 from six import text_type
-from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from wsgiref.util import FileWrapper
@@ -275,8 +273,8 @@ def send_tarball(tarball, size):
     """
     Renders a tarball to response, for use when sending a tar.gz file to the user.
     """
-    wrapper = FileWrapper(tarball, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
-    response = StreamingHttpResponse(wrapper, content_type='application/x-tgz')
+    wrapper = FileWrapper(tarball)
+    response = HttpResponse(wrapper, content_type='application/x-tgz')
     response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(tarball.name.encode('utf-8'))
     response['Content-Length'] = size
     return response
@@ -371,21 +369,18 @@ def export_status_handler(request, course_key_string):
     elif task_status.state == UserTaskStatus.SUCCEEDED:
         status = 3
         artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
-        if isinstance(artifact.file.storage, FileSystemStorage):
-            output_url = reverse_course_url('export_output_handler', course_key)
-        elif isinstance(artifact.file.storage, S3Boto3Storage):
-            disposition = 'attachment; filename="{}"'.format(artifact.file.name)
-            params = {
-                'ResponseContentDisposition': disposition,
-                'ResponseContentEncoding': 'application/octet-stream',
-                'ResponseContentType': 'application/x-tgz',
-            }
-            output_url = artifact.file.storage.url(
-                artifact.file.name,
-                parameters=params
-            )
+        if hasattr(artifact.file.storage, 'bucket'):
+            filename = os.path.basename(artifact.file.name).encode('utf-8')
+            disposition = 'attachment; filename="{}"'.format(filename)
+            output_url = artifact.file.storage.url(artifact.file.name, response_headers={
+                'response-content-disposition': disposition,
+                'response-content-encoding': 'application/octet-stream',
+                'response-content-type': 'application/x-tgz'
+            })
         else:
-            output_url = artifact.file.storage.url(artifact.file.name)
+            # local file, serve from the authorization wrapper view
+            output_url = reverse_course_url('export_output_handler', course_key)
+
     elif task_status.state in (UserTaskStatus.FAILED, UserTaskStatus.CANCELED):
         status = max(-(task_status.completed_steps + 1), -2)
         errors = UserTaskArtifact.objects.filter(status=task_status, name='Error')

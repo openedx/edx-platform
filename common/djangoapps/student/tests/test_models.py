@@ -207,42 +207,6 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
         self.assertIsNotNone(enrollment.schedule)
         self.assertIsNone(enrollment.upgrade_deadline)
 
-    @skip_unless_lms
-    # NOTE: We mute the post_save signal to prevent Schedules from being created for new enrollments
-    @factory.django.mute_signals(signals.post_save)
-    def test_enrollments_not_deleted(self):
-        """ Recreating a CourseOverview with an outdated version should not delete the associated enrollment. """
-        course = CourseFactory(self_paced=True)
-        CourseModeFactory(
-            course_id=course.id,
-            mode_slug=CourseMode.VERIFIED,
-            # This must be in the future to ensure it is returned by downstream code.
-            expiration_datetime=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=30),
-        )
-
-        # Create a CourseOverview with an outdated version
-        course_overview = CourseOverview.load_from_module_store(course.id)
-        course_overview.version = CourseOverview.VERSION - 1
-        course_overview.save()
-
-        # Create an inactive enrollment with this course overview
-        enrollment = CourseEnrollmentFactory(
-            user=self.user,
-            course_id=course.id,
-            mode=CourseMode.AUDIT,
-            course=course_overview,
-        )
-
-        # Re-fetch the CourseOverview record.
-        # As a side effect, this will recreate the record, and update the version.
-        course_overview_new = CourseOverview.get_from_id(course.id)
-        self.assertEqual(course_overview_new.version, CourseOverview.VERSION)
-
-        # Ensure that the enrollment record was unchanged during this re-creation
-        enrollment_refetched = CourseEnrollment.objects.filter(id=enrollment.id)
-        self.assertTrue(enrollment_refetched.exists())
-        self.assertEqual(enrollment_refetched.all()[0], enrollment)
-
 
 class PendingNameChangeTests(SharedModuleStoreTestCase):
     """

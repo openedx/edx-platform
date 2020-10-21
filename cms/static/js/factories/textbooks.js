@@ -2,7 +2,6 @@ import * as gettext from 'gettext';
 import * as Section from 'js/models/section';
 import * as TextbookCollection from 'js/collections/textbook';
 import * as ListTextbooksView from 'js/views/list_textbooks';
-import './base';
 
 'use strict';
 export default function TextbooksFactory(textbooksJson) {

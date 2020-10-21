@@ -185,7 +185,7 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
 
             sub_tasks = []
             video_location = unicode(video.location)
-            for lang in all_transcripts:
+            for lang in all_transcripts.keys():
                 sub_tasks.append(async_migrate_transcript_subtask.s(
                     video_location, revision, lang, force_update, **kwargs
                 ))

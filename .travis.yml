@@ -40,4 +40,5 @@ branches:
   # Reduce our TravisCI usage by skipping all pull request branches to reduce effect on the environment (earth),
   # so `continuous-integration/travis-ci/push` shouldn't be built anymore.
   only:
-  - /^appsembler\/(tahoe|hawthorn)\/(develop|master)$/
+   - /^appsembler\/(tahoe|hawthorn)\/(develop|master)$/
+   - appsembler/juniper-upgrade

@@ -1267,7 +1267,7 @@ class CourseEnrollment(models.Model):
     course = models.ForeignKey(
         CourseOverview,
         db_constraint=False,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
     )
 
     @property
