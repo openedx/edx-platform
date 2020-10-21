@@ -1,0 +1,153 @@
+name: Code quality with Pylint, iSort & Pycodestyle
+
+on:
+  # Trigger workflow on pull request, but only for PRs
+  # merging into master and develop branches
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches:
+      - master
+      - develop
+
+jobs:
+  quality:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - uses: technote-space/get-diff-action@v4
+        with:
+          PATTERNS: |
+            **/*.py
+            !**/migrations/*
+            !**/envs/*
+            !common/**/etree.py
+          DOT: '...'
+          DIFF_FILTER: 'AMRC'
+
+      - name: Set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.5
+        if: env.GIT_DIFF
+
+      - name: Cache python requirements
+        uses: actions/cache@v2
+        id: cache-python-requirements
+        with:
+          path: /opt/hostedtoolcache/Python/
+          key: |
+            ${{ hashFiles('requirements/edx/base.txt') }}-${{
+            hashFiles('philu_actions/scripts/dependency_downloader.sh') }}
+        if: env.GIT_DIFF
+
+      - name: Install OS packages
+        run: |
+          chmod +x philu_actions/scripts/dependency_downloader.sh
+          sudo bash philu_actions/scripts/dependency_downloader.sh
+        if: env.GIT_DIFF && steps.cache-python-requirements.outputs.cache-hit != 'true'
+
+      - name: Install edx-platform requirements
+        run: |
+          pip install -r requirements/edx/testing.txt
+        if: env.GIT_DIFF && steps.cache-python-requirements.outputs.cache-hit != 'true'
+
+      - name: Creating pylint report
+        id: pylint-report
+        continue-on-error: true
+        run: |
+          pylint ${{ env.GIT_DIFF }} 2>&1 | tee report_pylint.txt
+
+          body=$(cat report_pylint.txt)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+
+          echo ::set-output name=icon::":x:"
+          [[ $body == *".py:"* || $body == *"***********"* ]] && title="**Please fix following pylint issues:**"
+          [[ ${body:5} == "-----"* ]] && score="Pylint score" && echo ::set-output name=status::success \
+          && echo ::set-output name=icon::":heavy_check_mark:"
+
+          echo ::set-output name=score::$score
+          echo ::set-output name=title::$title
+          echo ::set-output name=body::$body
+        if: env.GIT_DIFF
+
+      - name: Creating pycodestyle report
+        id: pycodestyle-report
+        continue-on-error: true
+        run: |
+          pycodestyle ${{ env.GIT_DIFF }} 2>&1 | tee report_pycodestyle.txt
+
+          body=$(cat report_pycodestyle.txt)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+
+          echo ::set-output name=icon::":x:"
+          title="**Please fix following pycodestyle issues:**"
+          [[ ${#body} == 0 ]] && echo ::set-output name=status::success \
+          && echo ::set-output name=icon::":heavy_check_mark:" || (body="\`\`\` %0A $body %0A \`\`\`" \
+          && echo ::set-output name=title::$title && echo ::set-output name=body::$body)
+        if: env.GIT_DIFF
+
+      - name: Creating iSort report
+        id: isort-report
+        continue-on-error: true
+        run: |
+          isort ${{ env.GIT_DIFF }} -c 2>&1 | tee report_isort.txt
+
+          body=$(cat report_isort.txt)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+
+          echo ::set-output name=icon::":x:"
+          title="**Please fix following iSort issues:**"
+          [[ ${#body} == 0 ]] && echo ::set-output name=icon::":heavy_check_mark:" && \
+          echo ::set-output name=status::success || (body="\`\`\` %0A $body %0A \`\`\`" \
+          && echo ::set-output name=title::$title && echo ::set-output name=body::$body)
+        if: env.GIT_DIFF
+
+      - name: Post report on PR
+        uses: mshick/add-pr-comment@v1
+        with:
+          message: |
+            **pylint:** ${{ steps.pylint-report.outputs.icon }}
+            **pycodestyle:** ${{ steps.pycodestyle-report.outputs.icon }}
+            **iSort:** ${{ steps.isort-report.outputs.icon }}
+
+            ${{ steps.pylint-report.outputs.title }}
+            ```
+            ${{ steps.pylint-report.outputs.score }}${{ steps.pylint-report.outputs.body }}
+            ```
+
+            ${{ steps.pycodestyle-report.outputs.title }}
+            ${{ steps.pycodestyle-report.outputs.body }}
+
+            ${{ steps.isort-report.outputs.title }}
+            ${{ steps.isort-report.outputs.body }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+        if: env.GIT_DIFF
+
+      - name: No py file, post comment on PR
+        uses: mshick/add-pr-comment@v1
+        with:
+          message: |
+            No python file in PR. **Looks good** :+1:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+        if: env.GIT_DIFF == ''
+
+      - name: Check on failures
+        if: |
+          steps.pylint-report.outputs.status != 'success' ||
+          steps.isort-report.outputs.status != 'success' ||
+          steps.pycodestyle-report.outputs.status != 'success'
+        run: |
+          PY_FILES="${{ env.GIT_DIFF }}"
+          [[ -z "$PY_FILES" ]] || exit 1
