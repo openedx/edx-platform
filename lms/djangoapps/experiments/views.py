@@ -11,9 +11,9 @@ from edx_rest_framework_extensions.auth.session.authentication import SessionAut
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 
-from experiments import filters, serializers
-from experiments.models import ExperimentData, ExperimentKeyValue
-from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
+from lms.djangoapps.experiments import filters, serializers
+from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
+from lms.djangoapps.experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 
 User = get_user_model()  # pylint: disable=invalid-name

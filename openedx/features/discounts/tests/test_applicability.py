@@ -16,7 +16,7 @@ from mock import Mock, patch
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
-from experiments.models import ExperimentData
+from lms.djangoapps.experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.discounts.models import DiscountRestrictionConfig
 from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID

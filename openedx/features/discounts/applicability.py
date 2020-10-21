@@ -20,7 +20,7 @@ from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 
 from course_modes.models import CourseMode
 from entitlements.models import CourseEntitlement
-from experiments.models import ExperimentData
+from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
 from student.models import CourseEnrollment

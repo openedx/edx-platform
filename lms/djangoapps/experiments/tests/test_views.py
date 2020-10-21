@@ -15,9 +15,9 @@ from django.urls import reverse
 from mock import patch
 from rest_framework.test import APITestCase
 
-from experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
-from experiments.models import ExperimentData, ExperimentKeyValue
-from experiments.serializers import ExperimentDataSerializer
+from lms.djangoapps.experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
+from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
+from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
 from student.tests.factories import UserFactory
 
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'

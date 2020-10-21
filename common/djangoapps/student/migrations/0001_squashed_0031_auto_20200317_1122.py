@@ -12,7 +12,7 @@ import opaque_keys.edx.django.models
 import simple_history.models
 from django.conf import settings
 from django.db import migrations, models
-from experiments.models import ExperimentData
+from lms.djangoapps.experiments.models import ExperimentData
 from student.models import CourseEnrollment, FBEEnrollmentExclusion
 
 import openedx.core.djangolib.model_mixins
