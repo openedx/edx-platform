@@ -133,13 +133,14 @@ class CourseMode(models.Model):
 
     history = HistoricalRecords()
 
-    HONOR = u'honor'
-    PROFESSIONAL = u'professional'
-    VERIFIED = u'verified'
-    AUDIT = u'audit'
-    NO_ID_PROFESSIONAL_MODE = u'no-id-professional'
-    CREDIT_MODE = u'credit'
-    MASTERS = u'masters'
+    HONOR = 'honor'
+    PROFESSIONAL = 'professional'
+    VERIFIED = 'verified'
+    AUDIT = 'audit'
+    NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
+    CREDIT_MODE = 'credit'
+    MASTERS = 'masters'
+    EXECUTIVE_EDUCATION = 'executive-education'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -154,13 +155,22 @@ class CourseMode(models.Model):
     )
     DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS['slug']
 
-    ALL_MODES = [AUDIT, CREDIT_MODE, HONOR, NO_ID_PROFESSIONAL_MODE, PROFESSIONAL, VERIFIED, MASTERS, ]
+    ALL_MODES = [
+        AUDIT,
+        CREDIT_MODE,
+        HONOR,
+        NO_ID_PROFESSIONAL_MODE,
+        PROFESSIONAL,
+        VERIFIED,
+        MASTERS,
+        EXECUTIVE_EDUCATION
+    ]
 
     # Modes utilized for audit/free enrollments
     AUDIT_MODES = [AUDIT, HONOR]
 
     # Modes that allow a student to pursue a verified certificate
-    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS]
+    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION]
 
     # Modes that allow a student to pursue a non-verified certificate
     NON_VERIFIED_MODES = [HONOR, AUDIT, NO_ID_PROFESSIONAL_MODE]
@@ -169,7 +179,7 @@ class CourseMode(models.Model):
     CREDIT_MODES = [CREDIT_MODE]
 
     # Modes that are eligible to purchase credit
-    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE]
+    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE, EXECUTIVE_EDUCATION]
 
     # Modes for which certificates/programs may need to be updated
     CERTIFICATE_RELEVANT_MODES = CREDIT_MODES + CREDIT_ELIGIBLE_MODES + [MASTERS]
