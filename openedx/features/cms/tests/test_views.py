@@ -57,7 +57,7 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
     @mock.patch('openedx.features.cms.views.get_courses_accessible_to_user')
     def test_course_multiple_rerun_handler_listing(
         self, mock_get_courses_accessible_to_user, mock_create_multiple_reruns,
-        mock_latest_course_reruns, mock_render_to_response):
+            mock_latest_course_reruns, mock_render_to_response):
         """
         Testing get call to API, for latest course listing, to create rerun from
         """
@@ -90,7 +90,7 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
     @mock.patch('openedx.features.cms.views.get_courses_accessible_to_user')
     def test_course_multiple_rerun_handler_create_rerun(
         self, mock_get_courses_accessible_to_user, mock_create_multiple_reruns,
-        mock_latest_course_reruns, mock_render_to_response):
+            mock_latest_course_reruns, mock_render_to_response):
         """
         Testing post call to API, for creating rerun from json data
         """
@@ -124,7 +124,7 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
     @mock.patch('openedx.features.cms.views.get_courses_accessible_to_user')
     def test_course_multiple_rerun_handler_raise_rerun_exception(
         self, mock_get_courses_accessible_to_user, mock_create_multiple_reruns,
-        mock_latest_course_reruns, mock_render_to_response):
+            mock_latest_course_reruns, mock_render_to_response):
         request = self.factory.post(self.rerun_path, data='{"dummy":"data"}',
                                     content_type='application/json')
         request.user = self.user
@@ -301,7 +301,7 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
 
     @mock.patch('openedx.features.cms.views.helpers.update_course_re_run_details')
     def test_create_multiple_reruns_user_has_no_access_to_course(
-        self, mock_update_course_re_run_details):
+            self, mock_update_course_re_run_details):
         # Input dictionary for the method (as param), which we are testing
         course_re_run_details = [
             {
@@ -344,7 +344,7 @@ class CourseRerunAutomationViewTestCase(ModuleStoreTestCase):
 
     @mock.patch('openedx.features.cms.views.helpers.update_course_re_run_details')
     def test_create_multiple_reruns_raise_duplicate_course_error(
-        self, mock_update_course_re_run_details):
+            self, mock_update_course_re_run_details):
         # Input dictionary for the method (as param), which we are testing
         course_re_run_details = [
             {
