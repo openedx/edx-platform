@@ -1689,6 +1689,10 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
     'openedx.core.djangoapps.embargo.middleware.EmbargoMiddleware',
 
+    # Allows us to use enterprise customer's language as the learner's default language
+    # This middleware must come before `LanguagePreferenceMiddleware` middleware
+    'enterprise.middleware.EnterpriseLanguagePreferenceMiddleware',
+
     # Allows us to set user preferences
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
 
