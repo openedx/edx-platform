@@ -13,14 +13,14 @@ from mock import Mock, patch
 from path import Path
 from six.moves import range
 
-from badges.models import (
+from lms.djangoapps.badges.models import (
     BadgeAssertion,
     BadgeClass,
     CourseBadgesDisabledError,
     CourseCompleteImageConfiguration,
     validate_badge_image
 )
-from badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
+from lms.djangoapps.badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
 from lms.djangoapps.certificates.tests.test_models import TEST_DATA_ROOT
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
