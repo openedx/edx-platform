@@ -9,7 +9,7 @@ Python APIs exposed by the bulk_email app to other in-process apps.
 from django.conf import settings
 from django.urls import reverse
 
-from bulk_email.models_api import (
+from lms.djangoapps.bulk_email.models_api import (
     is_bulk_email_enabled_for_course,
     is_bulk_email_feature_enabled,
     is_user_opted_out_for_course

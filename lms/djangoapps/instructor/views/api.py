@@ -46,8 +46,8 @@ from submissions import api as sub_api  # installed from the edx-submissions rep
 import instructor_analytics.basic
 import instructor_analytics.csvs
 import instructor_analytics.distributions
-from bulk_email.api import is_bulk_email_feature_enabled
-from bulk_email.models import CourseEmail
+from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
+from lms.djangoapps.bulk_email.models import CourseEmail
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (

@@ -24,7 +24,7 @@ from six import text_type
 from six.moves import range, zip
 from social_django.models import UserSocialAuth
 
-from bulk_email.models import BulkEmailFlag, Optout
+from lms.djangoapps.bulk_email.models import BulkEmailFlag, Optout
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory

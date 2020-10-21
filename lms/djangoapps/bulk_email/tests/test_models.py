@@ -12,8 +12,8 @@ from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from bulk_email.api import is_bulk_email_feature_enabled
-from bulk_email.models import (
+from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
+from lms.djangoapps.bulk_email.models import (
     SEND_TO_COHORT,
     SEND_TO_STAFF,
     SEND_TO_TRACK,
