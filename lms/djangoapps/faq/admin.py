@@ -3,7 +3,7 @@ from django.contrib import admin
 from lms.djangoapps.faq.models import Faq
 
 
-@admin.register(Faq)
+#@admin.register(Faq)
 class FaqAdmin(admin.ModelAdmin):
     actions = ['disable', 'enable']
     fields = ('title', 'content',)

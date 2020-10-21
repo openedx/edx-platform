@@ -18,7 +18,6 @@ from lms.djangoapps.onboarding.models import (
     Organization, OrganizationMetricUpdatePrompt, PartnerNetwork, OrganizationAdminHashKeys
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.features.data_extract.models import CourseDataExtraction
 
 
 utc = pytz.UTC
@@ -8117,7 +8116,6 @@ def update_user_email(user, old_email, new_email):
     CourseEnrollmentAllowed.objects.filter(email=old_email).update(email=new_email)
     OrganizationAdminHashKeys.objects.filter(suggested_admin_email=old_email).update(
         suggested_admin_email=new_email)
-    CourseDataExtraction.objects.filter(emails=old_email).update(emails=new_email)
     Organization.objects.filter(unclaimed_org_admin_email=old_email).update(
         unclaimed_org_admin_email=new_email)
     Organization.objects.filter(alternate_admin_email=old_email).update(
