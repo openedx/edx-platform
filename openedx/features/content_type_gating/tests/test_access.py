@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from mock import patch, Mock
 from pyquery import PyQuery as pq
 
-from course_api.blocks.api import get_blocks
+from lms.djangoapps.course_api.blocks.api import get_blocks
 from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from lms.djangoapps.courseware.tests.factories import (
