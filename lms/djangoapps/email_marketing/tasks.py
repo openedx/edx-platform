@@ -14,7 +14,7 @@ from django.core.cache import cache
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
 
-from email_marketing.models import EmailMarketingConfiguration
+from .models import EmailMarketingConfiguration
 
 log = logging.getLogger(__name__)
 SAILTHRU_LIST_CACHE_KEY = "email.marketing.cache"
