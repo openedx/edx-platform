@@ -40,7 +40,8 @@ def find_and_autoscore_submissions(enrollments, submission_uuids, site_id):
     """
     days_to_wait = get_config_value_from_site_or_settings('DAYS_TO_WAIT_AUTO_ASSESSMENT', get_site(site_id))
 
-    if not days_to_wait:
+    if days_to_wait is None or days_to_wait < 0:
+        # Use default value if constant from site configuration is invalid
         days_to_wait = DAYS_TO_WAIT_AUTO_ASSESSMENT
 
     delta_datetime = datetime.now(utc) - timedelta(days=days_to_wait)
