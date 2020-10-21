@@ -16,7 +16,7 @@ from eventtracking import tracker
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 
-from branding import api as branding_api
+from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,

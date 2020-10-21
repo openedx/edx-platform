@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from branding.models import BrandingApiConfig
+from lms.djangoapps.branding.models import BrandingApiConfig
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -114,7 +114,7 @@ class TestFooter(CacheIsolationTestCase):
         # load, which can cause other tests to fail.  To ensure that this change
         # doesn't affect other tests, we patch the `url()` method directly instead.
         cdn_url = "http://cdn.example.com/static/image.png"
-        with mock.patch('branding.api.staticfiles_storage.url', return_value=cdn_url):
+        with mock.patch('lms.djangoapps.branding.api.staticfiles_storage.url', return_value=cdn_url):
             resp = self._get_footer()
 
         self.assertEqual(resp.status_code, 200)
