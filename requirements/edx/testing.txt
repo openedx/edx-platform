@@ -33,7 +33,7 @@ git+https://github.com/edx/edx-ora2.git@2.2.0#egg=ora2==2.2.0
 #git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1.4.0
 git+ssh://git@github.com/edly-io/edly-panel-edx-app.git@edly-1.4.0#egg=edly-panel-app==edly-1.4.0
 git+ssh://git@github.com/edly-io/figures.git@edly-1.0.0#egg=figures==edly-1.2.0
--e git+https://github.com/raccoongang/edx_xblock_scorm.git@v1.0.3#egg=edx_xblock_scorm==v1.0.3
+-e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.0.4#egg=edx_xblock_scorm==v1.0.4
 -e common/lib/safe_lxml
 -e common/lib/sandbox-packages
 -e common/lib/symmath
