@@ -41,7 +41,7 @@ These APIs can be removed entirely, as they are adequately covered by existing f
    This functionality should be removed entirely. CMS user accounts should be retired using the existing `edX User
    Retirement Feature <https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/user_retire/>`_.
 
-2. Staffing and Enrollment (TBD)
+2. Staffing and Enrollment
 
    https://github.com/edx/edx-platform/blob/master/lms/djangoapps/dashboard/sysadmin.py#L419-L477
 
