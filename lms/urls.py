@@ -148,6 +148,7 @@ urlpatterns = [
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
         url(r'^api/mobile/(?P<api_version>v(1|0.5))/', include('mobile_api.urls')),
+        url(r'^api/mobile/v1/', include('openedx.features.edly.api.urls')),
     ]
 
 if settings.FEATURES.get('ENABLE_OPENBADGES'):
