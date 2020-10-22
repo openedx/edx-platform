@@ -101,11 +101,34 @@ class ConsentApiClient(object):
         """
 
         # Call the endpoint with the given kwargs, and check the value that it provides.
+        LOGGER.info(
+            u"Calling enterprise consent API for user [{username}] and course [{course_id}].".format(
+                username=kwargs.get('username'),
+                course_id=kwargs.get('course_id')
+            )
+        )
         response = self.consent_endpoint.get(**kwargs)
 
         # No Enterprise record exists, but we're already enrolled in a course. So, go ahead and proceed.
         if enrollment_exists and not response.get('exists', False):
+            LOGGER.info(
+                u"No enterprise record exists for user [{username}] and course [{course_id}], but the user is already "
+                u"enrolled, so consent is not required.".format(
+                    username=kwargs.get('username'),
+                    course_id=kwargs.get('course_id')
+                )
+            )
+
             return False
+
+        LOGGER.info(
+            u"The response from the Enterprise API to check if consent is required for user [{username}] and course "
+            u"[{course_id}] is [{required}]. ".format(
+                username=kwargs.get('username'),
+                course_id=kwargs.get('course_id'),
+                required=response['consent_required']
+            )
+        )
 
         # In all other cases, just trust the Consent API.
         return response['consent_required']
@@ -534,7 +557,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     data sharing permissions before accessing a course.
     """
     LOGGER.info(
-        u'Determining if user [{username}] must consent to data sharing for course [{course_id}]'.format(
+        u"Determining if user [{username}] must consent to data sharing for course [{course_id}]".format(
             username=user.username,
             course_id=course_id
         )
@@ -544,8 +567,8 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
     if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value == 0:
         LOGGER.info(
-            u'Consent from user [{username}] is not needed for course [{course_id}]. The DSC cache was checked,'
-            u'and the value was 0.'.format(
+            u"Consent from user [{username}] is not needed for course [{course_id}]. The DSC cache was checked,"
+            u" and the value was 0.".format(
                 username=user.username,
                 course_id=course_id
             )
@@ -553,41 +576,55 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         return False
 
     enterprise_learner_details = get_enterprise_learner_data_from_db(user)
+    consent_needed = False
     if not enterprise_learner_details:
         LOGGER.info(
-            u'Consent from user [{username}] is not needed for course [{course_id}]. The user is not linked to an'
-            u'enterprise.'.format(
+            u"Consent from user [{username}] is not needed for course [{course_id}]. The user is not linked to an"
+            u" enterprise.".format(
                 username=user.username,
                 course_id=course_id
             )
         )
-        consent_needed = False
     else:
         client = ConsentApiClient(user=request.user)
         current_enterprise_uuid = enterprise_customer_uuid_for_request(request)
-        consent_needed = any(
-            current_enterprise_uuid == learner['enterprise_customer']['uuid']
-            and Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
-            and client.consent_required(
+        for learner in enterprise_learner_details:
+            if current_enterprise_uuid != learner['enterprise_customer']['uuid']:
+                # ignore details for enterprises other than the one the learner is currently logged in as
+                continue
+            if Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) != request.site:
+                LOGGER.info(
+                    u"Consent check for user [{username}] and course [{course_id}] found a site mismatch. The learner "
+                    u"details site [{learner_site}] doesn't match the request site [{request_site}]".format(
+                        username=user.username,
+                        course_id=course_id,
+                        learner_site=learner['enterprise_customer']['site']['domain'],
+                        request_site=request.site
+                    )
+                )
+                # ignore details for enterprises whose site doesn't match the request site
+                continue
+            if client.consent_required(
                 username=user.username,
                 course_id=course_id,
                 enterprise_customer_uuid=current_enterprise_uuid,
                 enrollment_exists=enrollment_exists,
-            )
-            for learner in enterprise_learner_details
-        )
+            ):
+                # consent is required, no longer necessary to check other details
+                consent_needed = True
+                break
         if consent_needed:
             LOGGER.info(
-                u'Consent from user [{username}] is needed for course [{course_id}]. The user''s current enterprise'
-                u'required data sharing consent, and it has not been given.'.format(
+                u"Consent from user [{username}] is needed for course [{course_id}]. The user's current enterprise"
+                u" required data sharing consent, and it has not been given.".format(
                     username=user.username,
                     course_id=course_id
                 )
             )
         else:
             LOGGER.info(
-                u'Consent from user [{username}] is not needed for course [{course_id}]. The user''s current enterprise'
-                u'does not require data sharing consent.'.format(
+                u"Consent from user [{username}] is not needed for course [{course_id}]. The user's current enterprise"
+                u"does not require data sharing consent.".format(
                     username=user.username,
                     course_id=course_id
                 )
