@@ -32,7 +32,7 @@ def is_enabled():
     return BrandingApiConfig.current().enabled
 
 
-def get_auth_footer(is_secure=True):  # pylint: disable=unused-argument
+def get_auth_footer():
     """ Override default get_footer method & add link for after authentication pages"""
     return {
         "copyright": _auth_footer_copyright(),
@@ -43,7 +43,7 @@ def get_auth_footer(is_secure=True):  # pylint: disable=unused-argument
     }
 
 
-def get_non_auth_footer(is_secure=True):  # pylint: disable=unused-argument
+def get_non_auth_footer():
     """ Override default get_footer method """
 
     return {

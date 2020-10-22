@@ -184,7 +184,7 @@ def get_course_current_class(all_course_reruns, current_time):
     """
     Method to get ongoing course
 
-    Args:
+    Arguments:
         all_course_reruns (list): List of course reruns key
         current_time (datetime): Current time
 

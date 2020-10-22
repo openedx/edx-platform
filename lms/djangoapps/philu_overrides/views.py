@@ -21,7 +21,6 @@ from ratelimitbackend.exceptions import RateLimitException
 from w3lib.url import url_query_cleaner
 
 import openedx.core.djangoapps.external_auth.views
-import third_party_auth
 from edxmako.shortcuts import marketing_link, render_to_response, render_to_string
 from lms.djangoapps.courseware.access import _can_enroll_courselike, has_access
 from lms.djangoapps.courseware.courses import get_course_by_id, get_courses, sort_by_announcement, sort_by_start_date
@@ -45,7 +44,8 @@ from philu_overrides.helpers import (
     reactivation_email_for_user_custom
 )
 from student.models import CourseEnrollment, LoginFailures
-from third_party_auth import pipeline, provider  # pylint: disable=ungrouped-imports
+from third_party_auth import is_enabled as third_party_auth_enabled
+from third_party_auth import pipeline, provider
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
@@ -99,7 +99,7 @@ def login_and_registration_form(request, initial_mode="login"):
         try:
             next_args = urlparse.parse_qs(urlparse.urlparse(redirect_to).query)
             provider_id = next_args['tpa_hint'][0]
-            if third_party_auth.provider.Registry.get(provider_id=provider_id):
+            if provider.Registry.get(provider_id=provider_id):
                 third_party_auth_hint = provider_id
                 initial_mode = "hinted_login"
         except (KeyError, ValueError, IndexError):
@@ -276,7 +276,7 @@ def login_user_custom(request, error=""):  # pylint: disable=too-many-statements
     redirect_url = None
     response = None
     running_pipeline = None
-    third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
+    third_party_auth_requested = third_party_auth_enabled() and pipeline.running(request)
     third_party_auth_successful = False
     trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     user = None
