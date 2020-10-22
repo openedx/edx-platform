@@ -40,6 +40,7 @@
 # Al Firdaus, 2014
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020
 # fizdoonk, 2013
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/).
@@ -81,9 +82,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-27 20:42+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-10-18 20:43+0000\n"
+"PO-Revision-Date: 2020-10-04 20:44+0000\n"
+"Last-Translator: Eka Y Saputra <ekajogja@ymail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -310,7 +311,6 @@ msgstr ""
 #: common/static/common/js/discussion/views/response_comment_view.js
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
 msgid "Error"
@@ -320,6 +320,14 @@ msgstr "Kesalahan"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "Mengupdate dengan konten library terakhir"
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Loading..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Selected blocks"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
@@ -786,13 +794,9 @@ msgstr "Hapus baris"
 msgid "Delete table"
 msgstr "Hapus tabel"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "Deskripsi"
 
@@ -3465,7 +3469,9 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select military status"
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
@@ -3473,7 +3479,9 @@ msgid "What is the highest level of education that you have achieved so far?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select guardian education"
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
@@ -3485,7 +3493,7 @@ msgid "What industry do you currently work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select prospective industry"
+msgid "What industry do you want to work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
@@ -5359,10 +5367,6 @@ msgstr "Terjadi kesalahan. Coba kembali."
 msgid "Could not submit order"
 msgstr "Tidak dapat mengajukan pesanan"
 
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-msgid "Could not retrieve payment information"
-msgstr "Tidak dapat memuat informasi pembayaran"
-
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
 msgstr "Foto kartu identitas Anda"
@@ -7096,11 +7100,6 @@ msgstr "Tindakan"
 #: lms/templates/ccx/schedule.underscore
 msgid "Unscheduled"
 msgstr "Tidak terjadwal"
-
-#: cms/templates/js/course_info_update.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "Tanggal"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -8922,7 +8921,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "Selanjutnya: %(nextStepTitle)s"
@@ -9058,13 +9056,11 @@ msgstr ""
 "aktivasi Anda dapat memuat kembali halaman ini."
 
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "Aktifkan account anda"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "ID photo"
 
@@ -9079,7 +9075,6 @@ msgstr ""
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "Webcam"
 
@@ -9177,7 +9172,6 @@ msgid "Check your email for an activation message."
 msgstr "Periksa email Anda untuk pesan aktivasi."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "Total"
 
@@ -9214,77 +9208,6 @@ msgid ""
 "You will use your webcam to take a picture of your face and of your "
 "government-issued photo ID."
 msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for {courseName}."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "Nomer order"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "Jumlah"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "Silakan catat"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "Item yang dicoret telah direfund."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "Ditagihkan kepada:"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "Tidak ada tanda terima yang tersedia"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next Step: Confirm your identity"
-msgstr "Langkah Selanjutnya: konfirmasi identitas anda"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email"
-msgstr "Periksa email anda"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr ""
-"Anda memerlukan untuk aktifasi account anda sebelum anda dapat mendaftar "
-"kursus. Periksa inbok anda pada aktifasi email"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"photo."
-msgstr "SIM, phasphor, ID terbitan pemerintah/ktp dengan nama dan photo anda"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"Jika Anda tidak memverifikasi identitas Anda sekarang, Anda masih dapat "
-"melihat kursus Anda dari dashboard Anda. Anda akan menerima pengingat dari "
-"%(platformName)s secara periodik untuk memverifikasi identitas Anda."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "Ingin konfirmasi identitas anda nanti?"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
@@ -10171,6 +10094,10 @@ msgid ""
 msgstr ""
 "Ada kode yang tidak sah/invalid  dalam konten anda. silakan cek untuk "
 "memastikan HTML yang sah/valid"
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Date"
+msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"

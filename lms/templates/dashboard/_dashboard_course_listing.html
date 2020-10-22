@@ -37,7 +37,6 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
   cert_name_long = course_overview.cert_name_long
   if cert_name_long == "":
     cert_name_long = settings.CERT_NAME_LONG
-  billing_email = settings.PAYMENT_SUPPORT_EMAIL
 
   is_course_expired = hasattr(show_courseware_link, 'error_code') and show_courseware_link.error_code == 'audit_expired'
 %>

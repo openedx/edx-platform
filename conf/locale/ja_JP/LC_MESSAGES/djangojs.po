@@ -77,9 +77,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-27 20:42+0000\n"
-"PO-Revision-Date: 2020-06-14 20:45+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
+"POT-Creation-Date: 2020-10-18 20:43+0000\n"
+"PO-Revision-Date: 2020-10-04 20:44+0000\n"
+"Last-Translator: Omar Al-Ithawi <i@omardo.com>\n"
 "Language-Team: Japanese (Japan) (http://www.transifex.com/open-edx/edx-platform/language/ja_JP/)\n"
 "Language: ja_JP\n"
 "MIME-Version: 1.0\n"
@@ -285,7 +285,6 @@ msgstr ""
 #: common/static/common/js/discussion/views/response_comment_view.js
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
 msgid "Error"
@@ -295,6 +294,14 @@ msgstr "エラー"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "最新のライブラリコンテンツで更新中"
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Loading..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Selected blocks"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
@@ -752,11 +759,14 @@ msgstr ""
 msgid "Delete table"
 msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
-msgstr "説明"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -3294,7 +3304,9 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select military status"
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
@@ -3302,7 +3314,9 @@ msgid "What is the highest level of education that you have achieved so far?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select guardian education"
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
@@ -3314,7 +3328,7 @@ msgid "What industry do you currently work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select prospective industry"
+msgid "What industry do you want to work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
@@ -5034,10 +5048,6 @@ msgstr "エラーが発生しました。再試行してください。"
 msgid "Could not submit order"
 msgstr "注文を送信できませんでした"
 
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-msgid "Could not retrieve payment information"
-msgstr "支払情報を復元できませんでした"
-
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
 msgstr "あなたのIDの写真を撮影する"
@@ -6740,11 +6750,6 @@ msgstr "操作"
 #: lms/templates/ccx/schedule.underscore
 msgid "Unscheduled"
 msgstr "未定"
-
-#: cms/templates/js/course_info_update.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "日付"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -8539,7 +8544,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "次: %(nextStepTitle)s"
@@ -8664,13 +8668,11 @@ msgstr ""
 "講座の受講登録を始める前に、アカウントを有効化させる必要があります。有効化に関するメールが届いているかご確認ください。有効化が完了したら、この画面に戻り再読込してください。"
 
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "アカウントを有効化する"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "写真ID"
 
@@ -8683,7 +8685,6 @@ msgstr "運転免許証、パスポートまたは政府発行の氏名と写真
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "ウェブカメラ"
 
@@ -8775,7 +8776,6 @@ msgid "Check your email for an activation message."
 msgstr "有効化に関するメールを確認してください。"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "合計"
 
@@ -8811,73 +8811,6 @@ msgid ""
 "You will use your webcam to take a picture of your face and of your "
 "government-issued photo ID."
 msgstr "顔写真および政府発行の写真付きIDの写真を撮るためにwebカメラを使用してください。"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for {courseName}."
-msgstr "ありがとうございました！ {courseName}講座の支払を受領しました。"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr "この画面を記録用に印刷してください。これは領収書になります。同様の情報をメールでもお送りしています。"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "申込番号"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "数量"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "注意してください"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "線が引いてあるアイテムは返金されました。"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "請求先"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "領収証なし"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next Step: Confirm your identity"
-msgstr "次のステップ: 本人確認"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email"
-msgstr "メールをチェックしてください"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr "講座の受講登録を始める前に、アカウントを有効化させる必要があります。有効化に関するメールが届いているかご確認ください。"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"photo."
-msgstr "運転免許証、パスポートまたは政府発行の氏名と写真付き身分証明書。"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"いますぐ本人認証を行わなくてもダッシュボードで講座を探すことはできます。定期的に%(platformName)sから本人認証を行うように通知があります。"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "後で本人認証を行いますか？"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
@@ -9738,6 +9671,10 @@ msgid ""
 "There is invalid code in your content. Please check to make sure it is valid"
 " HTML."
 msgstr "無効なコードがコンテンツに含まれています。有効なHTMLであることを確認してください。"
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Date"
+msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"

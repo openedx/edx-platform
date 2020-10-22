@@ -11,8 +11,8 @@ from boto.exception import NoAuthHandlerFound
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
-from django.urls import reverse
 from django.test import override_settings
+from django.urls import reverse
 from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.serializers import ArtifactSerializer, StatusSerializer
@@ -221,16 +221,16 @@ class TestUserTaskStopped(APITestCase):
         with mock.patch('django.core.mail.send_mail') as mock_exception:
             mock_exception.side_effect = NoAuthHandlerFound()
 
-            with mock.patch('cms_user_tasks.tasks.send_task_complete_email.retry') as mock_retry:
+            with mock.patch('cms.djangoapps.cms_user_tasks.tasks.send_task_complete_email.retry') as mock_retry:
                 user_task_stopped.send(sender=UserTaskStatus, status=self.status)
                 self.assertTrue(mock_retry.called)
 
     def test_queue_email_failure(self):
-        logger = logging.getLogger("cms_user_tasks.signals")
+        logger = logging.getLogger("cms.djangoapps.cms_user_tasks.signals")
         hdlr = MockLoggingHandler(level="DEBUG")
         logger.addHandler(hdlr)
 
-        with mock.patch('cms_user_tasks.tasks.send_task_complete_email.delay') as mock_delay:
+        with mock.patch('cms.djangoapps.cms_user_tasks.tasks.send_task_complete_email.delay') as mock_delay:
             mock_delay.side_effect = NoAuthHandlerFound()
             user_task_stopped.send(sender=UserTaskStatus, status=self.status)
             self.assertTrue(mock_delay.called)

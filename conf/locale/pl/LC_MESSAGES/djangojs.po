@@ -101,9 +101,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-09-27 20:42+0000\n"
-"PO-Revision-Date: 2020-08-20 11:18+0000\n"
-"Last-Translator: Jerzy Pankiewicz <jerzy.pankiewicz@pwr.edu.pl>\n"
+"POT-Creation-Date: 2020-10-18 20:43+0000\n"
+"PO-Revision-Date: 2020-10-04 20:44+0000\n"
+"Last-Translator: Maciej Kolankowski <maciej@eduprojekt.org>\n"
 "Language-Team: Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -309,7 +309,6 @@ msgstr ""
 #: common/static/common/js/discussion/views/response_comment_view.js
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
 msgid "Error"
@@ -319,6 +318,14 @@ msgstr "Błąd"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "Aktualizacja o najnowszą treść biblioteki"
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Loading..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
+msgid "Selected blocks"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
 msgid "Unable to update settings"
@@ -794,11 +801,14 @@ msgstr ""
 msgid "Delete table"
 msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
-msgstr "Opis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -3464,7 +3474,9 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select military status"
+msgid ""
+"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
+"National Guard?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
@@ -3472,7 +3484,9 @@ msgid "What is the highest level of education that you have achieved so far?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select guardian education"
+msgid ""
+"What is the highest level of education that any of your parents or guardians"
+" have achieved?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
@@ -3484,7 +3498,7 @@ msgid "What industry do you currently work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select prospective industry"
+msgid "What industry do you want to work in?"
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
@@ -5375,10 +5389,6 @@ msgstr "Wystąpił błąd. Spróbuj ponownie."
 msgid "Could not submit order"
 msgstr "Składanie zamówienia nie powiodło się"
 
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-msgid "Could not retrieve payment information"
-msgstr "Pobieranie informacji o płatności nie powiodło się"
-
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
 msgstr "Wykonaj zdjęcie swojego dowodu tożsamości"
@@ -7154,11 +7164,6 @@ msgstr "Czynności"
 #: lms/templates/ccx/schedule.underscore
 msgid "Unscheduled"
 msgstr "Niezaplanowany"
-
-#: cms/templates/js/course_info_update.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr "Data"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -9015,7 +9020,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "Następnie: %(nextStepTitle)s"
@@ -9158,13 +9162,11 @@ msgstr ""
 "wróć i odśwież tę stronę."
 
 #: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "Aktywuj swoje konto"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "Zdjęcie identyfikacyjne"
 
@@ -9179,7 +9181,6 @@ msgstr ""
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "Kamerka internetowa"
 
@@ -9287,7 +9288,6 @@ msgid "Check your email for an activation message."
 msgstr "Sprawdź pocztę e-mail i odszukać wiadomość aktywacyjną."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "Suma"
 
@@ -9331,82 +9331,6 @@ msgid ""
 msgstr ""
 "Kamerki internetowej użyjesz do wykonania zdjęcia swojej twarzy oraz zdjęcia"
 " dokumentu tożsamości."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for {courseName}."
-msgstr "Dziękujemy! Otrzymaliśmy twoją opłatę za kurs {courseName}."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"Proszę zapisać lub wydrukować tę stronę, gdyż służy ona za rachunek. Ten sam"
-" rachunek otrzymasz również drogą poczty elektronicznej."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "Nr zamówienia"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "Ilość"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "Uwaga"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "Za wykreślone elementy nastąpił zwrot pieniędzy."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "Nabywca:"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "Brak dostępnego pokwitowania"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next Step: Confirm your identity"
-msgstr "Następny krok: potwierdź swoją tożsamość"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email"
-msgstr "Sprawdź pocztę e-mail"
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr ""
-"Aby móc zarejestrować się na kursy, musisz najpierw aktywować swoje konto. "
-"Sprawdź pocztę i odnajdź e-mail z odnośnikiem aktywacyjnym."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"photo."
-msgstr ""
-"Dowód osobisty, prawo jazdy, paszport lub inny dokument tożsamości "
-"zawierający twoje zdjęcie oraz imię i nazwisko."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-#, python-format
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-"Jeśli nie potwierdzisz swojej tożsamości już teraz, wciąż możesz "
-"uczestniczyć w kursie z poziomu pulpitu studenta. Będziesz otrzymywać "
-"cykliczne powiadomienia od %(platformName)s z prośbą o poddanie się "
-"weryfikacji tożsamości."
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "Czy chcesz potwierdzić swoją tożsamość później?"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
@@ -10319,6 +10243,10 @@ msgid ""
 msgstr ""
 "W twojej treści znajduje się błędny kod. Proszę sprawdzić i upewnić się, że "
 "nie ma błędnych zapisów HTML."
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Date"
+msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
 msgid "Post"

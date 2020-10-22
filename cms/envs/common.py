@@ -456,8 +456,11 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
+# TODO: Is this next line necessary?
 sys.path.append(REPO_ROOT)
-sys.path.append(PROJECT_ROOT / 'djangoapps')
+# TODO: The next two path modifications will be removed in an upcoming Open edX release.
+# See docs/decisions/0007-sys-path-modification-removal.rst
+sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'studio')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For geolocation ip database
@@ -1351,19 +1354,19 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.video_pipeline',
 
     # For CMS
-    'contentstore.apps.ContentstoreConfig',
+    'cms.djangoapps.contentstore.apps.ContentstoreConfig',
 
     'openedx.core.djangoapps.contentserver',
-    'course_creators',
+    'cms.djangoapps.course_creators',
     'student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
-    'xblock_config.apps.XBlockConfig',
+    'cms.djangoapps.xblock_config.apps.XBlockConfig',
 
     # New (Blockstore-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
 
     # Maintenance tools
-    'maintenance',
+    'cms.djangoapps.maintenance',
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
@@ -1475,7 +1478,7 @@ INSTALLED_APPS = [
     'user_tasks',
 
     # CMS specific user task handling
-    'cms_user_tasks.apps.CmsUserTasksConfig',
+    'cms.djangoapps.cms_user_tasks.apps.CmsUserTasksConfig',
 
     # Unusual migrations
     'database_fixups',

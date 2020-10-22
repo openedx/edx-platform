@@ -285,15 +285,6 @@ FEATURES = {
     # .. toggle_warnings: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
     'SKIP_EMAIL_VALIDATION': False,
 
-    # Toggle the availability of the shopping cart page
-    'ENABLE_SHOPPING_CART': False,
-
-    # Toggle storing detailed billing information
-    'STORE_BILLING_INFO': False,
-
-    # Enable flow for payments for course registration (DIFFERENT from verified student flow)
-    'ENABLE_PAID_COURSE_REGISTRATION': False,
-
     # .. toggle_name: ENABLE_COSMETIC_DISPLAY_PRICE
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -723,8 +714,10 @@ NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
 
-# TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
+# TODO: Is this next line necessary?
 sys.path.append(REPO_ROOT)
+# TODO: The next two path modifications will be removed in an upcoming Open edX release.
+# See docs/decisions/0007-sys-path-modification-removal.rst
 sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'lms')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 
@@ -898,9 +891,6 @@ CONTEXT_PROCESSORS = [
 
     # Hack to get required link URLs to password reset templates
     'edxmako.shortcuts.marketing_link_context_processor',
-
-    # Shoppingcart processor (detects if request.user has a cart)
-    'shoppingcart.context_processor.user_has_cart_context_processor',
 
     # Timezone processor (sends language and time_zone preference)
     'lms.djangoapps.courseware.context_processor.user_timezone_locale_prefs',
@@ -1575,23 +1565,8 @@ EMBARGO_SITE_REDIRECT_URL = None
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'billing@example.com'
 
-##### Using cybersource by default #####
-
-CC_PROCESSOR_NAME = 'CyberSource2'
-CC_PROCESSOR = {
-    'CyberSource2': {
-        "PURCHASE_ENDPOINT": '',
-        "SECRET_KEY": '',
-        "ACCESS_KEY": '',
-        "PROFILE_ID": '',
-    }
-}
-
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
 PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
-
-# Members of this group are allowed to generate payment reports
-PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
 
 ################################# EdxNotes config  #########################
 
@@ -1713,6 +1688,10 @@ MIDDLEWARE = [
 
     'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
     'openedx.core.djangoapps.embargo.middleware.EmbargoMiddleware',
+
+    # Allows us to use enterprise customer's language as the learner's default language
+    # This middleware must come before `LanguagePreferenceMiddleware` middleware
+    'enterprise.middleware.EnterpriseLanguagePreferenceMiddleware',
 
     # Allows us to set user preferences
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
@@ -2589,7 +2568,7 @@ INSTALLED_APPS = [
     'django_countries',
 
     # edX Mobile API
-    'mobile_api',
+    'lms.djangoapps.mobile_api.apps.MobileApiConfig',
     'social_django',
 
     # Surveys
@@ -2779,6 +2758,7 @@ MKTG_URL_LINK_MAP = {
     'ROOT': 'root',
     'TOS': 'tos',
     'HONOR': 'honor',  # If your site does not have an honor code, simply delete this line.
+    'TOS_AND_HONOR': 'edx-terms-service',
     'PRIVACY': 'privacy',
     'PRESS': 'press',
     'BLOG': 'blog',

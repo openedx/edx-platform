@@ -87,6 +87,7 @@ from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
 from openedx.features.discounts.utils import offer_banner_wrapper
+from openedx.features.content_type_gating.services import ContentTypeGatingService
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
@@ -821,6 +822,7 @@ def get_module_system_for_user(
             'gating': GatingService(),
             'grade_utils': GradesUtilService(course_id=course_id),
             'user_state': UserStateService(),
+            'content_type_gating': ContentTypeGatingService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access

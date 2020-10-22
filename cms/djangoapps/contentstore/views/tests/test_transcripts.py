@@ -17,7 +17,7 @@ from edxval.api import create_video
 from mock import Mock, patch
 from opaque_keys.edx.keys import UsageKey
 
-from contentstore.tests.utils import CourseTestCase, mock_requests_get
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase, mock_requests_get
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -624,7 +624,10 @@ class TestRenameTranscripts(BaseTranscripts):
 
 
 @ddt.ddt
-@patch('contentstore.views.transcripts_ajax.download_youtube_subs', Mock(return_value=SJSON_TRANSCRIPT_CONTENT))
+@patch(
+    'cms.djangoapps.contentstore.views.transcripts_ajax.download_youtube_subs',
+    Mock(return_value=SJSON_TRANSCRIPT_CONTENT)
+)
 class TestReplaceTranscripts(BaseTranscripts):
     """
     Tests for '/transcripts/replace' endpoint.
@@ -735,7 +738,8 @@ class TestReplaceTranscripts(BaseTranscripts):
         Verify that replace transcript fails if YouTube does not have transcript for the given youtube id.
         """
         error_message = u'YT ID not found.'
-        with patch('contentstore.views.transcripts_ajax.download_youtube_subs') as mock_download_youtube_subs:
+        patch_path = 'cms.djangoapps.contentstore.views.transcripts_ajax.download_youtube_subs'
+        with patch(patch_path) as mock_download_youtube_subs:
             mock_download_youtube_subs.side_effect = GetTranscriptsFromYouTubeException(error_message)
             response = self.replace_transcript(locator=self.video_usage_key, youtube_id='non-existent-yt-id')
             self.assertContains(response, text=error_message, status_code=400)

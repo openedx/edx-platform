@@ -35,7 +35,7 @@ drf-yasg<1.17.1
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.8.32
+edx-enterprise==3.9.2
 
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
@@ -80,11 +80,17 @@ maxminddb<2.0.0
 # mock version 4.0.0 drops support for python 3.5
 mock<4.0.0
 
-# oauthlib>3.0.1 causes test failures
+# oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
+
+# django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
+django-oauth-toolkit<=1.3.2
 
 # path 13.2.0 drops support for Python 3.5
 path<13.2.0
+
+# pillow 8.0.0 drops support for Python 3.5
+pillow<8.0.0
 
 # ARCHBOM-1141: pip-tools upgrade requires pip upgrade
 pip-tools<5.0.0
@@ -122,4 +128,3 @@ vulture<2.0
 
 # edx-sga==0.12.0 is breaking one test
 edx-sga==0.11.1
-

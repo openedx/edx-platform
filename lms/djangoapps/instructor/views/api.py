@@ -325,10 +325,10 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
     row_errors = []
     general_errors = []
 
-    # for white labels we use 'shopping cart' which uses CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG as
+    # for white labels we use 'shopping cart' which uses CourseMode.HONOR as
     # course mode for creating course enrollments.
     if CourseMode.is_white_label(course_id):
-        course_mode = CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        course_mode = CourseMode.HONOR
     else:
         course_mode = None
 

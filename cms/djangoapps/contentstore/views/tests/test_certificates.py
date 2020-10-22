@@ -16,9 +16,8 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
 from six.moves import range
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
-from contentstore.views.certificates import CERTIFICATE_SCHEMA_VERSION, CertificateManager
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -27,6 +26,8 @@ from util.testing import EventTestMixin, UrlResetMixin
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
+
+from ..certificates import CERTIFICATE_SCHEMA_VERSION, CertificateManager
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -211,7 +212,7 @@ class CertificatesListHandlerTestCase(
         """
         Set up CertificatesListHandlerTestCase.
         """
-        super(CertificatesListHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
+        super(CertificatesListHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')
         self.reset_urls()
 
     def _url(self):
@@ -436,7 +437,7 @@ class CertificatesDetailHandlerTestCase(
         """
         Set up CertificatesDetailHandlerTestCase.
         """
-        super(CertificatesDetailHandlerTestCase, self).setUp('contentstore.views.certificates.tracker')
+        super(CertificatesDetailHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')
         self.reset_urls()
 
     def _url(self, cid=-1):

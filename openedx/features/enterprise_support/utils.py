@@ -76,7 +76,11 @@ def get_enterprise_sidebar_context(enterprise_customer, is_proxy_login):
     """
     Get context information for enterprise sidebar for the given enterprise customer.
 
-    Enterprise Sidebar Context has the following key-value pairs.
+    Args:
+        enterprise_customer (dict): customer data from enterprise-customer endpoint, cached
+        is_proxy_login (bool): If True, use proxy login welcome template
+
+    Returns: Enterprise Sidebar Context with the following key-value pairs.
     {
         'enterprise_name': 'Enterprise Name',
         'enterprise_logo_url': 'URL of the enterprise logo image',
@@ -354,14 +358,13 @@ def get_enterprise_learner_portal(request):
 def enterprise_branding_configuration(enterprise_customer_obj):
     """
     Given an instance of ``EnterpriseCustomer``, returns a related
-    branding_configuration serialized dictionary if it exists, otherwise an empty dictionary.
-    """
-    # We can use hasattr() on one-to-one relationships to avoid exception-catching:
-    # https://docs.djangoproject.com/en/2.2/topics/db/examples/one_to_one/
-    if not hasattr(enterprise_customer_obj, 'branding_configuration'):
-        return {}
+    branding_configuration serialized dictionary if it exists, otherwise
+    the serialized default EnterpriseCustomerBrandingConfiguration object.
 
-    branding_config = enterprise_customer_obj.branding_configuration
+    EnterpriseCustomerBrandingConfigurationSerializer will use default values
+    for any empty branding config fields.
+    """
+    branding_config = enterprise_customer_obj.safe_branding_configuration
     return EnterpriseCustomerBrandingConfigurationSerializer(branding_config).data
 
 

@@ -40,7 +40,7 @@ class Command(BaseCommand):
         send password reset email.
 
         csv file is expected to have one row per user with the format:
-        username, email, new_email
+        username, current_email, desired_email
 
         Example:
             $ ... recover_account csv_file_path
@@ -76,34 +76,34 @@ class Command(BaseCommand):
 
         for row in csv_reader:
             username = row['username']
-            email = row['email']
-            new_email = row['new_email']
+            current_email = row['current_email']
+            desired_email = row['desired_email']
 
             try:
-                user = get_user_model().objects.get(Q(username__iexact=username) | Q(email__iexact=email))
-                user.email = new_email
+                user = get_user_model().objects.get(Q(username__iexact=username) | Q(email__iexact=current_email))
+                user.email = desired_email
                 user.save()
-                self.send_password_reset_email(user, email, site)
-                successful_updates.append(new_email)
+                self.send_password_reset_email(user, site)
+                successful_updates.append(desired_email)
             except Exception as exc:  # pylint: disable=broad-except
-                logger.exception('Unable to send email to {email} and exception was {exp}'.
-                                 format(email=email, exp=exc)
+                logger.exception('Unable to send email to {desired_email} and exception was {exp}'.
+                                 format(desired_email=desired_email, exp=exc)
                                  )
 
-                failed_updates.append(email)
+                failed_updates.append(current_email)
 
         logger.info('Successfully updated {successful} accounts. Failed to update {failed} '
                     'accounts'.format(successful=successful_updates, failed=failed_updates)
                     )
 
-    def send_password_reset_email(self, user, email, site):
+    def send_password_reset_email(self, user, site):
         """
         Send email to learner with reset password link
         :param user:
-        :param email:
         :param site:
         """
         message_context = get_base_template_context(site)
+        email = user.email
         message_context.update({
             'email': email,
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),

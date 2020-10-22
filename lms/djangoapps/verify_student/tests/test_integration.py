@@ -2,11 +2,11 @@
 Integration tests of the payment flow, including course mode selection.
 """
 
-
 import six
 from django.urls import reverse
 
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -51,8 +51,9 @@ class TestProfEdVerification(ModuleStoreTestCase):
         # Go to the course mode page, expecting a redirect to the intro step of the
         # payment flow (since this is a professional ed course). Otherwise, the student
         # would have the option to choose their track.
-        resp = self.client.get(self.urls['course_modes_choose'], follow=True)
-        self.assertRedirects(resp, self.urls['verify_student_start_flow'])
+        with mock_payment_processors():
+            resp = self.client.get(self.urls['course_modes_choose'], follow=True)
+            self.assertRedirects(resp, self.urls['verify_student_start_flow'])
 
         # For professional ed courses, expect that the student is NOT enrolled
         # automatically in the course.

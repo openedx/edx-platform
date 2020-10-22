@@ -30,20 +30,9 @@ from mock import Mock, patch
 from six import StringIO
 from waffle.testutils import override_flag
 
-from contentstore.models import VideoUploadConfig
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views.videos import (
-    ENABLE_VIDEO_UPLOAD_PAGINATION,
-    KEY_EXPIRATION_IN_SECONDS,
-    VIDEO_IMAGE_UPLOAD_ENABLED,
-    WAFFLE_SWITCHES,
-    AssumeRole,
-    StatusDisplayStrings,
-    TranscriptProvider,
-    _get_default_video_image_url,
-    convert_video_status
-)
+from cms.djangoapps.contentstore.models import VideoUploadConfig
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
@@ -54,6 +43,18 @@ from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from ..videos import (
+    ENABLE_VIDEO_UPLOAD_PAGINATION,
+    KEY_EXPIRATION_IN_SECONDS,
+    VIDEO_IMAGE_UPLOAD_ENABLED,
+    WAFFLE_SWITCHES,
+    AssumeRole,
+    StatusDisplayStrings,
+    TranscriptProvider,
+    _get_default_video_image_url,
+    convert_video_status
+)
 
 
 def override_switch(switch, active):
@@ -784,7 +785,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         # Test should fail if video not found
         self.assertEqual(True, False, 'Invalid edx_video_id')
 
-    @patch('contentstore.views.videos.LOGGER')
+    @patch('cms.djangoapps.contentstore.views.videos.LOGGER')
     def test_video_status_update_request(self, mock_logger):
         """
         Verifies that video status update request works as expected.
@@ -1432,7 +1433,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
-    @patch('contentstore.views.videos.get_transcript_preferences')
+    @patch('cms.djangoapps.contentstore.views.videos.get_transcript_preferences')
     def test_transcript_preferences_metadata(self, transcript_preferences, is_video_transcript_enabled,
                                              mock_transcript_preferences, mock_conn, mock_key):
         """

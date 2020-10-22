@@ -6,6 +6,7 @@ from django.utils.translation import ngettext
 from rest_framework import serializers
 
 from lms.djangoapps.course_home_api.dates.v1.serializers import DateSummarySerializer
+from lms.djangoapps.course_home_api.mixins import DatesBannerSerializerMixin
 
 
 class CourseBlockSerializer(serializers.Serializer):
@@ -104,7 +105,7 @@ class ResumeCourseSerializer(serializers.Serializer):
     url = serializers.URLField()
 
 
-class OutlineTabSerializer(serializers.Serializer):
+class OutlineTabSerializer(DatesBannerSerializerMixin, serializers.Serializer):
     """
     Serializer for the Outline Tab
     """
@@ -115,6 +116,7 @@ class OutlineTabSerializer(serializers.Serializer):
     dates_widget = DatesWidgetSerializer()
     enroll_alert = EnrollAlertSerializer()
     handouts_html = serializers.CharField()
+    has_ended = serializers.BooleanField()
     offer_html = serializers.CharField()
     resume_course = ResumeCourseSerializer()
     welcome_message_html = serializers.CharField()

@@ -33,7 +33,8 @@ class mock_ecommerce_api_endpoint(object):
             response: a JSON-serializable Python type representing the desired response body.
             status: desired HTTP status for the response.
             expect_called: a boolean indicating whether an API request was expected; set
-                to False if we should ensure that no request arrived.
+                to False if we should ensure that no request arrived, or None to skip checking
+                if the request arrived
             exception: raise this exception instead of returning an HTTP response when called.
             reset_on_exit (bool): Indicates if `httpretty` should be reset after the decorator exits.
         """
@@ -75,7 +76,10 @@ class mock_ecommerce_api_endpoint(object):
         )
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        called_if_expected = self.expect_called == (httpretty.last_request().headers != {})
+        if self.expect_called is None:
+            called_if_expected = True
+        else:
+            called_if_expected = self.expect_called == (httpretty.last_request().headers != {})
         httpretty.disable()
 
         if self.reset_on_exit:
@@ -106,6 +110,18 @@ class mock_create_refund(mock_ecommerce_api_endpoint):
 
     def get_path(self):
         return '/refunds/'
+
+
+class mock_payment_processors(mock_ecommerce_api_endpoint):
+    """
+    Mocks calls to E-Commerce API payment processors method.
+    """
+
+    default_response = ['foo', 'bar']
+    method = httpretty.GET
+
+    def get_path(self):
+        return "/payment/processors/"
 
 
 class mock_process_refund(mock_ecommerce_api_endpoint):
