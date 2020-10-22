@@ -150,11 +150,11 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
 
     def verify_show_answer_present(self, show_answer_expected):
         """
-        Verifies that "Show Answer" is only present when expected (for staff only).
+        Verifies that "Show answer" is only present when expected (for staff only).
         """
         problem_html = json.loads(self.get_problem().content.decode('utf-8'))['html']
         self.assertIn(self.problem_display_name, problem_html)
-        self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
+        self.assertEqual(show_answer_expected, "Show answer" in problem_html)
 
     def ensure_masquerade_as_group_member(self, partition_id, group_id):
         """
