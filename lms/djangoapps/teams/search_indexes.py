@@ -104,7 +104,7 @@ class CourseTeamIndexer(object):
         """
         search_engine = cls.engine()
         serialized_course_team = CourseTeamIndexer(course_team).data()
-        search_engine.index(cls.DOCUMENT_TYPE_NAME, [serialized_course_team])
+        search_engine.index([serialized_course_team])
 
     @classmethod
     @if_search_enabled
@@ -112,7 +112,7 @@ class CourseTeamIndexer(object):
         """
         Remove course_team from the index (if feature is enabled).
         """
-        cls.engine().remove(cls.DOCUMENT_TYPE_NAME, [course_team.team_id])
+        cls.engine().remove([course_team.team_id])
 
     @classmethod
     @if_search_enabled

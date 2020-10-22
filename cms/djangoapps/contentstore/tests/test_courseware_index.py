@@ -137,7 +137,6 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     }
 
     INDEX_NAME = None
-    DOCUMENT_TYPE = None
 
     def setup_course_base(self, store):
         """ base version of setup_course_base is a no-op """
@@ -155,7 +154,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     def search(self, field_dictionary=None, query_string=None):
         """ Performs index search according to passed parameters """
         fields = field_dictionary if field_dictionary else self._get_default_search()
-        return self.searcher.search(query_string=query_string, field_dictionary=fields, doc_type=self.DOCUMENT_TYPE)
+        return self.searcher.search(query_string=query_string, field_dictionary=fields)
 
     def _perform_test_using_store(self, store_type, test_to_perform):
         """ Helper method to run a test function that uses a specific store """
@@ -248,7 +247,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         )
 
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
-    DOCUMENT_TYPE = CoursewareSearchIndexer.DOCUMENT_TYPE
 
     def reindex_course(self, store):
         """ kick off complete reindex of the course """
@@ -315,7 +313,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         """
         Test that course will also be delete from search_index after course deletion.
         """
-        self.DOCUMENT_TYPE = 'course_info'  # pylint: disable=invalid-name
+        self.searcher = SearchEngine.get_search_engine(CourseAboutSearchIndexer.INDEX_NAME)
         response = self.search()
         self.assertEqual(response["total"], 0)
 
@@ -422,34 +420,43 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.assertEqual(indexed_count, 7)
 
     def _test_course_about_property_index(self, store):
-        """ Test that informational properties in the course object end up in the course_info index """
+        """
+        Test that informational properties in the course object end up in the course_info index.
+        """
+        self.searcher = SearchEngine.get_search_engine(CourseAboutSearchIndexer.INDEX_NAME)
         display_name = "Help, I need somebody!"
         self.course.display_name = display_name
         self.update_item(store, self.course)
         self.reindex_course(store)
         response = self.searcher.search(
-            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
             field_dictionary={"course": six.text_type(self.course.id)}
         )
         self.assertEqual(response["total"], 1)
         self.assertEqual(response["results"][0]["data"]["content"]["display_name"], display_name)
 
     def _test_course_about_store_index(self, store):
-        """ Test that informational properties in the about store end up in the course_info index """
+        """
+        Test that informational properties in the about store end up in
+        the course_info index.
+        """
+        self.searcher = SearchEngine.get_search_engine(CourseAboutSearchIndexer.INDEX_NAME)
         short_description = "Not just anybody"
         CourseDetails.update_about_item(
             self.course, "short_description", short_description, ModuleStoreEnum.UserID.test, store
         )
         self.reindex_course(store)
         response = self.searcher.search(
-            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
             field_dictionary={"course": six.text_type(self.course.id)}
         )
         self.assertEqual(response["total"], 1)
         self.assertEqual(response["results"][0]["data"]["content"]["short_description"], short_description)
 
     def _test_course_about_mode_index(self, store):
-        """ Test that informational properties in the course modes store end up in the course_info index """
+        """
+        Test that informational properties in the course modes store end up in
+        the course_info index.
+        """
+        self.searcher = SearchEngine.get_search_engine(CourseAboutSearchIndexer.INDEX_NAME)
         honour_mode = CourseModeFactory(
             course_id=self.course.id,
             mode_slug=CourseMode.HONOR,
@@ -466,7 +473,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.reindex_course(store)
 
         response = self.searcher.search(
-            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
             field_dictionary={"course": six.text_type(self.course.id)}
         )
         self.assertEqual(response["total"], 1)
@@ -586,13 +592,15 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
     def _clean_course_id(self):
-        """ Clean all documents from the index that have a specific course provided """
+        """
+        Clean all documents from the index that have a specific course provided.
+        """
         if self.course_id:
 
             response = self.searcher.search(field_dictionary={"course": self.course_id})
             while response["total"] > 0:
                 for item in response["results"]:
-                    self.searcher.remove(CoursewareSearchIndexer.DOCUMENT_TYPE, item["data"]["id"])
+                    self.searcher.remove(item["data"]["id"])
                 response = self.searcher.search(field_dictionary={"course": self.course_id})
         self.course_id = None
 
@@ -725,10 +733,12 @@ class TestTaskExecution(SharedModuleStoreTestCase):
         super(TestTaskExecution, cls).tearDownClass()
 
     def test_task_indexing_course(self):
-        """ Making sure that the receiver correctly fires off the task when invoked by signal """
+        """
+        Making sure that the receiver correctly fires off the task when invoked
+        by signal.
+        """
         searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
         response = searcher.search(
-            doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
             field_dictionary={"course": six.text_type(self.course.id)}
         )
         self.assertEqual(response["total"], 0)
@@ -737,7 +747,6 @@ class TestTaskExecution(SharedModuleStoreTestCase):
 
         # Note that this test will only succeed if celery is working in inline mode
         response = searcher.search(
-            doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
             field_dictionary={"course": six.text_type(self.course.id)}
         )
         self.assertEqual(response["total"], 3)
@@ -807,7 +816,6 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         )
 
     INDEX_NAME = LibrarySearchIndexer.INDEX_NAME
-    DOCUMENT_TYPE = LibrarySearchIndexer.DOCUMENT_TYPE
 
     def _get_default_search(self):
         """ Returns field_dictionary for default search """
@@ -1223,22 +1231,24 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         """
         Return content values from args tuple in a mocked calls list.
         """
-        kall = mock_index.call_args
-        args, kwargs = kall  # pylint: disable=unused-variable
-        return args[1]
+        call = mock_index.call_args
+        (indexed_content, ), kwargs = call  # pylint: disable=unused-variable
+        return indexed_content
 
     def reindex_course(self, store):
         """ kick off complete reindex of the course """
         return CoursewareSearchIndexer.do_course_reindex(store, self.course.id)
 
     def test_content_group_gets_indexed(self):
-        """ indexing course with content groups added test """
+        """
+        Indexing course with content groups added test.
+        """
 
         # Only published modules should be in the index
         added_to_index = self.reindex_course(self.store)
         self.assertEqual(added_to_index, 16)
         response = self.searcher.search(field_dictionary={"course": six.text_type(self.course.id)})
-        self.assertEqual(response["total"], 17)
+        self.assertEqual(response["total"], 16)
 
         group_access_content = {'group_access': {666: [1]}}
 
