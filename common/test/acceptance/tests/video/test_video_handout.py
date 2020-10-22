@@ -3,16 +3,14 @@
 """
 Acceptance tests for CMS Video Handout.
 """
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
-@attr(shard=17)
 class VideoHandoutTest(CMSVideoBaseTest):
     """
     CMS Video Handout Test Class
     """
+    shard = 17
 
     def _create_course_unit_with_handout(self, handout_filename, save_settings=True):
         """

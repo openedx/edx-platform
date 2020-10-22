@@ -5,9 +5,9 @@ import crum
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
+from edx_django_utils.cache import RequestCache
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from waffle.testutils import override_flag
 
 from .. import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace, WaffleSwitch
@@ -32,8 +32,9 @@ class TestCourseWaffleFlag(TestCase):
     def setUp(self):
         super(TestCourseWaffleFlag, self).setUp()
         request = RequestFactory().request()
+        self.addCleanup(crum.set_current_request, None)
         crum.set_current_request(request)
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
     @ddt.data(
         {'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on, 'waffle_enabled': False, 'result': True},

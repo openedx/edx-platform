@@ -3,7 +3,6 @@ Tests that the generate_course_overview management command actually generates co
 """
 from django.core.management.base import CommandError
 from mock import patch
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.content.course_overviews.management.commands import generate_course_overview
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -12,11 +11,12 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=2)
 class TestGenerateCourseOverview(ModuleStoreTestCase):
     """
     Tests course overview management command.
     """
+    shard = 2
+
     def setUp(self):
         """
         Create courses in modulestore.

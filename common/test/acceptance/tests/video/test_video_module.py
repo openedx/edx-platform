@@ -8,9 +8,6 @@ from unittest import skipIf
 
 from ddt import data, ddt, unpack
 from mock import patch
-from nose.plugins.attrib import attr
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -24,6 +21,7 @@ from common.test.acceptance.tests.helpers import (
     is_youtube_available,
     skip_if_browser
 )
+from openedx.core.lib.tests import attr
 
 VIDEO_SOURCE_PORT = 8777
 VIDEO_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')
@@ -55,7 +53,7 @@ class VideoBaseTest(UniqueCourseTest):
         Initialization of pages and course fixture for video tests
         """
         super(VideoBaseTest, self).setUp()
-        self.longMessage = True  # pylint: disable=invalid-name
+        self.longMessage = True
 
         self.video = VideoPage(self.browser)
         self.tab_nav = TabNavPage(self.browser)
@@ -565,38 +563,6 @@ class YouTubeVideoTest(VideoBaseTest):
             u'Closed captions contain "{}" text'.format(text),
             timeout=5
         )
-
-    def test_video_language_menu_working(self):
-        """
-        Scenario: Language menu works correctly in Video component
-        Given the course has a Video component in "Youtube" mode
-        And I have defined multiple language transcripts for the videos
-        And I make sure captions are closed
-        And I see video menu "language" with correct items
-        And I select language with code "zh"
-        Then I see "好 各位同学" text in the captions
-        And I select language with code "en"
-        Then I see "Welcome to edX." text in the captions
-        """
-        self.assets.extend(['chinese_transcripts.srt', 'subs_3_yD_cEKoCk.srt.sjson'])
-        data = {'transcripts': {"zh": "chinese_transcripts.srt"}, 'sub': '3_yD_cEKoCk'}
-        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
-
-        # go to video
-        self.navigate_to_video()
-
-        self.video.hide_captions()
-
-        correct_languages = {'en': 'English', 'zh': 'Chinese'}
-        self.assertEqual(self.video.caption_languages, correct_languages)
-
-        self.video.select_language('zh')
-
-        unicode_text = "好 各位同学".decode('utf-8')
-        self._verify_caption_text(unicode_text)
-
-        self.video.select_language('en')
-        self._verify_caption_text('Welcome to edX.')
 
     def test_video_language_menu_working_closed_captions(self):
         """
@@ -1142,7 +1108,7 @@ class HLSVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         self.video.click_player_button('play')
-        self.assertEqual(self.video.state, 'playing')
+        self.assertIn(self.video.state, ['buffering', 'playing'])
         self.video.click_player_button('pause')
         self.assertEqual(self.video.state, 'pause')
 
@@ -1231,6 +1197,7 @@ class HLSVideoTest(VideoBaseTest):
         Given the course has a Video component with "HLS" video only
         And I have defined a transcript for the video
         Then I see the correct text in the captions for transcript
+        Then I play, pause and seek to 0:00
         Then I click on a caption line
         And video position should be updated accordingly
         Then I change video position
@@ -1242,6 +1209,12 @@ class HLSVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         self.assertIn("Hi, edX welcomes you0.", self.video.captions_text)
+
+        # This is required to load the video
+        self.video.click_player_button('play')
+        # Below 2 steps are required to test the caption line click scenario
+        self.video.click_player_button('pause')
+        self.video.seek('0:00')
 
         for line_no in range(5):
             self.video.click_transcript_line(line_no=line_no)

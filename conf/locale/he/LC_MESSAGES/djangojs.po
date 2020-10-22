@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # dana bublil <dana.bublil@gmail.com>, 2016
 # dotanlaks <dotanlaks6@gmail.com>, 2014
@@ -23,6 +24,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016-2017
 # e2f he_r1 <e2f_he_r1@outlook.com>, 2016
@@ -39,6 +41,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # dana bublil <dana.bublil@gmail.com>, 2016
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016-2017
@@ -54,6 +57,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Anna Lifshits Agmon <anna@campus.gov.il>, 2018
 # Bentsi Magidovich <magidovich@gmail.com>, 2015
 # e2f_HE c1 <e2f_HE_c1@outlook.com>, 2016
 # e2f he_r1 <e2f_he_r1@outlook.com>, 2016
@@ -66,9 +70,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-10 06:58+0000\n"
-"PO-Revision-Date: 2018-07-10 07:01+0000\n"
-"Last-Translator: e2f_HE c1 <e2f_HE_c1@outlook.com>\n"
+"POT-Creation-Date: 2018-10-17 06:43+0000\n"
+"PO-Revision-Date: 2018-09-02 13:32+0000\n"
+"Last-Translator: Anna Lifshits Agmon <anna@campus.gov.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -76,6 +80,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 "Generated-By: Babel 1.3\n"
+
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
+#: cms/static/cms/js/main.js common/static/bundles/commons.js
+msgid "Studio's having trouble saving your work"
+msgstr ""
+
+#: cms/static/cms/js/xblock/cms.runtime.v1.js common/static/bundles/commons.js
+msgid "OpenAssessment Save Error"
+msgstr ""
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -86,16 +105,28 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
-#: lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/edit_tabs.js
+#: common/static/bundles/js/factories/library.js
+#: common/static/bundles/js/factories/textbooks.js
+#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "שומר"
+
+#: cms/static/js/base.js common/static/bundles/commons.js
+msgid "This link will open in a new browser window/tab"
+msgstr ""
+
+#: cms/static/js/base.js common/static/bundles/commons.js
+msgid "This link will open in a modal window"
+msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
-#: common/static/js/vendor/ova/catch/js/catch.js
+#: common/static/bundles/js/factories/textbooks.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -116,6 +147,15 @@ msgstr "שומר"
 msgid "Delete"
 msgstr "מחק"
 
+#: cms/static/js/certificates/views/signatory_editor.js
+#: cms/static/js/views/course_info_update.js cms/static/js/views/list_item.js
+#: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+#: common/static/bundles/js/factories/edit_tabs.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Deleting"
+msgstr ""
+
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -127,6 +167,11 @@ msgstr "מחק"
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: common/static/bundles/commons.js
+#: common/static/bundles/js/factories/edit_tabs.js
+#: common/static/bundles/js/factories/textbooks.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -152,11 +197,154 @@ msgstr "מחק"
 msgid "Cancel"
 msgstr "ביטול"
 
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error during the upload process."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while unpacking the file."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid ""
+"File format not supported. Please upload a file with a {ext} extension."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new library to our database."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+
+#: cms/static/js/features/import/factories/import.js
+#: common/static/bundles/Import.js
+msgid "Your import has failed."
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "Error importing course"
+msgstr ""
+
+#: cms/static/js/features/import/views/import.js
+#: common/static/bundles/Import.js
+msgid "There was an error with the upload"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid "Organization:"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid "Course Number:"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid "Course Run:"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid "(Read-only)"
+msgstr ""
+
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
+#: common/static/bundles/CourseOrLibraryListing.js
+msgid "Re-run Course"
+msgstr ""
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "תצוגה חיה"
+
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
 #: cms/static/js/views/video_thumbnail.js lms/static/js/views/image_field.js
 msgid "Uploading"
 msgstr "מעלה"
+
+#: cms/static/js/models/chapter.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Chapter name and asset_path are both required"
+msgstr ""
+
+#: cms/static/js/models/chapter.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Chapter name is required"
+msgstr ""
+
+#: cms/static/js/models/chapter.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "asset_path is required"
+msgstr ""
+
+#: cms/static/js/models/course.js cms/static/js/models/section.js
+#: common/static/bundles/commons.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "You must specify a name"
+msgstr ""
+
+#: cms/static/js/models/textbook.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Textbook name is required"
+msgstr ""
+
+#: cms/static/js/models/textbook.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Please add at least one chapter"
+msgstr ""
+
+#: cms/static/js/models/textbook.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "All chapters must have a name and asset"
+msgstr ""
+
+#: cms/static/js/models/uploads.js common/static/bundles/commons.js
+msgid ""
+"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
+"<%= fileExtensions %> to upload."
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/institution_login.underscore
+#: lms/templates/student_account/institution_register.underscore
+msgid "or"
+msgstr "או"
+
+#: cms/static/js/models/xblock_validation.js
+#: common/static/bundles/js/factories/xblock_validation.js
+msgid "This unit has validation issues."
+msgstr ""
+
+#: cms/static/js/models/xblock_validation.js
+#: common/static/bundles/js/factories/xblock_validation.js
+msgid "This component has validation issues."
+msgstr ""
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -165,7 +353,7 @@ msgstr "מעלה"
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/student_account/tos_modal.js
+#: common/static/bundles/commons.js lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/alert-popup.underscore
@@ -188,11 +376,20 @@ msgstr "שם"
 msgid "Choose File"
 msgstr "בחר קובץ"
 
+#: cms/static/js/views/components/add_xblock.js
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Adding"
+msgstr ""
+
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
+#: common/static/bundles/js/factories/edit_tabs.js
 #: lms/static/js/Markdown.Editor.js
 #: common/static/common/templates/discussion/alert-popup.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
@@ -206,7 +403,7 @@ msgstr "ללא"
 #: cms/static/js/views/course_video_settings.js
 #: cms/static/js/views/metadata.js
 #: cms/static/js/views/previous_video_upload.js
-#: cms/static/js/views/video_transcripts.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -214,10 +411,84 @@ msgstr "ללא"
 msgid "Remove"
 msgstr "הסר"
 
+#: cms/static/js/views/edit_chapter.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Upload a new PDF to “<%= name %>”"
+msgstr ""
+
+#: cms/static/js/views/edit_chapter.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Please select a PDF file to upload."
+msgstr ""
+
+#: cms/templates/js/license-selector.underscore
+msgid "All Rights Reserved"
+msgstr "כל הזכויות שמורות"
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid "You reserve all rights for your work"
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid "Creative Commons"
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid "You waive some rights for your work, such that others can use it too"
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid "Version"
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid "Attribution"
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid ""
+"Allow others to copy, distribute, display and perform your copyrighted work "
+"but only if they give credit the way you request. Currently, this option is "
+"required."
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid "Noncommercial"
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid ""
+"Allow others to copy, distribute, display and perform your work - and "
+"derivative works based upon it - but for noncommercial purposes only."
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid "No Derivatives"
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid ""
+"Allow others to copy, distribute, display and perform only verbatim copies "
+"of your work, not derivative works based upon it. This option is "
+"incompatible with \"Share Alike\"."
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid "Share Alike"
+msgstr ""
+
+#: cms/static/js/views/license.js common/static/bundles/commons.js
+msgid ""
+"Allow others to distribute derivative works only under a license identical "
+"to the license that governs your work. This option is incompatible with \"No"
+" Derivatives\"."
+msgstr ""
+
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/manage_users_and_roles.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Ok"
 msgstr ""
 
@@ -227,11 +498,14 @@ msgid "Unknown"
 msgstr "לא ידוע"
 
 #: cms/static/js/views/manage_users_and_roles.js
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Are you sure?"
 msgstr ""
 
-#: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
+#: cms/static/js/views/metadata.js common/static/bundles/commons.js
+#: lms/static/js/views/file_uploader.js
 msgid "Upload File"
 msgstr "העלה קובץ"
 
@@ -254,11 +528,318 @@ msgstr "שמור"
 msgid "Advanced"
 msgstr "מתקדם"
 
+#. Translators: "title" is the name of the current component being edited.
+#: cms/static/js/views/modals/edit_xblock.js common/static/bundles/commons.js
+msgid "Editing: %(title)s"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+msgid "Unit"
+msgstr "יחידה"
+
+#: cms/static/js/views/modals/edit_xblock.js common/static/bundles/commons.js
+msgid "Component"
+msgstr ""
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Move"
+msgstr ""
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Choose a location to move your component to"
+msgstr ""
+
+#: cms/static/js/views/modals/move_xblock_modal.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Move: {displayName}"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Sections"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Subsections"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Units"
+msgstr ""
+
+#: cms/static/js/views/move_xblock_list.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Components"
+msgstr ""
+
+#: cms/templates/js/group-configuration-editor.underscore
+msgid "Groups"
+msgstr "קבוצות"
+
+#: cms/static/js/views/move_xblock_list.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "This {parentCategory} has no {childCategory}"
+msgstr ""
+
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+msgid "Course Outline"
+msgstr "מתווה קורס"
+
+#: cms/static/js/views/paged_container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Date added"
+msgstr ""
+
+#. Translators: "title" is the name of the current component or unit being
+#. edited.
+#: cms/static/js/views/pages/container.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Editing access for: %(title)s"
+msgstr ""
+
+#: cms/static/js/views/pages/container_subviews.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Publishing"
+msgstr ""
+
+#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
+#: cms/templates/js/course-video-settings-update-settings-footer.underscore
+#: cms/templates/js/publish-xblock.underscore
+msgid "Discard Changes"
+msgstr "התעלם משינויים"
+
+#: cms/static/js/views/pages/container_subviews.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid ""
+"Are you sure you want to revert to the last published version of the unit? "
+"You cannot undo this action."
+msgstr ""
+
+#: cms/static/js/views/pages/container_subviews.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Discarding Changes"
+msgstr ""
+
+#: cms/static/js/views/pages/container_subviews.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Hiding from Students"
+msgstr ""
+
+#: cms/static/js/views/pages/container_subviews.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Explicitly Hiding from Students"
+msgstr ""
+
+#: cms/static/js/views/pages/container_subviews.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Inheriting Student Visibility"
+msgstr ""
+
+#: cms/static/js/views/pages/container_subviews.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Make Visible to Students"
+msgstr ""
+
+#: cms/static/js/views/pages/container_subviews.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid ""
+"If the unit was previously published and released to students, any changes "
+"you made to the unit when it was hidden will now be visible to students. Do "
+"you want to proceed?"
+msgstr ""
+
+#: cms/static/js/views/pages/container_subviews.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Making Visible to Students"
+msgstr ""
+
+#: cms/static/js/views/pages/paged_container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Hide Previews"
+msgstr ""
+
+#: cms/static/js/views/pages/paged_container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Show Previews"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. ascending"
+#: cms/static/js/views/paging_header.js
+#: common/static/bundles/js/factories/library.js
+msgid ""
+"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
+"{assetType}, sorted by {sortName} ascending"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
+#. descending"
+#: cms/static/js/views/paging_header.js
+#: common/static/bundles/js/factories/library.js
+msgid ""
+"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
+"{assetType}, sorted by {sortName} descending"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+#: cms/static/js/views/paging_header.js
+#: common/static/bundles/js/factories/library.js
+msgid ""
+"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
+"ascending"
+msgstr ""
+
+#. Translators: sample result:
+#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
+#: cms/static/js/views/paging_header.js
+#: common/static/bundles/js/factories/library.js
+msgid ""
+"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
+"descending"
+msgstr ""
+
+#. Translators: turns into "25 total" to be used in other sentences, e.g.
+#. "Showing 0-9 out of 25 total".
+#: cms/static/js/views/paging_header.js
+#: common/static/bundles/js/factories/library.js
+msgid "{totalItems} total"
+msgstr ""
+
 #: cms/static/js/views/previous_video_upload.js
 #: cms/static/js/views/video/translations_editor.js
-#: cms/static/js/views/video_transcripts.js lms/static/js/views/image_field.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
+#: lms/static/js/views/image_field.js
 msgid "Removing"
 msgstr "מסיר"
+
+#: cms/static/js/views/show_textbook.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid "Delete “<%= name %>”?"
+msgstr ""
+
+#: cms/static/js/views/show_textbook.js
+#: common/static/bundles/js/factories/textbooks.js
+msgid ""
+"Deleting a textbook cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
+msgstr ""
+
+#: cms/static/js/views/tabs.js common/static/bundles/js/factories/edit_tabs.js
+msgid "Delete Page Confirmation"
+msgstr ""
+
+#: cms/static/js/views/tabs.js common/static/bundles/js/factories/edit_tabs.js
+msgid ""
+"Are you sure you want to delete this page? This action cannot be undone."
+msgstr ""
+
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Upload"
+msgstr "העלה"
+
+#: cms/static/js/views/uploads.js common/static/bundles/commons.js
+msgid "We're sorry, there was an error"
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Success! \"{displayName}\" has been moved."
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid ""
+"Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
+"location."
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Undo move"
+msgstr ""
+
+#: cms/static/js/views/utils/move_xblock_utils.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "Take me to the new location"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid "Duplicating"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid "Undo moving"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid "Moving"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid "Deleting this {xblock_type} is permanent and cannot be undone."
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid ""
+"Any content that has listed this content as a prerequisite will also have "
+"access limitations removed."
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid "Delete this {xblock_type} (and prerequisite)?"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid "Yes, delete this {xblock_type}"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid "Delete this {xblock_type}?"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid "section"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+msgid "subsection"
+msgstr ""
+
+#: cms/static/js/views/utils/xblock_utils.js common/static/bundles/commons.js
+#: cms/templates/js/container-access.underscore
+msgid "unit"
+msgstr ""
 
 #: cms/static/js/views/validation.js
 #: lms/static/js/discussions_management/views/divided_discussions_course_wide.js
@@ -267,10 +848,107 @@ msgstr "מסיר"
 msgid "Your changes have been saved."
 msgstr "השינויים נשמרו"
 
+#: cms/static/js/views/video/transcripts/file_uploader.js
+#: common/static/bundles/commons.js
+msgid "Please select a file in .srt format."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/file_uploader.js
+#: common/static/bundles/commons.js
+msgid "Error: Uploading failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/message_manager.js
+#: common/static/bundles/commons.js
+msgid "Error: Import failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/message_manager.js
+#: common/static/bundles/commons.js
+msgid "Error: Replacing failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/message_manager.js
+#: common/static/bundles/commons.js
+msgid "Error: Choosing failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+#: common/static/bundles/commons.js
+msgid "Error: Connection with server failed."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+#: common/static/bundles/commons.js
+msgid "Link types should be unique."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+#: common/static/bundles/commons.js
+msgid "Links should be unique."
+msgstr ""
+
+#: cms/static/js/views/video/transcripts/metadata_videolist.js
+#: common/static/bundles/commons.js
+msgid "Incorrect url format."
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+#: common/static/bundles/commons.js
+msgid ""
+"Sorry, there was an error parsing the subtitles that you uploaded. Please "
+"check the format and try again."
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+#: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
+msgid "Are you sure you want to remove this transcript?"
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+#: common/static/bundles/commons.js
+msgid ""
+"If you remove this transcript, the transcript will not be available for this"
+" component."
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+#: common/static/bundles/commons.js
+msgid "Remove Transcript"
+msgstr ""
+
+#: cms/static/js/views/video/translations_editor.js
+#: common/static/bundles/commons.js
+msgid "Upload translation"
+msgstr ""
+
+#: cms/static/js/views/xblock_editor.js common/static/bundles/commons.js
+msgid "Editor"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Settings"
+msgstr "הגדרות"
+
+#: cms/static/js/views/xblock_outline.js
+#: common/static/bundles/js/factories/container.js
+#: common/static/bundles/js/factories/library.js
+msgid "New {component_type}"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+#: common/static/bundles/js/factories/xblock_validation.js
+msgid "Warning"
+msgstr ""
+
 #. Translators: This message will be added to the front of messages of type
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
+#: common/static/bundles/js/factories/xblock_validation.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -295,47 +973,54 @@ msgstr "יצירה של קבוצות חסרות"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr "{start_strong}{total}{end_strong} סך כל המילים שנשלחו."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr "text_word_{uniqueId} title_word_{uniqueId}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "title_word_{uniqueId}"
-msgstr "title_word_{uniqueId}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId}"
-msgstr "text_word_{uniqueId}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableModule.js
 msgid "Show Annotations"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableModule.js
 msgid "Hide Annotations"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableModule.js
 msgid "Expand Instructions"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableModule.js
 msgid "Collapse Instructions"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableModule.js
 msgid "Commentary"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
+#: common/static/bundles/AnnotatableModule.js
 msgid "Reply to Annotation"
 msgstr ""
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
 msgstr[0] ""
@@ -346,6 +1031,7 @@ msgstr[3] ""
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
 msgstr[0] ""
@@ -356,288 +1042,332 @@ msgstr[3] ""
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] "נקודה %(num_points)s אפשרית (שדורגה)"
-msgstr[1] "%(num_points)s נקודות אפשריות (שדורגו)"
-msgstr[2] "%(num_points)s נקודות אפשריות (שדורגו)"
-msgstr[3] "%(num_points)s נקודות אפשריות (שדורגו)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] "נקודה %(num_points)s אפשרית (שלא דורגה)"
-msgstr[1] "%(num_points)s נקודות אפשריות (שלא דורגו)"
-msgstr[2] "%(num_points)s נקודות אפשריות (שלא דורגו)"
-msgstr[3] "%(num_points)s נקודות אפשריות (שלא דורגו)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
-msgstr[0] "נקודה %(earned)s/%(possible)s (שדורגה)"
-msgstr[1] "%(earned)s/%(possible)s נקודות (שדורגו)"
-msgstr[2] "%(earned)s/%(possible)s נקודות (שדורגו)"
-msgstr[3] "%(earned)s/%(possible)s נקודות (שדורגו)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] "נקודה %(earned)s/%(possible)s (שלא דורגה)"
-msgstr[1] "%(earned)s/%(possible)s נקודות (שלא דורגו)"
-msgstr[2] "%(earned)s/%(possible)s נקודות (שלא דורגו)"
-msgstr[3] "%(earned)s/%(possible)s נקודות (שלא דורגו)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "The grading process is still running. Refresh the page to see updates."
-msgstr "תהליך הדירוג ממשיך לפעול. רענן את הדף כדי לראות עדכונים."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "Could not grade your answer. The submission was aborted."
-msgstr "לא ניתן לדרג את התשובה. ההגשה בוטלה."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid ""
 "Submission aborted! Sorry, your browser does not support file uploads. If "
 "you can, please use Chrome or Safari which have been verified to support "
 "file uploads."
 msgstr ""
-"ההגשה בוטלה! מצטערים, הדפדפן שלך אינו תומך בהעלאות קבצים. אם ניתן, השתמש "
-"בדפדפן Chrome או Safari שניתן בוודאות להעלות דרכם קבצים."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
-msgstr "הגשת את {filename}; מותרים רק {allowedFiles}."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
-msgstr "הקובץ {filename} גדול מדי (גודל מרבי: {maxSize}MB)."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "You did not submit the required files: {requiredFiles}."
-msgstr "לא הגשת את הקבצים הדרושים: {requiredFiles}."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "You did not select any files to submit."
-msgstr "לא בחרת אף קובץ להגשה."
+msgstr ""
 
 #. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "{label}: {status}"
-msgstr "{label}: {status}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "This problem has been reset."
-msgstr "הבעיה לא אותחלה."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
+#: common/static/bundles/CapaModule.js
 msgid "unsubmitted"
-msgstr "לא הוגש"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Paragraph"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Preformatted"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Heading 3"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Heading 4"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Heading 5"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Heading 6"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Add to Dictionary"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Align center"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Align left"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Align right"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Alignment"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Alternative source"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Anchor"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Anchors"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Author"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Background color"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/Markdown.Editor.js
+#: common/static/bundles/commons.js lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
 msgstr "Blockquote"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Blocks"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Body"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Bold"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Border color"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Border"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Bottom"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Bullet list"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Caption"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Cell padding"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Cell properties"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Cell spacing"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Cell type"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Cell"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Center"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Circle"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Clear formatting"
 msgstr ""
 
@@ -645,7 +1375,12 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#. Translators: this is a toolbar button tooltip from the raw HTML editor
+#. displayed in the browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Code block"
 msgstr ""
 
@@ -656,102 +1391,119 @@ msgstr "קוד"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Color"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Cols"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Column group"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Column"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Constrain proportions"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Copy row"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Copy"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Could not find the specified string."
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Custom color"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Custom..."
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Cut row"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Cut"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Decrease indent"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Default"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Delete column"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Delete row"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Delete table"
 msgstr ""
 
@@ -765,38 +1517,38 @@ msgstr "תיאור"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Dimensions"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Disc"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Div"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Document properties"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Edit HTML"
 msgstr ""
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/course_info_update.underscore
@@ -807,89 +1559,103 @@ msgstr ""
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: common/static/common/templates/discussion/forum-action-edit.underscore
 msgid "Edit"
-msgstr "עריכה"
+msgstr "ערוך"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Embed"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Emoticons"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Encoding"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "File"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Find and replace"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Find next"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Find previous"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Find"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Finish"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Font Family"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Font Sizes"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Footer"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Format"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Formats"
 msgstr ""
 
@@ -900,54 +1666,63 @@ msgstr "מסך מלא"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "General"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "H Align"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Header 1"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Header 2"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Header 3"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Header 4"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Header 5"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Header 6"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Header cell"
 msgstr ""
 
@@ -955,246 +1730,287 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/static/bundles/CapaDescriptor.js common/static/bundles/commons.js
 msgid "Header"
-msgstr "כותרת"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Headers"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Heading 1"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Heading 2"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Headings"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Height"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Horizontal line"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Horizontal space"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "HTML source code"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Ignore all"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Ignore"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Image description"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Increase indent"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Inline"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert column after"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert column before"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert date/time"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert image"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert link"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert row after"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert row before"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert table"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert template"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert video"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert/edit image"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert/edit link"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert/edit video"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Italic"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Justify"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Keywords"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Left to right"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Left"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Lower Alpha"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Lower Greek"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Lower Roman"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Match case"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Merge cells"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Middle"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "New document"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "New window"
 msgstr ""
 
@@ -1207,36 +2023,42 @@ msgstr "הבא"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "No color"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Nonbreaking space"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Numbered list"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Page break"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Paste as text"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid ""
 "Paste is now in plain text mode. Contents will now be pasted as plain text "
 "until you toggle this option off."
@@ -1245,42 +2067,49 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Paste row after"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Paste row before"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Paste your embed code below:"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Paste"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Poster"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Pre"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Prev"
 msgstr ""
 
@@ -1291,30 +2120,35 @@ msgstr "תצוגה מקדימה"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Print"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Redo"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Remove link"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Replace all"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Replace with"
 msgstr ""
 
@@ -1327,12 +2161,14 @@ msgstr "החלף"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Restore last draft"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid ""
 "Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
 "ALT-0 for help"
@@ -1341,180 +2177,210 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Right to left"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Right"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Robots"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Row group"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Row properties"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Row type"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Row"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Rows"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Scope"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Select all"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Show blocks"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Show invisible characters"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Source code"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Source"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Special character"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Spellcheck"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Split cell"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Square"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Start search"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Strikethrough"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Style"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Subscript"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Superscript"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Table properties"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Table"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Target"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Templates"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Text color"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Text to display"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
 "required mailto: prefix?"
@@ -1523,6 +2389,7 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
 "required http:// prefix?"
@@ -1538,54 +2405,63 @@ msgstr "כותרת"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Tools"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Top"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Underline"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Undo"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Upper Alpha"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Upper Roman"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Url"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "V Align"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Vertical space"
 msgstr ""
 
@@ -1598,36 +2474,42 @@ msgstr "הצג"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Visual aids"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Whole words"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Width"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Words: {0}"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
 "Ctrl+X/C/V keyboard shortcuts instead."
@@ -1636,78 +2518,77 @@ msgstr ""
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/bundles/commons.js
 msgid "Insert/Edit Image"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
+#: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username and e-mail address sent to a 3rd party application.\n"
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"לחץ 'אישור' כדי לאשר ששם המשתמש שלך וכתובת הדואר האלקטרונית שלך יועברו לאפליקציה צד 3.\n"
-"\n"
-"לחץ על 'ביטול' כדי לחזור לעמוד זה מבלי שהמידע האישי שלך ישלח. "
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
+#: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your username sent to a 3rd party application.\n"
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"לחץ 'אישור' כדי לאשר ששם המשתמש שלך יועבר לאפליקציה צד 3. \n"
-"\n"
-"לחץ על 'ביטול' כדי לחזור לעמוד זה מבלי שהמידע האישי שלך ישלח. "
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
+#: common/static/bundles/LTIModule.js
 msgid ""
 "Click OK to have your e-mail address sent to a 3rd party application.\n"
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"לחץ 'אישור' כדי לאשר שכתובת הדואר האלקטרוני שלך תועבר לאפליקציה צד 3. \n"
-"\n"
-"לחץ על 'ביטול' כדי לחזור לעמוד זה מבלי שהמידע האישי שלך ישלח. "
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/static/bundles/CapaDescriptor.js
 msgid "incorrect"
-msgstr "לא נכון"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/static/bundles/CapaDescriptor.js
 msgid "correct"
-msgstr "נכון"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/static/bundles/CapaDescriptor.js
 msgid "answer"
-msgstr "תשובה"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/static/bundles/CapaDescriptor.js
 msgid "Short explanation"
-msgstr "הסבר קצר"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/static/bundles/CapaDescriptor.js
 msgid ""
 "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
-"במידה ואתה משתמש בעורך מתקדם, בעיה זו תומר לפורמט XML ולא תוכל לחזור לממשק של עורך פשוט.\n"
-"\n"
-"האם להמשיך לעורך מתקדם ולהמיר את הבעיה ל-XML?"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/static/bundles/CapaDescriptor.js
 msgid "Explanation"
-msgstr "הסבר"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: common/static/bundles/commons.js
 msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
-"שגיאת המשכיות! אינו יכול לעבור ל-%(tab_name)s במודול נוכחי. אנא צור קשר עם "
-"צוות הקורס."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: common/static/bundles/VerticalStudentView.js
+#: common/static/bundles/commons.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr "מסומן בסימניה"
@@ -1715,247 +2596,826 @@ msgstr "מסומן בסימניה"
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Play"
-msgstr "נגן"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Pause"
-msgstr "השהה"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/static/bundles/VideoModule.js
 msgid "Mute"
-msgstr "השתק"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/static/bundles/VideoModule.js
 msgid "Unmute"
-msgstr "בטל השתקה"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
+#: common/static/bundles/VideoModule.js
 msgid "Exit full browser"
-msgstr "צא מדפדפן מלא"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
+#: common/static/bundles/VideoModule.js
 msgid "Fill browser"
-msgstr "מלא דפדפן"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Speed"
-msgstr "מהירות"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Auto-advance"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Volume"
-msgstr "עוצמת הקול"
+msgstr ""
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/static/bundles/VideoModule.js
 msgid "Muted"
-msgstr "מושתק"
+msgstr ""
 
 #. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/static/bundles/VideoModule.js
 msgid "Very low"
-msgstr "נמוך מאד"
+msgstr ""
 
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/static/bundles/VideoModule.js
 msgid "Low"
-msgstr "נמוך"
+msgstr ""
 
 #. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/static/bundles/VideoModule.js
 msgid "Average"
-msgstr "ממוצע"
+msgstr ""
 
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/static/bundles/VideoModule.js
 msgid "Loud"
-msgstr "רועש"
+msgstr ""
 
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/static/bundles/VideoModule.js
 msgid "Very loud"
-msgstr "רועש מאד"
+msgstr ""
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/static/bundles/VideoModule.js
 msgid "Maximum"
-msgstr "מקסימום"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+#: common/static/bundles/VideoModule.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
-msgstr "דפדפן זה אינו יכול לנגן קבצי  ogg  .webm ,.mp4."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
+#: common/static/bundles/VideoModule.js
 msgid "Try using a different browser, such as Google Chrome."
-msgstr "נסה להשתמש בדפדפן אחר כגון גוגל כרום."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
+#: common/static/bundles/VideoModule.js
 msgid "High Definition"
-msgstr "איכות גבוהה"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
+#: common/static/bundles/VideoModule.js
 msgid "off"
-msgstr "כבוי"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
+#: common/static/bundles/VideoModule.js
 msgid "on"
-msgstr "פועל"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+#: common/static/bundles/VideoModule.js
 msgid "Video position. Press space to toggle playback"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+#: common/static/bundles/VideoModule.js
 msgid "Video ended"
-msgstr "סרטון הווידאו הסתיים"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+#: common/static/bundles/VideoModule.js
 msgid "Video position"
-msgstr "מיקום סרטון הווידאו"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+#: common/static/bundles/VideoModule.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] "%(value)s שעה"
-msgstr[1] "%(value)s שעות"
-msgstr[2] "%(value)s שעות"
-msgstr[3] "%(value)s שעות"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+#: common/static/bundles/VideoModule.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] "%(value)s דקה"
-msgstr[1] "%(value)s דקות"
-msgstr[2] "%(value)s דקות"
-msgstr[3] "%(value)s דקות"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+#: common/static/bundles/VideoModule.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] "%(value)s שניה"
-msgstr[1] "%(value)s שניות"
-msgstr[2] "%(value)s שניות"
-msgstr[3] "%(value)s שניות"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+#: common/static/bundles/VideoModule.js
 msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
 "buttons to increase or decrease volume level."
 msgstr ""
-"לחץ על לחצן זה כדי להשתיק או לבטל השתקה של סרטון וידאו זה או לחץ על המקשים "
-"למעלה או למטה כדי להגביר או להנמיך את רמת הקול. "
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Adjust video volume"
-msgstr "התאם את עוצמת הקול של סרטון הווידאו"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+#: common/static/bundles/VideoModule.js
 msgid ""
 "Press UP to enter the speed menu then use the UP and DOWN arrow keys to "
 "navigate the different speeds, then press ENTER to change to the selected "
 "speed."
 msgstr ""
-"לחץ על מקש החץ 'למעלה' כדי להיכנס לתפריט המהירות, ולאחר מכן השתמש במקשי "
-"החצים למעלה ולמטה כדי לנווט בין המהירויות השונות. לחץ על ENTER כדי לשנות "
-"למהירות שנבחרה."
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Adjust video speed"
-msgstr "התאם את מהירות סרטון הווידאו"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Video speed: "
-msgstr "מהירות סרטון הווידאו:"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Skip"
-msgstr "דלג"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_poster.js
+#: common/static/bundles/VideoModule.js
 msgid "Play video"
-msgstr "הפעל את סרטון הווידאו"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
+#: common/static/bundles/VideoModule.js
 msgid "Do not show again"
-msgstr "אל תציג שוב"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "Open language menu"
-msgstr "פתח תפריט שפה"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "Transcript will be displayed when you start playing the video."
-msgstr "תמלול יוצג כאשר תתחיל בהפעלת סרטון הווידאו."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid ""
 "Activating a link in this group will skip to the corresponding point in the "
 "video."
-msgstr "הפעלת קישור בקבוצה הזו תוביל ישירות לנקודה המקבילה בסרטון הווידאו."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "Video transcript"
-msgstr "תמלול סרטון וידאו"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "Start of transcript. Skip to the end."
-msgstr "התחלת התמלול. דלג לסוף."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "End of transcript. Skip to the start."
-msgstr "סוף התמלול. דלג להתחלה."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid ""
 "Press the UP arrow key to enter the language menu then use UP and DOWN arrow"
 " keys to navigate language options. Press ENTER to change to the selected "
 "language."
 msgstr ""
-"לחץ על מקש החץ למעלה כדי להיכנס לתפריט השפה ולאחר מכן השתמש במקשי החצים "
-"למעלה ולמטה כדי לנווט בין אפשרויות השפה. לחץ על ENTER כדי לשנות לשפה שנבחרה."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "Hide closed captions"
-msgstr "הסתר כתוביות"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "(Caption will be displayed when you start playing the video.)"
-msgstr "(כתוביות יוצגו כאשר תפעיל את סרטון הווידאו)."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "Turn on closed captioning"
-msgstr "הפעל כתוביות"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "Turn on transcripts"
-msgstr "הפעל תמלילים"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/static/bundles/VideoModule.js
 msgid "Turn off transcripts"
-msgstr "כבה תמלילים"
+msgstr ""
 
+#: common/static/bundles/CourseGoals.js
+#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
+msgid "Thank you for setting your course goal to {goal}!"
+msgstr ""
+
+#: common/static/bundles/CourseGoals.js
+msgid ""
+"There was an error in setting your goal, please reload the page and try "
+"again."
+msgstr ""
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "You have successfully updated your goal."
+msgstr ""
+
+#: common/static/bundles/CourseHome.js
+#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
+msgid "There was an error updating your goal."
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Starts {start}"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Started {start}"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Ends {end}"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "(Self-paced) Ended {end}"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "Starts {start}"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "Started {start}"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/models/course_card_model.js
+msgid "Ends {end}"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "You must select a session to access the course."
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "There was an error. Please reload the page and try again."
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Change Session"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+#: lms/templates/learner_dashboard/course_entitlement.underscore
+msgid "Select Session"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Leave Current Session"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure you want to select this session?"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure you want to change to a different session?"
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Any course progress or grades from your current session will be lost."
+msgstr ""
+
+#: common/static/bundles/EntitlementFactory.js
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
+msgid "Are you sure that you want to leave this session?"
+msgstr ""
+
+#: common/static/bundles/EntitlementUnenrollmentFactory.js
+#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
+msgid ""
+"Your unenrollment request could not be processed. Please try again later."
+msgstr ""
+
+#: common/static/bundles/EntitlementUnenrollmentFactory.js
+#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
+msgid ""
+"Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
+"will be refunded the amount you paid."
+msgstr ""
+
+#: common/static/bundles/PasswordResetConfirmation.js
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Reset Your Password"
+msgstr "אפס את סיסמתך"
+
+#: common/static/bundles/PasswordResetConfirmation.js
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Enter and confirm your new password."
+msgstr ""
+
+#: common/static/bundles/PasswordResetConfirmation.js
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "New Password"
+msgstr ""
+
+#: common/static/bundles/PasswordResetConfirmation.js
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Confirm Password"
+msgstr ""
+
+#: common/static/bundles/PasswordResetConfirmation.js
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Passwords do not match."
+msgstr ""
+
+#: common/static/bundles/PasswordResetConfirmation.js
+#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
+msgid "Reset My Password"
+msgstr ""
+
+#: common/static/bundles/PasswordResetConfirmation.js
+#: lms/static/js/student_account/components/PasswordResetInput.jsx
+msgid "Error: "
+msgstr ""
+
+#: common/static/bundles/ProblemBrowser.js
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+#: cms/templates/js/move-xblock-list.underscore
+msgid "View child items"
+msgstr ""
+
+#: common/static/bundles/ProblemBrowser.js
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Navigate up"
+msgstr ""
+
+#: common/static/bundles/ProblemBrowser.js
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Browsing"
+msgstr ""
+
+#: common/static/bundles/ProblemBrowser.js
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Select"
+msgstr ""
+
+#: common/static/bundles/ProblemBrowser.js
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
+msgid "Select a section or problem"
+msgstr ""
+
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "{type} Progress"
+msgstr ""
+
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
+msgid "Earned Certificates"
+msgstr ""
+
+#: common/static/bundles/ProgramDetailsFactory.js
+#: lms/static/js/learner_dashboard/views/program_details_view.js
+msgid "Enrolled"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/errors_list.jsx
+msgid "Please fix the following errors:"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Files that you upload must be smaller than 5MB in size."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid ""
+"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
+".png format."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Something went wrong. Please try again later."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Add Attachment"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "(Optional)"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
+msgid "Remove file"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Course Name"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Not specific to a course"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "נושא"
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Details"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "The more you tell us, the more quickly and helpfully we can respond!"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "שלח"
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
+msgid "Sign in to {platform} so we can help you better."
+msgstr ""
+
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+msgid "Sign in"
+msgstr "כניסה"
+
+#: common/static/bundles/SingleSupportForm.js
+msgid "Create an {platform} account"
+msgstr "יצירת חשבון {platform}"
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
+msgid ""
+"If you are unable to access your account contact us via email using {email}."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Select a course or select \"Not specific to a course\" for your support "
+"request."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Enter a subject for your support request."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Enter some details for your support request."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Contact Us"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Find answers to the top questions asked by learners."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid "Search the {platform} Help Center"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Go to my Dashboard"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid "Go to {platform} Home"
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/success.jsx
+msgid ""
+"Thank you for submitting a request! We will contact you within 24 hours."
+msgstr ""
+
+#: common/static/bundles/SingleSupportForm.js
+#: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
+msgid "Cancel upload"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You may also lose access to verified certificates and other program "
+"credentials like MicroMasters certificates. If you want to make a copy of "
+"these for your records before proceeding with deletion, follow the "
+"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Before proceeding, please {htmlStart}unlink all social media "
+"accounts{htmlEnd}."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
+"the above carefully before proceeding. This is an irreversible action, and "
+"{strongStart}you will no longer be able to use the same email on "
+"edX.{strongEnd}"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Please note: Deletion of your account and personal data is permanent and "
+"cannot be undone. EdX will not be able to recover your account or the data "
+"that is deleted."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"Once your account is deleted, you cannot use it to take courses on the edX "
+"app, edx.org, or any other site hosted by edX. This includes access to "
+"edx.org from your employer’s or university’s system and access to private "
+"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
+" Medical School."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Delete My Account"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Password is incorrect"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Unable to delete account"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Please re-enter your password."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Sorry, there was an error trying to process your request. Please try again "
+"later."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "A Password is required"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"You have selected “Delete my account.” Deletion of your account and personal"
+" data is permanent and cannot be undone. EdX will not be able to recover "
+"your account or the data that is deleted."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you proceed, you will be unable to use this account to take courses on "
+"the edX app, edx.org, or any other site hosted by edX. This includes access "
+"to edx.org from your employer’s or university’s system and access to private"
+" sites offered by MIT Open Learning, Wharton Executive Education, and "
+"Harvard Medical School."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"If you still wish to continue and delete your account, please enter your "
+"account password:"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "Yes, Delete"
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid "We're sorry to see you go! Your account will be deleted shortly."
+msgstr ""
+
+#: common/static/bundles/StudentAccountDeletion.js
+#: common/static/bundles/StudentAccountDeletionInitializer.js
+#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
+msgid ""
+"Account deletion, including removal from email lists, may take a few weeks "
+"to fully process through our system. If you want to opt-out of emails before"
+" then, please unsubscribe from the footer of any email."
+msgstr ""
+
+#: common/static/bundles/UnenrollmentFactory.js
+#: lms/static/js/dashboard/legacy.js
+#: lms/static/js/learner_dashboard/views/unenroll_view.js
+msgid ""
+"Unable to determine whether we should give you a refund because of System "
+"Error. Please try again later."
+msgstr ""
+
+#: common/static/bundles/VerticalStudentView.js
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
+msgid "An error has occurred. Please try again."
+msgstr "אירעה שגיאה. אנא נסה שוב."
+
+#: common/static/bundles/VerticalStudentView.js
+#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
+msgid "Bookmark this page"
+msgstr "סמן עמוד זה"
+
+#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr "שדה חובה"
 
+#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Please do not use any spaces in this field."
 msgstr "אנא אל תשתמש ברווחים בשדה זה."
 
+#: common/static/bundles/commons.js
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Please do not use any spaces or special characters in this field."
 msgstr "אנא אל תשתמש ברווחים או בתווים מיוחדים בשדה זה."
 
+#: common/static/bundles/js/factories/library.js
 #: common/static/common/js/components/views/paginated_view.js
 #: common/static/common/js/components/views/paging_footer.js
 msgid "Pagination"
@@ -2240,233 +3700,82 @@ msgstr "שוחרר על המטרה"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
-msgstr "לפני %s"
+msgstr ""
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s from now"
-msgstr "%s מעכשיו"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr "פחות מדקה"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr "בערך דקה"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "דקה %d"
-msgstr[1] "%d דקות"
-msgstr[2] "%d דקות"
-msgstr[3] "%d דקות"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr "בערך שעה"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] "כשעה %d"
-msgstr[1] "כ-%d שעות"
-msgstr[2] "כ-%d שעות"
-msgstr[3] "כ-%d שעות"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr "יום"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "יום %d"
-msgstr[1] "%d ימים"
-msgstr[2] "%d ימים"
-msgstr[3] "%d ימים"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr "בערך חודש אחד"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "חודש %d"
-msgstr[1] "%d חודשים"
-msgstr[2] "%d חודשים"
-msgstr[3] "%d חודשים"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr "כשנה"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] "שנה %d"
-msgstr[1] "%d שנים"
-msgstr[2] "%d שנים"
-msgstr[3] "%d שנים"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "User"
-msgstr "משתמש"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Annotation"
-msgstr "הסבר"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Start"
-msgstr "התחלה"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "End"
-msgstr "סוף"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "#Replies"
-msgstr "#תשובות"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Date posted"
-msgstr "תאריך פרסום"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: lms/static/js/courseware/credit_progress.js
-#: common/static/common/templates/discussion/forum-actions.underscore
-#: lms/templates/discovery/facet.underscore
-#: lms/templates/edxnotes/note-item.underscore
-msgid "More"
-msgstr "עוד"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "My Notes"
-msgstr "הרשומות שלי"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Instructor"
-msgstr "מדריך"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Public"
-msgstr "ציבורי"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: common/static/common/templates/components/search-field.underscore
-#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
-#: lms/djangoapps/support/static/support/templates/certificates.underscore
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: lms/djangoapps/support/static/support/templates/manage_user.underscore
-msgid "Search"
-msgstr "חיפוש"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Users"
-msgstr "משתמשים"
-
-#. Translators: 'Tags' is the name of the view (noun) within the Student Notes
-#. page that shows all
-#. notes organized by the tags the student has associated with them (if any).
-#. When defining a
-#. note in the courseware, the student can choose to associate 1 or more tags
-#. with the note
-#. in order to group similar notes together and help with search.
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: lms/static/js/edxnotes/views/tabs/tags.js
-msgid "Tags"
-msgstr "תגיות"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Annotation Text"
-msgstr "טקסט ההסבר"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: cms/templates/js/metadata-dict-entry.underscore
-#: cms/templates/js/metadata-file-uploader-entry.underscore
-#: cms/templates/js/metadata-list-entry.underscore
-#: cms/templates/js/metadata-number-entry.underscore
-#: cms/templates/js/metadata-option-entry.underscore
-#: cms/templates/js/metadata-string-entry.underscore
-msgid "Clear"
-msgstr "נקה"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Text"
-msgstr "טקסט"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Video"
-msgstr "וידאו"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: lms/static/js/views/image_field.js
-msgid "Image"
-msgstr "תמונה"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Reply"
-msgstr "השב"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: lms/templates/edxnotes/note-item.underscore
-msgid "Tags:"
-msgstr "תגיות:"
-
-#. Translators: please note that this is not a literal flag, but rather a
-#. report
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "Check the box to remove all flags."
-msgstr "סמן בתיבה כדי למחוק את כל הדגלים."
-
-#. Translators: 'totalFlags' is the number of flags solely for that annotation
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "Check the box to remove %(totalFlags)s flag."
-msgid_plural "Check the box to remove %(totalFlags)s flags."
-msgstr[0] "סמן את התיבה כדי להסיר דגל %(totalFlags)s."
-msgstr[1] "סמן את התיבה כדי להסיר %(totalFlags)s דגלים."
-msgstr[2] "סמן את התיבה כדי להסיר %(totalFlags)s דגלים."
-msgstr[3] "סמן את התיבה כדי להסיר %(totalFlags)s דגלים."
-
-#. Translators: 'count' is the number of flags solely for that annotation that
-#. will be removed
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "Check the box to remove %(count)s flag."
-msgid_plural "Check the box to remove %(count)s flags."
-msgstr[0] "סמן את התיבה כדי להסיר דגל %(count)s."
-msgstr[1] "סמן את התיבה כדי להסיר %(count)s דגלים."
-msgstr[2] "סמן את התיבה כדי להסיר %(count)s דגלים."
-msgstr[3] "סמן את התיבה כדי להסיר %(count)s דגלים."
-
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "All flags have been removed. To undo, uncheck the box."
-msgstr "כל הדגלים הוסרו. כדי לבטל את הפעולה, בטל את הסימון בתיבה."
-
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "You have already reported this annotation."
-msgstr "כבר דיווחת על ההערה הזו."
-
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "Report annotation as inappropriate or offensive."
-msgstr "דווח על ההערה כבלתי הולמת או פוגענית"
-
-#. Translators: 'count' is the number of flags solely for that annotation
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "This annotation has %(count)s flag."
-msgid_plural "This annotation has %(count)s flags."
-msgstr[0] "להערה זו יש דגל %(count)s."
-msgstr[1] "להסבר זה יש %(count)s דגלים."
-msgstr[2] "להסבר זה יש %(count)s דגלים."
-msgstr[3] "להסבר זה יש %(count)s דגלים."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -2491,122 +3800,6 @@ msgstr "ציין סיבה."
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Something went wrong changing this enrollment. Please try again."
 msgstr "משהו השתבש בעת שינוי הרשמה זו. נא נסה שוב."
-
-#: lms/djangoapps/support/static/support/jsx/errors_list.jsx
-msgid "Please fix the following errors:"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Files that you upload must be smaller than 5MB in size."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid ""
-"Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or "
-".png format."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Something went wrong. Please try again later."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Add Attachment"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "(Optional)"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Remove file"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Course Name"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Not specific to a course"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "נושא"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Details"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "שלח"
-
-#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid "Sign in to {platform} so we can help you better."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Select a course or select \"Not specific to a course\" for your support "
-"request."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter a subject for your support request."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Enter some details for your support request."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Contact Us"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Find answers to the top questions asked by learners."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Search the {platform} Help Center"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Go to my Dashboard"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Go to {platform} Home"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
-msgid "Cancel upload"
-msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -3291,6 +4484,13 @@ msgid "There has been an error processing your survey."
 msgstr "אירעה שגיאה בעיבוד הסקר שלך."
 
 #: lms/static/js/courseware/credit_progress.js
+#: common/static/common/templates/discussion/forum-actions.underscore
+#: lms/templates/discovery/facet.underscore
+#: lms/templates/edxnotes/note-item.underscore
+msgid "More"
+msgstr "עוד"
+
+#: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Less"
@@ -3347,13 +4547,6 @@ msgstr ""
 msgid ""
 "The refund deadline for this course has passed,so you will not receive a "
 "refund."
-msgstr ""
-
-#: lms/static/js/dashboard/legacy.js
-#: lms/static/js/learner_dashboard/views/unenroll_view.js
-msgid ""
-"Unable to determine whether we should give you a refund because of System "
-"Error. Please try again later."
 msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
@@ -3492,6 +4685,17 @@ msgstr "תוצאות חיפוש"
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
 msgstr "[no tags]"
+
+#. Translators: 'Tags' is the name of the view (noun) within the Student Notes
+#. page that shows all
+#. notes organized by the tags the student has associated with them (if any).
+#. When defining a
+#. note in the courseware, the student can choose to associate 1 or more tags
+#. with the note
+#. in order to group similar notes together and help with search.
+#: lms/static/js/edxnotes/views/tabs/tags.js
+msgid "Tags"
+msgstr "תגיות"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 msgid "Unable to submit application"
@@ -4376,95 +5580,6 @@ msgid ""
 msgstr ""
 "קישורים נוצרים לפי דרישה ותוקפם פג לאחר 5 דקות בגלל רגישות מידע על הסטודנט."
 
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Starts {start}"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Started {start}"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Ends {end}"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "(Self-paced) Ended {end}"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "Starts {start}"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "Started {start}"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/models/course_card_model.js
-msgid "Ends {end}"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "You must select a session to access the course."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "There was an error. Please reload the page and try again."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-#: lms/templates/learner_dashboard/course_entitlement.underscore
-msgid "Change Session"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-#: lms/templates/learner_dashboard/course_entitlement.underscore
-msgid "Select Session"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Leave Current Session"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure you want to select this session?"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure you want to change to a different session?"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Any course progress or grades from your current session will be lost."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/course_entitlement_view.js
-msgid "Are you sure that you want to leave this session?"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
-msgid ""
-"Your unenrollment request could not be processed. Please try again later."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/entitlement_unenrollment_view.js
-msgid ""
-"Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
-"will be refunded the amount you paid."
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
-msgid "{type} Progress"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
-msgid "Earned Certificates"
-msgstr ""
-
-#: lms/static/js/learner_dashboard/views/program_details_view.js
-msgid "Enrolled"
-msgstr ""
-
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
 msgstr "ניסיונות אופסו בהצלחה עבור משתמש  {user}"
@@ -4503,138 +5618,6 @@ msgstr ""
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Could not override problem score for {user}."
-msgstr ""
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Reset Your Password"
-msgstr "אפס את סיסמתך"
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Enter and confirm your new password."
-msgstr ""
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "New Password"
-msgstr ""
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Confirm Password"
-msgstr ""
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Passwords do not match."
-msgstr ""
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Reset My Password"
-msgstr ""
-
-#: lms/static/js/student_account/components/PasswordResetInput.jsx
-msgid "Error: "
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"You may also lose access to verified certificates and other program "
-"credentials like MicroMasters certificates. If you want to make a copy of "
-"these for your records before proceeding with deletion, follow the "
-"instructions for {htmlStart}printing or downloading a certificate{htmlEnd}."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Before proceeding, please {htmlStart}unlink all social media "
-"accounts{htmlEnd}."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Once your account is deleted, you cannot use it to take courses on the edX "
-"app, edx.org, or any other site hosted by edX. This includes access to "
-"edx.org from your employer’s or university’s system and access to private "
-"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
-" Medical School."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Delete My Account"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Password is incorrect"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Unable to delete account"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Please re-enter your password."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Sorry, there was an error trying to process your request. Please try again "
-"later."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "A Password is required"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. EdX will not be able to recover "
-"your account or the data that is deleted."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you still wish to continue and delete your account, please enter your "
-"account password:"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Yes, Delete"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "We're sorry to see you go! Your account will be deleted shortly."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"Account deletion, including removal from email lists, may take a few weeks "
-"to fully process through our system. If you want to opt-out of emails before"
-" then, please unsubscribe from the footer of any email."
 msgstr ""
 
 #: lms/static/js/student_account/tos_modal.js
@@ -5029,12 +6012,6 @@ msgid "Try the transaction again in a few minutes."
 msgstr "נסה לבצע את ההעברה שוב בעוד מספר דקות."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmarks_list.js
-msgid "An error has occurred. Please try again."
-msgstr "אירעה שגיאה. אנא נסה שוב."
-
-#: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
 msgstr "לא ניתן לשלוח את ההזמנה"
 
@@ -5124,6 +6101,10 @@ msgid "Change image"
 msgstr "שנה תמונה"
 
 #: lms/static/js/views/image_field.js
+msgid "Image"
+msgstr "תמונה"
+
+#: lms/static/js/views/image_field.js
 msgid "An error has occurred. Refresh the page, and then try again."
 msgstr "אירעה שגיאה. רענן את העמוד ונסה שוב."
 
@@ -5202,22 +6183,6 @@ msgstr "מספר לומדים"
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
 msgstr "ניקוד כללי"
-
-#: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
-msgid "Bookmark this page"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseGoals.js
-msgid "Thank you for setting your course goal to {goal}!"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "You have successfully updated your goal."
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/CourseHome.js
-msgid "There was an error updating your goal."
-msgstr ""
 
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result"
@@ -5309,29 +6274,6 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
-
-#: cms/static/cms/js/main.js
-msgid "Studio's having trouble saving your work"
-msgstr ""
-
-#: cms/static/cms/js/xblock/cms.runtime.v1.js
-msgid "OpenAssessment Save Error"
-msgstr "שגיאת שמירה של OpenAssessment"
-
-#: cms/static/js/base.js
-msgid "This link will open in a new browser window/tab"
-msgstr ""
-
-#: cms/static/js/base.js
-msgid "This link will open in a modal window"
-msgstr ""
-
 #: cms/static/js/certificates/collections/certificates.js
 msgid "Could not parse certificate JSON. %(message)s"
 msgstr "לא ניתן לעבד JSON של תעודה. %(message)s"
@@ -5384,13 +6326,6 @@ msgstr "למחוק את \"<%= signatoryName %>\" מרשימת החתימות?"
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
 msgstr "לא ניתן לבטל פעולה זו."
-
-#: cms/static/js/certificates/views/signatory_editor.js
-#: cms/static/js/views/course_info_update.js cms/static/js/views/list_item.js
-#: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Deleting"
-msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Upload signature image."
@@ -5464,75 +6399,6 @@ msgstr "הצג הגדרות מיושנות"
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error during the upload process."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while unpacking the file."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "Choose new file"
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while importing the new library to our database."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "Your import has failed."
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-msgid "Error importing course"
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-msgid "There was an error with the upload"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "Organization:"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "Course Number:"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "Course Run:"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "(Read-only)"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "Re-run Course"
-msgstr ""
-
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "תצוגה חיה"
-
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
 msgstr "שגיאת שרת פנימית."
@@ -5553,22 +6419,6 @@ msgstr "העלאה הושלמה"
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload failed"
 msgstr "העלאה נכשלה"
-
-#: cms/static/js/models/chapter.js
-msgid "Chapter name and asset_path are both required"
-msgstr ""
-
-#: cms/static/js/models/chapter.js
-msgid "Chapter name is required"
-msgstr ""
-
-#: cms/static/js/models/chapter.js
-msgid "asset_path is required"
-msgstr ""
-
-#: cms/static/js/models/course.js cms/static/js/models/section.js
-msgid "You must specify a name"
-msgstr ""
 
 #: cms/static/js/models/course_update.js
 msgid "Action required: Enter a valid date."
@@ -5666,38 +6516,6 @@ msgstr "תקופת חסד להגשה חייבת להיות מפורטת בתבנ
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr "לא ניתן להגדיר ציון עובר פחות מ-%(minimum_grade_cutoff)s%."
-
-#: cms/static/js/models/textbook.js
-msgid "Textbook name is required"
-msgstr ""
-
-#: cms/static/js/models/textbook.js
-msgid "Please add at least one chapter"
-msgstr ""
-
-#: cms/static/js/models/textbook.js
-msgid "All chapters must have a name and asset"
-msgstr ""
-
-#: cms/static/js/models/uploads.js
-msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
-msgstr ""
-
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/institution_login.underscore
-#: lms/templates/student_account/institution_register.underscore
-msgid "or"
-msgstr "או"
-
-#: cms/static/js/models/xblock_validation.js
-msgid "This unit has validation issues."
-msgstr ""
-
-#: cms/static/js/models/xblock_validation.js
-msgid "This component has validation issues."
-msgstr "לרכיב זה בעיות אימות."
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -5804,11 +6622,6 @@ msgstr "העלה קובץ חדש"
 msgid "Load Another File"
 msgstr "טען קובץ אחר"
 
-#: cms/static/js/views/components/add_xblock.js
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Adding"
-msgstr "מוסיף"
-
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "האם אתה בטוח שאתה רוצה למחוק את עדכון זה?"
@@ -5860,14 +6673,6 @@ msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
 msgid "{selectedProvider} credentials saved"
-msgstr ""
-
-#: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
-msgstr ""
-
-#: cms/static/js/views/edit_chapter.js
-msgid "Please select a PDF file to upload."
 msgstr ""
 
 #: cms/static/js/views/export.js
@@ -5977,77 +6782,6 @@ msgstr "העלה תמונת מדריך."
 msgid "Files must be in JPEG or PNG format."
 msgstr "קבצים חייבים להיות בפורמט JPEG או PNG. "
 
-#: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
-msgid "All Rights Reserved"
-msgstr "כל הזכויות שמורות"
-
-#: cms/static/js/views/license.js
-msgid "You reserve all rights for your work"
-msgstr " כל הזכויות על עבודתך שמורות עמך."
-
-#: cms/static/js/views/license.js
-msgid "Creative Commons"
-msgstr "Creative Commons"
-
-#: cms/static/js/views/license.js
-msgid "You waive some rights for your work, such that others can use it too"
-msgstr "אתה מוותר על מספר זכויותייך על עבודתך כדי שאחרים יוכלו גם להשתמש בה"
-
-#: cms/static/js/views/license.js
-msgid "Version"
-msgstr "גרסה"
-
-#: cms/static/js/views/license.js
-msgid "Attribution"
-msgstr "יחוס"
-
-#: cms/static/js/views/license.js
-msgid ""
-"Allow others to copy, distribute, display and perform your copyrighted work "
-"but only if they give credit the way you request. Currently, this option is "
-"required."
-msgstr ""
-"אפשר לאחרים להעתיק, להפיץ, להציג ולבצע את העבודה המוגנת בזכויות היוצרים שלך,"
-" אך רק אם הם מכירים בזכויותיך על פי בקשתך. נכון לעכשיו, אפשרות זו היא חובה."
-
-#: cms/static/js/views/license.js
-msgid "Noncommercial"
-msgstr "לא למטרות מסחר"
-
-#: cms/static/js/views/license.js
-msgid ""
-"Allow others to copy, distribute, display and perform your work - and "
-"derivative works based upon it - but for noncommercial purposes only."
-msgstr ""
-"אפשר לאחרים להעתיק, להפיץ, להציג ולבצע את עבודתך - ועבודות הנגזרות ממנה- שלא"
-" למטרות מסחר."
-
-#: cms/static/js/views/license.js
-msgid "No Derivatives"
-msgstr "ללא נגזרות"
-
-#: cms/static/js/views/license.js
-msgid ""
-"Allow others to copy, distribute, display and perform only verbatim copies "
-"of your work, not derivative works based upon it. This option is "
-"incompatible with \"Share Alike\"."
-msgstr ""
-"אפשר לאחרים להעתיק, להפיץ, להציג ולבצע אך ורק עותקים מדויקים של עבודתך ולא "
-"עבודות הנגזרות ממנה. אפשרות זו אינה מתאימה ל\"Share Alike\"."
-
-#: cms/static/js/views/license.js
-msgid "Share Alike"
-msgstr "שתף"
-
-#: cms/static/js/views/license.js
-msgid ""
-"Allow others to distribute derivative works only under a license identical "
-"to the license that governs your work. This option is incompatible with \"No"
-" Derivatives\"."
-msgstr ""
-"אפשר לאחרים להפיץ עבודות נגזרות אך ורק ברישיון דומה לרישיון שקיים לעבודתך. "
-"אפשרות זו אינה מתאימה ל\"ללא נגזרות\"."
-
 #. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
 msgid "Delete this %(item_display_name)s?"
@@ -6148,32 +6882,6 @@ msgstr "בסיס"
 msgid "Visibility"
 msgstr "תצוגה"
 
-#. Translators: "title" is the name of the current component being edited.
-#: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
-msgstr "עורך: %(title)s"
-
-#: cms/static/js/views/modals/edit_xblock.js
-#: lms/templates/ccx/schedule.underscore
-msgid "Unit"
-msgstr "יחידה"
-
-#: cms/static/js/views/modals/edit_xblock.js
-msgid "Component"
-msgstr "רכיב"
-
-#: cms/static/js/views/modals/move_xblock_modal.js
-msgid "Move"
-msgstr ""
-
-#: cms/static/js/views/modals/move_xblock_modal.js
-msgid "Choose a location to move your component to"
-msgstr ""
-
-#: cms/static/js/views/modals/move_xblock_modal.js
-msgid "Move: {displayName}"
-msgstr ""
-
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
 msgstr "טעות אימות במהלך שמירה"
@@ -6186,99 +6894,6 @@ msgstr "בטל שינויים"
 msgid "Change Manually"
 msgstr "שנה ידנית"
 
-#: cms/static/js/views/move_xblock_list.js
-msgid "Sections"
-msgstr "פרקים"
-
-#: cms/static/js/views/move_xblock_list.js
-msgid "Subsections"
-msgstr ""
-
-#: cms/static/js/views/move_xblock_list.js
-msgid "Units"
-msgstr "יחידות"
-
-#: cms/static/js/views/move_xblock_list.js
-msgid "Components"
-msgstr ""
-
-#: cms/static/js/views/move_xblock_list.js
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "Groups"
-msgstr "קבוצות"
-
-#: cms/static/js/views/move_xblock_list.js
-msgid "This {parentCategory} has no {childCategory}"
-msgstr ""
-
-#: cms/static/js/views/move_xblock_list.js
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/partition-group-details.underscore
-msgid "Course Outline"
-msgstr "מתווה קורס"
-
-#: cms/static/js/views/paged_container.js
-msgid "Date added"
-msgstr "הוסף תאריך"
-
-#. Translators: "title" is the name of the current component or unit being
-#. edited.
-#: cms/static/js/views/pages/container.js
-msgid "Editing access for: %(title)s"
-msgstr ""
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Publishing"
-msgstr "מפרסם"
-
-#: cms/static/js/views/pages/container_subviews.js
-#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
-#: cms/templates/js/course-video-settings-update-settings-footer.underscore
-#: cms/templates/js/publish-xblock.underscore
-msgid "Discard Changes"
-msgstr "התעלם משינויים"
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid ""
-"Are you sure you want to revert to the last published version of the unit? "
-"You cannot undo this action."
-msgstr ""
-"האם אתה בטוח שאתה רוצה לחזור לגרסה האחרונה של יחידה זו, שפורסמה ? אינך יכול "
-"לבטל פעולה זו. "
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Discarding Changes"
-msgstr "מתעלם משינויים"
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Hiding from Students"
-msgstr "מסתיר מסטודנטים"
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Explicitly Hiding from Students"
-msgstr "מסתיר במפורש מהסטודנטים"
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Inheriting Student Visibility"
-msgstr "יורש הגדרות חשיפה לסטודנטים"
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Make Visible to Students"
-msgstr "שנה לגלוי עבור הסטודנטים "
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid ""
-"If the unit was previously published and released to students, any changes "
-"you made to the unit when it was hidden will now be visible to students. Do "
-"you want to proceed?"
-msgstr ""
-"אם היחידה פורסמה והופצה בעבר לסטודנטים, כל שינוי שערכת ביחידה כאשר היתה "
-"נסתרת תהיה גלויה כעת בפני הסטודנטים. האם ברצונך להמשיך?"
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Making Visible to Students"
-msgstr "מציג עבור הסטודנטים"
-
 #: cms/static/js/views/pages/course_outline.js
 msgid "Course Index"
 msgstr "אינדקס קורס"
@@ -6286,62 +6901,6 @@ msgstr "אינדקס קורס"
 #: cms/static/js/views/pages/course_outline.js
 msgid "There were errors reindexing course."
 msgstr "קרו שגיאות במיון מחדש של הקורס."
-
-#: cms/static/js/views/pages/paged_container.js
-msgid "Hide Previews"
-msgstr "הסתר תצוגות מקדימות"
-
-#: cms/static/js/views/pages/paged_container.js
-msgid "Show Previews"
-msgstr "הראה תצוגות מקדימות"
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
-"{assetType}, sorted by {sortName} ascending"
-msgstr ""
-"מציג  {currentItemRange} מתוך {totalItemsCount}, ממוין על פי  {assetType}, "
-"בסדר עולה של {sortName} "
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
-"{assetType}, sorted by {sortName} descending"
-msgstr ""
-"מציג  {currentItemRange} מתוך {totalItemsCount}, ממוין על פי  {assetType}, "
-"בסדר יורד של {sortName} "
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
-"ascending"
-msgstr ""
-"מציג  {currentItemRange} מתוך {totalItemsCount}, ממוין בסדר עולה של "
-"{sortName} "
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
-"descending"
-msgstr ""
-"מציג  {currentItemRange} מתוך {totalItemsCount}, ממוין בסדר יורד של "
-"{sortName} "
-
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
-#: cms/static/js/views/paging_header.js
-msgid "{totalItems} total"
-msgstr "{totalItems} סך הכל"
 
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
@@ -6424,34 +6983,6 @@ msgstr "העלה את תמונת הבאנר."
 msgid "Upload your video thumbnail image."
 msgstr "העלה את תמונת הווידאו הממוזערת"
 
-#: cms/static/js/views/show_textbook.js
-msgid "Delete “<%= name %>”?"
-msgstr ""
-
-#: cms/static/js/views/show_textbook.js
-msgid ""
-"Deleting a textbook cannot be undone and once deleted any reference to it in"
-" your courseware's navigation will also be removed."
-msgstr ""
-
-#: cms/static/js/views/tabs.js
-msgid "Delete Page Confirmation"
-msgstr "אישור מחיקת עמוד"
-
-#: cms/static/js/views/tabs.js
-msgid ""
-"Are you sure you want to delete this page? This action cannot be undone."
-msgstr "האם אתה בטוח שאתה רוצה למחוק עמוד זה? לא ניתן לבטל פעולה זו."
-
-#: cms/templates/js/metadata-file-uploader-item.underscore
-#: cms/templates/js/video/metadata-translations-item.underscore
-msgid "Upload"
-msgstr "העלה"
-
-#: cms/static/js/views/uploads.js
-msgid "We're sorry, there was an error"
-msgstr ""
-
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
@@ -6467,70 +6998,6 @@ msgid ""
 msgstr ""
 "האורך המשולב של שדות הארגון וקוד הספרייה אינו יכול לעלות על <%=limit%> "
 "תווים."
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-msgid "Success! \"{displayName}\" has been moved."
-msgstr ""
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-msgid ""
-"Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
-"location."
-msgstr ""
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-msgid "Undo move"
-msgstr ""
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-msgid "Take me to the new location"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Duplicating"
-msgstr "משכפל"
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Undo moving"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Moving"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Deleting this {xblock_type} is permanent and cannot be undone."
-msgstr "מחיקת {xblock_type} זה היא קבועה ואינה הפיכה."
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid ""
-"Any content that has listed this content as a prerequisite will also have "
-"access limitations removed."
-msgstr "גם בכל תוכן שרשם תוכן זה כדרישה מוקדמת יוסרו מגבלות הגישה."
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this {xblock_type} (and prerequisite)?"
-msgstr "האם למחוק את  {xblock_type} (and prerequisite) זה? "
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Yes, delete this {xblock_type}"
-msgstr "כן, מחק את {xblock_type} זה"
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this {xblock_type}?"
-msgstr "האם למחוק את {xblock_type} זה?"
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "section"
-msgstr "פרק"
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "subsection"
-msgstr "תת פרק"
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "unit"
-msgstr "יחידה"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
@@ -6552,68 +7019,6 @@ msgstr "אנא התייחס לטעויות בעמוד זה קודם ולאחר �
 #: cms/static/js/views/validation.js
 msgid "Save Changes"
 msgstr "שמור שינויים"
-
-#: cms/static/js/views/video/transcripts/file_uploader.js
-msgid "Please select a file in .srt format."
-msgstr "אנא בחר קובץ בתבנית .srt"
-
-#: cms/static/js/views/video/transcripts/file_uploader.js
-msgid "Error: Uploading failed."
-msgstr "שגיאה: ההעלאה נכשלה."
-
-#: cms/static/js/views/video/transcripts/message_manager.js
-msgid "Error: Import failed."
-msgstr "שגיאה: הייבוא נכשל."
-
-#: cms/static/js/views/video/transcripts/message_manager.js
-msgid "Error: Replacing failed."
-msgstr "שגיאה: ההחלפה נכשלה."
-
-#: cms/static/js/views/video/transcripts/message_manager.js
-msgid "Error: Choosing failed."
-msgstr "שגיאה: הבחירה נכשלה."
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "Error: Connection with server failed."
-msgstr "שגיאה: החיבור לשרת נכשל."
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "Link types should be unique."
-msgstr "על סוגי הקישור להיות יחודיים."
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "Links should be unique."
-msgstr "על הקישורים להיות יחודיים."
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "Incorrect url format."
-msgstr "תבנית כתובת URL שגויה."
-
-#: cms/static/js/views/video/translations_editor.js
-msgid ""
-"Sorry, there was an error parsing the subtitles that you uploaded. Please "
-"check the format and try again."
-msgstr ""
-"מצטערים, אירעה שגיאה בניתוח הכתוביות שהעלת. אנא בדוק את התבנית ונסה שוב. "
-
-#: cms/static/js/views/video/translations_editor.js
-#: cms/static/js/views/video_transcripts.js
-msgid "Are you sure you want to remove this transcript?"
-msgstr ""
-
-#: cms/static/js/views/video/translations_editor.js
-msgid ""
-"If you remove this transcript, the transcript will not be available for this"
-" component."
-msgstr ""
-
-#: cms/static/js/views/video/translations_editor.js
-msgid "Remove Transcript"
-msgstr ""
-
-#: cms/static/js/views/video/translations_editor.js
-msgid "Upload translation"
-msgstr "העלה תרגום"
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "Add Thumbnail"
@@ -6755,26 +7160,6 @@ msgid ""
 "components that use this video."
 msgstr ""
 
-#: cms/static/js/views/xblock_editor.js
-msgid "Editor"
-msgstr "עורך"
-
-#: cms/static/js/views/xblock_editor.js
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Settings"
-msgstr "הגדרות"
-
-#: cms/static/js/views/xblock_outline.js
-msgid "New {component_type}"
-msgstr "חדש {component_type} "
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr "אזהרה"
-
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr "עדכון תגיות"
@@ -6838,6 +7223,14 @@ msgstr "מויין בידי"
 #: common/static/common/templates/components/search-field.underscore
 msgid "Clear search"
 msgstr "נקה חיפוש"
+
+#: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
+#: lms/djangoapps/support/static/support/templates/certificates.underscore
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
+msgid "Search"
+msgstr "חיפוש"
 
 #: common/static/common/templates/discussion/forum-action-answer.underscore
 msgid "Mark as Answer"
@@ -7352,7 +7745,7 @@ msgid "Password Status"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
-msgid "Disable Account"
+msgid "Toggle Account Password (Usable/Unusable)"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
@@ -7671,6 +8064,10 @@ msgstr "צויין ב:"
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Last Edited:"
 msgstr "נערך לאחרונה:"
+
+#: lms/templates/edxnotes/note-item.underscore
+msgid "Tags:"
+msgstr "תגיות:"
 
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "Clear search results"
@@ -8225,7 +8622,31 @@ msgid "Open the certificate you earned for the %(title)s program."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Program Record"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Once you complete one of the program requirements you have a program record."
+" This record is marked complete once you meet all program requirements. A "
+"program record can be used to continue your learning journey and demonstrate"
+" your learning to others."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "View Program Record"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Additional Credit Opportunities"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Learn More"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Additional Professional Opportunities"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8312,11 +8733,6 @@ msgid "Forgot password?"
 msgstr "שכחת סיסמה?"
 
 #: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/login.underscore
-msgid "Sign in"
-msgstr "כניסה"
-
-#: lms/templates/student_account/hinted_login.underscore
 #, python-format
 msgid "Would you like to sign in using your %(providerName)s credentials?"
 msgstr "האם תרצה להיכנס לחשבון באמצעות הרשאות %(providerName)s שלך?"
@@ -8357,7 +8773,7 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "Create an Account."
-msgstr ""
+msgstr "יצירת חשבון"
 
 #: lms/templates/student_account/login.underscore
 msgid "Sign in to continue learning as {email}"
@@ -8444,7 +8860,7 @@ msgstr "כבר יש לך חשבון  {platformName} ?"
 
 #: lms/templates/student_account/register.underscore
 msgid "Sign in."
-msgstr ""
+msgstr "הירשם"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -8461,7 +8877,7 @@ msgstr "או צור אחד חדש כאן"
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an Account"
-msgstr ""
+msgstr "צור חשבון"
 
 #: lms/templates/student_account/register.underscore
 msgid "Support education research by providing additional information"
@@ -10022,7 +10438,16 @@ msgstr "%(new_item_message)s"
 #: cms/templates/js/list.underscore
 #, python-format
 msgid "New %(item_type)s"
-msgstr "חדש %(item_type)s"
+msgstr " %(item_type)s חדש"
+
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-file-uploader-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/metadata-number-entry.underscore
+#: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-string-entry.underscore
+msgid "Clear"
+msgstr "נקה"
 
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-file-uploader-entry.underscore
@@ -10049,10 +10474,6 @@ msgstr ""
 
 #: cms/templates/js/move-xblock-list.underscore
 msgid "Current location"
-msgstr ""
-
-#: cms/templates/js/move-xblock-list.underscore
-msgid "View child items"
 msgstr ""
 
 #: cms/templates/js/move-xblock-list.underscore

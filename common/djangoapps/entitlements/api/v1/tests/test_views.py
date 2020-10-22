@@ -572,15 +572,12 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         course_entitlement.refresh_from_db()
         assert course_entitlement.expired_at is not None
 
-    def test_revoke_unenroll_entitlement(self):
-        course_entitlement = CourseEntitlementFactory.create()
+    @patch("entitlements.models.get_course_uuid_for_course")
+    def test_revoke_unenroll_entitlement(self, mock_course_uuid):
+        enrollment = CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
+        course_entitlement = CourseEntitlementFactory.create(user=self.user, enrollment_course_run=enrollment)
+        mock_course_uuid.return_value = course_entitlement.course_uuid
         url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(course_entitlement.uuid)])
-
-        enrollment = CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-
-        course_entitlement.refresh_from_db()
-        course_entitlement.enrollment_course_run = enrollment
-        course_entitlement.save()
 
         assert course_entitlement.enrollment_course_run is not None
 
@@ -754,10 +751,12 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert CourseEnrollment.is_enrolled(self.user, self.course.id)
         assert course_entitlement.enrollment_course_run is not None
 
+    @patch("entitlements.models.get_course_uuid_for_course")
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
-    def test_user_can_unenroll(self, mock_get_course_runs):
+    def test_user_can_unenroll(self, mock_get_course_runs, mock_get_course_uuid):
         course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
         mock_get_course_runs.return_value = self.return_values
+        mock_get_course_uuid.return_value = course_entitlement.course_uuid
 
         url = reverse(
             self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
@@ -904,11 +903,13 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert response.data['message'] == expected_message  # pylint: disable=no-member
         assert not CourseEnrollment.is_enrolled(self.user, fake_course_key)
 
-    @patch('entitlements.api.v1.views.refund_entitlement', return_value=True)
+    @patch('entitlements.models.refund_entitlement', return_value=True)
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
-    def test_user_can_revoke_and_refund(self, mock_get_course_runs, mock_refund_entitlement):
+    @patch("entitlements.models.get_course_uuid_for_course")
+    def test_user_can_revoke_and_refund(self, mock_course_uuid, mock_get_course_runs, mock_refund_entitlement):
         course_entitlement = CourseEntitlementFactory.create(user=self.user, mode=CourseMode.VERIFIED)
         mock_get_course_runs.return_value = self.return_values
+        mock_course_uuid.return_value = course_entitlement.course_uuid
 
         url = reverse(
             self.ENTITLEMENTS_ENROLLMENT_NAMESPACE,
@@ -939,14 +940,13 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
 
         course_entitlement.refresh_from_db()
         assert mock_refund_entitlement.is_called
-        assert (CourseEntitlementSerializer(mock_refund_entitlement.call_args[1]['course_entitlement']).data ==
-                CourseEntitlementSerializer(course_entitlement).data)
+        assert mock_refund_entitlement.call_args[1]['course_entitlement'] == course_entitlement
         assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
         assert course_entitlement.enrollment_course_run is None
         assert course_entitlement.expired_at is not None
 
     @patch('entitlements.api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=False)
-    @patch('entitlements.api.v1.views.refund_entitlement', return_value=True)
+    @patch('entitlements.models.refund_entitlement', return_value=True)
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
     def test_user_can_revoke_and_no_refund_available(
             self,
@@ -990,7 +990,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.expired_at is None
 
     @patch('entitlements.api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=True)
-    @patch('entitlements.api.v1.views.refund_entitlement', return_value=False)
+    @patch('entitlements.models.refund_entitlement', return_value=False)
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_user_is_not_unenrolled_on_failed_refund(
             self,

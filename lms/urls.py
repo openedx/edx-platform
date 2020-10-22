@@ -26,7 +26,6 @@ from lms.djangoapps.instructor.views import coupons as instructor_coupons_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
 from lms.djangoapps.instructor.views import registration_codes as instructor_registration_codes_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
-from lms_migration import migrate as lms_migrate_views
 from notes import views as notes_views
 from notification_prefs import views as notification_prefs_views
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
@@ -50,7 +49,6 @@ from ratelimitbackend import admin
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
 from student import views as student_views
-from student_account import views as student_account_views
 from track import views as track_views
 from util import views as util_views
 
@@ -62,6 +60,11 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     if password_policy_compliance.should_enforce_compliance_on_login():
         admin.site.login_form = PasswordPolicyAwareAdminAuthForm
 
+# Custom error pages
+# These are used by Django to render these error codes. Do not remove.
+# pylint: disable=invalid-name
+handler404 = static_template_view_views.render_404
+handler500 = static_template_view_views.render_500
 
 urlpatterns = [
     url(r'^$', branding_views.index, name='root'),   # Main marketing page, or redirect to courseware
@@ -147,23 +150,6 @@ urlpatterns = [
     url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.sites.urls')),
     url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.tpa_admin.urls')),
 ]
-
-# TODO: This needs to move to a separate urls.py once the student_account and
-# student views below find a home together
-if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
-    # Backwards compatibility with old URL structure, but serve the new views
-    urlpatterns += [
-        url(r'^login$', student_account_views.login_and_registration_form,
-            {'initial_mode': 'login'}, name='signin_user'),
-        url(r'^register$', student_account_views.login_and_registration_form,
-            {'initial_mode': 'register'}, name='register_user'),
-    ]
-else:
-    # Serve the old views
-    urlpatterns += [
-        url(r'^login$', student_views.signin_user, name='signin_user'),
-        url(r'^register$', student_views.register_user, name='register_user'),
-    ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
@@ -614,12 +600,6 @@ urlpatterns += [
         name='lti_rest_endpoints',
     ),
 
-    # Student account
-    url(
-        r'^account/',
-        include('student_account.urls')
-    ),
-
     # Student Notes
     url(
         r'^courses/{}/edxnotes/'.format(
@@ -809,6 +789,10 @@ if settings.FEATURES.get('CLASS_DASHBOARD'):
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     # Jasmine and admin
     urlpatterns += [
+        # The password pages in the admin tool are disabled so that all password
+        # changes go through our user portal and follow complexity requirements.
+        url(r'^admin/password_change/$', handler404),
+        url(r'^admin/auth/user/\d+/password/$', handler404),
         url(r'^admin/', include(admin.site.urls)),
     ]
 
@@ -912,18 +896,6 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     ]
 
-if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
-    urlpatterns += [
-        url(r'^migrate/modules$', lms_migrate_views.manage_modulestores),
-        url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', lms_migrate_views.manage_modulestores),
-        url(
-            r'^migrate/reload/(?P<reload_dir>[^/]+)/(?P<commit_id>[^/]+)$',
-            lms_migrate_views.manage_modulestores
-        ),
-        url(r'^gitreload$', lms_migrate_views.gitreload),
-        url(r'^gitreload/(?P<reload_dir>[^/]+)$', lms_migrate_views.gitreload),
-    ]
-
 if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     urlpatterns += [
         url(r'^event_logs$', track_views.view_tracking_log),
@@ -964,9 +936,6 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     urlpatterns += [
         url(r'', include('third_party_auth.urls')),
         url(r'api/third_party_auth/', include('third_party_auth.api.urls')),
-        # NOTE: The following login_oauth_token endpoint is DEPRECATED.
-        # Please use the exchange_access_token endpoint instead.
-        url(r'^login_oauth_token/(?P<backend>[^/]+)/$', student_views.login_oauth_token),
     ]
 
 # Enterprise
@@ -1046,13 +1015,6 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
 
-
-# Custom error pages
-# These are used by Django to render these error codes. Do not remove.
-# pylint: disable=invalid-name
-handler404 = static_template_view_views.render_404
-handler500 = static_template_view_views.render_500
-
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.
 urlpatterns += [
     url(r'^api/', include('edx_proctoring.urls')),
@@ -1087,6 +1049,11 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
     urlpatterns += [
         url(r'^api-docs/$', get_swagger_view(title='LMS API')),
     ]
+
+# edx-drf-extensions csrf app
+urlpatterns += [
+    url(r'', include('csrf.urls')),
+]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
 

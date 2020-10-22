@@ -4,7 +4,6 @@ Tests for helpers.py
 import datetime
 import hashlib
 from mock import patch
-from nose.plugins.attrib import attr
 from pytz import UTC
 
 from django.test import TestCase
@@ -17,13 +16,14 @@ TEST_SIZES = {'full': 50, 'small': 10}
 TEST_PROFILE_IMAGE_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
 
 
-@attr(shard=2)
 @patch.dict('django.conf.settings.PROFILE_IMAGE_SIZES_MAP', TEST_SIZES, clear=True)
 @skip_unless_lms
 class ProfileImageUrlTestCase(TestCase):
     """
     Tests for profile image URL generation helpers.
     """
+    shard = 2
+
     def setUp(self):
         super(ProfileImageUrlTestCase, self).setUp()
         self.user = UserFactory()

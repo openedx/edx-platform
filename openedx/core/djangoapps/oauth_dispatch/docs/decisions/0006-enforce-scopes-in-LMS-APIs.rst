@@ -72,13 +72,11 @@ unprotected microservices.
   make the new keys available to a microservice only after they
   have been updated to enforce OAuth Scopes.
 
-  * edx_rest_framework_extensions.settings_ supports having a list of
-    JWT_ISSUERS instead of just a single one.
-
-  * The `edx-platform settings`_ will be updated to have a list of
-    JWT_ISSUERS instead of a single JWT_ISSUER in its settings (example_).
-    A separate settings field will keep track of which is the new issuer
-    key that is to be used for signing tokens for Restricted Application.
+  * The `edx-platform settings`_ will be updated to support a new signing
+    key. Since this transition to using a new key will happen as a staged
+    rollout, we will take this opportunity to have the new signing key be
+    an asymmetric key, rather than the current (not as secure) shared
+    symmetric key.
 
   * oauth_dispatch.views.AccessTokenView.dispatch_ will be updated to
     pass the new JWT key to JwtBuilder_, but only if
@@ -90,12 +88,10 @@ unprotected microservices.
     JWT tokens for Restricted Applications, but ONLY if:
 
     * the token_type in the request equals *"jwt"* and
-    * a `feature toggle (switch)`_ named "oauth2.unexpired_restricted_applications"
+    * a `feature toggle (switch)`_ named "oauth2.enforce_jwt_scopes"
       is enabled.
 
-.. _edx_rest_framework_extensions.settings: https://github.com/edx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/edx_rest_framework_extensions/settings.py#L73
 .. _edx-platform settings: https://github.com/edx/edx-platform/blob/master/lms/envs/docs/README.rst
-.. _example: https://github.com/edx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/test_settings.py#L51
 .. _JwtBuilder: https://github.com/edx/edx-platform/blob/d3d64970c36f36a96d684571ec5b48ed645618d8/openedx/core/lib/token_utils.py#L15
 .. _oauth_dispatch.views.AccessTokenView.dispatch: https://github.com/edx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/djangoapps/oauth_dispatch/views.py#L100
 .. _oauth_dispatch.validators: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/dot_overrides/validators.py
@@ -193,7 +189,8 @@ See 0007-include-organizations-in-tokens_ for decisions on this.
 .. _function-based Django views: https://docs.djangoproject.com/en/2.0/topics/http/views/
 .. _Django Rest Framework (DRF): http://www.django-rest-framework.org/
 .. _Python decorator: http://www.django-rest-framework.org/tutorial/2-requests-and-responses/#wrapping-api-views
-.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/edx_rest_framework_extensions/authentication.py#L153
+.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/4569b9bf7e54a917d4acdd545b10c058c960dd1a/edx_rest_framework_extensions/auth/jwt/authentication.py#L17
+
 
 Consequences
 ------------

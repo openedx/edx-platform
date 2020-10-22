@@ -12,4 +12,4 @@ class EnterpriseSupportConfig(AppConfig):
 
     def ready(self):
         # Import signals to activate signal handler for enterprise.
-        from . import signals  # pylint: disable=unused-import, unused-variable
+        from . import signals  # pylint: disable=unused-variable

@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, Paginator
 from django.urls import reverse
-from django.db import transaction
 from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -253,7 +252,6 @@ def users_in_cohort(request, course_key_string, cohort_id):
                                'users': user_info})
 
 
-@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @require_POST
 def add_users_to_cohort(request, course_key_string, cohort_id):

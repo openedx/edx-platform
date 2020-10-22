@@ -4,8 +4,6 @@ Test the Studio help links.
 
 from unittest import skip
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.asset_index import AssetIndexPageStudioFrontend
@@ -35,6 +33,7 @@ from common.test.acceptance.tests.helpers import (
     url_for_help
 )
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase, StudioCourseTest, StudioLibraryTest
+from openedx.core.lib.tests import attr
 
 
 def _get_expected_documentation_url(path):

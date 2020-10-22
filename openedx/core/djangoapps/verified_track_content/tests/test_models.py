@@ -2,7 +2,6 @@
 Tests for Verified Track Cohorting models
 """
 # pylint: disable=attribute-defined-outside-init
-# pylint: disable=no-member
 
 import ddt
 import mock

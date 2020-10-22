@@ -6,8 +6,7 @@ import datetime
 from unittest import skip
 from uuid import uuid4
 
-from nose.plugins.attrib import attr
-from nose.tools import nottest
+import pytest
 from pytz import UTC
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -33,6 +32,7 @@ from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, skip_if_browser
+from openedx.core.lib.tests import attr
 
 
 THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
@@ -414,7 +414,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
             Response(id="response1"),
             [Comment(id="comment1")])
         thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
+        self.setup_thread_page(thread.get("id"))
 
         # Verify that `Add a Post` is not visible on course tab nav.
         self.assertFalse(self.tab_nav.has_new_post_button_visible_on_tab())
@@ -1052,9 +1052,8 @@ class InlineDiscussionTest(UniqueCourseTest):
         self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
         self.additional_discussion_page = InlineDiscussionPage(self.browser, self.additional_discussion_id)
 
-    # This test is too flaky to run at all. TNL-6215
     @attr('a11y')
-    @nottest
+    @pytest.mark.skip(reason='This test is too flaky to run at all. TNL-6215')
     def test_inline_a11y(self):
         """
         Tests Inline Discussion for accessibility issues.

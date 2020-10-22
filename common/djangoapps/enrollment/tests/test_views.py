@@ -17,7 +17,6 @@ from django.urls import reverse
 from django.test import Client
 from django.test.utils import override_settings
 from mock import patch
-from nose.plugins.attrib import attr
 from rest_framework import status
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -29,15 +28,16 @@ from enrollment import api
 from enrollment.errors import CourseEnrollmentError
 from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserRetirementStatus,
     UserOrgTag
 )
 from openedx.core.lib.django_test_client_utils import get_absolute_url
-from openedx.core.lib.token_utils import JwtBuilder
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import (
@@ -68,6 +68,7 @@ class EnrollmentTestMixin(object):
             min_mongo_calls=0,
             max_mongo_calls=0,
             linked_enterprise_customer=None,
+            cohort=None,
     ):
         """
         Enroll in the course and verify the response's status code. If the expected status is 200, also validates
@@ -96,6 +97,9 @@ class EnrollmentTestMixin(object):
 
         if linked_enterprise_customer is not None:
             data['linked_enterprise_customer'] = linked_enterprise_customer
+
+        if cohort is not None:
+            data['cohort'] = cohort
 
         extra = {}
         if as_server:
@@ -149,7 +153,6 @@ class EnrollmentTestMixin(object):
         return json.loads(resp.content)
 
 
-@attr(shard=3)
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -157,6 +160,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
     """
     Test user enrollment, especially with different course modes.
     """
+    shard = 3
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
@@ -576,6 +580,28 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             throttle.parse_rate(throttle.get_rate())
         except ImproperlyConfigured:
             self.fail("No throttle rate set for {}".format(user_scope))
+
+    def test_create_enrollment_with_cohort(self):
+        """Enroll in the course, and also add to a cohort."""
+        # Create a cohort
+        cohort_name = 'masters'
+        cohorts.set_course_cohorted(self.course.id, True)
+        cohorts.add_cohort(self.course.id, cohort_name, 'test')
+        # Create an enrollment
+
+        self.assert_enrollment_status(cohort=cohort_name)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(cohorts.get_cohort(self.user, self.course.id, assign=False).name, cohort_name)
+
+    def test_create_enrollment_with_wrong_cohort(self):
+        """Enroll in the course, and also add to a cohort."""
+        # Create a cohort
+        cohorts.set_course_cohorted(self.course.id, True)
+        cohorts.add_cohort(self.course.id, 'masters', 'test')
+        # Create an enrollment
+        self.assert_enrollment_status(cohort='missing', expected_status=status.HTTP_400_BAD_REQUEST)
 
     def test_create_enrollment_with_mode(self):
         """With the right API key, create a new enrollment with a mode set other than the default."""
@@ -1314,7 +1340,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         """
         Helper function for creating headers for the JWT authentication.
         """
-        token = JwtBuilder(user).build_token([])
+        token = create_jwt_for_user(user)
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
 
         return headers

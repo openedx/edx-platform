@@ -51,6 +51,8 @@ class MockGeneratedCertificate(object):
         self.course_id = course_id
         self.mode = mode
         self.status = status
+        self.created_date = datetime.now(pytz.UTC)
+        self.modified_date = datetime.now(pytz.UTC)
 
     def is_valid(self):
         """
@@ -121,3 +123,47 @@ class CertificatesApiTestCase(TestCase):
         self.certificate.status = certificate_status
 
         self.assertEqual(expected_value, api.is_certificate_valid(self.certificate))
+
+    @ddt.data(
+        (CourseMode.VERIFIED, CertificateStatuses.downloadable, True),
+        (CourseMode.VERIFIED, CertificateStatuses.notpassing, False),
+        (CourseMode.AUDIT, CertificateStatuses.downloadable, False)
+    )
+    @ddt.unpack
+    def test_available_date(self, enrollment_mode, certificate_status, expected_value):
+        self.enrollment.mode = enrollment_mode
+        self.enrollment.save()
+
+        self.certificate.mode = CourseMode.VERIFIED
+        self.certificate.status = certificate_status
+
+        self.assertEqual(expected_value, api.is_certificate_valid(self.certificate))
+
+    @ddt.data(
+        (True, True, False),  # feature enabled and self-paced should return False
+        (True, False, True),  # feature enabled and instructor-paced should return True
+        (False, True, False),  # feature not enabled and self-paced should return False
+        (False, False, False),  # feature not enabled and instructor-paced should return False
+    )
+    @ddt.unpack
+    def test_available_vs_display_date(
+            self, feature_enabled, is_self_paced, uses_avail_date
+    ):
+        self.course.self_paced = is_self_paced
+        with configure_waffle_namespace(feature_enabled):
+
+            # With no available_date set, both return modified_date
+            self.assertEqual(self.certificate.modified_date, api.available_date_for_certificate(self.course, self.certificate))
+            self.assertEqual(self.certificate.modified_date, api.display_date_for_certificate(self.course, self.certificate))
+
+            # With an available date set in the past, both return the available date (if configured)
+            self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=pytz.UTC)
+            maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
+            self.assertEqual(maybe_avail, api.available_date_for_certificate(self.course, self.certificate))
+            self.assertEqual(maybe_avail, api.display_date_for_certificate(self.course, self.certificate))
+
+            # With a future available date, they each return a different date
+            self.course.certificate_available_date = datetime.max.replace(tzinfo=pytz.UTC)
+            maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
+            self.assertEqual(maybe_avail, api.available_date_for_certificate(self.course, self.certificate))
+            self.assertEqual(self.certificate.modified_date, api.display_date_for_certificate(self.course, self.certificate))

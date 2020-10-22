@@ -158,7 +158,7 @@ img {
   pointer-events: none;
   opacity: 0;
 
-  @include transition(opacity .1s linear 0s);
+  @include transition(opacity 0.1s linear 0s);
 
   &::after {
     content: '▾';
@@ -192,12 +192,12 @@ img {
   padding: 15px 20px 17px;
   border-radius: 3px;
   border: 1px solid $border-color-3;
-  background: -webkit-linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0)) rgba(30, 30, 30, .92);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
+  background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0)) rgba(30, 30, 30, 0.92);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
   font-size: 13px;
   color: $white;
   opacity: 0;
-  -webkit-transition: all .2s;
+  -webkit-transition: all 0.2s;
 
   p, span {
     color: $white;

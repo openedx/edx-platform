@@ -59,7 +59,7 @@ class ThirdPartyAuthTestMixin(object):
         # Django's FileSystemStorage will rename files if they already exist.
         # This storage backend overwrites files instead, which makes it easier
         # to make assertions about filenames.
-        icon_image_field = OAuth2ProviderConfig._meta.get_field('icon_image')  # pylint: disable=protected-access
+        icon_image_field = OAuth2ProviderConfig._meta.get_field('icon_image')
         patch = mock.patch.object(icon_image_field, 'storage', OverwriteStorage())
         patch.start()
         self.addCleanup(patch.stop)

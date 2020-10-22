@@ -1,7 +1,7 @@
 """
 Test grading with access changes.
 """
-# pylint: disable=protected-access
+from crum import set_current_request
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
@@ -69,6 +69,7 @@ class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreT
 
     def setUp(self):
         super(GradesAccessIntegrationTest, self).setUp()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.student = self.request.user
         self.client.login(username=self.student.username, password="test")

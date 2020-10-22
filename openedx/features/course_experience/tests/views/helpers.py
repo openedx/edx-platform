@@ -25,5 +25,5 @@ def add_course_mode(course, upgrade_deadline_expired=False):
         mode_slug=CourseMode.VERIFIED,
         mode_display_name="Verified Certificate",
         min_price=TEST_COURSE_PRICE,
-        _expiration_datetime=upgrade_exp_date,  # pylint: disable=protected-access
+        _expiration_datetime=upgrade_exp_date,
     ).save()

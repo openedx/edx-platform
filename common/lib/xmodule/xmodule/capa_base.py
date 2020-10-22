@@ -952,7 +952,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         self.lcp.update_score(score_msg, queuekey)
         self.set_state_from_lcp()
         self.set_score(self.score_from_lcp())
-        self.publish_grade()
+        self.publish_grade(grader_response=True)
 
         return dict()  # No AJAX return is needed
 
@@ -1131,21 +1131,21 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         return answers
 
-    def publish_grade(self, score=None, only_if_higher=None):
+    def publish_grade(self, score=None, only_if_higher=None, **kwargs):
         """
         Publishes the student's current grade to the system as an event
         """
         if not score:
             score = self.score
-        self.runtime.publish(
-            self,
-            'grade',
-            {
-                'value': score.raw_earned,
-                'max_value': score.raw_possible,
-                'only_if_higher': only_if_higher,
-            }
-        )
+        event = {
+            'value': score.raw_earned,
+            'max_value': score.raw_possible,
+            'only_if_higher': only_if_higher,
+        }
+        if kwargs.get('grader_response'):
+            event['grader_response'] = kwargs['grader_response']
+
+        self.runtime.publish(self, 'grade', event)
 
         return {'grade': self.score.raw_earned, 'max_grade': self.score.raw_possible}
 
@@ -1216,7 +1216,12 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 }
 
         try:
+            # expose the attempt number to a potential python custom grader
+            # self.lcp.context['attempt'] refers to the attempt number (1-based)
+            self.lcp.context['attempt'] = self.attempts + 1
             correct_map = self.lcp.grade_answers(answers)
+            # self.attempts refers to the number of attempts that did not
+            # raise an error (0-based)
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()
@@ -1262,7 +1267,6 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 msg += u'\nTraceback:\n{}'.format(traceback.format_exc())
                 return {'success': msg}
             raise
-
         published_grade = self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
@@ -1679,6 +1683,9 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         Operates by creating a new correctness map based on the current
         state of the LCP, and updating the old correctness map of the LCP.
         """
+        # Make sure that the attempt number is always at least 1 for grading purposes,
+        # even if the number of attempts have been reset and this problem is regraded.
+        self.lcp.context['attempt'] = max(self.attempts, 1)
         new_correct_map = self.lcp.get_grade_from_current_answers(None)
         self.lcp.correct_map.update(new_correct_map)
 

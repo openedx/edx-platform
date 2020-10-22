@@ -3,9 +3,8 @@
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from openedx.core.lib.tests import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.bookmarks import BookmarksPage

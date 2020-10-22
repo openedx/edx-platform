@@ -1598,11 +1598,9 @@ class NumericalResponse(LoncapaResponse):
         # Catch a bunch of exceptions and give nicer messages to the student.
         try:
             student_float = evaluator({}, {}, student_answer)
-        except UndefinedVariable as undef_var:
+        except UndefinedVariable as err:
             raise StudentInputError(
-                _(u"You may not use variables ({bad_variables}) in numerical problems.").format(
-                    bad_variables=text_type(undef_var),
-                )
+                err.args[0]
             )
         except UnmatchedParenthesis as err:
             raise StudentInputError(
@@ -3110,7 +3108,7 @@ class FormulaResponse(LoncapaResponse):
                     cgi.escape(answer)
                 )
                 raise StudentInputError(
-                    _("Invalid input: {bad_input} not permitted in answer.").format(bad_input=text_type(err))
+                    err.args[0]
                 )
             except UnmatchedParenthesis as err:
                 log.debug(

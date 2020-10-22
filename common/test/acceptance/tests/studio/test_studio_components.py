@@ -2,7 +2,6 @@
 Acceptance tests for adding components in Studio.
 """
 import ddt
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.container import ContainerPage
@@ -11,13 +10,14 @@ from common.test.acceptance.pages.studio.utils import add_component, add_compone
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
 
-@attr(shard=22)
 @ddt.ddt
 class AdvancedProblemComponentTest(ContainerBase):
     """
     Feature: CMS.Component Adding
     As a course author, I want to be able to add a wide variety of components
     """
+    shard = 22
+
     def setUp(self, is_staff=True):
         """
         Create a course with a section, subsection, and unit to which to add the component.
@@ -70,12 +70,13 @@ class AdvancedProblemComponentTest(ContainerBase):
         self.assertEqual(problem.name, component)
 
 
-@attr(shard=22)
 class ComponentTest(ContainerBase):
     """
     Test class to add different components.
     (Not the advanced components)
     """
+    shard = 22
+
     def setUp(self, is_staff=True):
         """
         Create a course with a section, subsection, and unit to which to add the component.

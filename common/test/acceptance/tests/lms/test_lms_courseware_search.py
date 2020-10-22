@@ -3,8 +3,6 @@ Test courseware search
 """
 import json
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
@@ -17,7 +15,6 @@ from common.test.acceptance.pages.studio.utils import add_html_component, type_i
 from common.test.acceptance.tests.helpers import UniqueCourseTest, remove_file
 
 
-@attr(shard=5)
 class CoursewareSearchTest(UniqueCourseTest):
     """
     Test courseware search.
@@ -41,6 +38,7 @@ class CoursewareSearchTest(UniqueCourseTest):
     EDITED_SEARCH_STRING = "edited"
 
     TEST_INDEX_FILENAME = "test_root/index_file.dat"
+    shard = 5
 
     def setUp(self):
         """

@@ -9,8 +9,12 @@ import ddt
 import httpretty
 from django.conf import settings
 from django.urls import reverse
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from mock import call, patch
+
+from Cryptodome.PublicKey import RSA
+from jwkest import jwk
+
 from oauth2_provider import models as dot_models
 from organizations.tests.factories import OrganizationFactory
 
@@ -167,6 +171,20 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
         return body
 
+    def _generate_key_pair(self):
+        """ Generates an asymmetric key pair and returns the JWK of its public keys and keypair. """
+        rsa_key = RSA.generate(2048)
+        rsa_jwk = jwk.RSAKey(kid="key_id", key=rsa_key)
+
+        public_keys = jwk.KEYS()
+        public_keys.append(rsa_jwk)
+        serialized_public_keys_json = public_keys.dump_jwks()
+
+        serialized_keypair = rsa_jwk.serialize(private=True)
+        serialized_keypair_json = json.dumps(serialized_keypair)
+
+        return serialized_public_keys_json, serialized_keypair_json
+
     @ddt.data('dop_app', 'dot_app')
     def test_access_token_fields(self, client_attr):
         client = getattr(self, client_attr)
@@ -217,7 +235,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         (None, 'no_token_type_supplied'),
     )
     @ddt.unpack
-    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    @patch('edx_django_utils.monitoring.set_custom_metric')
     def test_access_token_metrics(self, token_type, expected_token_type, mock_set_custom_metric):
         response = self._post_request(self.user, self.dot_app, token_type=token_type)
         self.assertEqual(response.status_code, 200)
@@ -227,7 +245,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         ]
         mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
-    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    @patch('edx_django_utils.monitoring.set_custom_metric')
     def test_access_token_metrics_for_bad_request(self, mock_set_custom_metric):
         grant_type = dot_models.Application.GRANT_PASSWORD
         invalid_body = {
@@ -242,12 +260,11 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
     @ddt.data(
-        (False, True, settings.DEFAULT_JWT_ISSUER),
-        (True, False, settings.RESTRICTED_APPLICATION_JWT_ISSUER),
+        (False, True),
+        (True, False),
     )
     @ddt.unpack
-    def test_restricted_jwt_access_token(self, enforce_jwt_scopes_enabled, expiration_expected,
-                                         jwt_issuer_expected):
+    def test_restricted_jwt_access_token(self, enforce_jwt_scopes_enabled, expiration_expected):
         """
         Verify that when requesting a JWT token from a restricted Application
         within the DOT subsystem, that our claims is marked as already expired
@@ -266,7 +283,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
                 self.user,
                 data['scope'].split(' '),
                 should_be_expired=expiration_expected,
-                jwt_issuer=jwt_issuer_expected,
+                should_be_asymmetric_key=enforce_jwt_scopes_enabled,
                 should_be_restricted=True,
             )
 
@@ -323,7 +340,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             organization=OrganizationFactory()
         )
         scopes = dot_app_access.scopes
-        filters = self.dot_adapter.get_authorization_filters(dot_app.client_id)
+        filters = self.dot_adapter.get_authorization_filters(dot_app)
         response = self._post_request(self.user, dot_app, token_type='jwt', scope=scopes)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
@@ -570,13 +587,13 @@ class TestViewDispatch(TestCase):
         ]
         mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
-    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    @patch('edx_django_utils.monitoring.set_custom_metric')
     def test_dispatching_post_to_dot(self, mock_set_custom_metric):
         request = self._post_request('dot-id')
         self.assertEqual(self.view.select_backend(request), self.dot_adapter.backend)
         self._verify_oauth_metrics_calls(mock_set_custom_metric, 'dot')
 
-    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    @patch('edx_django_utils.monitoring.set_custom_metric')
     def test_dispatching_post_to_dop(self, mock_set_custom_metric):
         request = self._post_request('dop-id')
         self.assertEqual(self.view.select_backend(request), self.dop_adapter.backend)
@@ -658,36 +675,39 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
             'token': token,
         }
 
-    def _assert_refresh_token_invalidated(self):
+    def assert_refresh_token_status_code(self, refresh_token, expected_status_code):
         """
-        Asserts that oauth assigned refresh_token is not valid
+        Asserts the status code using oauth assigned refresh_token
         """
         response = self.client.post(
             self.access_token_url,
-            self.access_token_post_body_with_refresh_token(self.refresh_token)
+            self.access_token_post_body_with_refresh_token(refresh_token)
         )
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, expected_status_code)
 
-    def verify_revoke_token(self, token):
+    def revoke_token(self, token):
         """
-        Verifies access of token before and after revoking
+        Revokes the passed access or refresh token
         """
-        self._assert_access_token_is_valid()
-
         response = self.client.post(self.revoke_token_url, self.revoke_token_post_body(token))
         self.assertEqual(response.status_code, 200)
 
-        self._assert_access_token_invalidated()
-        self._assert_refresh_token_invalidated()
-
     def test_revoke_refresh_token_dot(self):
         """
-        Tests invalidation/revoke of user tokens against refresh token for django-oauth-toolkit
+        Tests invalidation/revoke of refresh token for django-oauth-toolkit
         """
-        self.verify_revoke_token(self.refresh_token)
+        self.assert_refresh_token_status_code(self.refresh_token, expected_status_code=200)
+
+        self.revoke_token(self.refresh_token)
+
+        self.assert_refresh_token_status_code(self.refresh_token, expected_status_code=401)
 
     def test_revoke_access_token_dot(self):
         """
         Tests invalidation/revoke of user access token for django-oauth-toolkit
         """
-        self.verify_revoke_token(self.access_token)
+        self._assert_access_token_is_valid(self.access_token)
+
+        self.revoke_token(self.access_token)
+
+        self._assert_access_token_invalidated(self.access_token)

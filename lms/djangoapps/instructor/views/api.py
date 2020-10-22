@@ -104,6 +104,7 @@ from student.models import (
     UNENROLLED_TO_ENROLLED,
     UNENROLLED_TO_UNENROLLED,
     CourseEnrollment,
+    CourseEnrollmentAllowed,
     EntranceExamConfiguration,
     ManualEnrollmentAudit,
     Registration,
@@ -227,7 +228,7 @@ def require_level(level):
         raise ValueError("unrecognized level '{}'".format(level))
 
     def decorator(func):  # pylint: disable=missing-docstring
-        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):
             request = args[0]
             course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
@@ -575,7 +576,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
         try:
             # It's a new user, an email will be sent to each newly created user.
             email_params.update({
-                'message': 'account_creation_and_enrollment',
+                'message_type': 'account_creation_and_enrollment',
                 'email_address': email,
                 'password': password,
                 'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
@@ -1827,7 +1828,7 @@ def spent_registration_codes(request, course_id):
 
         company_name = request.POST['spent_company_name']
         if company_name:
-            spent_codes_list = spent_codes_list.filter(invoice_item__invoice__company_name=company_name)  # pylint: disable=maybe-no-member
+            spent_codes_list = spent_codes_list.filter(invoice_item__invoice__company_name=company_name)
 
     csv_type = 'spent'
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
@@ -1870,6 +1871,63 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_post_params(
+    unique_student_identifier="email or username of student for whom to get enrollment status"
+)
+def get_student_enrollment_status(request, course_id):
+    """
+    Get the enrollment status of a student.
+    Limited to staff access.
+
+    Takes query parameter unique_student_identifier
+    """
+
+    error = ''
+    user = None
+    mode = None
+    is_active = None
+
+    course_id = CourseKey.from_string(course_id)
+    unique_student_identifier = request.POST.get('unique_student_identifier')
+
+    try:
+        user = get_student_from_identifier(unique_student_identifier)
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
+    except User.DoesNotExist:
+        # The student could have been invited to enroll without having
+        # registered. We'll also look at CourseEnrollmentAllowed
+        # records, so let the lack of a User slide.
+        pass
+
+    enrollment_status = _('Enrollment status for {student}: unknown').format(student=unique_student_identifier)
+
+    if user and mode:
+        if is_active:
+            enrollment_status = _('Enrollment status for {student}: active').format(student=user)
+        else:
+            enrollment_status = _('Enrollment status for {student}: inactive').format(student=user)
+    else:
+        email = user.email if user else unique_student_identifier
+        allowed = CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id)
+        if allowed and email in [cea.email for cea in allowed]:
+            enrollment_status = _('Enrollment status for {student}: pending').format(student=email)
+        else:
+            enrollment_status = _('Enrollment status for {student}: never enrolled').format(student=email)
+
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'error': error,
+        'enrollment_status': enrollment_status
+    }
+
+    return JsonResponse(response_payload)
+
+
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@common_exceptions_400
 @require_level('staff')
 @require_post_params(
     unique_student_identifier="email or username of student for whom to get progress url"
@@ -1990,7 +2048,7 @@ def reset_student_attempts(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @common_exceptions_400
-def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: disable=invalid-name
+def reset_student_attempts_for_entrance_exam(request, course_id):
     """
 
     Resets a students attempts counter or starts a task to reset all students
@@ -2341,7 +2399,7 @@ def list_instructor_tasks(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=invalid-name
+def list_entrance_exam_instructor_tasks(request, course_id):
     """
     List entrance exam related instructor tasks.
 
@@ -2879,7 +2937,7 @@ def enable_certificate_generation(request, course_id=None):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=invalid-name
+def mark_student_can_skip_entrance_exam(request, course_id):
     """
     Mark a student to skip entrance exam.
     Takes `unique_student_identifier` as required POST parameter.
@@ -3190,7 +3248,7 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable=invalid-name
+def generate_bulk_certificate_exceptions(request, course_id):
     """
     Add Students to certificate white list from the uploaded csv file.
     :return response in dict format.

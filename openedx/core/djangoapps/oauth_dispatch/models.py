@@ -12,7 +12,7 @@ from organizations.models import Organization
 from pytz import utc
 
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
-from openedx.core.djangoapps.request_cache import get_request_or_stub
+from openedx.core.lib.request_utils import get_request_or_stub
 
 
 class RestrictedApplication(models.Model):

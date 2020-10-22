@@ -5,9 +5,9 @@ Tests for `field_overrides` module.
 import unittest
 
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from xblock.field_data import DictFieldData
 
+from openedx.core.lib.tests import attr
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

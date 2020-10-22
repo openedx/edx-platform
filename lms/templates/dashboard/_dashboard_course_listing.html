@@ -184,8 +184,8 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     </span>
                   </a>
                 % elif not is_course_blocked:
-                  <a href="${course_target}" 
-                     class="enter-course ${'hidden' if is_unfulfilled_entitlement else ''}" 
+                  <a href="${course_target}"
+                     class="enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
                      data-course-key="${enrollment.course_id}">
                     ${_('View Course')}
                     <span class="sr">
@@ -202,6 +202,14 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                   </a>
                 % endif
               % endif
+            % elif hasattr(show_courseware_link, 'user_message'):
+              <span class="enter-course-blocked"
+                 data-course-key="${enrollment.course_id}">
+                ${show_courseware_link.user_message}
+                <span class="sr">
+                  &nbsp;${_('for {course_display_name}').format(course_display_name=course_overview.display_name_with_default)}
+                </span>
+              </span>
             % endif
 
             % if show_courseware_link or course_overview.has_social_sharing_url() or course_overview.has_marketing_url():

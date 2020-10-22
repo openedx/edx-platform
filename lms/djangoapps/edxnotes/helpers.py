@@ -24,7 +24,7 @@ from courseware.courses import get_current_child
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
-from openedx.core.lib.token_utils import JwtBuilder
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
@@ -59,12 +59,7 @@ def get_edxnotes_id_token(user):
         raise ImproperlyConfigured(
             'OAuth2 Client with name [{}] does not exist.'.format(CLIENT_NAME)
         )
-
-    scopes = ['email', 'profile']
-    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-    jwt = JwtBuilder(user, secret=client.client_secret).build_token(scopes, expires_in, aud=client.client_id)
-
-    return jwt
+    return create_jwt_for_user(user, secret=client.client_secret, aud=client.client_id)
 
 
 def get_token_url(course_id):
@@ -131,7 +126,7 @@ def delete_all_notes_for_user(user):
     Raises:
         EdxNotesServiceUnavailable - when notes api is not found/misconfigured.
     """
-    url = get_internal_endpoint('annotations')
+    url = get_internal_endpoint('retire_annotations')
     headers = {
         "x-annotator-auth-token": get_edxnotes_id_token(user),
     }
@@ -139,7 +134,7 @@ def delete_all_notes_for_user(user):
         "user": anonymous_id_for_user(user, None)
     }
     try:
-        response = requests.delete(
+        response = requests.post(
             url=url,
             headers=headers,
             data=data,

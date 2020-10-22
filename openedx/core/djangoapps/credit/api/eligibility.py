@@ -277,7 +277,6 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
                 log.exception("Error sending email")
 
 
-# pylint: disable=invalid-name
 def remove_credit_requirement_status(username, course_key, req_namespace, req_name):
     """
     Remove the user's requirement status.

@@ -31,7 +31,7 @@ else
 fi
 
 echo "Running explicit accessibility tests..."
-SELENIUM_BROWSER=phantomjs $TOX paver test_a11y
+SELENIUM_BROWSER=chrome BOKCHOY_HEADLESS=true $TOX paver test_a11y
 
 # The settings that we use are installed with the pa11ycrawler module
 export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'

@@ -1,6 +1,8 @@
 """
 Utility methods for the account settings.
 """
+from __future__ import unicode_literals
+
 import random
 import re
 import string
@@ -102,24 +104,20 @@ def _is_valid_social_username(value):
     return '/' not in value
 
 
-def retrieve_last_sitewide_block_completed(username):
+def retrieve_last_sitewide_block_completed(user):
     """
     Completion utility
     From a string 'username' or object User retrieve
     the last course block marked as 'completed' and construct a URL
 
-    :param username: str(username) or obj(User)
+    :param user: obj(User)
     :return: block_lms_url
 
     """
     if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
         return
 
-    if not isinstance(username, User):
-        userobj = User.objects.get(username=username)
-    else:
-        userobj = username
-    latest_completions_by_course = BlockCompletion.latest_blocks_completed_all_courses(userobj)
+    latest_completions_by_course = BlockCompletion.latest_blocks_completed_all_courses(user)
 
     current_site_configuration = get_config_value_from_site_or_settings(
         name='course_org_filter',

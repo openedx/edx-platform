@@ -1,12 +1,13 @@
 # disable missing docstring
 # pylint: disable=missing-docstring
+# pylint: disable=no-member
 
 from collections import OrderedDict
 
 from lettuce import step, world
-from nose.tools import assert_equal, assert_false, assert_in, assert_true
 
 from common import get_codemirror_value, type_in_codemirror
+from openedx.core.lib.tests.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
 
 CODEMIRROR_SELECTOR_PREFIX = "$('iframe').contents().find"
 
@@ -32,7 +33,7 @@ def i_created_raw_html(step):
 
 
 @step('I see the HTML component settings$')
-def i_see_only_the_html_display_name(step):
+def i_see_only_the_html_display_name(_step):
     world.verify_all_setting_entries(
         [
             ['Display Name', "Text", False],
@@ -53,28 +54,12 @@ def i_created_etext_in_latex(step):
 
 
 @step('I edit the page$')
-def i_click_on_edit_icon(step):
+def i_click_on_edit_icon(_step):
     world.edit_component()
 
 
-@step('I add an image with static link "(.*)" via the Image Plugin Icon$')
-def i_click_on_image_plugin_icon(step, path):
-    use_plugin(
-        '.mce-i-image',
-        lambda: world.css_fill('.mce-textbox', path, 0)
-    )
-
-
-@step('the link is shown as "(.*)" in the Image Plugin$')
-def check_link_in_image_plugin(step, path):
-    use_plugin(
-        '.mce-i-image',
-        lambda: assert_equal(path, world.css_find('.mce-textbox')[0].value)
-    )
-
-
 @step('I add a link with static link "(.*)" via the Link Plugin Icon$')
-def i_click_on_link_plugin_icon(step, path):
+def i_click_on_link_plugin_icon(_step, path):
     def fill_in_link_fields():
         world.css_fill('.mce-textbox', path, 0)
         world.css_fill('.mce-textbox', 'picture', 1)
@@ -83,7 +68,7 @@ def i_click_on_link_plugin_icon(step, path):
 
 
 @step('the link is shown as "(.*)" in the Link Plugin$')
-def check_link_in_link_plugin(step, path):
+def check_link_in_link_plugin(_step, path):
     # Ensure caret position is within the link just created.
     script = """
     var editor = tinyMCE.activeEditor;
@@ -98,25 +83,25 @@ def check_link_in_link_plugin(step, path):
 
 
 @step('type "(.*)" in the code editor and press OK$')
-def type_in_codemirror_plugin(step, text):
+def type_in_codemirror_plugin(_step, text):
     # Verify that raw code editor is not visible.
-    assert_true(world.css_has_class('.CodeMirror', 'is-inactive'))
+    assert world.css_has_class('.CodeMirror', 'is-inactive')
     # Verify that TinyMCE editor is present
-    assert_true(world.is_css_present('.tiny-mce'))
+    assert world.is_css_present('.tiny-mce')
     use_code_editor(
         lambda: type_in_codemirror(0, text, CODEMIRROR_SELECTOR_PREFIX)
     )
 
 
 @step('and the code editor displays "(.*)"$')
-def verify_code_editor_text(step, text):
+def verify_code_editor_text(_step, text):
     use_code_editor(
         lambda: assert_equal(text, get_codemirror_value(0, CODEMIRROR_SELECTOR_PREFIX))
     )
 
 
 @step('I save the page$')
-def i_click_on_save(step):
+def i_click_on_save(_step):
     world.save_component()
 
 
@@ -131,7 +116,7 @@ def check_raw_editor_text(step):
 
 
 @step('the src link is rewritten to the asset link "(.*)"$')
-def image_static_link_is_rewritten(step, path):
+def image_static_link_is_rewritten(_step, path):
     # Find the TinyMCE iframe within the main window
     with world.browser.get_iframe('mce_0_ifr') as tinymce:
         image = tinymce.find_by_tag('img').first
@@ -139,7 +124,7 @@ def image_static_link_is_rewritten(step, path):
 
 
 @step('the href link is rewritten to the asset link "(.*)"$')
-def link_static_link_is_rewritten(step, path):
+def link_static_link_is_rewritten(_step, path):
     # Find the TinyMCE iframe within the main window
     with world.browser.get_iframe('mce_0_ifr') as tinymce:
         link = tinymce.find_by_tag('a').first
@@ -147,7 +132,7 @@ def link_static_link_is_rewritten(step, path):
 
 
 @step('the expected toolbar buttons are displayed$')
-def check_toolbar_buttons(step):
+def check_toolbar_buttons(_step):
     dropdowns = world.css_find('.mce-listbox')
     assert_equal(2, len(dropdowns))
 
@@ -184,12 +169,12 @@ def check_toolbar_buttons(step):
     assert_equal(len(expected_buttons), len(buttons))
 
     for index, button in enumerate(expected_buttons):
-        class_names = buttons[index]._element.get_attribute('class')
+        class_names = buttons[index]._element.get_attribute('class')  # pylint: disable=protected-access
         assert_equal("mce-ico mce-i-" + button, class_names)
 
 
 @step('I set the text to "(.*)" and I select the text$')
-def set_text_and_select(step, text):
+def set_text_and_select(_step, text):
     script = """
     var editor = tinyMCE.activeEditor;
     editor.setContent(arguments[0]);
@@ -199,35 +184,35 @@ def set_text_and_select(step, text):
 
 
 @step('I select the code toolbar button$')
-def select_code_button(step):
+def select_code_button(_step):
     # This is our custom "code style" button. It uses an image instead of a class.
     world.css_click(".mce-i-none")
 
 
 @step('type "(.*)" into the Raw Editor$')
-def type_in_raw_editor(step, text):
+def type_in_raw_editor(_step, text):
     # Verify that CodeMirror editor is not hidden
-    assert_false(world.css_has_class('.CodeMirror', 'is-inactive'))
+    assert not world.css_has_class('.CodeMirror', 'is-inactive')
     # Verify that TinyMCE Editor is not present
-    assert_true(world.is_css_not_present('.tiny-mce'))
+    assert world.is_css_not_present('.tiny-mce')
     type_in_codemirror(0, text)
 
 
 @step('I edit the component and select the (Raw|Visual) Editor$')
-def select_editor(step, editor):
+def select_editor(_step, editor):
     world.edit_component_and_select_settings()
     world.browser.select('Editor', editor)
 
 
 @step('I click font selection dropdown')
-def click_font_dropdown(step):
+def click_font_dropdown(_step):
     dropdowns = [drop for drop in world.css_find('.mce-listbox') if drop.text == 'Font Family']
     assert_equal(len(dropdowns), 1)
     dropdowns[0].click()
 
 
 @step('I should see a list of available fonts')
-def font_selector_dropdown_is_shown(step):
+def font_selector_dropdown_is_shown(_step):
     font_panel = get_fonts_list_panel(world)
     expected_fonts = list(CUSTOM_FONTS.keys()) + list(TINYMCE_FONTS.keys())
     actual_fonts = [font.strip() for font in font_panel.text.split('\n')]
@@ -244,7 +229,7 @@ def default_options_sets_expected_font_family(step):  # pylint: disable=unused-a
 
 
 @step('all standard tinyMCE fonts should be available')
-def check_standard_tinyMCE_fonts(step):
+def check_standard_tinyMCE_fonts(_step):
     fonts = get_available_fonts(get_fonts_list_panel(world))
     for label, expected_fonts in TINYMCE_FONTS.items():
         for expected_font in expected_fonts:
@@ -318,4 +303,4 @@ def get_font_family(font_span):
     # get_attribute('style').replace('font-family: ', '').replace(';', '') is equivalent to
     # value_of_css_property('font-family'). However, for reason unknown value_of_css_property fails tests in CI
     # while works as expected in local development environment
-    return font_span._element.get_attribute('style').replace('font-family: ', '').replace(';', '')
+    return font_span._element.get_attribute('style').replace('font-family: ', '').replace(';', '')  # pylint: disable=protected-access

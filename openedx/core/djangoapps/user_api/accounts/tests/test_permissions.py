@@ -28,7 +28,7 @@ class CanDeactivateUserTest(TestCase):
                 app_label='student'
             )
         )
-        user.user_permissions.add(permission)  # pylint: disable=no-member
+        user.user_permissions.add(permission)
         self.request.user = user
 
         result = CanDeactivateUser().has_permission(self.request, None)

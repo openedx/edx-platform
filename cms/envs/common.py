@@ -102,8 +102,6 @@ from lms.envs.common import (
     # to generating test databases will discover and try to create all tables
     # and this setting needs to be present
     OAUTH2_PROVIDER_APPLICATION_MODEL,
-    DEFAULT_JWT_ISSUER,
-    RESTRICTED_APPLICATION_JWT_ISSUER,
     JWT_AUTH,
 
     USERNAME_REGEX_PARTIAL,
@@ -204,9 +202,6 @@ FEATURES = {
     # an Open edX admin has added them to the course creator group.
     'ENABLE_CREATOR_GROUP': True,
 
-    # whether to use password policy enforcement or not
-    'ENFORCE_PASSWORD_POLICY': False,
-
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 
@@ -239,6 +234,10 @@ FEATURES = {
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
     'ENABLE_EDXNOTES': False,
+
+    # Show a new field in "Advanced settings" that can store custom data about a
+    # course and that can be read from themes
+    'ENABLE_OTHER_COURSE_SETTINGS': False,
 
     # Enable support for content libraries. Note that content libraries are
     # only supported in courses using split mongo.
@@ -471,9 +470,10 @@ XQUEUE_INTERFACE = {
 
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
-    'openedx.core.djangoapps.request_cache.middleware.RequestCache',
 
-    'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware',
+    # A newer and safer request cache.
+    'edx_django_utils.cache.middleware.RequestCacheMiddleware',
+    'edx_django_utils.monitoring.middleware.MonitoringMemoryMiddleware',
 
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
@@ -525,14 +525,21 @@ MIDDLEWARE_CLASSES = [
 
     'waffle.middleware.WaffleMiddleware',
 
-    'edx_rest_framework_extensions.middleware.EnsureJWTAuthSettingsMiddleware',
+    # Enables force_django_cache_miss functionality for TieredCache.
+    'edx_django_utils.cache.middleware.TieredCacheMiddleware',
+
+    # Outputs monitoring metrics for a request.
+    'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
+
+    'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
+    'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
     # This must be last so that it runs first in the process_response chain
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
 
-# Clickjacking protection can be enabled by setting this to 'DENY'
-X_FRAME_OPTIONS = 'ALLOW'
+# Clickjacking protection can be disabled by setting this to 'ALLOW'
+X_FRAME_OPTIONS = 'DENY'
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
@@ -919,7 +926,6 @@ CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 
 HIGH_PRIORITY_QUEUE = 'edx.core.high'
 DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
-LOW_PRIORITY_QUEUE = 'edx.core.low'
 
 CELERY_QUEUE_HA_POLICY = 'all'
 
@@ -930,7 +936,6 @@ CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
-    LOW_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
@@ -1112,6 +1117,7 @@ INSTALLED_APPS = [
     # These are apps that aren't strictly needed by Studio, but are imported by
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
+    'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
     'oauth_provider',
     'courseware',
     'survey.apps.SurveyConfig',
@@ -1243,12 +1249,23 @@ EVENT_TRACKING_BACKENDS = {
 EVENT_TRACKING_PROCESSORS = []
 
 #### PASSWORD POLICY SETTINGS #####
-
-PASSWORD_MIN_LENGTH = None
-PASSWORD_MAX_LENGTH = None
-PASSWORD_COMPLEXITY = {}
-PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
-PASSWORD_DICTIONARY = []
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "util.password_policy_validators.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 2
+        }
+    },
+    {
+        "NAME": "util.password_policy_validators.MaximumLengthValidator",
+        "OPTIONS": {
+            "max_length": 75
+        }
+    },
+]
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
@@ -1282,6 +1299,7 @@ OPTIONAL_APPS = (
     ('integrated_channels.integrated_channel', None),
     ('integrated_channels.degreed', None),
     ('integrated_channels.sap_success_factors', None),
+    ('integrated_channels.xapi', None),
 )
 
 
@@ -1496,19 +1514,22 @@ COURSE_CATALOG_API_URL = None
 ############################# Persistent Grades ####################################
 
 # Queue to use for updating persistent grades
-RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
+RECALCULATE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 # Queue to use for updating grades due to grading policy change
-POLICY_CHANGE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
+POLICY_CHANGE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 # Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
 ############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
+COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ########## Settings for video transcript migration tasks ############
-VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = LOW_PRIORITY_QUEUE
+VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
+
+########## Settings youtube thumbnails scraper tasks ############
+SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ###################### VIDEO IMAGE STORAGE ######################
 

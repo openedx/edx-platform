@@ -7,7 +7,7 @@ from django.contrib import admin
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
 
-class ProgramsApiConfigAdmin(ConfigurationModelAdmin):  # pylint: disable=missing-docstring
+class ProgramsApiConfigAdmin(ConfigurationModelAdmin):
     pass
 
 

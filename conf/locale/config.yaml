@@ -120,6 +120,18 @@ ignore_dirs:
     # Directories full of auto-generated JS
     - lms/static/js/i18n
     - cms/static/js/i18n
+    # Directories with 3rd party apps.
+    - src/acid-xblock
+    - src/code-block-timer
+    - src/codejail
+    - src/django-wiki
+    - src/done-xblock
+    - src/edx-jsme
+    - src/parse-rest
+    - src/pygeoip
+    - src/pystache-custom
+    - src/rate-xblock
+    - src/xblock-google-drive
 
 
 # Third-party installed apps that we also extract strings from.  When adding a

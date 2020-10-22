@@ -217,11 +217,11 @@ def instructor_dashboard_2(request, course_id):
     disable_buttons = not _is_small_course(course_key)
 
     certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
-    generate_certificate_exceptions_url = reverse(  # pylint: disable=invalid-name
+    generate_certificate_exceptions_url = reverse(
         'generate_certificate_exceptions',
         kwargs={'course_id': unicode(course_key), 'generate_for': ''}
     )
-    generate_bulk_certificate_exceptions_url = reverse(  # pylint: disable=invalid-name
+    generate_bulk_certificate_exceptions_url = reverse(
         'generate_bulk_certificate_exceptions',
         kwargs={'course_id': unicode(course_key)}
     )
@@ -230,7 +230,7 @@ def instructor_dashboard_2(request, course_id):
         kwargs={'course_id': unicode(course_key)}
     )
 
-    certificate_invalidation_view_url = reverse(  # pylint: disable=invalid-name
+    certificate_invalidation_view_url = reverse(
         'certificate_invalidation_view',
         kwargs={'course_id': unicode(course_key)}
     )
@@ -586,6 +586,10 @@ def _section_student_admin(course, access):
         'section_display_name': _('Student Admin'),
         'access': access,
         'is_small_course': is_small_course,
+        'get_student_enrollment_status_url': reverse(
+            'get_student_enrollment_status',
+            kwargs={'course_id': unicode(course_key)}
+        ),
         'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': unicode(course_key)}),
         'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': unicode(course_key)}),

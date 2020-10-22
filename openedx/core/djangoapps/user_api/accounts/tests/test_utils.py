@@ -115,31 +115,17 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, FilteredQueryCountMixin
             )
 
     @override_settings(LMS_ROOT_URL='test_url:9999')
-    @ddt.unpack
-    @ddt.data({
-        'use_username': True,
-        'engaged_queries': 3,
-        'cruft_queries': 2,
-    }, {
-        'use_username': False,
-        'engaged_queries': 2,
-        'cruft_queries': 1,
-    })
-    def test_retrieve_last_sitewide_block_completed(self, use_username, engaged_queries, cruft_queries):
+    def test_retrieve_last_sitewide_block_completed(self):
         """
         Test that the method returns a URL for the "last completed" block
         when sending a user object
         """
-        with self.assertNumQueries(engaged_queries):
-            block_url = retrieve_last_sitewide_block_completed(
-                self.engaged_user.username if use_username else self.engaged_user
-            )
-
-        with self.assertNumQueries(cruft_queries):
-            empty_block_url = retrieve_last_sitewide_block_completed(
-                self.cruft_user.username if use_username else self.cruft_user
-            )
-
+        block_url = retrieve_last_sitewide_block_completed(
+            self.engaged_user.username if use_username else self.engaged_user
+        )
+        empty_block_url = retrieve_last_sitewide_block_completed(
+            self.cruft_user.username if use_username else self.cruft_user
+        )
         self.assertEqual(
             block_url,
             # Appsembler: We're omitting the domain name because our users are always on a single site.

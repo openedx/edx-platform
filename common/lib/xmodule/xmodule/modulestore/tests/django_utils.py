@@ -8,7 +8,7 @@ import os
 from contextlib import contextmanager
 from enum import Enum
 
-from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from courseware.tests.factories import StaffFactory
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
@@ -271,7 +271,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
 
     # List of modulestore signals enabled for this test. Defaults to an empty
     # list. The list of signals available is found on the SignalHandler class,
-    # in /common/lib/xmodule/xmodule/modulestore/django.py
+    # in /common/lib/xmodule/xmodule/modulestore/xmodule_django.py
     #
     # You must use the signal itself, and not its name. So for example:
     #

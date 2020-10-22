@@ -9,15 +9,14 @@ import ddt
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from mako.template import Template
-from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.markup import HTML, Text, strip_all_tags_but_br
 
 
-@attr(shard=2)
 @ddt.ddt
 class FormatHtmlTest(unittest.TestCase):
     """Test that we can format plain strings and HTML into them properly."""
+    shard = 2
 
     @ddt.data(
         (u"hello", u"hello"),
@@ -28,7 +27,7 @@ class FormatHtmlTest(unittest.TestCase):
         (u"<a>нтмℓ-єѕ¢αρє∂</a>", u"&lt;a&gt;нтмℓ-єѕ¢αρє∂&lt;/a&gt;"),
     )
     def test_simple(self, (before, after)):
-        self.assertEqual(unicode(Text(_(before))), after)  # pylint: disable=translation-of-non-string
+        self.assertEqual(unicode(Text(_(before))), after)
         self.assertEqual(unicode(Text(before)), after)
 
     def test_formatting(self):

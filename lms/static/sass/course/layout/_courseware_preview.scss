@@ -123,12 +123,15 @@
             color: theme-color("brand");
           }
         }
+
         .exam-timer-clock {
           background-color: transparent;
           border: 1px solid $white;
+
           #toggle_timer, b {
             color: $white;
           }
+
           #toggle_timer {
             border-top: none;
             border-right: none;
@@ -172,6 +175,7 @@
         border: 0;
       }
     }
+
     .exam-timer-clock {
       display: inline-block;
       padding: 0 0 0 ($baseline/3);
@@ -186,6 +190,7 @@
         border-top-left-radius: 0;
         margin-right: 0;
       }
+
       b {
         padding-right: ($baseline/5);
 

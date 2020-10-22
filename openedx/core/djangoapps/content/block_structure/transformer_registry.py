@@ -6,7 +6,7 @@ from base64 import b64encode
 from hashlib import sha1
 
 from openedx.core.lib.plugins import PluginManager
-from openedx.core.lib.cache_utils import memoized
+from openedx.core.lib.cache_utils import process_cached
 
 
 class TransformerRegistry(PluginManager):
@@ -35,7 +35,7 @@ class TransformerRegistry(PluginManager):
             return set()
 
     @classmethod
-    @memoized
+    @process_cached
     def get_write_version_hash(cls):
         """
         Returns a deterministic hash value of the WRITE_VERSION of all

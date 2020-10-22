@@ -20,7 +20,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.timezone import now
-from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -39,20 +38,20 @@ factory = APIRequestFactory()  # pylint: disable=invalid-name
 class MockView(APIView):  # pylint: disable=missing-docstring
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request):  # pylint: disable=unused-argument
+    def get(self, _request):
         return HttpResponse({'a': 1, 'b': 2, 'c': 3})
 
-    def post(self, request):  # pylint: disable=unused-argument
+    def post(self, _request):
         return HttpResponse({'a': 1, 'b': 2, 'c': 3})
 
-    def put(self, request):  # pylint: disable=unused-argument
+    def put(self, _request):
         return HttpResponse({'a': 1, 'b': 2, 'c': 3})
 
 
 # This is the a change we've made from the django-rest-framework-oauth version
 # of these tests.  We're subclassing our custom OAuth2AuthenticationAllowInactiveUser
 # instead of OAuth2Authentication.
-class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactiveUser):  # pylint: disable=missing-docstring
+class OAuth2AuthenticationDebug(authentication.OAuth2AuthenticationAllowInactiveUser):
     allow_query_params_token = True
 
 
@@ -73,12 +72,13 @@ urlpatterns = [
 ]
 
 
-@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""
+    shard = 2
+
     def setUp(self):
         super(OAuth2Tests, self).setUp()
         self.dop_adapter = adapters.DOPAdapter()
@@ -164,7 +164,7 @@ class OAuth2Tests(TestCase):
         self.assertEqual(response.status_code, status_code)
         self.assertEqual(response_dict['error_code'], error_code)
 
-    def _create_authorization_header(self, token=None):  # pylint: disable=missing-docstring
+    def _create_authorization_header(self, token=None):
         if token is None:
             token = self.access_token.token
         return "Bearer {0}".format(token)

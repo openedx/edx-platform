@@ -16,6 +16,7 @@ from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import STUDENT_VIEW, XModuleFields
 from xmodule.xml_module import XmlParserMixin
 
@@ -98,8 +99,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             'bookmark_id': u"{},{}".format(child_context['username'], unicode(self.location)),  # pylint: disable=no-member
         }))
 
-        for tag in webpack_loader.utils.get_as_tags('VerticalStudentView'):
-            fragment.add_resource(tag, mimetype='text/html', placement='head')
+        add_webpack_to_fragment(fragment, 'VerticalStudentView')
         fragment.initialize_js('VerticalStudentView')
 
         return fragment

@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import list_route
 from rest_framework.response import Response
@@ -9,7 +10,6 @@ from rest_framework.response import Response
 from experiments import filters, serializers
 from experiments.models import ExperimentData, ExperimentKeyValue
 from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
-from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 
 User = get_user_model()  # pylint: disable=invalid-name

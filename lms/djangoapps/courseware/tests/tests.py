@@ -6,12 +6,12 @@ from unittest import TestCase
 
 import mock
 from django.urls import reverse
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from openedx.core.lib.tests import attr
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
@@ -45,7 +45,7 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
         has 'is_from_log_out' attribute set to true.
         """
         response = self.client.get(reverse('logout'))
-        self.assertTrue(getattr(response.wsgi_request, 'is_from_logout', False))  # pylint: disable=no-member
+        self.assertTrue(getattr(response.wsgi_request, 'is_from_logout', False))
 
 
 class PageLoaderTestCase(LoginEnrollmentTestCase):

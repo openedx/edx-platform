@@ -19,9 +19,9 @@ from shutil import rmtree
 from tempfile import mkdtemp
 
 import ddt
-from nose.plugins.attrib import attr
 from mock import patch
 
+from openedx.core.lib.tests import attr
 from xmodule.tests import CourseComparisonTest
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml
@@ -188,7 +188,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                         self.assertEqual(source_course.url_name, 'course')
 
                         export_dir_path = path(self.export_dir)
-                        policy_dir = export_dir_path / 'exported_source_course' / 'policies' / source_course.url_name
+                        policy_dir = export_dir_path / 'exported_source_course' / 'policies' / source_course_key.run
                         policy_path = policy_dir / 'policy.json'
                         self.assertTrue(os.path.exists(policy_path))
 

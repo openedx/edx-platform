@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type, iteritems
@@ -28,7 +28,6 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     get_pseudo_session_for_entitlement,
@@ -42,9 +41,10 @@ from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_bann
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
+from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
-from student.cookies import set_user_info_cookie
+from openedx.core.djangoapps.user_authn.cookies import set_deprecated_user_info_cookie
 from student.helpers import cert_info, check_verify_status_by_course
 from student.models import (
     CourseEnrollment,
@@ -647,10 +647,10 @@ def student_dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(
-        enrollment.course_id for enrollment in course_enrollments
-        if has_access(request.user, 'load', enrollment.course_overview)
-    )
+    show_courseware_links_for = {
+        enrollment.course_id: has_access(request.user, 'load', enrollment.course_overview)
+        for enrollment in course_enrollments
+    }
 
     # Find programs associated with course runs being displayed. This information
     # is passed in the template context to allow rendering of program-related
@@ -821,6 +821,7 @@ def student_dashboard(request):
         'nav_hidden': True,
         'inverted_programs': inverted_programs,
         'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'show_journal_listing': journals_enabled(),  # TODO: Dashboard Plugin required
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
@@ -837,14 +838,15 @@ def student_dashboard(request):
         })
 
     # Gather urls for course card resume buttons.
-    resume_button_urls = _get_urls_for_resume_buttons(user, course_enrollments)
+    resume_button_urls = ['' for entitlement in course_entitlements]
+    for url in _get_urls_for_resume_buttons(user, course_enrollments):
+        resume_button_urls.append(url)
     # There must be enough urls for dashboard.html. Template creates course
     # cards for "enrollments + entitlements".
-    resume_button_urls += ['' for entitlement in course_entitlements]
     context.update({
         'resume_button_urls': resume_button_urls
     })
 
     response = render_to_response('dashboard.html', context)
-    set_user_info_cookie(response, request)
+    set_deprecated_user_info_cookie(response, request, user)  # pylint: disable=protected-access
     return response

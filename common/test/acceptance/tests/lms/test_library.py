@@ -5,7 +5,6 @@ End-to-end tests for LibraryContent block in LMS
 import textwrap
 
 import ddt
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.library import LibraryFixture
@@ -23,7 +22,6 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr(shard=10)
 class LibraryContentTestBase(UniqueCourseTest):
     """ Base class for library content block tests """
     USERNAME = "STUDENT_TESTER"
@@ -31,6 +29,7 @@ class LibraryContentTestBase(UniqueCourseTest):
 
     STAFF_USERNAME = "STAFF_TESTER"
     STAFF_EMAIL = "staff101@example.com"
+    shard = 10
 
     def populate_library_fixture(self, library_fixture):
         """
@@ -147,11 +146,12 @@ class LibraryContentTestBase(UniqueCourseTest):
 
 
 @ddt.ddt
-@attr(shard=10)
 class LibraryContentTest(LibraryContentTestBase):
     """
     Test courseware.
     """
+    shard = 10
+
     def populate_library_fixture(self, library_fixture):
         """
         Populates library fixture with XBlock Fixtures
@@ -200,11 +200,12 @@ class LibraryContentTest(LibraryContentTestBase):
 
 
 @ddt.ddt
-@attr(shard=10)
 class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
     """
+    shard = 10
+
     def setUp(self):
         """ SetUp method """
         self._create_search_index()

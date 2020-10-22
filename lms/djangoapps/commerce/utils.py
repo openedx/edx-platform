@@ -340,7 +340,7 @@ def _send_refund_notification(user, refund_ids):
     return create_zendesk_ticket(requester_name, student.email, subject, body, tags)
 
 
-def _generate_refund_notification_body(student, refund_ids):  # pylint: disable=invalid-name
+def _generate_refund_notification_body(student, refund_ids):
     """ Returns a refund notification message body. """
     msg = _(
         'A refund request has been initiated for {username} ({email}). '

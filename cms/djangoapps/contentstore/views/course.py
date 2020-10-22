@@ -6,7 +6,7 @@ import json
 import logging
 import random
 import re
-import string  # pylint: disable=deprecated-module
+import string
 
 import django.utils
 import six
@@ -223,7 +223,6 @@ def _dismiss_notification(request, course_action_state_id):  # pylint: disable=u
     return JsonResponse({'success': True})
 
 
-# pylint: disable=unused-argument
 @login_required
 def course_handler(request, course_key_string=None):
     """
@@ -633,7 +632,13 @@ def course_index(request, course_key):
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
         locator_to_show = request.GET.get('show', None)
-        course_release_date = get_default_time_display(course_module.start) if course_module.start != DEFAULT_START_DATE else _("Unscheduled")
+
+        course_release_date = (
+            get_default_time_display(course_module.start)
+            if course_module.start != DEFAULT_START_DATE
+            else _("Set Date")
+        )
+
         settings_url = reverse_course_url('settings_handler', course_key)
 
         try:
@@ -937,7 +942,6 @@ def rerun_course(user, source_course_key, org, number, run, fields, async=True):
     return destination_course_key
 
 
-# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(["GET"])
@@ -970,7 +974,6 @@ def course_info_handler(request, course_key_string):
             return HttpResponseBadRequest("Only supports html requests")
 
 
-# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))

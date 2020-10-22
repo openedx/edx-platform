@@ -106,7 +106,10 @@ module.exports = Merge.smart({
             Popper: 'popper.js', // used by bootstrap
             CodeMirror: 'codemirror',
             'edx.HtmlUtils': 'edx-ui-toolkit/js/utils/html-utils',
-            AjaxPrefix: 'ajax_prefix'
+            AjaxPrefix: 'ajax_prefix',
+            // This is used by some XModules/XBlocks, which don't have
+            // any other way to declare that dependency.
+            $script: 'scriptjs'
         }),
 
         // Note: Until karma-webpack releases v3, it doesn't play well with

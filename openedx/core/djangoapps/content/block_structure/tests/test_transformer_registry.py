@@ -3,7 +3,6 @@ Tests for transformer_registry.py
 """
 
 import ddt
-from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from ..transformer_registry import TransformerRegistry
@@ -31,12 +30,13 @@ class UnregisteredTestTransformer3(MockTransformer):
     pass
 
 
-@attr(shard=2)
 @ddt.ddt
 class TransformerRegistryTestCase(TestCase):
     """
     Test cases for TransformerRegistry.
     """
+    shard = 2
+
     def tearDown(self):
         super(TransformerRegistryTestCase, self).tearDown()
         clear_registered_transformers_cache()

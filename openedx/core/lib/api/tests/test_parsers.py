@@ -3,7 +3,6 @@ TestCases verifying proper behavior of custom DRF request parsers.
 """
 
 from collections import namedtuple
-from nose.plugins.attrib import attr
 from io import BytesIO
 
 from rest_framework import exceptions
@@ -12,11 +11,12 @@ from rest_framework.test import APITestCase, APIRequestFactory
 from openedx.core.lib.api import parsers
 
 
-@attr(shard=2)
 class TestTypedFileUploadParser(APITestCase):
     """
     Tests that verify the behavior of TypedFileUploadParser
     """
+    shard = 2
+
     def setUp(self):
         super(TestTypedFileUploadParser, self).setUp()
         self.parser = parsers.TypedFileUploadParser()

@@ -1,4 +1,4 @@
-
+# coding=utf-8
 import json
 import unittest
 
@@ -14,8 +14,10 @@ from mock import Mock, patch
 from six import text_type
 
 from edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, CacheIsolationMixin
 from student.models import (
@@ -24,6 +26,7 @@ from student.models import (
     UserProfile,
     get_retired_email_by_email
 )
+from openedx.core.lib.request_utils import safe_get_host
 from student.tests.factories import PendingEmailChangeFactory, RegistrationFactory, UserFactory
 from student.views import (
     SETTING_CHANGE_INITIATED,
@@ -33,7 +36,6 @@ from student.views import (
 )
 from student.views import generate_activation_email_context, send_reactivation_email_for_user
 from third_party_auth.views import inactive_user_view
-from util.request import safe_get_host
 from util.testing import EventTestMixin
 
 
@@ -199,7 +201,7 @@ class ActivationEmailTests(CacheIsolationTestCase):
                 )
 
 
-@patch('student.views.login.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+@patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 @patch('django.contrib.auth.models.User.email_user')
 class ReactivationEmailTests(EmailTestMixin, CacheIsolationTestCase):
     """
@@ -281,13 +283,14 @@ class ReactivationEmailTests(EmailTestMixin, CacheIsolationTestCase):
         self.assertTrue(response_data['success'])
 
 
-class EmailChangeRequestTests(EventTestMixin, CacheIsolationTestCase):
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolationTestCase):
     """
     Test changing a user's email address
     """
 
-    def setUp(self):
-        super(EmailChangeRequestTests, self).setUp('student.views.management.tracker')
+    def setUp(self, tracker='student.views.management.tracker'):
+        super(EmailChangeRequestTests, self).setUp(tracker)
         self.user = UserFactory.create()
         self.new_email = 'new.email@edx.org'
         self.req_factory = RequestFactory()
@@ -311,10 +314,8 @@ class EmailChangeRequestTests(EventTestMixin, CacheIsolationTestCase):
         """
         Executes do_email_change_request, returning any resulting error message.
         """
-        try:
+        with patch('crum.get_current_request', return_value=self.fake_request):
             do_email_change_request(user, email, activation_key)
-        except ValueError as err:
-            return text_type(err)
 
     def assertFailedRequest(self, response_data, expected_error):
         """
@@ -338,8 +339,8 @@ class EmailChangeRequestTests(EventTestMixin, CacheIsolationTestCase):
         user2 = UserFactory.create(email=self.new_email, password="test2")
 
         # Send requests & ensure no error was thrown
-        self.assertIsNone(self.do_email_change(self.user, user1_new_email))
-        self.assertIsNone(self.do_email_change(user2, user2_new_email))
+        self.do_email_change(self.user, user1_new_email)
+        self.do_email_change(user2, user2_new_email)
 
     def test_invalid_emails(self):
         """
@@ -355,61 +356,64 @@ class EmailChangeRequestTests(EventTestMixin, CacheIsolationTestCase):
         """
         self.assertEqual(self.do_email_validation(self.user.email), 'Old email is the same as the new email.')
 
-    def test_duplicate_email(self):
-        """
-        Assert the expected error message from the email validation method for an email address
-        that is already in use by another account.
-        """
-        UserFactory.create(email=self.new_email)
-        self.assertEqual(self.do_email_validation(self.new_email), 'An account with this e-mail already exists.')
-
-    def test_retired_email(self):
-        """
-        Assert the expected error message from the email validation method for an email address
-        that corresponds with an already-retired account.
-        """
-        user = UserFactory.create(email=self.new_email)
-        user.email = get_retired_email_by_email(self.new_email)
-        user.save()
-        self.assertEqual(self.do_email_validation(self.new_email), 'An account with this e-mail already exists.')
-
     @patch('django.core.mail.send_mail')
-    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_email_failure(self, send_mail):
         """
         Test the return value if sending the email for the user to click fails.
         """
         send_mail.side_effect = [Exception, None]
-        self.assertEqual(
-            self.do_email_change(self.user, "valid@email.com"),
-            'Unable to send email activation link. Please try again later.'
-        )
+        with self.assertRaisesRegexp(ValueError, 'Unable to send email activation link. Please try again later.'):
+            self.do_email_change(self.user, "valid@email.com")
+
         self.assert_no_events_were_emitted()
 
-    @patch('django.core.mail.send_mail')
-    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
-    def test_email_success(self, send_mail):
+    def test_email_success(self):
         """
         Test email was sent if no errors encountered.
         """
         old_email = self.user.email
         new_email = "valid@example.com"
-        registration_key = "test registration key"
-        self.assertIsNone(self.do_email_change(self.user, new_email, registration_key))
-        context = {
-            'key': registration_key,
-            'old_email': old_email,
-            'new_email': new_email
-        }
-        send_mail.assert_called_with(
-            mock_render_to_string('emails/email_change_subject.txt', context),
-            mock_render_to_string('emails/email_change.txt', context),
-            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            [new_email]
+        registration_key = "test-registration-key"
+
+        self.do_email_change(self.user, new_email, registration_key)
+
+        self._assert_email(
+            subject=u'Request to change édX account e-mail',
+            body_fragments=[
+                u'We received a request to change the e-mail associated with',
+                u'your édX account from {old_email} to {new_email}.'.format(
+                    old_email=old_email,
+                    new_email=new_email,
+                ),
+                u'If this is correct, please confirm your new e-mail address by visiting:',
+                u'http://edx.org/email_confirm/{key}'.format(key=registration_key),
+                u'If you didn\'t request this, you don\'t need to do anything;',
+                u'you won\'t receive any more email from us.',
+                u'Please do not reply to this e-mail; if you require assistance,',
+                u'check the help section of the édX web site.',
+            ],
         )
+
         self.assert_event_emitted(
             SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'email', old=old_email, new=new_email
         )
+
+    def _assert_email(self, subject, body_fragments):
+        """
+        Verify that the email was sent.
+        """
+        assert len(mail.outbox) == 1
+        assert len(body_fragments) > 1, 'Should provide at least two body fragments'
+
+        message = mail.outbox[0]
+        text = message.body
+        html = message.alternatives[0][0]
+
+        assert message.subject == subject
+
+        for body in text, html:
+            for fragment in body_fragments:
+                assert fragment in body
 
 
 @patch('django.contrib.auth.models.User.email_user')

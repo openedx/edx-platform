@@ -1,7 +1,6 @@
 """
 Common test utilities for courseware functionality
 """
-# pylint: disable=attribute-defined-outside-init
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta

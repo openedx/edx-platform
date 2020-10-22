@@ -7,6 +7,7 @@
 <%!
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+import waffle
 
 from lms.djangoapps.ccx.overrides import get_current_ccx
 from openedx.core.djangolib.markup import HTML, Text
@@ -14,6 +15,7 @@ from openedx.core.djangolib.markup import HTML, Text
 # App that handles subdomain specific branding
 from branding import api as branding_api
 from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 %>
 
@@ -27,6 +29,26 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
     HeaderFactory();
     </%static:require_module>
     </%block>
+% endif
+
+<%
+  unsupported_browser_alert_versions = configuration_helpers.get_value('UNSUPPORTED_BROWSER_ALERT_VERSIONS', settings.FEATURES.get('UNSUPPORTED_BROWSER_ALERT_VERSIONS'))
+%>
+% if waffle.switch_is_active('enable_unsupported_browser_alert'):
+  <script>
+    var $buoop = {
+        notify:${unsupported_browser_alert_versions | n, decode.utf8},
+        api:5,
+        reminder:0
+    };
+    function $buo_f() {
+        var e = document.createElement("script");
+        e.src = "//browser-update.org/update.min.js";
+        document.body.appendChild(e);
+    };
+    try {document.addEventListener("DOMContentLoaded", $buo_f,false)}
+    catch(e){window.attachEvent("onload", $buo_f)}
+  </script>
 % endif
 
 <header class="global-header ${'slim' if course else ''}">

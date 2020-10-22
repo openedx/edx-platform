@@ -4,7 +4,6 @@ import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.test import TestCase, RequestFactory
-from nose.plugins.attrib import attr
 from rest_framework.generics import GenericAPIView
 
 from student.roles import CourseStaffRole, CourseInstructorRole
@@ -31,9 +30,9 @@ class TestCcxObject(TestObject):
         self.coach = user
 
 
-@attr(shard=2)
 class IsCourseStaffInstructorTests(TestCase):
     """ Test for IsCourseStaffInstructor permission class. """
+    shard = 2
 
     def setUp(self):
         super(IsCourseStaffInstructorTests, self).setUp()
@@ -65,9 +64,9 @@ class IsCourseStaffInstructorTests(TestCase):
         self.assertFalse(self.permission.has_object_permission(self.request, None, self.obj))
 
 
-@attr(shard=2)
 class IsMasterCourseStaffInstructorTests(TestCase):
     """ Test for IsMasterCourseStaffInstructorTests permission class. """
+    shard = 2
 
     def setUp(self):
         super(IsMasterCourseStaffInstructorTests, self).setUp()
@@ -110,10 +109,10 @@ class IsMasterCourseStaffInstructorTests(TestCase):
             self.permission.has_permission(post_request, None)
 
 
-@attr(shard=2)
 @ddt.ddt
 class IsStaffOrOwnerTests(TestCase):
     """ Tests for IsStaffOrOwner permission class. """
+    shard = 2
 
     def setUp(self):
         super(IsStaffOrOwnerTests, self).setUp()

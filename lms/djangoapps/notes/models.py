@@ -62,7 +62,6 @@ class Note(models.Model):
         """
         Returns the absolute url for the note object.
         """
-        # pylint: disable=no-member
         kwargs = {'course_id': text_type(self.course_id), 'note_id': str(self.pk)}
         return reverse('notes_api_note', kwargs=kwargs)
 

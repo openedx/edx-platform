@@ -5,7 +5,6 @@ End-to-end tests for the LMS Instructor Dashboard.
 
 import ddt
 from bok_choy.promise import EmptyPromise
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -31,6 +30,7 @@ from common.test.acceptance.tests.helpers import (
     disable_animations,
     get_modal_alert
 )
+from openedx.core.lib.tests import attr
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):

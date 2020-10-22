@@ -24,9 +24,11 @@ from django.utils.http import urlquote_plus
 from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
+from edx_django_utils.monitoring import set_custom_metrics_for_course_key
 from eventtracking import tracker
 from ipware.ip import get_ip
 from markupsafe import escape
@@ -81,7 +83,6 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit
 )
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -94,6 +95,7 @@ from openedx.features.course_experience.views.course_dates import CourseDatesFra
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.journals.api import get_journals_context
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from util.cache import cache, cache_if_anonymous
@@ -188,13 +190,13 @@ def user_groups(user):
     cache_expiration = 60 * 60  # one hour
 
     # Kill caching on dev machines -- we switch groups a lot
-    group_names = cache.get(key)  # pylint: disable=no-member
+    group_names = cache.get(key)
     if settings.DEBUG:
         group_names = None
 
     if group_names is None:
         group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
-        cache.set(key, group_names, cache_expiration)  # pylint: disable=no-member
+        cache.set(key, group_names, cache_expiration)
 
     return group_names
 
@@ -224,7 +226,8 @@ def courses(request):
         {
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
-            'programs_list': programs_list
+            'programs_list': programs_list,
+            'journal_info': get_journals_context(request),  # TODO: Course Listing Plugin required
         }
     )
 
@@ -989,8 +992,9 @@ def _progress(request, course_key, student_id):
         'supports_preview_menu': True,
         'student': student,
         'credit_course_requirements': _credit_course_requirements(course_key, student),
-        'certificate_data': _get_cert_data(student, course, enrollment_mode, course_grade),
     }
+    if certs_api.get_active_web_certificate(course):
+        context['certificate_data'] = _get_cert_data(student, course, enrollment_mode, course_grade)
     context.update(
         get_experiment_user_metadata_context(
             course,
@@ -1013,7 +1017,7 @@ def _downloadable_certificate_message(course, cert_downloadable_status):
                     course_id=course.id, uuid=cert_downloadable_status['uuid']
                 )
             )
-        elif not cert_downloadable_status['download_url']:
+        else:
             return GENERATING_CERT_DATA
 
     # Hack: Was `return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])`
@@ -1413,7 +1417,7 @@ def generate_user_cert(request, course_id):
         return HttpResponse()
 
 
-def _track_successful_certificate_generation(user_id, course_id):  # pylint: disable=invalid-name
+def _track_successful_certificate_generation(user_id, course_id):
     """
     Track a successful certificate generation event.
 
@@ -1446,6 +1450,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
 
 @require_http_methods(["GET", "POST"])
 @ensure_valid_usage_key
+@xframe_options_exempt
 def render_xblock(request, usage_key_string, check_if_enrolled=True):
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
@@ -1615,7 +1620,7 @@ def financial_assistance_form(request):
     enrolled_courses = get_financial_aid_courses(user)
     incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000']
     annual_incomes = [
-        {'name': _(income), 'value': income} for income in incomes  # pylint: disable=translation-of-non-string
+        {'name': _(income), 'value': income} for income in incomes
     ]
     return render_to_response('financial-assistance/apply.html', {
         'header_text': FINANCIAL_ASSISTANCE_HEADER,

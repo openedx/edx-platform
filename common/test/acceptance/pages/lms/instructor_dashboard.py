@@ -1480,7 +1480,7 @@ class CertificatesPage(PageObject):
         return self.get_selector('#btn-start-generating-certificates')
 
     @property
-    def generate_certificates_disabled_button(self):  # pylint: disable=invalid-name
+    def generate_certificates_disabled_button(self):
         """
         Returns the disabled state of button
         """
@@ -1529,7 +1529,7 @@ class CertificatesPage(PageObject):
         return self.get_selector('div.certificate-invalidation-container table tr:last-child td')
 
     @property
-    def certificate_invalidation_message(self):  # pylint: disable=invalid-name
+    def certificate_invalidation_message(self):
         """
         Returns the message (error/success) in "Certificate Invalidation" section.
         """

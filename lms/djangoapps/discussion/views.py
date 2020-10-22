@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
@@ -44,7 +45,6 @@ from django_comment_client.utils import (
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.core.djangoapps.monitoring_utils import function_trace
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
@@ -149,7 +149,6 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
             )
         )
     )
-
     paginated_results = cc.Thread.search(query_params)
     threads = paginated_results.collection
 
@@ -181,7 +180,7 @@ def use_bulk_ops(view_func):
     the request uri to a CourseKey before passing to the view.
     """
     @wraps(view_func)
-    def wrapped_view(request, course_id, *args, **kwargs):  # pylint: disable=missing-docstring
+    def wrapped_view(request, course_id, *args, **kwargs):
         course_key = CourseKey.from_string(course_id)
         with modulestore().bulk_operations(course_key):
             return view_func(request, course_key, *args, **kwargs)
@@ -248,6 +247,7 @@ def forum_form_discussion(request, course_key):
     Renders the main Discussion page, potentially filtered by a search query
     """
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    request.user.is_community_ta = utils.is_user_community_ta(request.user, course.id)
     if request.is_ajax():
         user = cc.User.from_django_user(request.user)
         user_info = user.to_dict()
@@ -292,7 +292,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
     Depending on the HTTP headers, we'll adjust our response accordingly.
     """
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-
+    request.user.is_community_ta = utils.is_user_community_ta(request.user, course.id)
     if request.is_ajax():
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict()
@@ -350,7 +350,6 @@ def _find_thread(request, course, discussion_id, thread_id):
         )
     except cc.utils.CommentClientRequestError:
         return None
-
     # Verify that the student has access to this thread if belongs to a course discussion module
     thread_context = getattr(thread, "context", "course")
     if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):

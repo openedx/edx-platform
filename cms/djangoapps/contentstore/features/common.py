@@ -1,4 +1,5 @@
 # pylint: disable=missing-docstring
+# pylint: disable=no-member
 # pylint: disable=redefined-outer-name
 
 import os
@@ -6,9 +7,9 @@ from logging import getLogger
 
 from django.conf import settings
 from lettuce import step, world
-from nose.tools import assert_in, assert_true
 from selenium.webdriver.common.keys import Keys
 
+from openedx.core.lib.tests.tools import assert_in  # pylint: disable=no-name-in-module
 from student import auth
 from student.models import get_user
 from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
@@ -78,7 +79,7 @@ def i_have_populated_a_new_course(_step):
 
 
 @step('(I select|s?he selects) the new course')
-def select_new_course(_step, whom):
+def select_new_course(_step, _whom):
     course_link_css = 'a.course-link'
     world.css_click(course_link_css)
 
@@ -103,7 +104,7 @@ def i_change_field_to_value(_step, field, value):
     field_css = '#%s' % '-'.join([s.lower() for s in field.split()])
     ele = world.css_find(field_css).first
     ele.fill(value)
-    ele._element.send_keys(Keys.ENTER)
+    ele._element.send_keys(Keys.ENTER)  # pylint: disable=protected-access
 
 
 @step('I reset the database')
@@ -121,7 +122,7 @@ def reset_the_db(_step):
 
 
 @step('I see a confirmation that my changes have been saved')
-def i_see_a_confirmation(step):
+def i_see_a_confirmation(_step):
     confirmation_css = '#alert-confirmation'
     assert world.is_css_present(confirmation_css)
 
@@ -199,12 +200,12 @@ def create_a_course():
     course_link_css = 'a.course-link'
     world.css_click(course_link_css)
     course_title_css = 'span.course-title'
-    assert_true(world.is_css_present(course_title_css))
+    assert world.is_css_present(course_title_css)
 
 
 def add_section():
     world.css_click('.outline .button-new')
-    assert_true(world.is_css_present('.outline-section .xblock-field-value'))
+    assert world.is_css_present('.outline-section .xblock-field-value')
 
 
 def set_date_and_time(date_css, desired_date, time_css, desired_time, key=None):
@@ -268,14 +269,14 @@ def edit_new_unit(step):
 
 
 @step('the save notification button is disabled')
-def save_button_disabled(step):
+def save_button_disabled(_step):
     button_css = '.action-save'
     disabled = 'is-disabled'
     assert world.css_has_class(button_css, disabled)
 
 
 @step('the "([^"]*)" button is disabled')
-def button_disabled(step, value):
+def button_disabled(_step, value):
     button_css = 'input[value="%s"]' % value
     assert world.css_has_class(button_css, 'is-disabled')
 
@@ -312,12 +313,12 @@ def confirm_studio_prompt():
 
 
 @step('I confirm the prompt')
-def confirm_the_prompt(step):
+def confirm_the_prompt(_step):
     confirm_studio_prompt()
 
 
 @step(u'I am shown a prompt$')
-def i_am_shown_a_notification(step):
+def i_am_shown_a_notification(_step):
     assert world.is_css_present('.wrapper-prompt')
 
 
@@ -342,7 +343,7 @@ def get_codemirror_value(index=0, find_prefix="$"):
 def attach_file(filename, sub_path):
     path = os.path.join(TEST_ROOT, sub_path, filename)
     world.browser.execute_script("$('input.file-input').css('display', 'block')")
-    assert_true(os.path.exists(path))
+    assert os.path.exists(path)
     world.browser.attach_file('file', os.path.abspath(path))
 
 
@@ -377,7 +378,7 @@ def other_user_login(step, name):
         login_form.find_by_name('password').fill("test")
         login_form.find_by_name('submit').click()
     world.retry_on_exception(fill_login_form)
-    assert_true(world.is_css_present('.new-course-button'))
+    assert world.is_css_present('.new-course-button')
     world.scenario_dict['USER'] = get_user(name + '@edx.org')
 
 

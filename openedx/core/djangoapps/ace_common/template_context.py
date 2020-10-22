@@ -2,6 +2,7 @@
 Context dictionary for templates that use the ace_common base template.
 """
 from django.conf import settings
+from django.core.urlresolvers import NoReverseMatch
 from django.urls import reverse
 
 from edxmako.shortcuts import marketing_link
@@ -12,10 +13,17 @@ def get_base_template_context(site):
     """
     Dict with entries needed for all templates that use the base template.
     """
+    # When on LMS and a dashboard is available, use that as the dashboard url.
+    # Otherwise, use the home url instead.
+    try:
+        dashboard_url = reverse('dashboard')
+    except NoReverseMatch:
+        dashboard_url = reverse('home')
+
     return {
         # Platform information
         'homepage_url': marketing_link('ROOT'),
-        'dashboard_url': reverse('dashboard'),
+        'dashboard_url': dashboard_url,
         'template_revision': getattr(settings, 'EDX_PLATFORM_REVISION', None),
         'platform_name': get_config_value_from_site_or_settings(
             'PLATFORM_NAME',

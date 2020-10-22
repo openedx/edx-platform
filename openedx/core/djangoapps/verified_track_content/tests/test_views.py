@@ -4,8 +4,6 @@ Tests for verified track content views.
 
 import json
 
-from nose.plugins.attrib import attr
-
 from django.http import Http404
 from django.test.client import RequestFactory
 
@@ -18,12 +16,12 @@ from ..models import VerifiedTrackCohortedCourse
 from ..views import cohorting_settings
 
 
-@attr(shard=2)
 @skip_unless_lms
 class CohortingSettingsTestCase(SharedModuleStoreTestCase):
     """
     Tests the `cohort_discussion_topics` view.
     """
+    shard = 2
 
     @classmethod
     def setUpClass(cls):

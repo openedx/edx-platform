@@ -5,8 +5,6 @@ End-to-end tests related to the divided discussion management on the LMS Instruc
 
 import uuid
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
@@ -14,6 +12,7 @@ from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThrea
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, CohortTestMixin
 from common.test.acceptance.tests.helpers import UniqueCourseTest
+from openedx.core.lib.tests import attr
 
 
 class BaseDividedDiscussionTest(UniqueCourseTest, CohortTestMixin):

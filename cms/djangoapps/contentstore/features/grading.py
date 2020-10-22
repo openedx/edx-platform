@@ -1,31 +1,32 @@
 # pylint: disable=missing-docstring
+# pylint: disable=no-member
 # pylint: disable=redefined-outer-name
 
 from lettuce import step, world
-from nose.tools import assert_equal, assert_in, assert_not_equal
 from selenium.common.exceptions import InvalidElementStateException
 
 from common import *
 from contentstore.utils import reverse_course_url
+from openedx.core.lib.tests.tools import assert_equal, assert_in, assert_not_equal  # pylint: disable=no-name-in-module
 from terrain.steps import reload_the_page
 
 
 @step(u'I am viewing the grading settings')
-def view_grading_settings(step):
+def view_grading_settings(_step):
     world.click_course_settings()
     link_css = 'li.nav-course-settings-grading a'
     world.css_click(link_css)
 
 
 @step(u'I add "([^"]*)" new grade')
-def add_grade(step, many):
+def add_grade(_step, many):
     grade_css = '.new-grade-button'
     for __ in range(int(many)):
         world.css_click(grade_css)
 
 
 @step(u'I delete a grade')
-def delete_grade(step):
+def delete_grade(_step):
     #grade_css = 'li.grade-specific-bar > a.remove-button'
     #range_css = '.grade-specific-bar'
     #world.css_find(range_css)[1].mouseover()
@@ -33,30 +34,22 @@ def delete_grade(step):
     world.browser.execute_script('document.getElementsByClassName("remove-button")[0].click()')
 
 
-@step(u'Grade list has "([^"]*)" grades$')
-def check_grade_values(step, grade_list):  # pylint: disable=unused-argument
-    visible_list = ''.join(
-        [grade.text for grade in world.css_find('.letter-grade')]
-    )
-    assert_equal(visible_list, grade_list, 'Grade lists should be equal')
-
-
 @step(u'I see I now have "([^"]*)" grades$')
-def view_grade_slider(step, how_many):
+def view_grade_slider(_step, how_many):
     grade_slider_css = '.grade-specific-bar'
     all_grades = world.css_find(grade_slider_css)
     assert_equal(len(all_grades), int(how_many))
 
 
 @step(u'I move a grading section')
-def move_grade_slider(step):
+def move_grade_slider(_step):
     moveable_css = '.ui-resizable-e'
     f = world.css_find(moveable_css).first
-    f.action_chains.drag_and_drop_by_offset(f._element, 100, 0).perform()
+    f.action_chains.drag_and_drop_by_offset(f._element, 100, 0).perform()  # pylint: disable=protected-access
 
 
 @step(u'I see that the grade range has changed')
-def confirm_change(step):
+def confirm_change(_step):
     range_css = '.range'
     all_ranges = world.css_find(range_css)
     for i in range(len(all_ranges)):
@@ -64,18 +57,18 @@ def confirm_change(step):
 
 
 @step(u'I change assignment type "([^"]*)" to "([^"]*)"$')
-def change_assignment_name(step, old_name, new_name):
+def change_assignment_name(_step, old_name, new_name):
     name_id = '#course-grading-assignment-name'
     index = get_type_index(old_name)
     f = world.css_find(name_id)[index]
     assert_not_equal(index, -1)
     for __ in xrange(len(old_name)):
-        f._element.send_keys(Keys.END, Keys.BACK_SPACE)
-    f._element.send_keys(new_name)
+        f._element.send_keys(Keys.END, Keys.BACK_SPACE)  # pylint: disable=protected-access
+    f._element.send_keys(new_name)  # pylint: disable=protected-access
 
 
 @step(u'I go back to the main course page')
-def main_course_page(step):
+def main_course_page(_step):
     main_page_link = reverse_course_url('course_handler', world.scenario_dict['COURSE'].id)
 
     world.visit(main_page_link)
@@ -83,7 +76,7 @@ def main_course_page(step):
 
 
 @step(u'I do( not)? see the assignment name "([^"]*)"$')
-def see_assignment_name(step, do_not, name):
+def see_assignment_name(_step, _do_not, _name):
     # TODO: rewrite this once grading has been added back to the course outline
     pass
     # assignment_menu_css = 'ul.menu > li > a'
@@ -102,32 +95,32 @@ def see_assignment_name(step, do_not, name):
 
 
 @step(u'I delete the assignment type "([^"]*)"$')
-def delete_assignment_type(step, to_delete):
+def delete_assignment_type(_step, to_delete):
     delete_css = '.remove-grading-data'
     world.css_click(delete_css, index=get_type_index(to_delete))
 
 
 @step(u'I add a new assignment type "([^"]*)"$')
-def add_assignment_type(step, new_name):
+def add_assignment_type(_step, new_name):
     add_button_css = '.add-grading-data'
     world.css_click(add_button_css)
     name_id = '#course-grading-assignment-name'
     new_assignment = world.css_find(name_id)[-1]
-    new_assignment._element.send_keys(new_name)
+    new_assignment._element.send_keys(new_name)  # pylint: disable=protected-access
 
 
 @step(u'I set the assignment weight to "([^"]*)"$')
-def set_weight(step, weight):
+def set_weight(_step, weight):
     weight_id = '#course-grading-assignment-gradeweight'
     weight_field = world.css_find(weight_id)[-1]
     old_weight = world.css_value(weight_id, -1)
     for __ in range(len(old_weight)):
-        weight_field._element.send_keys(Keys.END, Keys.BACK_SPACE)
-    weight_field._element.send_keys(weight)
+        weight_field._element.send_keys(Keys.END, Keys.BACK_SPACE)  # pylint: disable=protected-access
+    weight_field._element.send_keys(weight)  # pylint: disable=protected-access
 
 
 @step(u'the assignment weight is displayed as "([^"]*)"$')
-def verify_weight(step, weight):
+def verify_weight(_step, weight):
     weight_id = '#course-grading-assignment-gradeweight'
     assert_equal(world.css_value(weight_id, -1), weight)
 
@@ -190,7 +183,7 @@ def i_change_grace_period(_step, grace_period):
     # this to happen, then we can end up with
     # an invalid value (e.g. "00:0048:00")
     # which prevents us from saving.
-    assert_true(world.css_has_value(grace_period_css, "00:00"))
+    assert world.css_has_value(grace_period_css, "00:00")
 
     # Set the new grace period
     ele.value = grace_period

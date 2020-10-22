@@ -24,7 +24,7 @@ from openedx.core.release import RELEASE_LINE
 os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()
 
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
 ######################### Testing overrides ####################################
 
@@ -145,8 +145,8 @@ LMS_ROOT_URL = "http://localhost:8000"
 if RELEASE_LINE == "master":
     # On master, acceptance tests use edX books, not the default Open edX books.
     HELP_TOKENS_BOOKS = {
-        'learner': 'http://edx.readthedocs.io/projects/edx-guide-for-students',
-        'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
+        'learner': 'https://edx.readthedocs.io/projects/edx-guide-for-students',
+        'course_author': 'https://edx.readthedocs.io/projects/edx-partner-course-staff',
     }
 
 ########################## VIDEO TRANSCRIPTS STORAGE ############################
@@ -162,6 +162,6 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=import-error
+    from .private import *      # pylint: disable=wildcard-import
 except ImportError:
     pass

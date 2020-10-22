@@ -1,23 +1,22 @@
 """
 Acceptance tests for course in studio
 """
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.index import DashboardPage
 from common.test.acceptance.pages.studio.users import CourseTeamPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
-@attr(shard=2)
 class CourseTeamPageTest(StudioCourseTest):
     """ As a course author, I want to be able to add others to my team """
+    shard = 2
+
     def _make_user(self, username):
         """ Registers user and returns user representation dictionary as expected by `log_in` function """
         user = {
             'username': username,
             'email': username + "@example.com",
-            'password': username + '123'
+            'password': username + '123$%^'
         }
         AutoAuthPage(
             self.browser, no_login=True,

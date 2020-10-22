@@ -158,7 +158,7 @@ class UserInfoTest(BaseTestMixin, UserInfoTestCase):
         full_scope = 'openid %s' % scope
         self.set_access_token_scope(full_scope)
 
-        token = self.access_token.token  # pylint: disable=no-member
+        token = self.access_token.token
         return full_scope, token
 
     def get_with_scope(self, scope):

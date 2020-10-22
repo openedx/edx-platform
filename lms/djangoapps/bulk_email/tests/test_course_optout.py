@@ -8,7 +8,6 @@ from django.core import mail
 from django.core.management import call_command
 from django.urls import reverse
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from bulk_email.models import BulkEmailFlag
@@ -23,12 +22,12 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestOptoutCourseEmails(ModuleStoreTestCase):
     """
     Test that optouts are referenced in sending course email.
     """
+    shard = 1
 
     def setUp(self):
         super(TestOptoutCourseEmails, self).setUp()
@@ -118,12 +117,13 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.assertIn(self.instructor.email, sent_addresses)
 
 
-@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestACEOptoutCourseEmails(ModuleStoreTestCase):
     """
     Test that optouts are referenced in sending course email.
     """
+    shard = 1
+
     def setUp(self):
         super(TestACEOptoutCourseEmails, self).setUp()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"

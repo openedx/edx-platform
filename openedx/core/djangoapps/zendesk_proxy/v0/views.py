@@ -20,7 +20,7 @@ class ZendeskProxyThrottle(SimpleRateThrottle):
         self.rate = '{}/hour'.format(ZENDESK_REQUESTS_PER_HOUR)
         super(ZendeskProxyThrottle, self).__init__()
 
-    def get_cache_key(self, request, view):  # pylint: disable=unused-argument
+    def get_cache_key(self, request, view):
         """
         By providing a static string here, we are limiting *all* users to the same combined limit.
         """

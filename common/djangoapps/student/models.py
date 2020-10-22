@@ -55,6 +55,7 @@ from openedx.core.djangoapps.theming.helpers import (
     get_current_site,
 )
 
+from edx_django_utils.cache import RequestCache
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -72,7 +73,6 @@ from openedx.core.djangoapps.appsembler.sites.utils import (
     get_current_organization,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
@@ -242,6 +242,13 @@ def is_username_retired(username):
         if "user_api_userretirementstatus" in text_type(exc):
             return User.objects.filter(username__in=list(locally_hashed_usernames)).exists()
         raise
+
+
+def username_exists_or_retired(username):
+    """
+    Check a username for existence -or- retirement against the User model.
+    """
+    return User.objects.filter(username=username).exists() or is_username_retired(username)
 
 
 def generate_retired_email_address(email, organization):
@@ -1267,7 +1274,7 @@ class CourseEnrollment(models.Model):
     course = models.ForeignKey(
         CourseOverview,
         db_constraint=False,
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
 
     @property
@@ -2184,7 +2191,7 @@ class CourseEnrollment(models.Model):
         """
         # before populating the cache with another bulk set of data,
         # remove previously cached entries to keep memory usage low.
-        clear_cache(cls.MODE_CACHE_NAMESPACE)
+        RequestCache(cls.MODE_CACHE_NAMESPACE).clear()
 
         records = cls.objects.filter(user__in=users, course_id=course_key).select_related('user')
         cache = cls._get_mode_active_request_cache()
@@ -2195,9 +2202,9 @@ class CourseEnrollment(models.Model):
     @classmethod
     def _get_mode_active_request_cache(cls):
         """
-        Returns the request-specific cache for CourseEnrollment
+        Returns the request-specific cache for CourseEnrollment as dict.
         """
-        return get_cache(cls.MODE_CACHE_NAMESPACE)
+        return RequestCache(cls.MODE_CACHE_NAMESPACE).data
 
     @classmethod
     def _get_enrollment_in_request_cache(cls, user, course_key):

@@ -35,7 +35,7 @@ class InvalidTestName(Exception):
 
 xblock_loaded = False  # pylint: disable=invalid-name
 
-for entrypoint in pkg_resources.iter_entry_points(group="xblock.test.v0"):  # pylint: disable=no-member
+for entrypoint in pkg_resources.iter_entry_points(group="xblock.test.v0"):
     plugin = entrypoint.load()
     classname = plugin.__name__
     if classname in globals():

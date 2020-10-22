@@ -9,7 +9,7 @@ from config_models.models import ConfigurationModel
 from django.db.models import TextField
 
 from opaque_keys.edx.django.models import CourseKeyField
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from openedx.core.lib.cache_utils import request_cached
 
 
 class StudioConfig(ConfigurationModel):
@@ -42,7 +42,7 @@ class CourseEditLTIFieldsEnabledFlag(ConfigurationModel):
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     @classmethod
-    @request_cached
+    @request_cached()
     def lti_access_to_learners_editable(cls, course_id, is_already_sharing_learner_info):
         """
         Looks at the currently active configuration model to determine whether

@@ -7,7 +7,6 @@ import ddt
 from django.core.management import call_command
 from django.test import TestCase
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
@@ -22,6 +21,7 @@ from bulk_email.models import (
 )
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.models import CourseCohort
+from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

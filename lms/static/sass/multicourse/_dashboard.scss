@@ -178,6 +178,7 @@
 
                 .change-session {
                   @extend %t-title7;
+
                   @include margin(0, 0, 0, $baseline/4);
 
                   padding: 0;
@@ -508,7 +509,6 @@
     max-width: $baseline*20;
     min-width: $baseline*20;
     min-height: $baseline/2;
-
     flex-grow: 1;
     order: 2;
 
@@ -810,6 +810,7 @@
 
       .action-view-consent {
         @extend %btn-pl-white-base;
+
         @include float(right);
 
         &.archived {
@@ -953,7 +954,7 @@
           @include float(right);
 
           .action {
-                    @include margin(0, 0, ($baseline/2), ($baseline*0.75));
+            @include margin(0, 0, ($baseline/2), ($baseline*0.75));
 
             float: none;
             text-align: center;
@@ -969,6 +970,7 @@
 
           .action-certificate .btn {
             @extend %btn-inherited-primary;
+
             @include box-sizing(border-box);
 
             padding: 7px $baseline*0.75;
@@ -1342,7 +1344,7 @@ p.course-block {
 
 .enter-course-blocked {
   @include box-sizing(border-box);
-  @include float(left);
+  @include float(right);
 
   display: block;
   font: normal 15px/1.6rem $font-family-sans-serif;

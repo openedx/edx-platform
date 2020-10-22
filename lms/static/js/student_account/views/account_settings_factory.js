@@ -168,7 +168,8 @@
                                     {platform_name: platformName}
                                 ),
                                 options: fieldsData.language.options,
-                                persistChanges: true
+                                persistChanges: true,
+                                focusNextID: '#u-field-select-country',
                             })
                         },
                         countryFieldView,
@@ -388,7 +389,12 @@
             });
 
             accountSettingsView.render();
-
+            if( $.cookie('focus_id')) {
+                $($.cookie('focus_id')).attr({"tabindex": 0});
+                $($.cookie('focus_id')).focus();
+                // Deleting the cookie
+                document.cookie = "focus_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/account;";
+            }
             showAccountSettingsPage = function() {
                 // Record that the account settings page was viewed.
                 Logger.log('edx.user.settings.viewed', {

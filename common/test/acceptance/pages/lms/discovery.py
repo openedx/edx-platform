@@ -31,7 +31,7 @@ class CourseDiscoveryPage(PageObject):
         """
         Return search result items.
         """
-        return self.q(css=".courses-listing-item")
+        return self.q(css=".courses-list .courses-listing-item")
 
     @property
     def clear_button(self):

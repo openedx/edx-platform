@@ -4,7 +4,7 @@ Settings for OpenStack deployments.
 
 # We import the aws settings because that's currently where the base settings are stored for all deployments.
 # TODO - fix this when aws.py is split/renamed.
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 SWIFT_AUTH_URL = AUTH_TOKENS.get('SWIFT_AUTH_URL')
 SWIFT_AUTH_VERSION = AUTH_TOKENS.get('SWIFT_AUTH_VERSION', 1)

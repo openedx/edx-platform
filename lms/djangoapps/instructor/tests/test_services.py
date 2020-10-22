@@ -5,7 +5,6 @@ Tests for the InstructorService
 import json
 
 import mock
-from nose.plugins.attrib import attr
 
 from courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access
@@ -17,11 +16,12 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class InstructorServiceTests(SharedModuleStoreTestCase):
     """
     Tests for the InstructorService
     """
+    shard = 1
+
     @classmethod
     def setUpClass(cls):
         super(InstructorServiceTests, cls).setUpClass()

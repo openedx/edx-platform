@@ -1,0 +1,4 @@
+<% _.each(gradingPolicies, function(policy){ %>
+    <% var value = policy.replace(/[\W_]+/g, ''); %>
+    <option value="<%- value %>"><%- policy %></option>
+<% }) %>

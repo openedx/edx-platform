@@ -68,8 +68,8 @@ class DOPAdapterTestCase(TestCase):
         self.assertEqual(self.adapter.get_client_for_token(token), self.public_client)
 
     def test_get_access_token(self):
-        token = models.AccessToken.objects.create(
-            token='token-id',
+        token = self.adapter.create_access_token_for_test(
+            'token-id',
             client=self.public_client,
             user=self.user,
             expires=now() + timedelta(days=30),

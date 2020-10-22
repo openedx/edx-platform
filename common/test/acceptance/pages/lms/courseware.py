@@ -155,27 +155,27 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         return int(tab_id.split('_')[1])
 
     @property
-    def _active_sequence_tab(self):  # pylint: disable=missing-docstring
+    def _active_sequence_tab(self):
         return self.q(css='#sequence-list .nav-item.active')
 
     @property
-    def is_next_button_enabled(self):  # pylint: disable=missing-docstring
+    def is_next_button_enabled(self):
         return not self.q(css='.sequence-nav > .sequence-nav-button.button-next.disabled').is_present()
 
     @property
-    def is_previous_button_enabled(self):  # pylint: disable=missing-docstring
+    def is_previous_button_enabled(self):
         return not self.q(css='.sequence-nav > .sequence-nav-button.button-previous.disabled').is_present()
 
-    def click_next_button_on_top(self):  # pylint: disable=missing-docstring
+    def click_next_button_on_top(self):
         self._click_navigation_button('sequence-nav', 'button-next')
 
-    def click_next_button_on_bottom(self):  # pylint: disable=missing-docstring
+    def click_next_button_on_bottom(self):
         self._click_navigation_button('sequence-bottom', 'button-next')
 
-    def click_previous_button_on_top(self):  # pylint: disable=missing-docstring
+    def click_previous_button_on_top(self):
         self._click_navigation_button('sequence-nav', 'button-previous')
 
-    def click_previous_button_on_bottom(self):  # pylint: disable=missing-docstring
+    def click_previous_button_on_bottom(self):
         self._click_navigation_button('sequence-bottom', 'button-previous')
 
     def _click_navigation_button(self, top_or_bottom_class, next_or_previous_class):

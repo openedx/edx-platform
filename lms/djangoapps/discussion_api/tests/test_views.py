@@ -11,7 +11,6 @@ import ddt
 import httpretty
 import mock
 from django.urls import reverse
-from nose.plugins.attrib import attr
 from pytz import UTC
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient
@@ -27,9 +26,10 @@ from discussion_api.tests.utils import (
     make_paginated_api_response
 )
 from django_comment_client.tests.utils import ForumsEnableMixin
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from openedx.core.lib.token_utils import JwtBuilder
+from openedx.core.lib.tests import attr
 from student.models import get_retired_username_by_username
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, SuperuserFactory
 from util.testing import PatchMediaTypeMixin, UrlResetMixin
@@ -190,7 +190,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         Helper function for creating headers for the JWT authentication.
         """
-        token = JwtBuilder(user).build_token([])
+        token = create_jwt_for_user(user)
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         return headers
 

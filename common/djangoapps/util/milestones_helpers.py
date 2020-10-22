@@ -11,8 +11,8 @@ from milestones.services import MilestonesService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.request_cache import get_cache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.cache_utils import get_cache
 from xmodule.modulestore.django import modulestore
 
 NAMESPACE_CHOICES = {

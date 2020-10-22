@@ -3,11 +3,12 @@ Test the various password reset flows
 """
 import json
 import re
+import unicodedata
 import unittest
 
 import ddt
 from django.conf import settings
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core.cache import cache
@@ -24,11 +25,14 @@ from provider.oauth2 import models as dop_models
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
+from openedx.core.djangoapps.user_api.config.waffle import (
+    PASSWORD_UNICODE_NORMALIZE_FLAG, PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
+)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
 from student.views import SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
+from util.password_policy_validators import create_validator_config
 from util.testing import EventTestMixin
 
 from .test_configuration_overrides import fake_get_value
@@ -351,16 +355,40 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 self.user.refresh_from_db()
                 assert not self.user.is_active
 
-    @override_settings(PASSWORD_MIN_LENGTH=2)
-    @override_settings(PASSWORD_MAX_LENGTH=10)
+    def test_password_reset_normalize_password(self):
+        """
+        Tests that if we provide a not properly normalized password, it is saved using our normalization
+        method of NFKC.
+        In this test, the input password is u'p\u212bssword'. It should be normalized to u'p\xc5ssword'
+        """
+        with PASSWORD_UNICODE_NORMALIZE_FLAG.override(active=True):
+            url = reverse(
+                "password_reset_confirm",
+                kwargs={"uidb36": self.uidb36, "token": self.token}
+            )
+
+            password = u'p\u212bssword'
+            request_params = {'new_password1': password, 'new_password2': password}
+            confirm_request = self.request_factory.post(url, data=request_params)
+            response = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+
+            user = User.objects.get(pk=self.user.pk)
+            salt_val = user.password.split('$')[1]
+            expected_user_password = make_password(unicodedata.normalize('NFKC', u'p\u212bssword'), salt_val)
+            self.assertEqual(expected_user_password, user.password)
+
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
+        create_validator_config('util.password_policy_validators.MaximumLengthValidator', {'max_length': 10})
+    ])
     @ddt.data(
         {
             'password': '1',
-            'error_message': 'Enter a password with at least 2 characters.',
+            'error_message': 'This password is too short. It must contain at least 2 characters.',
         },
         {
             'password': '01234567891',
-            'error_message': 'Enter a password with at most 10 characters.',
+            'error_message': 'This password is too long. It must contain no more than 10 characters.',
         }
     )
     def test_password_reset_with_invalid_length(self, password_dict):

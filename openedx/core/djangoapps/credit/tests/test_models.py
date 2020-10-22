@@ -5,7 +5,6 @@ Tests for credit course models.
 
 import ddt
 from django.test import TestCase
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.models import (
@@ -15,8 +14,10 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirement,
     CreditRequirementStatus
 )
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import RetirementTestCase
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import setup_retirement_states
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
+    RetirementTestCase,
+    setup_retirement_states
+)
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from student.tests.factories import UserFactory
 
@@ -32,12 +33,12 @@ def add_credit_course(course_key):
     return credit_course
 
 
-@attr(shard=2)
 @ddt.ddt
 class CreditEligibilityModelTests(TestCase):
     """
     Tests for credit models used to track credit eligibility.
     """
+    shard = 2
 
     def setUp(self):
         super(CreditEligibilityModelTests, self).setUp()
@@ -106,7 +107,6 @@ class CreditRequirementStatusTests(RetirementTestCase):
     def setUp(self):
         super(CreditRequirementStatusTests, self).setUp()
         self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
-        RetirementTestCase.setup_states()
         self.old_username = "username"
         self.user = UserFactory(username=self.old_username)
         self.retirement = UserRetirementStatus.create_retirement(self.user)
@@ -178,7 +178,6 @@ class CreditRequestTest(RetirementTestCase):
 
     def setUp(self):
         super(CreditRequestTest, self).setUp()
-        RetirementTestCase.setup_states()
         self.user = UserFactory.create()
         self.retirement = UserRetirementStatus.create_retirement(self.user)
         self.credit_course = CreditCourse.objects.create()

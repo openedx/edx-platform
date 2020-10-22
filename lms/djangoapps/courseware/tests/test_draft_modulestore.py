@@ -1,15 +1,15 @@
 from django.test import TestCase
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.django import modulestore
 
 
-@attr(shard=1)
 class TestDraftModuleStore(TestCase):
     """
     Test the draft modulestore
     """
+    shard = 1
+
     def test_get_items_with_course_items(self):
         store = modulestore()
 

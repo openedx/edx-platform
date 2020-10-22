@@ -4,7 +4,7 @@ End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
 import datetime
 
-from nose.plugins.attrib import attr
+import pytest
 
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -141,9 +141,9 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
         self.dashboard_page.visit()
 
 
-@attr(shard=9)
 class LmsDashboardPageTest(BaseLmsDashboardTest):
     """ Test suite for the LMS Student Dashboard page """
+    shard = 9
 
     def setUp(self):
         super(LmsDashboardPageTest, self).setUp()
@@ -399,7 +399,7 @@ class LmsDashboardCourseUnEnrollDialogMessageTest(BaseLmsDashboardTestMultiple):
         self.assertEqual(dialog_message['refund-info'][0], expected_refund_message)
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
     """
     Class to test lms student dashboard accessibility.

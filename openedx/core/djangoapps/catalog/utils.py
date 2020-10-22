@@ -14,11 +14,12 @@ from pytz import UTC
 
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
-from openedx.core.djangoapps.catalog.cache import (PROGRAM_CACHE_KEY_TPL,
+from openedx.core.djangoapps.catalog.cache import (PATHWAY_CACHE_KEY_TPL, PROGRAM_CACHE_KEY_TPL,
+                                                   SITE_PATHWAY_IDS_CACHE_KEY_TPL,
                                                    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_edx_api_data
-from openedx.core.lib.token_utils import JwtBuilder
 from student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
@@ -26,9 +27,7 @@ logger = logging.getLogger(__name__)
 
 def create_catalog_api_client(user, site=None):
     """Returns an API client which can be used to make Catalog API requests."""
-    scopes = ['email', 'profile']
-    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-    jwt = JwtBuilder(user).build_token(scopes, expires_in)
+    jwt = create_jwt_for_user(user)
 
     if site:
         url = site.configuration.get_value('COURSE_CATALOG_API_URL')
@@ -63,7 +62,7 @@ def get_programs(site, uuid=None):
         return program
     uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
     if not uuids:
-        logger.warning('Failed to get program UUIDs from the cache.')
+        logger.warning('Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
 
     programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
     programs = list(programs.values())
@@ -122,6 +121,62 @@ def get_program_types(name=None):
         return data
     else:
         return []
+
+
+def get_pathways(site, pathway_id=None):
+    """
+    Read pathways from the cache.
+    The cache is populated by a management command, cache_programs.
+
+    Arguments:
+        site (Site): django.contrib.sites.models object
+
+    Keyword Arguments:
+        pathway_id (string): id identifying a specific pathway to read from the cache.
+
+    Returns:
+        list of dict, representing pathways.
+        dict, if a specific pathway is requested.
+    """
+    missing_details_msg_tpl = 'Failed to get details for credit pathway {id} from the cache.'
+
+    if pathway_id:
+        pathway = cache.get(PATHWAY_CACHE_KEY_TPL.format(id=pathway_id))
+        if not pathway:
+            logger.warning(missing_details_msg_tpl.format(id=pathway_id))
+
+        return pathway
+    pathway_ids = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [])
+    if not pathway_ids:
+        logger.warning('Failed to get credit pathway ids from the cache.')
+
+    pathways = cache.get_many([PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in pathway_ids])
+    pathways = pathways.values()
+
+    # The get_many above sometimes fails to bring back details cached on one or
+    # more Memcached nodes. It doesn't look like these keys are being evicted.
+    # 99% of the time all keys come back, but 1% of the time all the keys stored
+    # on one or more nodes are missing from the result of the get_many. One
+    # get_many may fail to bring these keys back, but a get_many occurring
+    # immediately afterwards will succeed in bringing back all the keys. This
+    # behavior can be mitigated by trying again for the missing keys, which is
+    # what we do here. Splitting the get_many into smaller chunks may also help.
+    missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
+    if missing_ids:
+        logger.info(
+            'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))
+        )
+
+        retried_pathways = cache.get_many(
+            [PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in missing_ids]
+        )
+        pathways += retried_pathways.values()
+
+        still_missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
+        for missing_id in still_missing_ids:
+            logger.warning(missing_details_msg_tpl.format(id=missing_id))
+
+    return pathways
 
 
 def get_currency_data():
@@ -403,13 +458,15 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
             course_id=course_id
         )
         is_enrolled_in_mode = is_active and (user_enrollment_mode == entitlement.mode)
-        if (course_run.get('status') == COURSE_PUBLISHED and
-                is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
-            if (is_enrolled_in_mode and
-                    entitlement.enrollment_course_run and
-                    course_id == entitlement.enrollment_course_run.course_id):
-                enrollable_sessions.append(course_run)
-            elif not is_enrolled_in_mode:
+        if (is_enrolled_in_mode and
+                entitlement.enrollment_course_run and
+                course_id == entitlement.enrollment_course_run.course_id):
+            # User is enrolled in the course so we should include it in the list of enrollable sessions always
+            # this will ensure it is available for the UI
+            enrollable_sessions.append(course_run)
+        elif (course_run.get('status') == COURSE_PUBLISHED and not
+              is_enrolled_in_mode and
+              is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
                 enrollable_sessions.append(course_run)
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))

@@ -2,7 +2,6 @@
 Tests for block_structure/cache.py
 """
 import ddt
-from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
@@ -13,13 +12,13 @@ from ..store import BlockStructureStore
 from .helpers import ChildrenMapTestMixin, UsageKeyFactoryMixin, MockCache, MockTransformer
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheIsolationTestCase):
     """
     Tests for BlockStructureStore
     """
     ENABLED_CACHES = ['default']
+    shard = 2
 
     def setUp(self):
         super(TestBlockStructureStore, self).setUp()

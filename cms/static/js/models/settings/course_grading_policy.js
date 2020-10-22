@@ -1,3 +1,4 @@
+/* globals _ */
 define(['backbone', 'js/models/location', 'js/collections/course_grader'],
     function(Backbone, Location, CourseGraderCollection) {
         var CourseGradingPolicy = Backbone.Model.extend({

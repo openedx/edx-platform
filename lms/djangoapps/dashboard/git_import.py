@@ -15,14 +15,14 @@ from django.core import management
 from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from opaque_keys.edx.keys import CourseKey
+from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
+from opaque_keys.edx.locator import CourseLocator
 
 from dashboard.models import CourseImportLog
 
 log = logging.getLogger(__name__)
 
 DEFAULT_GIT_REPO_DIR = '/edx/var/app/edxapp/course_repos'
-DEFAULT_PYTHON_LIB_FILENAME = 'python_lib.zip'
 
 
 class GitImportError(Exception):
@@ -298,8 +298,13 @@ def add_repo(repo, rdir_in, branch=None):
     # this is needed in order for custom course scripts to work
     match = re.search(r'(?ms)===> IMPORTING courselike (\S+)', ret_import)
     if match:
-        course_id = match.group(1)
-        course_key = CourseKey.from_string(course_id)
+        course_id = match.group(1).split('/')
+        # we need to transform course key extracted from logs into CourseLocator instance, because
+        # we are using split module store and course keys store as instance of CourseLocator.
+        # please see common.lib.xmodule.xmodule.modulestore.split_mongo.split.SplitMongoModuleStore#make_course_key
+        # We want set course id in CourseImportLog as CourseLocator. So that in split module
+        # environment course id remain consistent as CourseLocator instance.
+        course_key = CourseLocator(*course_id)
         cdir = '{0}/{1}'.format(git_repo_dir, course_key.course)
         log.debug('Studio course dir = %s', cdir)
 

@@ -30,7 +30,35 @@ from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.message_types import PasswordReset
 from student.models import CourseEnrollmentAllowed, email_exists_or_retired
-from util.password_policy_validators import password_max_length, password_min_length, validate_password
+from util.password_policy_validators import validate_password
+
+
+def send_password_reset_email_for_user(user, request):
+    """
+    Send out a password reset email for the given user.
+    """
+    site = get_current_site()
+    message_context = get_base_template_context(site)
+    message_context.update({
+        'request': request,  # Used by google_analytics_tracking_pixel
+        # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'reset_link': '{protocol}://{site}{link}'.format(
+            protocol='https' if request.is_secure() else 'http',
+            site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+            link=reverse('password_reset_confirm', kwargs={
+                'uidb36': int_to_base36(user.id),
+                'token': default_token_generator.make_token(user),
+            }),
+        )
+    })
+
+    msg = PasswordReset().personalize(
+        recipient=Recipient(user.username, user.email),
+        language=get_user_preference(user, LANGUAGE_KEY),
+        user_context=message_context,
+    )
+    ace.send(msg)
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
@@ -78,29 +106,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
         user.
         """
         for user in self.users_cache:
-            site = get_current_site()
-            message_context = get_base_template_context(site)
-
-            message_context.update({
-                'request': request,  # Used by google_analytics_tracking_pixel
-                # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
-                'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-                'reset_link': '{protocol}://{site}{link}'.format(
-                    protocol='https' if use_https else 'http',
-                    site=site.domain,
-                    link=reverse('password_reset_confirm', kwargs={
-                        'uidb36': int_to_base36(user.id),
-                        'token': token_generator.make_token(user),
-                    }),
-                )
-            })
-
-            msg = PasswordReset().personalize(
-                recipient=Recipient(user.username, user.email),
-                language=get_user_preference(user, LANGUAGE_KEY),
-                user_context=message_context,
-            )
-            ace.send(msg)
+            send_password_reset_email_for_user(user, request)
 
 
 class TrueCheckbox(widgets.CheckboxInput):
@@ -201,7 +207,6 @@ class AccountCreationForm(forms.Form):
     """
 
     _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
-    _PASSWORD_INVALID_MSG = _("A valid password is required")
     _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of two characters long")
 
     # TODO: Resolve repetition
@@ -217,15 +222,9 @@ class AccountCreationForm(forms.Form):
             "max_length": _("Email cannot be more than %(limit_value)s characters long"),
         }
     )
-    password = forms.CharField(
-        min_length=password_min_length(),
-        max_length=password_max_length(),
-        error_messages={
-            "required": _PASSWORD_INVALID_MSG,
-            "min_length": _PASSWORD_INVALID_MSG,
-            "max_length": _PASSWORD_INVALID_MSG,
-        }
-    )
+
+    password = forms.CharField()
+
     name = forms.CharField(
         min_length=accounts_settings.NAME_MIN_LENGTH,
         error_messages={
@@ -240,14 +239,14 @@ class AccountCreationForm(forms.Form):
             data=None,
             extra_fields=None,
             extended_profile_fields=None,
-            enforce_password_policy=False,
+            do_third_party_auth=True,
             tos_required=True
     ):
         super(AccountCreationForm, self).__init__(data)
 
         extra_fields = extra_fields or {}
         self.extended_profile_fields = extended_profile_fields or {}
-        self.enforce_password_policy = enforce_password_policy
+        self.do_third_party_auth = do_third_party_auth
         if tos_required:
             self.fields["terms_of_service"] = TrueField(
                 error_messages={"required": _("You must accept the terms of service.")}
@@ -295,8 +294,13 @@ class AccountCreationForm(forms.Form):
     def clean_password(self):
         """Enforce password policies (if applicable)"""
         password = self.cleaned_data["password"]
-        if self.enforce_password_policy:
-            validate_password(password, username=self.cleaned_data.get('username'))
+        if not self.do_third_party_auth:
+            # Creating a temporary user object to test password against username
+            # This user should NOT be saved
+            username = self.cleaned_data.get('username')
+            email = self.cleaned_data.get('email')
+            temp_user = User(username=username, email=email) if username else None
+            validate_password(password, temp_user)
         return password
 
     def clean_email(self):

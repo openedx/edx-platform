@@ -4,8 +4,9 @@ by the individual due dates feature.
 """
 import json
 
+from courseware.models import StudentFieldOverride
+
 from .field_overrides import FieldOverrideProvider
-from .models import StudentFieldOverride
 
 
 class IndividualStudentOverrideProvider(FieldOverrideProvider):

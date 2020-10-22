@@ -9,15 +9,13 @@ import itertools
 import mimetypes
 from uuid import uuid4
 from contextlib import contextmanager
+import pytest
 from mock import patch, Mock, call
 
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
-# This import breaks this test file when run separately. Needs to be fixed! (PLAT-449)
-from nose.plugins.attrib import attr
-from nose import SkipTest
 import pymongo
 from pytz import UTC
 from shutil import rmtree
@@ -42,6 +40,7 @@ if not settings.configured:
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
+from openedx.core.lib.tests import attr
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
@@ -3279,7 +3278,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
         Check that asides could be imported from XML and the modulestores handle asides crud
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
         with MongoContentstoreBuilder().build() as contentstore:
             self.store = MixedModuleStore(
                 contentstore=contentstore,
@@ -3354,7 +3353,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
            lambda self, block: ['test_aside'])
     def test_export_course_with_asides(self, default_store):
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
         with MongoContentstoreBuilder().build() as contentstore:
             self.store = MixedModuleStore(
                 contentstore=contentstore,
@@ -3441,7 +3440,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
            lambda self, block: ['test_aside'])
     def test_export_course_after_creating_new_items_with_asides(self, default_store):  # pylint: disable=too-many-statements
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
         with MongoContentstoreBuilder().build() as contentstore:
             self.store = MixedModuleStore(
                 contentstore=contentstore,
@@ -3578,7 +3577,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         Tests that connected asides could be stored, received and updated along with connected course items
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
 
         self.initdb(default_store)
 
@@ -3642,7 +3641,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         Tests that connected asides will be cloned together with the parent courses
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
 
         with MongoContentstoreBuilder().build() as contentstore:
             # initialize the mixed modulestore
@@ -3690,7 +3689,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         Tests that connected asides will be removed together with the connected items
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
 
         self.initdb(default_store)
 
@@ -3740,7 +3739,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         Tests that public/unpublish doesn't affect connected stored asides
         """
         if default_store == ModuleStoreEnum.Type.mongo:
-            raise SkipTest("asides not supported in old mongo")
+            pytest.skip("asides not supported in old mongo")
 
         self.initdb(default_store)
 

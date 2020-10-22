@@ -5,7 +5,6 @@ import json
 
 from ddt import ddt, data, unpack
 from mock import sentinel
-from nose.plugins.attrib import attr
 
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
@@ -30,12 +29,12 @@ def expect_failure_with_message(message):
     return test_decorator
 
 
-@attr(shard=3)
 @ddt
 class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     """
     Test processing of Segment events.
     """
+    shard = 3
 
     def test_get_request(self):
         request = self.request_factory.get(SEGMENTIO_TEST_ENDPOINT)

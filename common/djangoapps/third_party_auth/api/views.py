@@ -1,20 +1,22 @@
 """
 Third Party Auth REST API views
 """
+
+from collections import namedtuple
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404
-from rest_framework import exceptions, status
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from rest_framework import exceptions, status, throttling
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 from social_django.models import UserSocialAuth
 
-from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationAllowInactiveUser,
-    SessionAuthenticationAllowInactiveUser
-)
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from third_party_auth import pipeline
 from third_party_auth.api import serializers
@@ -22,13 +24,132 @@ from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
 from third_party_auth.provider import Registry
 
 
-class UserView(APIView):
+class ProviderBaseThrottle(throttling.UserRateThrottle):
+    """
+    Base throttle for provider queries
+    """
+
+    def allow_request(self, request, view):
+        """
+        Only throttle unprivileged requests.
+        """
+        if view.is_unprivileged_query(request, view.get_identifier_for_requested_user(request)):
+            return super(ProviderBaseThrottle, self).allow_request(request, view)
+        return True
+
+
+class ProviderBurstThrottle(ProviderBaseThrottle):
+    """
+    Maximum number of provider requests in a quick burst.
+    """
+    rate = settings.TPA_PROVIDER_BURST_THROTTLE  # Default '10/min'
+
+
+class ProviderSustainedThrottle(ProviderBaseThrottle):
+    """
+    Maximum number of provider requests over time.
+    """
+    rate = settings.TPA_PROVIDER_SUSTAINED_THROTTLE  # Default '50/day'
+
+
+class BaseUserView(APIView):
+    """
+    Common core of UserView and UserViewV2
+    """
+    identifier = namedtuple('identifier', ['kind', 'value'])
+    identifier_kinds = ['email', 'username']
+
+    authentication_classes = (
+        # Users may want to view/edit the providers used for authentication before they've
+        # activated their account, so we allow inactive users.
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
+
+    def do_get(self, request, identifier):
+        """
+        Fulfill the request, now that the identifier has been specified.
+        """
+        is_unprivileged = self.is_unprivileged_query(request, identifier)
+
+        if is_unprivileged:
+            if not getattr(settings, 'ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY', False):
+                return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(**{identifier.kind: identifier.value})
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        providers = pipeline.get_provider_user_states(user)
+
+        active_providers = [
+            self.get_provider_data(assoc, is_unprivileged)
+            for assoc in providers if assoc.has_account
+        ]
+
+        # In the future this can be trivially modified to return the inactive/disconnected providers as well.
+
+        return Response({
+            "active": active_providers
+        })
+
+    def get_provider_data(self, assoc, is_unprivileged):
+        """
+        Return the data for the specified provider.
+
+        If the request is unprivileged, do not return the remote ID of the user.
+        """
+        provider_data = {
+            "provider_id": assoc.provider.provider_id,
+            "name": assoc.provider.name,
+        }
+        if not is_unprivileged:
+            provider_data["remote_id"] = assoc.remote_id
+        return provider_data
+
+    def is_unprivileged_query(self, request, identifier):
+        """
+        Return True if a non-superuser requests information about another user.
+
+        Params must be a dict that includes only one of 'username' or 'email'
+        """
+        if identifier.kind not in self.identifier_kinds:
+            # This is already checked before we get here, so raise a 500 error
+            # if the check fails.
+            raise ValueError("Identifier kind {} not in {}".format(identifier.kind, self.identifier_kinds))
+
+        self_request = False
+        if identifier == self.identifier('username', request.user.username):
+            self_request = True
+        elif identifier.kind == 'email' and getattr(identifier, 'value', object()) == request.user.email:
+            # AnonymousUser does not have an email attribute, so fall back to
+            # something that will never compare equal to the provided email.
+            self_request = True
+        if self_request:
+            # We can always ask for our own provider
+            return False
+        # We are querying permissions for a user other than the current user.
+        if not request.user.is_superuser and not ApiKeyHeaderPermission().has_permission(request, self):
+            # The user does not have elevated permissions.
+            return True
+        return False
+
+
+class UserView(BaseUserView):
     """
     List the third party auth accounts linked to the specified user account.
+
+    [DEPRECATED]
+
+    This view uses heuristics to guess whether the provided identifier is a
+    username or email address.  Instead, use /api/third_party_auth/v0/users/
+    and specify ?username=foo or ?email=foo@exmaple.com.
 
     **Example Request**
 
         GET /api/third_party_auth/v0/users/{username}
+        GET /api/third_party_auth/v0/users/{email@example.com}
 
     **Response Values**
 
@@ -47,18 +168,11 @@ class UserView(APIView):
               is what is used to link the user to their edX account during
               login.
     """
-    authentication_classes = (
-        # Users may want to view/edit the providers used for authentication before they've
-        # activated their account, so we allow inactive users.
-        OAuth2AuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
 
     def get(self, request, username):
-        """Create, read, or update enrollment information for a user.
+        """Read provider information for a user.
 
-        HTTP Endpoint for all CRUD operations for a user course enrollment. Allows creation, reading, and
-        updates of the current enrollment for a particular course.
+        Allows reading the list of providers for a specified user.
 
         Args:
             request (Request): The HTTP GET request
@@ -68,34 +182,80 @@ class UserView(APIView):
             JSON serialized list of the providers linked to this user.
 
         """
-        if request.user.username != username:
-            # We are querying permissions for a user other than the current user.
-            if not request.user.is_superuser and not ApiKeyHeaderPermission().has_permission(request, self):
-                # Return a 403 (Unauthorized) without validating 'username', so that we
-                # do not let users probe the existence of other user accounts.
-                return Response(status=status.HTTP_403_FORBIDDEN)
+        identifier = self.get_identifier_for_requested_user(request)
+        return self.do_get(request, identifier)
 
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+    def get_identifier_for_requested_user(self, _request):
+        """
+        Return an identifier namedtuple for the requested user.
+        """
+        if u'@' in self.kwargs[u'username']:
+            id_kind = u'email'
+        else:
+            id_kind = u'username'
+        return self.identifier(id_kind, self.kwargs[u'username'])
 
-        providers = pipeline.get_provider_user_states(user)
 
-        active_providers = [
-            {
-                "provider_id": assoc.provider.provider_id,
-                "name": assoc.provider.name,
-                "remote_id": assoc.remote_id,
-            }
-            for assoc in providers if assoc.has_account
-        ]
+# TODO: When removing deprecated UserView, rename this view to UserView.
+class UserViewV2(BaseUserView):
+    """
+    List the third party auth accounts linked to the specified user account.
 
-        # In the future this can be trivially modified to return the inactive/disconnected providers as well.
+    **Example Request**
 
-        return Response({
-            "active": active_providers
-        })
+        GET /api/third_party_auth/v0/users/?username={username}
+        GET /api/third_party_auth/v0/users/?email={email@example.com}
+
+    **Response Values**
+
+        If the request for information about the user is successful, an HTTP 200 "OK" response
+        is returned.
+
+        The HTTP 200 response has the following values.
+
+        * active: A list of all the third party auth providers currently linked
+          to the given user's account. Each object in this list has the
+          following attributes:
+
+            * provider_id: The unique identifier of this provider (string)
+            * name: The name of this provider (string)
+            * remote_id: The ID of the user according to the provider. This ID
+              is what is used to link the user to their edX account during
+              login.
+    """
+
+    def get(self, request):
+        """
+        Read provider information for a user.
+
+        Allows reading the list of providers for a specified user.
+
+        Args:
+            request (Request): The HTTP GET request
+
+        Request Parameters:
+            Must provide one of 'email' or 'username'.  If both are provided,
+            the username will be ignored.
+
+        Return:
+            JSON serialized list of the providers linked to this user.
+
+        """
+        identifier = self.get_identifier_for_requested_user(request)
+        return self.do_get(request, identifier)
+
+    def get_identifier_for_requested_user(self, request):
+        """
+        Return an identifier namedtuple for the requested user.
+        """
+        identifier = None
+        for id_kind in self.identifier_kinds:
+            if id_kind in request.GET:
+                identifier = self.identifier(id_kind, request.GET[id_kind])
+                break
+        if identifier is None:
+            raise exceptions.ValidationError(u"Must provide one of {}".format(self.identifier_kinds))
+        return identifier
 
 
 class UserMappingView(ListAPIView):
@@ -197,7 +357,7 @@ class UserMappingView(ListAPIView):
         # When using multi-IdP backend, we only retrieve the ones that are for current IdP.
         # test if the current provider has a slug
         uid = self.provider.get_social_auth_uid('uid')
-        if uid is not 'uid':
+        if uid != 'uid':
             # if yes, we add a filter for the slug on uid column
             query_set = query_set.filter(uid__startswith=uid[:-3])
 
@@ -209,13 +369,13 @@ class UserMappingView(ListAPIView):
         if usernames:
             usernames = ','.join(usernames)
             usernames = set(usernames.split(',')) if usernames else set()
-            if len(usernames):
+            if usernames:
                 query = query | Q(user__username__in=usernames)
 
         if remote_ids:
             remote_ids = ','.join(remote_ids)
             remote_ids = set(remote_ids.split(',')) if remote_ids else set()
-            if len(remote_ids):
+            if remote_ids:
                 query = query | Q(uid__in=[self.provider.get_social_auth_uid(remote_id) for remote_id in remote_ids])
 
         return query_set.filter(query)

@@ -3,16 +3,15 @@ Test Custom Exceptions
 """
 import ddt
 from django.test import TestCase
-from nose.plugins.attrib import attr
 from rest_framework import exceptions as drf_exceptions
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestDictExceptionsAllowDictDetails(TestCase):
     """
     Test that standard DRF exceptions can return dictionaries in error details.
     """
+    shard = 2
 
     def test_drf_errors_are_not_coerced_to_strings(self):
         # Demonstrate that dictionaries in exceptions are not coerced to strings.

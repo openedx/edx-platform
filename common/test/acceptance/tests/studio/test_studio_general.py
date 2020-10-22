@@ -72,7 +72,7 @@ class SignUpAndSignInTest(UniqueCourseTest):
     """
     shard = 21
 
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         super(SignUpAndSignInTest, self).setUp()
         self.sign_up_page = SignupPage(self.browser)
         self.login_page = LoginPage(self.browser)

@@ -15,7 +15,6 @@ Examples of html5 videos for manual testing:
 import copy
 import json
 import logging
-import random
 from collections import defaultdict, OrderedDict
 from operator import itemgetter
 
@@ -25,7 +24,8 @@ from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
-from openedx.core.lib.cache_utils import memoize_in_request_cache
+from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
+from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -44,7 +44,6 @@ from xmodule.xml_module import deserialize_field, is_pointer_tag, name_to_pathna
 from .bumper_utils import bumperize
 from .transcripts_utils import (
     get_html5_ids,
-    get_video_ids_info,
     Transcript,
     VideoTranscriptsMixin,
     clean_video_id,
@@ -97,7 +96,6 @@ log = logging.getLogger(__name__)
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
-
 
 EXPORT_IMPORT_COURSE_DIR = u'course'
 EXPORT_IMPORT_STATIC_DIR = u'static'
@@ -181,6 +179,34 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
+
+    @property
+    def youtube_deprecated(self):
+        """
+        Return True if youtube is deprecated and hls as primary playback is enabled else False
+        """
+        # Return False if `hls` playback feature is disabled.
+        if not HLSPlaybackEnabledFlag.feature_enabled(self.location.course_key):
+            return False
+
+        # check if youtube has been deprecated and hls as primary playback
+        # is enabled for this course
+        return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.location.course_key)
+
+    def prioritize_hls(self, youtube_streams, html5_sources):
+        """
+        Decide whether hls can be prioritized as primary playback or not.
+
+        If both the youtube and hls sources are present then make decision on flag
+        If only either youtube or hls is present then play whichever is present
+        """
+        yt_present = bool(youtube_streams.strip())
+        hls_present = any(source for source in html5_sources if source.strip().endswith('.m3u8'))
+
+        if yt_present and hls_present:
+            return self.youtube_deprecated
+
+        return False
 
     def get_html(self):
 
@@ -363,6 +389,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             # this user, based on what was recorded the last time we saw the
             # user, and defaulting to True.
             'recordedYoutubeIsAvailable': self.youtube_is_available,
+            'prioritizeHls': self.prioritize_hls(self.youtube_streams, sources),
         }
 
         bumperize(self)
@@ -1026,8 +1053,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         return self.runtime.service(self, "request_cache")
 
-    @memoize_in_request_cache('request_cache')
-    def get_cached_val_data_for_course(self, video_profile_names, course_id):
+    @classmethod
+    @request_cached(
+        request_cache_getter=lambda args, kwargs: args[1],
+    )
+    def get_cached_val_data_for_course(cls, request_cache, video_profile_names, course_id):
         """
         Returns the VAL data for the requested video profiles for the given course.
         """
@@ -1060,7 +1090,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 video_profile_names.append('hls')
 
             # get and cache bulk VAL data for course
-            val_course_data = self.get_cached_val_data_for_course(video_profile_names, self.location.course_key)
+            val_course_data = self.get_cached_val_data_for_course(
+                self.request_cache,
+                video_profile_names,
+                self.location.course_key,
+            )
             val_video_data = val_course_data.get(self.edx_video_id, {})
 
             # Get the encoded videos if data from VAL is found

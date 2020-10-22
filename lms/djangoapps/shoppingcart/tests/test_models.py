@@ -20,7 +20,6 @@ from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, MagicMock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
@@ -56,13 +55,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 @ddt.ddt
 class OrderTest(ModuleStoreTestCase):
     """
     Test shopping cart orders (e.g., cart contains various items,
     order is taken through various pieces of cart state, etc.)
     """
+    shard = 3
 
     def setUp(self):
         super(OrderTest, self).setUp()
@@ -271,7 +270,7 @@ class OrderTest(ModuleStoreTestCase):
         self.assertIn(item.additional_instruction_text(), mail.outbox[0].body)
 
         # Verify Google Analytics event fired for purchase
-        self.mock_tracker.track.assert_called_once_with(  # pylint: disable=maybe-no-member
+        self.mock_tracker.track.assert_called_once_with(
             self.user.id,
             'Completed Order',
             {
@@ -489,12 +488,13 @@ class OrderItemTest(TestCase):
         self.assertEqual(item.get_list_price(), item.list_price)
 
 
-@attr(shard=3)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
     """
     Paid Course Registration Tests.
     """
+    shard = 3
+
     def setUp(self):
         super(PaidCourseRegistrationTest, self).setUp()
 
@@ -870,7 +870,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         """
         Assert that we fired a refund event.
         """
-        self.mock_analytics_tracker.track.assert_called_with(  # pylint: disable=maybe-no-member
+        self.mock_analytics_tracker.track.assert_called_with(
             self.user.id,
             'Refunded Order',
             {

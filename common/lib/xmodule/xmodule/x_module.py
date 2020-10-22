@@ -33,6 +33,7 @@ from xmodule import block_metadata_utils
 from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
@@ -261,8 +262,7 @@ def shim_xmodule_js(block, fragment):
         fragment.initialize_js('XBlockToXModuleShim')
         fragment.json_init_args = {'xmodule-type': block.js_module_name}
 
-        for tag in webpack_loader.utils.get_as_tags('XModuleShim'):
-            fragment.add_resource(tag, mimetype='text/html', placement='head')
+        add_webpack_to_fragment(fragment, 'XModuleShim')
 
 
 class XModuleFields(object):
@@ -1120,7 +1120,11 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
         node.tag = exported_node.tag
         node.text = exported_node.text
         node.tail = exported_node.tail
+
         for key, value in exported_node.items():
+            if key == 'url_name' and value == 'course' and key in node.attrib:
+                # if url_name is set in ExportManager then do not override it here.
+                continue
             node.set(key, value)
 
         node.extend(list(exported_node))

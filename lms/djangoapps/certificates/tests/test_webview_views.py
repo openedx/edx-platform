@@ -11,7 +11,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-from django.utils import translation
 from mock import patch
 
 import ddt
@@ -38,11 +37,11 @@ from lms.djangoapps.badges.tests.factories import (
     CourseCompleteImageConfigurationFactory
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from nose.plugins.attrib import attr
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from track.tests import EventTrackingTestCase
@@ -242,12 +241,12 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         template.save()
 
 
-@attr(shard=1)
 @ddt.ddt
-class CertificatesViewsTests(CommonCertificatesTestCase):
+class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase):
     """
     Tests for the certificates web/html views
     """
+    shard = 1
 
     def setUp(self):
         super(CertificatesViewsTests, self).setUp()
@@ -984,6 +983,19 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn(date, response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_invalid_certificate_configuration(self):
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertIn("Invalid Certificate", response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_500_view_invalid_certificate_configuration(self):
         self._add_course_certificates(count=1, signatory_count=2)
         CertificateHtmlViewConfiguration.objects.all().update(enabled=False)
@@ -1698,11 +1710,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         )
 
 
-@attr(shard=1)
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
     """
     Test events emitted by certificate handling.
     """
+    shard = 1
+
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_evidence_event_emitted(self):
         self.client.logout()

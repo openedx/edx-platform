@@ -6,8 +6,8 @@
 
 (function(requirejs, require, define) {
     'use strict';
-    define('video/02_html5_hls_video.js', ['video/02_html5_video.js', 'hls'],
-    function(HTML5Video, HLS) {
+    define('video/02_html5_hls_video.js', ['underscore', 'video/02_html5_video.js', 'hls'],
+    function(_, HTML5Video, HLS) {
         var HLSVideo = {};
 
         HLSVideo.Player = (function() {
@@ -20,8 +20,12 @@
             function Player(el, config) {
                 var self = this;
 
+                this.config = config;
+
                 // do common initialization independent of player type
                 this.init(el, config);
+
+                _.bindAll(this, 'playVideo', 'pauseVideo', 'onReady');
 
                 // If we have only HLS sources and browser doesn't support HLS then show error message.
                 if (config.HLSOnlySources && !config.canPlayHLS) {
@@ -29,11 +33,16 @@
                     return;
                 }
 
+                this.config.state.el.on('initialize', _.once(function() {
+                    console.log('[HLS Video]: HLS Player initialized');
+                    self.showPlayButton();
+                }));
+
                 // Safari has native support to play HLS videos
                 if (config.browserIsSafari) {
                     this.videoEl.attr('src', config.videoSources[0]);
                 } else {
-                    this.hls = new HLS();
+                    this.hls = new HLS({autoStartLoad: false});
                     this.hls.loadSource(config.videoSources[0]);
                     this.hls.attachMedia(this.video);
 
@@ -49,6 +58,7 @@
                                 };
                             })
                         );
+                        self.config.onReadyHLS();
                     });
                     this.hls.on(HLS.Events.LEVEL_SWITCHED, function(event, data) {
                         var level = self.hls.levels[data.level];
@@ -65,6 +75,28 @@
 
             Player.prototype = Object.create(HTML5Video.Player.prototype);
             Player.prototype.constructor = Player;
+
+            Player.prototype.playVideo = function() {
+                HTML5Video.Player.prototype.updatePlayerLoadingState.apply(this, ['show']);
+                if (!this.config.browserIsSafari) {
+                    this.hls.startLoad();
+                }
+                HTML5Video.Player.prototype.playVideo.apply(this);
+            };
+
+            Player.prototype.pauseVideo = function() {
+                HTML5Video.Player.prototype.pauseVideo.apply(this);
+                HTML5Video.Player.prototype.updatePlayerLoadingState.apply(this, ['hide']);
+            };
+
+            Player.prototype.onPlaying = function() {
+                HTML5Video.Player.prototype.onPlaying.apply(this);
+                HTML5Video.Player.prototype.updatePlayerLoadingState.apply(this, ['hide']);
+            };
+
+            Player.prototype.onReady = function() {
+                this.config.events.onReady(null);
+            };
 
             /**
              * Handler for HLS video errors. This only takes care of fatal erros, non-fatal errors

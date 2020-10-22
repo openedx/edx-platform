@@ -3,7 +3,6 @@ Test cases for the HTTP endpoints of the profile image api.
 """
 from contextlib import closing
 import datetime
-from nose.plugins.attrib import attr
 from pytz import UTC
 
 from django.urls import reverse
@@ -23,6 +22,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import (
     get_profile_image_storage,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.lib.tests import attr
 
 from ..images import create_profile_images, ImageValidationError
 from ..views import LOG_MESSAGE_CREATE, LOG_MESSAGE_DELETE

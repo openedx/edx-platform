@@ -10,12 +10,12 @@ from django.urls import reverse
 from django.test.utils import override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from openedx.core.lib.tests import attr
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from shoppingcart.models import Order, PaidCourseRegistration

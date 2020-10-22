@@ -20,7 +20,7 @@ from six import text_type
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
 from xmodule import course_metadata_utils
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
+from xmodule.course_metadata_utils import DEFAULT_START_DATE, DEFAULT_GRADING_POLICY
 from xmodule.graders import grader_from_conf
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
@@ -229,40 +229,7 @@ class CourseFields(object):
     )
     grading_policy = Dict(
         help=_("Grading policy definition for this class"),
-        default={
-            "GRADER": [
-                {
-                    "type": "Homework",
-                    "min_count": 12,
-                    "drop_count": 2,
-                    "short_label": "HW",
-                    "weight": 0.15,
-                },
-                {
-                    "type": "Lab",
-                    "min_count": 12,
-                    "drop_count": 2,
-                    "weight": 0.15,
-                },
-                {
-                    "type": "Midterm Exam",
-                    "short_label": "Midterm",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "weight": 0.3,
-                },
-                {
-                    "type": "Final Exam",
-                    "short_label": "Final",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "weight": 0.4,
-                }
-            ],
-            "GRADE_CUTOFFS": {
-                "Pass": 0.5,
-            },
-        },
+        default=DEFAULT_GRADING_POLICY,
         scope=Scope.content
     )
     show_calculator = Boolean(
@@ -888,6 +855,15 @@ class CourseFields(object):
         ),
         scope=Scope.settings, default=False
     )
+    other_course_settings = Dict(
+        display_name=_("Other Course Settings"),
+        help=_(
+            "Any additional information about the course that the platform needs or that allows integration with "
+            "external systems such as CRM software. Enter a dictionary of values in JSON format, such as "
+            "{ \"my_custom_setting\": \"value\", \"other_setting\": \"value\" }"
+        ),
+        scope=Scope.settings
+    )
 
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
@@ -1275,12 +1251,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Get a list of dicts with start and end fields with datetime values from
         the discussion_blackouts setting
         """
+
+        blackout_dates = self.discussion_blackouts
         date_proxy = Date()
+        if blackout_dates and type(blackout_dates[0]) not in (list, tuple):
+            blackout_dates = [blackout_dates]
+
         try:
             ret = [
                 {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
                 for start, end
-                in filter(None, self.discussion_blackouts)
+                in filter(None, blackout_dates)
             ]
             for blackout in ret:
                 if not blackout["start"] or not blackout["end"]:
@@ -1289,7 +1270,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         except (TypeError, ValueError):
             log.info(
                 "Error parsing discussion_blackouts %s for course %s",
-                self.discussion_blackouts,
+                blackout_dates,
                 self.id
             )
             return []

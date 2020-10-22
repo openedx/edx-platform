@@ -3,13 +3,13 @@ Tests for wiki permissions
 """
 
 from django.contrib.auth.models import Group
-from nose.plugins.attrib import attr
 from wiki.models import URLPath
 
 from course_wiki import settings
 from course_wiki.utils import course_wiki_slug, user_is_article_course_staff
 from course_wiki.views import get_or_create_root
 from courseware.tests.factories import InstructorFactory, StaffFactory
+from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

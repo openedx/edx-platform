@@ -91,7 +91,7 @@ class MockSignalHandlerMixin(object):
             mock_signal.connect(mock_handler)
             yield
             self.assertTrue(mock_handler.called)
-            mock_args, mock_kwargs = mock_handler.call_args  # pylint: disable=unpacking-non-sequence
+            mock_args, mock_kwargs = mock_handler.call_args
             if 'exclude_args' in kwargs:
                 for key in kwargs['exclude_args']:
                     self.assertIn(key, mock_kwargs)

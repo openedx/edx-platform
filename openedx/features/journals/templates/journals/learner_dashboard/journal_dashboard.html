@@ -1,0 +1,136 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%def name="online_help_token()"><% return "learnerdashboard" %></%def>
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.features.journals.views.learner_dashboard import format_expiration_date, has_access_expired
+from openedx.features.journals.api import get_journal_about_page_url
+%>
+
+<%block name="pagetitle">${_("Journal Dashboard")}</%block>
+<%block name="bodyclass">view-dashboard is-authenticated</%block>
+
+<%block name="header_extras">
+% for template_name in ["donation"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="dashboard/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<%block name="js_extra">
+<script src="${static.url('js/commerce/credit.js')}"></script>
+<%static:js group='dashboard'/>
+<script type="text/javascript">
+  $(document).ready(function() {
+    edx.dashboard.legacy.init({
+      dashboard: "${reverse('dashboard') | n, js_escaped_string}",
+      signInUser: "${reverse('signin_user') | n, js_escaped_string}",
+      changeEmailSettings: "${reverse('change_email_settings') | n, js_escaped_string}"
+    });
+  });
+</script>
+
+% if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
+<%static:require_module module_name="course_search/js/dashboard_search_factory" class_name="DashboardSearchFactory">
+DashboardSearchFactory();
+</%static:require_module>
+% endif
+% if redirect_message:
+<%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+var banner = new MessageBannerView({urgency: 'low', type: 'warning'});
+$('#content').prepend(banner.$el);
+banner.showMessage(${redirect_message | n, dump_js_escaped_json})
+</%static:require_module>
+% endif
+</%block>
+
+<main id="main" aria-label="Content" tabindex="-1">
+  <div class="dashboard" id="dashboard-main">
+    <div class="main-container">
+      <div class="my-courses" id="my-courses">
+        <%include file="/learner_dashboard/_dashboard_navigation_journals.html"/>
+
+        % if len(journals) > 0:
+        <ul class="listing-courses">
+          % for journal in journals:
+          <%
+            about_page_url = get_journal_about_page_url(about_page_id=journal['journal']['journalaboutpage']['id'])
+            formatted_expiration_date = format_expiration_date(journal['expiration_date'])
+            access_expired = has_access_expired(journal['expiration_date'])
+          %>
+          <li class="course-item">
+            <div class="course-container">
+              <article class="course" aria-labelledby="journal-title-${journal['journal']['name']}" id="course-card-${journal['journal']['name']}">
+                <section class="details" aria-labelledby="details-heading-${journal['journal']['name']}">
+                  <h2 class="hd hd-2 sr" id="details-heading-${journal['journal']['name']}">$_('Journal details')}</h2>
+                  <div class="wrapper-course-image" aria-label="true">
+                    <a href="${about_page_url}" class="cover" tabindex="-1">
+                      <img src="${journal['journal']['journalaboutpage']['card_image_absolute_url']}" class="course-image" alt="${_('{journal_title} Cover Image').format(journal_title=journal['journal']['name'])}"/>
+                    </a>
+                  </div>
+                  <div class="wrapper-course-details">
+                    <h3 class="course-title" id="course-title-${journal['journal']['name']}" href="${about_page_url}">
+                      <a data-course-key="${journal['uuid']}">${journal['journal']['name']}</a>
+                    </h3>
+                    <div class="course-info">
+                      <span class="info-university">${journal['journal']['organization']}</span>
+                      <span class="info-date-block-container">
+                        % if access_expired:
+                          <span class="info-date-block" aria-live="polite">
+                            <span class="icon fa fa-warning" aria-hidden="true"></span>
+                            ${_('Access Expired: {date}').format(date=formatted_expiration_date)}
+                          </span>
+                        % else:
+                          <span class="info-date-block">
+                            ${_('Access Expires: {date}').format(date=formatted_expiration_date)}
+                          </span>
+                        % endif
+                      </span>
+                    </div>
+                    <div class="wrapper-course-actions">
+                      <div class="course-actions">
+                        % if access_expired:
+                        <a href="${about_page_url}"
+                           class="enter-course"
+                           data-course-key="${journal['uuid']}">
+                          ${_('Renew Access')}
+                          <span class="sr">
+                          ${journal['journal']['name']}
+                        </span>
+                        </a>
+                        % else:
+                        <a href="${about_page_url}"
+                           class="enter-course"
+                           data-course-key="${journal['uuid']}">
+                          ${_('View Journal')}
+                          <span class="sr">
+                          ${journal['journal']['name']}
+                        </span>
+                        </a>
+                        % endif
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </article>
+            </div>
+          </li>
+          % endfor
+        </ul>
+        % else:
+        <div class="empty-dashboard-message">
+          <p>${_("You have not purchased access to any journals yet.")}</p>
+          <a class="btn btn-primary" href="${marketing_link('COURSES')}">
+            ${_("Explore journals and courses")}
+          </a>
+        </div>
+        % endif
+      </div>
+    </div>
+    <div class="side-container"></div>
+  </div>
+</main>

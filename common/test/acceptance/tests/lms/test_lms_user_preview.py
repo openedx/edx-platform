@@ -3,10 +3,7 @@
 Tests the "preview" selector in the LMS that allows changing between Staff, Learner, and Content Groups.
 """
 
-
 from textwrap import dedent
-
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -14,6 +11,7 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_partition_json
+from openedx.core.lib.tests import attr
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 
 
@@ -36,7 +34,7 @@ class StaffViewTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         )
 
-        self.populate_course_fixture(self.course_fixture)  # pylint: disable=no-member
+        self.populate_course_fixture(self.course_fixture)
 
         self.course_fixture.install()
 

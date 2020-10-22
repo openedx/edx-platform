@@ -1,7 +1,6 @@
 """
 Tests for users API
 """
-# pylint: disable=no-member
 import datetime
 
 import ddt
@@ -12,7 +11,6 @@ from django.test import RequestFactory, override_settings
 from django.utils import timezone
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
@@ -27,6 +25,7 @@ from mobile_api.testutils import (
     MobileCourseAccessTestMixin
 )
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from util.milestones_helpers import set_prerequisite_courses
 from util.testing import UrlResetMixin
@@ -91,7 +90,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     }
 
     @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self, *args, **kwargs):
+    def setUp(self):
         super(TestUserEnrollmentApi, self).setUp()
 
     def verify_success(self, response):
@@ -296,18 +295,6 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
             mode_slug=CourseMode.HONOR,
         )
         self.login_and_enroll()
-        certificates = [
-            {
-                'id': 1,
-                'name': 'Test Certificate Name',
-                'description': 'Test Certificate Description',
-                'course_title': 'tes_course_title',
-                'signatories': [],
-                'version': 1,
-                'is_active': True
-            }
-        ]
-        self.course.certificates = {'certificates': certificates}
         self.course.cert_html_view_enabled = True
         self.store.update_item(self.course, self.user.id)
 

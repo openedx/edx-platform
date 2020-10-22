@@ -6,15 +6,12 @@ import mock
 from contextlib import contextmanager
 
 import ddt
-import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.urls import reverse
 from django.test.client import RequestFactory
 from eventtracking.processors.exceptions import EventEmissionExit
 from mock import ANY, Mock, patch
-from nose.plugins.attrib import attr
-from nose.tools import assert_equal, assert_true
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -41,6 +38,7 @@ from lms.lib.comment_client import Thread
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.lib.tests import attr
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -239,15 +237,15 @@ class ViewsTestCaseMixin(object):
         with patch('student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
-            self.password = 'test'  # pylint: disable=attribute-defined-outside-init
+            self.password = 'test'
 
             # Create the user and make them active so we can log them in.
-            self.student = User.objects.create_user(uname, email, self.password)  # pylint: disable=attribute-defined-outside-init
+            self.student = User.objects.create_user(uname, email, self.password)
             self.student.is_active = True
             self.student.save()
 
             # Add a discussion moderator
-            self.moderator = UserFactory.create(password=self.password)  # pylint: disable=attribute-defined-outside-init
+            self.moderator = UserFactory.create(password=self.password)
 
             # Enroll the student in the course
             CourseEnrollmentFactory(user=self.student,
@@ -257,7 +255,7 @@ class ViewsTestCaseMixin(object):
             CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
             self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
 
-            assert_true(self.client.login(username='student', password=self.password))
+            assert self.client.login(username='student', password=self.password)
 
     def _setup_mock_request(self, mock_request, include_depth=False):
         """
@@ -322,7 +320,7 @@ class ViewsTestCaseMixin(object):
         url = reverse('create_thread', kwargs={'commentable_id': 'i4x-MITx-999-course-Robot_Super_Course',
                                                'course_id': unicode(self.course_id)})
         response = self.client.post(url, data=thread)
-        assert_true(mock_request.called)
+        assert mock_request.called
         expected_data = {
             'thread_type': 'discussion',
             'body': u'this is a post',
@@ -343,7 +341,7 @@ class ViewsTestCaseMixin(object):
             headers=ANY,
             timeout=5
         )
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     def update_thread_helper(self, mock_request):
         """
@@ -437,7 +435,6 @@ class ViewsTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(ViewsTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create(
                 org='MITx', course='999',
@@ -466,15 +463,15 @@ class ViewsTestCase(
         with patch('student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
-            self.password = 'test'  # pylint: disable=attribute-defined-outside-init
+            self.password = 'test'
 
             # Create the user and make them active so we can log them in.
-            self.student = User.objects.create_user(uname, email, self.password)  # pylint: disable=attribute-defined-outside-init
+            self.student = User.objects.create_user(uname, email, self.password)
             self.student.is_active = True
             self.student.save()
 
             # Add a discussion moderator
-            self.moderator = UserFactory.create(password=self.password)  # pylint: disable=attribute-defined-outside-init
+            self.moderator = UserFactory.create(password=self.password)
 
             # Enroll the student in the course
             CourseEnrollmentFactory(user=self.student,
@@ -484,7 +481,7 @@ class ViewsTestCase(
             CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
             self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
 
-            assert_true(self.client.login(username='student', password=self.password))
+            assert self.client.login(username='student', password=self.password)
 
     @contextmanager
     def assert_discussion_signals(self, signal, user=None):
@@ -780,7 +777,7 @@ class ViewsTestCase(
             'course_id': unicode(self.course_id)
         })
         response = self.client.post(url)
-        assert_true(mock_request.called)
+        assert mock_request.called
 
         call_list = [
             (
@@ -814,7 +811,7 @@ class ViewsTestCase(
 
         assert mock_request.call_args_list == call_list
 
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_un_flag_thread_open(self, mock_request):
         self.un_flag_thread(mock_request, False)
@@ -858,7 +855,7 @@ class ViewsTestCase(
             'course_id': unicode(self.course_id)
         })
         response = self.client.post(url)
-        assert_true(mock_request.called)
+        assert mock_request.called
 
         call_list = [
             (
@@ -892,7 +889,7 @@ class ViewsTestCase(
 
         assert mock_request.call_args_list == call_list
 
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_flag_comment_open(self, mock_request):
         self.flag_comment(mock_request, False)
@@ -930,7 +927,7 @@ class ViewsTestCase(
             'course_id': unicode(self.course_id)
         })
         response = self.client.post(url)
-        assert_true(mock_request.called)
+        assert mock_request.called
 
         call_list = [
             (
@@ -964,7 +961,7 @@ class ViewsTestCase(
 
         assert mock_request.call_args_list == call_list
 
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_un_flag_comment_open(self, mock_request):
         self.un_flag_comment(mock_request, False)
@@ -1002,7 +999,7 @@ class ViewsTestCase(
             'course_id': unicode(self.course_id)
         })
         response = self.client.post(url)
-        assert_true(mock_request.called)
+        assert mock_request.called
 
         call_list = [
             (
@@ -1036,7 +1033,7 @@ class ViewsTestCase(
 
         assert mock_request.call_args_list == call_list
 
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     @ddt.data(
         ('upvote_thread', 'thread_id', 'thread_voted'),
@@ -1076,7 +1073,6 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(ViewPermissionsTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1188,7 +1184,6 @@ class CreateThreadUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(CreateThreadUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1231,7 +1226,6 @@ class UpdateThreadUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(UpdateThreadUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1274,7 +1268,6 @@ class CreateCommentUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(CreateCommentUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1322,7 +1315,6 @@ class UpdateCommentUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(UpdateCommentUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1363,7 +1355,6 @@ class CreateSubCommentUnicodeTestCase(
     """
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(CreateSubCommentUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1445,7 +1436,6 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(TeamsPermissionsTestCase, cls).setUpClassAndTestData():
             teams_configuration = {
                 'topics': [{'id': "topic_id", 'name': 'Solar Power', 'description': 'Solar power is hot'}]
@@ -1756,7 +1746,6 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
     """
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(ForumEventTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1938,7 +1927,6 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(UsersEndpointTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 

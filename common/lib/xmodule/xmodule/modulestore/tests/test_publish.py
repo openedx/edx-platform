@@ -9,10 +9,10 @@ import unittest
 import uuid
 import xml.etree.ElementTree as ET
 from contextlib import contextmanager
-from nose.plugins.attrib import attr
 from shutil import rmtree
 from tempfile import mkdtemp
 
+from openedx.core.lib.tests import attr
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError

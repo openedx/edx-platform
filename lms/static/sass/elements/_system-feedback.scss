@@ -1102,7 +1102,7 @@ body.uxdesign.alerts {
     .alert-message {
       @include float(left);
 
-      margin: 4px 0 0 0;
+      margin: 4px 0 0;
       color: $gray-d3;
     }
 

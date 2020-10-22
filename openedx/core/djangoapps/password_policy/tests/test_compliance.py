@@ -16,7 +16,7 @@ from openedx.core.djangoapps.password_policy.compliance import (NonCompliantPass
                                                                 should_enforce_compliance_on_login)
 from student.tests.factories import (CourseAccessRoleFactory,
                                      UserFactory)
-from util.password_policy_validators import SecurityPolicyError, ValidationError, validate_password
+from util.password_policy_validators import ValidationError
 
 
 date1 = parse_date('2018-01-01 00:00:00+00:00')
@@ -93,35 +93,20 @@ class TestCompliance(TestCase):
         """
 
         # Test that a user that passes validate_password returns True
-        with patch('openedx.core.djangoapps.password_policy.compliance.validate_password') as mock_validate_password:
+        with patch('openedx.core.djangoapps.password_policy.compliance.validate_password') as \
+                mock_validate_password:
             user = UserFactory()
             # Mock validate_password to return True without checking the password
             mock_validate_password.return_value = True
             self.assertTrue(_check_user_compliance(user, None))  # Don't need a password here
 
         # Test that a user that does not pass validate_password returns False
-        with patch('openedx.core.djangoapps.password_policy.compliance.validate_password') as mock_validate_password:
+        with patch('openedx.core.djangoapps.password_policy.compliance.validate_password') as \
+                mock_validate_password:
             user = UserFactory()
             # Mock validate_password to throw a ValidationError without checking the password
             mock_validate_password.side_effect = ValidationError('Some validation error')
             self.assertFalse(_check_user_compliance(user, None))  # Don't need a password here
-
-    @patch('student.models.PasswordHistory.is_allowable_password_reuse')
-    @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE': 1})
-    def test_ignore_reset_checks(self, mock_reuse):
-        """
-        Test that we don't annoy user about compliance failures that only affect password resets
-        """
-        user = UserFactory()
-        password = 'nope1234'
-        mock_reuse.return_value = False
-
-        # Sanity check that normal validation would trip us up
-        with self.assertRaises(SecurityPolicyError):
-            validate_password(password, user=user)
-
-        # Confirm that we don't trip on it
-        self.assertTrue(_check_user_compliance(user, password))
 
     @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={
         'STAFF_USER_COMPLIANCE_DEADLINE': date1,

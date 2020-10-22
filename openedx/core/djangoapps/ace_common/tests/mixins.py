@@ -1,5 +1,12 @@
 # pylint: disable=missing-docstring
 from urlparse import parse_qs, urlparse
+import uuid
+from django.http import HttpRequest
+from mock import patch
+
+from edx_ace import Message, Recipient
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from student.tests.factories import UserFactory
 
 
 class QueryStringAssertionMixin(object):
@@ -52,3 +59,30 @@ class QueryStringAssertionMixin(object):
         parsed_qs = parse_qs(parsed_url.query)
         for expected_key, expected_value in kwargs.items():
             self.assertEqual(parsed_qs[expected_key], [str(expected_value)])
+
+
+class EmailTemplateTagMixin(object):
+
+    def setUp(self):
+        super(EmailTemplateTagMixin, self).setUp()
+
+        patcher = patch('openedx.core.djangoapps.ace_common.templatetags.ace.get_current_request')
+        self.mock_get_current_request = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.fake_request = HttpRequest()
+        self.fake_request.user = UserFactory.create()
+        self.fake_request.site = SiteFactory.create()
+        self.fake_request.site.domain = 'example.com'
+        self.mock_get_current_request.return_value = self.fake_request
+
+        self.message = Message(
+            app_label='test_app_label',
+            name='test_name',
+            recipient=Recipient(username='test_user'),
+            context={},
+            send_uuid=uuid.uuid4(),
+        )
+        self.context = {
+            'message': self.message
+        }

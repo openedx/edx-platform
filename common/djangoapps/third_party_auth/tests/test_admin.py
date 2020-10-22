@@ -58,7 +58,6 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Edit the provider via the admin edit link
         admin = OAuth2ProviderConfigAdmin(provider1, AdminSite())
-        # pylint: disable=protected-access
         update_url = reverse('admin:{}_{}_add'.format(admin.model._meta.app_label, admin.model._meta.model_name))
         update_url += "?source={}".format(provider1.pk)
 

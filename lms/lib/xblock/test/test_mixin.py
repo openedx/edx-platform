@@ -2,7 +2,6 @@
 Tests of the LMS XBlock Mixin
 """
 import ddt
-from nose.plugins.attrib import attr
 
 from lms_xblock.mixin import (
     INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
@@ -11,6 +10,7 @@ from lms_xblock.mixin import (
     INVALID_USER_PARTITION_VALIDATION_UNIT,
     NONSENSICAL_ACCESS_RESTRICTION
 )
+from openedx.core.lib.tests import attr
 from xblock.validation import ValidationMessage
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory, ItemFactory

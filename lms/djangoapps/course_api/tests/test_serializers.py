@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 import ddt
-from nose.plugins.attrib import attr
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
@@ -22,7 +21,6 @@ from ..serializers import CourseDetailSerializer, CourseSerializer
 from .mixins import CourseApiFactoryMixin
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     """
@@ -31,6 +29,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     expected_mongo_calls = 0
     maxDiff = 5000  # long enough to show mismatched dicts, in case of error
     serializer_class = CourseSerializer
+    shard = 3
 
     ENABLED_SIGNALS = ['course_published']
 
@@ -97,7 +96,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     def test_basic(self):
         course = self.create_course()
-        CourseDetails.update_about_video(course, 'test_youtube_id', self.staff_user.id)  # pylint: disable=no-member
+        CourseDetails.update_about_video(course, 'test_youtube_id', self.staff_user.id)
         with check_mongo_calls(self.expected_mongo_calls):
             result = self._get_result(course)
         self.assertDictEqual(result, self.expected_data)
@@ -140,7 +139,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         self.assertEqual(result['pacing'], expected_pacing)
 
 
-class TestCourseDetailSerializer(TestCourseSerializer):  # pylint: disable=test-inherits-tests
+class TestCourseDetailSerializer(TestCourseSerializer):
     """
     Test CourseDetailSerializer by rerunning all the tests
     in TestCourseSerializer, but with the

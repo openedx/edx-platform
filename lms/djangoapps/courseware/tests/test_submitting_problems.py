@@ -17,7 +17,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.timezone import now
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from capa.tests.response_xml_factory import (
@@ -34,6 +33,7 @@ from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import CourseEnrollment, anonymous_id_for_user
 from submissions import api as submissions_api

@@ -149,9 +149,9 @@ class ApiRequestStatusViewTest(ApiAdminTest):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         unicode_content = response.content.decode('utf-8')
-        self.assertIn(application.client_secret, unicode_content)  # pylint: disable=no-member
-        self.assertIn(application.client_id, unicode_content)  # pylint: disable=no-member
-        self.assertIn(application.redirect_uris, unicode_content)  # pylint: disable=no-member
+        self.assertIn(application.client_secret, unicode_content)
+        self.assertIn(application.client_id, unicode_content)
+        self.assertIn(application.redirect_uris, unicode_content)
 
     def test_get_anonymous(self):
         """Verify that users must be logged in to see the page."""

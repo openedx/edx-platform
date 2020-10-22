@@ -2,19 +2,18 @@
 Tests for VisibilityTransformer.
 """
 import ddt
-from nose.plugins.attrib import attr
 
 from ..visibility import VisibilityTransformer
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr(shard=3)
 @ddt.ddt
 class VisibilityTransformerTestCase(BlockParentsMapTestCase):
     """
     VisibilityTransformer Test
     """
     TRANSFORMER_CLASS_TO_TEST = VisibilityTransformer
+    shard = 3
 
     # Following test cases are based on BlockParentsMapTestCase.parents_map
     @ddt.data(

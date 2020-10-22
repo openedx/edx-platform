@@ -1,19 +1,17 @@
 """ Tests for Credit API serializers. """
 
-# pylint: disable=no-member
 from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from nose.plugins.attrib import attr
 from openedx.core.djangoapps.credit import serializers
 from openedx.core.djangoapps.credit.tests.factories import CreditProviderFactory, CreditEligibilityFactory
 from student.tests.factories import UserFactory
 
 
-@attr(shard=2)
 class CreditProviderSerializerTests(TestCase):
     """ CreditProviderSerializer tests. """
+    shard = 2
 
     def test_data(self):
         """ Verify the correct fields are serialized. """
@@ -32,9 +30,9 @@ class CreditProviderSerializerTests(TestCase):
         self.assertDictEqual(serializer.data, expected)
 
 
-@attr(shard=2)
 class CreditEligibilitySerializerTests(TestCase):
     """ CreditEligibilitySerializer tests. """
+    shard = 2
 
     def test_data(self):
         """ Verify the correct fields are serialized. """

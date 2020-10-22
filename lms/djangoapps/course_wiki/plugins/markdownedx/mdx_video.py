@@ -135,7 +135,7 @@ try:
     # but import the 2.0.3 version if it fails
     from markdown.util import etree
 except ImportError:
-    from markdown import etree  # pylint: disable=no-name-in-module
+    from markdown import etree
 
 
 version = "0.1.6"

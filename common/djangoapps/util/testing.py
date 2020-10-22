@@ -76,8 +76,7 @@ class EventTestMixin(object):
     """
     def setUp(self, tracker):
         super(EventTestMixin, self).setUp()
-        self.tracker = tracker
-        patcher = patch(self.tracker)
+        patcher = patch(tracker)
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
 

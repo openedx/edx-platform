@@ -387,7 +387,7 @@ class GroupVisibilityTest(CourseTestCase):
     def test_no_visibility_set(self):
         """ Tests when group_access has not been set on anything. """
 
-        def verify_all_components_visible_to_all():  # pylint: disable=invalid-name
+        def verify_all_components_visible_to_all():
             """ Verifies when group_access has not been set on anything. """
             for item in (self.sequential, self.vertical, self.html, self.problem):
                 self.assertFalse(utils.has_children_visible_to_specific_partition_groups(item))
@@ -430,7 +430,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         """Create a dummy course. """
         super(GetUserPartitionInfoTest, self).setUp()
         self.course = CourseFactory()
-        self.block = ItemFactory.create(category="problem", parent_location=self.course.location)  # pylint: disable=no-member
+        self.block = ItemFactory.create(category="problem", parent_location=self.course.location)
 
         # Set up some default partitions
         self._set_partitions([

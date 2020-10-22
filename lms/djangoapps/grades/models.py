@@ -22,7 +22,7 @@ from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
-from openedx.core.djangoapps.request_cache import get_cache
+from openedx.core.lib.cache_utils import get_cache
 
 import events
 
@@ -314,7 +314,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         Returns the "correct" usage key value with the run filled in.
         """
-        if self.usage_key.run is None:  # pylint: disable=no-member
+        if self.usage_key.run is None:
             return self.usage_key.replace(course_key=self.course_id)
         else:
             return self.usage_key

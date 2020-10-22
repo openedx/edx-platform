@@ -12,7 +12,6 @@ from urllib import quote_plus
 # it to get the correct value
 import lettuce.django
 from lettuce import world
-from nose.tools import assert_true
 from selenium.common.exceptions import (
     InvalidElementStateException,
     StaleElementReferenceException,
@@ -22,6 +21,8 @@ from selenium.common.exceptions import (
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+from openedx.core.lib.tests.tools import assert_true
 
 GLOBAL_WAIT_FOR_TIMEOUT = 60
 

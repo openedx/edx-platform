@@ -47,7 +47,6 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
         """
         user = UserFactory()
         course = CourseFactory()
-        # pylint: disable=no-member
         CourseEnrollment.enroll(user, course_key=course.location.course_key)
         self.assertFalse(user.badgeassertion_set.all())
 
@@ -61,7 +60,6 @@ class CourseEnrollmentBadgeTest(ModuleStoreTestCase):
         courses = [CourseFactory() for _i in range(required_badges)]
         for course in courses:
             CourseEnrollment.enroll(user, course_key=course.location.course_key)
-        # pylint: disable=no-member
         assertions = user.badgeassertion_set.all().order_by('id')
         self.assertEqual(user.badgeassertion_set.all().count(), checkpoint)
         self.assertEqual(assertions[checkpoint - 1].badge_class, self.badge_classes[checkpoint - 1])
@@ -76,7 +74,7 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
     """
     shard = 4
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(CourseCompletionBadgeTest, self).setUp()
         self.badge_classes = [
             RandomBadgeClassFactory(
@@ -102,10 +100,8 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
         user = UserFactory()
         course = CourseFactory()
         GeneratedCertificate(
-            # pylint: disable=no-member
             user=user, course_id=course.location.course_key, status=CertificateStatuses.downloadable
         ).save()
-        # pylint: disable=no-member
         self.assertFalse(user.badgeassertion_set.all())
 
     @unpack
@@ -118,12 +114,9 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
         courses = [CourseFactory() for _i in range(required_badges)]
         for course in courses:
             GeneratedCertificate(
-                # pylint: disable=no-member
                 user=user, course_id=course.location.course_key, status=CertificateStatuses.downloadable
             ).save()
-        # pylint: disable=no-member
         assertions = user.badgeassertion_set.all().order_by('id')
-        # pylint: disable=no-member
         self.assertEqual(user.badgeassertion_set.all().count(), checkpoint)
         self.assertEqual(assertions[checkpoint - 1].badge_class, self.badge_classes[checkpoint - 1])
 
@@ -151,7 +144,6 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
         ]
         self.courses = []
         for _badge_class in self.badge_classes:
-            # pylint: disable=no-member
             self.courses.append([CourseFactory().location.course_key for _i in range(3)])
         lines = [badge_class.slug + ',' + ','.join([unicode(course_key) for course_key in keys])
                  for badge_class, keys in zip(self.badge_classes, self.courses)]
@@ -166,10 +158,8 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
         user = UserFactory()
         course = CourseFactory()
         GeneratedCertificate(
-            # pylint: disable=no-member
             user=user, course_id=course.location.course_key, status=CertificateStatuses.downloadable
         ).save()
-        # pylint: disable=no-member
         self.assertFalse(user.badgeassertion_set.all())
 
     def test_group_matches(self):
@@ -188,7 +178,6 @@ class CourseGroupBadgeTest(ModuleStoreTestCase):
                     self.assertTrue(badge_class.get_for_user(user))
                 else:
                     self.assertFalse(badge_class.get_for_user(user))
-        # pylint: disable=no-member
         classes = [badge.badge_class.id for badge in user.badgeassertion_set.all()]
         source_classes = [badge.id for badge in self.badge_classes]
         self.assertEqual(classes, source_classes)

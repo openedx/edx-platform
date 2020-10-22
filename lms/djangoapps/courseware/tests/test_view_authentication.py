@@ -3,7 +3,6 @@ import datetime
 import pytz
 from django.urls import reverse
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from courseware.access import has_access
@@ -23,7 +22,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr(shard=1)
 class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that view authentication works properly.
@@ -31,6 +29,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
 
     ACCOUNT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
     ENABLED_SIGNALS = ['course_published']
+    shard = 1
 
     @staticmethod
     def _reverse_urls(names, course):
@@ -410,11 +409,12 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.assertTrue(self.enroll(self.course))
 
 
-@attr(shard=1)
 class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
     """
     Tests for the beta tester feature
     """
+    shard = 1
+
     def setUp(self):
         super(TestBetatesterAccess, self).setUp()
 

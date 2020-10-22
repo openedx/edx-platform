@@ -73,7 +73,7 @@ def has_course_goal_permission(request, course_id, user_access):
     can use this feature.
     """
     course_key = CourseKey.from_string(course_id)
-    has_verified_mode = CourseMode.has_verified_mode(CourseMode.modes_for_course_dict(unicode(course_id)))
+    has_verified_mode = CourseMode.has_verified_mode(CourseMode.modes_for_course_dict(course_key))
     return user_access['is_enrolled'] and has_verified_mode and ENABLE_COURSE_GOALS.is_enabled(course_key) \
         and settings.FEATURES.get('ENABLE_COURSE_GOALS')
 

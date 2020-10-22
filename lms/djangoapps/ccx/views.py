@@ -25,7 +25,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
-from courseware.field_overrides import disable_overrides
+from lms.djangoapps.courseware.field_overrides import disable_overrides
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
 from django_comment_common.utils import seed_permissions_roles
 from edxmako.shortcuts import render_to_response
@@ -199,6 +199,8 @@ def create_ccx(request, course, ccx=None):
 
     # Enforce a static limit for the maximum amount of students that can be enrolled
     override_field_for_ccx(ccx, course, 'max_student_enrollments_allowed', settings.CCX_MAX_STUDENTS_ALLOWED)
+    # Save display name explicitly
+    override_field_for_ccx(ccx, course, 'display_name', name)
 
     # Hide anything that can show up in the schedule
     hidden = 'visible_to_staff_only'

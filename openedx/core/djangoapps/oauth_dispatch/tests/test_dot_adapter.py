@@ -93,9 +93,9 @@ class DOTAdapterTestCase(TestCase):
         self.assertEqual(self.adapter.get_client_for_token(token), self.public_client)
 
     def test_get_access_token(self):
-        token = models.AccessToken.objects.create(
-            token='token-id',
-            application=self.public_client,
+        token = self.adapter.create_access_token_for_test(
+            'token-id',
+            client=self.public_client,
             user=self.user,
             expires=now() + timedelta(days=30),
         )
@@ -106,9 +106,9 @@ class DOTAdapterTestCase(TestCase):
         Make sure when generating an access_token for a restricted client
         that the token is immediately expired
         """
-        models.AccessToken.objects.create(
-            token='expired-token-id',
-            application=self.restricted_client,
+        self.adapter.create_access_token_for_test(
+            'expired-token-id',
+            client=self.restricted_client,
             user=self.user,
             expires=now() + timedelta(days=30),
         )

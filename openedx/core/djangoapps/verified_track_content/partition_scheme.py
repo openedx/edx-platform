@@ -45,7 +45,7 @@ class EnrollmentTrackUserPartition(UserPartition):
             return []
 
         return [
-            Group(ENROLLMENT_GROUP_IDS[mode.slug], unicode(mode.name))
+            Group(ENROLLMENT_GROUP_IDS[mode.slug]["id"], unicode(mode.name))
             for mode in CourseMode.modes_for_course(course_key, include_expired=True)
         ]
 
@@ -100,7 +100,7 @@ class EnrollmentTrackPartitionScheme(object):
                 course_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             if not course_mode:
                 course_mode = CourseMode.DEFAULT_MODE
-            return Group(ENROLLMENT_GROUP_IDS[course_mode.slug], unicode(course_mode.name))
+            return Group(ENROLLMENT_GROUP_IDS[course_mode.slug]["id"], unicode(course_mode.name))
         else:
             return None
 

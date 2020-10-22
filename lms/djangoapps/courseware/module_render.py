@@ -18,7 +18,9 @@ from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
+from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_monitoring_transaction_name
 from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -43,6 +45,7 @@ from courseware.masquerade import (
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -51,7 +54,6 @@ from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
-from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key, set_monitoring_transaction_name
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
@@ -70,7 +72,7 @@ from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
 from django.utils.text import slugify
-from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
@@ -80,7 +82,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 
-from .field_overrides import OverrideFieldData
 
 log = logging.getLogger(__name__)
 
@@ -396,7 +397,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
 
 def get_module_system_for_user(
         user,
-        student_data,  # TODO  # pylint: disable=too-many-statements
+        student_data,  # TODO
         # Arguments preceding this comment have user binding, those following don't
         descriptor,
         course_id,
@@ -549,6 +550,7 @@ def get_module_system_for_user(
             raw_possible=event['max_value'],
             only_if_higher=event.get('only_if_higher'),
             score_deleted=event.get('score_deleted'),
+            grader_response=event.get('grader_response')
         )
 
     @beeline.traced(name="lms.courseware.module_render.handle_deprecated_progress_event")
@@ -809,7 +811,7 @@ def get_module_system_for_user(
 
 # TODO: Find all the places that this method is called and figure out how to
 # get a loaded course passed into it
-def get_module_for_descriptor_internal(user, descriptor, student_data, course_id,  # pylint: disable=invalid-name
+def get_module_for_descriptor_internal(user, descriptor, student_data, course_id,
                                        track_function, xqueue_callback_url_prefix, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                                        static_asset_path='', user_location=None, disable_staff_debug_info=False,
@@ -930,6 +932,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
 
 
 @csrf_exempt
+@xframe_options_exempt
 def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
     """
     Entry point for unauthenticated XBlock handlers.
@@ -942,6 +945,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
+@xframe_options_exempt
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.

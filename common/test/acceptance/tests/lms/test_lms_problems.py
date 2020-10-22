@@ -6,14 +6,13 @@ See also old lettuce tests in lms/djangoapps/courseware/features/problems.featur
 """
 from textwrap import dedent
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
+from openedx.core.lib.tests import attr
 
 
 class ProblemsTest(UniqueCourseTest):

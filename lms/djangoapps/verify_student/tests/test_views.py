@@ -24,7 +24,6 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
@@ -39,12 +38,12 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.views import (
     PayAndVerifyView,
     checkout_with_ecommerce_service,
-    render_to_response,
-    EmailMarketingConfiguration
+    render_to_response
 )
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
+from openedx.core.lib.tests import attr
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -1279,7 +1278,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         ecommerce api, we correctly call to that api to create a basket.
         """
         user = UserFactory.create(username="test-username")
-        course_mode = CourseModeFactory.create(sku="test-sku").to_tuple()  # pylint: disable=no-member
+        course_mode = CourseModeFactory.create(sku="test-sku").to_tuple()
         expected_payment_data = {'foo': 'bar'}
         # mock out the payment processors endpoint
         httpretty.register_uri(
@@ -1775,7 +1774,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed.
         """
-        EmailMarketingConfiguration.objects.create(sailthru_verification_passed_template='test_template')
         data = {
             "EdX-ID": self.receipt_id,
             "Result": "PASS",
@@ -1792,8 +1790,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'approved')
         self.assertEquals(response.content, 'OK!')
-        self.assertFalse(mock_log_error.called)
-        self.assertTrue(mock_sailthru_send.call_args[1], 'test_template')
+        self.assertEqual(len(mail.outbox), 1)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1805,11 +1802,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for failed verification.
         """
-        EmailMarketingConfiguration.objects.create(sailthru_verification_failed_template='test_template')
         data = {
             "EdX-ID": self.receipt_id,
             "Result": 'FAIL',
-            "Reason": 'Invalid photo',
+            "Reason": [{"photoIdReasons": ["Not provided"]}],
             "MessageType": 'Your photo doesn\'t meet standards.'
         }
         json_data = json.dumps(data)
@@ -1823,10 +1819,9 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'denied')
         self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
-        self.assertEqual(attempt.error_msg, u'"Invalid photo"')
+        self.assertEqual(attempt.error_msg, u'[{"photoIdReasons": ["Not provided"]}]')
         self.assertEquals(response.content, 'OK!')
-        self.assertFalse(mock_log_error.called)
-        self.assertTrue(mock_sailthru_send.call_args[1], 'test_template')
+        self.assertEqual(len(mail.outbox), 1)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',

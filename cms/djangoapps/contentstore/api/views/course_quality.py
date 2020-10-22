@@ -5,8 +5,9 @@ from scipy import stats
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
+from contentstore.views.item import highlights_setting
 from edxval.api import get_videos_for_course
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.graph_traversals import traverse_pre_order
 from xmodule.modulestore.django import modulestore
@@ -122,12 +123,13 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _sections_quality(self, course):
         sections, visible_sections = self._get_sections(course)
-        sections_with_highlights = [s for s in visible_sections if s.highlights]
+        sections_with_highlights = [section for section in visible_sections if section.highlights]
         return dict(
             total_number=len(sections),
             total_visible=len(visible_sections),
             number_with_highlights=len(sections_with_highlights),
-            highlights_enabled=course.highlights_enabled_for_messaging,
+            highlights_active_for_course=course.highlights_enabled_for_messaging,
+            highlights_enabled=highlights_setting.is_enabled(),
         )
 
     def _subsections_quality(self, course, request):
@@ -170,26 +172,27 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
             durations=self._stats_dict(video_durations),
         )
 
-    @request_cached
-    def _get_subsections_and_units(self, course, request):
+    @classmethod
+    @request_cached()
+    def _get_subsections_and_units(cls, course, request):
         """
         Returns {subsection_key: {unit_key: {num_leaf_blocks: <>, leaf_block_types: set(<>) }}}
         for all visible subsections and units.
         """
-        _, visible_sections = self._get_sections(course)
+        _, visible_sections = cls._get_sections(course)
         subsection_dict = {}
         for section in visible_sections:
-            visible_subsections = self._get_visible_children(section)
+            visible_subsections = cls._get_visible_children(section)
 
             if get_bool_param(request, 'exclude_graded', False):
                 visible_subsections = [s for s in visible_subsections if not s.graded]
 
             for subsection in visible_subsections:
                 unit_dict = {}
-                visible_units = self._get_visible_children(subsection)
+                visible_units = cls._get_visible_children(subsection)
 
                 for unit in visible_units:
-                    leaf_blocks = self._get_leaf_blocks(unit)
+                    leaf_blocks = cls._get_leaf_blocks(unit)
                     unit_dict[unit.location] = dict(
                         num_leaf_blocks=len(leaf_blocks),
                         leaf_block_types=set(block.location.block_type for block in leaf_blocks),
@@ -198,39 +201,44 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
                 subsection_dict[subsection.location] = unit_dict
         return subsection_dict
 
-    @request_cached
-    def _get_sections(self, course):
-        return self._get_all_children(course)
+    @classmethod
+    @request_cached()
+    def _get_sections(cls, course):
+        return cls._get_all_children(course)
 
-    def _get_all_children(self, parent):
+    @classmethod
+    def _get_all_children(cls, parent):
         store = modulestore()
-        children = [store.get_item(child_usage_key) for child_usage_key in self._get_children(parent)]
+        children = [store.get_item(child_usage_key) for child_usage_key in cls._get_children(parent)]
         visible_children = [
             c for c in children
             if not c.visible_to_staff_only and not c.hide_from_toc
         ]
         return children, visible_children
 
-    def _get_visible_children(self, parent):
-        _, visible_chidren = self._get_all_children(parent)
+    @classmethod
+    def _get_visible_children(cls, parent):
+        _, visible_chidren = cls._get_all_children(parent)
         return visible_chidren
 
-    def _get_children(self, parent):
+    @classmethod
+    def _get_children(cls, parent):
         if not hasattr(parent, 'children'):
             return []
         else:
             return parent.children
 
-    def _get_leaf_blocks(self, unit):
+    @classmethod
+    def _get_leaf_blocks(cls, unit):
         def leaf_filter(block):
             return (
                 block.location.block_type not in ('chapter', 'sequential', 'vertical') and
-                len(self._get_children(block)) == 0
+                len(cls._get_children(block)) == 0
             )
 
         return [
             block for block in
-            traverse_pre_order(unit, self._get_visible_children, leaf_filter)
+            traverse_pre_order(unit, cls._get_visible_children, leaf_filter)
         ]
 
     def _stats_dict(self, data):

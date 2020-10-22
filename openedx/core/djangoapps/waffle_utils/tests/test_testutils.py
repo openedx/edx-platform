@@ -5,9 +5,9 @@ Tests for waffle utils test utilities.
 import crum
 from django.test import TestCase
 from django.test.client import RequestFactory
+from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from .. import CourseWaffleFlag, WaffleFlagNamespace
 from ..testutils import override_waffle_flag
 
@@ -28,8 +28,9 @@ class OverrideWaffleFlagTests(TestCase):
     def setUp(self):
         super(OverrideWaffleFlagTests, self).setUp()
         request = RequestFactory().request()
+        self.addCleanup(crum.set_current_request, None)
         crum.set_current_request(request)
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
     @override_waffle_flag(TEST_COURSE_FLAG, True)
     def assert_decorator_activates_flag(self):

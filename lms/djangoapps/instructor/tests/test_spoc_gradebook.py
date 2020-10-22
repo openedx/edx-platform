@@ -3,12 +3,12 @@ Tests of the instructor dashboard spoc gradebook
 """
 
 from django.urls import reverse
-from nose.plugins.attrib import attr
 from six import text_type
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
+from openedx.core.lib.tests import attr
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

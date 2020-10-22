@@ -8,7 +8,6 @@ from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
 from mock import patch
-from nose.tools import assert_equals
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
@@ -59,8 +58,8 @@ class TestVerifyStudentCommand(MockS3Mixin, TestCase):
         with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             self.create_and_submit("RetryRick")
         # check to make sure we had two successes and two failures; otherwise we've got problems elsewhere
-        assert_equals(len(SoftwareSecurePhotoVerification.objects.filter(status="submitted")), 1)
-        assert_equals(len(SoftwareSecurePhotoVerification.objects.filter(status='must_retry')), 2)
+        assert len(SoftwareSecurePhotoVerification.objects.filter(status="submitted")) == 1
+        assert len(SoftwareSecurePhotoVerification.objects.filter(status='must_retry')) == 2
         call_command('retry_failed_photo_verifications')
         attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(status='must_retry')
-        assert_equals(bool(attempts_to_retry), False)
+        assert not attempts_to_retry

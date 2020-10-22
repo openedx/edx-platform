@@ -57,6 +57,8 @@
             this.ajaxUrl = this.el.data('ajax-url');
             this.nextUrl = this.el.data('next-url');
             this.prevUrl = this.el.data('prev-url');
+            this.savePosition = this.el.data('save-position');
+            this.showCompletion = this.el.data('show-completion');
             this.keydownHandler($(element).find('#sequence-list .tab'));
             this.base_page_title = ($('title').data('base-title') || '').trim();
             this.bind();
@@ -230,11 +232,15 @@
             if (this.position !== newPosition) {
                 if (this.position) {
                     this.mark_visited(this.position);
-                    this.update_completion(this.position);
-                    modxFullUrl = '' + this.ajaxUrl + '/goto_position';
-                    $.postWithPrefix(modxFullUrl, {
-                        position: newPosition
-                    });
+                    if (this.showCompletion) {
+                        this.update_completion(this.position);
+                    }
+                    if (this.savePosition) {
+                        modxFullUrl = '' + this.ajaxUrl + '/goto_position';
+                        $.postWithPrefix(modxFullUrl, {
+                            position: newPosition
+                        });
+                    }
                 }
 
                 // On Sequence change, fire custom event 'sequence:change' on element.

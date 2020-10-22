@@ -565,7 +565,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         switches = waffle.waffle()
         # pylint: disable=protected-access
         switch_name = switches._namespaced_name(waffle.ENABLE_COMPLETION_TRACKING)
-        switch, _ = Switch.objects.get_or_create(name=switch_name)  # pylint: disable=unpacking-non-sequence
+        switch, _ = Switch.objects.get_or_create(name=switch_name)
 
         self.assertEqual(switch.created, view._completion_data_collection_start())
 

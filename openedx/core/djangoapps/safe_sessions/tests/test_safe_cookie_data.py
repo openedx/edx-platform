@@ -7,19 +7,19 @@ import ddt
 from django.test import TestCase
 import itertools
 from mock import patch
-from nose.plugins.attrib import attr
 from time import time
 
 from ..middleware import SafeCookieData, SafeCookieError
 from .test_utils import TestSafeSessionsLogMixin
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeCookieData
     """
+    shard = 2
+
     def setUp(self):
         super(TestSafeCookieData, self).setUp()
         self.session_id = 'test_session_id'

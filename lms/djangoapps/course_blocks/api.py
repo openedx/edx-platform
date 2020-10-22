@@ -10,13 +10,15 @@ from openedx.core.djangoapps.content.block_structure.transformers import BlockSt
 from .transformers import library_content, start_date, user_partitions, visibility, load_override_data
 from .usage_info import CourseUsageInfo
 
-INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER = 'courseware.student_field_overrides.IndividualStudentOverrideProvider'
+INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER = (
+    'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider'
+)
 
 
 def has_individual_student_override_provider():
     """
     check if FIELD_OVERRIDE_PROVIDERS has class
-    `courseware.student_field_overrides.IndividualStudentOverrideProvider`
+    `lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider`
     """
     return INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER in getattr(settings, 'FIELD_OVERRIDE_PROVIDERS', ())
 

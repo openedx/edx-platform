@@ -17,9 +17,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 LOGGER = get_task_logger(__name__)
 
 
-# pylint: disable=not-callable
 @task(default_retry_delay=settings.CREDIT_TASK_DEFAULT_RETRY_DELAY, max_retries=settings.CREDIT_TASK_MAX_RETRIES)
-def update_credit_course_requirements(course_id):   # pylint: disable=invalid-name
+def update_credit_course_requirements(course_id):
     """
     Updates course requirements table for a course.
 

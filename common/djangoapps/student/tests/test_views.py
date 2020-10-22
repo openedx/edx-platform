@@ -19,17 +19,15 @@ from opaque_keys import InvalidKeyError
 
 from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
-from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
-from edx_oauth2_provider.tests.factories import (ClientFactory,
-                                                 TrustedClientFactory)
 from entitlements.tests.factories import CourseEntitlementFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from pyquery import PyQuery as pq
-from student.cookies import get_user_info_cookie_data
+from openedx.core.djangoapps.user_authn.cookies import _get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
@@ -157,91 +155,6 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 406)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class LogoutTests(TestCase):
-    """ Tests for the logout functionality. """
-
-    def setUp(self):
-        """ Create a course and user, then log in. """
-        super(LogoutTests, self).setUp()
-        self.user = UserFactory()
-        self.client.login(username=self.user.username, password=PASSWORD)
-
-    def create_oauth_client(self):
-        """ Creates a trusted OAuth client. """
-        client = ClientFactory(logout_uri='https://www.example.com/logout/')
-        TrustedClientFactory(client=client)
-        return client
-
-    def assert_session_logged_out(self, oauth_client, **logout_headers):
-        """ Authenticates a user via OAuth 2.0, logs out, and verifies the session is logged out. """
-        self.authenticate_with_oauth(oauth_client)
-
-        # Logging out should remove the session variables, and send a list of logout URLs to the template.
-        # The template will handle loading those URLs and redirecting the user. That functionality is not tested here.
-        response = self.client.get(reverse('logout'), **logout_headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertNotIn(AUTHORIZED_CLIENTS_SESSION_KEY, self.client.session)
-
-        return response
-
-    def authenticate_with_oauth(self, oauth_client):
-        """ Perform an OAuth authentication using the current web client.
-
-        This should add an AUTHORIZED_CLIENTS_SESSION_KEY entry to the current session.
-        """
-        data = {
-            'client_id': oauth_client.client_id,
-            'client_secret': oauth_client.client_secret,
-            'response_type': 'code'
-        }
-        # Authenticate with OAuth to set the appropriate session values
-        self.client.post(reverse('oauth2:capture'), data, follow=True)
-        self.assertListEqual(self.client.session[AUTHORIZED_CLIENTS_SESSION_KEY], [oauth_client.client_id])
-
-    def assert_logout_redirects_to_root(self):
-        """ Verify logging out redirects the user to the homepage. """
-        response = self.client.get(reverse('logout'))
-        self.assertRedirects(response, '/', fetch_redirect_response=False)
-
-    def assert_logout_redirects_with_target(self):
-        """ Verify logging out with a redirect_url query param redirects the user to the target. """
-        url = '{}?{}'.format(reverse('logout'), 'redirect_url=/courses')
-        response = self.client.get(url)
-        self.assertRedirects(response, '/courses', fetch_redirect_response=False)
-
-    def test_without_session_value(self):
-        """ Verify logout works even if the session does not contain an entry with
-        the authenticated OpenID Connect clients."""
-        self.assert_logout_redirects_to_root()
-        self.assert_logout_redirects_with_target()
-
-    def test_client_logout(self):
-        """ Verify the context includes a list of the logout URIs of the authenticated OpenID Connect clients.
-
-        The list should only include URIs of the clients for which the user has been authenticated.
-        """
-        client = self.create_oauth_client()
-        response = self.assert_session_logged_out(client)
-        expected = {
-            'logout_uris': [client.logout_uri + '?no_redirect=1'],  # pylint: disable=no-member
-            'target': '/',
-        }
-        self.assertDictContainsSubset(expected, response.context_data)  # pylint: disable=no-member
-
-    def test_filter_referring_service(self):
-        """ Verify that, if the user is directed to the logout page from a service, that service's logout URL
-        is not included in the context sent to the template.
-        """
-        client = self.create_oauth_client()
-        response = self.assert_session_logged_out(client, HTTP_REFERER=client.logout_uri)  # pylint: disable=no-member
-        expected = {
-            'logout_uris': [],
-            'target': '/',
-        }
-        self.assertDictContainsSubset(expected, response.context_data)  # pylint: disable=no-member
-
-
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, CompletionWaffleTestMixin):
@@ -301,7 +214,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         request = RequestFactory().get(self.path)
         request.user = self.user
-        expected = json.dumps(get_user_info_cookie_data(request))
+        expected = json.dumps(_get_user_info_cookie_data(request, self.user))
         self.client.get(self.path)
         actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
         self.assertEqual(actual, expected)
@@ -377,10 +290,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         program = ProgramFactory()
         CourseEntitlementFactory.create(user=self.user, course_uuid=program['courses'][0]['uuid'])
         mock_get_programs.return_value = [program]
-        mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW)
+        course_key = CourseKey.from_string('course-v1:FAKE+FA1-MA1.X+3T2017')
+        mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW, id=course_key)
         mock_course_runs.return_value = [
             {
-                'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+                'key': unicode(course_key),
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified',
@@ -388,7 +302,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             }
         ]
         mock_pseudo_session.return_value = {
-            'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+            'key': unicode(course_key),
             'type': 'verified'
         }
         response = self.client.get(self.path)
@@ -449,8 +363,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
-    @patch('opaque_keys.edx.keys.CourseKey.from_string')
-    def test_sessions_for_entitlement_course_runs(self, mock_course_key, mock_course_overview, mock_course_runs):
+    def test_sessions_for_entitlement_course_runs(self, mock_course_overview, mock_course_runs):
         """
         When a learner has a fulfilled entitlement for a course run in the past, there should be no availableSession
         data passed to the JS view. When a learner has a fulfilled entitlement for a course run enrollment ending in the
@@ -466,7 +379,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, end=self.THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
         )
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
@@ -486,7 +398,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         mocked_course_overview.save()
 
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -504,7 +415,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         mocked_course_overview.save()
 
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -520,8 +430,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
-    @patch('opaque_keys.edx.keys.CourseKey.from_string')
-    def test_fulfilled_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
+    def test_fulfilled_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
         """
         When a learner has a fulfilled entitlement, their course dashboard should have:
             - exactly one course item, meaning it:
@@ -534,7 +443,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
@@ -558,8 +466,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
-    @patch('opaque_keys.edx.keys.CourseKey.from_string')
-    def test_fulfilled_expired_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
+    def test_fulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
         """
         When a learner has a fulfilled entitlement that is expired, their course dashboard should have:
             - exactly one course item, meaning it:
@@ -571,7 +478,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
         mock_course_runs.return_value = [
             {
@@ -701,6 +607,21 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             course_run=course_run_string
         )
 
+    @staticmethod
+    def _get_html_for_entitlement_button(course_key_string):
+        return'''
+            <div class="course-info">
+            <span class="info-university">{org} - </span>
+            <span class="info-course-id">{course}</span>
+            <span class="info-date-block-container">
+            <button class="change-session btn-link ">Change or Leave Session</button>
+            </span>
+            </div>
+        '''.format(
+            org=course_key_string.split('/')[0],
+            course=course_key_string.split('/')[1]
+        )
+
     def test_view_course_appears_on_dashboard(self):
         """
         When a course doesn't have completion data, its course card should
@@ -814,8 +735,10 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         html_for_view_buttons = []
         html_for_resume_buttons = []
+        html_for_entitlement = []
 
         for i in range(num_course_cards):
+
             course = CourseFactory.create()
             course_enrollment = CourseEnrollmentFactory(
                 user=self.user,
@@ -824,9 +747,14 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
             course_key = course_enrollment.course_id
             course_key_string = str(course_key)
-            last_completed_block_string = ''
-            course_run_string = self._pull_course_run_from_course_key(
-                course_key_string)
+
+            if i == 1:
+                CourseEntitlementFactory.create(user=self.user, enrollment_course_run=course_enrollment)
+
+            else:
+                last_completed_block_string = ''
+                course_run_string = self._pull_course_run_from_course_key(
+                    course_key_string)
 
             # Submit completed course blocks in even-numbered courses.
             if isEven(i):
@@ -855,6 +783,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     course_run_string
                 )
             )
+            html_for_entitlement.append(
+                self._get_html_for_entitlement_button(
+                    course_key_string
+                )
+            )
 
         response = self.client.get(reverse('dashboard'))
 
@@ -866,18 +799,27 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             self._remove_whitespace_from_html_string(button)
             for button in html_for_resume_buttons
         ]
+        html_for_entitlement = [
+            self._remove_whitespace_from_html_string(button)
+            for button in html_for_entitlement
+        ]
+
         dashboard_html = self._remove_whitespace_from_html_string(response.content)
 
         for i in range(num_course_cards):
             expected_button = None
             unexpected_button = None
 
-            if isEven(i):
+            if i == 1:
+                expected_button = html_for_entitlement[i]
+                unexpected_button = html_for_view_buttons[i] + html_for_resume_buttons[i]
+
+            elif isEven(i):
                 expected_button = html_for_resume_buttons[i]
-                unexpected_button = html_for_view_buttons[i]
+                unexpected_button = html_for_view_buttons[i] + html_for_entitlement[i]
             else:
                 expected_button = html_for_view_buttons[i]
-                unexpected_button = html_for_resume_buttons[i]
+                unexpected_button = html_for_resume_buttons[i] + html_for_entitlement[i]
 
             self.assertIn(
                 expected_button,

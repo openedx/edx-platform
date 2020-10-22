@@ -2,8 +2,8 @@ from django.test import TestCase
 import mock
 
 from django_comment_common import signals, models
+from edx_django_utils.cache import RequestCache
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
-import openedx.core.djangoapps.request_cache as request_cache
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -76,7 +76,7 @@ class CoursePublishHandlerTestCase(ModuleStoreTestCase):
         self._assert_discussion_id_map(course_key, {})
 
         # create discussion block
-        request_cache.clear_cache(name=None)
+        RequestCache().clear()
         discussion_id = 'discussion1'
         discussion_block = ItemFactory.create(
             parent_location=course.location,

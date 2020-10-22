@@ -20,7 +20,6 @@ from six import text_type
 from social_django.models import UserSocialAuth, Partial
 
 from django_comment_common import models
-from openedx.core.djangoapps.user_api.accounts.tests.test_retirement_views import RetirementTestCase
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
@@ -28,12 +27,14 @@ from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
-from student.models import get_retired_email_by_email
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 )
-from util.password_policy_validators import password_max_length, password_min_length
+from util.password_policy_validators import (
+    create_validator_config, password_validators_instruction_texts, password_validators_restrictions,
+    DEFAULT_MAX_PASSWORD_LENGTH,
+)
 from .test_helpers import TestCaseForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -41,7 +42,11 @@ from ..accounts import (
     NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_BAD_LENGTH_MSG
 )
-from ..accounts.tests.retirement_helpers import setup_retirement_states  # pylint: disable=unused-import
+from ..accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
+    RetirementTestCase,
+    fake_requested_retirement,
+    setup_retirement_states
+)
 from ..accounts.api import get_account_settings
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
@@ -617,7 +622,7 @@ class LoginSessionViewTest(UserAPITestCase):
                 "placeholder": "",
                 "instructions": "",
                 "restrictions": {
-                    "max_length": password_max_length(),
+                    "max_length": DEFAULT_MAX_PASSWORD_LENGTH,
                 },
                 "errorMessages": {},
                 "supplementalText": "",
@@ -804,17 +809,6 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         super(RegistrationViewValidationErrorTest, self).setUp()
         self.url = reverse("user_api_registration")
 
-    def _retireRequestUser(self):
-        """
-        Very basic user retirement initiation, logic copied form DeactivateLogoutView.  This only lands the user in
-        PENDING, simulating a retirement request only.
-        """
-        user = User.objects.get(username=self.USERNAME)
-        UserRetirementStatus.create_retirement(user)
-        user.email = get_retired_email_by_email(user.email)
-        user.set_unusable_password()
-        user.save()
-
     @mock.patch('openedx.core.djangoapps.user_api.views.check_account_exists')
     def test_register_retired_email_validation_error(self, dummy_check_account_exists):
         dummy_check_account_exists.return_value = []
@@ -829,7 +823,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertHttpOK(response)
 
         # Initiate retirement for the above user:
-        self._retireRequestUser()
+        fake_requested_retirement(User.objects.get(username=self.USERNAME))
 
         # Try to create a second user with the same email address as the retired user
         response = self.client.post(self.url, {
@@ -871,7 +865,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertHttpOK(response)
 
         # Initiate retirement for the above user:
-        self._retireRequestUser()
+        fake_requested_retirement(User.objects.get(username=self.USERNAME))
 
         # Try to create a second user with the same email address as the retired user
         response = self.client.post(self.url, {
@@ -892,6 +886,48 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
+                    )
+                }]
+            }
+        )
+
+    def test_register_duplicate_retired_username_account_validation_error(self):
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Initiate retirement for the above user.
+        fake_requested_retirement(User.objects.get(username=self.USERNAME))
+
+        with mock.patch('openedx.core.djangoapps.user_authn.views.register.do_create_account') as dummy_do_create_acct:
+            # do_create_account should *not* be called - the duplicate retired username
+            # should be detected by check_account_exists before account creation is called.
+            dummy_do_create_acct.side_effect = Exception('do_create_account should *not* have been called!')
+            # Try to create a second user with the same username.
+            response = self.client.post(self.url, {
+                "email": "someone+else@example.com",
+                "name": "Someone Else",
+                "username": self.USERNAME,
+                "password": self.PASSWORD,
+                "honor_code": "true",
+            })
+        self.assertEqual(response.status_code, 409)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {
+                "username": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different username."
+                    ).format(
+                        self.USERNAME
                     )
                 }]
             }
@@ -1156,15 +1192,16 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 u"type": u"password",
                 u"required": True,
                 u"label": u"Password",
-                u"instructions": u'Your password must contain at least {} characters.'.format(password_min_length()),
-                u"restrictions": {
-                    'min_length': password_min_length(),
-                    'max_length': password_max_length(),
-                },
+                u"instructions": password_validators_instruction_texts(),
+                u"restrictions": password_validators_restrictions(),
             }
         )
 
-    @override_settings(PASSWORD_COMPLEXITY={'NON ASCII': 1, 'UPPER': 3})
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
+        create_validator_config('util.password_policy_validators.UppercaseValidator', {'min_upper': 3}),
+        create_validator_config('util.password_policy_validators.SymbolValidator', {'min_symbol': 1}),
+    ])
     def test_register_form_password_complexity(self):
         no_extra_fields_setting = {}
 
@@ -1174,32 +1211,22 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 u'name': u'password',
                 u'label': u'Password',
-                u'instructions': u'Your password must contain at least {} characters.'.format(password_min_length()),
-                u'restrictions': {
-                    'min_length': password_min_length(),
-                    'max_length': password_max_length(),
-                },
+                u"instructions": password_validators_instruction_texts(),
+                u"restrictions": password_validators_restrictions(),
             }
         )
 
-        # Now with an enabled password policy
-        with mock.patch.dict(settings.FEATURES, {'ENFORCE_PASSWORD_POLICY': True}):
-            msg = u'Your password must contain at least {} characters, including '\
-                  u'3 uppercase letters & 1 symbol.'.format(password_min_length())
-            self._assert_reg_field(
-                no_extra_fields_setting,
-                {
-                    u'name': u'password',
-                    u'label': u'Password',
-                    u'instructions': msg,
-                    u'restrictions': {
-                        'min_length': password_min_length(),
-                        'max_length': password_max_length(),
-                        'non_ascii': 1,
-                        'upper': 3,
-                    },
-                }
-            )
+        msg = u'Your password must contain at least 2 characters, including '\
+              u'3 uppercase letters & 1 symbol.'
+        self._assert_reg_field(
+            no_extra_fields_setting,
+            {
+                u'name': u'password',
+                u'label': u'Password',
+                u'instructions': msg,
+                u"restrictions": password_validators_restrictions(),
+            }
+        )
 
     @override_settings(REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm')
     def test_extension_form_fields(self):
@@ -1815,7 +1842,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": u"You must agree to the {platform_name} Terms of Service and Privacy Policy".format(  # pylint: disable=line-too-long
+                    "required": u"You must agree to the {platform_name} Terms of Service and Privacy Policy".format(
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -2290,7 +2317,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             response_json,
             {
                 u"username": [{u"user_message": USERNAME_BAD_LENGTH_MSG}],
-                u"password": [{u"user_message": u"A valid password is required"}],
+                u"password": [{u"user_message": u"This field is required."}],
             }
         )
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for static_replace"""
+from __future__ import print_function
 
 import re
 from cStringIO import StringIO
@@ -10,7 +11,6 @@ import pytest
 from django.test import override_settings
 from django.utils.http import urlencode, urlquote
 from mock import Mock, patch
-from nose.tools import assert_equals, assert_false, assert_true  # pylint: disable=no-name-in-module
 from opaque_keys.edx.keys import CourseKey
 from PIL import Image
 
@@ -54,21 +54,17 @@ def encode_unicode_characters_in_url(url):
 def test_multi_replace():
     course_source = '"/course/file.png"'
 
-    assert_equals(
-        replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY),
+    assert replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY) == \
         replace_static_urls(replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY), DATA_DIRECTORY)
-    )
-    assert_equals(
-        replace_course_urls(course_source, COURSE_KEY),
+    assert replace_course_urls(course_source, COURSE_KEY) == \
         replace_course_urls(replace_course_urls(course_source, COURSE_KEY), COURSE_KEY)
-    )
 
 
 def test_process_url():
     def processor(__, prefix, quote, rest):  # pylint: disable=missing-docstring
         return quote + 'test' + prefix + rest + quote
 
-    assert_equals('"test/static/file.png"', process_static_urls(STATIC_SOURCE, processor))
+    assert process_static_urls(STATIC_SOURCE, processor) == '"test/static/file.png"'
 
 
 def test_process_url_data_dir_exists():
@@ -77,7 +73,7 @@ def test_process_url_data_dir_exists():
     def processor(original, prefix, quote, rest):  # pylint: disable=unused-argument,missing-docstring
         return quote + 'test' + rest + quote
 
-    assert_equals(base, process_static_urls(base, processor, data_dir=DATA_DIRECTORY))
+    assert process_static_urls(base, processor, data_dir=DATA_DIRECTORY) == base
 
 
 def test_process_url_no_match():
@@ -85,14 +81,14 @@ def test_process_url_no_match():
     def processor(__, prefix, quote, rest):  # pylint: disable=missing-docstring
         return quote + 'test' + prefix + rest + quote
 
-    assert_equals('"test/static/file.png"', process_static_urls(STATIC_SOURCE, processor))
+    assert process_static_urls(STATIC_SOURCE, processor) == '"test/static/file.png"'
 
 
 @patch('django.http.HttpRequest', autospec=True)
 def test_static_urls(mock_request):
     mock_request.build_absolute_uri = lambda url: 'http://' + url
     result = make_static_urls_absolute(mock_request, STATIC_SOURCE)
-    assert_equals(result, '\"http:///static/file.png\"')
+    assert result == '\"http:///static/file.png\"'
 
 
 @patch('static_replace.staticfiles_storage', autospec=True)
@@ -100,7 +96,7 @@ def test_storage_url_exists(mock_storage):
     mock_storage.exists.return_value = True
     mock_storage.url.return_value = '/static/file.png'
 
-    assert_equals('"/static/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY) == '"/static/file.png"'
     mock_storage.exists.assert_called_once_with('file.png')
     mock_storage.url.assert_called_once_with('file.png')
 
@@ -110,7 +106,7 @@ def test_storage_url_not_exists(mock_storage):
     mock_storage.exists.return_value = False
     mock_storage.url.return_value = '/static/data_dir/file.png'
 
-    assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY) == '"/static/data_dir/file.png"'
     mock_storage.exists.assert_called_once_with('file.png')
     mock_storage.url.assert_called_once_with('data_dir/file.png')
 
@@ -127,13 +123,11 @@ def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_m
     mock_get_excluded_extensions.return_value = ['foobar']
 
     # No namespace => no change to path
-    assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY) == '"/static/data_dir/file.png"'
 
     # Namespace => content url
-    assert_equals(
-        '"' + mock_static_content.get_canonicalized_asset_path.return_value + '"',
+    assert '"' + mock_static_content.get_canonicalized_asset_path.return_value + '"' == \
         replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, course_id=COURSE_KEY)
-    )
 
     mock_static_content.get_canonicalized_asset_path.assert_called_once_with(COURSE_KEY, 'file.png', u'', ['foobar'])
 
@@ -146,10 +140,10 @@ def test_data_dir_fallback(mock_storage, mock_modulestore, mock_settings):
     mock_storage.url.side_effect = Exception
 
     mock_storage.exists.return_value = True
-    assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY) == '"/static/data_dir/file.png"'
 
     mock_storage.exists.return_value = False
-    assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
+    assert replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY) == '"/static/data_dir/file.png"'
 
 
 def test_raw_static_check():
@@ -157,10 +151,10 @@ def test_raw_static_check():
     Make sure replace_static_urls leaves alone things that end in '.raw'
     """
     path = '"/static/foo.png?raw"'
-    assert_equals(path, replace_static_urls(path, DATA_DIRECTORY))
+    assert replace_static_urls(path, DATA_DIRECTORY) == path
 
     text = 'text <tag a="/static/js/capa/protex/protex.nocache.js?raw"/><div class="'
-    assert_equals(path, replace_static_urls(path, text))
+    assert replace_static_urls(path, text) == path
 
 
 @pytest.mark.django_db
@@ -177,7 +171,32 @@ def test_static_url_with_query(mock_modulestore, mock_storage):
 
     pre_text = 'EMBED src ="/static/LAlec04_controller.swf?csConfigFile=/static/LAlec04_config.xml&name1=value1&name2=value2"'
     post_text = 'EMBED src ="/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2"'
-    assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY))
+    assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY) == post_text
+
+
+@pytest.mark.django_db
+@patch('static_replace.staticfiles_storage', autospec=True)
+@patch('xmodule.modulestore.django.modulestore', autospec=True)
+def test_static_paths_out(mock_modulestore, mock_storage):
+    """
+    Tests the side-effect of passing an array to collect static_paths_out.
+
+    * if a static URL is changed, then its changed URL is returned.
+    * if a static URL is unchanged, then the unchanged URL is returned.
+    * xblock paths are not included in the static_paths_out array.
+    """
+    mock_storage.exists.return_value = False
+    mock_modulestore.return_value = Mock(MongoModuleStore)
+
+    static_url = '/static/LAlec04_controller.swf?csConfigFile=/static/LAlec04_config.xml&name1=value1&name2=value2'
+    static_course_url = '/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2'
+    raw_url = '/static/js/capa/protex/protex.nocache.js?raw'
+    xblock_url = '/static/xblock/resources/babys_first.lil_xblock/public/images/pacifier.png'
+    pre_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_url, xblock_url, raw_url)
+    post_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_course_url, xblock_url, raw_url)
+    static_paths = []
+    assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY, static_paths_out=static_paths) == post_text
+    assert static_paths == [(static_url, static_course_url), (raw_url, raw_url)]
 
 
 def test_regex():
@@ -192,12 +211,12 @@ def test_regex():
     regex = _url_replace_regex('/static/')
 
     for s in yes:
-        print 'Should match: {0!r}'.format(s)
-        assert_true(re.match(regex, s))
+        print('Should match: {0!r}'.format(s))
+        assert re.match(regex, s)
 
     for s in no:
-        print 'Should not match: {0!r}'.format(s)
-        assert_false(re.match(regex, s))
+        print('Should not match: {0!r}'.format(s))
+        assert not re.match(regex, s)
 
 
 @patch('static_replace.staticfiles_storage', autospec=True)
@@ -212,7 +231,7 @@ def test_static_url_with_xblock_resource(mock_modulestore, mock_storage):
 
     pre_text = 'EMBED src ="/static/xblock/resources/babys_first.lil_xblock/public/images/pacifier.png"'
     post_text = pre_text
-    assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY))
+    assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY) == post_text
 
 
 @patch('static_replace.staticfiles_storage', autospec=True)
@@ -228,7 +247,7 @@ def test_static_url_with_xblock_resource_on_cdn(mock_modulestore, mock_storage):
 
     pre_text = 'EMBED src ="https://example.com/static/xblock/resources/tehehe.xblock/public/images/woo.png"'
     post_text = pre_text
-    assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY))
+    assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY) == post_text
 
 
 @ddt.ddt
@@ -567,8 +586,8 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         with check_mongo_calls(mongo_calls):
             asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
-            print expected
-            print asset_path
+            print(expected)
+            print(asset_path)
             self.assertIsNotNone(re.match(expected, asset_path))
 
     @ddt.data(
@@ -765,6 +784,6 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
 
         with check_mongo_calls(mongo_calls):
             asset_path = StaticContent.get_canonicalized_asset_path(self.courses[prefix].id, start, base_url, exts)
-            print expected
-            print asset_path
+            print(expected)
+            print(asset_path)
             self.assertIsNotNone(re.match(expected, asset_path))

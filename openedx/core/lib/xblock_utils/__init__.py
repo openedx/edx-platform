@@ -26,6 +26,7 @@ from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
 
 from xmodule.seq_module import SequenceModule
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 
@@ -62,7 +63,7 @@ def wrap_xblock(
         block,
         view,
         frag,
-        context,                        # pylint: disable=unused-argument
+        context,
         usage_id_serializer,
         request_token,                  # pylint: disable=redefined-outer-name
         display_name_only=False,
@@ -129,6 +130,8 @@ def wrap_xblock(
     data['block-type'] = block.scope_ids.block_type
     data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
     data['request-token'] = request_token
+    data['graded'] = getattr(block, 'graded', False)
+    data['has-score'] = getattr(block, 'has_score', False)
 
     if block.name:
         data['name'] = block.name
@@ -149,8 +152,7 @@ def wrap_xblock(
 
     if isinstance(block, (XModule, XModuleDescriptor)):
         # Add the webpackified asset tags
-        for tag in webpack_loader.utils.get_as_tags(class_name):
-            frag.add_resource(tag, mimetype='text/html', placement='head')
+        add_webpack_to_fragment(frag, class_name)
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 

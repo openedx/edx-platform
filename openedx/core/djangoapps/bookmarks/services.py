@@ -4,8 +4,8 @@ Bookmarks service.
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -46,12 +46,12 @@ class BookmarksService(object):
             return []
         cache_key = CACHE_KEY_TEMPLATE.format(self._user.id, course_key)
 
-        bookmarks_cache = RequestCache.get_request_cache().data.get(cache_key, None)
+        bookmarks_cache = DEFAULT_REQUEST_CACHE.data.get(cache_key, None)
         if bookmarks_cache is None and fetch is True:
             bookmarks_cache = api.get_bookmarks(
                 self._user, course_key=course_key, fields=DEFAULT_FIELDS
             )
-            RequestCache.get_request_cache().data[cache_key] = bookmarks_cache
+            DEFAULT_REQUEST_CACHE.data[cache_key] = bookmarks_cache
 
         return bookmarks_cache
 

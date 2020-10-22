@@ -143,6 +143,9 @@
                 this.showNotificationMessage(successMessage);
 
                 if (this.options.refreshPageOnSave) {
+                    if ("focusNextID" in this.options) {
+                        $.cookie('focus_id', this.options.focusNextID );
+                    }
                     location.reload(true);
                 }
 

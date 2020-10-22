@@ -7,7 +7,6 @@ from copy import deepcopy
 
 from django.contrib.auth.models import User
 from django.urls import reverse
-from nose.plugins.attrib import attr
 
 from common.test.utils import XssTestMixin
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -16,12 +15,11 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTestMixin):
     """
     All tests for the views.py file
     """
-
+    shard = 1
     STUDENT_INFO = [('view@test.com', 'foo')]
 
     @classmethod

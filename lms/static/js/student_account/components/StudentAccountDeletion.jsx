@@ -41,7 +41,7 @@ export class StudentAccountDeletion extends React.Component {
     const loseAccessText = StringUtils.interpolate(
       gettext('You may also lose access to verified certificates and other program credentials like MicroMasters certificates. If you want to make a copy of these for your records before proceeding with deletion, follow the instructions for {htmlStart}printing or downloading a certificate{htmlEnd}.'),
       {
-        htmlStart: '<a href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_certificates.html#printing-a-certificate" target="_blank">',
+        htmlStart: '<a href="https://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_certificates.html#printing-a-certificate" target="_blank">',
         htmlEnd: '</a>',
       },
     );
@@ -64,6 +64,22 @@ export class StudentAccountDeletion extends React.Component {
       },
     );
 
+    const changeAcctInfoText = StringUtils.interpolate(
+      gettext('{htmlStart}Want to change your email, name, or password instead?{htmlEnd}'),
+      {
+        htmlStart: '<a href="https://support.edx.org/hc/en-us/sections/115004139268-Manage-Your-Account-Settings" target="_blank">',
+        htmlEnd: '</a>',
+      },
+    );
+
+    const acctDeletionWarningText = StringUtils.interpolate(
+      gettext('{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on edX.{strongEnd}'),
+      {
+        strongStart: '<strong>',
+        strongEnd: '</strong>',
+      },
+    );
+
     return (
       <div className="account-deletion-details">
         <p className="account-settings-header-subtitle">{ gettext('We’re sorry to see you go!') }</p>
@@ -73,7 +89,14 @@ export class StudentAccountDeletion extends React.Component {
           className="account-settings-header-subtitle"
           dangerouslySetInnerHTML={{ __html: loseAccessText }}
         />
-
+        <p
+          className="account-settings-header-subtitle-warning"
+          dangerouslySetInnerHTML={{ __html: acctDeletionWarningText }}
+        />
+        <p
+          className="account-settings-header-subtitle"
+          dangerouslySetInnerHTML={{ __html: changeAcctInfoText }}
+        />
         <Button
           id="delete-account-btn"
           className={['btn-outline-primary']}

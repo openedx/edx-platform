@@ -15,9 +15,9 @@ from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
+from edx_django_utils.monitoring import set_custom_metric
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.monitoring_utils import set_custom_metric
 from openedx.core.djangoapps.schedules import message_types
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules import resolvers
@@ -49,7 +49,7 @@ def update_course_schedules(self, **kwargs):
             start=new_start_date,
             upgrade_deadline=new_upgrade_deadline
         )
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
             LOG.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
         raise self.retry(kwargs=kwargs, exc=exc)

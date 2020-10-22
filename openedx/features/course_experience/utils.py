@@ -6,11 +6,11 @@ from completion.models import BlockCompletion
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from openedx.core.lib.cache_utils import request_cached
 from xmodule.modulestore.django import modulestore
 
 
-@request_cached
+@request_cached()
 def get_course_outline_block_tree(request, course_id):
     """
     Returns the root block of the course outline, with children as blocks.

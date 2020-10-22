@@ -3,7 +3,7 @@ Tasks for bookmarks.
 """
 import logging
 
-from celery.task import task  # pylint: disable=import-error,no-name-in-module
+from celery.task import task
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 

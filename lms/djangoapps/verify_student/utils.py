@@ -76,23 +76,6 @@ def verification_for_datetime(deadline, candidates):
             return verification
 
 
-def send_verification_status_email(context):
-    """
-    Send an email to inform learners about their verification status
-    using sailthru
-    """
-    sailthru_client = SailthruClient(context['email_config'].sailthru_key, context['email_config'].sailthru_secret)
-    sailthru_response = sailthru_client.send(
-        email=context['email'], template=context['template'],
-        _vars=context['template_vars']
-    )
-    if not sailthru_response.is_ok():
-        error = sailthru_response.get_error()
-        log.error("Error attempting to send verification status email to user: {} via Sailthru: {}".format(
-            context['email'], error.get_message()
-        ))
-
-
 def most_recent_verification(photo_id_verifications, sso_id_verifications, manual_id_verifications, most_recent_key):
     """
     Return the most recent verification given querysets for photo, sso and manual verifications.

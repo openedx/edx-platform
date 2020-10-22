@@ -400,10 +400,12 @@ class UserRetirementPartnerReportSerializer(serializers.Serializer):
     """
     Perform serialization for the UserRetirementPartnerReportingStatus model
     """
+    user_id = serializers.IntegerField()
     original_username = serializers.CharField()
     original_email = serializers.EmailField()
     original_name = serializers.CharField()
     orgs = serializers.ListField(child=serializers.CharField())
+    created = serializers.DateTimeField()
 
     # Required overrides of abstract base class methods, but we don't use them
     def create(self, validated_data):

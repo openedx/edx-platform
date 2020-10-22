@@ -8,7 +8,6 @@ from datetime import timedelta, datetime
 from mock import MagicMock
 
 from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -23,7 +22,6 @@ from openedx.core.djangoapps.credit.signals import listen_for_grade_calculation
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-@attr(shard=2)
 @skip_unless_lms
 @ddt.ddt
 class TestMinGradedRequirementStatus(ModuleStoreTestCase):
@@ -34,6 +32,7 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     """
     VALID_DUE_DATE = datetime.now(pytz.UTC) + timedelta(days=20)
     EXPIRED_DUE_DATE = datetime.now(pytz.UTC) - timedelta(days=20)
+    shard = 2
 
     DATES = {
         'valid': VALID_DUE_DATE,

@@ -2,7 +2,6 @@
 """ Tests for the language API. """
 
 from mock import patch
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import translation
 from django.contrib.auth.models import User
@@ -11,13 +10,14 @@ import ddt
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import api as language_api
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 EN = language_api.Language('en', 'English')
 ES_419 = language_api.Language('es-419', u'Español (Latinoamérica)')
 
 
 @ddt.ddt
-class LanguageApiTest(TestCase):
+class LanguageApiTest(CacheIsolationTestCase):
     """
     Tests of the language APIs.
     """

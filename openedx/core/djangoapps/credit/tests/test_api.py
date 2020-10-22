@@ -12,7 +12,6 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.db import connection
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
@@ -156,7 +155,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         ]
     }
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(CreditApiTestBase, self).setUp()
         self.course = CourseFactory.create(org="edx", course="DemoX", run="Demo_Course")
         self.course_key = self.course.id
@@ -202,13 +201,13 @@ class CreditApiTestBase(ModuleStoreTestCase):
         )
 
 
-@attr(shard=2)
 @skip_unless_lms
 @ddt.ddt
 class CreditRequirementApiTests(CreditApiTestBase):
     """
     Test Python API for credit requirements and eligibility.
     """
+    shard = 2
 
     @ddt.data(
         [
@@ -874,12 +873,12 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertIn(providers_email_message, text_content_first)
 
 
-@attr(shard=2)
 @ddt.ddt
 class CreditProviderIntegrationApiTests(CreditApiTestBase):
     """
     Test Python API for credit provider integration.
     """
+    shard = 2
 
     USER_INFO = {
         "username": "bob",
@@ -1201,7 +1200,6 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         self.assertEqual(statuses[0]["status"], expected_status)
 
 
-@attr(shard=2)
 @skip_unless_lms
 @override_settings(
     ECOMMERCE_API_URL=TEST_API_URL,
@@ -1210,6 +1208,8 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
 @ddt.ddt
 class CourseApiTests(CreditApiTestBase):
     """Test Python API for course product information."""
+    shard = 2
+
     def setUp(self):
         super(CourseApiTests, self).setUp()
         self.worker_user = User.objects.create_user(username=TEST_ECOMMERCE_WORKER)

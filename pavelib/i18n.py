@@ -245,6 +245,7 @@ def i18n_clean():
 
 @task
 @needs(
+    "pavelib.i18n.i18n_clean",
     "pavelib.i18n.i18n_extract",
     "pavelib.i18n.i18n_transifex_push",
 )

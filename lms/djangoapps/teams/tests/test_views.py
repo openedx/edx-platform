@@ -13,7 +13,6 @@ from django.db.models.signals import post_save
 from django.utils import translation
 from elasticsearch.exceptions import ConnectionError
 from mock import patch
-from nose.plugins.attrib import attr
 from rest_framework.test import APIClient, APITestCase
 from search.search_engine_base import SearchEngine
 
@@ -32,7 +31,6 @@ from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_sav
 from .factories import LAST_ACTIVITY_AT, CourseTeamFactory
 
 
-@attr(shard=1)
 class TestDashboard(SharedModuleStoreTestCase):
     """Tests for the Teams dashboard."""
     shard = 6

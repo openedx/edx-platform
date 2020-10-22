@@ -11,18 +11,17 @@ from unittest import skipUnless
 from django.conf import settings
 from django.test import TestCase
 from mock import patch
-from nose.plugins.attrib import attr
 
 from courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
 from courseware.tests.factories import StudentModuleFactory, course_id, location
 
 
-@attr(shard=1)
 @skipUnless(settings.FEATURES["ENABLE_CSMH_EXTENDED"], "CSMH Extended needs to be enabled")
 class TestStudentModuleHistoryBackends(TestCase):
     """ Tests of data in CSMH and CSMHE """
     # Tell Django to clean out all databases, not just default
     multi_db = True
+    shard = 1
 
     def setUp(self):
         super(TestStudentModuleHistoryBackends, self).setUp()

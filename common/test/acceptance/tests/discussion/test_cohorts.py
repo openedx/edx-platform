@@ -3,14 +3,13 @@ Tests related to the cohorting feature.
 """
 from uuid import uuid4
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThreadPage, InlineDiscussionPage
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase, CohortTestMixin
 from common.test.acceptance.tests.helpers import UniqueCourseTest
+from openedx.core.lib.tests import attr
 
 
 class NonCohortedDiscussionTestMixin(BaseDiscussionMixin):

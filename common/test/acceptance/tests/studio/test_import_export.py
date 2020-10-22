@@ -4,11 +4,6 @@ Acceptance tests for the Import and Export pages
 from abc import abstractmethod
 from datetime import datetime
 
-from nose.plugins.attrib import attr
-
-from common.test.acceptance.pages.lms.course_home import CourseHomePage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.pages.studio.import_export import (
     ExportCoursePage,
     ExportLibraryPage,
@@ -18,6 +13,7 @@ from common.test.acceptance.pages.studio.import_export import (
 from common.test.acceptance.pages.studio.library import LibraryEditPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest, StudioLibraryTest
+from openedx.core.lib.tests import attr
 
 
 class ExportTestMixin(object):

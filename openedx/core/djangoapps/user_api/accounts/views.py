@@ -18,7 +18,8 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
 from integrated_channels.degreed.models import DegreedLearnerDataTransmissionAudit
 from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
@@ -34,6 +35,7 @@ from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
 from entitlements.models import CourseEntitlement
+from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.appsembler.sites.utils import get_single_user_organization
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
@@ -42,10 +44,7 @@ from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCoho
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models, retire_dop_oauth2_models
-from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationAllowInactiveUser,
-    SessionAuthenticationAllowInactiveUser
-)
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
     CourseEnrollment,
@@ -53,6 +52,7 @@ from student.models import (
     PasswordHistory,
     PendingNameChange,
     CourseEnrollmentAllowed,
+    LoginFailures,
     PendingEmailChange,
     Registration,
     User,
@@ -63,8 +63,6 @@ from student.models import (
     generate_retired_email_address,
     is_username_retired
 )
-from student.views.login import AuthFailedError, LoginFailures
-
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
 from ..models import (
     RetirementState,
@@ -597,10 +595,12 @@ class AccountRetirementPartnerReportView(ViewSet):
 
         retirements = [
             {
+                'user_id': retirement.user.pk,
                 'original_username': retirement.original_username,
                 'original_email': retirement.original_email,
                 'original_name': retirement.original_name,
-                'orgs': self._get_orgs_for_user(retirement.user)
+                'orgs': self._get_orgs_for_user(retirement.user),
+                'created': retirement.created,
             }
             for retirement in retirement_statuses
         ]
@@ -645,7 +645,7 @@ class AccountRetirementPartnerReportView(ViewSet):
 
     def retirement_partner_cleanup(self, request):
         """
-        DELETE /api/user/v1/accounts/retirement_partner_report/
+        POST /api/user/v1/accounts/retirement_partner_report_cleanup/
 
         [{'original_username': 'user1'}, {'original_username': 'user2'}, ...]
 
@@ -748,9 +748,9 @@ class AccountRetirementStatusView(ViewSet):
         so to get one day you would set both dates to that day.
         """
         try:
-            start_date = datetime.datetime.strptime(request.GET['start_date'], '%Y-%m-%d')
-            end_date = datetime.datetime.strptime(request.GET['end_date'], '%Y-%m-%d')
-            now = datetime.datetime.now()
+            start_date = datetime.datetime.strptime(request.GET['start_date'], '%Y-%m-%d').replace(tzinfo=pytz.UTC)
+            end_date = datetime.datetime.strptime(request.GET['end_date'], '%Y-%m-%d').replace(tzinfo=pytz.UTC)
+            now = datetime.datetime.now(pytz.UTC)
             if start_date > now or end_date > now or start_date > end_date:
                 raise RetirementStateError('Dates must be today or earlier, and start must be earlier than end.')
 
@@ -840,6 +840,39 @@ class AccountRetirementStatusView(ViewSet):
         except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def cleanup(self, request):
+        """
+        DELETE /api/user/v1/accounts/update_retirement_status/
+
+        {
+            'usernames': ['user1', 'user2', ...]
+        }
+
+        Deletes a batch of retirement requests by username.
+        """
+        try:
+            usernames = request.data['usernames']
+
+            if not isinstance(usernames, list):
+                raise TypeError('Usernames should be an array.')
+
+            complete_state = RetirementState.objects.get(state_name='COMPLETE')
+            retirements = UserRetirementStatus.objects.filter(
+                original_username__in=usernames,
+                current_state=complete_state
+            )
+
+            # Sanity check that they're all valid usernames in the right state
+            if len(usernames) != len(retirements):
+                raise UserRetirementStatus.DoesNotExist('Not all usernames exist in the COMPLETE state.')
+
+            retirements.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except (RetirementStateError, UserRetirementStatus.DoesNotExist, TypeError) as exc:
             return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

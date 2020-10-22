@@ -67,13 +67,17 @@ class DOTAdapter(object):
         """
         return models.AccessToken.objects.get(token=token_string)
 
-    def normalize_scopes(self, scopes):
+    def create_access_token_for_test(self, token_string, client, user, expires):
         """
-        Given a list of scopes, return a space-separated list of those scopes.
+        Returns a new AccessToken object created from the given arguments.
+        This method is currently used only by tests.
         """
-        if not scopes:
-            scopes = ['default']
-        return ' '.join(scopes)
+        return models.AccessToken.objects.create(
+            token=token_string,
+            application=client,
+            user=user,
+            expires=expires,
+        )
 
     def get_token_scope_names(self, token):
         """
@@ -81,18 +85,17 @@ class DOTAdapter(object):
         """
         return list(token.scopes)
 
-    def is_client_restricted(self, client_id):
+    def is_client_restricted(self, client):
         """
         Returns true if the client is set up as a RestrictedApplication.
         """
-        application = self.get_client(client_id=client_id)
-        return RestrictedApplication.objects.filter(application=application).exists()
+        return RestrictedApplication.objects.filter(application=client).exists()
 
-    def get_authorization_filters(self, client_id):
+    def get_authorization_filters(self, client):
         """
         Get the authorization filters for the given client application.
         """
-        application = self.get_client(client_id=client_id)
+        application = client
         filters = [org_relation.to_jwt_filter_claim() for org_relation in application.organizations.all()]
 
         # Allow applications configured with the client credentials grant type to access

@@ -7,7 +7,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.test.utils import override_settings
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from courseware.tests.factories import GlobalStaffFactory
@@ -21,17 +20,15 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr(shard=1)
 class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
     """
-
+    shard = 1
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
     @classmethod
     def setUpClass(cls):
-        #  pylint: disable=super-method-not-called
         with super(TestNavigation, cls).setUpClassAndTestData():
             cls.test_course = CourseFactory.create()
             cls.test_course_proctored = CourseFactory.create()

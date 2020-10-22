@@ -85,10 +85,9 @@ class IDVerificationService(object):
         return verifications
 
     @classmethod
-    def get_verified_users(cls, users):
+    def get_verified_user_ids(cls, users):
         """
-        Return the list of users that have non-expired verifications of either type from
-        the given list of users.
+        Given a list of users, returns an iterator of user ids that have non-expired verifications of any type.
         """
         filter_kwargs = {
             'user__in': users,
@@ -96,9 +95,9 @@ class IDVerificationService(object):
             'created_at__gte': (earliest_allowed_verification_date())
         }
         return chain(
-            SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).select_related('user'),
-            SSOVerification.objects.filter(**filter_kwargs).select_related('user'),
-            ManualVerification.objects.filter(**filter_kwargs).select_related('user')
+            SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
+            SSOVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
+            ManualVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True)
         )
 
     @classmethod

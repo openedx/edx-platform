@@ -14,7 +14,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
 from capa.xqueue_interface import XQueueInterface
 from lms.djangoapps.certificates import api as certs_api
@@ -35,6 +34,7 @@ from courseware.tests.factories import StaffFactory, GlobalStaffFactory, Instruc
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -139,7 +139,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         """
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.global_staff.id)  # pylint: disable=no-member
+        self.store.update_item(self.course, self.global_staff.id)
         self.client.login(username=self.global_staff.username, password="test")
         response = self.client.get(self.url)
         self.assertContains(response, 'Enable Student-Generated Certificates')
@@ -155,7 +155,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         """
         self.course.cert_html_view_enabled = True
         self.course.save()
-        self.store.update_item(self.course, self.global_staff.id)  # pylint: disable=no-member
+        self.store.update_item(self.course, self.global_staff.id)
         self.client.login(username=self.global_staff.username, password="test")
         response = self.client.get(self.url)
         self.assertContains(response, 'Enable Student-Generated Certificates')
@@ -556,7 +556,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Certificate Exception Updated data
         self.assertEqual(certificate_exception['user_email'], self.user.email)
         self.assertEqual(certificate_exception['user_name'], self.user.username)
-        self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
+        self.assertEqual(certificate_exception['user_id'], self.user.id)
 
     def test_certificate_exception_invalid_username_error(self):
         """
@@ -651,7 +651,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Certificate Exception Updated data
         self.assertEqual(certificate_exception['user_email'], self.user.email)
         self.assertEqual(certificate_exception['user_name'], self.user.username)
-        self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
+        self.assertEqual(certificate_exception['user_id'], self.user.id)
 
         course2 = CourseFactory.create()
         url_course2 = reverse(
@@ -672,7 +672,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Certificate Exception Updated data
         self.assertEqual(certificate_exception['user_email'], self.user.email)
         self.assertEqual(certificate_exception['user_name'], self.user.username)
-        self.assertEqual(certificate_exception['user_id'], self.user.id)  # pylint: disable=no-member
+        self.assertEqual(certificate_exception['user_id'], self.user.id)
 
     def test_certificate_exception_user_not_enrolled_error(self):
         """

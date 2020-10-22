@@ -154,13 +154,13 @@
 }
 
 .manage-user-results {
-
   .manage-user-table {
     display: inline-block;
   }
 
   th {
     @extend %t-title7;
+
     text-align: center;
   }
 
@@ -171,6 +171,7 @@
   .disable-account-btn,
   .disable-account-btn:hover {
     @extend %t-action4;
+
     letter-spacing: normal;
     text-transform: none;
     background-image: none;
@@ -216,12 +217,6 @@
     border: 1px solid $blue;
     border-radius: 3px;
     color: $blue;
-
-    &:hover,
-    &:focus {
-      color: $blue;
-      background-color: $mediumGrey !important;
-    }
   }
 
   .label-course {

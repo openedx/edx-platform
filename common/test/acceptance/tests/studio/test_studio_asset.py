@@ -198,9 +198,9 @@ class AssetIndexTestStudioFrontendPagination(StudioCourseTest):
             files.append(file_path)
         course_fixture.add_asset(files)
 
-    def assert_correct_number_of_page_buttons(self, count):
-        """Make sure the correct number of page buttons are on the page."""
-        assert self.asset_page.number_of_pagination_page_buttons == count
+    def assert_correct_number_of_buttons(self, count):
+        """Make sure the correct number of buttons are on the page; includes previous and next. """
+        assert self.asset_page.number_of_pagination_buttons == count
 
     def assert_correct_direction_buttons(self):
         """Make sure the previous and next pagination buttons are on the page."""
@@ -210,7 +210,7 @@ class AssetIndexTestStudioFrontendPagination(StudioCourseTest):
     def test_pagination_exists(self):
         """Make sure the pagination elements are on the page."""
         self.asset_page.visit()
-        self.assert_correct_number_of_page_buttons(2)
+        self.assert_correct_number_of_buttons(4)
         self.assert_correct_direction_buttons()
 
     def test_pagination_page_click(self):
@@ -218,9 +218,8 @@ class AssetIndexTestStudioFrontendPagination(StudioCourseTest):
         self.asset_page.visit()
 
         first_page_file_names = self.asset_page.asset_files_names
-
-        assert self.asset_page.click_pagination_page_button(1)
-        assert self.asset_page.is_selected_page(1)
+        assert self.asset_page.click_pagination_page_button(2)
+        assert self.asset_page.is_selected_page(2)
         assert self.asset_page.number_of_asset_files == 1
         second_page_file_names = self.asset_page.asset_files_names
 
@@ -234,16 +233,15 @@ class AssetIndexTestStudioFrontendPagination(StudioCourseTest):
         self.asset_page.visit()
 
         first_page_file_names = self.asset_page.asset_files_names
-
         assert self.asset_page.click_pagination_next_button()
-        assert self.asset_page.is_selected_page(1)
+        assert self.asset_page.is_selected_page(2)
         assert self.asset_page.number_of_asset_files == 1
         next_page_file_names = self.asset_page.asset_files_names
 
         assert first_page_file_names != next_page_file_names
 
         assert self.asset_page.click_pagination_previous_button()
-        assert self.asset_page.is_selected_page(0)
+        assert self.asset_page.is_selected_page(1)
         assert self.asset_page.number_of_asset_files == 50
         previous_page_file_names = self.asset_page.asset_files_names
 

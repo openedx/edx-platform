@@ -178,7 +178,7 @@ def has_staff_access_to_preview_mode(user, course_key):
     return has_admin_access_to_course or is_masquerading_as_student(user, course_key)
 
 
-def _can_view_courseware_with_prerequisites(user, course):  # pylint: disable=invalid-name
+def _can_view_courseware_with_prerequisites(user, course):
     """
     Checks if a user has access to a course based on its prerequisites.
 
@@ -629,7 +629,7 @@ def _dispatch(table, action, user, obj):
         type(obj), action))
 
 
-def _adjust_start_date_for_beta_testers(user, descriptor, course_key):  # pylint: disable=invalid-name
+def _adjust_start_date_for_beta_testers(user, descriptor, course_key):
     """
     If user is in a beta test group, adjust the start date by the appropriate number of
     days.
@@ -722,7 +722,7 @@ def administrative_accesses_to_course_for_user(user, course_key):
     return global_staff, staff_access, instructor_access
 
 
-def _has_instructor_access_to_descriptor(user, descriptor, course_key):  # pylint: disable=invalid-name
+def _has_instructor_access_to_descriptor(user, descriptor, course_key):
     """Helper method that checks whether the user has staff access to
     the course of the location.
 

@@ -5,7 +5,6 @@ from ddt import data, ddt, unpack
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from gating.api import evaluate_prerequisite
@@ -57,12 +56,12 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         )
 
 
-@attr(shard=3)
 @ddt
 class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
     """
     Tests for the evaluate_prerequisite function
     """
+    shard = 3
 
     def setUp(self):
         super(TestEvaluatePrerequisite, self).setUp()

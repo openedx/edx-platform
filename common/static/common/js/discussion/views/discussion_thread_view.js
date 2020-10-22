@@ -317,6 +317,7 @@
                 if (options.focusAddedResponse) {
                     this.focusToTheAddedResponse(view.el);
                 }
+                DiscussionUtil.typesetMathJax(view.$el.find('.js-response-list'));
             };
 
             DiscussionThreadView.prototype.renderAddResponseButton = function() {

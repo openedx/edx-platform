@@ -2,7 +2,7 @@
 This module provides a :class:`~xblock.field_data.FieldData` implementation
 which wraps an other `FieldData` object and provides overrides based on the
 user.  The use of providers allows for overrides that are arbitrarily
-extensible.  One provider is found in `courseware.student_field_overrides`
+extensible.  One provider is found in `lms.djangoapps.courseware.student_field_overrides`
 which allows for fields to be overridden for individual students.  One can
 envision other providers being written that allow for fields to be overridden
 base on membership of a student in a cohort, or similar.  The use of an
@@ -19,9 +19,9 @@ from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 
 from django.conf import settings
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from xblock.field_data import FieldData
 
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.modulestore.inheritance import InheritanceMixin
 
 NOTSET = object()
@@ -180,7 +180,7 @@ class OverrideFieldData(FieldData):
         Arguments:
             course: The course XBlock
         """
-        request_cache = RequestCache.get_request_cache()
+        request_cache = DEFAULT_REQUEST_CACHE
         if course is None:
             cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id='None')
         else:
@@ -294,7 +294,7 @@ class OverrideModulestoreFieldData(OverrideFieldData):
         course_id = unicode(block.location.course_key)
         cache_key = ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY.format(course_id=course_id)
 
-        request_cache = RequestCache.get_request_cache()
+        request_cache = DEFAULT_REQUEST_CACHE
         enabled_providers = request_cache.data.get(cache_key)
 
         if enabled_providers is None:

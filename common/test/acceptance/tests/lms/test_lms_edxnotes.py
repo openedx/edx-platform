@@ -6,8 +6,6 @@ from datetime import datetime
 from unittest import skip
 from uuid import uuid4
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.edxnotes import EdxNotesFixture, Note, Range
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -15,6 +13,7 @@ from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.edxnotes import EdxNotesPage, EdxNotesPageNoContent, EdxNotesUnitPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
+from openedx.core.lib.tests import attr
 
 
 class EdxNotesTestMixin(UniqueCourseTest):

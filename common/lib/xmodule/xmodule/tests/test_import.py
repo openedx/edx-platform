@@ -32,6 +32,7 @@ from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 ORG = 'test_org'
 COURSE = 'test_course'
+RUN = 'test_run'
 
 
 class DummySystem(ImportSystem):
@@ -43,7 +44,7 @@ class DummySystem(ImportSystem):
             xmlstore = LibraryXMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
         else:
             xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
-        course_id = CourseKey.from_string('/'.join([ORG, COURSE, 'test_run']))
+        course_id = CourseKey.from_string('/'.join([ORG, COURSE, RUN]))
         course_dir = "test_dir"
         error_tracker = Mock()
 
@@ -197,7 +198,7 @@ class ImportTestCase(BaseCourseTestCase):
         # Now make sure the exported xml is a sequential
         self.assertEqual(node.tag, 'sequential')
 
-    def course_descriptor_inheritance_check(self, descriptor, from_date_string, unicorn_color, url_name):
+    def course_descriptor_inheritance_check(self, descriptor, from_date_string, unicorn_color, course_run=RUN):
         """
         Checks to make sure that metadata inheritance on a course descriptor is respected.
         """
@@ -228,7 +229,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(node.attrib['org'], ORG)
 
         # Does the course still have unicorns?
-        with descriptor.runtime.export_fs.open(u'course/{url_name}.xml'.format(url_name=url_name)) as f:
+        with descriptor.runtime.export_fs.open(u'course/{course_run}.xml'.format(course_run=course_run)) as f:
             course_xml = etree.fromstring(f.read())
 
         self.assertEqual(course_xml.attrib['unicorn'], unicorn_color)
@@ -267,7 +268,7 @@ class ImportTestCase(BaseCourseTestCase):
         )
         descriptor = system.process_xml(start_xml)
         compute_inherited_metadata(descriptor)
-        self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color, url_name)
+        self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color)
 
     def test_library_metadata_import_export(self):
         """Two checks:
@@ -300,7 +301,7 @@ class ImportTestCase(BaseCourseTestCase):
         compute_inherited_metadata(descriptor)
         # Check the course module, since it has inheritance
         descriptor = descriptor.get_children()[0]
-        self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color, url_name)
+        self.course_descriptor_inheritance_check(descriptor, from_date_string, unicorn_color)
 
     def test_metadata_no_inheritance(self):
         """
