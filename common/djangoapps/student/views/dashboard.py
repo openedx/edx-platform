@@ -609,7 +609,7 @@ def student_dashboard(request):
             )
 
 
-# Disable lookup of Enterprise consent_required_course due to ENT-727
+    # Disable lookup of Enterprise consent_required_course due to ENT-727
     # Will re-enable after fixing WL-1315
     consent_required_courses = set()
     enterprise_customer_name = None
