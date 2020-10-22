@@ -74,7 +74,3 @@ git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-rate
 
 git+https://github.com/open-craft/xblock-poll@1efd04bd6e16252a20e39a7516f9b69a000ace24#egg=xblock-poll==1.10.0
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10
-
-
-# Test new version of edx-search
-git+https://github.com/raccoongang/edx-search.git@golub-sergey/BD-19/transition-from-ES1.5-to-ES7
