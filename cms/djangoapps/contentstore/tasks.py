@@ -84,7 +84,7 @@ COURSE_LEVEL_TIMEOUT_SECONDS = 1200
 VIDEO_LEVEL_TIMEOUT_SECONDS = 300
 
 
-@chord_task(bind=True)
+@chord_task(bind=True, routing_key=settings.VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE)
 def task_status_callback(self, results, revision,  # pylint: disable=unused-argument
                          course_id, command_run, video_location):
     """
@@ -157,7 +157,8 @@ def get_course_videos(course_key):
     base=LoggedPersistOnFailureTask,
     default_retry_delay=RETRY_DELAY_SECONDS,
     max_retries=1,
-    time_limit=COURSE_LEVEL_TIMEOUT_SECONDS
+    time_limit=COURSE_LEVEL_TIMEOUT_SECONDS,
+    routing_key=settings.VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE
 )
 def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=unused-argument
     """
@@ -185,7 +186,7 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
 
             sub_tasks = []
             video_location = unicode(video.location)
-            for lang in all_transcripts.keys():
+            for lang in all_transcripts:
                 sub_tasks.append(async_migrate_transcript_subtask.s(
                     video_location, revision, lang, force_update, **kwargs
                 ))
@@ -251,7 +252,8 @@ def save_transcript_to_storage(command_run, edx_video_id, language_code, transcr
     base=LoggedPersistOnFailureTask,
     default_retry_delay=RETRY_DELAY_SECONDS,
     max_retries=2,
-    time_limit=VIDEO_LEVEL_TIMEOUT_SECONDS
+    time_limit=VIDEO_LEVEL_TIMEOUT_SECONDS,
+    routing_key=settings.VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE
 )
 def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=unused-argument
     """

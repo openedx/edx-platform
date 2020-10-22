@@ -35,6 +35,7 @@
 # Laura Silva <lingison@edx.org>, 2015-2018
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
+# Marco Morales, 2018
 # Marcos Buccella <marcosfiore07@gmail.com>, 2018
 # Marina Pastor <mpastor@edx.org>, 2017-2018
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
@@ -56,7 +57,7 @@
 # wjmendez <walterj.mendez@gmail.com>, 2014
 # José Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -123,7 +124,7 @@
 # Irvin Cabrera <pirpinachisloco@hotmail.com>, 2014
 # Ismael Saavedra <isma.18.94@gmail.com>, 2014
 # jimenaianina <jime.ianina@gmail.com>, 2014
-# Jonathan Amaya <jonathan.amaya88@yahoo.com>, 2014
+# 1673e3cf8bd85685e54576636ae7f409, 2014
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018
@@ -164,7 +165,7 @@
 # Yleana Munoz <yleana.munoz@gmail.com>, 2015
 # José Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -204,7 +205,7 @@
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2015
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -219,8 +220,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-25 13:22+0000\n"
-"PO-Revision-Date: 2018-06-06 15:12+0000\n"
+"POT-Creation-Date: 2018-07-10 06:59+0000\n"
+"PO-Revision-Date: 2018-07-10 07:01+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
@@ -2824,6 +2825,10 @@ msgstr "ID de la respuesta"
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Question"
 msgstr "Pregunta"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Correct Answer"
+msgstr "Respuesta Correcta"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
@@ -7351,6 +7356,8 @@ msgstr "El usuario no existe."
 msgid ""
 "Found a conflict with given identifier. Please try an alternative identifier"
 msgstr ""
+"Se encontró un conflicto con el identificador proveído. Por favor encuentre "
+"un identificador alternativo"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -10171,6 +10178,30 @@ msgid "Your Platform Description Here"
 msgstr "Tu descripción de la plataforma aquí"
 
 #: lms/envs/common.py
+msgid "Read access"
+msgstr "Leer acceso"
+
+#: lms/envs/common.py
+msgid "Write access"
+msgstr "Escribir acceso"
+
+#: lms/envs/common.py
+msgid "Know your email address"
+msgstr "Conocer su dirección de correo electrónico"
+
+#: lms/envs/common.py
+msgid "Know your name and username"
+msgstr "Conocer su nombre y su nombre de usuario"
+
+#: lms/envs/common.py
+msgid "Retrieve your grades for your enrolled courses"
+msgstr "Obtener las calificaciones para los cursos en los que está inscrito"
+
+#: lms/envs/common.py
+msgid "Retrieve your course certificates"
+msgstr "Obtener sus certificados"
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "Tomar como asistente"
@@ -10303,13 +10334,9 @@ msgstr "Ha cerrado su sesión."
 #: lms/templates/logout.html
 #, python-format
 msgid ""
-"\n"
-"          If you are not redirected within 5 seconds, <a href=\"%(target)s\">click here to go to the home page</a>.\n"
-"        "
+"If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
+"here to go to the home page</a>."
 msgstr ""
-"\n"
-"Si no es redirigido en 5 segundos, <a href=\"%(target)s\">haga clic aquí para ir a la página de inicio</a>.\n"
-"        "
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -10325,6 +10352,14 @@ msgid ""
 "The above application requests the following permissions from your account:"
 msgstr ""
 "La aplicación indicada arriba pide los siguientes permisos de su cuenta:"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"These permissions will be granted for data from your courses associated with"
+" the following content providers:"
+msgstr ""
+"Estos permisos serán otorgados para información de sus cursos asociada con "
+"el siguiente contenido de proveedores:"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
@@ -10568,15 +10603,12 @@ msgid "Create new merged version"
 msgstr "Crear una nueva versión fusionada."
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
+#: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
-"\n"
-"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
-"  "
+"You need to <a href=\"%(login_url)s\">log in</a> or <a "
+"href=\"%(signup_url)s\">sign up</a> to use this function."
 msgstr ""
-"\n"
-"  Debe <a href=\"%(login_url)s\">Iniciar sesión</a> o <a href=\"%(signup_url)s\">registrarse</a> para usar esta función.\n"
-"  "
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
@@ -10691,13 +10723,9 @@ msgstr "Citas"
 #: lms/templates/wiki/includes/editor_widget.html
 #, python-format
 msgid ""
-"\n"
-"        Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
-"    "
+"Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
+" help."
 msgstr ""
-"\n"
-"        Se permite la sintaxis de marcadores Markdown. Vea el %(start_link)sresumen de wiki%(end_link)s para obtener mas información.\n"
-"    "
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/wiki_plugin.py
@@ -11419,14 +11447,12 @@ msgid ""
 "Comma-separated list of scopes that this application will be allowed to "
 "request."
 msgstr ""
+"Lista de ámbitos separada por comas que esta aplicación será autorizada a "
+"solicitar."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
-msgstr ""
-
-#: openedx/core/djangoapps/oauth_dispatch/models.py
-msgid "The short_name of an existing Organization."
-msgstr ""
+msgstr "Proveedor de Contenido"
 
 #: openedx/core/djangoapps/password_policy/apps.py
 msgid "Password Policy"
@@ -11440,6 +11466,10 @@ msgid ""
 "\"Forgot password?\" link below to continue using the site. Thank you for "
 "helping us keep your data safe."
 msgstr ""
+"{platform_name} ahora solicita contraseñas más complejas. Su contraseña "
+"actual no cumple con los nuevos requisitos. Cambie su contraseña el enlace "
+"de \"¿olvidó su contraseña?\" ubicado en la parte inferior para continuar "
+"usando el sitio . Gracias por ayudarnos a mantener su información segura."
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
@@ -11451,6 +11481,12 @@ msgid ""
 "\"Account\". You can reset your password from this page. Thank you for "
 "helping us keep your data safe."
 msgstr ""
+"{platform_name} ahora requiere contraseñas más complejas. Su contraseña "
+"actual no cumple con los nuevos requerimientos. Debe cambiar su contraseña "
+"antes de {deadline} para continuar usando el sitio. Para cambiar su "
+"contraseña, seleccione el icono de menú desplegable al lado de su nombre de "
+"usuario,luego seleccione \"cuenta\". Puede restablecer su contraseña desde "
+"esta página. Gracias por ayudarnos a mantener su información segura."
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
@@ -11590,8 +11626,8 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
-msgid "Welcome to week %(week_num)s "
-msgstr "Bienvenido/a a la semana %(week_num)s "
+msgid "Welcome to week %(week_num)s"
+msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -12145,7 +12181,7 @@ msgstr "No se suministraron datos para actualizar la preferencia de usuario"
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
 msgid "Hello %(full_name)s,"
-msgstr ""
+msgstr "Hola %(full_name)s,"
 
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
@@ -12154,6 +12190,8 @@ msgid ""
 "We received a deletion request for your account on %(platform_name)s. We're "
 "sorry to see you go!"
 msgstr ""
+"Recibimos una solicitud para borrar su cuenta en  %(platform_name)s. ¡ "
+"Lamentamos que se vaya.!"
 
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
@@ -12163,6 +12201,12 @@ msgid ""
 "If you want to opt-out of emails before then, please unsubscribe from the "
 "footer of any email."
 msgstr ""
+"Su cuenta será eliminada prontamente. La eliminación de la cuenta, "
+"incluyendo remover información de listas de correo electrónico, puede tomar "
+"un par de semanas para ejecutar el proceso completamente en nuestro sistema."
+" Si desea optar por no recibir correos electrónicos antes de esa fecha, "
+"cancele su suscripción desde el pie de página de cualquier correo "
+"electrónico."
 
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
@@ -12171,16 +12215,18 @@ msgid ""
 "This is an informational email only. If you did not initiate this request, "
 "please contact %(contact_email)s."
 msgstr ""
+"Este es un correo electrónico solo de información. Si usted no inició esta "
+"solicitud, por favor contacte%(contact_email)s."
 
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
 #, python-format
 msgid "Best, %(platform_name)s"
-msgstr ""
+msgstr "El mejor, %(platform_name)s"
 
 #: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/subject.txt
 msgid "Your Account Has Been Queued For Deletion"
-msgstr ""
+msgstr "Su cuenta ha sido marcada para ser borrada"
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
@@ -13541,6 +13587,8 @@ msgid ""
 "You must complete the prerequisites for '{prereq_section_name}' to access "
 "this content."
 msgstr ""
+"Debe completar los prerequisitos para '{prereq_section_name}' Para acceder a"
+" este contenido."
 
 #: lms/templates/_gated_content.html
 msgid "Go to Prerequisite Section"
@@ -15155,8 +15203,8 @@ msgid "Terms of Service for {platform_name} APIs"
 msgstr "Términos del servicio para las APIs de {platform_name}"
 
 #: lms/templates/api_admin/terms_of_service.html
-msgid "Effective Date: April 12th, 2016"
-msgstr "Fecha de Vigencia: 12 de abril de 2016"
+msgid "Effective Date: May 24th, 2018"
+msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -22557,7 +22605,7 @@ msgstr "Configuración avanzada"
 
 #: cms/templates/checklists.html cms/templates/widgets/header.html
 msgid "Checklists"
-msgstr ""
+msgstr "Listas de chequeo"
 
 #: cms/templates/checklists.html cms/templates/export.html
 #: cms/templates/export_git.html cms/templates/import.html
@@ -23445,7 +23493,7 @@ msgstr "¿Que tipo de contenido es exportado?"
 
 #: cms/templates/export.html
 msgid "The following content is exported."
-msgstr ""
+msgstr "El siguiente contenido es exportado."
 
 #: cms/templates/export.html cms/templates/import.html
 msgid "Course content and structure"
@@ -23468,10 +23516,12 @@ msgid ""
 "Settings on the Advanced Settings page, including MATLAB API keys and LTI "
 "passports"
 msgstr ""
+"Ajustes en la Página de configuración Avanzada, incluyen MATLAB, llaves API "
+"y pasaportes LTI"
 
 #: cms/templates/export.html
 msgid "The following content is not exported."
-msgstr ""
+msgstr "El siguiente contenido no es exportado."
 
 #: cms/templates/export.html cms/templates/import.html
 msgid ""
@@ -25195,13 +25245,15 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course About Sidebar HTML"
-msgstr ""
+msgstr "HTML de la barra lateral en la página de resumen del curso"
 
 #: cms/templates/settings.html
 msgid ""
 "Custom sidebar content for {a_link_start}your course summary "
 "page{a_link_end} (formatted in HTML)"
 msgstr ""
+"Contenido personalizado de la barra lateral para {a_link_start} su página de"
+" resumen del curso {a_link_end} (formatted in HTML)"
 
 #: cms/templates/settings.html
 msgid "Course Card Image"
@@ -26514,13 +26566,10 @@ msgstr "Un archivo ha sido borrado: %s"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"\n"
-"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
-"    "
+"The file may be referenced on other articles. Deleting it means that they "
+"will loose their references to this file. The following articles reference "
+"this file:"
 msgstr ""
-"\n"
-"    El archivo puede ser referenciado en otros artículos. Eliminarlo significa que perderán sus referencias a este archivo. Los siguientes artículos hacen referencia a este archivo:\n"
-"    "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
@@ -26528,13 +26577,9 @@ msgstr "¡Bórralo!"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"\n"
-"    You can remove a reference to a file, but it will retain its references on other articles.\n"
-"    "
+"You can remove a reference to a file, but it will retain its references on "
+"other articles."
 msgstr ""
-"\n"
-"    Puede eliminar una referencia a un archivo, pero conservará sus referencias en otros artículos.\n"
-"    "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove reference"
@@ -26575,13 +26620,14 @@ msgstr "¡Utilizar esta!"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"\n"
-"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
-"  "
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
+"that this attachment is in use on other articles, you may distort contents. "
+"However, do not hestitate to take advantage of this and make replacements "
+"for the listed articles where necessary. This way of working is more "
+"efficient...."
 msgstr ""
-"\n"
-"  Reemplazar un archivo adjunto significa agregar un nuevo archivo que se usará en su lugar. Todas las referencias al archivo se reemplazarán por la que cargue y el archivo se descargará como <strong>%(filename)s</strong>. Tenga en cuenta que este archivo adjunto está en uso en otros artículos, puede distorsionar los contenidos. Sin embargo, no dude en aprovechar esto y hacer reemplazos para los artículos enumerados cuando sea necesario. Esta forma de trabajar es más eficiente....\n"
-"  "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
@@ -26590,13 +26636,10 @@ msgstr "Artículos usando"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"\n"
-"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
-"  "
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>."
 msgstr ""
-"\n"
-"  Reemplazar un archivo adjunto significa agregar un nuevo archivo que se usará en su lugar. Todas las referencias al archivo se reemplazarán por la que cargue y el archivo se descargará como <strong>%(filename)s</strong>.\n"
-"  "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
@@ -26983,14 +27026,8 @@ msgstr "coincidencias,coincidencia"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid ""
-"\n"
-"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
-"      "
+msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
 msgstr ""
-"\n"
-"        %(cnt)s %(articles_plur)s en este nivel %(match_plur)s su búsqueda.\n"
-"      "
 
 #: wiki/templates/wiki/dir.html
 msgid "is,are"
@@ -26998,14 +27035,8 @@ msgstr "es,son"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid ""
-"\n"
-"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
-"      "
+msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
 msgstr ""
-"\n"
-"        Hay %(articles_plur_verb)s %(cnt)s %(articles_plur)s en este nivel.\n"
-"      "
 
 #: wiki/templates/wiki/dir.html
 msgid "Last modified"

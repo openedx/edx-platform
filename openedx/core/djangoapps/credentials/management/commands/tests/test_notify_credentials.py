@@ -8,7 +8,8 @@ import mock
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase
+from django.db import connection, reset_queries
+from django.test import TestCase, override_settings
 from freezegun import freeze_time
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -89,21 +90,32 @@ class TestNotifyCredentials(TestCase):
 
     @mock.patch(COMMAND_MODULE + '.handle_cert_change')
     @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
-    @mock.patch(COMMAND_MODULE + '.handle_course_cert_awarded')
     @mock.patch(COMMAND_MODULE + '.handle_course_cert_changed')
-    def test_hand_off(self, mock_grade_cert_change, mock_grade_interesting, mock_program_awarded, mock_program_changed):
+    def test_hand_off(self, mock_grade_cert_change, mock_grade_interesting, mock_program_changed):
         call_command(Command(), '--start-date', '2017-02-01')
         self.assertEqual(mock_grade_cert_change.call_count, 2)
         self.assertEqual(mock_grade_interesting.call_count, 2)
-        self.assertEqual(mock_program_awarded.call_count, 2)
         self.assertEqual(mock_program_changed.call_count, 2)
 
     @mock.patch(COMMAND_MODULE + '.time')
     def test_delay(self, mock_time):
-        call_command(Command(), '--start-date', '2017-02-01')
+        call_command(Command(), '--start-date', '2017-01-01', '--page-size=2')
         self.assertEqual(mock_time.sleep.call_count, 0)
         mock_time.sleep.reset_mock()
 
-        call_command(Command(), '--start-date', '2017-02-01', '--delay', '0.2')
-        self.assertEqual(mock_time.sleep.call_count, 4)  # After each cert and each grade (2 each)
+        call_command(Command(), '--start-date', '2017-01-01', '--page-size=2', '--delay', '0.2')
+        self.assertEqual(mock_time.sleep.call_count, 2)  # Between each page, twice (2 pages, for certs and grades)
         self.assertEqual(mock_time.sleep.call_args[0][0], 0.2)
+
+    @override_settings(DEBUG=True)
+    def test_page_size(self):
+        call_command(Command(), '--start-date', '2017-01-01')
+        baseline = len(connection.queries)
+
+        reset_queries()
+        call_command(Command(), '--start-date', '2017-01-01', '--page-size=1')
+        self.assertEqual(len(connection.queries), baseline + 4)  # two extra page queries each for certs & grades
+
+        reset_queries()
+        call_command(Command(), '--start-date', '2017-01-01', '--page-size=2')
+        self.assertEqual(len(connection.queries), baseline + 2)  # one extra page query each for certs & grades

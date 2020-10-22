@@ -7,10 +7,10 @@ import unittest
 
 import ddt
 import httpretty
-from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.urls import reverse
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, TestCase
+from mock import call, patch
 from oauth2_provider import models as dot_models
 from organizations.tests.factories import OrganizationFactory
 
@@ -211,6 +211,35 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             data['scope'].split(' '),
             should_be_restricted=False,
         )
+
+    @ddt.data(
+        ('jwt', 'jwt'),
+        (None, 'no_token_type_supplied'),
+    )
+    @ddt.unpack
+    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    def test_access_token_metrics(self, token_type, expected_token_type, mock_set_custom_metric):
+        response = self._post_request(self.user, self.dot_app, token_type=token_type)
+        self.assertEqual(response.status_code, 200)
+        expected_calls = [
+            call('oauth_token_type', expected_token_type),
+            call('oauth_grant_type', 'password'),
+        ]
+        mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
+
+    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    def test_access_token_metrics_for_bad_request(self, mock_set_custom_metric):
+        grant_type = dot_models.Application.GRANT_PASSWORD
+        invalid_body = {
+            'grant_type': grant_type.replace('-', '_'),
+        }
+        bad_response = self.client.post(self.url, invalid_body)
+        self.assertEqual(bad_response.status_code, 400)
+        expected_calls = [
+            call('oauth_token_type', 'no_token_type_supplied'),
+            call('oauth_grant_type', 'password'),
+        ]
+        mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
     @ddt.data(
         (False, True, settings.DEFAULT_JWT_ISSUER),
@@ -529,13 +558,29 @@ class TestViewDispatch(TestCase):
         """
         return RequestFactory().get('/?client_id={}'.format(client_id))
 
-    def test_dispatching_post_to_dot(self):
+    def _verify_oauth_metrics_calls(self, mock_set_custom_metric, expected_oauth_adapter):
+        """
+        Args:
+            mock_set_custom_metric: MagicMock of set_custom_metric
+            expected_oauth_adapter: Either 'dot' or 'dop'
+        """
+        expected_calls = [
+            call('oauth_client_id', '{}-id'.format(expected_oauth_adapter)),
+            call('oauth_adapter', expected_oauth_adapter),
+        ]
+        mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
+
+    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    def test_dispatching_post_to_dot(self, mock_set_custom_metric):
         request = self._post_request('dot-id')
         self.assertEqual(self.view.select_backend(request), self.dot_adapter.backend)
+        self._verify_oauth_metrics_calls(mock_set_custom_metric, 'dot')
 
-    def test_dispatching_post_to_dop(self):
+    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    def test_dispatching_post_to_dop(self, mock_set_custom_metric):
         request = self._post_request('dop-id')
         self.assertEqual(self.view.select_backend(request), self.dop_adapter.backend)
+        self._verify_oauth_metrics_calls(mock_set_custom_metric, 'dop')
 
     def test_dispatching_get_to_dot(self):
         request = self._get_request('dot-id')
@@ -646,104 +691,3 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
         Tests invalidation/revoke of user access token for django-oauth-toolkit
         """
         self.verify_revoke_token(self.access_token)
-
-
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
-class JwksViewTests(TestCase):
-    def test_serialize_rsa_key(self):
-        key = """\
------BEGIN PRIVATE KEY-----
-MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCkK6N/mhkEYrgx
-p8xEZj37N1FEj1gObWv7zVygMLKxKvCSFOQUjA/Z2ZLqVi8m5DnCJ+5BrdYW/UqH
-02vZdEnWb04vf8mmYzJOL9i7APu0h/rm1pvVI5JFiSjE4pG669m5dAb2dZtesYOd
-yfC5bF97KbBZoisCEAtRLn6cNrt1q6PxWeCxZq4ysQD8xZKETOxHnfAYqVyIRkDW
-v8B9DnldLjYa8GhuGHL1J5ncHoseJoATLCnAWYo+yy6gdI2Fs9rj0tbeBcnoKwUZ
-ENwEUp3En+Xw7zjtDuSDWW9ySkuwrK7nXrs0r1CPVf87dLBUEvdzHHUelDr6rdIY
-tnieCjCHAgMBAAECggEBAJvTiAdQPzq4cVlAilTKLz7KTOsknFJlbj+9t5OdZZ9g
-wKQIDE2sfEcti5O+Zlcl/eTaff39gN6lYR73gMEQ7h0J3U6cnsy+DzvDkpY94qyC
-/ZYqUhPHBcnW3Mm0vNqNj0XGae15yBXjrKgSy9lUknSXJ3qMwQHeNL/DwA2KrfiL
-g0iVjk32dvSSHWcBh0M+Qy1WyZU0cf9VWzx+Q1YLj9eUCHteStVubB610XV3JUZt
-UTWiUCffpo2okHsTBuKPVXK/5BL+BpGplcxRSlnSbMaI611kN3iKlO8KGISXHBz7
-nOPdkfZC9poEXt5SshtINuGGCCc8hDxpg1otYqCLaYECgYEA1MSCPs3pBkEagchV
-g0rxYmDUC8QkeIOBuZFjhkdoUgZ6rFntyRZd1NbCUi3YBbV1YC12ZGohqWUWom1S
-AtNbQ2ZTbqEnDKWbNvLBRwkdp/9cKBce85lCCD6+U2o2Ha8C0+hKeLBn8un1y0zY
-1AQTqLAz9ItNr0aDPb89cs5voWcCgYEAxYdC8vR3t8iYMUnK6LWYDrKSt7YiorvF
-qXIMANcXQrnO0ptC0B56qrUCgKHNrtPi5bGpNBJ0oKMfbmGfwX+ca8sCUlLvq/O8
-S2WZwSJuaHH4lEBi8ErtY++8F4B4l3ENCT84Hyy5jiMpbpkHEnh/1GNcvvmyI8ud
-3jzovCNZ4+ECgYEA0r+Oz0zAOzyzV8gqw7Cw5iRJBRqUkXaZQUj8jt4eO9lFG4C8
-IolwCclrk2Drb8Qsbka51X62twZ1ZA/qwve9l0Y88ADaIBHNa6EKxyUFZglvrBoy
-w1GT8XzMou06iy52G5YkZeU+IYOSvnvw7hjXrChUXi65lRrAFqJd6GEIe5MCgYA/
-0LxDa9HFsWvh+JoyZoCytuSJr7Eu7AUnAi54kwTzzL3R8tE6Fa7BuesODbg6tD/I
-v4YPyaqePzUnXyjSxdyOQq8EU8EUx5Dctv1elTYgTjnmA4szYLGjKM+WtC3Bl4eD
-pkYGZFeqYRfAoHXVdNKvlk5fcKIpyF2/b+Qs7CrdYQKBgQCc/t+JxC9OpI+LhQtB
-tEtwvklxuaBtoEEKJ76P9vrK1semHQ34M1XyNmvPCXUyKEI38MWtgCCXcdmg5syO
-PBXdDINx+wKlW7LPgaiRL0Mi9G2aBpdFNI99CWVgCr88xqgSE24KsOxViMwmi0XB
-Ld/IRK0DgpGP5EJRwpKsDYe/UQ==
------END PRIVATE KEY-----"""
-
-        # pylint: disable=line-too-long
-        expected = {
-            'kty': 'RSA',
-            'use': 'sig',
-            'alg': 'RS512',
-            'n': 'pCujf5oZBGK4MafMRGY9-zdRRI9YDm1r-81coDCysSrwkhTkFIwP2dmS6lYvJuQ5wifuQa3WFv1Kh9Nr2XRJ1m9OL3_JpmMyTi_YuwD7tIf65tab1SOSRYkoxOKRuuvZuXQG9nWbXrGDncnwuWxfeymwWaIrAhALUS5-nDa7dauj8VngsWauMrEA_MWShEzsR53wGKlciEZA1r_AfQ55XS42GvBobhhy9SeZ3B6LHiaAEywpwFmKPssuoHSNhbPa49LW3gXJ6CsFGRDcBFKdxJ_l8O847Q7kg1lvckpLsKyu5167NK9Qj1X_O3SwVBL3cxx1HpQ6-q3SGLZ4ngowhw',
-            'e': 'AQAB',
-            'kid': '6e80b9d2e5075ae8bb5d1dd762ebc62e'
-        }
-        self.assertEqual(views.JwksView.serialize_rsa_key(key), expected)
-
-    def test_get(self):
-        JWT_PRIVATE_SIGNING_KEY = RSA.generate(2048).exportKey('PEM')
-        JWT_EXPIRED_PRIVATE_SIGNING_KEYS = [RSA.generate(2048).exportKey('PEM'), RSA.generate(2048).exportKey('PEM')]
-        secret_keys = [JWT_PRIVATE_SIGNING_KEY] + JWT_EXPIRED_PRIVATE_SIGNING_KEYS
-
-        with override_settings(JWT_PRIVATE_SIGNING_KEY=JWT_PRIVATE_SIGNING_KEY,
-                               JWT_EXPIRED_PRIVATE_SIGNING_KEYS=JWT_EXPIRED_PRIVATE_SIGNING_KEYS):
-            response = self.client.get(reverse('jwks'))
-
-        self.assertEqual(response.status_code, 200)
-        actual = json.loads(response.content)
-        expected = {
-            'keys': [views.JwksView.serialize_rsa_key(key) for key in secret_keys],
-        }
-        self.assertEqual(actual, expected)
-
-    @override_settings(JWT_PRIVATE_SIGNING_KEY=None, JWT_EXPIRED_PRIVATE_SIGNING_KEYS=[])
-    def test_get_without_keys(self):
-        """ The view should return an empty list if no keys are configured. """
-        response = self.client.get(reverse('jwks'))
-
-        self.assertEqual(response.status_code, 200)
-        actual = json.loads(response.content)
-        self.assertEqual(actual, {'keys': []})
-
-
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
-class ProviderInfoViewTests(TestCase):
-    DOMAIN = 'testserver.fake'
-
-    def build_url(self, path):
-        return 'http://{domain}{path}'.format(domain=self.DOMAIN, path=path)
-
-    def test_get(self):
-        issuer = 'test-issuer'
-        self.client = self.client_class(SERVER_NAME=self.DOMAIN)
-
-        expected = {
-            'issuer': issuer,
-            'authorization_endpoint': self.build_url(reverse('authorize')),
-            'token_endpoint': self.build_url(reverse('access_token')),
-            'end_session_endpoint': self.build_url(reverse('logout')),
-            'token_endpoint_auth_methods_supported': ['client_secret_post'],
-            'access_token_signing_alg_values_supported': ['RS512', 'HS256'],
-            'scopes_supported': ['openid', 'profile', 'email'],
-            'claims_supported': ['sub', 'iss', 'name', 'given_name', 'family_name', 'email'],
-            'jwks_uri': self.build_url(reverse('jwks')),
-        }
-
-        with override_settings(JWT_AUTH={'JWT_ISSUER': issuer}):
-            response = self.client.get(reverse('openid-config'))
-
-        self.assertEqual(response.status_code, 200)
-        actual = json.loads(response.content)
-        self.assertEqual(actual, expected)

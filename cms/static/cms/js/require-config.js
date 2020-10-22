@@ -128,28 +128,7 @@
             'tooltip_manager': 'js/src/tooltip_manager',
             'draggabilly': 'js/vendor/draggabilly',
             'hls': 'common/js/vendor/hls',
-
-            // Files needed for Annotations feature
-            'annotator': 'js/vendor/ova/annotator-full',
-            'annotator-harvardx': 'js/vendor/ova/annotator-full-firebase-auth',
-            'video.dev': 'js/vendor/ova/video.dev',
-            'vjs.youtube': 'js/vendor/ova/vjs.youtube',
-            'rangeslider': 'js/vendor/ova/rangeslider',
-            'share-annotator': 'js/vendor/ova/share-annotator',
-            'richText-annotator': 'js/vendor/ova/richText-annotator',
-            'reply-annotator': 'js/vendor/ova/reply-annotator',
-            'grouping-annotator': 'js/vendor/ova/grouping-annotator',
-            'tags-annotator': 'js/vendor/ova/tags-annotator',
-            'diacritic-annotator': 'js/vendor/ova/diacritic-annotator',
-            'flagging-annotator': 'js/vendor/ova/flagging-annotator',
-            'jquery-Watch': 'js/vendor/ova/jquery-Watch',
-            'openseadragon': 'js/vendor/ova/openseadragon',
-            'osda': 'js/vendor/ova/OpenSeaDragonAnnotation',
-            'ova': 'js/vendor/ova/ova',
-            'catch': 'js/vendor/ova/catch/js/catch',
-            'handlebars': 'js/vendor/ova/catch/js/handlebars-1.1.2',
             'lang_edx': 'js/src/lang_edx',
-            // end of Annotation tool files
 
             // externally hosted files
             mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len

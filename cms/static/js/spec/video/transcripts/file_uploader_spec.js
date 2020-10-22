@@ -116,7 +116,7 @@ function($, _, Backbone, TranscriptUtils, FileUploader) {
 
                 expect(view.$form.ajaxSubmit).toHaveBeenCalled();
                 expect(view.$form.ajaxSubmit).toHaveBeenCalledWith(jasmine.objectContaining({
-                    data: {'edx_video_id': videoId}
+                    data: {edx_video_id: videoId}
                 }));
             });
         });

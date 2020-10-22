@@ -30,7 +30,7 @@ def remove_files_from_folder(files, folder):
             continue
 
 
-def reset_test_db(db_cache_files, update_cache_files=True):
+def reset_test_db(db_cache_files, update_cache_files=True, use_existing_db=False):
     """
     Reset the bokchoy test db for a new test run
 
@@ -41,6 +41,8 @@ def reset_test_db(db_cache_files, update_cache_files=True):
     cmd = '{}/scripts/reset-test-db.sh'.format(Env.REPO_ROOT)
     if update_cache_files:
         cmd = '{} --rebuild_cache'.format(cmd)
+    if use_existing_db:
+        cmd = '{} --use-existing-db'.format(cmd)
     sh(cmd)
     verify_files_exist(db_cache_files)
 

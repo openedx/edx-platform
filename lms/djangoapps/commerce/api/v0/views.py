@@ -1,7 +1,6 @@
 """ API v0 views. """
 import logging
 
-from courseware import courses
 from django.urls import reverse
 from edx_rest_api_client import exceptions
 from opaque_keys import InvalidKeyError
@@ -13,6 +12,7 @@ from rest_framework.views import APIView
 from six import text_type
 
 from course_modes.models import CourseMode
+from courseware import courses
 from enrollment.api import add_enrollment
 from enrollment.views import EnrollmentCrossDomainSessionAuth
 from entitlements.models import CourseEntitlement
@@ -21,7 +21,9 @@ from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
+from student.signals import SAILTHRU_AUDIT_PURCHASE
 from util.json_request import JsonResponse
+
 from ...constants import Messages
 from ...http import DetailResponse
 
@@ -139,6 +141,10 @@ class BasketsView(APIView):
                 )
             log.info(msg)
             self._enroll(course_key, user, default_enrollment_mode.slug)
+            mode = CourseMode.AUDIT if audit_mode else CourseMode.HONOR
+            SAILTHRU_AUDIT_PURCHASE.send(
+                sender=None, user=user, mode=mode, course_id=course_id
+            )
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
         else:

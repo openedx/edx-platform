@@ -15,10 +15,8 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirement,
     CreditRequirementStatus
 )
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
-    RetirementTestCase,
-    setup_retirement_states
-)
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import RetirementTestCase
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import setup_retirement_states
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from student.tests.factories import UserFactory
 
@@ -108,6 +106,7 @@ class CreditRequirementStatusTests(RetirementTestCase):
     def setUp(self):
         super(CreditRequirementStatusTests, self).setUp()
         self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
+        RetirementTestCase.setup_states()
         self.old_username = "username"
         self.user = UserFactory(username=self.old_username)
         self.retirement = UserRetirementStatus.create_retirement(self.user)
@@ -179,6 +178,7 @@ class CreditRequestTest(RetirementTestCase):
 
     def setUp(self):
         super(CreditRequestTest, self).setUp()
+        RetirementTestCase.setup_states()
         self.user = UserFactory.create()
         self.retirement = UserRetirementStatus.create_retirement(self.user)
         self.credit_course = CreditCourse.objects.create()

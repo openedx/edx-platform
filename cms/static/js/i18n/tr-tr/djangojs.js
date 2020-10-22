@@ -77,6 +77,7 @@
     "August": "A\u011fustos", 
     "Available %s": "Mevcut %s", 
     "Back to Full List": "Tam Listeye D\u00f6n", 
+    "Block view is unavailable": "Blok g\u00f6r\u00fcn\u00fcm mevcut de\u011fil", 
     "Can I request additional time to complete my exam?": "S\u0131nav\u0131m\u0131 tamamlamak i\u00e7in ekstra zaman isteyebilir miyim?", 
     "Cancel": "\u0130ptal", 
     "Cannot Start Proctored Exam": "G\u00f6zetmenli S\u0131nav Ba\u015flat\u0131lam\u0131yor", 

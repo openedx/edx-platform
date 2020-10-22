@@ -1,6 +1,5 @@
 """Tests of commerce utilities."""
 import json
-import unittest
 from urllib import urlencode
 
 import ddt
@@ -10,14 +9,18 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
+from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement
+from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, refund_seat
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
+from student.models import CourseEnrollment
 from student.tests.factories import (TEST_PASSWORD, UserFactory)
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
@@ -161,13 +164,13 @@ class EcommerceServiceTests(TestCase):
         """ Verify the checkout page URL is properly constructed and returned. """
         url = EcommerceService().get_checkout_page_url(
             *skus,
-            enterprise_customer_catalog_uuid=enterprise_catalog_uuid
+            catalog=enterprise_catalog_uuid
         )
         config = CommerceConfiguration.current()
 
         query = {'sku': skus}
         if enterprise_catalog_uuid:
-            query.update({'enterprise_customer_catalog_uuid': enterprise_catalog_uuid})
+            query.update({'catalog': enterprise_catalog_uuid})
 
         expected_url = '{root}{basket_url}?{skus}'.format(
             basket_url=config.basket_checkout_page,
@@ -178,8 +181,10 @@ class EcommerceServiceTests(TestCase):
         self.assertEqual(url, expected_url)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@ddt.ddt
+@skip_unless_lms
 class RefundUtilMethodTests(ModuleStoreTestCase):
+    """Tests for Refund Utilities"""
     shard = 4
 
     def setUp(self):
@@ -320,3 +325,55 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
         call_args = list(mock_send_notification.call_args)
         assert call_args[0] == (course_entitlement.user, [1])
         assert not refund_success
+
+    @httpretty.activate
+    @ddt.data(
+        (["verified", "audit"], "audit"),
+        (["professional"], "professional"),
+    )
+    @ddt.unpack
+    def test_mode_change_after_refund_seat(self, course_modes, new_mode):
+        """
+        Test if a course seat is refunded student is enrolled into default course mode
+        unless no default mode available.
+        """
+        course_id = CourseLocator('test_org', 'test_course_number', 'test_run')
+        CourseMode.objects.all().delete()
+        for course_mode in course_modes:
+            CourseModeFactory.create(
+                course_id=course_id,
+                mode_slug=course_mode,
+                mode_display_name=course_mode,
+            )
+
+        httpretty.register_uri(
+            httpretty.POST,
+            settings.ECOMMERCE_API_URL + 'refunds/',
+            status=201,
+            body='[1]',
+            content_type='application/json'
+        )
+        httpretty.register_uri(
+            httpretty.PUT,
+            settings.ECOMMERCE_API_URL + 'refunds/1/process/',
+            status=200,
+            body=json.dumps({
+                "id": 9,
+                "created": "2017-12-21T18:23:49.468298Z",
+                "modified": "2017-12-21T18:24:02.741426Z",
+                "total_credit_excl_tax": "100.00",
+                "currency": "USD",
+                "status": "Complete",
+                "order": 15,
+                "user": 5
+            }),
+            content_type='application/json'
+        )
+        enrollment = CourseEnrollment.enroll(self.user, course_id, mode=course_modes[0])
+
+        refund_success = refund_seat(enrollment, True)
+
+        enrollment = CourseEnrollment.get_or_create_enrollment(self.user, course_id)
+
+        assert refund_success
+        self.assertEqual(enrollment.mode, new_mode)

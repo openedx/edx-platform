@@ -550,30 +550,6 @@ class UnitAccessTest(CourseOutlineTest):
             )
         )
 
-    def _set_restriction_on_unrestricted_unit(self, unit):
-        """
-        Restrict unit access to a certain group and confirm that a
-        warning is displayed.  Then, remove the access restriction
-        and verify that the warning no longer appears.
-        """
-        self.assertFalse(unit.has_restricted_warning)
-        unit.toggle_unit_access('Content Groups', [self.content_group_a_id])
-        self.assertTrue(unit.has_restricted_warning)
-        unit.toggle_unit_access('Content Groups', [self.content_group_a_id])
-        self.assertFalse(unit.has_restricted_warning)
-
-    def test_units_can_be_restricted(self):
-        """
-        Visit the course outline page, restrict access to a unit.
-        Verify that there is a restricted group warning.
-        Remove the group access restriction and verify that there
-        is no longer a warning.
-        """
-        self.course_outline_page.visit()
-        self.course_outline_page.expand_all_subsections()
-        unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0)
-        self._set_restriction_on_unrestricted_unit(unit)
-
 
 @attr(shard=14)
 class StaffLockTest(CourseOutlineTest):

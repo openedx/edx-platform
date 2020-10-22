@@ -558,6 +558,9 @@ HELP_TOKENS_BOOKS = ENV_TOKENS.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)
 
+########## Settings for video transcript migration tasks ############
+VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE', LOW_PRIORITY_QUEUE)
+
 ########################## Parental controls config  #######################
 
 # The age at which a learner no longer requires parental consent, or None
@@ -587,6 +590,12 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
 ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
     'ENTERPRISE_REPORTING_SECRET',
     ENTERPRISE_REPORTING_SECRET
+)
+
+# A default dictionary to be used for filtering out enterprise customer catalog.
+ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
+    'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
+    ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
 )
 
 ############### Settings for Retirement #####################

@@ -508,7 +508,8 @@ OAUTH2_DEFAULT_SCOPES = {
 
 OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.validators.EdxOAuth2Validator',
-    'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
+    # 6 months and then we expire refresh tokens using edx_clear_expired_tokens (length is mobile app driven)
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 15552000,
     'SCOPES_BACKEND_CLASS': 'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes',
     'SCOPES': dict(OAUTH2_DEFAULT_SCOPES, **{
         'grades:read': _('Retrieve your grades for your enrolled courses'),
@@ -1610,23 +1611,6 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/discussion/inline-discussion-rtl.css',
     },
-    'style-xmodule-annotations': {
-        'source_filenames': [
-            'css/vendor/ova/annotator.css',
-            'css/vendor/ova/edx-annotator.css',
-            'css/vendor/ova/video-js.min.css',
-            'css/vendor/ova/rangeslider.css',
-            'css/vendor/ova/share-annotator.css',
-            'css/vendor/ova/richText-annotator.css',
-            'css/vendor/ova/tags-annotator.css',
-            'css/vendor/ova/flagging-annotator.css',
-            'css/vendor/ova/diacritic-annotator.css',
-            'css/vendor/ova/grouping-annotator.css',
-            'css/vendor/ova/ova.css',
-            'js/vendor/ova/catch/css/main.css'
-        ],
-        'output_filename': 'css/lms-style-xmodule-annotations.css',
-    },
     FOOTER_CSS['openedx']['ltr']: {
         'source_filenames': [
             'css/lms-footer.css',
@@ -2231,7 +2215,6 @@ INSTALLED_APPS = [
 
     # Course data caching
     'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig',
-    'openedx.core.djangoapps.content.course_structures.apps.CourseStructuresConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'lms.djangoapps.course_blocks',
 
@@ -3360,6 +3343,7 @@ ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 ENTERPRISE_SUPPORT_URL = ''
 # The default value of this needs to be a 16 character string
 ENTERPRISE_REPORTING_SECRET = '0000000000000000'
+ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class

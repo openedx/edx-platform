@@ -16,14 +16,15 @@ from six import text_type
 import third_party_auth
 from course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
+from lms.djangoapps.email_marketing.tasks import get_email_cookies_via_sailthru, update_user, update_user_email
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_THIRD_PARTY_MAILINGS
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, get_email_cookies_via_sailthru
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from student.cookies import CREATE_LOGON_COOKIE
-from student.signals import ENROLL_STATUS_CHANGE
+from student.signals import SAILTHRU_AUDIT_PURCHASE
 from student.views import REGISTER_USER
 from util.model_utils import USER_FIELD_CHANGED
+
 from .tasks import update_course_enrollment
 
 log = logging.getLogger(__name__)
@@ -39,8 +40,8 @@ WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 SAILTHRU_AUDIT_PURCHASE_ENABLED = 'audit_purchase_enabled'
 
 
-@receiver(ENROLL_STATUS_CHANGE)
-def update_sailthru(sender, event, user, mode, course_id, **kwargs):
+@receiver(SAILTHRU_AUDIT_PURCHASE)
+def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable=unused-argument
     """
     Receives signal and calls a celery task to update the
     enrollment track
@@ -51,9 +52,8 @@ def update_sailthru(sender, event, user, mode, course_id, **kwargs):
         None
     """
     if WAFFLE_SWITCHES.is_enabled(SAILTHRU_AUDIT_PURCHASE_ENABLED) and mode in CourseMode.AUDIT_MODES:
-        course_key = str(course_id)
         email = str(user.email)
-        update_course_enrollment.delay(email, course_key, mode)
+        update_course_enrollment.delay(email, course_id, mode)
 
 
 @receiver(CREATE_LOGON_COOKIE)

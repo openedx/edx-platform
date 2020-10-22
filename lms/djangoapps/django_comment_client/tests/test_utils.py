@@ -25,7 +25,8 @@ from django_comment_client.tests.utils import config_course_discussions, topic_n
 from django_comment_common.models import (
     CourseDiscussionSettings,
     ForumsConfig,
-    assign_role
+    assign_role,
+    DiscussionsIdMapping,
 )
 from django_comment_common.utils import (
     get_course_discussion_settings,
@@ -34,7 +35,6 @@ from django_comment_common.utils import (
 )
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from lms.lib.comment_client.utils import CommentClientMaintenanceError, perform_request
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
@@ -262,6 +262,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
             discussion_target='Beta Testing',
             visible_to_staff_only=True
         )
+        RequestCache.clear_request_cache()  # clear the cache before the last course publish
         self.bad_discussion = ItemFactory.create(
             parent_location=self.course.location,
             category='discussion',
@@ -278,14 +279,14 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         usage_key = utils.get_cached_discussion_key(self.course.id, 'bogus_id')
         self.assertIsNone(usage_key)
 
-    def test_cache_raises_exception_if_course_structure_not_cached(self):
-        CourseStructure.objects.all().delete()
+    def test_cache_raises_exception_if_discussion_id_map_not_cached(self):
+        DiscussionsIdMapping.objects.all().delete()
         with self.assertRaises(utils.DiscussionIdMapIsNotCached):
             utils.get_cached_discussion_key(self.course.id, 'test_discussion_id')
 
     def test_cache_raises_exception_if_discussion_id_not_cached(self):
-        cache = CourseStructure.objects.get(course_id=self.course.id)
-        cache.discussion_id_map_json = None
+        cache = DiscussionsIdMapping.objects.get(course_id=self.course.id)
+        cache.mapping = None
         cache.save()
 
         with self.assertRaises(utils.DiscussionIdMapIsNotCached):
@@ -313,7 +314,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         self.verify_discussion_metadata()
 
     def test_get_discussion_id_map_without_cache(self):
-        CourseStructure.objects.all().delete()
+        DiscussionsIdMapping.objects.all().delete()
         self.verify_discussion_metadata()
 
     def test_get_missing_discussion_id_map_from_cache(self):

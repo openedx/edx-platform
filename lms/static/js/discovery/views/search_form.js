@@ -60,7 +60,7 @@
                 this.clearSearch();
             },
 
-            showErrorMessage: function (error) {
+            showErrorMessage: function(error) {
                 this.$message.text(gettext(error || 'There was an error, try searching again.'));
             }
 
