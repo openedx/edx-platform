@@ -89,6 +89,7 @@ edx-rest-api-client
 edx-search
 edx-sga
 edx-submissions
+edx-toggles                         # Feature toggles management
 edx-user-state-client
 edx-when
 edxval
