@@ -41,13 +41,13 @@ jobs:
           path: /opt/hostedtoolcache/Python/
           key: |
             ${{ hashFiles('requirements/edx/testing.txt') }}-${{ hashFiles('requirements/adg/base.txt') }}-${{
-            hashFiles('philu_actions/scripts/dependency_downloader.sh') }}
+            hashFiles('adg_pipelines/scripts/github-ci-dependencies.sh') }}
         if: env.GIT_DIFF
 
       - name: Install OS packages
         run: |
-          chmod +x philu_actions/scripts/dependency_downloader.sh
-          sudo bash philu_actions/scripts/dependency_downloader.sh
+          SCRIPT_PATH=adg_pipelines/scripts/github-ci-dependencies.sh
+          chmod +x ${SCRIPT_PATH} && sudo ${SCRIPT_PATH}
         if: env.GIT_DIFF && steps.cache-python-requirements.outputs.cache-hit != 'true'
 
       - name: Install edx-platform requirements
@@ -100,6 +100,7 @@ jobs:
         continue-on-error: true
         run: |
           isort ${{ env.GIT_DIFF }} -c 2>&1 | tee report_isort.txt
+          sed -i 's#/home/runner/work/edx-platform/edx-platform##g' report_isort.txt
 
           body=$(cat report_isort.txt)
           body="${body//'%'/'%25'}"

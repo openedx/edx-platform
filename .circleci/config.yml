@@ -1,0 +1,79 @@
+version: 2.1
+
+executors:
+  docker-executor: # a reusable executor
+    docker:
+      - image: cimg/python:3.5-node
+        auth:
+          username: jw3759142
+          password: $DOCKERHUB_PASSWORD
+      - image: circleci/mongo:4.1.12-bionic
+        auth:
+          username: jw3759142
+          password: $DOCKERHUB_PASSWORD
+    working_directory: ~/edx-platform
+
+commands:
+  common-steps: # a reusable command
+    steps:
+      - checkout
+      - restore_cache:
+          key: cache-{{ checksum "requirements/edx/testing.txt" }}-{{ checksum "requirements/adg/base.txt"
+            }}-{{ checksum "requirements/edx/coverage.txt" }}-{{ checksum "package.json" }}
+      - run:
+          name: Download requirements
+          no_output_timeout: 25m
+          command: |
+            wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+            echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" \
+            | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+            sudo apt-get update
+            sudo apt-get install -y mongodb-org-shell=4.4.1 jq
+
+            pip install --exists-action w -r requirements/edx/testing.txt
+            pip install --exists-action w -r requirements/adg/base.txt
+      - run:
+          name: Run all tests
+          command: |
+            pr_no=$(echo $CIRCLE_PULL_REQUEST | rev | cut -d/ -f1 | rev)
+            pr_api_url=https://api.github.com/repos/"$CIRCLE_PROJECT_USERNAME"/"$CIRCLE_PROJECT_REPONAME"/pulls/"$pr_no"
+            BASE_BRANCH=$(curl "$pr_api_url" | jq -r ".base.ref")
+            BASE_BRANCH="origin/${BASE_BRANCH}"
+
+            echo "Base branch is ${BASE_BRANCH}"
+            source adg_pipelines/scripts/adg-run-test.sh "$BASE_BRANCH"
+
+            if [ "$BASE_BRANCH" == "origin/master" ]; then
+              source adg_pipelines/scripts/edx-run-test.sh "$BASE_BRANCH"
+            fi
+      - save_cache:
+          key: cache-{{ checksum "requirements/edx/testing.txt" }}-{{ checksum "requirements/adg/base.txt"
+            }}-{{ checksum "requirements/edx/coverage.txt" }}-{{ checksum "package.json" }}
+          paths:
+            - "/home/circleci/.pyenv/versions/3.5.10/bin/"
+            - "/home/circleci/.pyenv/versions/3.5.10/lib/"
+            - "/home/circleci/.cache/pip"
+            - "/home/circleci/project/node_modules"
+      - store_artifacts:
+          path: reports
+      - store_artifacts:
+          path: test_root/log
+      - store_test_results:
+          path: reports
+
+jobs:
+  adg-test:
+    executor: docker-executor
+    steps:
+      - common-steps
+      - run:
+          name: Upload report to Codecov
+          command: |
+            bash <(curl -s https://codecov.io/bash) -f reports/coverage.xml
+
+workflows:
+  main:
+    jobs:
+      - adg-test:
+          context:
+            - adg-context
