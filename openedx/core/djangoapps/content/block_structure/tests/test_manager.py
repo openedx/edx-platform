@@ -6,8 +6,7 @@ Tests for manager.py
 import ddt
 import six
 from django.test import TestCase
-
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_switch
 
 from ..block_structure import BlockStructureBlockData
 from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE, waffle_switch

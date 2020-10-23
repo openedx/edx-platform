@@ -1,7 +1,7 @@
 """ Course API """
 
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch, WaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitch, WaffleSwitchNamespace
 
 WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name='course_list_api_rate_limit')
 

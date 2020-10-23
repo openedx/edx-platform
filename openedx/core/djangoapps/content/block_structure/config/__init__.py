@@ -4,7 +4,7 @@ waffle switches for the Block Structure framework.
 """
 
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch, WaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitch, WaffleSwitchNamespace
 from openedx.core.lib.cache_utils import request_cached
 
 from .models import BlockStructureConfiguration

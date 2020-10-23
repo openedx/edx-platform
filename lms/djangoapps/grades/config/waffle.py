@@ -4,12 +4,8 @@ waffle switches for the Grades app.
 """
 
 
-from openedx.core.djangoapps.waffle_utils import (
-    CourseWaffleFlag,
-    WaffleFlagNamespace,
-    WaffleSwitch,
-    WaffleSwitchNamespace
-)
+from edx_toggles.toggles import WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace
 WAFFLE_NAMESPACE = u'grades'

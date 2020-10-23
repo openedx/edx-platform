@@ -9,7 +9,6 @@ import json
 import re
 from contextlib import contextmanager
 from datetime import datetime
-from functools import wraps
 
 import dateutil.parser
 import ddt
@@ -17,6 +16,8 @@ import pytz
 import six
 from django.conf import settings
 from django.test.utils import override_settings
+from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from edxval.api import (
     create_or_update_transcript_preferences,
     create_or_update_video_transcript,
@@ -33,17 +34,13 @@ from waffle.testutils import override_flag
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
     waffle_flags
 )
-from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..videos import (

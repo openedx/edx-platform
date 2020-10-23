@@ -14,13 +14,13 @@ from django.http import QueryDict
 from django.urls import reverse
 from django.utils.http import urlquote_plus
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
 from experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -45,7 +45,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
@@ -1020,6 +1020,7 @@ class CourseHomeFragmentViewTests(ModuleStoreTestCase):
         mock.Mock(return_value=(HTML("<span>DISCOUNT_PRICE</span>"), True))
     )
     def test_upgrade_message_discount(self):
+        # pylint: disable=no-member
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
 
         with override_waffle_flag(SHOW_UPGRADE_MSG_ON_COURSE_HOME, True):

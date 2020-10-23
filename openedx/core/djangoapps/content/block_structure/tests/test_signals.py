@@ -4,10 +4,9 @@ Unit tests for the Course Blocks signals
 
 
 import ddt
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
-
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

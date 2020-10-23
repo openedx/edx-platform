@@ -41,6 +41,7 @@ from edxval.api import (
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
+from edx_toggles.toggles import WaffleFlagNamespace, WaffleSwitchNamespace
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
@@ -48,7 +49,7 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
     waffle_flags
 )
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript
 

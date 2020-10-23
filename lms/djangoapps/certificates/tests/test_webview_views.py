@@ -17,6 +17,7 @@ from mock import patch
 from urllib.parse import urlencode
 
 from course_modes.models import CourseMode
+from edx_toggles.toggles import WaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
@@ -46,7 +47,6 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import (
     with_site_configuration,
     with_site_configuration_context
 )
-from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.tests.assertions.events import assert_event_matches

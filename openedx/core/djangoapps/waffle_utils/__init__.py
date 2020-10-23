@@ -6,7 +6,6 @@ import logging
 
 from opaque_keys.edx.keys import CourseKey
 
-# pylint: disable=unused-import
 from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
 
 log = logging.getLogger(__name__)

@@ -12,16 +12,16 @@ not other discounts like coupons or enterprise/program offers configured in ecom
 
 from datetime import datetime, timedelta
 
+import pytz
 from crum import get_current_request, impersonate
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-import pytz
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 
 from course_modes.models import CourseMode
 from entitlements.models import CourseEntitlement
 from experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
 from student.models import CourseEnrollment
 from track import segment

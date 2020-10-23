@@ -10,6 +10,9 @@ import ddt
 import mock
 import six
 from django.core.management import call_command
+from edx_toggles.toggles.testutils import override_waffle_switch
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 import openedx.core.djangoapps.content.block_structure.config as block_structure_config
 from openedx.core.djangoapps.content.block_structure.signals import update_block_structure_on_course_publish
@@ -22,10 +25,7 @@ from openedx.core.djangoapps.coursegraph.tasks import (
     should_dump_course,
     strip_branch_and_version
 )
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):

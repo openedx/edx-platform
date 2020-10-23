@@ -6,9 +6,9 @@ from django.utils.translation import ugettext as _
 from edx_django_utils.monitoring import set_custom_attribute
 from waffle import flag_is_active
 
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace for course experience waffle flags.

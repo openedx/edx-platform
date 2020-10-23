@@ -11,16 +11,16 @@ from django.utils.timezone import now
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import format_course_price, get_cosmetic_verified_display_price, CourseMode
-from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
+from course_modes.models import CourseMode, format_course_price, get_cosmetic_verified_display_price
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.courseware.access import has_staff_access_to_preview_mode
+from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.schedules.models import Schedule
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-from openedx.features.course_duration_limits.access import get_user_course_expiration_date, get_user_course_duration
+from openedx.features.course_duration_limits.access import get_user_course_duration, get_user_course_expiration_date
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
 

@@ -18,7 +18,10 @@ from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import patch
+from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
+from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
@@ -32,12 +35,9 @@ from openedx.core.djangoapps.user_authn.views.login import (
     AllowedAuthUser,
     _check_user_auth_flow
 )
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.api.test_utils import ApiTestCase
-from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt

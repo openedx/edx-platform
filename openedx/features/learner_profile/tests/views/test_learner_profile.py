@@ -10,10 +10,10 @@ from django.conf import settings
 from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
-from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.certificates.api import is_passing_status
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL

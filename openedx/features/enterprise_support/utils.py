@@ -10,8 +10,9 @@ from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
+from edx_toggles.toggles import WaffleFlag
 from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
-from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomer
+from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
 
 import third_party_auth
@@ -19,7 +20,6 @@ from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.djangoapps.waffle_utils import WaffleFlag
 from student.helpers import get_next_url_for_login_page
 
 ENTERPRISE_HEADER_LINKS = WaffleFlag('enterprise', 'enterprise_header_links', __name__)

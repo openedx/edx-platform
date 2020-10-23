@@ -2,7 +2,6 @@
 Helper methods for Studio views.
 """
 
-import hashlib
 from uuid import uuid4
 
 import six
@@ -17,7 +16,6 @@ from edxmako.shortcuts import render_to_string
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 from ..utils import reverse_course_url, reverse_library_url, reverse_usage_url
 

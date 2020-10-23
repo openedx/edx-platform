@@ -4,12 +4,8 @@ waffle switches for the contentstore app.
 """
 
 
-from openedx.core.djangoapps.waffle_utils import (
-    CourseWaffleFlag,
-    WaffleFlag,
-    WaffleFlagNamespace,
-    WaffleSwitchNamespace
-)
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace
 WAFFLE_NAMESPACE = u'studio'

@@ -6,10 +6,10 @@ This is not inside a django app because it is a global property of the system.
 
 from django.test import Client, TestCase
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
+from student.tests.factories import TEST_PASSWORD, UserFactory
 
 from openedx.core.djangoapps.user_authn.views.login import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
-from student.tests.factories import TEST_PASSWORD, UserFactory
 
 
 class TestAdminView(TestCase):

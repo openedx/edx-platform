@@ -3,9 +3,8 @@ Toggles for Learner Profile page.
 """
 
 
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-
 
 # Namespace for learner profile waffle flags.
 WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='learner_profile')

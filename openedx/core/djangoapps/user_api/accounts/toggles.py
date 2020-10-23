@@ -2,8 +2,8 @@
 Toggles for accounts related code.
 """
 
+from edx_toggles.toggles import WaffleFlag
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.waffle_utils import WaffleFlag
 
 # .. toggle_name: order_history.redirect_to_microfrontend
 # .. toggle_implementation: WaffleFlag

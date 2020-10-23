@@ -3,8 +3,7 @@ Toggles for Course API.
 """
 
 
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
-
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 
 COURSE_BLOCKS_API_NAMESPACE = WaffleFlagNamespace(name=u'course_blocks_api')
 

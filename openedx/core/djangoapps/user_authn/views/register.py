@@ -21,12 +21,11 @@ from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
-from ipware.ip import get_ip
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from pytz import UTC
 from ratelimit.decorators import ratelimit
 from requests import HTTPError
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 from six import text_type
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
@@ -57,7 +56,6 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory,
     get_registration_extension_form
 )
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from student.helpers import (
     AccountValidationError,
     authenticate_new_user,

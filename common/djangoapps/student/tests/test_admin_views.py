@@ -15,17 +15,17 @@ from django.forms import ValidationError
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils.timezone import now
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import Mock
 from pytz import UTC
-
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
 from student.admin import COURSE_ENROLLMENT_ADMIN_SWITCH, AllowedAuthUserForm, CourseEnrollmentForm, UserAdmin
 from student.models import AllowedAuthUser, CourseEnrollment, LoginFailures
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 
 class AdminCourseRolesPageTest(SharedModuleStoreTestCase):

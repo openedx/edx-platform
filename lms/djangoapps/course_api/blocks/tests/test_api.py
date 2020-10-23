@@ -8,16 +8,16 @@ from itertools import product
 import ddt
 import six
 from django.test.client import RequestFactory
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import patch
-
-from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle_switch
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.sample_courses import BlockInfo
+
+from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
+from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle_switch
 
 from ..api import get_blocks
 
