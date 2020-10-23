@@ -8,7 +8,7 @@ if and only if the service is deployed in the Open edX installation.
 To ensure maximum separation of concerns, and a minimum of interdependencies,
 this package should be kept small, thin, and stateless.
 """
-
+default_app_config = 'openedx.core.djangoapps.programs.apps.ProgramsConfig'
 
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch, WaffleSwitchNamespace
 

@@ -24,7 +24,7 @@ from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
-from openedx.core.djangoapps.programs.tasks.v1 import tasks
+from openedx.core.djangoapps.programs import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
@@ -32,7 +32,7 @@ from student.tests.factories import UserFactory
 log = logging.getLogger(__name__)
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'https://credentials.example.com'
-TASKS_MODULE = 'openedx.core.djangoapps.programs.tasks.v1.tasks'
+TASKS_MODULE = 'openedx.core.djangoapps.programs.tasks'
 
 
 @skip_unless_lms

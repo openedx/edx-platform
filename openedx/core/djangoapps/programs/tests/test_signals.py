@@ -28,7 +28,7 @@ TEST_COURSE_KEY = CourseKey.from_string('course-v1:edX+test_course+1')
 
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
-@mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.award_program_certificates.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.award_program_certificates.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
@@ -89,7 +89,7 @@ class CertAwardedReceiverTest(TestCase):
 
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
-@mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.award_course_certificate.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.award_course_certificate.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
@@ -172,7 +172,7 @@ class CertChangedReceiverTest(TestCase):
 
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
-@mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.revoke_program_certificates.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.revoke_program_certificates.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
@@ -232,7 +232,7 @@ class CertRevokedReceiverTest(TestCase):
 
 
 @skip_unless_lms
-@mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.update_certificate_visible_date_on_course_update.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
