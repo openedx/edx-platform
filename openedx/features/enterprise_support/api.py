@@ -564,17 +564,40 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     else:
         client = ConsentApiClient(user=request.user)
         current_enterprise_uuid = enterprise_customer_uuid_for_request(request)
-        consent_needed = any(
-            current_enterprise_uuid == learner['enterprise_customer']['uuid']
-            and Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
-            and client.consent_required(
+
+        consent_needed = False
+        consent_condition_results = []
+        for learner in enterprise_learner_details:
+
+            enterprise_uuid_matched = current_enterprise_uuid == learner['enterprise_customer']['uuid']
+            site_matched = Site.objects.get(domain=learner['enterprise_customer']['site']['domain']) == request.site
+            consent_required_by_enterprise = client.consent_required(
                 username=user.username,
                 course_id=course_id,
                 enterprise_customer_uuid=current_enterprise_uuid,
                 enrollment_exists=enrollment_exists,
             )
-            for learner in enterprise_learner_details
-        )
+
+            LOGGER.info(
+                u"[ENTERPRISE CONSENT INFO] user: [%s], course_id: [%s], enterprise_name: [%s], enterprise_uuid: [%s], "
+                u"enterprise_uuid_matched: [%s], site_matched: [%s], consent_required_by_enterprise: [%s], "
+                u"current_enterprise_uuid: [%s], domain: [%s], request_site: [%s], enrollment_exists: [%s]",
+                user.username,
+                course_id,
+                learner['enterprise_customer']['name'],
+                learner['enterprise_customer']['uuid'],
+                enterprise_uuid_matched,
+                site_matched,
+                consent_required_by_enterprise,
+                current_enterprise_uuid,
+                learner['enterprise_customer']['site']['domain'],
+                request.site,
+                enrollment_exists
+            )
+
+            consent_needed = enterprise_uuid_matched and site_matched and consent_required_by_enterprise
+            if consent_needed:
+                break
 
         if consent_needed:
             LOGGER.info(
