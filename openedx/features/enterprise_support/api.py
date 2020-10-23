@@ -552,6 +552,7 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         )
         return False
 
+    consent_needed = False
     enterprise_learner_details = get_enterprise_learner_data_from_db(user)
     if not enterprise_learner_details:
         LOGGER.info(
