@@ -12,6 +12,7 @@ from edx_ace.utils.date import serialize
 from mock import patch
 from six.moves import range
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.management.commands import send_course_update as nudge
@@ -21,7 +22,6 @@ from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base
 )
 from openedx.core.djangoapps.schedules.management.commands.tests.upsell_base import ScheduleUpsellTestMixin
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

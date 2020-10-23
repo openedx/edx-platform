@@ -3,12 +3,14 @@
 import datetime
 from unittest.mock import patch
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.content_highlights import (
-    course_has_highlights, get_week_highlights, get_next_section_highlights,
+    course_has_highlights,
+    get_next_section_highlights,
+    get_week_highlights
 )
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory

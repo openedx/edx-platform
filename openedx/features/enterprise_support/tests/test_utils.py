@@ -3,19 +3,20 @@ Test the enterprise support utils.
 """
 
 import json
-import mock
-import ddt
 
+import ddt
+import mock
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.enterprise_support.utils import ENTERPRISE_HEADER_LINKS, get_enterprise_learner_portal
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
-    EnterpriseCustomerBrandingConfigurationFactory, EnterpriseCustomerUserFactory,
+    EnterpriseCustomerBrandingConfigurationFactory,
+    EnterpriseCustomerUserFactory
 )
+from openedx.features.enterprise_support.utils import ENTERPRISE_HEADER_LINKS, get_enterprise_learner_portal
 from student.tests.factories import UserFactory
 
 

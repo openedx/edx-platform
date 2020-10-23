@@ -19,7 +19,9 @@ from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from lms.djangoapps.courseware.masquerade import (
-    CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group,
+    CourseMasquerade,
+    MasqueradingKeyValueStore,
+    get_masquerading_user_group
 )
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member

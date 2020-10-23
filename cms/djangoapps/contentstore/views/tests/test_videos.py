@@ -33,6 +33,7 @@ from waffle.testutils import override_flag
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
@@ -41,7 +42,6 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
 )
 from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..videos import (

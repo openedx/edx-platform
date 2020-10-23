@@ -25,6 +25,7 @@ from pyquery import PyQuery as pq
 from six.moves import range
 
 from course_modes.models import CourseMode
+from edx_toggles.toggles.testutils import override_waffle_flag
 from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
@@ -33,7 +34,6 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.helpers import DISABLE_UNENROLL_CERT_STATES

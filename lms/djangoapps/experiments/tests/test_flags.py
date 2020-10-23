@@ -11,13 +11,13 @@ from edx_django_utils.cache import RequestCache
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from experiments.factories import ExperimentKeyValueFactory
 from experiments.flags import ExperimentWaffleFlag
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -105,7 +105,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_forcing_bucket(self, active, expected_bucket):
         bucket_flag = CourseWaffleFlag('experiments', 'test.0', __name__)
-        with bucket_flag.override(active=active):
+        with override_waffle_flag(bucket_flag, active=active):
             self.assertEqual(self.get_bucket(), expected_bucket)
 
     def test_tracking(self):

@@ -14,10 +14,10 @@ from mock import Mock, patch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from entitlements.tests.factories import CourseEntitlementFactory
 from experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.discounts.models import DiscountRestrictionConfig
 from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

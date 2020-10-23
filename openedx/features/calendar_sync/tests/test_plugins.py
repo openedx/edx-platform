@@ -7,8 +7,8 @@ import crum
 import ddt
 from django.test import RequestFactory
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.calendar_sync.plugins import CalendarSyncToggleTool
 from openedx.features.course_experience import CALENDAR_SYNC_FLAG, RELATIVE_DATES_FLAG
 from xmodule.modulestore.tests.django_utils import CourseUserType, SharedModuleStoreTestCase

@@ -7,8 +7,7 @@ from contextlib import contextmanager
 
 from opaque_keys.edx.keys import CourseKey
 
-from edx_toggles.toggles import WaffleFlag as BaseWaffleFlag
-from edx_toggles.toggles import WaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from edx_toggles.toggles import WaffleSwitch as BaseWaffleSwitch
 from edx_toggles.toggles import WaffleSwitchNamespace as BaseWaffleSwitchNamespace
 
@@ -93,26 +92,6 @@ class WaffleSwitch(BaseWaffleSwitch):
         with self.waffle_namespace.override(self.switch_name, active):
             yield
 
-
-class WaffleFlag(BaseWaffleFlag):
-    """
-    Waffle flag class that implements custom override method.
-
-    This class should be removed in favour of edx_toggles.toggles.WaffleFlag once we get rid of the WaffleFlagNamespace
-    class and the `override` method.
-    """
-
-    @contextmanager
-    def override(self, active=True):
-        """
-        Shortcut method for `override_waffle_flag`.
-        """
-        # TODO We can move this import to the top of the file once this code is
-        # not all contained within the __init__ module.
-        from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-
-        with override_waffle_flag(self, active):
-            yield
 
 
 class CourseWaffleFlag(WaffleFlag):

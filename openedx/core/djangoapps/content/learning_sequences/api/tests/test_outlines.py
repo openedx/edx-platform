@@ -10,17 +10,15 @@ from edx_when.api import set_dates_for_course
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from student.auth import user_has_role
 from student.models import CourseEnrollment
 from student.roles import CourseBetaTesterRole
 
-from ...data import (
-    CourseLearningSequenceData, CourseOutlineData, CourseSectionData, VisibilityData, CourseVisibility
-)
+from ...data import CourseLearningSequenceData, CourseOutlineData, CourseSectionData, CourseVisibility, VisibilityData
 from ..outlines import (
     get_course_outline,
     get_user_course_outline,

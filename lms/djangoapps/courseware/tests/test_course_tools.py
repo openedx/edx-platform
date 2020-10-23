@@ -12,13 +12,12 @@ from mock import patch
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool
-from lms.djangoapps.courseware.course_tools import VerifiedUpgradeTool
+from edx_toggles.toggles.testutils import override_waffle_flag
+from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool, VerifiedUpgradeTool
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.config import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

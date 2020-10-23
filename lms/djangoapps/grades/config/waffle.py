@@ -84,6 +84,9 @@ def waffle():
 def waffle_flags():
     """
     Returns the namespaced, cached, audited Waffle flags dictionary for Grades.
+
+    WARNING: do not replicate this pattern. Instead of declaring waffle flag names as strings, you should create
+    WaffleFlag and CourseWaffleFlag objects as top-level constants.
     """
     namespace = WaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Grades: ')
     return {

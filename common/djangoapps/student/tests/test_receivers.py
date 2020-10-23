@@ -1,5 +1,6 @@
 """ Tests for student signal receivers. """
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION,
@@ -16,8 +17,8 @@ class ReceiversTest(SharedModuleStoreTestCase):
     Tests for dashboard utility functions
     """
     @override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True)
-    @COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.override(active=True)
-    @COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION.override(active=True)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES, active=True)
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION, active=True)
     def test_celebration_created(self):
         """ Test that we make celebration objects when enrollments are created """
         self.assertEqual(CourseEnrollmentCelebration.objects.count(), 0)

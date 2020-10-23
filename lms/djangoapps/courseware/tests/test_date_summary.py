@@ -10,6 +10,7 @@ import waffle
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import RequestFactory
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from mock import patch
 from pytz import utc
 
@@ -42,7 +43,6 @@ from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLA
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     DISABLE_UNIFIED_COURSE_TAB_FLAG,
@@ -756,7 +756,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             self.client.login(username=user.username, password=TEST_PASSWORD)
             if mfe_active:
                 with override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True), \
-                     COURSE_HOME_MICROFRONTEND_DATES_TAB.override(active=True):
+                     override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True):
                     response = self.client.get(url, follow=True)
             else:
                 response = self.client.get(url, follow=True)

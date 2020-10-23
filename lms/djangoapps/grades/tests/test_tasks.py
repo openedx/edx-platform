@@ -17,6 +17,7 @@ from django.utils import timezone
 from mock import MagicMock, patch
 from six.moves import range
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.config.waffle import ENFORCE_FREEZE_GRADE_AFTER_COURSE_END, waffle_flags
@@ -33,7 +34,6 @@ from lms.djangoapps.grades.tasks import (
     recalculate_subsection_grade_v3
 )
 from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.models import CourseEnrollment, anonymous_id_for_user
 from student.tests.factories import UserFactory
 from track.event_transaction_utils import create_new_event_transaction_id, get_event_transaction_id

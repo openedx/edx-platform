@@ -36,6 +36,7 @@ from testfixtures import LogCapture
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -68,7 +69,6 @@ from openedx.core.djangoapps.django_comment_common.utils import seed_permissions
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
