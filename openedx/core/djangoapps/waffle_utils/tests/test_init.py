@@ -7,7 +7,8 @@ import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-# Note that we really shouldn't import from edx_toggles' internal API
+# TODO: we really shouldn't import from edx_toggles' internal API, but that's currently the only way to mock the
+# monitoring functions.
 import edx_toggles.toggles.internal.waffle
 from edx_django_utils.cache import RequestCache
 from mock import call, patch

@@ -65,7 +65,7 @@ from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateCli
 from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
-from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
+from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_switch
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -74,7 +74,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_switch
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
@@ -1446,7 +1446,7 @@ class ProgressPageTests(ProgressPageBaseTests):
     def test_progress_queries(self, enable_waffle, initial, subsequent):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
-        with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
+        with override_waffle_switch(grades_waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT), active=enable_waffle):
             with self.assertNumQueries(
                 initial, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
             ), check_mongo_calls(1):

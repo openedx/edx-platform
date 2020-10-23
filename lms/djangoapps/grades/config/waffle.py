@@ -4,7 +4,12 @@ waffle switches for the Grades app.
 """
 
 
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
+from openedx.core.djangoapps.waffle_utils import (
+    CourseWaffleFlag,
+    WaffleFlagNamespace,
+    WaffleSwitch,
+    WaffleSwitchNamespace
+)
 
 # Namespace
 WAFFLE_NAMESPACE = u'grades'
@@ -79,6 +84,16 @@ def waffle():
     Returns the namespaced, cached, audited Waffle class for Grades.
     """
     return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Grades: ')
+
+
+def waffle_switch(name):
+    """
+    Return the corresponding namespaced waffle switch.
+
+    WARNING: do not replicate this pattern. Instead of declaring waffle switch names as strings, you should create
+    WaffleSwitch objects as top-level constants.
+    """
+    return WaffleSwitch(waffle(), name, module_name=__name__)
 
 
 def waffle_flags():

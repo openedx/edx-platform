@@ -3,95 +3,13 @@ Extra utilities for waffle: most classes are defined in edx_toggles.toggles (htt
 we keep here some extra classes for usage within edx-platform. These classes cover course override use cases.
 """
 import logging
-from contextlib import contextmanager
 
 from opaque_keys.edx.keys import CourseKey
 
-from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
-from edx_toggles.toggles import WaffleSwitch as BaseWaffleSwitch
-from edx_toggles.toggles import WaffleSwitchNamespace as BaseWaffleSwitchNamespace
+# pylint: disable=unused-import
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
 
 log = logging.getLogger(__name__)
-
-
-class WaffleSwitchNamespace(BaseWaffleSwitchNamespace):
-    """
-    Waffle switch namespace that implements custom overriding methods. We should eventually get rid of this class.
-
-    To test WaffleSwitchNamespace, use the provided context managers.  For example:
-
-        with WAFFLE_SWITCHES.override(waffle.ESTIMATE_FIRST_ATTEMPTED, active=True):
-            ...
-
-    Note: this should eventually be deprecated in favour of a dedicated `override_waffle_switch` context manager.
-    """
-
-    @contextmanager
-    def override(self, switch_name, active=True):
-        """
-        Overrides the active value for the given switch for the duration of this
-        contextmanager.
-        Note: The value is overridden in the request cache AND in the model.
-        """
-        previous_active = self.is_enabled(switch_name)
-        try:
-            self.override_for_request(switch_name, active)
-            with self.override_in_model(switch_name, active):
-                yield
-        finally:
-            self.override_for_request(switch_name, previous_active)
-
-    def override_for_request(self, switch_name, active=True):
-        """
-        Overrides the active value for the given switch for the remainder of
-        this request (as this is not a context manager).
-        Note: The value is overridden in the request cache, not in the model.
-        """
-        namespaced_switch_name = self._namespaced_name(switch_name)
-        self._cached_switches[namespaced_switch_name] = active
-        log.info(
-            "%sSwitch '%s' set to %s for request.",
-            self.log_prefix,
-            namespaced_switch_name,
-            active,
-        )
-
-    @contextmanager
-    def override_in_model(self, switch_name, active=True):
-        """
-        Overrides the active value for the given switch for the duration of this
-        contextmanager.
-        Note: The value is overridden in the model, not the request cache.
-        Note: This should probably be moved to a test class.
-        """
-        # Import is placed here to avoid model import at project startup.
-        # pylint: disable=import-outside-toplevel
-        from waffle.testutils import override_switch as waffle_override_switch
-
-        namespaced_switch_name = self._namespaced_name(switch_name)
-        with waffle_override_switch(namespaced_switch_name, active):
-            log.info(
-                "%sSwitch '%s' set to %s in model.",
-                self.log_prefix,
-                namespaced_switch_name,
-                active,
-            )
-            yield
-
-
-class WaffleSwitch(BaseWaffleSwitch):
-    """
-    This class should be removed in favour of edx_toggles.toggles.WaffleSwitch once we get rid of the
-    WaffleSwitchNamespace class.
-    """
-
-    NAMESPACE_CLASS = WaffleSwitchNamespace
-
-    @contextmanager
-    def override(self, active=True):
-        with self.waffle_namespace.override(self.switch_name, active):
-            yield
-
 
 
 class CourseWaffleFlag(WaffleFlag):

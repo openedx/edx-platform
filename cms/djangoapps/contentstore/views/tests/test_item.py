@@ -35,6 +35,7 @@ from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import item as item_module
 from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
 from student.tests.factories import UserFactory
 from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 from xblock_django.user_service import DjangoXBlockUserService
@@ -2666,7 +2667,7 @@ class TestXBlockInfo(ItemTest):
         self.course.highlights_enabled_for_messaging = True
         self.store.update_item(self.course, None)
         chapter = self.store.get_item(self.chapter.location)
-        with highlights_setting.override():
+        with override_waffle_switch(highlights_setting, active=True):
             chapter_xblock_info = create_xblock_info(chapter)
             course_xblock_info = create_xblock_info(self.course)
             self.assertTrue(chapter_xblock_info['highlights_enabled'])

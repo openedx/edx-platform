@@ -41,7 +41,9 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
     waffle_flags
 )
 from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration
+from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_switch
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..videos import (
@@ -56,23 +58,7 @@ from ..videos import (
     convert_video_status
 )
 
-
-def override_switch(switch, active):
-    """
-    Overrides the given waffle switch to `active` boolean.
-
-    Arguments:
-        switch(str): switch name
-        active(bool): A boolean representing (to be overridden) value
-    """
-    def decorate(function):
-        @wraps(function)
-        def inner(*args, **kwargs):
-            with WAFFLE_SWITCHES.override(switch, active=active):
-                function(*args, **kwargs)
-        return inner
-
-    return decorate
+VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH = WaffleSwitch(WAFFLE_SWITCHES, VIDEO_IMAGE_UPLOAD_ENABLED)
 
 
 class VideoUploadTestBase(object):
@@ -908,7 +894,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         self.assertIn('error', response)
         self.assertEqual(response['error'], error_message)
 
-    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, False)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, False)
     def test_video_image_upload_disabled(self):
         """
         Tests the video image upload when the feature is disabled.
@@ -917,7 +903,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         response = self.client.post(video_image_upload_url, {'file': 'dummy_file'}, format='multipart')
         self.assertEqual(response.status_code, 404)
 
-    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, True)
     def test_video_image(self):
         """
         Test video image is saved.
@@ -939,7 +925,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
 
         self.assertNotEqual(image_url1, image_url2)
 
-    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, True)
     def test_video_image_no_file(self):
         """
         Test that an error error message is returned if upload request is incorrect.
@@ -948,7 +934,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         response = self.client.post(video_image_upload_url, {})
         self.verify_error_message(response, 'An image file is required.')
 
-    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, True)
     def test_no_video_image(self):
         """
         Test image url is set to None if no video image.
@@ -1130,7 +1116,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         )
     )
     @ddt.unpack
-    @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
+    @override_waffle_switch(VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH, True)
     def test_video_image_validation_message(self, image_data, error_message):
         """
         Test video image validation gives proper error message.
