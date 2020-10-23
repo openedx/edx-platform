@@ -27,9 +27,7 @@ from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
-from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ACCOUNT_MICROFRONTEND
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -40,7 +38,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 @skip_unless_lms
 @ddt.ddt
-class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase, SiteMixin):
+class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for Login and Registration. """
     USERNAME = "bob"
     EMAIL = "bob@example.com"
@@ -82,13 +80,9 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         Test that if Logistration MFE is enabled, then we redirect to
         the correct URL.
         """
-        site_domain = 'example.org'
-        self.set_up_site(site_domain, {'ENABLE_ACCOUNT_MICROFRONTEND': True})
+        response = self.client.get(reverse(url_name))
 
-        with override_waffle_flag(REDIRECT_TO_ACCOUNT_MICROFRONTEND, active=True):
-            response = self.client.get(reverse(url_name))
-
-        self.assertEqual(response.url, settings.ACCOUNT_MICROFRONTEND_URL + path)
+        self.assertEqual(response.url, settings.LOGISTRATION_MICROFRONTEND_URL + path)
         self.assertEqual(response.status_code, 302)
 
     @ddt.data(
@@ -110,15 +104,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         Test that if request is redirected to logistration MFE,
         query params are passed to the redirect url.
         """
-        site_domain = 'example.org'
-        expected_url = settings.ACCOUNT_MICROFRONTEND_URL + path + '?' + urlencode(query_params)
+        expected_url = settings.LOGISTRATION_MICROFRONTEND_URL + path + '?' + urlencode(query_params)
+        response = self.client.get(reverse(url_name), query_params)
 
-        self.set_up_site(site_domain, {'ENABLE_ACCOUNT_MICROFRONTEND': True})
-
-        with override_waffle_flag(REDIRECT_TO_ACCOUNT_MICROFRONTEND, active=True):
-            response = self.client.get(reverse(url_name), query_params)
-
-        self.assertRedirects(response, expected_url)
+        self.assertRedirects(response, expected_url, target_status_code=302)
 
     @ddt.data(
         ("signin_user", "login"),

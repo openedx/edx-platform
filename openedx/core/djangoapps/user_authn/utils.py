@@ -11,6 +11,8 @@ from django.utils import http
 from oauth2_provider.models import Application
 from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 
 def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, require_https):
     """
@@ -67,3 +69,12 @@ def is_registration_api_v1(request):
     :return: Bool
     """
     return 'v1' in request.get_full_path() and 'register' not in request.get_full_path()
+
+
+def should_redirect_to_logistration_mircrofrontend():
+    """
+    Checks if login/registration should be done via MFE.
+    """
+    return configuration_helpers.get_value(
+        'ENABLE_LOGISTRATION_MICROFRONTEND', settings.FEATURES.get('ENABLE_LOGISTRATION_MICROFRONTEND')
+    )
