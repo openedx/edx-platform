@@ -59,7 +59,7 @@ class UserSiteSerializerTests(TestCase):
 
         protocol = 'https' if self.request.is_secure() else 'http'
         url = self.test_site_configuration['SITE_NAME']
-        expected_api_host_url = '{}//:{}'.format(protocol, url) if url else ''
+        expected_api_host_url = '{}://{}'.format(protocol, url) if url else ''
         assert expected_api_host_url == serializer.data['app_config'].get('API_HOST_URL')
 
     def test_site_data(self):

@@ -19,7 +19,7 @@ class UserSiteSerializer(serializers.Serializer):
             default=''
         )
         protocol = 'https' if self.context['request'].is_secure() else 'http'
-        mobile_app_config['API_HOST_URL'] = '{}//:{}'.format(protocol, url) if url else ''
+        mobile_app_config['API_HOST_URL'] = '{}://{}'.format(protocol, url) if url else ''
         mobile_app_config['ORGANIZATION_CODE'] = self.context['edly_sub_org_of_user'].edx_organization.short_name
         return mobile_app_config
 
