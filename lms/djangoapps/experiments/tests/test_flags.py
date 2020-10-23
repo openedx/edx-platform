@@ -2,9 +2,8 @@
 Tests for experimentation feature flags
 """
 
-import pytz
-
 import ddt
+import pytz
 from crum import set_current_request
 from dateutil import parser
 from django.test.client import RequestFactory
@@ -14,6 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from experiments.factories import ExperimentKeyValueFactory
 from experiments.flags import ExperimentWaffleFlag
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
@@ -47,7 +47,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
         self.addCleanup(RequestCache.clear_all_namespaces)
 
     def get_bucket(self, track=False, active=True):
-        # Does not use ExperimentWaffleFlag.override, since that shortcuts get_bucket and we want to test internals
+        # Does not use override_experiment_waffle_flag, since that shortcuts get_bucket and we want to test internals
         with override_waffle_flag(self.flag, active):
             with override_waffle_flag(self.flag.bucket_flags[1], True):
                 return self.flag.get_bucket(course_key=self.key, track=track)
@@ -152,7 +152,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     @ddt.unpack
     # Test the override method
     def test_override_method(self, active, bucket_override, expected_bucket):
-        with self.flag.override(active=active, bucket=bucket_override):
+        with override_experiment_waffle_flag(self.flag, active=active, bucket=bucket_override):
             self.assertEqual(self.flag.get_bucket(), expected_bucket)
             self.assertEqual(self.flag.is_experiment_on(), active)
 

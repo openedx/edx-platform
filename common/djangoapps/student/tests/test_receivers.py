@@ -1,10 +1,11 @@
 """ Tests for student signal receivers. """
 
 from lms.djangoapps.courseware.toggles import (
-    REDIRECT_TO_COURSEWARE_MICROFRONTEND,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
-    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION
+    COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION,
+    REDIRECT_TO_COURSEWARE_MICROFRONTEND
 )
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from student.models import CourseEnrollmentCelebration
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -14,7 +15,7 @@ class ReceiversTest(SharedModuleStoreTestCase):
     """
     Tests for dashboard utility functions
     """
-    @REDIRECT_TO_COURSEWARE_MICROFRONTEND.override(active=True)
+    @override_experiment_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True)
     @COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.override(active=True)
     @COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_FIRST_SECTION_CELEBRATION.override(active=True)
     def test_celebration_created(self):

@@ -36,6 +36,9 @@ from testfixtures import LogCapture
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
@@ -45,9 +48,7 @@ from lms.djangoapps.courseware.tests.factories import (
     UserProfileFactory
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.certificates.api import generate_user_certificates
-from lms.djangoapps.certificates.models import CertificateStatuses
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 from lms.djangoapps.instructor.views.api import (
     _split_input_list,
@@ -87,8 +88,11 @@ from student.models import (
     get_retired_username_by_username
 )
 from student.roles import (
-    CourseBetaTesterRole, CourseDataResearcherRole, CourseFinanceAdminRole,
-    CourseInstructorRole, CourseSalesAdminRole
+    CourseBetaTesterRole,
+    CourseDataResearcherRole,
+    CourseFinanceAdminRole,
+    CourseInstructorRole,
+    CourseSalesAdminRole
 )
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.fields import Date
@@ -3997,7 +4001,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             get_extended_due(self.course, self.week3, self.user1)
         )
 
-    @RELATIVE_DATES_FLAG.override(True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': text_type(self.course.id)})
@@ -4011,7 +4015,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             get_extended_due(self.course, self.week1, self.user1)
         )
 
-    @RELATIVE_DATES_FLAG.override(True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_date_only_in_edx_when(self):
         # Start with a unit that only has a date in edx-when
         self.assertEqual(get_date_for_block(self.course, self.week3, self.user1), None)
@@ -4144,7 +4148,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
 
-    @RELATIVE_DATES_FLAG.override(True)
+    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_extension_to_deleted_date(self):
         """
         Test that we can delete a due date extension after deleting the normal
