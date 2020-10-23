@@ -57,7 +57,7 @@ def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs)
         status,
     )
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
-    from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
+    from openedx.core.djangoapps.programs.tasks import award_program_certificates
     award_program_certificates.delay(user.username)
 
 
@@ -133,7 +133,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
         status,
     )
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
-    from openedx.core.djangoapps.programs.tasks.v1.tasks import award_course_certificate
+    from openedx.core.djangoapps.programs.tasks import award_course_certificate
     award_course_certificate.delay(user.username, str(course_key))
 
 
@@ -176,7 +176,7 @@ def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs)
         status,
     )
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
-    from openedx.core.djangoapps.programs.tasks.v1.tasks import revoke_program_certificates
+    from openedx.core.djangoapps.programs.tasks import revoke_program_certificates
     revoke_program_certificates.delay(user.username, course_key)
 
 
@@ -209,5 +209,5 @@ def handle_course_cert_date_change(sender, course_key, **kwargs):
         course_key,
     )
     # import here, because signal is registered at startup, but items in tasks are not yet loaded
-    from openedx.core.djangoapps.programs.tasks.v1.tasks import update_certificate_visible_date_on_course_update
+    from openedx.core.djangoapps.programs.tasks import update_certificate_visible_date_on_course_update
     update_certificate_visible_date_on_course_update.delay(course_key)

@@ -2233,7 +2233,6 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 # Celery's task autodiscovery won't find tasks nested in a tasks package.
 # Tasks are only registered when the module they are defined in is imported.
 CELERY_IMPORTS = (
-    'openedx.core.djangoapps.programs.tasks.v1.tasks',
     'poll.tasks'
 )
 

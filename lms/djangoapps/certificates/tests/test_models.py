@@ -358,7 +358,7 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
             CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
         )
 
-    @patch('openedx.core.djangoapps.programs.tasks.v1.tasks.revoke_program_certificates.delay')
+    @patch('openedx.core.djangoapps.programs.tasks.revoke_program_certificates.delay')
     @patch(
         'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
         return_value=True,
