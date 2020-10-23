@@ -53,7 +53,7 @@ pull_translations: ## pull translations from Transifex
 	i18n_tool generate
 	git clean -fdX conf/locale/rtl
 	git clean -fdX conf/locale/eo
-	i18n_tool validate
+	i18n_tool validate --verbose
 	paver i18n_compilejs
 
 

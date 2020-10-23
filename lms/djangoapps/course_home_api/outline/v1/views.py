@@ -91,6 +91,11 @@ class OutlineTabView(RetrieveAPIView):
             analytics_id: (str) The unique id given to the tool.
             title: (str) The display title of the tool.
             url: (str) The link to access the tool.
+        dates_banner_info: (obj)
+            content_type_gating_enabled: (bool) Whether content type gating is enabled for this enrollment.
+            missed_deadlines: (bool) Whether the user has missed any graded content deadlines for the given course.
+            missed_gated_content: (bool) Whether the user has missed any gated content for the given course.
+            verified_upgrade_link: (str) The URL to ecommerce IDA for purchasing the verified upgrade.
         dates_widget:
             course_date_blocks: List of serialized Course Dates objects. Each serialization has the following fields:
                 complete: (bool) Meant to only be used by assignments. Indicates completeness for an
@@ -108,6 +113,7 @@ class OutlineTabView(RetrieveAPIView):
             can_enroll: (bool) Whether the user can enroll in the given course
             extra_text: (str)
         handouts_html: (str) Raw HTML for the handouts section of the course info
+        has_ended: (bool) Indicates whether course has ended
         resume_course:
             has_visited_course: (bool) Whether the user has ever visited the course
             url: (str) The display name of the course block to resume
@@ -249,6 +255,7 @@ class OutlineTabView(RetrieveAPIView):
             'dates_widget': dates_widget,
             'enroll_alert': enroll_alert,
             'handouts_html': handouts_html or None,
+            'has_ended': course.has_ended(),
             'offer_html': offer_html or None,
             'resume_course': resume_course,
             'welcome_message_html': welcome_message_html or None,

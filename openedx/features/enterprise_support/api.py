@@ -101,11 +101,34 @@ class ConsentApiClient(object):
         """
 
         # Call the endpoint with the given kwargs, and check the value that it provides.
+        LOGGER.info(
+            u"Calling enterprise consent API for user [{username}] and course [{course_id}].".format(
+                username=kwargs.get('username'),
+                course_id=kwargs.get('course_id')
+            )
+        )
         response = self.consent_endpoint.get(**kwargs)
 
         # No Enterprise record exists, but we're already enrolled in a course. So, go ahead and proceed.
         if enrollment_exists and not response.get('exists', False):
+            LOGGER.info(
+                u"No enterprise record exists for user [{username}] and course [{course_id}], but the user is already "
+                u"enrolled, so consent is not required.".format(
+                    username=kwargs.get('username'),
+                    course_id=kwargs.get('course_id')
+                )
+            )
+
             return False
+
+        LOGGER.info(
+            u"The response from the Enterprise API to check if consent is required for user [{username}] and course "
+            u"[{course_id}] is [{required}]. ".format(
+                username=kwargs.get('username'),
+                course_id=kwargs.get('course_id'),
+                required=response['consent_required']
+            )
+        )
 
         # In all other cases, just trust the Consent API.
         return response['consent_required']

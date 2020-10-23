@@ -1173,7 +1173,6 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
             )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_generate_course_survey_report(self):
         """
         test to generate course survey report

@@ -7,7 +7,7 @@ development mode; otherwise, it is ignored.
 
 from django.conf.urls import url
 
-from contentstore.views.dev import dev_mode
+from cms.djangoapps.contentstore.views.dev import dev_mode
 
 urlpatterns = [
     url(r'^dev_mode$', dev_mode, name='dev_mode'),

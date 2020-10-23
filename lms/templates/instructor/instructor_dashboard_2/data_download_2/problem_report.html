@@ -29,11 +29,11 @@ from openedx.core.djangolib.markup import HTML, Text
 <!--            class="btn-brand mb-20" type="button" value="download report">Download-->
 <!--        report-->
 <!--    </button>-->
-    <input hidden data-endpoint="${ section_data['get_problem_responses_url'] }"
+    <input data-endpoint="${ section_data['get_problem_responses_url'] }"
            type="button"
            value="Download Report"
            id="download-problem-report"
-           class="download-report mb-20"
+           class="download-report mb-20 hidden"
            style="margin-left: 0">
 
     <% max_entries = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT') %>

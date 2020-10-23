@@ -12,11 +12,11 @@ from datetime import datetime
 from math import ceil
 from tempfile import NamedTemporaryFile, mkdtemp
 
+from ccx_keys.locator import CCXLocator
 from celery import group
 from celery.task import task
 from celery.utils.log import get_task_logger
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
-from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
@@ -36,12 +36,15 @@ from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
-from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
-from contentstore.storage import course_import_export_storage
-from contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
-from contentstore.video_utils import scrape_youtube_thumbnail
+from cms.djangoapps.contentstore.courseware_index import (
+    CoursewareSearchIndexer,
+    LibrarySearchIndexer,
+    SearchIndexingError
+)
+from cms.djangoapps.contentstore.storage import course_import_export_storage
+from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from course_action_state.models import CourseRerunState
-from models.settings.course_metadata import CourseMetadata
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from student.auth import has_course_author_access
@@ -449,7 +452,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             if courselike_module.entrance_exam_enabled:
                 fake_request = RequestFactory().get(u'/')
                 fake_request.user = user
-                from contentstore.views.entrance_exam import remove_entrance_exam_milestone_reference
+                from .views.entrance_exam import remove_entrance_exam_milestone_reference
                 # TODO: Is this really ok?  Seems dangerous for a live course
                 remove_entrance_exam_milestone_reference(fake_request, courselike_key)
                 LOGGER.info(
@@ -549,6 +552,6 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
                 metadata = {u'entrance_exam_id': text_type(entrance_exam_chapter.location)}
                 CourseMetadata.update_from_dict(metadata, course, user)
-                from contentstore.views.entrance_exam import add_entrance_exam_milestone
+                from .views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(u'Course %s Entrance exam imported', course.id)

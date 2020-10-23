@@ -48,11 +48,14 @@ class DatesTabView(RetrieveAPIView):
             link: (str) An absolute link to content related to the date event
                 (ex. verified link or link to assignment)
             title: (str) The title of the date event
-        missed_deadlines: (bool) Indicates whether the user missed any graded content deadlines
-        missed_gated_content: (bool) Indicates whether the user missed gated content
+        dates_banner_info: (obj)
+            content_type_gating_enabled: (bool) Whether content type gating is enabled for this enrollment.
+            missed_deadlines: (bool) Indicates whether the user missed any graded content deadlines
+            missed_gated_content: (bool) Indicates whether the user missed gated content
+            verified_upgrade_link: (str) The link for upgrading to the Verified track in a course
+        has_ended: (bool) Indicates whether course has ended
         learner_is_full_access: (bool) Indicates if the user is verified in the course
         user_timezone: (str) The user's preferred timezone
-        verified_upgrade_link: (str) The link for upgrading to the Verified track in a course
 
     **Returns**
 

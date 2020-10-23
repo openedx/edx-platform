@@ -30,10 +30,10 @@ from six import text_type
 from six.moves import range
 from waffle.testutils import override_switch
 
-from contentstore.config import waffle
-from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
-from contentstore.utils import delete_course, reverse_course_url, reverse_url
-from contentstore.views.component import ADVANCED_COMPONENT_TYPES
+from cms.djangoapps.contentstore.config import waffle
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
+from cms.djangoapps.contentstore.utils import delete_course, reverse_course_url, reverse_url
+from cms.djangoapps.contentstore.views.component import ADVANCED_COMPONENT_TYPES
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded

@@ -5,7 +5,7 @@ Note that these views are only for interacting with existing blocks. Other
 Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 
-
+from corsheaders.signals import check_request_enabled
 from django.contrib.auth import get_user_model
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -132,7 +132,17 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
     # Run the handler, and save any resulting XBlock field value changes:
     response_webob = block.handle(handler_name, request_webob, suffix)
     response = webob_to_django_response(response_webob)
-    # We need to set Access-Control-Allow-Origin: * to allow sandboxed XBlocks
-    # to call these handlers:
-    response['Access-Control-Allow-Origin'] = '*'
     return response
+
+
+def cors_allow_xblock_handler(sender, request, **kwargs):
+    """
+    Sandboxed XBlocks need to be able to call XBlock handlers via POST,
+    from a different domain. See 'xblock_handler' method for details and how security is
+    enforced.
+    Per the corsheaders docs, a signal is the only way to achieve this for
+    just a specific view/URL.
+    """
+    return request.path.startswith('/api/xblock/v2/xblocks/') and '/handler/' in request.path
+
+check_request_enabled.connect(cors_allow_xblock_handler)

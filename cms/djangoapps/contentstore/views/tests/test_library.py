@@ -14,13 +14,14 @@ from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from six import binary_type, text_type
 from six.moves import range
 
-from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
-from contentstore.utils import reverse_course_url, reverse_library_url
-from contentstore.views.component import get_component_templates
-from contentstore.views.library import get_library_creator_status
-from course_creators.views import add_user_with_status_granted as grant_course_creator_status
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_library_url
+from cms.djangoapps.course_creators.views import add_user_with_status_granted as grant_course_creator_status
 from student.roles import LibraryUserRole
 from xmodule.modulestore.tests.factories import LibraryFactory
+
+from ..component import get_component_templates
+from ..library import get_library_creator_status
 
 LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries
 
@@ -48,23 +49,23 @@ class UnitTestLibraries(CourseTestCase):
     ######################################################
     # Tests for /library/ - list and create libraries:
 
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", False)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_library_creator_status_libraries_not_enabled(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertEqual(get_library_creator_status(nostaff_user), False)
 
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_is_staff_user(self):
         self.assertEqual(get_library_creator_status(self.user), True)
 
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_course_creator_role(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             grant_course_creator_status(self.user, nostaff_user)
             self.assertEqual(get_library_creator_status(nostaff_user), True)
 
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_no_course_creator_role(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertEqual(get_library_creator_status(nostaff_user), True)
@@ -83,7 +84,7 @@ class UnitTestLibraries(CourseTestCase):
         Ensure that the setting DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION as expected.
         """
         _, nostaff_user = self.create_non_staff_authed_user_client()
-        with mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True):
+        with mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True):
             with mock.patch.dict(
                 "django.conf.settings.FEATURES",
                 {
@@ -94,7 +95,7 @@ class UnitTestLibraries(CourseTestCase):
                 self.assertEqual(get_library_creator_status(nostaff_user), expected_status)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True})
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_no_course_creator_role_and_disabled_nonstaff_course_creation(self):
         """
         Ensure that `DISABLE_COURSE_CREATION` feature works with libraries as well.
@@ -110,7 +111,7 @@ class UnitTestLibraries(CourseTestCase):
         self.assertEqual(get_response.status_code, 200)
         self.assertEqual(post_response.status_code, 403)
 
-    @patch("contentstore.views.library.LIBRARIES_ENABLED", False)
+    @patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_with_libraries_disabled(self):
         """
         The library URLs should return 404 if libraries are disabled.
