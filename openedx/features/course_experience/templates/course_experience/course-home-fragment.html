@@ -63,9 +63,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
     </header>
     <div class="page-content">
         <div class="page-content-main">
-            % if next_up_banner_fragment:
-                ${HTML(next_up_banner_fragment.body_html())}
-            % endif
             % if offer_banner_fragment:
                 ${HTML(offer_banner_fragment.content)}
             % endif
