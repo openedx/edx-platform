@@ -953,7 +953,6 @@ div.problem {
 // +Problem - Actions
 // ====================
 div.problem .action {
-  margin-top: $baseline;
   min-height: $baseline;
   width: 100%;
   display: flex;
@@ -962,6 +961,13 @@ div.problem .action {
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
+
+  .problem-action-buttons-wrapper {
+      display: inline-flex;
+      justify-content: flex-end;
+      width: 100%;
+      padding-bottom: $baseline;
+  }
 
   .problem-action-button-wrapper {
     @include border-right(1px solid $light-gray1);
@@ -977,6 +983,8 @@ div.problem .action {
     @include margin-right($baseline / 5);
 
     max-width: 110px;
+    text-decoration: underline;
+    text-transform: none;
 
     .icon {
       margin-bottom: $baseline / 10;
@@ -1009,13 +1017,12 @@ div.problem .action {
         display: inline-block;
     }
     .submit-cta-description {
-        margin-left: 8px;
+        color: $blue;
+        font-size: small;
     }
     .submit-cta-link-button {
-        background: none;
-        border: none;
-        color: $blue;
-        cursor: pointer;
+        text-decoration: underline;
+        text-transform: none;
     }
   }
 
