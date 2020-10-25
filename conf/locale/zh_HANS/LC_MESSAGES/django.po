@@ -397,7 +397,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-10-18 20:43+0000\n"
+"POT-Creation-Date: 2020-10-25 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -914,16 +914,10 @@ msgstr "{platform_name}的{course_name}专业证书"
 
 #: common/djangoapps/student/models.py
 msgid ""
-"The company identifier for the LinkedIn Add-to-Profile button e.g "
-"0_0dPSPyS070e0HsE9HNz_13_d11_"
-msgstr "LinkedIn“添加到配置文件”按钮的公司标识符，例如0_0dPSPyS070e0HsE9HNz_13_d11_"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Short identifier for the LinkedIn partner used in the tracking code.  "
-"(Example: 'edx')  If no value is provided, tracking codes will not be sent "
-"to LinkedIn."
-msgstr "领英伙伴的短标识符被用在跟踪代码中。 (比如: 'edx') 如果没有提供任何值，跟踪代码不会发送到领英。"
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
+msgstr ""
 
 #: common/djangoapps/student/models.py
 #, python-brace-format
@@ -1003,7 +997,7 @@ msgstr ""
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
-"follows:                     username, email, new_email"
+"follows:                     username, current_email, desired_email"
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -2360,7 +2354,6 @@ msgstr "超过截止日期"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "显示答案"
 
@@ -9282,6 +9275,13 @@ msgstr ""
 #: openedx/core/djangoapps/content_libraries/api.py
 #, python-brace-format
 msgid ""
+"You may not change a library's type to {library_type} if it still has "
+"unpublished changes."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
 "You can only set a library to {library_type} if all existing blocks are of "
 "that type. Found incompatible block {block_id} with type {block_type}."
 msgstr ""
@@ -12777,17 +12777,6 @@ msgid "View in Insights"
 msgstr ""
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} attempt"
-msgid_plural "You have used {num_used} of {num_total} attempts"
-msgstr[0] "您已经尝试了{num_used}次，总共可以尝试{num_total}次"
-
-#: lms/templates/problem.html
-msgid ""
-"Some problems have options such as save, reset, hints, or show answer. These"
-" options follow the Submit button."
-msgstr "一些题目设有保存、重置、提示、显示答案等选项，点击提交后即会出现。"
-
-#: lms/templates/problem.html
 msgid "Hint"
 msgstr "提示"
 
@@ -12798,6 +12787,21 @@ msgstr "保存答案"
 #: lms/templates/problem.html
 msgid "Reset your answer"
 msgstr "重置答案"
+
+#: lms/templates/problem.html
+msgid "Show answer"
+msgstr ""
+
+#: lms/templates/problem.html
+msgid "You have used {num_used} of {num_total} attempt"
+msgid_plural "You have used {num_used} of {num_total} attempts"
+msgstr[0] "您已经尝试了{num_used}次，总共可以尝试{num_total}次"
+
+#: lms/templates/problem.html
+msgid ""
+"Some problems have options such as save, reset, hints, or show answer. These"
+" options follow the Submit button."
+msgstr "一些题目设有保存、重置、提示、显示答案等选项，点击提交后即会出现。"
 
 #: lms/templates/problem.html
 msgid "Answers are displayed within the problem"
@@ -18512,10 +18516,6 @@ msgstr "此门课程没有任何更新。"
 msgid "Latest Update"
 msgstr "最近更新"
 
-#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
-msgid "Get started on what's next: "
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Show More"
 msgstr ""
@@ -21126,10 +21126,10 @@ msgstr "自定进度"
 
 #: cms/templates/settings.html
 msgid ""
-"Self-paced courses do not have release dates for course content or due dates"
-" for assignments. Learners can complete course material at any time before "
-"the course end date."
-msgstr "自学课程没有课程发布时间与作业缴交时间，学生可以在课程结束时间间自由地完成。"
+"Self-paced courses offer suggested due dates for assignments or exams based "
+"on the learner’s enrollment date and the expected course duration. These "
+"courses offer learners flexibility to modify the assignment dates as needed."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Schedule"

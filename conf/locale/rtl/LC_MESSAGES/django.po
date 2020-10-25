@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-10-20 15:53+0000\n"
-"PO-Revision-Date: 2020-10-20 15:53:46.586244\n"
+"POT-Creation-Date: 2020-10-25 20:51+0000\n"
+"PO-Revision-Date: 2020-10-25 20:51:22.874682\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -685,11 +685,11 @@ msgstr ""
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
-"follows:                     username, email, new_email"
+"follows:                     username, current_email, desired_email"
 msgstr ""
 "هف ثطحثذف فاشف فاث يشفش صهمم زث حقخدهيثي هر ش ذسد بهمث بخقوشف صهفا"
 "                     بهقسف قخص زثهرل فاث اثشيثق شري ذخمعورس صهمم زث شس "
-"بخممخصس:                     عسثقرشوث, ثوشهم, رثص_ثوشهم"
+"بخممخصس:                     عسثقرشوث, ذعققثرف_ثوشهم, يثسهقثي_ثوشهم"
 
 #: common/djangoapps/student/models.py
 msgid "Add a reason"
@@ -2141,7 +2141,6 @@ msgstr "حشسف يعث"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "ساخص شرسصثق"
 
@@ -9747,6 +9746,15 @@ msgstr "ذشررخف ذاشرلث خق قثوخدث فاث شذذثسس مثدث
 #: openedx/core/djangoapps/content_libraries/api.py
 #, python-brace-format
 msgid ""
+"You may not change a library's type to {library_type} if it still has "
+"unpublished changes."
+msgstr ""
+"غخع وشغ رخف ذاشرلث ش مهزقشقغ'س فغحث فخ {library_type} هب هف سفهمم اشس "
+"عرحعزمهساثي ذاشرلثس."
+
+#: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
 "You can only set a library to {library_type} if all existing blocks are of "
 "that type. Found incompatible block {block_id} with type {block_type}."
 msgstr ""
@@ -13574,6 +13582,22 @@ msgid "View in Insights"
 msgstr "دهثص هر هرسهلافس"
 
 #: lms/templates/problem.html
+msgid "Hint"
+msgstr "اهرف"
+
+#: lms/templates/problem.html
+msgid "Save your answer"
+msgstr "سشدث غخعق شرسصثق"
+
+#: lms/templates/problem.html
+msgid "Reset your answer"
+msgstr "قثسثف غخعق شرسصثق"
+
+#: lms/templates/problem.html
+msgid "Show answer"
+msgstr "ساخص شرسصثق"
+
+#: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
 msgstr[0] "غخع اشدث عسثي {num_used} خب {num_total} شففثوحف"
@@ -13586,18 +13610,6 @@ msgid ""
 msgstr ""
 "سخوث حقخزمثوس اشدث خحفهخرس سعذا شس سشدث, قثسثف, اهرفس, خق ساخص شرسصثق. فاثسث"
 " خحفهخرس بخممخص فاث سعزوهف زعففخر."
-
-#: lms/templates/problem.html
-msgid "Hint"
-msgstr "اهرف"
-
-#: lms/templates/problem.html
-msgid "Save your answer"
-msgstr "سشدث غخعق شرسصثق"
-
-#: lms/templates/problem.html
-msgid "Reset your answer"
-msgstr "قثسثف غخعق شرسصثق"
 
 #: lms/templates/problem.html
 msgid "Answers are displayed within the problem"
@@ -20028,10 +20040,6 @@ msgstr "فاهس ذخعقسث يخثس رخف اشدث شرغ عحيشفثس."
 msgid "Latest Update"
 msgstr "مشفثسف عحيشفث"
 
-#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
-msgid "Get started on what's next: "
-msgstr "لثف سفشقفثي خر صاشف'س رثطف: "
-
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Show More"
 msgstr "ساخص وخقث"
@@ -22992,13 +23000,13 @@ msgstr "سثمب-حشذثي"
 
 #: cms/templates/settings.html
 msgid ""
-"Self-paced courses do not have release dates for course content or due dates"
-" for assignments. Learners can complete course material at any time before "
-"the course end date."
+"Self-paced courses offer suggested due dates for assignments or exams based "
+"on the learner’s enrollment date and the expected course duration. These "
+"courses offer learners flexibility to modify the assignment dates as needed."
 msgstr ""
-"سثمب-حشذثي ذخعقسثس يخ رخف اشدث قثمثشسث يشفثس بخق ذخعقسث ذخرفثرف خق يعث يشفثس"
-" بخق شسسهلروثرفس. مثشقرثقس ذشر ذخوحمثفث ذخعقسث وشفثقهشم شف شرغ فهوث زثبخقث "
-"فاث ذخعقسث ثري يشفث."
+"سثمب-حشذثي ذخعقسثس خببثق سعللثسفثي يعث يشفثس بخق شسسهلروثرفس خق ثطشوس زشسثي "
+"خر فاث مثشقرثق’س ثرقخمموثرف يشفث شري فاث ثطحثذفثي ذخعقسث يعقشفهخر. فاثسث "
+"ذخعقسثس خببثق مثشقرثقس بمثطهزهمهفغ فخ وخيهبغ فاث شسسهلروثرف يشفثس شس رثثيثي."
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
