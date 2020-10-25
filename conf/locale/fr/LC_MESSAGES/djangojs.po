@@ -23,6 +23,7 @@
 # Françoise Docq, 2014
 # Françoise Docq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
+# Grégory Petit <petit.gregory.51@gmail.com>, 2020
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
 # INARES <contact@inares.org>, 2015
 # jmc <jmc@edx.org>, 2014

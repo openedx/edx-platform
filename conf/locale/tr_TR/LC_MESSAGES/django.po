@@ -130,7 +130,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-10-18 20:43+0000\n"
+"POT-Creation-Date: 2020-10-25 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2019\n"
 "Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -676,21 +676,10 @@ msgstr "{course_name} için {platform_name} Profesyonel Sertifika"
 
 #: common/djangoapps/student/models.py
 msgid ""
-"The company identifier for the LinkedIn Add-to-Profile button e.g "
-"0_0dPSPyS070e0HsE9HNz_13_d11_"
+"Your organization ID (if your organization has an existing page on LinkedIn)"
+" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
+" instead."
 msgstr ""
-"LinkedIn Profile Ekle düğmesi için şirket tanımlayıcısı. Örneğin, "
-"0_0dPSPyS070e0HsE9HNz_13_d11_"
-
-#: common/djangoapps/student/models.py
-msgid ""
-"Short identifier for the LinkedIn partner used in the tracking code.  "
-"(Example: 'edx')  If no value is provided, tracking codes will not be sent "
-"to LinkedIn."
-msgstr ""
-"Izleme kodunda kullanılan LinkedIn ortağının kısa tanımlayıcısı. (Example: "
-"'edx') Hiçbir değer sağlanmıyorsa, izleme kodları LinkedIn'e "
-"gönderilmeyecektir."
 
 #: common/djangoapps/student/models.py
 #, python-brace-format
@@ -736,6 +725,9 @@ msgid ""
 "follows:                     user_id, username, email, course_id, "
 "is_verified, verification_date"
 msgstr ""
+"Verilerin, ilk satırın başlık olduğu bir csv dosyası biçiminde             "
+"sağlanması beklenir ve sütunlar şu şekilde olacaktır:            user_id, "
+"username, email, course_id, is_verified, verification_date"
 
 #: common/djangoapps/student/models.py
 msgid ""
@@ -772,7 +764,7 @@ msgstr ""
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
-"follows:                     username, email, new_email"
+"follows:                     username, current_email, desired_email"
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -2211,7 +2203,6 @@ msgstr "Zaman Aşımına Uğramış"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "Yanıtı Göster"
 
@@ -5127,6 +5118,8 @@ msgid ""
 "If you need help, please use our web form at %(support_url)s or email "
 "%(support_email)s."
 msgstr ""
+"Eğer yardıma ihtiyacınız olursa, lütfen %(support_url)s içindeki web "
+"formumuzu ya da %(support_email)s e-posta adresini kullanın."
 
 #: common/templates/student/edx_ace/accountactivation/email/subject.txt
 #, python-format
@@ -8920,6 +8913,8 @@ msgid ""
 "You must have a valid ID verification to take proctored exams and qualify "
 "for certificates."
 msgstr ""
+"Gözetmenli sınavlara katılmaya ve sertifika almaya hak kazanmak için kimlik "
+"doğrulamasını tamamlamanız gerekiyor."
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
@@ -9797,6 +9792,13 @@ msgstr ""
 #: openedx/core/djangoapps/content_libraries/api.py
 #, python-brace-format
 msgid ""
+"You may not change a library's type to {library_type} if it still has "
+"unpublished changes."
+msgstr ""
+
+#: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
 "You can only set a library to {library_type} if all existing blocks are of "
 "that type. Found incompatible block {block_id} with type {block_type}."
 msgstr ""
@@ -10328,6 +10330,9 @@ msgid ""
 "We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
 "let you know what you can look forward to in week {week_num}:"
 msgstr ""
+"{start_strong}{course_name}{end_strong} dersinden keyif aldığınızı umut "
+"ediyoruz! {week_num}. hafta içinde neler bekleyebileceğinizi size bildirmek "
+"istiyoruz:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/body.txt
@@ -10351,6 +10356,8 @@ msgid ""
 "We hope you're enjoying %(course_name)s! We want to let you know what you "
 "can look forward to in week %(week_num)s:"
 msgstr ""
+"%(course_name)s dersinden keyif aldığınızı umut ediyoruz! %(week_num)s. "
+"hafta içinde neler bekleyebileceğinizi size bildirmek istiyoruz:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
@@ -10363,6 +10370,9 @@ msgid ""
 "We hope you're enjoying {start_strong}{course_name}{end_strong}! We want to "
 "let you know what you can look forward to in the coming weeks:"
 msgstr ""
+"{start_strong}{course_name}{end_strong} dersinden keyif aldığınızı umut "
+"ediyoruz! Önümüzdeki haftalarda neler bekleyebileceğinizi size bildirmek "
+"istiyoruz:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
@@ -10370,6 +10380,8 @@ msgid ""
 "We encourage you to spend time with the course each week. Your focused "
 "attention will pay off in the end!"
 msgstr ""
+"Her hafta derste zaman geçirmenizi öneririz. Odaklanmış dikkatiniz sonunda "
+"karşılığını alacaktır!"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/body.txt
 #, python-format
@@ -10377,6 +10389,8 @@ msgid ""
 "We hope you're enjoying %(course_name)s! We want to let you know what you "
 "can look forward to in the coming weeks:"
 msgstr ""
+"%(course_name)s dersinden keyif aldığınızı umut ediyoruz! Önümüzdeki "
+"haftalarda neler bekleyebileceğinizi size bildirmek istiyoruz:"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/instructorledcourseupdate/email/subject.txt
 #, python-format
@@ -10539,6 +10553,10 @@ msgid ""
 "you to highlight your new knowledge and skills. An %(platform_name)s "
 "certificate is official and easily shareable."
 msgstr ""
+"Umarız şu ana dek {start_strong}%(platform_name)s{end_strong} platformunda "
+"bizimle birlikte öğrenmekten keyif alıyorsunuzdur! Onaylı bir sertifika yeni"
+" bilgi ve becerilerinizi öne çıkarmanızı sağlar. %(platform_name)s "
+"sertifikası resmidir ve kolaylıkla paylaşılabilir."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 #, python-brace-format
@@ -10548,6 +10566,10 @@ msgid ""
 " you to highlight your new knowledge and skills. An {platform_name} "
 "certificate is official and easily shareable."
 msgstr ""
+"Umarız şu ana dek {start_strong}{first_course_name}{end_strong} dersinde "
+"bizimle birlikte öğrenmekten keyif alıyorsunuzdur! Onaylı bir sertifika yeni"
+" bilgi ve becerilerinizi öne çıkarmanızı sağlar. {platform_name} sertifikası"
+" resmidir ve kolaylıkla paylaşılabilir."
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
 #, python-format, python-brace-format
@@ -13078,6 +13100,8 @@ msgid ""
 "It looks like you missed some important deadlines based on our suggested "
 "schedule. "
 msgstr ""
+"Görünüşe göre, önerilen programımıdaki bazı önemli teslim tarihlerini "
+"kaçırdınız."
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -13090,6 +13114,8 @@ msgid ""
 " Don't worry—you won't lose any of the progress you've made when you shift "
 "your due dates."
 msgstr ""
+" Endişelenmeyin—son tarihlerinizi değiştirdiğinizde kaydettiğiniz "
+"ilerlemelerin hiçbirini kaybetmezsiniz."
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -13499,6 +13525,22 @@ msgid "View in Insights"
 msgstr ""
 
 #: lms/templates/problem.html
+msgid "Hint"
+msgstr "İpucu"
+
+#: lms/templates/problem.html
+msgid "Save your answer"
+msgstr "Cevabınızı kaydedin"
+
+#: lms/templates/problem.html
+msgid "Reset your answer"
+msgstr "Cevabınızı sıfırlayın"
+
+#: lms/templates/problem.html
+msgid "Show answer"
+msgstr ""
+
+#: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
 msgstr[0] ""
@@ -13511,18 +13553,6 @@ msgid ""
 msgstr ""
 "Bazı problemler kaydet, sıfırla, ipucu veya cevabı göster gibi seçeneklere "
 "sahiptir. Gönder düğmesinden sonra bu özellikler görünür hale gelir."
-
-#: lms/templates/problem.html
-msgid "Hint"
-msgstr "İpucu"
-
-#: lms/templates/problem.html
-msgid "Save your answer"
-msgstr "Cevabınızı kaydedin"
-
-#: lms/templates/problem.html
-msgid "Reset your answer"
-msgstr "Cevabınızı sıfırlayın"
 
 #: lms/templates/problem.html
 msgid "Answers are displayed within the problem"
@@ -15929,6 +15959,8 @@ msgid ""
 "{student_name}, you have met the requirements for credit in this course. "
 "{a_start}Go to your dashboard{a_end} to purchase course credit."
 msgstr ""
+"{student_name}, bu dersteki kredi için gereklilikleri yerine getirdiniz. "
+"{a_start}Panelinize{a_end} giderek kredilerinizi alabilirsiniz."
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -19615,10 +19647,6 @@ msgstr "Bu derste herhangi bir güncelleme yok."
 msgid "Latest Update"
 msgstr "Son Güncelleme"
 
-#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
-msgid "Get started on what's next: "
-msgstr ""
-
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Show More"
 msgstr "Daha Fazla Göster"
@@ -22590,13 +22618,10 @@ msgstr "Kendi Kendine Eğitim"
 
 #: cms/templates/settings.html
 msgid ""
-"Self-paced courses do not have release dates for course content or due dates"
-" for assignments. Learners can complete course material at any time before "
-"the course end date."
+"Self-paced courses offer suggested due dates for assignments or exams based "
+"on the learner’s enrollment date and the expected course duration. These "
+"courses offer learners flexibility to modify the assignment dates as needed."
 msgstr ""
-"Kendi kendine derslerin içerik için yayın tarihi veya görevler için bitiş "
-"tarihleri bulunmamaktadır. Öğrenciler dersin bitiş tarihinden önce ders "
-"materyallerini istedikleri zaman bitirebilir. "
 
 #: cms/templates/settings.html
 msgid "Course Schedule"

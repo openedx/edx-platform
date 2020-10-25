@@ -433,7 +433,7 @@ msgstr "Sortutako talde berria: \"{}\""
 
 #: common/djangoapps/student/management/commands/manage_group.py
 msgid "Found existing group: \"{}\""
-msgstr "Existitzen duen taldea aurkitu da: \"{}\""
+msgstr "Existitzen den taldea aurkitu da: \"{}\""
 
 #: common/djangoapps/student/management/commands/manage_group.py
 #, python-brace-format
@@ -483,7 +483,7 @@ msgstr "Erabiltzaile berria sortu da: \"{}\""
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Found existing user: \"{}\""
-msgstr ""
+msgstr "Existitzen den erabiltzailea aurkitu da: \"{}\""
 
 #: common/djangoapps/student/management/commands/manage_user.py
 msgid "Setting unusable password for user \"{}\""
@@ -685,7 +685,7 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Add a reason"
-msgstr ""
+msgstr "Gehitu arrazoia"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -1337,6 +1337,8 @@ msgid ""
 "Your password must contain {length_instruction}, including "
 "{complexity_instructions}."
 msgstr ""
+"Pasahitzak {length_instruction} izan behar du, {complexity_instructions} "
+"barne."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1379,8 +1381,8 @@ msgstr[1] "Pasahitzak ezin du izan %(max_length)d karaktere baino gehiago."
 #, python-format
 msgid "This password must contain at least %(min_alphabetic)d letter."
 msgid_plural "This password must contain at least %(min_alphabetic)d letters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pasahitz honek gutxienez letra %(min_alphabetic)d izan behar du."
+msgstr[1] "Pasahitz honek gutxienez %(min_alphabetic)d letra izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1400,15 +1402,15 @@ msgstr[1] "%(num)d letra"
 #, python-format
 msgid "This password must contain at least %(min_numeric)d number."
 msgid_plural "This password must contain at least %(min_numeric)d numbers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pasahitz honek utxienez zenbaki %(min_numeric)d izan behar du."
+msgstr[1] "Pasahitz honek gutxienez %(min_numeric)d zenbaki izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
 msgid "Your password must contain at least %(min_numeric)d number."
 msgid_plural "Your password must contain at least %(min_numeric)d numbers."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pasahitzak gutxienez zenbaki %(min_numeric)d izan behar du."
+msgstr[1] "Pasahitzak gutxienez %(min_numeric)d zenbaki izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1422,16 +1424,17 @@ msgstr[1] "%(num)d zenbaki"
 msgid "This password must contain at least %(min_upper)d uppercase letter."
 msgid_plural ""
 "This password must contain at least %(min_upper)d uppercase letters."
-msgstr[0] ""
+msgstr[0] "Pasahitz honek gutxienez letra larri %(min_upper)d izan behar du."
 msgstr[1] ""
+"Pasahitz honek gutxienez %(min_upper)d letra larri izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
 msgid "Your password must contain at least %(min_upper)d uppercase letter."
 msgid_plural ""
 "Your password must contain at least %(min_upper)d uppercase letters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Paashitzak gutxienez letra larri %(min_upper)d izan behar du."
+msgstr[1] "Pasahitzak gutxienez %(min_upper)d letra larri izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1445,23 +1448,23 @@ msgstr[1] ""
 msgid "This password must contain at least %(min_lower)d lowercase letter."
 msgid_plural ""
 "This password must contain at least %(min_lower)d lowercase letters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pasahitz honek gutxienez letra xehe %(min_lower)d izan behar du."
+msgstr[1] "Pasahitz honek gutxienez %(min_lower)d letra xehe izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
 msgid "Your password must contain at least %(min_lower)d lowercase letter."
 msgid_plural ""
 "Your password must contain at least %(min_lower)d lowercase letters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pasahitzak gutxienez letra xehe %(min_lower)d izan behar du."
+msgstr[1] "Pasahitzak gutxienez %(min_lower)d letra xehe izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
 msgid "%(num)d lowercase letter"
 msgid_plural "%(num)d lowercase letters"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "letra xehe %(num)d"
+msgstr[1] "%(num)d letra xehe"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1470,7 +1473,9 @@ msgid ""
 msgid_plural ""
 "This password must contain at least %(min_punctuation)d punctuation marks."
 msgstr[0] ""
+"Pasahitz honek gutxienez puntuazio-ikur %(min_punctuation)d izan behar du."
 msgstr[1] ""
+"Pasahitz honek gutxienez %(min_punctuation)d puntuazio-ikur izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -1479,28 +1484,30 @@ msgid ""
 msgid_plural ""
 "Your password must contain at least %(min_punctuation)d punctuation marks."
 msgstr[0] ""
+"Pasahitzak gutxienez %(min_punctuation)d puntuazio-ikur izan behar du."
 msgstr[1] ""
+"Pasahitzak gutxienez %(min_punctuation)d puntuazio-ikur izan behar ditu."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
 msgid "%(num)d punctuation mark"
 msgid_plural "%(num)d punctuation marks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "puntuazio-ikur %(num)d "
+msgstr[1] "%(num)d puntuazio-ikur"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
 msgid "This password must contain at least %(min_symbol)d symbol."
 msgid_plural "This password must contain at least %(min_symbol)d symbols."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pasahitz honek gutxienez sinbolo %(min_symbol)d izan behar du."
+msgstr[1] "Pasahitz honek gutxienez %(min_symbol)d sinbolo izan behar du."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
 msgid "Your password must contain at least %(min_symbol)d symbol."
 msgid_plural "Your password must contain at least %(min_symbol)d symbols."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Pasahitzak gutxienez %(min_symbol)d sinbolo izan behar du."
+msgstr[1] "Pasahitzak honek gutxienez %(min_symbol)d sinbolo izan behar du."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-format
@@ -5664,7 +5671,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/courses.py
 msgid "Submission"
-msgstr ""
+msgstr "Bidalketa"
 
 #: lms/djangoapps/courseware/courses.py
 msgid ""
@@ -5703,6 +5710,8 @@ msgstr "Ez ahaztu egutegiko oroigarria ipintzea!"
 #, python-brace-format
 msgid "Course starts in {time_remaining_string} on {course_start_date}."
 msgstr ""
+"Ikastaroa {time_remaining_string} barru hasiko da, {course_start_date} "
+"datan."
 
 #: lms/djangoapps/courseware/date_summary.py
 #, python-brace-format
@@ -5841,7 +5850,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Verify My Identity"
-msgstr ""
+msgstr "Egiaztatu nire nortasuna"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Missed Verification Deadline"
@@ -6177,7 +6186,7 @@ msgstr "Izen osoa eman behar da"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied"
-msgstr ""
+msgstr "Pasahitza eman behar da"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email address required (not username)"
@@ -9414,7 +9423,7 @@ msgstr "Eduki-hornitzailea"
 
 #: openedx/core/djangoapps/password_policy/apps.py
 msgid "Password Policy"
-msgstr ""
+msgstr "Pasahitzen politika"
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
@@ -10127,7 +10136,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 msgid "Password Reset Success"
-msgstr ""
+msgstr "Pasahitza ondo berrezarri da"
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #, python-format
@@ -10263,11 +10272,11 @@ msgstr "Pasahitza ez da ondo berrezarri"
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Error in resetting your password."
-msgstr ""
+msgstr "Errorea pasahitza berrezartzean."
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 msgid "Error in resetting your password. Please try again."
-msgstr ""
+msgstr "Errorea pasahitza berrezartzean. Saiatu berriz."
 
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 #, python-brace-format

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-10-20 15:53+0000\n"
-"PO-Revision-Date: 2020-10-20 15:53:46.586244\n"
+"POT-Creation-Date: 2020-10-25 20:51+0000\n"
+"PO-Revision-Date: 2020-10-25 20:51:22.874682\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -783,16 +783,16 @@ msgstr ""
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
-"follows:                     username, email, new_email"
+"follows:                     username, current_email, desired_email"
 msgstr ""
 "Ìt éxpéçt thät thé dätä wïll ßé prövïdéd ïn ä çsv fïlé förmät wïth"
 "                     fïrst röw ßéïng thé héädér änd çölümns wïll ßé äs "
-"föllöws:                     üsérnämé, émäïl, néw_émäïl Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ησ#"
+"föllöws:                     üsérnämé, çürrént_émäïl, désïréd_émäïl Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢#"
 
 #: common/djangoapps/student/models.py
 msgid "Add a reason"
@@ -2452,7 +2452,6 @@ msgstr "Päst Düé Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "Shöw Ànswér Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -11288,6 +11287,15 @@ msgstr ""
 #: openedx/core/djangoapps/content_libraries/api.py
 #, python-brace-format
 msgid ""
+"You may not change a library's type to {library_type} if it still has "
+"unpublished changes."
+msgstr ""
+"Ýöü mäý nöt çhängé ä lïßrärý's týpé tö {library_type} ïf ït stïll häs "
+"ünpüßlïshéd çhängés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: openedx/core/djangoapps/content_libraries/api.py
+#, python-brace-format
+msgid ""
 "You can only set a library to {library_type} if all existing blocks are of "
 "that type. Found incompatible block {block_id} with type {block_type}."
 msgstr ""
@@ -15709,6 +15717,22 @@ msgid "View in Insights"
 msgstr "Vïéw ïn Ìnsïghts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/problem.html
+msgid "Hint"
+msgstr "Hïnt Ⱡ'σяєм ι#"
+
+#: lms/templates/problem.html
+msgid "Save your answer"
+msgstr "Sävé ýöür änswér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/problem.html
+msgid "Reset your answer"
+msgstr "Rését ýöür änswér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/problem.html
+msgid "Show answer"
+msgstr "Shöw änswér Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
 msgstr[0] ""
@@ -15725,18 +15749,6 @@ msgid ""
 msgstr ""
 "Sömé prößléms hävé öptïöns süçh äs sävé, rését, hïnts, ör shöw änswér. Thésé"
 " öptïöns föllöw thé Süßmït ßüttön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/problem.html
-msgid "Hint"
-msgstr "Hïnt Ⱡ'σяєм ι#"
-
-#: lms/templates/problem.html
-msgid "Save your answer"
-msgstr "Sävé ýöür änswér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/problem.html
-msgid "Reset your answer"
-msgstr "Rését ýöür änswér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/problem.html
 msgid "Answers are displayed within the problem"
@@ -23012,10 +23024,6 @@ msgstr ""
 msgid "Latest Update"
 msgstr "Lätést Ûpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
-#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
-msgid "Get started on what's next: "
-msgstr "Gét stärtéd ön whät's néxt:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Show More"
 msgstr "Shöw Möré Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -26550,18 +26558,18 @@ msgstr "Sélf-Päçéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/settings.html
 msgid ""
-"Self-paced courses do not have release dates for course content or due dates"
-" for assignments. Learners can complete course material at any time before "
-"the course end date."
+"Self-paced courses offer suggested due dates for assignments or exams based "
+"on the learner’s enrollment date and the expected course duration. These "
+"courses offer learners flexibility to modify the assignment dates as needed."
 msgstr ""
-"Sélf-päçéd çöürsés dö nöt hävé réléäsé dätés för çöürsé çöntént ör düé dätés"
-" för ässïgnménts. Léärnérs çän çömplété çöürsé mätérïäl ät äný tïmé ßéföré "
-"thé çöürsé énd däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
-"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι#"
+"Sélf-päçéd çöürsés öffér süggéstéd düé dätés för ässïgnménts ör éxäms ßäséd "
+"ön thé léärnér’s énröllmént däté änd thé éxpéçtéd çöürsé dürätïön. Thésé "
+"çöürsés öffér léärnérs fléxïßïlïtý tö mödïfý thé ässïgnmént dätés äs néédéd."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgια#"
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
