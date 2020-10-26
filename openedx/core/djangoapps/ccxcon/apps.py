@@ -11,4 +11,4 @@ class CCXConnectorConfig(AppConfig):
     verbose_name = "CCX Connector"
 
     def ready(self):
-        from . import signals
+        from . import signals, tasks

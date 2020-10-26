@@ -34,5 +34,5 @@ class BookmarksConfig(AppConfig):
     }
 
     def ready(self):
-        # Register the signals handled by bookmarks.
-        from . import signals
+        # Register the signals handled and tasks dispatched by bookmarks.
+        from . import signals, tasks

@@ -2477,7 +2477,7 @@ INSTALLED_APPS = [
     'lms.djangoapps.dashboard',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
-    'lms.djangoapps.bulk_email',
+    'lms.djangoapps.bulk_email.apps.BulkEmailConfig',
     'lms.djangoapps.branding',
 
     # New (Blockstore-based) XBlock runtime
