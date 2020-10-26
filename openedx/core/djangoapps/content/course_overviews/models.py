@@ -776,7 +776,6 @@ class CourseOverview(TimeStampedModel):
         """
         Returns the course from the modulestore.
         """
-        log.warning('Falling back on modulestore to get course information for %s', self.id)
         return modulestore().get_course(self.id)
 
     @property
