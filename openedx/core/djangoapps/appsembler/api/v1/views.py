@@ -34,10 +34,10 @@ from courseware.courses import get_course_by_id
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from student.forms import PasswordResetFormNoActive
 from student.models import CourseEnrollment
-from student.views import create_account_with_params
 
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,
