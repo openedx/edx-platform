@@ -8,8 +8,8 @@ from django.test import TestCase
 from mock import patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from lti_provider.management.commands import resend_lti_scores
-from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
+from lms.djangoapps.lti_provider.management.commands import resend_lti_scores
+from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.utils import TEST_DATA_DIR
@@ -100,7 +100,7 @@ class CommandExecutionTestCase(SharedModuleStoreTestCase):
         """
         cmd = resend_lti_scores.Command()
         self._configure_lti(UsageKey.from_string(self.lti_block))
-        with patch(u'lti_provider.outcomes.send_score_update') as mock_update:
+        with patch('lms.djangoapps.lti_provider.outcomes.send_score_update') as mock_update:
             cmd.handle(*args, **kwargs)
             return mock_update.called
 

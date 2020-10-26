@@ -15,7 +15,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, transaction
 from six.moves import range
 
-from lti_provider.models import LtiUser
+from lms.djangoapps.lti_provider.models import LtiUser
 from student.models import UserProfile
 
 

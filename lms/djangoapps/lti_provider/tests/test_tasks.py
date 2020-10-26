@@ -9,8 +9,8 @@ from django.test import TestCase
 from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
-import lti_provider.tasks as tasks
-from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
+import lms.djangoapps.lti_provider.tasks as tasks
+from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 from student.tests.factories import UserFactory
 
 
@@ -54,7 +54,7 @@ class BaseOutcomeTest(TestCase):
         self.assignment.save()
 
         self.send_score_update_mock = self.setup_patch(
-            'lti_provider.outcomes.send_score_update', None
+            'lms.djangoapps.lti_provider.outcomes.send_score_update', None
         )
 
     def setup_patch(self, function_name, return_value):
@@ -105,12 +105,12 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
         )
         self.course_grade = MagicMock()
         self.course_grade_mock = self.setup_patch(
-            'lti_provider.tasks.CourseGradeFactory.read', self.course_grade
+            'lms.djangoapps.lti_provider.tasks.CourseGradeFactory.read', self.course_grade
         )
         self.module_store = MagicMock()
         self.module_store.get_item = MagicMock(return_value=self.descriptor)
         self.check_result_mock = self.setup_patch(
-            'lti_provider.tasks.modulestore',
+            'lms.djangoapps.lti_provider.tasks.modulestore',
             self.module_store
         )
 

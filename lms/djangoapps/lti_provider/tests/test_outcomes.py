@@ -8,8 +8,8 @@ from lxml import etree
 from mock import ANY, MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
-import lti_provider.outcomes as outcomes
-from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
+import lms.djangoapps.lti_provider.outcomes as outcomes
+from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
