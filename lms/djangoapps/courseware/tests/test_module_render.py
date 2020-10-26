@@ -859,7 +859,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
 
         with patch(
-            'courseware.module_render.is_xblock_aside',
+            'lms.djangoapps.courseware.module_render.is_xblock_aside',
             return_value=True
         ), self.assertRaises(Http404):
             render.handle_xblock_callback(
