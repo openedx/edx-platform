@@ -22,7 +22,7 @@ from lms.djangoapps.verify_student.models import (
     VerificationException
 )
 from student.tests.factories import UserFactory
-from verify_student.tests import TestVerificationBase
+from lms.djangoapps.verify_student.tests import TestVerificationBase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 FAKE_SETTINGS = {
