@@ -51,10 +51,9 @@ from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    RELATIVE_DATES_FLAG,
+    DISABLE_UNIFIED_COURSE_TAB_FLAG,
     SHOW_REVIEWS_TOOL_FLAG,
-    SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-    UNIFIED_COURSE_TAB_FLAG
+    SHOW_UPGRADE_MSG_ON_COURSE_HOME
 )
 from student.models import CourseEnrollment, FBEEnrollmentExclusion
 from student.tests.factories import UserFactory
@@ -186,7 +185,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         response = self.client.get(url)
         self.assertContains(response, TEST_WELCOME_MESSAGE, status_code=200)
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_welcome_message_when_not_unified(self):
         # Create a welcome message
         create_course_update(self.course, self.user, TEST_WELCOME_MESSAGE)
@@ -344,7 +343,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                     self.assertContains(private_response,
                                         'You must be enrolled in the course to see course content.')
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
         [CourseUserType.ANONYMOUS, 'To see course content'],

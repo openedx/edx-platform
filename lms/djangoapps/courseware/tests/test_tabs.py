@@ -28,7 +28,7 @@ from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
+from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.milestones_helpers import (
@@ -774,7 +774,7 @@ class CourseInfoTabTestCase(TabTestCase):
         self.user = self.create_mock_user()
         self.addCleanup(set_current_request, None)
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_default_tab(self):
         # Verify that the course info tab is the first tab
         tabs = get_course_tab_list(self.user, self.course)
@@ -785,14 +785,14 @@ class CourseInfoTabTestCase(TabTestCase):
         # as part of the linked ticket
         self.assertEqual(tabs[1].type, 'course_info')
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_default_tab_for_new_course_experience(self):
         # Verify that the unified course experience hides the course info tab
         tabs = get_course_tab_list(self.user, self.course)
         self.assertEqual(tabs[0].type, 'courseware')
 
     # TODO: LEARNER-611 - remove once course_info is removed.
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
     def test_default_tab_for_displayable(self):
         tabs = xmodule_tabs.CourseTabList.iterate_displayable(self.course, self.user)
         for i, tab in enumerate(tabs):

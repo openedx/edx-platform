@@ -22,7 +22,7 @@ from lms.djangoapps.courseware.tests.factories import InstructorFactory, Request
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
-from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
+from openedx.features.course_experience import DISABLE_COURSE_OUTLINE_PAGE_FLAG, DISABLE_UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory
 from util.milestones_helpers import (
@@ -357,7 +357,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.assertNotContains(resp, 'You have passed the entrance exam.')
 
     # TODO: LEARNER-71: Do we need to adjust or remove this test?
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_entrance_exam_passed_message_and_course_content(self):
         """
         Unit Test: exam passing message and rest of the course section should be present
@@ -456,7 +456,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                                })
         self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_courseinfo_page_access_without_passing_entrance_exam(self):
         """
         Test courseware access page without passing entrance exam
