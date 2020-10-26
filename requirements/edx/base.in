@@ -77,7 +77,7 @@ edx-drf-extensions
 edx-enterprise
 edx-milestones
 edx-oauth2-provider
-git+https://github.com/appsembler/edx-organizations.git@0.4.12-appsembler5  # edx-organizations
+git+https://github.com/appsembler/edx-organizations.git@omar/ironwood  # edx-organizations
 edx-proctoring
 edx-rest-api-client
 edx-search
