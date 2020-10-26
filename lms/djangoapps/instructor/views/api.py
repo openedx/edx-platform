@@ -43,9 +43,9 @@ from six import text_type
 from six.moves import map, range
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
-import instructor_analytics.basic
-import instructor_analytics.csvs
-import instructor_analytics.distributions
+from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic
+from lms.djangoapps.instructor_analytics import csvs as instructor_analytics_csvs
+from lms.djangoapps.instructor_analytics import distributions as instructor_analytics_distributions
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import CourseEmail
 from course_modes.models import CourseMode
@@ -1079,7 +1079,7 @@ def get_grading_config(request, course_id):
     # )
     course = get_course_by_id(course_id)
 
-    grading_config_summary = instructor_analytics.basic.dump_grading_context(course)
+    grading_config_summary = instructor_analytics_basic.dump_grading_context(course)
 
     response_payload = {
         'course_id': text_type(course_id),
@@ -1111,10 +1111,10 @@ def get_issued_certificates(request, course_id):
         ('total_issued_certificate', _('Total Certificates Issued')),
         ('report_run_date', _('Date Report Run'))
     ]
-    certificates_data = instructor_analytics.basic.issued_certificates(course_key, query_features)
+    certificates_data = instructor_analytics_basic.issued_certificates(course_key, query_features)
     if csv_required.lower() == 'true':
-        __, data_rows = instructor_analytics.csvs.format_dictlist(certificates_data, query_features)
-        return instructor_analytics.csvs.create_csv_response(
+        __, data_rows = instructor_analytics_csvs.format_dictlist(certificates_data, query_features)
+        return instructor_analytics_csvs.create_csv_response(
             'issued_certificates.csv',
             [col_header for __, col_header in query_features_names],
             data_rows
@@ -1146,7 +1146,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     course_key = CourseKey.from_string(course_id)
     course = get_course_by_id(course_key)
     report_type = _('enrolled learner profile')
-    available_features = instructor_analytics.basic.AVAILABLE_FEATURES
+    available_features = instructor_analytics_basic.AVAILABLE_FEATURES
 
     # Allow for sites to be able to define additional columns.
     # Note that adding additional columns has the potential to break
@@ -1203,7 +1203,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
     query_features_names['country'] = _('Country')
 
     if not csv:
-        student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
+        student_data = instructor_analytics_basic.enrolled_students_features(course_key, query_features)
         response_payload = {
             'course_id': six.text_type(course_key),
             'students': student_data,
