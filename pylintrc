@@ -71,7 +71,7 @@
 ignore = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 persistent = yes
 load-plugins = edx_lint.pylint,pylint_django,pylint_celery
-init-hook = "import sys; sys.path.extend(['import_shims/lms', 'import_shims/studio', 'common/djangoapps'])"
+init-hook = "import sys; sys.path.extend(['common/djangoapps'])"
 
 [MESSAGES CONTROL]
 enable = 
