@@ -1,7 +1,7 @@
 import factory
 
 from student.tests.factories import UserFactory
-from survey.models import SurveyAnswer, SurveyForm
+from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
 
 
 class SurveyFormFactory(factory.DjangoModelFactory):

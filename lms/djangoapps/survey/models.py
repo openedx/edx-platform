@@ -15,7 +15,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangolib.markup import HTML
 from student.models import User
-from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
+from lms.djangoapps.survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 
 log = logging.getLogger("edx.survey")
 
