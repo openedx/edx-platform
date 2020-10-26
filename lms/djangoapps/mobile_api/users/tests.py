@@ -24,13 +24,13 @@ from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from mobile_api.testutils import (
+from lms.djangoapps.mobile_api.testutils import (
     MobileAPITestCase,
     MobileAuthTestMixin,
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
-from mobile_api.utils import API_V1, API_V05
+from lms.djangoapps.mobile_api.utils import API_V1, API_V05
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig

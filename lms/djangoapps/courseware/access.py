@@ -43,7 +43,7 @@ from lms.djangoapps.courseware.access_utils import (
 from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from mobile_api.models import IgnoreMobileAvailableFlagConfig
+from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import check_course_expired
 from student import auth
