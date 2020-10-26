@@ -28,7 +28,6 @@ from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import can_show_certificate_available_date_field
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
-from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import RELATIVE_DATES_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 from student.models import CourseEnrollment
 
@@ -444,8 +443,6 @@ class CourseExpiredDate(DateSummary):
 
     @property
     def date(self):
-        if not CourseDurationLimitConfig.enabled_for_enrollment(self.user, self.course):
-            return
         return get_user_course_expiration_date(self.user, self.course)
 
     @property
