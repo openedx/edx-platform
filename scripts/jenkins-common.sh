@@ -18,7 +18,8 @@ mongo --quiet --eval 'db.getMongo().getDBNames().forEach(function(i){db.getSibli
 # branch to a target branch; depending on how the GitHub plugin refspec
 # is configured, this may not already be fetched.
 if [ ! -z ${TARGET_BRANCH+x} ]; then
-    git fetch origin $TARGET_BRANCH:refs/remotes/origin/$TARGET_BRANCH
+    TARGET_BRANCH_WITHOUT_ORIGIN=$(echo "${TARGET_BRANCH}" | sed 's:^origin/::')
+    git fetch origin $TARGET_BRANCH_WITHOUT_ORIGIN:refs/remotes/origin/$TARGET_BRANCH_WITHOUT_ORIGIN
 fi
 
 # Reset the jenkins worker's virtualenv back to the

@@ -67,8 +67,7 @@
   }
 
   .exam-timer {
-    @include font-size(14);
-
+    font-size: 14px;
     background-color: rgb(229, 234, 236);
     padding: $baseline ($baseline*2);
     border-left: 4px solid theme-color("primary");
@@ -128,7 +127,8 @@
           background-color: transparent;
           border: 1px solid $white;
 
-          #toggle_timer, b {
+          #toggle_timer,
+          b {
             color: $white;
           }
 

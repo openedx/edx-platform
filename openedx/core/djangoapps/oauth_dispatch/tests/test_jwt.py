@@ -82,7 +82,11 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
             )
             self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=scopes_enforced and client_restricted)
 
-    def test_create_jwt_for_user(self):
+    @ddt.data(True, False)
+    def test_create_jwt_for_user(self, user_email_verified):
+        self.user.is_active = user_email_verified
+        self.user.save()
+
         aud = 'test_aud'
         secret = 'test_secret'
         additional_claims = {'claim1_key': 'claim1_val'}
@@ -91,3 +95,4 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
             jwt_token, self.user, self.default_scopes, aud=aud, secret=secret,
         )
         self.assertDictContainsSubset(additional_claims, token_payload)
+        self.assertEqual(user_email_verified, token_payload['email_verified'])

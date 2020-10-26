@@ -256,16 +256,21 @@ class CourseGradingModel(object):
 def _grading_event_and_signal(course_key, user_id):
     name = GRADING_POLICY_CHANGED_EVENT_TYPE
     course = modulestore().get_course(course_key)
-
+    grading_policy_hash = unicode(hash_grading_policy(course.grading_policy))
     data = {
         "course_id": unicode(course_key),
         "user_id": unicode(user_id),
-        "grading_policy_hash": unicode(hash_grading_policy(course.grading_policy)),
+        "grading_policy_hash": grading_policy_hash,
         "event_transaction_id": unicode(create_new_event_transaction_id()),
         "event_transaction_type": GRADING_POLICY_CHANGED_EVENT_TYPE,
     }
     tracker.emit(name, data)
-    GRADING_POLICY_CHANGED.send(sender=CourseGradingModel, user_id=user_id, course_key=course_key)
+    GRADING_POLICY_CHANGED.send(
+        sender=CourseGradingModel,
+        user_id=user_id,
+        course_key=course_key,
+        grading_policy_hash=grading_policy_hash
+    )
 
 
 def hash_grading_policy(grading_policy):

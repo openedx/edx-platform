@@ -116,6 +116,7 @@ from lms.envs.common import (
     FILE_UPLOAD_STORAGE_PREFIX,
 
     COURSE_ENROLLMENT_MODES,
+    CONTENT_TYPE_GATE_GROUP_IDS,
 
     HELP_TOKENS_BOOKS,
 
@@ -147,6 +148,7 @@ from lms.envs.common import (
     _make_locale_paths,
 )
 from path import Path as path
+from django.core.urlresolvers import reverse_lazy
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
@@ -223,9 +225,6 @@ FEATURES = {
 
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': False,
-
-    # Turn off Advanced Security by default
-    'ADVANCED_SECURITY': False,
 
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
@@ -372,6 +371,7 @@ CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.template.context_processors.csrf',
     'help_tokens.context_processor',
+    'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
 )
 
 # Django templating
@@ -427,9 +427,8 @@ DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 ##############################################################################
 
 EDX_ROOT_URL = ''
-
-LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
-LOGIN_URL = EDX_ROOT_URL + '/signin'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/home/'
+LOGIN_URL = reverse_lazy('login_redirect_to_lms')
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = [
@@ -469,6 +468,8 @@ XQUEUE_INTERFACE = {
 ################################# Middleware ###################################
 
 MIDDLEWARE_CLASSES = [
+    'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+
     'crum.CurrentRequestUserMiddleware',
 
     # A newer and safer request cache.
@@ -480,6 +481,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
+    'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
     # Allows us to define redirects via Django admin
     'django_sites_extensions.middleware.RedirectMiddleware',
@@ -532,7 +534,6 @@ MIDDLEWARE_CLASSES = [
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
-    'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
     # This must be last so that it runs first in the process_response chain
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -882,6 +883,10 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+    },
+    'WORKERS': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
 WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
@@ -1004,6 +1009,7 @@ INSTALLED_APPS = [
 
     # Database-backed configuration
     'config_models',
+    'openedx.core.djangoapps.config_model_utils',
     'waffle',
 
     # Monitor the status of services
@@ -1032,9 +1038,6 @@ INSTALLED_APPS = [
     # Tracking
     'track',
     'eventtracking.django.apps.EventTrackingConfig',
-
-    # Monitoring
-    'openedx.core.djangoapps.datadog.apps.DatadogConfig',
 
     # For asset pipelining
     'edxmako.apps.EdxMakoConfig',
@@ -1099,9 +1102,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.credit.apps.CreditConfig',
 
     'xblock_django',
-
-    # edX Proctoring
-    'edx_proctoring',
 
     # Catalog integration
     'openedx.core.djangoapps.catalog',
@@ -1170,6 +1170,10 @@ INSTALLED_APPS = [
 
     # API Documentation
     'rest_framework_swagger',
+
+    'openedx.features.course_duration_limits',
+    'openedx.features.content_type_gating',
+    'experiments',
 ]
 
 
@@ -1321,10 +1325,6 @@ for app_name, insert_before in OPTIONAL_APPS:
         INSTALLED_APPS.append(app_name)
 
 
-### ADVANCED_SECURITY_CONFIG
-# Empty by default
-ADVANCED_SECURITY_CONFIG = {}
-
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
@@ -1455,12 +1455,6 @@ MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.Filebas
 # TTL for microsite database template cache
 MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 
-############################### PROCTORING CONFIGURATION DEFAULTS ##############
-PROCTORING_BACKEND_PROVIDER = {
-    'class': 'edx_proctoring.backends.null.NullBackendProvider',
-    'options': {},
-}
-PROCTORING_SETTINGS = {}
 
 ############################ Global Database Configuration #####################
 

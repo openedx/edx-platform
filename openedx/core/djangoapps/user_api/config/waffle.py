@@ -5,12 +5,10 @@ from __future__ import absolute_import
 
 from django.utils.translation import ugettext_lazy as _
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace, WaffleFlagNamespace, WaffleFlag
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 
 SYSTEM_MAINTENANCE_MSG = _(u'System maintenance in progress. Please try again later.')
 WAFFLE_NAMESPACE = u'user_api'
-_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(WAFFLE_NAMESPACE)
-PASSWORD_UNICODE_NORMALIZE_FLAG = WaffleFlag(_WAFFLE_FLAG_NAMESPACE, u'password_unicode_normalize')
 
 # Switches
 PREVENT_AUTH_USER_WRITES = u'prevent_auth_user_writes'

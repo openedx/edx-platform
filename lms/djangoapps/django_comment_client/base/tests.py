@@ -403,8 +403,8 @@ class ViewsQueryCountTestCase(
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 35),
-        (ModuleStoreEnum.Type.split, 3, 13, 35),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 41),
+        (ModuleStoreEnum.Type.split, 3, 13, 41),
     )
     @ddt.unpack
     @count_queries
@@ -412,8 +412,8 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 31),
-        (ModuleStoreEnum.Type.split, 3, 10, 31),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 37),
+        (ModuleStoreEnum.Type.split, 3, 10, 37),
     )
     @ddt.unpack
     @count_queries
@@ -435,6 +435,7 @@ class ViewsTestCase(
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(ViewsTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create(
                 org='MITx', course='999',
@@ -1073,6 +1074,7 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(ViewPermissionsTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1184,6 +1186,7 @@ class CreateThreadUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(CreateThreadUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1226,6 +1229,7 @@ class UpdateThreadUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(UpdateThreadUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1268,6 +1272,7 @@ class CreateCommentUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(CreateCommentUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1315,6 +1320,7 @@ class UpdateCommentUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(UpdateCommentUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1355,6 +1361,7 @@ class CreateSubCommentUnicodeTestCase(
     """
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(CreateSubCommentUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1436,6 +1443,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(TeamsPermissionsTestCase, cls).setUpClassAndTestData():
             teams_configuration = {
                 'topics': [{'id': "topic_id", 'name': 'Solar Power', 'description': 'Solar power is hot'}]
@@ -1746,6 +1754,7 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
     """
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(ForumEventTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1927,6 +1936,7 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(UsersEndpointTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 

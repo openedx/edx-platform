@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from io import BytesIO
 
-import analytics
 import pytz
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from config_models.models import ConfigurationModel
@@ -37,9 +36,11 @@ from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.markup import HTML, Text
 from shoppingcart.pdf import PDFInvoice
 from student.models import CourseEnrollment, EnrollStatusChange
 from student.signals import UNENROLL_DONE
+from track import segment
 from util.query import use_read_replica_if_available
 from xmodule.modulestore.django import modulestore
 
@@ -520,19 +521,15 @@ class Order(models.Model):
 
         """
         try:
-            if settings.LMS_SEGMENT_KEY:
-                tracking_context = tracker.get_tracker().resolve_context()
-                analytics.track(self.user.id, event_name, {
-                    'orderId': self.id,
-                    'total': str(self.total_cost),
-                    'currency': self.currency,
-                    'products': [item.analytics_data() for item in orderitems]
-                }, context={
-                    'ip': tracking_context.get('ip'),
-                    'Google Analytics': {
-                        'clientId': tracking_context.get('client_id')
-                    }
-                })
+            segment.track(self.user.id, event_name, {
+                'orderId': self.id,
+                'total': str(self.total_cost),
+                # For Rockerbox integration, we need a field named revenue since they cannot parse a field named total.
+                # TODO: DE-1188: Remove / move Rockerbox integration code.
+                'revenue': str(self.total_cost),
+                'currency': self.currency,
+                'products': [item.analytics_data() for item in orderitems]
+            })
 
         except Exception:  # pylint: disable=broad-except
             # Capturing all exceptions thrown while tracking analytics events. We do not want
@@ -1578,7 +1575,7 @@ class PaidCourseRegistration(OrderItem):
         item.unit_cost = cost
         item.list_price = cost
         item.line_desc = _(u'Registration for Course: {course_name}').format(
-            course_name=course.display_name_with_default_escaped)
+            course_name=course.display_name_with_default)
         item.currency = currency
         order.currency = currency
         item.report_comments = item.csv_report_comments
@@ -1618,12 +1615,12 @@ class PaidCourseRegistration(OrderItem):
         Generates instructions when the user has purchased a PaidCourseRegistration.
         Basically tells the user to visit the dashboard to see their new classes
         """
-        notification = _(
+        notification = Text(_(
             u"Please visit your {link_start}dashboard{link_end} "
             u"to see your new course."
-        ).format(
-            link_start=u'<a href="{url}">'.format(url=reverse('dashboard')),
-            link_end=u'</a>',
+        )).format(
+            link_start=HTML(u'<a href="{url}">').format(url=reverse('dashboard')),
+            link_end=HTML(u'</a>'),
         )
 
         return self.pk_with_subclass, set([notification])
@@ -1761,7 +1758,7 @@ class CourseRegCodeItem(OrderItem):
         item.list_price = cost
         item.qty = qty
         item.line_desc = _(u'Enrollment codes for Course: {course_name}').format(
-            course_name=course.display_name_with_default_escaped)
+            course_name=course.display_name_with_default)
         item.currency = currency
         order.currency = currency
         item.report_comments = item.csv_report_comments

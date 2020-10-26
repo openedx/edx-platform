@@ -647,7 +647,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         for answer in answers:
             self.assert_grade(problem, answer, "correct")
 
-        problem = self.build_problem(answer="^(-\|){2,5}$", case_sensitive=False, regexp=True)
+        problem = self.build_problem(answer=r"^(-\|){2,5}$", case_sensitive=False, regexp=True)
         self.assert_grade(problem, "-|-|-|", "correct")
         self.assert_grade(problem, "-|", "incorrect")
         self.assert_grade(problem, "-|-|-|-|-|-|", "incorrect")

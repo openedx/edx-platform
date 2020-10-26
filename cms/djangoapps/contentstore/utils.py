@@ -1,6 +1,7 @@
 """
 Common utility functions useful throughout the contentstore
 """
+from __future__ import print_function
 
 import logging
 import re
@@ -10,6 +11,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocator
 from pytz import UTC
 from six import text_type
 
@@ -17,6 +19,12 @@ from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.appsembler.sites.utils import get_lms_link_from_course_key
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.features.course_duration_limits.config import (
+    CONTENT_TYPE_GATING_FLAG,
+    FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG
+)
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from student import auth
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -89,7 +97,7 @@ def _remove_instructors(course_key):
     """
     In the django layer, remove all the user/groups permissions associated with this course
     """
-    print 'removing User permissions from course....'
+    print('removing User permissions from course....')
 
     try:
         remove_all_instructors(course_key)
@@ -443,6 +451,14 @@ def get_visibility_partition_info(xblock, course=None):
     for partition in enrollment_user_partitions:
         if len(partition["groups"]) > 1 or any(group["selected"] for group in partition["groups"]):
             selectable_partitions.append(partition)
+
+    flag_enabled = CONTENT_TYPE_GATING_FLAG.is_enabled() and not FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled()
+    course_key = xblock.scope_ids.usage_id.course_key
+    is_library = isinstance(course_key, LibraryLocator)
+    if not is_library and (
+        flag_enabled or ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled
+    ):
+        selectable_partitions += get_user_partition_info(xblock, schemes=[CONTENT_TYPE_GATING_SCHEME], course=course)
 
     # Now add the cohort user partitions.
     selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"], course=course)

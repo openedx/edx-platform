@@ -1,7 +1,7 @@
 # pylint: disable=missing-docstring
 from __future__ import unicode_literals
 
-from mock import MagicMock
+from mock import MagicMock, patch
 import six
 from django.conf import settings
 from django.http import HttpResponse
@@ -56,6 +56,9 @@ class CookieTests(TestCase):
             for key, val in response.cookies.iteritems()
         }
 
+    def _set_use_jwt_cookie_header(self, request):
+        request.META['HTTP_USE_JWT_COOKIE'] = 'true'
+
     def _assert_recreate_jwt_from_cookies(self, response, can_recreate):
         """
         If can_recreate is True, verifies that a JWT can be properly recreated
@@ -105,35 +108,39 @@ class CookieTests(TestCase):
         self._assert_consistent_expires(response)
         self._assert_recreate_jwt_from_cookies(response, can_recreate=False)
 
+    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_set_logged_in_jwt_cookies(self):
         setup_login_oauth_client()
-        with cookies_api.JWT_COOKIES_FLAG.override(True):
-            response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
-            self._assert_cookies_present(response, cookies_api.ALL_LOGGED_IN_COOKIE_NAMES)
-            self._assert_consistent_expires(response)
-            self._assert_recreate_jwt_from_cookies(response, can_recreate=True)
+        self._set_use_jwt_cookie_header(self.request)
+        response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
+        self._assert_cookies_present(response, cookies_api.ALL_LOGGED_IN_COOKIE_NAMES)
+        self._assert_consistent_expires(response)
+        self._assert_recreate_jwt_from_cookies(response, can_recreate=True)
 
-    def test_delete_and_is_logged_in_cookie_set(self):
+    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
+    def test_delete_and_are_logged_in_cookies_set(self):
+        setup_login_oauth_client()
         response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
         self._copy_cookies_to_request(response, self.request)
-        self.assertTrue(cookies_api.is_logged_in_cookie_set(self.request))
+        self.assertTrue(cookies_api.are_logged_in_cookies_set(self.request))
 
         cookies_api.delete_logged_in_cookies(response)
         self._copy_cookies_to_request(response, self.request)
-        self.assertFalse(cookies_api.is_logged_in_cookie_set(self.request))
+        self.assertFalse(cookies_api.are_logged_in_cookies_set(self.request))
 
+    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_refresh_jwt_cookies(self):
         def _get_refresh_token_value(response):
             return response.cookies[cookies_api.jwt_cookies.jwt_refresh_cookie_name()].value
 
         setup_login_oauth_client()
-        with cookies_api.JWT_COOKIES_FLAG.override(True):
-            response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
-            self._copy_cookies_to_request(response, self.request)
+        self._set_use_jwt_cookie_header(self.request)
+        response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
+        self._copy_cookies_to_request(response, self.request)
 
-            new_response = cookies_api.refresh_jwt_cookies(self.request, HttpResponse())
-            self._assert_recreate_jwt_from_cookies(new_response, can_recreate=True)
-            self.assertNotEqual(
-                _get_refresh_token_value(response),
-                _get_refresh_token_value(new_response),
-            )
+        new_response = cookies_api.refresh_jwt_cookies(self.request, HttpResponse())
+        self._assert_recreate_jwt_from_cookies(new_response, can_recreate=True)
+        self.assertNotEqual(
+            _get_refresh_token_value(response),
+            _get_refresh_token_value(new_response),
+        )

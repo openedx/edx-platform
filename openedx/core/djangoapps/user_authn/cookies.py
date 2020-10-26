@@ -22,7 +22,6 @@ from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token, 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.djangoapps.user_authn.waffle import JWT_COOKIES_FLAG
 from student.models import CourseEnrollment
 
 
@@ -56,12 +55,17 @@ DEPRECATED_LOGGED_IN_COOKIE_NAMES = (
 ALL_LOGGED_IN_COOKIE_NAMES = JWT_COOKIE_NAMES + DEPRECATED_LOGGED_IN_COOKIE_NAMES
 
 
-def is_logged_in_cookie_set(request):
+def are_logged_in_cookies_set(request):
     """ Check whether the request has logged in cookies set. """
-    return (
-        settings.EDXMKTG_LOGGED_IN_COOKIE_NAME in request.COOKIES and
-        request.COOKIES[settings.EDXMKTG_LOGGED_IN_COOKIE_NAME]
-    )
+    if settings.FEATURES.get('DISABLE_SET_JWT_COOKIES_FOR_TESTS', False):
+        cookies_that_should_exist = DEPRECATED_LOGGED_IN_COOKIE_NAMES
+    else:
+        cookies_that_should_exist = ALL_LOGGED_IN_COOKIE_NAMES
+
+    return all(
+        cookie_name in request.COOKIES
+        for cookie_name in cookies_that_should_exist
+    ) and request.COOKIES[settings.EDXMKTG_LOGGED_IN_COOKIE_NAME]
 
 
 def delete_logged_in_cookies(response):
@@ -108,7 +112,7 @@ def standard_cookie_settings(request):
     # In non-production environments (acceptance tests, devstack, and sandboxes),
     # we still want to set this cookie.  However, we do NOT want to set it to "secure"
     # because the browser won't send it back to us.  This can cause an infinite redirect
-    # loop in the third-party auth flow, which calls `is_logged_in_cookie_set` to determine
+    # loop in the third-party auth flow, which calls `are_logged_in_cookies_set` to determine
     # whether it needs to set the cookie or continue to the next pipeline stage.
     cookie_settings['secure'] = request.is_secure()
 
@@ -140,7 +144,7 @@ def set_logged_in_cookies(request, response, user):
         cookie_settings = standard_cookie_settings(request)
 
         _set_deprecated_logged_in_cookie(response, cookie_settings)
-        set_deprecated_user_info_cookie(response, request, user, cookie_settings)
+        _set_deprecated_user_info_cookie(response, request, user, cookie_settings)
         _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
 
@@ -152,19 +156,18 @@ def refresh_jwt_cookies(request, response):
     Resets the JWT related cookies in the response, while expecting a refresh
     cookie in the request.
     """
-    if JWT_COOKIES_FLAG.is_enabled():
-        try:
-            refresh_token = request.COOKIES[jwt_cookies.jwt_refresh_cookie_name()]
-        except KeyError:
-            raise AuthFailedError(u"JWT Refresh Cookie not found in request.")
+    try:
+        refresh_token = request.COOKIES[jwt_cookies.jwt_refresh_cookie_name()]
+    except KeyError:
+        raise AuthFailedError(u"JWT Refresh Cookie not found in request.")
 
-        # TODO don't extend the cookie expiration - reuse value from existing cookie
-        cookie_settings = standard_cookie_settings(request)
-        _create_and_set_jwt_cookies(response, request, cookie_settings, refresh_token=refresh_token)
+    # TODO don't extend the cookie expiration - reuse value from existing cookie
+    cookie_settings = standard_cookie_settings(request)
+    _create_and_set_jwt_cookies(response, request, cookie_settings, refresh_token=refresh_token)
     return response
 
 
-def set_deprecated_user_info_cookie(response, request, user, cookie_settings=None):
+def _set_deprecated_user_info_cookie(response, request, user, cookie_settings=None):
     """
     Sets the user info cookie on the response.
 
@@ -248,7 +251,12 @@ def _get_user_info_cookie_data(request, user):
 
 def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None, refresh_token=None):
     """ Sets a cookie containing a JWT on the response. """
-    if not JWT_COOKIES_FLAG.is_enabled():
+
+    # Skip setting JWT cookies for most unit tests, since it raises errors when
+    # a login oauth client cannot be found in the database in ``_get_login_oauth_client``.
+    # This solution is not ideal, but see https://github.com/edx/edx-platform/pull/19180#issue-226706355
+    # for a discussion of alternative solutions that did not work or were halted.
+    if settings.FEATURES.get('DISABLE_SET_JWT_COOKIES_FOR_TESTS', False):
         return
 
     # For security reasons, the JWT that is embedded inside the cookie expires

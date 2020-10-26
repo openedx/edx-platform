@@ -379,22 +379,21 @@ class CoursewareSearchIndexer(SearchIndexerBase):
     @classmethod
     def fetch_group_usage(cls, modulestore, structure):
         groups_usage_dict = {}
-        groups_usage_info = GroupConfiguration.get_partitions_usage_info(modulestore, structure).items()
-        groups_usage_info.extend(
-            GroupConfiguration.get_content_groups_items_usage_info(
-                modulestore,
-                structure
-            ).items()
+        partitions_info = GroupConfiguration.get_partitions_usage_info(modulestore, structure)
+        content_group_info = GroupConfiguration.get_content_groups_items_usage_info(
+            modulestore,
+            structure
         )
-        if groups_usage_info:
-            for name, group in groups_usage_info:
-                for module in group:
-                    view, args, kwargs = resolve(module['url'])  # pylint: disable=unused-variable
-                    usage_key_string = unicode(kwargs['usage_key_string'])
-                    if groups_usage_dict.get(usage_key_string, None):
-                        groups_usage_dict[usage_key_string].append(name)
-                    else:
-                        groups_usage_dict[usage_key_string] = [name]
+        for group_info in (partitions_info, content_group_info):
+            for groups in group_info.values():
+                for name, group in groups.items():
+                    for module in group:
+                        view, args, kwargs = resolve(module['url'])  # pylint: disable=unused-variable
+                        usage_key_string = unicode(kwargs['usage_key_string'])
+                        if groups_usage_dict.get(usage_key_string, None):
+                            groups_usage_dict[usage_key_string].append(name)
+                        else:
+                            groups_usage_dict[usage_key_string] = [name]
         return groups_usage_dict
 
     @classmethod

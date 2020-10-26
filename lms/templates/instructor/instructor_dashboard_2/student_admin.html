@@ -2,13 +2,17 @@
 <%! from django.utils.translation import ugettext as _ %>
 %if section_data['access']['staff'] or section_data['access']['instructor']:
 <div class="action-type-container">
-    %if section_data['is_small_course']:
+    %if section_data.get('writable_gradebook_url') or section_data.get('is_small_course'):
         <br><br>
         <h4 class="hd hd-4">${_("View gradebook for enrolled learners")}</h4>
         <br>
         <label for="gradebook-link">${_("Note: This feature is available only to courses with a small number of enrolled learners.")}</label>
         <br><br>
+    %if section_data.get('writable_gradebook_url'):
+        <span name="gradebook-link"><a href="${ section_data['writable_gradebook_url'] }" class="gradebook-link"> ${_("View Gradebook")} </a></span>
+    %elif section_data.get('is_small_course'):
         <span name="gradebook-link"><a href="${ section_data['spoc_gradebook_url'] }" class="gradebook-link"> ${_("View Gradebook")} </a></span>
+    %endif
         <br><br>
         <hr>
     %endif

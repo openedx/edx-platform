@@ -30,6 +30,7 @@ from contentstore.utils import reverse_course_url
 from contentstore.views.videos import (
     _get_default_video_image_url,
     VIDEO_IMAGE_UPLOAD_ENABLED,
+    ENABLE_VIDEO_UPLOAD_PAGINATION,
     WAFFLE_SWITCHES,
     TranscriptProvider
 )
@@ -39,6 +40,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
 from edxval.api import create_or_update_transcript_preferences, get_transcript_preferences
 from waffle.testutils import override_flag
@@ -326,6 +328,16 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         # Crude check for presence of data in returned HTML
         for video in self.previous_uploads:
             self.assertIn(video["edx_video_id"], response.content)
+        self.assertNotIn('video_upload_pagination', response.content)
+
+    @override_waffle_flag(ENABLE_VIDEO_UPLOAD_PAGINATION, active=True)
+    def test_get_html_paginated(self):
+        """
+        Tests that response is paginated.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('video_upload_pagination', response.content)
 
     def test_post_non_json(self):
         response = self.client.post(self.url, {"files": []})

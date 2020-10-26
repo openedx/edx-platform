@@ -6,8 +6,6 @@ import datetime
 import json
 import logging
 
-import analytics
-import dogstats_wrapper as dog_stats_api
 from django.conf import settings
 from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
@@ -17,7 +15,6 @@ from django.db import transaction
 from django.dispatch import Signal
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
-from eventtracking import tracker
 # Note that this lives in LMS, so this dependency should be refactored.
 from notification_prefs.views import enable_notifications
 from pytz import UTC
@@ -44,6 +41,7 @@ from student.models import (
     create_comments_service_user,
 )
 from student.views import compose_and_send_activation_email
+from track import segment
 import third_party_auth
 from third_party_auth import pipeline, provider
 from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
@@ -194,8 +192,6 @@ def create_account_with_params(request, params):
         except Exception:  # pylint: disable=broad-except
             log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
 
-    dog_stats_api.increment("common.student.account_created")
-
     _track_user_registration(user, profile, params, third_party_provider)
 
     # Announce registration
@@ -316,7 +312,6 @@ def _link_user_to_third_party_provider(
 def _track_user_registration(user, profile, params, third_party_provider):
     """ Track the user's registration. """
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-        tracking_context = tracker.get_tracker().resolve_context()
         identity_args = [
             user.id,
             {
@@ -332,7 +327,7 @@ def _track_user_registration(user, profile, params, third_party_provider):
                 'country': text_type(profile.country),
             }
         ]
-
+        # Provide additional context only if needed.
         if hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID'):
             identity_args.append({
                 "MailChimp": {
@@ -340,9 +335,8 @@ def _track_user_registration(user, profile, params, third_party_provider):
                 }
             })
 
-        analytics.identify(*identity_args)
-
-        analytics.track(
+        segment.identify(*identity_args)
+        segment.track(
             user.id,
             "edx.bi.user.account.registered",
             {
@@ -350,12 +344,6 @@ def _track_user_registration(user, profile, params, third_party_provider):
                 'label': params.get('course_id'),
                 'provider': third_party_provider.name if third_party_provider else None
             },
-            context={
-                'ip': tracking_context.get('ip'),
-                'Google Analytics': {
-                    'clientId': tracking_context.get('client_id')
-                }
-            }
         )
 
 

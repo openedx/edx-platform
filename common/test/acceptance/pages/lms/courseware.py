@@ -325,6 +325,56 @@ class CoursewarePage(CoursePage, CompletionOnViewMixin):
         bookmarks_page = BookmarksPage(self.browser, self.course_id)
         bookmarks_page.visit()
 
+    def is_gating_banner_visible(self):
+        """
+        Check if the gated banner for locked content is visible.
+        """
+        return self.q(css='.problem-header').is_present() \
+            and self.q(css='.btn-brand').text[0] == u'Go To Prerequisite Section' \
+            and self.q(css='.problem-header').text[0] == u'Content Locked'
+
+    @property
+    def is_word_cloud_rendered(self):
+        """
+        Check for word cloud fields presence
+        """
+        return self.q(css='.input-cloud').visible
+
+    def input_word_cloud(self, answer_word):
+        """
+        Fill the word cloud fields
+
+        Args:
+            answer_word(str): An answer words to be filled in the field
+        """
+        self.wait_for_element_visibility('.input-cloud', "Word cloud fields are visible")
+        css = '.input_cloud_section label:nth-child({}) .input-cloud'
+        for index in range(1, len(self.q(css='.input-cloud')) + 1):
+            self.q(css=css.format(index)).fill(answer_word + str(index))
+
+    def save_word_cloud(self):
+        """
+        Click save button
+        """
+        self.q(css='.input_cloud_section .action button.save').click()
+        self.wait_for_ajax()
+
+    @property
+    def word_cloud_answer_list(self):
+        """
+        Get saved words
+
+        Returns:
+            list: Return empty when no answer words are present
+            list: Return populated when answer words are present
+        """
+
+        self.wait_for_element_presence('.your_words', "Answer list is present")
+        if self.q(css='.your_words strong').present:
+            return self.q(css='.your_words strong').text
+        else:
+            return self.q(css='.your_words').text[0]
+
 
 class CoursewareSequentialTabPage(CoursePage):
     """

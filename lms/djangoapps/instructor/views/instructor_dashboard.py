@@ -5,6 +5,7 @@ Instructor Dashboard Views
 import datetime
 import logging
 import uuid
+from urlparse import urljoin
 import beeline
 
 import pytz
@@ -21,6 +22,7 @@ from django.views.decorators.http import require_POST
 from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -42,6 +44,7 @@ from django_comment_client.utils import available_division_schemes, has_forum_ac
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
+from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
@@ -321,13 +324,15 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled, reports_enab
 @beeline.traced('instructor.views._section_special_exams')
 def _section_special_exams(course, access):
     """ Provide data for the corresponding dashboard section """
-    course_key = course.id
+    course_key = unicode(course.id)
+    from edx_proctoring.api import is_backend_dashboard_available
 
     section_data = {
         'section_key': 'special_exams',
         'section_display_name': _('Special Exams'),
         'access': access,
-        'course_id': unicode(course_key)
+        'course_id': course_key,
+        'show_dashboard': is_backend_dashboard_available(course_key),
     }
     return section_data
 
@@ -609,6 +614,8 @@ def _section_student_admin(course, access):
                                                           kwargs={'course_id': unicode(course_key)}),
         'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': unicode(course_key)}),
     }
+    if waffle_flags()[WRITABLE_GRADEBOOK].is_enabled(course_key) and settings.WRITABLE_GRADEBOOK_URL:
+        section_data['writable_gradebook_url'] = urljoin(settings.WRITABLE_GRADEBOOK_URL, '/' + text_type(course_key))
     return section_data
 
 

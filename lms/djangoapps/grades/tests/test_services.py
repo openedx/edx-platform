@@ -5,7 +5,11 @@ from datetime import datetime
 import ddt
 import pytz
 from freezegun import freeze_time
-from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+from lms.djangoapps.grades.models import (
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
+    PersistentSubsectionGradeOverrideHistory,
+)
 from lms.djangoapps.grades.services import GradesService
 from mock import patch, call
 from student.tests.factories import UserFactory
@@ -20,6 +24,7 @@ class MockWaffleFlag(object):
     def __init__(self, state):
         self.state = state
 
+    # pylint: disable=unused-argument
     def is_enabled(self, course_key):
         return self.state
 
@@ -34,7 +39,7 @@ class GradesServiceTests(ModuleStoreTestCase):
     def setUp(self):
         super(GradesServiceTests, self).setUp()
         self.service = GradesService()
-        self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
+        self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
         self.subsection = ItemFactory.create(parent=self.course, category="subsection", display_name="Subsection")
         self.user = UserFactory()
         self.grade = PersistentSubsectionGrade.update_or_create_grade(
@@ -119,15 +124,21 @@ class GradesServiceTests(ModuleStoreTestCase):
             }
         )
 
-        # test with id strings as parameters instead
+        # test with course key parameter as string instead
         self.assertDictEqual(self.subsection_grade_override_to_dict(self.service.get_subsection_grade_override(
             user_id=self.user.id,
             course_key_or_id=unicode(self.course.id),
-            usage_key_or_id=unicode(self.subsection.location)
+            usage_key_or_id=self.subsection.location
         )), {
             'earned_all_override': override.earned_all_override,
             'earned_graded_override': override.earned_graded_override
         })
+
+    def _verify_override_history(self, override_history, history_action):
+        self.assertIsNone(override_history.user)
+        self.assertIsNotNone(override_history.created)
+        self.assertEqual(override_history.feature, PersistentSubsectionGradeOverrideHistory.PROCTORING)
+        self.assertEqual(override_history.action, history_action)
 
     @ddt.data(
         [{
@@ -191,11 +202,13 @@ class GradesServiceTests(ModuleStoreTestCase):
                 score_db_table=ScoreDatabaseTableEnum.overrides
             )
         )
+        override_history = PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override_obj.id).first()
+        self._verify_override_history(override_history, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
 
     @freeze_time('2017-01-01')
     def test_undo_override_subsection_grade(self):
         override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(grade=self.grade)
-
+        override_id = override.id
         self.service.undo_override_subsection_grade(
             user_id=self.user.id,
             course_key_or_id=self.course.id,
@@ -218,6 +231,8 @@ class GradesServiceTests(ModuleStoreTestCase):
                 score_db_table=ScoreDatabaseTableEnum.overrides
             )
         )
+        override_history = PersistentSubsectionGradeOverrideHistory.objects.filter(override_id=override_id).first()
+        self._verify_override_history(override_history, PersistentSubsectionGradeOverrideHistory.DELETE)
 
     @freeze_time('2018-01-01')
     def test_undo_override_subsection_grade_without_grade(self):

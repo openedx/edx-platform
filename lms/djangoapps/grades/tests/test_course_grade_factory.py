@@ -1,3 +1,6 @@
+"""
+Tests for the CourseGradeFactory class.
+"""
 import itertools
 
 import ddt
@@ -92,35 +95,35 @@ class TestCourseGradeFactory(GradeTestBase):
                 [self.sequence.display_name, self.sequence2.display_name]
             )
 
-        with self.assertNumQueries(2), mock_get_score(1, 2):
+        with self.assertNumQueries(5), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        num_queries = 41
+        num_queries = 47
         with self.assertNumQueries(num_queries), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(5):
             _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
 
-        num_queries = 6
+        num_queries = 9
         with self.assertNumQueries(num_queries), mock_get_score(1, 4):
             grade_factory.update(self.request.user, self.course, force_update_subsections=False)
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(5):
             _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
 
-        num_queries = 20
+        num_queries = 26
         with self.assertNumQueries(num_queries), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(5):
             _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
 
-        num_queries = 23
+        num_queries = 29
         with self.assertNumQueries(num_queries), mock_get_score(0, 0):  # the subsection now is worth zero
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(5):
             _assert_read(expected_pass=False, expected_percent=0.0)  # updated to grade of 0.0
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
@@ -311,7 +314,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             else mock_course_grade.return_value
             for student in self.students
         ]
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(9):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(
             {student: text_type(all_errors[student]) for student in all_errors},

@@ -60,7 +60,7 @@ def compute_all_grades_for_course(**kwargs):
         log.debug('Grades: ignoring policy change regrade due to waffle switch')
     else:
         course_key = CourseKey.from_string(kwargs.pop('course_key'))
-        if _are_grades_frozen(course_key):
+        if are_grades_frozen(course_key):
             log.info("Attempted compute_all_grades_for_course for course '%s', but grades are frozen.", course_key)
             return
         for course_key_string, offset, batch_size in _course_task_args(course_key=course_key, **kwargs):
@@ -115,7 +115,7 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
     offset.
     """
     course_key = CourseKey.from_string(course_key)
-    if _are_grades_frozen(course_key):
+    if are_grades_frozen(course_key):
         log.info("Attempted compute_grades_for_course for course '%s', but grades are frozen.", course_key)
         return
 
@@ -148,7 +148,7 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
 
     user = User.objects.get(id=user_id)
     course_key = CourseKey.from_string(course_key_str)
-    if _are_grades_frozen(course_key):
+    if are_grades_frozen(course_key):
         log.info(
             "Attempted recalculate_course_and_subsection_grades_for_user for course '%s', but grades are frozen.",
             course_key,
@@ -205,7 +205,7 @@ def _recalculate_subsection_grade(self, **kwargs):
     """
     try:
         course_key = CourseLocator.from_string(kwargs['course_id'])
-        if _are_grades_frozen(course_key):
+        if are_grades_frozen(course_key):
             log.info("Attempted _recalculate_subsection_grade for course '%s', but grades are frozen.", course_key)
             return
 
@@ -237,6 +237,7 @@ def _recalculate_subsection_grade(self, **kwargs):
             kwargs['only_if_higher'],
             kwargs['user_id'],
             kwargs['score_deleted'],
+            kwargs.get('force_update_subsections', False),
         )
     except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
@@ -296,7 +297,9 @@ def _has_db_updated_with_new_score(self, scored_block_usage_key, **kwargs):
     return db_is_updated
 
 
-def _update_subsection_grades(course_key, scored_block_usage_key, only_if_higher, user_id, score_deleted):
+def _update_subsection_grades(
+        course_key, scored_block_usage_key, only_if_higher, user_id, score_deleted, force_update_subsections=False
+):
     """
     A helper function to update subsection grades in the database
     for each subsection containing the given block, and to signal
@@ -321,7 +324,8 @@ def _update_subsection_grades(course_key, scored_block_usage_key, only_if_higher
                 subsection_grade = subsection_grade_factory.update(
                     course_structure[subsection_usage_key],
                     only_if_higher,
-                    score_deleted
+                    score_deleted,
+                    force_update_subsections,
                 )
                 SUBSECTION_SCORE_CHANGED.send(
                     sender=None,
@@ -350,7 +354,7 @@ def _course_task_args(course_key, **kwargs):
         yield (six.text_type(course_key), offset, batch_size)
 
 
-def _are_grades_frozen(course_key):
+def are_grades_frozen(course_key):
     """ Returns whether grades are frozen for the given course. """
     if waffle_flags()[ENFORCE_FREEZE_GRADE_AFTER_COURSE_END].is_enabled(course_key):
         course = CourseOverview.get_from_id(course_key)
@@ -358,3 +362,4 @@ def _are_grades_frozen(course_key):
             freeze_grade_date = course.end + timedelta(30)
             now = timezone.now()
             return now > freeze_grade_date
+    return False

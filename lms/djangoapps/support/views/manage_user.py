@@ -8,7 +8,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from rest_framework.generics import GenericAPIView
-from rest_framework.response import Response
 
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission

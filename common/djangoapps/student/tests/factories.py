@@ -13,6 +13,7 @@ from pytz import UTC
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from student.models import (
+    AccountRecovery,
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -200,3 +201,13 @@ class PermissionFactory(DjangoModelFactory):
 
     codename = factory.Faker('codename')
     content_type = factory.SubFactory(ContentTypeFactory)
+
+
+class AccountRecoveryFactory(DjangoModelFactory):
+    class Meta(object):
+        model = AccountRecovery
+        django_get_or_create = ('user',)
+
+    user = None
+    secondary_email = factory.Sequence(u'robot+test+recovery+{0}@edx.org'.format)
+    is_active = True

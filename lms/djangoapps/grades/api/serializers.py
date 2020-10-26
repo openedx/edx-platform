@@ -34,35 +34,16 @@ class SectionBreakdownSerializer(serializers.Serializer):
     """
     Serializer for the `section_breakdown` portion of a gradebook entry.
     """
-    are_grades_published = serializers.BooleanField()
-    auto_grade = serializers.BooleanField()
+    attempted = serializers.BooleanField()
     category = serializers.CharField()
-    chapter_name = serializers.CharField()
-    comment = serializers.CharField()
-    detail = serializers.CharField()
-    displayed_value = serializers.CharField()
     is_graded = serializers.BooleanField()
-    grade_description = serializers.CharField()
-    is_ag = serializers.BooleanField()
-    is_average = serializers.BooleanField()
-    is_manually_graded = serializers.BooleanField()
     label = serializers.CharField()
     letter_grade = serializers.CharField()
     module_id = serializers.CharField()
     percent = serializers.FloatField()
     score_earned = serializers.FloatField()
     score_possible = serializers.FloatField()
-    section_block_id = serializers.CharField()
     subsection_name = serializers.CharField()
-
-
-class SimpleSerializer(serializers.BaseSerializer):
-    """
-    A Serializer intended to take a dictionary of data and simply spit
-    that same dictionary back out as the "serialization".
-    """
-    def to_representation(self, instance):
-        return instance
 
 
 class StudentGradebookEntrySerializer(serializers.Serializer):
@@ -79,4 +60,46 @@ class StudentGradebookEntrySerializer(serializers.Serializer):
     letter_grade = serializers.CharField()
     progress_page_url = serializers.CharField()
     section_breakdown = SectionBreakdownSerializer(many=True)
-    aggregates = SimpleSerializer()
+
+
+class SubsectionGradeOverrideSerializer(serializers.Serializer):
+    """
+    Serializer for subsection grade override.
+    """
+    earned_all_override = serializers.FloatField()
+    possible_all_override = serializers.FloatField()
+    earned_graded_override = serializers.FloatField()
+    possible_graded_override = serializers.FloatField()
+
+
+class SubsectionGradeSerializer(serializers.Serializer):
+    """
+    Serializer for subsection grade.
+    """
+    earned_all = serializers.FloatField()
+    possible_all = serializers.FloatField()
+    earned_graded = serializers.FloatField()
+    possible_graded = serializers.FloatField()
+
+
+class SubsectionGradeOverrideHistorySerializer(serializers.Serializer):
+    """
+    Serializer for subsection grade override history.
+    """
+    user = serializers.CharField()
+    comments = serializers.CharField()
+    created = serializers.DateTimeField()
+    feature = serializers.CharField()
+    action = serializers.CharField()
+
+
+class SubsectionGradeResponseSerializer(serializers.Serializer):
+    """
+    Serializer for subsection grade response.
+    """
+    subsection_id = serializers.CharField()
+    user_id = serializers.IntegerField()
+    course_id = serializers.CharField()
+    original_grade = SubsectionGradeSerializer()
+    override = SubsectionGradeOverrideSerializer()
+    history = SubsectionGradeOverrideHistorySerializer(many=True)

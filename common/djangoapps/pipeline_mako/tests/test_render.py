@@ -3,10 +3,8 @@
 from unittest import skipUnless
 
 import ddt
-import os
 from django.conf import settings
 from django.test import TestCase
-from paver.easy import call_task
 from mock import patch
 
 from pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides

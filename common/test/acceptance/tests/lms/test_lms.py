@@ -2,7 +2,8 @@
 """
 End-to-end tests for the LMS.
 """
-import urllib
+import json
+
 from datetime import datetime, timedelta
 from textwrap import dedent
 
@@ -30,6 +31,8 @@ from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.pages.lms.video.video import VideoPage
+from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
+from common.test.acceptance.pages.lms.course_about import CourseAboutPage
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.tests.helpers import (
     EventsTestMixin,
@@ -38,6 +41,7 @@ from common.test.acceptance.tests.helpers import (
     get_selected_option_text,
     load_data_str,
     select_option_by_text,
+    remove_file
 )
 from openedx.core.lib.tests import attr
 
@@ -526,6 +530,11 @@ class CourseWikiA11yTest(UniqueCourseTest):
         """
         Verify the basic accessibility of the wiki page as initially displayed.
         """
+        self.course_wiki_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.course_wiki_page.a11y_audit.check_for_accessibility_errors()
 
     def test_edit(self):
@@ -533,6 +542,11 @@ class CourseWikiA11yTest(UniqueCourseTest):
         Verify the basic accessibility of edit wiki page.
         """
         self._open_editor()
+        self.course_wiki_edit_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.course_wiki_edit_page.a11y_audit.check_for_accessibility_errors()
 
     def test_changes(self):
@@ -541,6 +555,11 @@ class CourseWikiA11yTest(UniqueCourseTest):
         """
         self.course_wiki_page.show_history()
         history_page = CourseWikiHistoryPage(self.browser, self.course_id, self.course_info)
+        history_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         history_page.wait_for_page()
         history_page.a11y_audit.check_for_accessibility_errors()
 
@@ -550,6 +569,11 @@ class CourseWikiA11yTest(UniqueCourseTest):
         """
         self.course_wiki_page.show_children()
         children_page = CourseWikiChildrenPage(self.browser, self.course_id, self.course_info)
+        children_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         children_page.wait_for_page()
         children_page.a11y_audit.check_for_accessibility_errors()
 
@@ -1140,4 +1164,61 @@ class LMSLanguageTest(UniqueCourseTest):
         self.assertEqual(
             get_selected_option_text(language_selector),
             u'English'
+        )
+
+
+@attr(shard=19)
+class RegisterCourseTests(EventsTestMixin, UniqueCourseTest):
+    """Test that learner can enroll into a course from courses page"""
+
+    TEST_INDEX_FILENAME = "test_root/index_file.dat"
+
+    def setUp(self):
+        """
+        Initialize the test.
+
+        Create the necessary page objects, create course page and courses to find.
+        """
+        super(RegisterCourseTests, self).setUp()
+
+        # create test file in which index for this test will live
+        with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
+            json.dump({}, index_file)
+        self.addCleanup(remove_file, self.TEST_INDEX_FILENAME)
+
+        self.course_discovery = CourseDiscoveryPage(self.browser)
+        self.dashboard_page = DashboardPage(self.browser)
+        self.course_about = CourseAboutPage(self.browser, self.course_id)
+
+        # Create a course
+        CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name'],
+            settings={'enrollment_start': datetime(1970, 1, 1).isoformat()}
+        ).install()
+
+        # Create a user and log them in
+        AutoAuthPage(self.browser).visit()
+
+    def test_register_for_course(self):
+        """
+        Scenario: I can register for a course
+        Given The course "6.002x" exists
+            And I am logged in
+            And I visit the courses page
+        When I register for the course "6.002x"
+            Then I should see the course numbered "6.002x" in my dashboard
+            And a "edx.course.enrollment.activated" server event is emitted
+        """
+        # Navigate to the dashboard
+        self.course_discovery.visit()
+        self.course_discovery.click_course(self.course_id)
+        self.course_about.wait_for_page()
+        self.course_about.enroll_in_course()
+        self.dashboard_page.wait_for_page()
+        self.assertTrue(self.dashboard_page.is_course_present(self.course_id))
+        self.assert_matching_events_were_emitted(
+            event_filter={'name': u'edx.course.enrollment.activated', 'event_source': 'server'}
         )

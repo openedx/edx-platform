@@ -25,6 +25,16 @@ class PipelineForgivingStorage(PipelineCachedStorage):
             out = name
         return out
 
+    def stored_name(self, name):
+        try:
+            out = super(PipelineForgivingStorage, self).stored_name(name)
+        except ValueError:
+            # This means that a file could not be found, and normally this would
+            # cause a fatal error, which seems rather excessive given that
+            # some packages have missing files in their css all the time.
+            out = name
+        return out
+
 
 class ProductionStorage(
         PipelineForgivingStorage,

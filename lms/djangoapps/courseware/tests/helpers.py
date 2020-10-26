@@ -1,23 +1,28 @@
 """
 Helpers for courseware tests.
 """
+from datetime import timedelta
 import json
 
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
+from django.urls import reverse
+from django.utils.timezone import now
+from django.utils.translation import get_language
 from six import text_type
 
 from courseware.access import has_access
 from courseware.masquerade import handle_ajax, setup_masquerade
 from edxmako.shortcuts import render_to_string
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import Registration
+from student.models import Registration, CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from util.date_utils import strftime_localized
 from xblock.field_data import DictFieldData
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
@@ -348,3 +353,45 @@ def _create_mock_json_request(user, data, method='POST'):
     request.user = user
     request.session = {}
     return request
+
+
+def get_expiration_banner_text(user, course, language='en'):
+    """
+    Get text for banner that messages user course expiration date
+    for different tests that depend on it.
+    """
+    expiration_date = now() + timedelta(weeks=4)
+    upgrade_link = verified_upgrade_deadline_link(user=user, course=course)
+    enrollment = CourseEnrollment.get_enrollment(user, course.id)
+    upgrade_deadline = enrollment.upgrade_deadline
+    if upgrade_deadline is None or now() < upgrade_deadline:
+        upgrade_deadline = enrollment.course_upgrade_deadline
+
+    date_string = '<span class="localized-datetime" data-format="shortDate" \
+        data-datetime="{formatted_date}" data-language="{language}">{formatted_date}</span>'
+    formatted_expiration_date = date_string.format(
+        language=language,
+        formatted_date=strftime_localized(expiration_date, '%b. %-d, %Y')
+    )
+    if upgrade_deadline:
+        formatted_upgrade_deadline = date_string.format(
+            language=language,
+            formatted_date=strftime_localized(upgrade_deadline, '%b. %-d, %Y')
+        )
+
+        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
+                     You lose all access to this course, including your progress, on {expiration_date}.\
+                     <br>Upgrade by {upgrade_deadline} to get unlimited access to the course as long as it exists\
+                     on the site. <a href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past\
+                     {expiration_date}</span></a>'.format(
+            expiration_date=formatted_expiration_date,
+            upgrade_link=upgrade_link,
+            upgrade_deadline=formatted_upgrade_deadline
+        )
+    else:
+        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
+                     You lose all access to this course, including your progress, on {expiration_date}.\
+                     '.format(
+            expiration_date=formatted_expiration_date
+        )
+    return bannerText

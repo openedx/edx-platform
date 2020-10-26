@@ -5,7 +5,7 @@ import itertools
 import json
 import re
 import unittest
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import ddt
 from completion.test_utils import submit_completions_for_testing, CompletionWaffleTestMixin
@@ -27,7 +27,12 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from pyquery import PyQuery as pq
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.user_authn.cookies import _get_user_info_cookie_data
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
@@ -170,7 +175,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     MOCK_SETTINGS = {
         'FEATURES': {
             'DISABLE_START_DATES': False,
-            'ENABLE_MKTG_SITE': True
+            'ENABLE_MKTG_SITE': True,
+            'DISABLE_SET_JWT_COOKIES_FOR_TESTS': True,
         },
         'SOCIAL_SHARING_SETTINGS': {
             'CUSTOM_COURSE_URLS': True,
@@ -181,6 +187,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     MOCK_SETTINGS_HIDE_COURSES = {
         'FEATURES': {
             'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': True,
+            'DISABLE_SET_JWT_COOKIES_FOR_TESTS': True,
         }
     }
 
@@ -306,7 +313,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             'type': 'verified'
         }
         response = self.client.get(self.path)
-        self.assertIn('class="enter-course hidden"', response.content)
+        self.assertIn('class="course-target-link enter-course hidden"', response.content)
         self.assertIn('You must select a session to access the course.', response.content)
         self.assertIn('<div class="course-entitlement-selection-container ">', response.content)
         self.assertIn('Related Programs:', response.content)
@@ -581,7 +588,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     def _get_html_for_view_course_button(course_key_string, course_run_string):
         return '''
             <a href="/courses/{course_key}/course/"
-               class="enter-course "
+               class="course-target-link enter-course"
                data-course-key="{course_key}">
               View Course
               <span class="sr">
@@ -594,7 +601,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     def _get_html_for_resume_course_button(course_key_string, resume_block_key_string, course_run_string):
         return '''
             <a href="/courses/{course_key}/jump_to/{url_to_block}"
-               class="enter-course "
+               class="course-target-link enter-course"
                data-course-key="{course_key}">
               Resume Course
               <span class="sr">
@@ -716,6 +723,39 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         )
         self.assertNotIn(
             view_button_html,
+            dashboard_html
+        )
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    def test_content_gating_course_card_changes(self):
+        """
+        When a course is expired, the links on the course card should be removed.
+        Links will be removed from the course title, course image and button (View Course/Resume Course).
+        The course card should have an access expired message.
+        """
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        self.override_waffle_switch(True)
+
+        course = CourseFactory.create(start=self.THREE_YEARS_AGO)
+        add_course_mode(course, upgrade_deadline_expired=False)
+        enrollment = CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=course.id
+        )
+        schedule = ScheduleFactory(start=self.THREE_YEARS_AGO, enrollment=enrollment)
+
+        response = self.client.get(reverse('dashboard'))
+        dashboard_html = self._remove_whitespace_from_html_string(response.content)
+        access_expired_substring = 'Accessexpired'
+        course_link_class = 'course-target-link'
+
+        self.assertNotIn(
+            course_link_class,
+            dashboard_html
+        )
+
+        self.assertIn(
+            access_expired_substring,
             dashboard_html
         )
 

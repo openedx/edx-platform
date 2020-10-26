@@ -3,6 +3,7 @@
 """
 Tests for import_course_from_xml using the mongo modulestore.
 """
+from __future__ import print_function
 
 import copy
 from uuid import uuid4
@@ -119,7 +120,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
         # make sure we have ONE asset in our contentstore ("should_be_imported.html")
         all_assets, count = content_store.get_all_content_for_course(course.id)
-        print "len(all_assets)=%d" % len(all_assets)
+        print("len(all_assets)=%d" % len(all_assets))
         self.assertEqual(len(all_assets), 1)
         self.assertEqual(count, 1)
 
@@ -133,7 +134,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(content)
 
         # make sure course.static_asset_path is correct
-        print "static_asset_path = {0}".format(course.static_asset_path)
+        print("static_asset_path = {0}".format(course.static_asset_path))
         self.assertEqual(course.static_asset_path, 'test_import_course')
 
     def test_asset_import_nostatic(self):
@@ -172,7 +173,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_tab_name_imports_correctly(self):
         _module_store, _content_store, course = self.load_test_import_course()
-        print "course tabs = {0}".format(course.tabs)
+        print("course tabs = {0}".format(course.tabs))
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
     def test_import_performance_mongo(self):

@@ -11,7 +11,6 @@ from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 from static_replace import replace_static_urls
-from xmodule.annotator_token import retrieve_token
 
 
 @login_required

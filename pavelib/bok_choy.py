@@ -2,6 +2,7 @@
 Run acceptance tests that use the bok-choy framework
 https://bok-choy.readthedocs.org/en/latest/
 """
+from __future__ import print_function
 
 import os
 
@@ -146,7 +147,7 @@ def run_bokchoy(options, passthrough_options):
             default_store=test_suite.default_store,
         )
     )
-    print msg
+    print(msg)
     test_suite.run()
 
 
@@ -157,12 +158,12 @@ def parse_coverage(report_dir, coveragerc):
     report_dir.makedirs_p()
 
     msg = colorize('green', "Combining coverage reports")
-    print msg
+    print(msg)
 
     sh("coverage combine --rcfile={}".format(coveragerc))
 
     msg = colorize('green', "Generating coverage reports")
-    print msg
+    print(msg)
 
     sh("coverage html --rcfile={}".format(coveragerc))
     sh("coverage xml --rcfile={}".format(coveragerc))

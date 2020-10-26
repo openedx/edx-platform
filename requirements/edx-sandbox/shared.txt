@@ -10,17 +10,18 @@
 -e common/lib/symmath
 asn1crypto==0.24.0        # via cryptography
 cffi==1.11.5              # via cryptography
-cryptography==2.3.1
+cryptography==2.4.2
 enum34==1.1.6             # via cryptography
-idna==2.7                 # via cryptography
+idna==2.8                 # via cryptography
 ipaddress==1.0.22         # via cryptography
 lxml==3.8.0
-markupsafe==1.0
+markupsafe==1.1.0
 networkx==1.7
-nltk==3.3.0
+nltk==3.4
 numpy==1.6.2
 pycparser==2.19           # via cffi
 pyparsing==2.2.0
 scipy==0.14.0
-six==1.11.0               # via cryptography, nltk
+singledispatch==3.4.0.3   # via nltk
+six==1.11.0               # via cryptography, nltk, singledispatch
 sympy==0.7.1

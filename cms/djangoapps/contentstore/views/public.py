@@ -4,6 +4,7 @@ Public views
 from django.conf import settings
 from django.template.context_processors import csrf
 from django.urls import reverse
+from django.utils.http import urlquote_plus
 from django.shortcuts import redirect
 from django.views.decorators.clickjacking import xframe_options_deny
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -14,7 +15,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from waffle.decorators import waffle_switch
 from contentstore.config import waffle
 
-__all__ = ['signup', 'login_page', 'howitworks', 'accessibility']
+__all__ = ['signup', 'login_page', 'login_redirect_to_lms', 'howitworks', 'accessibility']
 
 
 @ensure_csrf_cookie
@@ -64,6 +65,20 @@ def login_page(request):
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
         }
     )
+
+
+def login_redirect_to_lms(request):
+    """
+    This view redirects to the LMS login view. It is used for Django's LOGIN_URL
+    setting, which is where unauthenticated requests to protected endpoints are redirected.
+    """
+    next_url = request.GET.get('next')
+    absolute_next_url = request.build_absolute_uri(next_url)
+    login_url = '{base_url}/login{params}'.format(
+        base_url=settings.LMS_ROOT_URL,
+        params='?next=' + urlquote_plus(absolute_next_url) if next_url else '',
+    )
+    return redirect(login_url)
 
 
 def howitworks(request):

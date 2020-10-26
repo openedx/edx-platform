@@ -7,7 +7,6 @@ import sys
 from lxml import etree
 from pkg_resources import resource_string
 
-import dogstats_wrapper as dog_stats_api
 from capa import responsetypes
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawDescriptor
@@ -194,10 +193,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     # edited in the cms
     @classmethod
     def backcompat_paths(cls, path):
-        dog_stats_api.increment(
-            DEPRECATION_VSCOMPAT_EVENT,
-            tags=["location:capa_descriptor_backcompat_paths"]
-        )
         return [
             'problems/' + path[8:],
             path[8:],

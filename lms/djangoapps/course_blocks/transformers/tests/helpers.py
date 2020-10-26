@@ -77,7 +77,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
 
         if block_type != 'course':
             kwargs['category'] = block_type
-            kwargs['publish_item'] = True,
+            kwargs['publish_item'] = True
         if parent:
             kwargs['parent'] = parent
 

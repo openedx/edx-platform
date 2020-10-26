@@ -12,11 +12,9 @@ import logging
 from pysrt import SubRipTime, SubRipItem, SubRipFile
 from pysrt.srtexc import Error
 from lxml import etree
-from opaque_keys.edx.locator import BlockUsageLocator
 from HTMLParser import HTMLParser
 from six import text_type
 
-from xmodule.modulestore.django import modulestore
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore

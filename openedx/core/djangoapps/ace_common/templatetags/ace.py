@@ -108,6 +108,7 @@ def _get_google_analytics_tracking_url(context):
             message.send_uuid,
             message.uuid,
         ),
+        document_host=site.domain.rstrip('/')
     )
     course_ids = context.get('course_ids')
     if course_ids is not None and len(course_ids) > 0:

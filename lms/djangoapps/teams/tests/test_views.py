@@ -201,6 +201,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(TeamAPITestCase, cls).setUpClassAndTestData():
             teams_configuration_1 = {
                 'topics':

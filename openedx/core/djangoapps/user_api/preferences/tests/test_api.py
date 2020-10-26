@@ -332,9 +332,9 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     """
     Test cases to cover API-driven email list opt-in update workflows
     """
-    USERNAME = u'frank-underwood'
+    USERNAME = u'claire-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'frank+underwood@example.com'
+    EMAIL = u'claire+underwood@example.com'
     shard = 2
 
     @ddt.data(

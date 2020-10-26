@@ -13,6 +13,8 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
+from django.utils.translation import ugettext_lazy
+
 from .common import *
 import os
 from path import Path as path
@@ -25,6 +27,7 @@ from openedx.core.lib.derived import derive_settings
 from lms.envs.test import (
     WIKI_ENABLED,
     PLATFORM_NAME,
+    PLATFORM_DESCRIPTION,
     SITE_NAME,
     DEFAULT_FILE_STORAGE,
     MEDIA_ROOT,
@@ -34,6 +37,12 @@ from lms.envs.test import (
     REGISTRATION_EXTRA_FIELDS,
     ECOMMERCE_API_URL,
 )
+
+
+# Include a non-ascii character in STUDIO_NAME and STUDIO_SHORT_NAME to uncover possible
+# UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
+STUDIO_NAME = ugettext_lazy(u"Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_SHORT_NAME = ugettext_lazy(u"𝓢𝓽𝓾𝓭𝓲𝓸")
 
 # Allow all hosts during tests, we use a lot of different ones all over the codebase.
 ALLOWED_HOSTS = [
@@ -125,6 +134,7 @@ if os.environ.get('DISABLE_MIGRATIONS'):
 LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
+LOGIN_URL = EDX_ROOT_URL + '/signin'
 
 
 CACHES = {
@@ -191,6 +201,8 @@ PASSWORD_HASHERS = [
 
 # No segment key
 CMS_SEGMENT_KEY = None
+
+FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 

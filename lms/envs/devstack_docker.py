@@ -9,11 +9,12 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-LMS_BASE = 'edx.devstack.lms:18000'
-CMS_BASE = 'edx.devstack.studio:18010'
+LMS_BASE = 'localhost:18000'
+CMS_BASE = 'localhost:18010'
 SITE_NAME = LMS_BASE
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
@@ -40,6 +41,7 @@ FEATURES.update({
     'ENABLE_DISCUSSION_SERVICE': True,
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
     'ENABLE_ENTERPRISE_INTEGRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
 })
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
@@ -78,3 +80,7 @@ COURSE_CATALOG_API_URL = 'http://edx.devstack.discovery:18381/api/v1/'
 REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (  # noqa F405
     'rest_framework.renderers.BrowsableAPIRenderer',
 )
+
+# Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
+# LOGGING['handlers']['console']['level'] = 'DEBUG'
+# LOGGING['loggers']['django.db.backends'] = {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False}

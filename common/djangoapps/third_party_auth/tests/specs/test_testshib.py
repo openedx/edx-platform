@@ -212,7 +212,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         )
 
         # Fire off the disconnect pipeline to unlink.
-        self.assert_redirect_to_dashboard_looks_correct(
+        self.assert_redirect_after_pipeline_completes(
             actions.do_disconnect(
                 request.backend,
                 user,

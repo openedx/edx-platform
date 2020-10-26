@@ -13,6 +13,7 @@ from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from courseware.testutils import FieldOverrideTestMixin
 from courseware.views.views import progress
 from django.conf import settings
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -21,6 +22,7 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from pytz import UTC
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -67,6 +69,8 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         self.request = self.request_factory.get("foo")
         self.request.session = {}
         self.request.user = self.student
+        messages = FallbackStorage(self.request)
+        self.request._messages = messages  # pylint: disable=protected-access
 
         patcher = mock.patch('edxmako.request_context.get_current_request', return_value=self.request)
         patcher.start()
@@ -198,6 +202,11 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         Test without any field overrides.
         """
+        ContentTypeGatingConfig.objects.create(
+            enabled=True,
+            enabled_as_of=datetime(2018, 1, 1),
+        )
+
         providers = {
             'no_overrides': (),
             'ccx': ('ccx.overrides.CustomCoursesForEdxOverrideProvider',)
@@ -230,23 +239,25 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     __test__ = True
 
+    # TODO: decrease query count as part of REVO-28
+    QUERY_COUNT = 36
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): (
         #     # of sql queries to default,
         #     # of mongo queries,
         # )
-        ('no_overrides', 1, True, False): (18, 1),
-        ('no_overrides', 2, True, False): (18, 1),
-        ('no_overrides', 3, True, False): (18, 1),
-        ('ccx', 1, True, False): (18, 1),
-        ('ccx', 2, True, False): (18, 1),
-        ('ccx', 3, True, False): (18, 1),
-        ('no_overrides', 1, False, False): (18, 1),
-        ('no_overrides', 2, False, False): (18, 1),
-        ('no_overrides', 3, False, False): (18, 1),
-        ('ccx', 1, False, False): (18, 1),
-        ('ccx', 2, False, False): (18, 1),
-        ('ccx', 3, False, False): (18, 1),
+        ('no_overrides', 1, True, False): (QUERY_COUNT, 1),
+        ('no_overrides', 2, True, False): (QUERY_COUNT, 1),
+        ('no_overrides', 3, True, False): (QUERY_COUNT, 1),
+        ('ccx', 1, True, False): (QUERY_COUNT, 1),
+        ('ccx', 2, True, False): (QUERY_COUNT, 1),
+        ('ccx', 3, True, False): (QUERY_COUNT, 1),
+        ('no_overrides', 1, False, False): (QUERY_COUNT, 1),
+        ('no_overrides', 2, False, False): (QUERY_COUNT, 1),
+        ('no_overrides', 3, False, False): (QUERY_COUNT, 1),
+        ('ccx', 1, False, False): (QUERY_COUNT, 1),
+        ('ccx', 2, False, False): (QUERY_COUNT, 1),
+        ('ccx', 3, False, False): (QUERY_COUNT, 1),
     }
 
 
@@ -257,20 +268,22 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     __test__ = True
 
+    # TODO: decrease query count as part of REVO-28
+    QUERY_COUNT = 36
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (18, 3),
-        ('no_overrides', 2, True, False): (18, 3),
-        ('no_overrides', 3, True, False): (18, 3),
-        ('ccx', 1, True, False): (18, 3),
-        ('ccx', 2, True, False): (18, 3),
-        ('ccx', 3, True, False): (18, 3),
-        ('ccx', 1, True, True): (19, 3),
-        ('ccx', 2, True, True): (19, 3),
-        ('ccx', 3, True, True): (19, 3),
-        ('no_overrides', 1, False, False): (18, 3),
-        ('no_overrides', 2, False, False): (18, 3),
-        ('no_overrides', 3, False, False): (18, 3),
-        ('ccx', 1, False, False): (18, 3),
-        ('ccx', 2, False, False): (18, 3),
-        ('ccx', 3, False, False): (18, 3),
+        ('no_overrides', 1, True, False): (QUERY_COUNT, 3),
+        ('no_overrides', 2, True, False): (QUERY_COUNT, 3),
+        ('no_overrides', 3, True, False): (QUERY_COUNT, 3),
+        ('ccx', 1, True, False): (QUERY_COUNT, 3),
+        ('ccx', 2, True, False): (QUERY_COUNT, 3),
+        ('ccx', 3, True, False): (QUERY_COUNT, 3),
+        ('ccx', 1, True, True): (QUERY_COUNT + 1, 3),
+        ('ccx', 2, True, True): (QUERY_COUNT + 1, 3),
+        ('ccx', 3, True, True): (QUERY_COUNT + 1, 3),
+        ('no_overrides', 1, False, False): (QUERY_COUNT, 3),
+        ('no_overrides', 2, False, False): (QUERY_COUNT, 3),
+        ('no_overrides', 3, False, False): (QUERY_COUNT, 3),
+        ('ccx', 1, False, False): (QUERY_COUNT, 3),
+        ('ccx', 2, False, False): (QUERY_COUNT, 3),
+        ('ccx', 3, False, False): (QUERY_COUNT, 3),
     }

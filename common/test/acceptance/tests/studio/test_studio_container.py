@@ -1066,8 +1066,9 @@ class UnitPublishingTest(ContainerBase):
         """
         Verifies no component is visible when viewing as a student.
         """
-        self._verify_and_return_staff_page().set_staff_view_mode('Learner')
-        self.assertEqual(0, self.courseware.num_xblock_components)
+        page = self._verify_and_return_staff_page()
+        page.set_staff_view_mode('Learner')
+        page.wait_for(lambda: self.courseware.num_xblock_components == 0, 'No XBlocks visible')
 
     def _verify_student_view_visible(self, expected_components):
         """

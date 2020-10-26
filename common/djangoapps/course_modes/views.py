@@ -30,6 +30,8 @@ from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
@@ -153,22 +155,24 @@ class ChooseModeView(View):
                 meter_inverted_programs = meter.invert_programs()
                 if len(meter_inverted_programs) > 0:
                     # program for the course on this page
-                    program_for_course = meter_inverted_programs.get(course_id)[0]
-                    program_uuid = program_for_course.get('uuid')
-                    if program_for_course:
-                        # program data with bundle info
-                        program_data = ProgramDataExtender(program_for_course, request.user, mobile_only=False).extend()
-                        skus = program_data.get('skus')
-                        ecommerce_service = EcommerceService()
-                        program_bundle_url = ecommerce_service.get_checkout_page_url(*skus, program_uuid=program_uuid)
-                        bundle_data = {
-                            'program_marketing_site_url': program_data.get('marketing_url'),
-                            'program_bundle_url': program_bundle_url,
-                            'discount_data': program_data.get('discount_data'),
-                            'program_type': program_data.get('type'),
-                            'program_title': program_data.get('title'),
-                            'program_price': program_data.get('full_program_price'),
-                        }
+                    programs_for_course = meter_inverted_programs.get(course_id)
+                    if programs_for_course:
+                        program_for_course = programs_for_course[0]
+                        program_uuid = program_for_course.get('uuid')
+                        if program_for_course:
+                            # program data with bundle info
+                            program_data = ProgramDataExtender(program_for_course, request.user, mobile_only=False).extend()
+                            skus = program_data.get('skus')
+                            ecommerce_service = EcommerceService()
+                            program_bundle_url = ecommerce_service.get_checkout_page_url(*skus, program_uuid=program_uuid)
+                            bundle_data = {
+                                'program_marketing_site_url': program_data.get('marketing_url'),
+                                'program_bundle_url': program_bundle_url,
+                                'discount_data': program_data.get('discount_data'),
+                                'program_type': program_data.get('type'),
+                                'program_title': program_data.get('title'),
+                                'program_price': program_data.get('full_program_price'),
+                            }
 
         context = {
             "bundle_data": bundle_data,
@@ -178,13 +182,21 @@ class ChooseModeView(View):
             ),
             "modes": modes,
             "has_credit_upsell": has_credit_upsell,
-            "course_name": course.display_name_with_default_escaped,
+            "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
             "chosen_price": chosen_price,
             "error": error,
             "responsive": True,
             "nav_hidden": True,
+            "content_gating_enabled": ContentTypeGatingConfig.enabled_for_enrollment(
+                user=request.user,
+                course_key=course_key
+            ),
+            "course_duration_limit_enabled": CourseDurationLimitConfig.enabled_for_enrollment(
+                user=request.user,
+                course_key=course_key
+            ),
         }
         context.update(
             get_experiment_user_metadata_context(
@@ -194,7 +206,7 @@ class ChooseModeView(View):
         )
 
         title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
-            course_name=course.display_name_with_default_escaped
+            course_name=course.display_name_with_default
         )
 
         context["title_content"] = title_content

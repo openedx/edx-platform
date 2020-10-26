@@ -2,8 +2,8 @@
 
 import os
 from unittest import TestCase
+from uuid import uuid4
 
-import paver.easy
 from paver import tasks
 from paver.easy import BuildFailure
 
@@ -63,7 +63,7 @@ class MockEnvironment(tasks.Environment):
             self.messages.append(unicode(output))
 
 
-def fail_on_eslint(*args):
+def fail_on_eslint(*args, **kwargs):
     """
     For our tests, we need the call for diff-quality running eslint reports
     to fail, since that is what is going to fail when we pass in a
@@ -72,7 +72,10 @@ def fail_on_eslint(*args):
     if "eslint" in args[0]:
         raise BuildFailure('Subprocess return code: 1')
     else:
-        return
+        if kwargs.get('capture', False):
+            return uuid4().hex
+        else:
+            return
 
 
 def fail_on_npm_install(*args, **kwargs):  # pylint: disable=unused-argument

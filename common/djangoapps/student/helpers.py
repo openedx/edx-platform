@@ -35,12 +35,10 @@ from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, v
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
-from openedx.core.djangoapps.user_api.config.waffle import PASSWORD_UNICODE_NORMALIZE_FLAG
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from student.models import (
     LinkedInAddToProfileConfiguration,
-    PasswordHistory,
     Registration,
     UserAttribute,
     UserProfile,
@@ -418,10 +416,11 @@ def authenticate_new_user(request, username, password):
     logged in until they close the browser. They can't log in again until they click
     the activation link from the email.
     """
-    if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
-        password = normalize_password(password)
+    password = normalize_password(password)
     backend = load_backend(NEW_USER_AUTH_BACKEND)
     user = backend.authenticate(request=request, username=username, password=password)
+    if not user:
+        log.warning("Unable to authenticate user: {username}".format(username=username))
     user.backend = NEW_USER_AUTH_BACKEND
     return user
 
@@ -620,9 +619,7 @@ def do_create_account(form, custom_form=None):
         email=form.cleaned_data["email"],
         is_active=False
     )
-    password = form.cleaned_data["password"]
-    if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
-        password = normalize_password(password)
+    password = normalize_password(form.cleaned_data["password"])
     user.set_password(password)
     registration = Registration()
 
@@ -654,11 +651,6 @@ def do_create_account(form, custom_form=None):
             )
         else:
             raise
-
-    # add this account creation to password history
-    # NOTE, this will be a NOP unless the feature has been turned on in configuration
-    password_history_entry = PasswordHistory()
-    password_history_entry.create(user)
 
     registration.register(user)
 

@@ -595,6 +595,11 @@ class BookmarksA11yTests(BookmarksTestMixin):
         """
         Verify the basic accessibility of the bookmarks page while paginated.
         """
+        self.bookmarks_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.setup_test(num_chapters=11)
         self.bookmark_units(num_units=11)
         self.bookmarks_page.visit()

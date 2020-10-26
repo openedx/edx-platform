@@ -34,31 +34,33 @@ pull_translations: ## pull translations from Transifex
 	git clean -fdX conf/locale/eo
 	i18n_tool validate
 
+detect_changed_source_translations: ## check if translation files are up-to-date
+	i18n_tool changed
+
 requirements: ## install development environment requirements
 	pip install -qr requirements/edx/development.txt --exists-action w
+
+# Order is very important in this list: files must appear after everything they include!
+REQ_FILES = \
+	requirements/edx/pip-tools \
+	requirements/edx/coverage \
+	requirements/edx/paver \
+	requirements/edx-sandbox/shared \
+	requirements/edx-sandbox/base \
+	requirements/edx/base \
+	requirements/edx/testing \
+	requirements/edx/development
 
 upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
 upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints
 	pip install -qr requirements/edx/pip-tools.txt
-	# Make sure to compile files after any other files they include!
-	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/pip-tools.txt requirements/edx/pip-tools.in
-	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/coverage.txt requirements/edx/coverage.in
-	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/paver.txt requirements/edx/paver.in
-	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx-sandbox/shared.txt requirements/edx-sandbox/shared.in
-	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx-sandbox/base.txt requirements/edx-sandbox/base.in
-	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/base.txt requirements/edx/base.in
-	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/testing.txt requirements/edx/testing.in
-	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/development.txt requirements/edx/development.in
+	@for f in $(REQ_FILES); do \
+		echo ; \
+		echo "== $$f ===============================" ; \
+		pip-compile -v --no-emit-trusted-host --no-index --upgrade -o $$f.txt $$f.in || exit 1; \
+	done
 	# Post process all of the files generated above to work around open pip-tools issues
-	scripts/post-pip-compile.sh \
-        requirements/edx/pip-tools.txt \
-	    requirements/edx/coverage.txt \
-	    requirements/edx/paver.txt \
-	    requirements/edx-sandbox/shared.txt \
-	    requirements/edx-sandbox/base.txt \
-	    requirements/edx/base.txt \
-	    requirements/edx/testing.txt \
-	    requirements/edx/development.txt
+	scripts/post-pip-compile.sh $(REQ_FILES:=.txt)
 	# Let tox control the Django version for tests
 	grep "^django==" requirements/edx/base.txt > requirements/edx/django.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp

@@ -21,8 +21,6 @@ import requests
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.urls import reverse
@@ -33,7 +31,6 @@ from django.utils.translation import ugettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
-from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 from lms.djangoapps.verify_student.ssencrypt import (
     encrypt_and_encode,
@@ -538,6 +535,13 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
     copy_id_photo_from = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
+
+    # Fields for functionality of sending email when verification expires
+    # expiry_date: The date when the SoftwareSecurePhotoVerification will expire
+    # expiry_email_date: This field is used to maintain a check for learners to which email
+    # to notify for expired verification is already sent.
+    expiry_date = models.DateTimeField(null=True, blank=True, db_index=True)
+    expiry_email_date = models.DateTimeField(null=True, blank=True, db_index=True)
 
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):

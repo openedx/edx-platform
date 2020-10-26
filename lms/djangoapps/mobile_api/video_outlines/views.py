@@ -6,7 +6,6 @@ only displayed at the course level. This is because it makes it a lot easier to
 optimize and reason about, and it avoids having to tackle the bigger problem of
 general XBlock representation in this rather specialized formatting.
 """
-import os
 from functools import partial
 
 from django.http import Http404, HttpResponse
@@ -17,12 +16,7 @@ from rest_framework.response import Response
 from mobile_api.models import MobileApiConfig
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import (
-    convert_video_transcript,
-    get_video_transcript_content,
-    Transcript,
-    get_transcript,
-)
+from xmodule.video_module.transcripts_utils import get_transcript
 
 from ..decorators import mobile_course_access, mobile_view
 from .serializers import BlockOutline, video_summary
@@ -90,6 +84,7 @@ class VideoSummaryList(generics.ListAPIView):
                 {"video": partial(video_summary, video_profiles)},
                 request,
                 video_profiles,
+                kwargs.get('api_version')
             )
         )
         return Response(video_outline)

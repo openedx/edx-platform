@@ -3,6 +3,7 @@
 Commandline tool for doing operations on Problems
 """
 from __future__ import unicode_literals
+from __future__ import print_function
 
 import argparse
 import logging
@@ -67,7 +68,7 @@ def main():
 
 def command_show(problem):
     """Display the text for this problem"""
-    print problem.get_html()
+    print(problem.get_html())
 
 
 def command_test(problem):

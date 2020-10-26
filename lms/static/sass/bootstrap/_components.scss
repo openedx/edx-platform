@@ -9,6 +9,17 @@
   .user-messages {
     margin-top: $baseline;
   }
+
+  .user-messages-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin: 5px 0;
+    }
+  }
+
 }
 
 // Alerts
@@ -22,4 +33,12 @@
   .message-actions {
     margin-left: $baseline;
   }
+}
+
+.alert.alert-info a {
+  // Need to have sufficient contrast for blue links on blue background
+  // Based this on some existing css for this use case
+  color: #0075b4;
+  text-decoration: underline;
+  font-weight: bold;
 }

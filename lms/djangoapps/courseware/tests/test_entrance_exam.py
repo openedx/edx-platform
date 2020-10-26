@@ -2,7 +2,6 @@
 Tests use cases related to LMS Entrance Exam behavior, such as gated content access (TOC)
 """
 from django.urls import reverse
-from django.test.client import RequestFactory
 from mock import Mock, patch
 from crum import set_current_request
 
@@ -15,7 +14,7 @@ from courseware.entrance_exams import (
 )
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
-from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
+from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory, RequestFactoryNoCsrf
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
@@ -536,7 +535,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Tests entrance exam xblock has `entrance_exam_passed` key in json response.
         """
-        request_factory = RequestFactory()
+        request_factory = RequestFactoryNoCsrf()
         data = {'input_{}_2_1'.format(unicode(self.problem_1.location.html_id())): 'choice_2'}
         request = request_factory.post(
             'problem_check',

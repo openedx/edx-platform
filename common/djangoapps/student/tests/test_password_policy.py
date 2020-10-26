@@ -144,7 +144,8 @@ class TestPasswordPolicy(TestCase):
         create_validator_config('util.password_policy_validators.NumericValidator', {'min_numeric': 3})
     ])
     def test_not_enough_numeric_characters(self):
-        self.url_params['password'] = u'thishouldfail½2'
+        # The unicode ២ is the number 2 in Khmer and the ٧ is the Arabic-Indic number 7
+        self.url_params['password'] = u'thisShouldFail២٧'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 400)
         obj = json.loads(response.content)
@@ -157,8 +158,8 @@ class TestPasswordPolicy(TestCase):
         create_validator_config('util.password_policy_validators.NumericValidator', {'min_numeric': 3})
     ])
     def test_enough_numeric_characters(self):
-        # This unicode 1/2 should count as a numeric value here
-        self.url_params['password'] = u'thisShouldPass½33'
+        # The unicode ២ is the number 2 in Khmer
+        self.url_params['password'] = u'thisShouldPass២33'
         response = self.client.post(self.url, self.url_params)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
@@ -260,7 +261,7 @@ class TestPasswordPolicy(TestCase):
         """
         Tests that even if password policy is enforced, ext_auth registrations aren't subject to it
         """
-        self.url_params['password'] = 'aaa'  # shouldn't pass validation
+        self.url_params['password'] = u'aaa'  # shouldn't pass validation
         request = self.request_factory.post(self.url, self.url_params)
         request.site = SiteFactory.create()
         # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.

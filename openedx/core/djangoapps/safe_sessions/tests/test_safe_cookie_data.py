@@ -200,7 +200,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     )
     @ddt.unpack
     def test_digest_incorrect_field_value(self, field_name, incorrect_field_value):
-        digest = self.safe_cookie_data._compute_digest(self.user_id),
+        digest = self.safe_cookie_data._compute_digest(self.user_id)
         setattr(self.safe_cookie_data, field_name, incorrect_field_value)
         self.assertNotEqual(
             digest,

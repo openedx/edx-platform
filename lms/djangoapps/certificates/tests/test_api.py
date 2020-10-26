@@ -14,6 +14,7 @@ from django.test.utils import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 import pytz
 
@@ -359,6 +360,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         cls.student = UserFactory()
         cls.student_no_cert = UserFactory()
         cls.uuid = uuid.uuid4().hex
+        cls.nonexistent_course_id = CourseKey.from_string('course-v1:some+fake+course')
         cls.web_cert_course = CourseFactory.create(
             org='edx',
             number='verified_1',
@@ -390,6 +392,12 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             download_url='www.gmail.com',
             grade="0.99",
             verify_uuid=cls.uuid,
+        )
+        # certificate for a course that will be deleted
+        GeneratedCertificateFactory.create(
+            user=cls.student,
+            course_id=cls.nonexistent_course_id,
+            status=CertificateStatuses.downloadable
         )
 
     @classmethod
@@ -493,6 +501,17 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             uuid=self.uuid
         )
         self.assertEqual('www.gmail.com', cert_url)
+
+    def test_get_certificate_with_deleted_course(self):
+        """
+        Test the case when there is a certificate but the course was deleted.
+        """
+        self.assertIsNone(
+            certs_api.get_certificate_for_user(
+                self.student.username,
+                self.nonexistent_course_id
+            )
+        )
 
 
 @attr(shard=1)
@@ -737,8 +756,11 @@ def set_microsite(domain):
             """
             Execute the function after setting up the microsite.
             """
-            microsite.set_by_domain(domain)
-            return func(request, *args, **kwargs)
+            try:
+                microsite.set_by_domain(domain)
+                return func(request, *args, **kwargs)
+            finally:
+                microsite.clear()
         return inner
     return decorator
 

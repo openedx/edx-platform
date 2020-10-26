@@ -5,7 +5,6 @@ from time import time
 from celery import current_task
 from django.db import reset_queries
 
-import dogstats_wrapper as dog_stats_api
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
 from util.db import outer_atomic
 
@@ -109,8 +108,7 @@ def run_main_task(entry_id, task_fcn, action_name):
         raise ValueError(message)
 
     # Now do the work
-    with dog_stats_api.timer('instructor_tasks.time.overall', tags=[u'action:{name}'.format(name=action_name)]):
-        task_progress = task_fcn(entry_id, course_id, task_input, action_name)
+    task_progress = task_fcn(entry_id, course_id, task_input, action_name)
 
     # Release any queries that the connection has been hanging onto
     reset_queries()

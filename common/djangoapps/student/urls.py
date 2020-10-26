@@ -22,16 +22,29 @@ urlpatterns = [
 
     # password reset in views (see below for password reset django views)
     url(r'^account/password$', views.password_change_request_handler, name='password_change_request'),
+    url(r'^account/account_recovery', views.account_recovery_request_handler, name='account_recovery'),
     url(r'^password_reset/$', views.password_reset, name='password_reset'),
     url(
         r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         views.password_reset_confirm_wrapper,
         name='password_reset_confirm',
     ),
+    url(
+        r'^account_recovery_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        views.account_recovery_confirm_wrapper,
+        name='account_recovery_confirm',
+    ),
 
     url(r'^course_run/{}/refund_status$'.format(settings.COURSE_ID_PATTERN),
         views.course_run_refund_status,
         name="course_run_refund_status"),
+
+    url(
+        r'^activate_secondary_email/(?P<key>[^/]*)$',
+        views.activate_secondary_email,
+        name='activate_secondary_email'
+    ),
+
 ]
 
 # password reset django views (see above for password reset views)

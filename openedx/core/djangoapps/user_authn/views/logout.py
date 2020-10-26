@@ -29,11 +29,11 @@ class LogoutView(TemplateView):
     @property
     def target(self):
         """
-        If a redirect_url is specified in the querystring for this request, and the value is a url
-        with the same host, the view will redirect to this page after rendering the template.
+        If a redirect_url is specified in the querystring for this request, and the value is a safe
+        url for redirect, the view will redirect to this page after rendering the template.
         If it is not specified, we will use the default target url.
         """
-        target_url = self.request.GET.get('redirect_url')
+        target_url = self.request.GET.get('redirect_url') or self.request.GET.get('next')
 
         if target_url and is_safe_login_or_logout_redirect(self.request, target_url):
             return target_url

@@ -14,7 +14,6 @@ from django.contrib.auth.password_validation import (
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _, ungettext
-from openedx.core.djangoapps.user_api.config.waffle import PASSWORD_UNICODE_NORMALIZE_FLAG
 from six import text_type
 
 log = logging.getLogger(__name__)
@@ -124,16 +123,7 @@ def validate_password(password, user=None):
     Raises:
         ValidationError if any of the password validators fail.
     """
-    if not isinstance(password, text_type):
-        try:
-            # some checks rely on unicode semantics (e.g. length)
-            password = text_type(password, encoding='utf8')
-        except UnicodeDecodeError:
-            # no reason to get into weeds
-            raise ValidationError([_('Invalid password.')])
-
-    if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
-        password = normalize_password(password)
+    password = normalize_password(password)
     django_validate_password(password, user)
 
 

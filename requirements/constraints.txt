@@ -1,0 +1,32 @@
+# Version constraints for pip-installation.
+#
+# This file doesn't install any packages. It specifies version constraints
+# that will be applied if a package is needed.
+#
+# When pinning something here, please provide an explanation of why.  Ideally,
+# link to other information that will help people in the future to remove the
+# pin when possible.  Writing an issue against the offending project and
+# linking to it here is good.
+
+# six is at 1.12.0, but transifex-client requires ==1.11.0
+# https://github.com/transifex/transifex-client/issues/252
+six==1.11.0
+
+# Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
+Markdown==2.6.11
+
+# required by edx-lint and pinned explicitly here because newer versions don't guarantee python 2 support.
+# Can be removed when we get to Python 3.
+pylint-plugin-utils==0.3
+
+# Browser driver used by lettuce - pinned because splinter==0.10.0 breaks lettuce tests.  EDUCATOR-3795
+splinter==0.9.0
+
+# transifex-client 0.13.5 requires urllib3<1.24, but requests will pull in urllib3==1.24 (https://github.com/transifex/transifex-client/pull/241/files)
+urllib3<1.24
+
+# Bumping requests-oauthlib to 1.2 updates oauthlib to 3.0.0, which changes a response code in certain cases
+# This causes a test to fail. Before fixing, we would need to make sure mobile apps are functional with this change
+# See https://github.com/oauthlib/oauthlib/issues/264 for more context
+requests-oauthlib==1.1.0
+oauthlib==2.1.0

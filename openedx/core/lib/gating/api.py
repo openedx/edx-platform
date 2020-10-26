@@ -470,12 +470,14 @@ def get_subsection_completion_percentage(subsection_usage_key, user):
                     block, 'completion_mode'
                 )
 
+                #  always exclude html blocks (in addition to EXCLUDED blocks) for gating calculations
+                #  See https://openedx.atlassian.net/browse/WL-1798
                 if completion_mode not in (CompletionMode.AGGREGATOR, CompletionMode.EXCLUDED) \
                         and not block.block_type == 'html':
                     completable_blocks.append(block)
 
             if not completable_blocks:
-                return 0
+                return 100
             subsection_completion_total = 0
             course_block_completions = BlockCompletion.get_course_completions(user, subsection_usage_key.course_key)
             for block in completable_blocks:

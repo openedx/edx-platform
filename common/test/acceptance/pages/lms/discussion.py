@@ -723,13 +723,15 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         Get the rendered preview of the contents of the Discussions new post editor
         Waits for content to appear, as the preview is triggered on debounced/delayed onchange
         """
+        self.scroll_to_element(selector)
         self.wait_for_element_visibility(selector, "WMD preview pane has contents", timeout=10)
         return self.q(css=".wmd-preview").html[0]
 
-    def get_new_post_preview_text(self):
+    def get_new_post_preview_text(self, selector=".wmd-preview > div"):
         """
         Get the rendered preview of the contents of the Discussions new post editor
         Waits for content to appear, as the preview is triggered on debounced/delayed onchange
         """
-        self.wait_for_element_visibility(".wmd-preview > div", "WMD preview pane has contents", timeout=10)
+        self.scroll_to_element(selector)
+        self.wait_for_element_visibility(selector, "WMD preview pane has contents", timeout=10)
         return self.q(css=".wmd-preview").text[0]

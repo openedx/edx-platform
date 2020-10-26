@@ -43,6 +43,10 @@ LATEST_UPDATE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'latest_update')
 # Waffle flag to enable the use of Bootstrap for course experience pages
 USE_BOOTSTRAP_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'use_bootstrap', flag_undefined_default=True)
 
+# Waffle flag to enable anonymous access to a course
+SEO_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='seo')
+COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(SEO_WAFFLE_FLAG_NAMESPACE, 'enable_anonymous_courseware_access')
+
 
 def course_home_page_title(course):  # pylint: disable=unused-argument
     """

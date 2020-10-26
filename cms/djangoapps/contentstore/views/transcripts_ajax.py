@@ -30,14 +30,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.video_module.transcripts_utils import (
     clean_video_id,
-    copy_or_rename_transcript,
     download_youtube_subs,
     GetTranscriptsFromYouTubeException,
-    get_video_transcript_content,
-    generate_subs_from_source,
     get_transcript_for_video,
     get_transcripts_from_youtube,
-    remove_subs_from_store,
     Transcript,
     TranscriptsRequestValidationException,
     TranscriptsGenerationException,

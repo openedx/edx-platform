@@ -9,61 +9,70 @@ from django.conf import settings
 from django.template import defaultfilters
 from django.test import RequestFactory, override_settings
 from django.utils import timezone
+from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
 
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from course_modes.models import CourseMode
 from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from mobile_api.testutils import (
     MobileAPITestCase,
     MobileAuthTestMixin,
     MobileAuthUserTestMixin,
     MobileCourseAccessTestMixin
 )
+from mobile_api.utils import API_V05, API_V1
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.tests import attr
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory
 from util.milestones_helpers import set_prerequisite_courses
 from util.testing import UrlResetMixin
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from .. import errors
-from .serializers import CourseEnrollmentSerializer
+from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05
 
 
 @attr(shard=9)
+@ddt.ddt
 class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
-    Tests for /api/mobile/v0.5/users/<user_name>...
+    Tests for /api/mobile/{api_version}/users/<user_name>...
     """
-    REVERSE_INFO = {'name': 'user-detail', 'params': ['username']}
+    REVERSE_INFO = {'name': 'user-detail', 'params': ['username', 'api_version']}
 
-    def test_success(self):
+    @ddt.data(API_V05, API_V1)
+    def test_success(self, api_version):
         self.login()
 
-        response = self.api_response()
+        response = self.api_response(api_version=api_version)
         self.assertEqual(response.data['username'], self.user.username)
         self.assertEqual(response.data['email'], self.user.email)
 
 
 @attr(shard=9)
+@ddt.ddt
 class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
     """
-    Tests for /api/mobile/v0.5/my_user_info
+    Tests for /api/mobile/{api_version}/my_user_info
     """
-    def reverse_url(self, reverse_args=None, **kwargs):
-        return '/api/mobile/v0.5/my_user_info'
+    REVERSE_INFO = {'name': 'user-info', 'params': ['api_version']}
 
-    def test_success(self):
+    @ddt.data(API_V05, API_V1)
+    def test_success(self, api_version):
         """Verify the endpoint redirects to the user detail endpoint"""
         self.login()
 
-        response = self.api_response(expected_response_code=302)
+        response = self.api_response(expected_response_code=302, api_version=api_version)
         self.assertIn(self.username, response['location'])
 
 
@@ -73,14 +82,15 @@ class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
 class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTestMixin,
                             MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
-    Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
+    Tests for /api/mobile/{api_version}/users/<user_name>/course_enrollments/
     """
-    REVERSE_INFO = {'name': 'courseenrollment-detail', 'params': ['username']}
+    REVERSE_INFO = {'name': 'courseenrollment-detail', 'params': ['username', 'api_version']}
     ALLOW_ACCESS_TO_UNRELEASED_COURSE = True
     ALLOW_ACCESS_TO_MILESTONE_COURSE = True
     ALLOW_ACCESS_TO_NON_VISIBLE_COURSE = True
     NEXT_WEEK = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=7)
     LAST_WEEK = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=7)
+    THREE_YEARS_AGO = now() - datetime.timedelta(days=(365 * 3))
     ADVERTISED_START = "Spring 2016"
     ENABLED_SIGNALS = ['course_published']
     DATES = {
@@ -121,7 +131,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertEqual(len(courses), 0)
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
-    def test_sort_order(self):
+    @ddt.data(API_V05, API_V1)
+    def test_sort_order(self, api_version):
         self.login()
 
         num_courses = 3
@@ -131,19 +142,20 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             self.enroll(courses[course_index].id)
 
         # verify courses are returned in the order of enrollment, with most recently enrolled first.
-        response = self.api_response()
+        response = self.api_response(api_version=api_version)
         for course_index in range(num_courses):
             self.assertEqual(
                 response.data[course_index]['course']['id'],
                 unicode(courses[num_courses - course_index - 1].id)
             )
 
+    @ddt.data(API_V05, API_V1)
     @patch.dict(settings.FEATURES, {
         'ENABLE_PREREQUISITE_COURSES': True,
         'DISABLE_START_DATES': False,
         'ENABLE_MKTG_SITE': True,
     })
-    def test_courseware_access(self):
+    def test_courseware_access(self, api_version):
         self.login()
 
         course_with_prereq = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
@@ -170,7 +182,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             self.enroll(course.id)
 
         # Verify courses have the correct response through error code. Last enrolled course is first course in response
-        response = self.api_response()
+        response = self.api_response(api_version=api_version)
         for course_index in range(len(courses)):
             result = response.data[course_index]['course']['courseware_access']
             self.assertEqual(result['error_code'], expected_error_codes[::-1][course_index])
@@ -179,16 +191,22 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 self.assertFalse(result['has_access'])
 
     @ddt.data(
-        ('next_week', ADVERTISED_START, ADVERTISED_START, "string"),
-        ('next_week', None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
-        ('next_week', '', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp"),
-        ('default_start_date', ADVERTISED_START, ADVERTISED_START, "string"),
-        ('default_start_date', '', None, "empty"),
-        ('default_start_date', None, None, "empty"),
+        ('next_week', ADVERTISED_START, ADVERTISED_START, "string", API_V05),
+        ('next_week', ADVERTISED_START, ADVERTISED_START, "string", API_V1),
+        ('next_week', None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V05),
+        ('next_week', None, defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V1),
+        ('next_week', '', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V05),
+        ('next_week', '', defaultfilters.date(NEXT_WEEK, "DATE_FORMAT"), "timestamp", API_V1),
+        ('default_start_date', ADVERTISED_START, ADVERTISED_START, "string", API_V05),
+        ('default_start_date', ADVERTISED_START, ADVERTISED_START, "string", API_V1),
+        ('default_start_date', '', None, "empty", API_V05),
+        ('default_start_date', '', None, "empty", API_V1),
+        ('default_start_date', None, None, "empty", API_V05),
+        ('default_start_date', None, None, "empty", API_V1),
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False, 'ENABLE_MKTG_SITE': True})
-    def test_start_type_and_display(self, start, advertised_start, expected_display, expected_type):
+    def test_start_type_and_display(self, start, advertised_start, expected_display, expected_type, api_version):
         """
         Tests that the correct start_type and start_display are returned in the
         case the course has not started
@@ -197,19 +215,21 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         course = CourseFactory.create(start=self.DATES[start], advertised_start=advertised_start, mobile_available=True)
         self.enroll(course.id)
 
-        response = self.api_response()
+        response = self.api_response(api_version=api_version)
         self.assertEqual(response.data[0]['course']['start_type'], expected_type)
         self.assertEqual(response.data[0]['course']['start_display'], expected_display)
 
+    @ddt.data(API_V05, API_V1)
     @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True, 'ENABLE_MKTG_SITE': True})
-    def test_discussion_url(self):
+    def test_discussion_url(self, api_version):
         self.login_and_enroll()
 
-        response = self.api_response()
+        response = self.api_response(api_version=api_version)
         response_discussion_url = response.data[0]['course']['discussion_url']
         self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
 
-    def test_org_query(self):
+    @ddt.data(API_V05, API_V1)
+    def test_org_query(self, api_version):
         self.login()
 
         # Create list of courses with various organizations
@@ -226,7 +246,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         for course in courses:
             self.enroll(course.id)
 
-        response = self.api_response(data={'org': 'edX'})
+        response = self.api_response(data={'org': 'edX'}, api_version=api_version)
 
         # Test for 3 expected courses
         self.assertEqual(len(response.data), 3)
@@ -235,14 +255,79 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         for entry in response.data:
             self.assertEqual(entry['course']['org'], 'edX')
 
+    def create_enrollment(self, expired):
+        """
+        Create an enrollment
+        """
+        if expired:
+            course = CourseFactory.create(start=self.THREE_YEARS_AGO, mobile_available=True)
+            enrollment = CourseEnrollmentFactory.create(
+                user=self.user,
+                course_id=course.id
+            )
+            ScheduleFactory(start=self.THREE_YEARS_AGO, enrollment=enrollment)
+        else:
+            course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
+            self.enroll(course.id)
+
+        add_course_mode(course, upgrade_deadline_expired=False)
+
+    def _get_enrollment_data(self, api_version, expired):
+        self.login()
+        self.create_enrollment(expired)
+        return self.api_response(api_version=api_version).data
+
+    def _assert_enrollment_results(self, api_version, courses, num_courses_returned, gating_enabled=True):
+        self.assertEqual(len(courses), num_courses_returned)
+
+        if api_version == API_V05:
+            if num_courses_returned:
+                self.assertNotIn('audit_access_expires', courses[0])
+        else:
+            self.assertIn('audit_access_expires', courses[0])
+            if gating_enabled:
+                self.assertIsNotNone(courses[0].get('audit_access_expires'))
+
+    @ddt.data(
+        (API_V05, True, 0),
+        (API_V05, False, 1),
+        (API_V1, True, 1),
+        (API_V1, False, 1),
+    )
+    @ddt.unpack
+    def test_enrollment_with_gating(self, api_version, expired, num_courses_returned):
+        '''
+        Test that expired courses are only returned in v1 of API
+        when waffle flag enabled, and un-expired courses always returned
+        '''
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
+        courses = self._get_enrollment_data(api_version, expired)
+        self._assert_enrollment_results(api_version, courses, num_courses_returned, True)
+
+    @ddt.data(
+        (API_V05, True, 1),
+        (API_V05, False, 1),
+        (API_V1, True, 1),
+        (API_V1, False, 1),
+    )
+    @ddt.unpack
+    def test_enrollment_no_gating(self, api_version, expired, num_courses_returned):
+        '''
+        Test that expired and non-expired courses returned if waffle flag is disabled
+        regarless of version of API
+        '''
+        CourseDurationLimitConfig.objects.create(enabled=False)
+        courses = self._get_enrollment_data(api_version, expired)
+        self._assert_enrollment_results(api_version, courses, num_courses_returned, False)
+
 
 @attr(shard=9)
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, MilestonesTestCaseMixin):
     """
-    Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
+    Tests for /api/mobile/{api_version}/users/<user_name>/course_enrollments/
     """
-    REVERSE_INFO = {'name': 'courseenrollment-detail', 'params': ['username']}
+    REVERSE_INFO = {'name': 'courseenrollment-detail', 'params': ['username', 'api_version']}
     ENABLED_SIGNALS = ['course_published']
 
     def verify_pdf_certificate(self):
@@ -315,9 +400,9 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 @attr(shard=9)
 class CourseStatusAPITestCase(MobileAPITestCase):
     """
-    Base test class for /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
+    Base test class for /api/mobile/{api_version}/users/<user_name>/course_status_info/{course_id}
     """
-    REVERSE_INFO = {'name': 'user-course-status', 'params': ['username', 'course_id']}
+    REVERSE_INFO = {'name': 'user-course-status', 'params': ['username', 'course_id', 'api_version']}
 
     def setUp(self):
         """
@@ -373,7 +458,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
     """
     Tests for PATCH of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
-    def url_method(self, url, **kwargs):
+    def url_method(self, url, **kwargs):  # pylint: disable=arguments-differ
         # override implementation to use PATCH method.
         return self.client.patch(url, data=kwargs.get('data', None))
 
@@ -472,6 +557,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 
 
 @attr(shard=9)
+@ddt.ddt
 @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
 class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin):
@@ -486,14 +572,37 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         self.request = RequestFactory().get('/')
         self.request.user = self.user
 
-    def test_success(self):
-        serialized = CourseEnrollmentSerializer(
+    def get_serialized_data(self, api_version):
+        '''
+        Return data from CourseEnrollmentSerializer
+        '''
+        if api_version == API_V05:
+            serializer = CourseEnrollmentSerializerv05
+        else:
+            serializer = CourseEnrollmentSerializer
+
+        return serializer(
             CourseEnrollment.enrollments_for_user(self.user)[0],
-            context={'request': self.request},
+            context={'request': self.request, 'api_version': api_version},
         ).data
+
+    def _expiration_in_response(self, response, api_version):
+        '''
+        Assert that audit_access_expires field in present in response
+        based on version of api being used
+        '''
+        if api_version != API_V05:
+            self.assertIn('audit_access_expires', response)
+        else:
+            self.assertNotIn('audit_access_expires', response)
+
+    @ddt.data(API_V05, API_V1)
+    def test_success(self, api_version):
+        serialized = self.get_serialized_data(api_version)
         self.assertEqual(serialized['course']['name'], self.course.display_name)
         self.assertEqual(serialized['course']['number'], self.course.id.course)
         self.assertEqual(serialized['course']['org'], self.course.id.org)
+        self._expiration_in_response(serialized, api_version)
 
         # Assert utm parameters
         expected_utm_parameters = {
@@ -502,14 +611,13 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         }
         self.assertEqual(serialized['course']['course_sharing_utm_parameters'], expected_utm_parameters)
 
-    def test_with_display_overrides(self):
+    @ddt.data(API_V05, API_V1)
+    def test_with_display_overrides(self, api_version):
         self.course.display_coursenumber = "overridden_number"
         self.course.display_organization = "overridden_org"
         self.store.update_item(self.course, self.user.id)
 
-        serialized = CourseEnrollmentSerializer(
-            CourseEnrollment.enrollments_for_user(self.user)[0],
-            context={'request': self.request},
-        ).data
+        serialized = self.get_serialized_data(api_version)
         self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
         self.assertEqual(serialized['course']['org'], self.course.display_organization)
+        self._expiration_in_response(serialized, api_version)

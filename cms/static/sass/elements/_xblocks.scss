@@ -887,6 +887,14 @@
   }
 }
 
+.wrapper-comp-plugins {
+  display: none;
+
+  &.is-active {
+    display: block;
+  }
+}
+
 
 // +Case - Special Xblock Type Overrides
 // ====================

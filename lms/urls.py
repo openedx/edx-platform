@@ -153,7 +153,7 @@ urlpatterns = [
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
-        url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
+        url(r'^api/mobile/(?P<api_version>v(1|0.5))/', include('mobile_api.urls')),
     ]
 
 if settings.FEATURES.get('ENABLE_OPENBADGES'):
@@ -519,6 +519,9 @@ urlpatterns += [
         discussion_views.course_discussions_settings_handler,
         name='course_discussions_settings',
     ),
+
+    # Cohorts management API
+    url(r'^api/cohorts/', include('openedx.core.djangoapps.course_groups.urls', namespace='api_cohorts')),
 
     # Cohorts management
     url(
@@ -1014,11 +1017,6 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
     urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
-
-# include into our URL patterns the HTTP REST API that comes with edx-proctoring.
-urlpatterns += [
-    url(r'^api/', include('edx_proctoring.urls')),
-]
 
 if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
     urlpatterns += [

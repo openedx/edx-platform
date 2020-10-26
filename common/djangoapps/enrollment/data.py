@@ -27,6 +27,7 @@ from student.models import (
     EnrollmentClosedError,
     NonExistentCourseError
 )
+from student.roles import RoleCache
 
 log = logging.getLogger(__name__)
 
@@ -337,3 +338,16 @@ def get_course_enrollment_info(course_id, include_expired=False):
         raise CourseNotFoundError(msg)
     else:
         return CourseSerializer(course, include_expired=include_expired).data
+
+
+def get_user_roles(user_id):
+    """
+    Returns a list of all roles that this user has.
+    :param user_id: The id of the selected user.
+    :return: All roles for all courses that this user has.
+    """
+    user = _get_user(user_id)
+    if not hasattr(user, '_roles'):
+        user._roles = RoleCache(user)
+    role_cache = user._roles
+    return role_cache._roles

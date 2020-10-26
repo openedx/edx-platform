@@ -23,7 +23,7 @@ from enrollment.errors import (
 from enrollment.serializers import CourseEnrollmentSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, CourseAccessRoleFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -378,3 +378,19 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
         if not include_expired:
             self.assertNotIn('verified', result_slugs)
+
+    def test_get_roles(self):
+        """Create a role for a user, then get it"""
+        expected_role = CourseAccessRoleFactory.create(course_id=self.course.id, user=self.user, role="SuperCoolTestRole")
+        roles = data.get_user_roles(self.user.username)
+        self.assertEqual(roles, {expected_role})
+
+    def test_get_roles_no_roles(self):
+        """Get roles for a user who has no roles"""
+        roles = data.get_user_roles(self.user.username)
+        self.assertEqual(roles, set())
+
+    def test_get_roles_invalid_user(self):
+        """Get roles for a user that doesn't exist"""
+        with pytest.raises(UserNotFoundError):
+            data.get_user_roles("i_dont_exist_and_should_raise_an_error")

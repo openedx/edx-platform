@@ -2,6 +2,7 @@
 This file contains helpers for paver commands, Django is not initialized in paver commands.
 So, django settings, models etc. can not be used here.
 """
+from __future__ import print_function
 import os
 
 from path import Path
@@ -27,13 +28,13 @@ def get_theme_paths(themes, theme_dirs):
     for theme in themes:
         theme_base_dirs = get_theme_base_dirs(theme, theme_dirs)
         if not theme_base_dirs:
-            print(
+            print((
                 "\033[91m\nSkipping '{theme}': \n"
                 "Theme ({theme}) not found in any of the theme dirs ({theme_dirs}). \033[00m".format(
                     theme=theme,
                     theme_dirs=", ".join(theme_dirs)
                 ),
-            )
+            ))
         theme_paths.extend(theme_base_dirs)
 
     return theme_paths

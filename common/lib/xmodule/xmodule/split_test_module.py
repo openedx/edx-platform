@@ -333,8 +333,18 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Record in the tracking logs which child was rendered
         """
         # TODO: use publish instead, when publish is wired to the tracking logs
-        self.system.track_function('xblock.split_test.child_render', {'child_id': text_type(self.child.scope_ids.usage_id)})
-        return Response()
+        try:
+            child_id = text_type(self.child.scope_ids.usage_id)
+        except Exception:
+            log.info(
+                "Can't get usage_id of Nonetype object in course {course_key}".format(
+                    course_key=unicode(self.location.course_key)
+                )
+            )
+            raise
+        else:
+            self.system.track_function('xblock.split_test.child_render', {'child_id': child_id})
+            return Response()
 
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'

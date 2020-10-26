@@ -238,6 +238,9 @@ $zebra-stripe-color: rgb(249, 250, 252) !default;
 $divider-color: rgb(226, 231, 236) !default;
 $lms-preview-menu-color: #c8c8c8 !default;
 
+//Form control border color for account settings
+$gray58-border: tint($gray, 22%) !default;
+
 // old color variables
 // DEPRECATED: Do not continue to use these colors, instead use pattern libary and base colors above.
 $dark-gray1: rgb(74, 74, 74) !default;

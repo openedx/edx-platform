@@ -1,6 +1,7 @@
 """
 Helper functions for test tasks
 """
+from __future__ import print_function
 import os
 import re
 import subprocess
@@ -68,7 +69,7 @@ def clean_reports_dir(options):
     Clean coverage files, to ensure that we don't use stale data to generate reports.
     """
     if getattr(options, 'skip_clean', False):
-        print '--skip-clean is set, skipping...'
+        print('--skip-clean is set, skipping...')
         return
 
     # We delete the files but preserve the directory structure

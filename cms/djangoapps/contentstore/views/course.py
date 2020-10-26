@@ -1,6 +1,7 @@
 """
 Views related to operations on course objects
 """
+from collections import defaultdict
 import copy
 import json
 import logging
@@ -66,6 +67,8 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
+from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student import auth
 from student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
 from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
@@ -90,6 +93,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
+from xmodule.partitions.partitions import UserPartition
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 
 from .component import ADVANCED_COMPONENT_TYPES
@@ -901,7 +905,7 @@ def create_new_course_in_store(store, user, org, number, run, fields):
     return new_course
 
 
-def rerun_course(user, source_course_key, org, number, run, fields, async=True):
+def rerun_course(user, source_course_key, org, number, run, fields, background=True):
     """
     Rerun an existing course.
     """
@@ -934,7 +938,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, async=True):
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     args = [unicode(source_course_key), unicode(destination_course_key), user.id, json_fields]
 
-    if async:
+    if background:
         rerun_course_task.delay(*args)
     else:
         rerun_course_task(*args)
@@ -1563,7 +1567,7 @@ def remove_content_or_experiment_group(request, store, course, configuration, gr
 
         group_id = int(group_id)
         usages = GroupConfiguration.get_partitions_usage_info(store, course)
-        used = group_id in usages
+        used = group_id in usages[configuration.id]
 
         if used:
             return JsonResponse(
@@ -1615,9 +1619,15 @@ def group_configurations_list_handler(request, course_key_string):
             has_content_groups = False
             displayable_partitions = []
             for partition in all_partitions:
+                partition['read_only'] = getattr(UserPartition.get_scheme(partition['scheme']), 'read_only', False)
+
                 if partition['scheme'] == COHORT_SCHEME:
                     has_content_groups = True
                     displayable_partitions.append(partition)
+                elif partition['scheme'] == CONTENT_TYPE_GATING_SCHEME:
+                    # Add it to the front of the list if it should be shown.
+                    if ContentTypeGatingConfig.current(course_key=course_key).studio_override_enabled:
+                        displayable_partitions.append(partition)
                 elif partition['scheme'] == ENROLLMENT_SCHEME:
                     should_show_enrollment_track = len(partition['groups']) > 1
 
@@ -1629,6 +1639,12 @@ def group_configurations_list_handler(request, course_key_string):
                     # want to display their groups twice.
                     displayable_partitions.append(partition)
 
+            # Set the sort-order. Higher numbers sort earlier
+            scheme_priority = defaultdict(lambda: -1, {
+                ENROLLMENT_SCHEME: 1,
+                CONTENT_TYPE_GATING_SCHEME: 0
+            })
+            displayable_partitions.sort(key=lambda p: scheme_priority[p['scheme']], reverse=True)
             # Add empty content group if there is no COHORT User Partition in the list.
             # This will add ability to add new groups in the view.
             if not has_content_groups:

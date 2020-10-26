@@ -25,15 +25,12 @@ from openedx.core.djangoapps.user_authn.views.register import (
     _skip_activation_email,
 )
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts import (
     USERNAME_BAD_LENGTH_MSG, USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_UNICODE
 )
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PASSWORD_UNICODE_NORMALIZE_FLAG, PREVENT_AUTH_USER_WRITES, waffle
-)
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.models import UserAttribute
 from student.tests.factories import UserFactory
@@ -105,7 +102,7 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.params = {
             "username": self.username,
             "email": "test@example.org",
-            "password": "testpass",
+            "password": u"testpass",
             "name": "Test User",
             "honor_code": "true",
             "terms_of_service": "true",
@@ -136,7 +133,6 @@ class TestCreateAccount(SiteMixin, TestCase):
         user = User.objects.get(username=self.username)
         return user.profile
 
-    @override_waffle_flag(PASSWORD_UNICODE_NORMALIZE_FLAG, active=True)
     def test_create_account_and_normalize_password(self):
         """
         Test that unicode normalization on passwords is happening when a user registers.
@@ -186,8 +182,8 @@ class TestCreateAccount(SiteMixin, TestCase):
         "Microsites not implemented in this environment"
     )
     @override_settings(LMS_SEGMENT_KEY="testkey")
-    @mock.patch('openedx.core.djangoapps.user_authn.views.register.analytics.track')
-    @mock.patch('openedx.core.djangoapps.user_authn.views.register.analytics.identify')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.register.segment.track')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.register.segment.identify')
     def test_segment_tracking(self, mock_segment_identify, _):
         year = datetime.now().year
         year_of_birth = year - 14

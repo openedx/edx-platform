@@ -1,14 +1,13 @@
 """
 Tests for paver quality tasks
 """
+from __future__ import print_function
 import os
 import shutil
 import tempfile
 import textwrap
 import unittest
 
-import paver.easy
-import paver.tasks
 from ddt import ddt, file_data, data, unpack
 from mock import MagicMock, mock_open, patch
 from path import Path as path
@@ -321,13 +320,14 @@ class TestPaverRunQuality(PaverTestCase):
             with self.assertRaises(SystemExit):
                 pavelib.quality.run_quality("")
                 self.assertRaises(BuildFailure)
-        print self._mock_paver_sh.mock_calls
+        print(self._mock_paver_sh.mock_calls)
 
         # Test that pylint is called
         _mock_pylint_violations.assert_called_once_with(clean=False)
-        # Assert that sh was called twice- once for diff quality with pylint
+        # Assert that sh was called four times - once to get the comparison commit hash,
+        # once to get the current commit hash, once for diff quality with pylint,
         # and once for diff quality with eslint
-        self.assertEqual(self._mock_paver_sh.call_count, 2)
+        self.assertEqual(self._mock_paver_sh.call_count, 4)
 
     @patch('__builtin__.open', mock_open())
     def test_other_exception(self):

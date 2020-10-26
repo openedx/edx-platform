@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Settings for Bok Choy tests that are used when running Studio.
 
@@ -13,6 +14,7 @@ from the same directory.
 import os
 from path import Path as path
 
+from django.utils.translation import ugettext_lazy
 from openedx.core.release import RELEASE_LINE
 
 ########################## Prod-like settings ###################################
@@ -51,6 +53,11 @@ XBLOCK_SETTINGS.update({'VideoDescriptor': {'licensing_enabled': True}})
 
 # Capture the console log via template includes, until webdriver supports log capture again
 CAPTURE_CONSOLE_LOG = True
+
+PLATFORM_NAME = ugettext_lazy(u"édX")
+PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
+STUDIO_NAME = ugettext_lazy(u"Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_SHORT_NAME = ugettext_lazy(u"𝓢𝓽𝓾𝓭𝓲𝓸")
 
 ############################ STATIC FILES #############################
 
@@ -141,7 +148,7 @@ MOCK_SEARCH_BACKING_FILE = (
 # this secret key should be the same as lms/envs/bok_choy.py's
 SECRET_KEY = "very_secret_bok_choy_key"
 
-LMS_ROOT_URL = "http://localhost:8000"
+LMS_ROOT_URL = "http://localhost:8003"
 if RELEASE_LINE == "master":
     # On master, acceptance tests use edX books, not the default Open edX books.
     HELP_TOKENS_BOOKS = {

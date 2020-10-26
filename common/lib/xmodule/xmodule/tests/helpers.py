@@ -32,10 +32,19 @@ class StubUserService(UserService):
     """
     Stub UserService for testing the sequence module.
     """
+
+    def __init__(self, is_anonymous=False, **kwargs):
+        self.is_anonymous = is_anonymous
+        super(StubUserService, self).__init__(**kwargs)
+
     def get_current_user(self):
         """
         Implements abstract method for getting the current user.
         """
         user = XBlockUser()
-        user.opt_attrs['edx-platform.username'] = 'bilbo'
+        if self.is_anonymous:
+            user.opt_attrs['edx-platform.username'] = 'anonymous'
+            user.opt_attrs['edx-platform.is_authenticated'] = False
+        else:
+            user.opt_attrs['edx-platform.username'] = 'bilbo'
         return user

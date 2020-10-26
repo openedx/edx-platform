@@ -5,9 +5,7 @@ import fnmatch
 import functools
 import json
 import logging
-import random
 import re
-import string
 import unicodedata
 import urllib
 from textwrap import dedent

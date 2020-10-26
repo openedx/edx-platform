@@ -7,19 +7,24 @@ import json
 import unittest
 
 import ddt
-import mock
 from django.conf import settings
+from django.test import RequestFactory
 from django.test.utils import override_settings
 from pytz import UTC
-from milestones.tests.utils import MilestonesTestCaseMixin
+import mock
 from mock import Mock, patch
+from crum import set_current_request
+from milestones.tests.utils import MilestonesTestCaseMixin
+
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
+from contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 from milestones.models import MilestoneRelationshipType
 from models.settings.course_grading import CourseGradingModel, GRADING_POLICY_CHANGED_EVENT_TYPE, hash_grading_policy
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from util import milestones_helpers
@@ -569,11 +574,13 @@ class CourseGradingTest(CourseTestCase):
 
         # one for each of the calls to update_from_json()
         send_signal.assert_has_calls([
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_3),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_4),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_4),
+            # pylint: enable=line-too-long
         ])
 
         # one for each of the calls to update_from_json(); the last update doesn't actually change the parts of the
@@ -619,9 +626,11 @@ class CourseGradingTest(CourseTestCase):
 
         # one for each of the calls to update_grader_from_json()
         send_signal.assert_has_calls([
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_3),
+            # pylint: enable=line-too-long
         ])
 
         # one for each of the calls to update_grader_from_json()
@@ -734,8 +743,10 @@ class CourseGradingTest(CourseTestCase):
 
         # one for each call to update_section_grader_type()
         send_signal.assert_has_calls([
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
+            # pylint: enable=line-too-long
         ])
 
         tracker.emit.assert_has_calls([
@@ -796,7 +807,7 @@ class CourseGradingTest(CourseTestCase):
             '{}/{}'.format(grader_type_url_base, len(original_model['graders'])),
             new_grader
         )
-
+        grading_policy_hash1 = self._grading_policy_hash_for_course()
         self.assertEqual(200, response.status_code)
         grader_sample = json.loads(response.content)
         new_grader['id'] = len(original_model['graders'])
@@ -804,7 +815,7 @@ class CourseGradingTest(CourseTestCase):
 
         # test deleting the original grader
         response = self.client.delete(grader_type_url_base + '/1', HTTP_ACCEPT="application/json")
-
+        grading_policy_hash2 = self._grading_policy_hash_for_course()
         self.assertEqual(204, response.status_code)
         updated_model = self._model_from_url(grader_type_url_base)
         new_grader['id'] -= 1  # one fewer and the id mutates
@@ -812,9 +823,11 @@ class CourseGradingTest(CourseTestCase):
         self.assertNotIn(original_model['graders'][1], updated_model['graders'])
         send_signal.assert_has_calls([
             # once for the POST
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_hash1),
             # once for the DELETE
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_hash2),
+            # pylint: enable=line-too-long
         ])
 
     def setup_test_set_get_section_grader_ajax(self):
@@ -855,11 +868,17 @@ class CourseMetadataEditingTest(CourseTestCase):
     shard = 1
 
     def setUp(self):
-        CourseTestCase.setUp(self)
+        super(CourseMetadataEditingTest, self).setUp()
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
         self.notes_tab = {"type": "notes", "name": "My Notes"}
+
+        self.request = RequestFactory().request()
+        self.user = UserFactory()
+        self.request.user = self.user
+        set_current_request(self.request)
+        self.addCleanup(set_current_request, None)
 
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course)
@@ -1091,7 +1110,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         fresh = modulestore().get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
 
-        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')
+        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')  # pylint: disable=line-too-long
         self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
                             'days_early_for beta should not be updated to a wrong value')
 
@@ -1253,6 +1272,193 @@ class CourseMetadataEditingTest(CourseTestCase):
             'advanced_modules': {"value": [""]}
         })
         self.assertEqual(response.status_code, 200)
+
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_proctoring_provider_present_when_waffle_flag_enabled(self):
+        """
+        Tests that proctoring provider field is not filtered out when the waffle flag is enabled.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertIn('proctoring_provider', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {}
+        }
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_validate_update_does_not_filter_out_proctoring_provider_when_waffle_flag_enabled(self):
+        """
+        Tests that proctoring provider field is returned by validate_and_update_from_json method when
+        waffle flag is enabled.
+        """
+        field_name = "proctoring_provider"
+
+        _, _, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                field_name: {"value": 'test_proctoring_provider'},
+            },
+            user=self.user
+        )
+        self.assertIn(field_name, test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {}
+        }
+    )
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, True)
+    def test_update_from_json_does_not_filter_out_proctoring_provider_when_waffle_flag_enabled(self):
+        """
+        Tests that proctoring provider field is returned by update_from_json method when
+        waffle flag is enabled.
+        """
+        field_name = "proctoring_provider"
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                field_name: {"value": 'test_proctoring_provider'},
+            },
+            user=self.user
+        )
+        self.assertIn(field_name, test_model)
+
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
+    def test_proctoring_provider_not_present_when_waffle_flag_not_enabled(self):
+        """
+        Tests that proctoring provider field is filtered out when the waffle flag is not enabled.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertNotIn('proctoring_provider', test_model)
+
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
+    def test_validate_update_does_filter_out_proctoring_provider_when_waffle_flag_not_enabled(self):
+        """
+        Tests that proctoring provider field is not returned by validate_and_update_from_json method when
+        waffle flag is not enabled.
+        """
+        field_name = "proctoring_provider"
+
+        _, _, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                field_name: {"value": 'test_proctoring_provider'},
+            },
+            user=self.user
+        )
+        self.assertNotIn(field_name, test_model)
+
+    @override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES, False)
+    def test_update_from_json_does_filter_out_proctoring_provider_when_waffle_flag_not_enabled(self):
+        """
+        Tests that proctoring provider field is not returned by update_from_json method when
+        waffle flag is not enabled.
+        """
+        field_name = "proctoring_provider"
+
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                field_name: {"value": 'test_proctoring_provider'},
+            },
+            user=self.user
+        )
+        self.assertNotIn(field_name, test_model)
+
+    def test_create_zendesk_tickets_present_for_edx_staff(self):
+        """
+        Tests that create zendesk tickets field is not filtered out when the user is an edX staff member.
+        """
+        self._set_request_user_to_staff()
+
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertIn('create_zendesk_tickets', test_model)
+
+    def test_validate_update_does_not_filter_out_create_zendesk_tickets_for_edx_staff(self):
+        """
+        Tests that create zendesk tickets field is returned by validate_and_update_from_json method when
+        the user is an edX staff member.
+        """
+        self._set_request_user_to_staff()
+
+        field_name = "create_zendesk_tickets"
+
+        _, _, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                field_name: {"value": True},
+            },
+            user=self.user
+        )
+        self.assertIn(field_name, test_model)
+
+    def test_update_from_json_does_not_filter_out_create_zendesk_tickets_for_edx_staff(self):
+        """
+        Tests that create zendesk tickets field is returned by update_from_json method when
+        the user is an edX staff member.
+        """
+        self._set_request_user_to_staff()
+
+        field_name = "create_zendesk_tickets"
+
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                field_name: {"value": True},
+            },
+            user=self.user
+        )
+        self.assertIn(field_name, test_model)
+
+    def test_create_zendesk_tickets_not_present_for_course_staff(self):
+        """
+        Tests that create zendesk tickets field is filtered out when the user is not an edX staff member.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertNotIn('create_zendesk_tickets', test_model)
+
+    def test_validate_update_does_filter_out_create_zendesk_tickets_for_course_staff(self):
+        """
+        Tests that create zendesk tickets field is not returned by validate_and_update_from_json method when
+        the user is not an edX staff member.
+        """
+        field_name = "create_zendesk_tickets"
+
+        _, _, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                field_name: {"value": True},
+            },
+            user=self.user
+        )
+        self.assertNotIn(field_name, test_model)
+
+    def test_update_from_json_does_filter_out_create_zendesk_tickets_for_course_staff(self):
+        """
+        Tests that create zendesk tickets field is not returned by update_from_json method when
+        the user is not an edX staff member.
+        """
+        field_name = "create_zendesk_tickets"
+
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                field_name: {"value": True},
+            },
+            user=self.user
+        )
+        self.assertNotIn(field_name, test_model)
+
+    def _set_request_user_to_staff(self):
+        """
+        Update the current request's user to be an edX staff member.
+        """
+        self.user.is_staff = True
+        self.request.user = self.user
+        set_current_request(self.request)
 
 
 class CourseGraderUpdatesTest(CourseTestCase):

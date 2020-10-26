@@ -1,6 +1,7 @@
 """
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
+from __future__ import print_function
 
 import logging
 from functools import wraps
@@ -45,6 +46,7 @@ from django_comment_client.utils import (
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
@@ -581,6 +583,12 @@ def user_profile(request, course_key, user_id):
             })
         else:
             tab_view = CourseTabView()
+
+            # To avoid mathjax loading from 'mathjax_include.html'
+            # as that file causes multiple loadings of Mathjax on
+            # 'user_profile' page
+            context['load_mathjax'] = False
+
             return tab_view.get(request, unicode(course_key), 'discussion', profile_page_context=context)
     except User.DoesNotExist:
         raise Http404
@@ -626,8 +634,8 @@ def followed_threads(request, course_key, user_id):
             query_params['group_id'] = group_id
 
         paginated_results = profiled_user.subscribed_threads(query_params)
-        print "\n \n \n paginated results \n \n \n "
-        print paginated_results
+        print("\n \n \n paginated results \n \n \n ")
+        print(paginated_results)
         query_params['page'] = paginated_results.page
         query_params['num_pages'] = paginated_results.num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -712,6 +720,10 @@ class DiscussionBoardFragmentView(EdxFragmentView):
                 else None
             )
             context = _create_discussion_board_context(request, base_context, thread=thread)
+            course_expiration_fragment = generate_course_expired_fragment(request.user, context['course'])
+            context.update({
+                'course_expiration_fragment': course_expiration_fragment,
+            })
             if profile_page_context:
                 # EDUCATOR-2119: styles are hard to reconcile if the profile page isn't also a fragment
                 html = render_to_string('discussion/discussion_profile_page.html', profile_page_context)

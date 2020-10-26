@@ -25,7 +25,6 @@ from .transcripts_utils import (
     clean_video_id,
     get_or_create_sjson,
     generate_sjson_for_all_speeds,
-    save_to_store,
     subs_filename,
     Transcript,
     TranscriptException,

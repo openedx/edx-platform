@@ -20,7 +20,6 @@ from six import text_type
 from social_django.models import UserSocialAuth, Partial
 
 from django_comment_common import models
-from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
 from openedx.core.lib.time_zone_utils import get_display_time_zone
@@ -659,13 +658,7 @@ class LoginSessionViewTest(UserAPITestCase):
         response = self.client.get(reverse("dashboard"))
         self.assertHttpOK(response)
 
-    @ddt.data(
-        (json.dumps(True), False),
-        (json.dumps(False), True),
-        (None, True),
-    )
-    @ddt.unpack
-    def test_login_remember_me(self, remember_value, expire_at_browser_close):
+    def test_session_cookie_expiry(self):
         # Create a test user
         UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
 
@@ -675,17 +668,13 @@ class LoginSessionViewTest(UserAPITestCase):
             "password": self.PASSWORD,
         }
 
-        if remember_value is not None:
-            data["remember"] = remember_value
-
         response = self.client.post(self.url, data)
         self.assertHttpOK(response)
 
         # Verify that the session expiration was set correctly
-        self.assertEqual(
-            self.client.session.get_expire_at_browser_close(),
-            expire_at_browser_close
-        )
+        cookie = self.client.cookies[settings.SESSION_COOKIE_NAME]
+        expected_expiry = datetime.datetime.utcnow() + datetime.timedelta(weeks=4)
+        self.assertIn(expected_expiry.strftime('%d-%b-%Y'), cookie.get('expires'))
 
     def test_invalid_credentials(self):
         # Create a test user
@@ -2739,7 +2728,7 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
         self.assertEqual(time_zone_info['description'], get_display_time_zone(time_zone_name))
 
     # The time zones count may need to change each time we upgrade pytz
-    @ddt.data((ALL_TIME_ZONES_URI, 439),
+    @ddt.data((ALL_TIME_ZONES_URI, 440),
               (COUNTRY_TIME_ZONES_URI, 28))
     @ddt.unpack
     def test_get_basic(self, country_uri, expected_count):

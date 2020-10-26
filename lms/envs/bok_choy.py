@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Settings for Bok Choy tests that are used when running LMS.
 
@@ -14,6 +15,7 @@ import os
 from path import Path as path
 from tempfile import mkdtemp
 
+from django.utils.translation import ugettext_lazy
 from openedx.core.release import RELEASE_LINE
 
 CONFIG_ROOT = path(__file__).abspath().dirname()
@@ -51,6 +53,9 @@ update_module_store_settings(
 
 # Capture the console log via template includes, until webdriver supports log capture again
 CAPTURE_CONSOLE_LOG = True
+
+PLATFORM_NAME = ugettext_lazy(u"édX")
+PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
 
 ############################ STATIC FILES #############################
 
@@ -120,7 +125,6 @@ import logging
 LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
     ('edxmako.shortcuts', logging.ERROR),
-    ('dd.dogapi', logging.ERROR),
     ('edx.discussion', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:
@@ -154,6 +158,9 @@ FEATURES['RESTRICT_AUTOMATIC_AUTH'] = False
 # Open up endpoint for faking Software Secure responses
 FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
 
+# Disable instructor dash buttons for downloading course data when enrollment exceeds this number
+FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS'] = 4
+
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 ########################### Entrance Exams #################################
@@ -176,7 +183,6 @@ YOUTUBE['TEXT_API']['url'] = "{0}:{1}/test_transcripts_youtube/".format(YOUTUBE_
 FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
-FEATURES['ADVANCED_SECURITY'] = False
 
 FEATURES['ENABLE_MOBILE_REST_API'] = True  # Show video bumper in LMS
 FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Show video bumper in LMS
@@ -228,7 +234,10 @@ BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBacke
 # Configure the LMS to use our stub eCommerce implementation
 ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 
-LMS_ROOT_URL = "http://localhost:8000"
+LMS_ROOT_URL = "http://localhost:{}".format(os.environ.get('BOK_CHOY_LMS_PORT', 8003))
+CMS_BASE = "localhost:{}".format(os.environ.get('BOK_CHOY_CMS_PORT', 8031))
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
+
 if RELEASE_LINE == "master":
     # On master, acceptance tests use edX books, not the default Open edX books.
     HELP_TOKENS_BOOKS = {

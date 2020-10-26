@@ -32,6 +32,7 @@ import imp
 import sys
 import os
 
+from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
 
@@ -236,9 +237,6 @@ FEATURES = {
 
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': True,
-
-    # Turn on Advanced Security by default
-    'ADVANCED_SECURITY': True,
 
     # When a logged in user goes to the homepage ('/') should the user be
     # redirected to the dashboard - this is default Open edX behavior. Set to
@@ -1219,6 +1217,8 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 ################################# Middleware ###################################
 
 MIDDLEWARE_CLASSES = [
+    'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+
     'crum.CurrentRequestUserMiddleware',
 
     # A newer and safer request cache.
@@ -1231,6 +1231,7 @@ MIDDLEWARE_CLASSES = [
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
+    'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
     # Allows us to define redirects via Django admin
     'openedx.core.djangoapps.appsembler.sites.middleware.CustomDomainsRedirectMiddleware',
@@ -1309,7 +1310,6 @@ MIDDLEWARE_CLASSES = [
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
-    'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -1356,28 +1356,6 @@ courseware_js = [
     'js/modules/tab.js',
 ]
 
-proctoring_js = (
-    [
-        'proctoring/js/models/proctored_exam_allowance_model.js',
-        'proctoring/js/models/proctored_exam_attempt_model.js',
-        'proctoring/js/models/proctored_exam_model.js'
-    ] +
-    [
-        'proctoring/js/collections/proctored_exam_allowance_collection.js',
-        'proctoring/js/collections/proctored_exam_attempt_collection.js',
-        'proctoring/js/collections/proctored_exam_collection.js'
-    ] +
-    [
-        'proctoring/js/views/Backbone.ModalDialog.js',
-        'proctoring/js/views/proctored_exam_add_allowance_view.js',
-        'proctoring/js/views/proctored_exam_allowance_view.js',
-        'proctoring/js/views/proctored_exam_attempt_view.js',
-        'proctoring/js/views/proctored_exam_view.js'
-    ] +
-    [
-        'proctoring/js/proctored_app.js'
-    ]
-)
 
 # Before a student accesses courseware, we do not
 # need many of the JS dependencies.  This includes
@@ -1434,7 +1412,6 @@ dashboard_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
 discussion_js = (
-    rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/mathjax_include.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'js/customwmd.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'js/mathjax_accessible.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'js/mathjax_delay_renderer.js') +
@@ -1705,10 +1682,6 @@ PIPELINE_JS = {
         ),
         'output_filename': 'js/lms-application.js',
     },
-    'proctoring': {
-        'source_filenames': proctoring_js,
-        'output_filename': 'js/lms-proctoring.js',
-    },
     'courseware': {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',
@@ -1853,6 +1826,10 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+    },
+    'WORKERS': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
 WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
@@ -2044,6 +2021,7 @@ INSTALLED_APPS = [
 
     # Database-backed configuration
     'config_models',
+    'openedx.core.djangoapps.config_model_utils',
     'waffle',
 
     # Monitor the status of services
@@ -2146,9 +2124,6 @@ INSTALLED_APPS = [
 
     # Splash screen
     'splash',
-
-    # Monitoring
-    'openedx.core.djangoapps.datadog.apps.DatadogConfig',
 
     # User API
     'rest_framework',
@@ -2298,6 +2273,8 @@ INSTALLED_APPS = [
     'openedx.features.learner_profile',
     'openedx.features.learner_analytics',
     'openedx.features.portfolio_project',
+    'openedx.features.course_duration_limits',
+    'openedx.features.content_type_gating',
 
     'experiments',
 
@@ -2517,13 +2494,16 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
+    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+        'use-jwt-cookie',
+    )
 
 # Default cache expiration for the cross-domain proxy HTML page.
 # This is a static page that can be iframed into an external page
 # to simulate cross-domain requests.
 XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 
-LOGIN_REDIRECT_WHITELIST = []
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ###################### Registration ##################################
 
@@ -2888,9 +2868,6 @@ OPTIONAL_APPS = [
     # edxval
     ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
 
-    # edX Proctoring
-    ('edx_proctoring', None),
-
     # Organizations App (http://github.com/edx/edx-organizations)
     ('organizations', None),
 
@@ -2922,10 +2899,6 @@ for app_name, insert_before in OPTIONAL_APPS:
         INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
     except (IndexError, ValueError):
         INSTALLED_APPS.append(app_name)
-
-### ADVANCED_SECURITY_CONFIG
-# Empty by default
-ADVANCED_SECURITY_CONFIG = {}
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
@@ -3038,6 +3011,7 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "account_privacy",
         "accomplishments_shared",
         "extended_profile",
+        "secondary_email",
     ]
 }
 
@@ -3089,7 +3063,7 @@ FIELD_OVERRIDE_PROVIDERS = ()
 
 # Modulestore-level field override providers. These field override providers don't
 # require student context.
-MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ()
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ('openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',)  # pylint: disable=line-too-long
 
 # PROFILE IMAGE CONFIG
 # WARNING: Certain django storage backends do not support atomic
@@ -3185,6 +3159,8 @@ JWT_AUTH = {
     'JWT_LEEWAY': 1,
     'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.auth.jwt.decoder.jwt_decode_handler',
 
+    'JWT_AUTH_COOKIE': 'edx-jwt-cookie',
+
     # Number of seconds before JWTs expire
     'JWT_EXPIRATION': 30,
     'JWT_IN_COOKIE_EXPIRATION': 60 * 60,
@@ -3222,14 +3198,6 @@ MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 ################################ Settings for rss_proxy ################################
 
 RSS_PROXY_CACHE_TIMEOUT = 3600  # The length of time we cache RSS retrieved from remote URLs in seconds
-
-#### PROCTORING CONFIGURATION DEFAULTS
-
-PROCTORING_BACKEND_PROVIDER = {
-    'class': 'edx_proctoring.backends.null.NullBackendProvider',
-    'options': {},
-}
-PROCTORING_SETTINGS = {}
 
 #### Custom Courses for EDX (CCX) configuration
 
@@ -3423,6 +3391,11 @@ COURSE_ENROLLMENT_MODES = {
     },
 }
 
+CONTENT_TYPE_GATE_GROUP_IDS = {
+    'limited_access': 1,
+    'full_access': 2,
+}
+
 ############## Settings for the Discovery App ######################
 
 COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
@@ -3484,6 +3457,11 @@ RETIREMENT_STATES = [
     'ABORTED',
     'COMPLETE',
 ]
+
+############## Settings for Writable Gradebook  #########################
+# If running a Gradebook container locally,
+# modify lms/envs/private.py to give it a non-null value
+WRITABLE_GRADEBOOK_URL = None
 
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [

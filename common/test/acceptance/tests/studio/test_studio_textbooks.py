@@ -79,7 +79,8 @@ class TextbooksTest(StudioCourseTest):
 
         self.textbook_view_page.a11y_audit.config.set_rules({
             'ignore': [
-                'section'  # AC-503
+                'section',  # AC-503
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ],
         })
         self.textbook_view_page.a11y_audit.check_for_accessibility_errors()

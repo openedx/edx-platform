@@ -24,6 +24,7 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.scorable import ScorableXBlockMixin
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 
 from xmodule.seq_module import SequenceModule
 from xmodule.util.xmodule_django import add_webpack_to_fragment
@@ -139,14 +140,13 @@ def wrap_xblock(
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
-        'display_name': block.display_name_with_default_escaped,
+        'display_name': block.display_name_with_default_escaped,  # xss-lint: disable=python-deprecated-display-name
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
                                      for key, value in data.iteritems()),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
-        # Replace / with \/ so that "</script>" in the data won't break things.
-        template_context['js_init_parameters'] = json.dumps(frag.json_init_args).replace("/", r"\/")
+        template_context['js_init_parameters'] = frag.json_init_args
     else:
         template_context['js_init_parameters'] = ""
 
@@ -165,7 +165,8 @@ def wrap_xblock_aside(
         context,                        # pylint: disable=unused-argument
         usage_id_serializer,
         request_token,                   # pylint: disable=redefined-outer-name
-        extra_data=None
+        extra_data=None,
+        extra_classes=None
 ):
     """
     Wraps the results of rendering an XBlockAside view in a standard <section> with identifying
@@ -181,6 +182,7 @@ def wrap_xblock_aside(
     :param request_token: An identifier that is unique per-request, so that only xblocks
         rendered as part of this request will have their javascript initialized.
     :param extra_data: A dictionary with extra data values to be set on the wrapper
+    :param extra_classes: A list with extra classes to be set on the wrapper element
     """
 
     if extra_data is None:
@@ -197,6 +199,8 @@ def wrap_xblock_aside(
         ),
         'xblock_asides-v1'
     ]
+    if extra_classes:
+        css_classes.extend(extra_classes)
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
@@ -215,8 +219,7 @@ def wrap_xblock_aside(
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
-        # Replace / with \/ so that "</script>" in the data won't break things.
-        template_context['js_init_parameters'] = json.dumps(frag.json_init_args).replace("/", r"\/")
+        template_context['js_init_parameters'] = frag.json_init_args
     else:
         template_context['js_init_parameters'] = ""
 
@@ -311,6 +314,9 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
 
     Does nothing if module is a SequenceModule.
     """
+    if context and context.get('hide_staff_markup', False):
+        # If hide_staff_markup is passed, don't add the markup
+        return frag
     # TODO: make this more general, eg use an XModule attribute instead
     if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
         # check that the course is a mongo backed Studio course before doing work
@@ -443,6 +449,7 @@ def get_course_update_items(course_updates, provided_index=0):
         except (etree.XMLSyntaxError, etree.ParserError):
             log.error("Cannot parse: " + course_updates.data)
             escaped = escape(course_updates.data)
+            # xss-lint: disable=python-concat-html
             course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
 
         # confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
@@ -511,3 +518,31 @@ def xblock_resource_pkg(block):
         return module_name
 
     return module_name.rsplit('.', 1)[0]
+
+
+def is_xblock_aside(usage_key):
+    """
+    Returns True if the given usage key is for an XBlock aside
+
+    Args:
+        usage_key (opaque_keys.edx.keys.UsageKey): A usage key
+
+    Returns:
+        bool: Whether or not the usage key is an aside key type
+    """
+    return isinstance(usage_key, (AsideUsageKeyV1, AsideUsageKeyV2))
+
+
+def get_aside_from_xblock(xblock, aside_type):
+    """
+    Gets an instance of an XBlock aside from the XBlock that it's decorating. This also
+    configures the aside instance with the runtime and fields of the given XBlock.
+
+    Args:
+        xblock (xblock.core.XBlock): The XBlock that the desired aside is decorating
+        aside_type (str): The aside type
+
+    Returns:
+        xblock.core.XBlockAside: Instance of an xblock aside
+    """
+    return xblock.runtime.get_aside_of_type(xblock, aside_type)

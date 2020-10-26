@@ -75,12 +75,7 @@ class TestPaverPytestCmd(unittest.TestCase):
         ])
 
         if run_under_coverage:
-            if xdist_ip_addresses:
-                for module in Env.covered_modules():
-                    expected_statement.append('--cov')
-                    expected_statement.append(module)
-            else:
-                expected_statement.append('--cov')
+            expected_statement.append('--cov')
             expected_statement.append('--cov-report=')
         return expected_statement
 

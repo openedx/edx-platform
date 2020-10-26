@@ -13,6 +13,8 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
+from django.utils.translation import ugettext_lazy
+
 from .common import *
 import os
 from path import Path as path
@@ -50,6 +52,8 @@ os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
 
 THIS_UUID = uuid4().hex[:5]
 
+FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
+
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
 FEATURES['DISABLE_START_DATES'] = True
@@ -77,6 +81,8 @@ FEATURES['MILESTONES_APP'] = True
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
+
+FEATURES['ENABLE_API_DOCS'] = True
 
 DEFAULT_MOBILE_AVAILABLE = True
 
@@ -222,7 +228,6 @@ FEATURES['ENFORCE_PASSWORD_POLICY'] = False
 FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
-FEATURES['ADVANCED_SECURITY'] = False
 
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
@@ -393,8 +398,12 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
 
-# Include a non-ascii character in PLATFORM_NAME to uncover possible UnicodeEncodeErrors in tests.
-PLATFORM_NAME = u"édX"
+
+# Include a non-ascii character in PLATFORM_NAME and PLATFORM_DESCRIPTION to uncover possible
+# UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
+PLATFORM_NAME = ugettext_lazy(u"édX")
+PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
+
 SITE_NAME = "edx.org"
 
 # set up some testing for microsites
@@ -602,7 +611,6 @@ JWT_AUTH.update({
         'ayjB_lvltHyZxfl0dvruShZOx1N6ykEo7YrAskC_qxUyrIvqmJ64zPW3jkuOYrFs7Ykj3zFx3Zq1H5568G0", "kid": "BTZ9HA6K", "kty"'
         ': "RSA"}'
     ),
-    'JWT_LOGIN_CLIENT_ID': 'test-login-service-client-id',
 })
 
 ####################### Plugin Settings ##########################

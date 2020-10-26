@@ -144,7 +144,10 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
 
         """
         course_key = block_structure.root_block_usage_key.course_key
-        user_can_skip_entrance_exam = EntranceExamConfiguration.user_can_skip_entrance_exam(usage_info.user, course_key)
+        user_can_skip_entrance_exam = False
+        if usage_info.user.is_authenticated:
+            user_can_skip_entrance_exam = EntranceExamConfiguration.user_can_skip_entrance_exam(
+                usage_info.user, course_key)
         required_content = milestones_helpers.get_required_content(course_key, usage_info.user)
 
         if not required_content:

@@ -2,7 +2,7 @@ import logging
 
 import unicodecsv
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db.models import Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey

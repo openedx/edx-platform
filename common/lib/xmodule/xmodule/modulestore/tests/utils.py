@@ -4,7 +4,6 @@ Helper classes and methods for running modulestore tests without Django.
 from uuid import uuid4
 import io
 import os
-import random
 
 from contextlib import contextmanager, nested
 from importlib import import_module

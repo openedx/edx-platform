@@ -15,6 +15,7 @@ from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
 from student import STUDENT_WAFFLE_NAMESPACE
 from student.models import (
+    AccountRecovery,
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -241,6 +242,14 @@ class UserProfileInline(admin.StackedInline):
     verbose_name_plural = _('User profile')
 
 
+class AccountRecoveryInline(admin.StackedInline):
+    """ Inline admin interface for AccountRecovery model. """
+    model = AccountRecovery
+    can_delete = False
+    verbose_name = _('Account recovery')
+    verbose_name_plural = _('Account recovery')
+
+
 class UserChangeForm(BaseUserChangeForm):
     """
     Override the default UserChangeForm such that the password field
@@ -257,7 +266,7 @@ class UserChangeForm(BaseUserChangeForm):
 
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
-    inlines = (UserProfileInline,)
+    inlines = (UserProfileInline, AccountRecoveryInline)
     form = UserChangeForm
 
     def get_readonly_fields(self, request, obj=None):

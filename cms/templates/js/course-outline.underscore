@@ -122,9 +122,15 @@ if (is_proctored_exam) {
                     </span>
                 <% } %>
             </h3>
-
         <div class="<%- xblockType %>-header-actions">
             <ul class="actions-list">
+                <% if (xblockInfo.isSequential() && xblockInfo.get('proctoring_exam_configuration_link')) { %>
+                <li class="action-item">
+                    <a href="<%- xblockInfo.get('proctoring_exam_configuration_link') %>" data-tooltip="<%- gettext('Proctoring Settings') %>" class="proctoring-configuration-button" target="_blank">
+                        <span class="action-button-text"><%- gettext('Proctoring Settings') %></span>
+                    </a>
+                </li>
+                <% } %>
                 <% if (xblockInfo.isPublishable()) { %>
                     <li class="action-item action-publish">
                         <a href="#" data-tooltip="<%- gettext('Publish') %>" class="publish-button action-button">
@@ -218,7 +224,7 @@ if (is_proctored_exam) {
                          -
                         <span class="sr status-proctored-exam-label"> <%- exam_value %> </span>
                         <span class="status-proctored-exam-value"> <%- exam_value %> </span>
-                        <% if (xblockInfo.get('due_date')) { %>
+                        <% if (xblockInfo.get('due_date') && !course.get('self_paced')) { %>
                             <span class="status-grading-date"> <%- gettext('Due:') %> <%- xblockInfo.get('due_date') %> </span>
                         <% } %>
                     </p>

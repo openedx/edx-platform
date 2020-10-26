@@ -4,6 +4,7 @@ Grade service
 from datetime import datetime
 
 import pytz
+from six import text_type
 
 from lms.djangoapps.utils import _get_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -12,7 +13,11 @@ from track.event_transaction_utils import create_new_event_transaction_id, set_e
 from .config.waffle import waffle_flags, REJECTED_EXAM_OVERRIDES_GRADE
 from .constants import ScoreDatabaseTableEnum
 from .events import SUBSECTION_OVERRIDE_EVENT_TYPE
-from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+from .models import (
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
+    PersistentSubsectionGradeOverrideHistory
+)
 from .signals.signals import SUBSECTION_OVERRIDE_CHANGED
 
 
@@ -42,17 +47,13 @@ class GradesService(object):
 
         If override does not exist, returns None. If subsection grade does not exist, will raise an exception.
         """
-        course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
 
-        grade = self.get_subsection_grade(user_id, course_key, usage_key)
+        # Verify that a corresponding subsection grade exists for the given user and usage_key
+        # Raises PersistentSubsectionGrade.DoesNotExist if it does not exist.
+        _ = self.get_subsection_grade(user_id, course_key_or_id, usage_key_or_id)
 
-        try:
-            return PersistentSubsectionGradeOverride.objects.get(
-                grade=grade
-            )
-        except PersistentSubsectionGradeOverride.DoesNotExist:
-            return None
+        return PersistentSubsectionGradeOverride.get_override(user_id, usage_key)
 
     def override_subsection_grade(self, user_id, course_key_or_id, usage_key_or_id, earned_all=None,
                                   earned_graded=None):
@@ -65,17 +66,17 @@ class GradesService(object):
         course_key = _get_key(course_key_or_id, CourseKey)
         usage_key = _get_key(usage_key_or_id, UsageKey)
 
-        grade = PersistentSubsectionGrade.objects.get(
+        grade = PersistentSubsectionGrade.read_grade(
             user_id=user_id,
-            course_id=course_key,
             usage_key=usage_key
         )
 
-        # Create override that will prevent any future updates to grade
-        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
-            grade=grade,
+        override = PersistentSubsectionGradeOverride.update_or_create_override(
+            requesting_user=None,
+            subsection_grade_model=grade,
+            feature=PersistentSubsectionGradeOverrideHistory.PROCTORING,
             earned_all_override=earned_all,
-            earned_graded_override=earned_graded
+            earned_graded_override=earned_graded,
         )
 
         # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
@@ -87,8 +88,8 @@ class GradesService(object):
         SUBSECTION_OVERRIDE_CHANGED.send(
             sender=None,
             user_id=user_id,
-            course_id=unicode(course_key),
-            usage_id=unicode(usage_key),
+            course_id=text_type(course_key),
+            usage_id=text_type(usage_key),
             only_if_higher=False,
             modified=override.modified,
             score_deleted=False,
@@ -112,6 +113,11 @@ class GradesService(object):
 
         # Older rejected exam attempts that transition to verified might not have an override created
         if override is not None:
+            _ = PersistentSubsectionGradeOverrideHistory.objects.create(
+                override_id=override.id,
+                feature=PersistentSubsectionGradeOverrideHistory.PROCTORING,
+                action=PersistentSubsectionGradeOverrideHistory.DELETE
+            )
             override.delete()
 
         # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
@@ -124,8 +130,8 @@ class GradesService(object):
         SUBSECTION_OVERRIDE_CHANGED.send(
             sender=None,
             user_id=user_id,
-            course_id=unicode(course_key),
-            usage_id=unicode(usage_key),
+            course_id=text_type(course_key),
+            usage_id=text_type(usage_key),
             only_if_higher=False,
             modified=datetime.now().replace(tzinfo=pytz.UTC),  # Not used when score_deleted=True
             score_deleted=True,

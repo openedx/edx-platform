@@ -4,7 +4,6 @@ Course Grade Factory Class
 from collections import namedtuple
 from logging import getLogger
 
-import dogstats_wrapper as dog_stats_api
 from six import text_type
 
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED, COURSE_GRADE_NOW_PASSED
@@ -103,8 +102,7 @@ class CourseGradeFactory(object):
         )
         stats_tags = [u'action:{}'.format(course_data.course_key)]
         for user in users:
-            with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=stats_tags):
-                yield self._iter_grade_result(user, course_data, force_update)
+            yield self._iter_grade_result(user, course_data, force_update)
 
     def _iter_grade_result(self, user, course_data, force_update):
         try:
@@ -112,7 +110,7 @@ class CourseGradeFactory(object):
                 'user': user,
                 'course': course_data.course,
                 'collected_block_structure': course_data.collected_structure,
-                'course_key': course_data.course_key
+                'course_key': course_data.course_key,
             }
             if force_update:
                 kwargs['force_update_subsections'] = True

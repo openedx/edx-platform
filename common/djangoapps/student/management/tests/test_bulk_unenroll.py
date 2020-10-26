@@ -7,7 +7,7 @@ from testfixtures import LogCapture
 
 from course_modes.tests.factories import CourseModeFactory
 from student.tests.factories import UserFactory
-from student.models import CourseEnrollment, User
+from student.models import CourseEnrollment
 
 
 LOGGER_NAME = 'student.management.commands.bulk_unenroll'

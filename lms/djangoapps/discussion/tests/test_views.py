@@ -46,6 +46,7 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -430,18 +431,18 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 17, 5),
-        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 17, 5),
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 23, 8),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 23, 8),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 17, 5),
-        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 17, 5),
+        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 23, 8),
+        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 23, 8),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 17, 5),
-        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 17, 5),
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 23, 8),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 23, 8),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 17, 5),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 17, 5),
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 23, 8),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 23, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -455,6 +456,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             num_cached_sql_queries,
             mock_request
     ):
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with modulestore().default_store(default_store):
             course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
 
@@ -1481,6 +1483,7 @@ class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCa
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(InlineDiscussionUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1514,6 +1517,7 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(ForumFormDiscussionUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1603,6 +1607,7 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(ForumDiscussionSearchUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1639,6 +1644,7 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(SingleThreadUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create(discussion_topics={'dummy_discussion_id': {'id': 'dummy_discussion_id'}})
 
@@ -1672,6 +1678,7 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(UserProfileUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1704,6 +1711,7 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(FollowedThreadsUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 

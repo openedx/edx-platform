@@ -42,7 +42,6 @@ from xmodule.services import SettingsService
 from xmodule.studio_editable import has_author_view
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor
-import webpack_loader.utils
 
 from .helpers import render_from_lms
 from .session_kv_store import SessionKeyValueStore

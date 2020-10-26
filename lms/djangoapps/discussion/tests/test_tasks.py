@@ -288,6 +288,7 @@ class TaskTestCase(ModuleStoreTestCase):
             'uuid': 'uuid1',
             'send_uuid': 'uuid2',
             'thread_id': 'dummy_discussion_id',
+            'course_id': 'fake_course_edx',
             'thread_created_at': datetime(2000, 1, 1, 0, 0, 0)
         }
     ), (
@@ -305,6 +306,7 @@ class TaskTestCase(ModuleStoreTestCase):
             'uuid': 'uuid3',
             'send_uuid': 'uuid4',
             'thread_id': 'dummy_discussion_id2',
+            'course_id': 'fake_course_edx2',
             'thread_created_at': datetime(2000, 1, 1, 0, 0, 0)
         }
 
@@ -318,12 +320,13 @@ class TaskTestCase(ModuleStoreTestCase):
                 setattr(message, key, entry)
 
             test_props['nonInteraction'] = True
-
-            with mock.patch('analytics.track') as mock_analytics_track:
+            # Also augment context with site object, for setting segment context.
+            site = Site.objects.get_current()
+            context['site'] = site
+            with mock.patch('lms.djangoapps.discussion.tasks.segment.track') as mock_segment_track:
                 _track_notification_sent(message, context)
-                mock_analytics_track.assert_called_once_with(
+                mock_segment_track.assert_called_once_with(
                     user_id=context['thread_author_id'],
-                    event='edx.bi.email.sent',
-                    course_id=context['course_id'],
-                    properties=test_props
+                    event_name='edx.bi.email.sent',
+                    properties=test_props,
                 )

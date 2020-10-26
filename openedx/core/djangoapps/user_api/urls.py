@@ -8,7 +8,6 @@ from django.conf.urls import url
 from ..profile_images.views import ProfileImageView
 from .accounts.views import (
     AccountDeactivationView,
-    AccountRetireMailingsView,
     AccountRetirementPartnerReportView,
     AccountRetirementStatusView,
     AccountRetirementView,
@@ -59,7 +58,7 @@ RETIREMENT_UPDATE = AccountRetirementStatusView.as_view({
 })
 
 RETIREMENT_CLEANUP = AccountRetirementStatusView.as_view({
-    'delete': 'cleanup',
+    'post': 'cleanup',
 })
 
 RETIREMENT_POST = AccountRetirementView.as_view({
@@ -95,11 +94,6 @@ urlpatterns = [
         r'^v1/accounts/{}/deactivate/$'.format(settings.USERNAME_PATTERN),
         AccountDeactivationView.as_view(),
         name='accounts_deactivation'
-    ),
-    url(
-        r'^v1/accounts/retire_mailings/$',
-        AccountRetireMailingsView.as_view(),
-        name='accounts_retire_mailings'
     ),
     url(
         r'^v1/accounts/deactivate_logout/$',

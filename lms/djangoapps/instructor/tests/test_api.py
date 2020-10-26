@@ -2,6 +2,7 @@
 """
 Unit tests for instructor.api methods.
 """
+from __future__ import print_function
 import datetime
 import functools
 import io
@@ -1227,7 +1228,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'enroll',
                                           'email_students': False})
-        print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
+        print("type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email)))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now enrolled
@@ -1276,7 +1277,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
 
-        print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
+        print("type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email)))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now enrolled
@@ -1432,7 +1433,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                   'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+        print("type(self.notregistered_email): {}".format(type(self.notregistered_email)))
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -1483,7 +1484,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': False})
-        print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
+        print("type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email)))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now unenrolled
@@ -1529,7 +1530,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': True})
-        print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
+        print("type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email)))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now unenrolled
@@ -1591,7 +1592,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url,
                                     {'identifiers': self.allowed_email, 'action': 'unenroll', 'email_students': True})
-        print "type(self.allowed_email): {}".format(type(self.allowed_email))
+        print("type(self.allowed_email): {}".format(type(self.allowed_email)))
         self.assertEqual(response.status_code, 200)
 
         # test the response data
@@ -1719,7 +1720,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                   'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+        print("type(self.notregistered_email): {}".format(type(self.notregistered_email)))
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox

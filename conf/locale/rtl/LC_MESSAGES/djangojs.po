@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:37+0000\n"
-"PO-Revision-Date: 2018-10-21 20:37:16.736206\n"
+"POT-Creation-Date: 2019-01-02 15:30+0000\n"
+"PO-Revision-Date: 2019-01-02 15:30:42.102744\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -88,7 +88,7 @@ msgstr "يثمثفث"
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
-#: lms/static/js/Markdown.Editor.js lms/static/js/writable_gradebook.js
+#: lms/static/js/Markdown.Editor.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -215,7 +215,6 @@ msgstr "عحمخشي بهمث"
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/writable_gradebook.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -3812,7 +3811,6 @@ msgstr "وشقن ثرقخمموثرف ذخيث شس عرعسثي"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/static/js/writable_gradebook.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
@@ -4083,6 +4081,18 @@ msgstr "سثري فخ:"
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
 msgstr "حمثشسث ثرفثق ش سفعيثرف ثوشهم شييقثسس خق عسثقرشوث."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting enrollment status for '<%- student_id %>'. Make sure that the "
+"student identifier is spelled correctly."
+msgstr ""
+"ثققخق لثففهرل ثرقخمموثرف سفشفعس بخق '<%- student_id %>'. وشنث سعقث فاشف فاث "
+"سفعيثرف هيثرفهبهثق هس سحثممثي ذخققثذفمغ."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Retrieving enrollment status..."
+msgstr "قثفقهثدهرل ثرقخمموثرف سفشفعس..."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4824,6 +4834,14 @@ msgstr ""
 "غخع قثذثهدث وثسسشلثس بقخو {platform_name} شري ذخعقسث فثشوس شف فاهس شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Secondary Email Address"
+msgstr "سثذخريشقغ ثوشهم شييقثسس"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "You may access your account when single-sign on is not available."
+msgstr "غخع وشغ شذذثسس غخعق شذذخعرف صاثر سهرلمث-سهلر خر هس رخف شدشهمشزمث."
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Full Name"
 msgstr "بعمم رشوث"
@@ -4925,6 +4943,14 @@ msgstr "غثشق خب زهقفا"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "حقثبثققثي مشرلعشلث"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
+"صث'دث سثرف ش ذخربهقوشفهخر وثسسشلث فخ {new_secondary_email_address}. ذمهذن "
+"فاث مهرن هر فاث وثسسشلث فخ عحيشفث غخعق سثذخريشقغ ثوشهم شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -5260,41 +5286,6 @@ msgstr "نز"
 msgid "MB"
 msgstr "وز"
 
-#: lms/static/js/writable_gradebook.js
-msgid "Current grade"
-msgstr "ذعققثرف لقشيث"
-
-#: lms/static/js/writable_gradebook.js
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "فخفشم"
-
-#: lms/static/js/writable_gradebook.js
-msgid "The Assignment name is:"
-msgstr "فاث شسسهلروثرف رشوث هس:"
-
-#: lms/static/js/writable_gradebook.js
-msgid "Publish grades"
-msgstr "حعزمهسا لقشيثس"
-
-#: lms/static/js/writable_gradebook.js
-msgid "No matching records found"
-msgstr "رخ وشفذاهرل قثذخقيس بخعري"
-
-#: lms/static/js/writable_gradebook.js
-msgid "Student Name"
-msgstr "سفعيثرف رشوث"
-
-#: lms/static/js/writable_gradebook.js
-msgid "Comment"
-msgstr "ذخووثرف"
-
-#: lms/static/js/writable_gradebook.js
-msgid "There are no student grades to adjust."
-msgstr "فاثقث شقث رخ سفعيثرف لقشيثس فخ شيتعسف."
-
 #: lms/static/lms/js/preview/preview_factory.js
 msgid "Course is not yet visible to students."
 msgstr "ذخعقسث هس رخف غثف دهسهزمث فخ سفعيثرفس."
@@ -5467,10 +5458,6 @@ msgstr "فاهس مهرن صهمم خحثر هر ش رثص زقخصسثق صهر
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
 msgstr "فاهس مهرن صهمم خحثر هر ش وخيشم صهريخص"
-
-#: cms/static/js/certificates/collections/certificates.js
-msgid "Could not parse certificate JSON. %(message)s"
-msgstr "ذخعمي رخف حشقسث ذثقفهبهذشفث تسخر. %(message)s"
 
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
@@ -6272,8 +6259,12 @@ msgid "Visibility"
 msgstr "دهسهزهمهفغ"
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
-msgstr "ثيهفهرل: %(title)s"
+msgid "Editing: {title}"
+msgstr "ثيهفهرل: {title}"
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
+msgstr "حمعلهرس"
 
 #: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
@@ -7686,6 +7677,12 @@ msgid "Amount"
 msgstr "شوخعرف"
 
 #: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "فخفشم"
+
+#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Please Note"
 msgstr "حمثشسث رخفث"
@@ -8463,6 +8460,22 @@ msgstr "ذاشرلث وغ ثوشهم شييقثسس"
 #: lms/templates/student_account/account.underscore
 msgid "Reset Password"
 msgstr "قثسثف حشسسصخقي"
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid "Account Recovery"
+msgstr "شذذخعرف قثذخدثقغ"
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid ""
+"Please enter your secondary email address below and we will send you "
+"instructions for recovering your account and setting a new password."
+msgstr ""
+"حمثشسث ثرفثق غخعق سثذخريشقغ ثوشهم شييقثسس زثمخص شري صث صهمم سثري غخع "
+"هرسفقعذفهخرس بخق قثذخدثقهرل غخعق شذذخعرف شري سثففهرل ش رثص حشسسصخقي."
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid "Recover my account"
+msgstr "قثذخدثق وغ شذذخعرف"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
@@ -10504,6 +10517,10 @@ msgid ""
 msgstr ""
 "هب فاث سعزسثذفهخر يخثس رخف اشدث ش يعث يشفث, مثشقرثقس شمصشغس سثث فاثهق سذخقثس"
 " صاثر فاثغ سعزوهف شرسصثقس فخ شسسثسسوثرفس."
+
+#: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr "حيب ذاشحفثقس"
 
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"

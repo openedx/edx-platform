@@ -3,6 +3,7 @@
 """
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
+from __future__ import print_function
 import json
 import os
 import re
@@ -109,7 +110,7 @@ def find_fixme(options):
         num_fixme += _count_pylint_violations(
             "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
 
-    print "Number of pylint fixmes: " + str(num_fixme)
+    print("Number of pylint fixmes: " + str(num_fixme))
 
 
 def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, clean=True):
@@ -177,7 +178,7 @@ def run_pylint(options):
 
     # Print number of violations to log
     violations_count_str = "Number of pylint violations: " + str(num_violations)
-    print violations_count_str
+    print(violations_count_str)
 
     # Also write the number of violations to a file
     with open(Env.METRICS_DIR / "pylint", "w") as f:
@@ -294,8 +295,8 @@ def run_pep8(options):  # pylint: disable=unused-argument
 
     # Print number of violations to log
     violations_count_str = "Number of PEP 8 violations: {count}".format(count=count)
-    print violations_count_str
-    print violations_list
+    print(violations_count_str)
+    print(violations_list)
 
     # Also write the number of violations to a file
     with open(Env.METRICS_DIR / "pep8", "w") as f:
@@ -327,7 +328,7 @@ def run_complexity():
     Env.METRICS_DIR.makedirs_p()
     _prepare_report_dir(complexity_report_dir)
 
-    print "--> Calculating cyclomatic complexity of python files..."
+    print("--> Calculating cyclomatic complexity of python files...")
     try:
         sh(
             "radon cc {system_string} --total-average > {complexity_report}".format(
@@ -340,11 +341,11 @@ def run_complexity():
             complexity_metric,
             (Env.METRICS_DIR / "python_complexity")
         )
-        print "--> Python cyclomatic complexity report complete."
-        print "radon cyclomatic complexity score: {metric}".format(metric=str(complexity_metric))
+        print("--> Python cyclomatic complexity report complete.")
+        print("radon cyclomatic complexity score: {metric}".format(metric=str(complexity_metric)))
 
     except BuildFailure:
-        print "FAILURE: Unable to calculate python-only code-complexity."
+        print("FAILURE: Unable to calculate python-only code-complexity.")
 
 
 @task
@@ -612,6 +613,15 @@ def run_xsscommitlint():
     _write_metric(violations_count_str, metrics_report)
     # Output report to console.
     sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
+    if num_violations:
+        fail_quality(
+            'xsscommitlint',
+            "FAILURE: XSSCommitLinter Failed.\n{error_message}\n"
+            "See {xsscommitlint_report} or run the following command to hone in on the problem:\n"
+            "  ./scripts/xss-commit-linter.sh -h".format(
+                error_message=violations_count_str, xsscommitlint_report=xsscommitlint_report
+            )
+        )
     write_junit_xml("xsscommitlint")
 
 
@@ -811,47 +821,47 @@ def run_quality(options):
     _, upper_violations_limit, _, _ = _parse_pylint_options(options)
 
     # Print total number of violations to log
-    print _lint_output('pylint', count, violations_list, limit=upper_violations_limit)
+    print(_lint_output('pylint', count, violations_list, limit=upper_violations_limit))
     if count > upper_violations_limit > -1:
         diff_quality_pass = False
         failure_reasons.append('Too many total violations.')
 
     # ----- Set up for diff-quality pylint call -----
-    # Set the string, if needed, to be used for the diff-quality --compare-branch switch.
-    compare_branch = getattr(options, 'compare_branch', None)
-    compare_branch_string = u''
-    if compare_branch:
-        compare_branch_string = u'--compare-branch={0}'.format(compare_branch)
+    # Set the string to be used for the diff-quality --compare-branch switch.
+    compare_branch = getattr(options, 'compare_branch', u'origin/master')
+    compare_commit = sh('git merge-base HEAD {}'.format(compare_branch), capture=True).strip()
+    if sh('git rev-parse HEAD', capture=True).strip() != compare_commit:
+        compare_branch_string = u'--compare-branch={0}'.format(compare_commit)
 
-    # Set the string, if needed, to be used for the diff-quality --fail-under switch.
-    diff_threshold = int(getattr(options, 'percentage', -1))
-    percentage_string = u''
-    if diff_threshold > -1:
-        percentage_string = u'--fail-under={0}'.format(diff_threshold)
+        # Set the string, if needed, to be used for the diff-quality --fail-under switch.
+        diff_threshold = int(getattr(options, 'percentage', -1))
+        percentage_string = u''
+        if diff_threshold > -1:
+            percentage_string = u'--fail-under={0}'.format(diff_threshold)
 
-    pylint_files = get_violations_reports("pylint")
-    pylint_reports = u' '.join(pylint_files)
-    if not run_diff_quality(
-        violations_type="pylint",
-        reports=pylint_reports,
-        percentage_string=percentage_string,
-        branch_string=compare_branch_string,
-        dquality_dir=dquality_dir
-    ):
-        diff_quality_pass = False
-        failure_reasons.append('Pylint violation(s) were found in the lines of code that were added or changed.')
-
-    eslint_files = get_violations_reports("eslint")
-    eslint_reports = u' '.join(eslint_files)
-    if not run_diff_quality(
-            violations_type="eslint",
-            reports=eslint_reports,
+        pylint_files = get_violations_reports("pylint")
+        pylint_reports = u' '.join(pylint_files)
+        if not run_diff_quality(
+            violations_type="pylint",
+            reports=pylint_reports,
             percentage_string=percentage_string,
             branch_string=compare_branch_string,
             dquality_dir=dquality_dir
-    ):
-        diff_quality_pass = False
-        failure_reasons.append('Eslint violation(s) were found in the lines of code that were added or changed.')
+        ):
+            diff_quality_pass = False
+            failure_reasons.append('Pylint violation(s) were found in the lines of code that were added or changed.')
+
+        eslint_files = get_violations_reports("eslint")
+        eslint_reports = u' '.join(eslint_files)
+        if not run_diff_quality(
+                violations_type="eslint",
+                reports=eslint_reports,
+                percentage_string=percentage_string,
+                branch_string=compare_branch_string,
+                dquality_dir=dquality_dir
+        ):
+            diff_quality_pass = False
+            failure_reasons.append('Eslint violation(s) were found in the lines of code that were added or changed.')
 
     # If one of the quality runs fails, then paver exits with an error when it is finished
     if not diff_quality_pass:

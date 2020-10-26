@@ -60,7 +60,7 @@ class SiteConfiguration(models.Model):
     page_elements = JSONField(blank=True, default=get_initial_page_elements)
 
     def __unicode__(self):
-        return u"<SiteConfiguration: {site} >".format(site=self.site)
+        return u"<SiteConfiguration: {site} >".format(site=self.site)  # xss-lint: disable=python-wrap-html
 
     def __repr__(self):
         return self.__unicode__()
@@ -109,15 +109,19 @@ class SiteConfiguration(models.Model):
         return default
 
     @classmethod
-    def get_configuration_for_org(cls, org):
+    def get_configuration_for_org(cls, org, select_related=None):
         """
         This returns a SiteConfiguration object which has an org_filter that matches
         the supplied org
 
         Args:
             org (str): Org to use to filter SiteConfigurations
+            select_related (list or None): A list of values to pass as arguments to select_related
         """
-        for configuration in cls.objects.filter(values__contains=org, enabled=True).defer('page_elements', 'sass_variables').all():
+        query = cls.objects.filter(values__contains=org, enabled=True).defer('page_elements', 'sass_variables').all()
+        if select_related is not None:
+            query = query.select_related(*select_related)
+        for configuration in query:
             course_org_filter = configuration.get_value('course_org_filter', [])
             # The value of 'course_org_filter' can be configured as a string representing
             # a single organization or a list of strings representing multiple organizations.
@@ -274,7 +278,8 @@ class SiteConfigurationHistory(TimeStampedModel):
         ordering = ('-modified', '-created',)
 
     def __unicode__(self):
-        return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(
+        # pylint: disable=line-too-long
+        return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(  # xss-lint: disable=python-wrap-html
             modified=self.modified,
             site=self.site,
         )

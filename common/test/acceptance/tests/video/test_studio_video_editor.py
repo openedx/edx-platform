@@ -73,22 +73,6 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.save_unit_settings()
         self.assertFalse(self.video.is_captions_visible())
 
-    def test_shown_captions(self):
-        """
-        Scenario: Captions are shown when "transcript display" is true
-        Given I have created a Video component with subtitles
-        And I have set "transcript display" to True
-        Then when I view the video it does show the captions
-        """
-        self._create_video_component(subtitles=True)
-        # Prevent cookies from overriding course settings
-        self.browser.delete_cookie('hide_captions')
-        self.edit_component()
-        self.open_advanced_tab()
-        self.video.set_field_value('Show Transcript', 'True', 'select')
-        self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
-
     def test_translations_uploading(self):
         """
         Scenario: Translations uploading works correctly

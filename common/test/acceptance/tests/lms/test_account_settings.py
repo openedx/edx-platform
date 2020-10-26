@@ -565,4 +565,9 @@ class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
         """
         self.log_in_as_unique_user()
         self.visit_account_settings_page()
+        self.account_settings_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.account_settings_page.a11y_audit.check_for_accessibility_errors()

@@ -58,3 +58,42 @@ def escape_html_characters(content):
             )
         )
     )
+
+
+def get_short_labeler(prefix):
+    """
+    Returns a labeling function that prepends
+    `prefix` to an assignment index.
+    """
+    def labeler(index):
+        return u"{prefix} {index:02d}".format(prefix=prefix, index=index)
+    return labeler
+
+
+def get_default_short_labeler(course):
+    """
+    Returns a helper function that creates a default
+    short_label for a subsection.
+    """
+    default_labelers = {}
+    for grader, assignment_type, _ in course.grader.subgraders:
+        default_labelers[assignment_type] = {
+            'labeler': get_short_labeler(grader.short_label),
+            'index': 1,
+        }
+
+    def default_labeler(assignment_type):
+        """
+        Given an assignment type, returns the next short_label
+        for that assignment type.  For example, if the assignment_type
+        is "Homework" and this is the 2nd time the function has been called
+        for that assignment type, this function would return "Ex 02", assuming
+        that "Ex" is the short_label assigned to a grader for Homework subsections.
+        """
+        if assignment_type not in default_labelers:
+            return None
+        labeler = default_labelers[assignment_type]['labeler']
+        index = default_labelers[assignment_type]['index']
+        default_labelers[assignment_type]['index'] += 1
+        return labeler(index)
+    return default_labeler

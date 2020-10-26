@@ -54,9 +54,6 @@ NPM_INSTALLED_LIBRARIES = [
     'backbone.paginator/lib/backbone.paginator.js',
     'backbone/backbone.js',
     'bootstrap/dist/js/bootstrap.bundle.js',
-    'datatables/media',
-    'datatables.net/js/jquery.dataTables.js',
-    'datatables.net-fixedcolumns/js/dataTables.fixedColumns.min.js',
     'hls.js/dist/hls.js',
     'jquery-migrate/dist/jquery-migrate.js',
     'jquery.scrollto/jquery.scrollTo.js',
@@ -82,8 +79,6 @@ NPM_INSTALLED_DEVELOPER_LIBRARIES = [
 NPM_JS_VENDOR_DIRECTORY = path('common/static/common/js/vendor')
 NPM_CSS_VENDOR_DIRECTORY = path("common/static/common/css/vendor")
 NPM_CSS_DIRECTORY = path("common/static/common/css")
-NPM_MEDIA_DIRECTORY = path("common/static/common/media")
-NPM_MEDIA_VENDOR_DIRECTORY = path("common/static/common/media/vendor")
 
 # system specific lookup path additions, add sass dirs if one system depends on the sass files for other systems
 SASS_LOOKUP_DEPENDENCIES = {
@@ -609,8 +604,6 @@ def process_npm_assets():
 
         if library.endswith('.css') or library.endswith('.css.map'):
             vendor_dir = NPM_CSS_VENDOR_DIRECTORY
-        elif library.endswith('/media'):
-            vendor_dir = NPM_MEDIA_VENDOR_DIRECTORY
         else:
             vendor_dir = NPM_JS_VENDOR_DIRECTORY
         if os.path.exists(library_path):
@@ -641,8 +634,6 @@ def process_npm_assets():
     NPM_JS_VENDOR_DIRECTORY.mkdir_p()
     NPM_CSS_DIRECTORY.mkdir_p()
     NPM_CSS_VENDOR_DIRECTORY.mkdir_p()
-    NPM_MEDIA_DIRECTORY.mkdir_p()
-    NPM_MEDIA_VENDOR_DIRECTORY.mkdir_p()
 
     # Copy each file to the vendor directory, overwriting any existing file.
     print("Copying vendor files into static directory")

@@ -5,6 +5,8 @@ Bok choy acceptance tests for problems in the LMS
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
 from textwrap import dedent
+import time
+import ddt
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -690,27 +692,6 @@ class LogoutDuringAnswering(ProblemsTest):
         problem_page.click_submit()
         self.assertTrue(problem_page.simpleprob_is_correct())
 
-    def test_logout_cancel_no_redirect(self):
-        """
-        1) User goes to a problem page.
-        2) User fills out an answer to the problem.
-        3) User is logged out because their session id is invalidated or removed.
-        4) User clicks "check", and sees a confirmation modal asking them to
-           re-authenticate, since they've just been logged out.
-        5) User clicks "cancel".
-        6) User is not redirected to the login page.
-        """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
-        problem_page.fill_answer_numerical('1')
-        self.log_user_out()
-        with problem_page.handle_alert(confirm=False):
-            problem_page.click_submit()
-
-        problem_page.wait_for_page()
-        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
-
 
 @attr(shard=9)
 class ProblemQuestionDescriptionTest(ProblemsTest):
@@ -954,3 +935,223 @@ class ProblemMetaUngradedTest(ProblemsTest):
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
         self.assertEqual(problem_page.problem_progress_graded_value, "1 point possible (ungraded)")
+
+
+class FormulaProblemTest(ProblemsTest):
+    """
+    Test Class to verify the formula problem on LMS.
+    """
+    def setUp(self):
+        """
+        Setup the test suite to verify various behaviors involving formula problem type.
+
+        Given a course, setup a formula problem type and view it in courseware
+        Given the MathJax requirement for generating preview, wait for MathJax files to load
+        """
+        super(FormulaProblemTest, self).setUp()
+        self.courseware_page.visit()
+        time.sleep(6)
+
+    def get_problem(self):
+        """
+        creating the formula response problem, with reset button enabled.
+        """
+        xml = dedent("""
+                    <problem>
+    <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="R_1*R_2/R_3">
+        <p>You can use this template as a guide to the OLX markup to use for math expression problems. Edit this component to replace the example with your own assessment.</p>
+        <label>Add the question text, or prompt, here. This text is required. Example: Write an expression for the product of R_1, R_2, and the inverse of R_3.</label>
+        <description>You can add an optional tip or note related to the prompt like this. Example: To test this example, the correct answer is R_1*R_2/R_3</description>
+        <responseparam type="tolerance" default="0.00001"/>
+        <formulaequationinput size="40"/>
+    </formularesponse>
+                    </problem>
+                """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml, metadata={'show_reset_button': True})
+
+    def test_reset_problem_after_incorrect_submission(self):
+        """
+        Scenario: Verify that formula problem can be resetted after an incorrect submission.
+
+        Given I am attempting a formula response problem type
+        When I input an incorrect answer
+        Then the answer preview is generated using MathJax
+        When I submit the problem
+        Then I can see incorrect status and a reset button
+        When I click reset, the input pane contents get clear
+        """
+        problem_page = ProblemPage(self.browser)
+        problem_page.fill_answer_numerical('R_1*R_2')
+        problem_page.verify_mathjax_rendered_in_preview()
+        problem_page.click_submit()
+        self.assertFalse(problem_page.simpleprob_is_correct())
+        self.assertTrue(problem_page.is_reset_button_present())
+        problem_page.click_reset()
+        self.assertEqual(problem_page.get_numerical_input_value, '')
+
+    def test_reset_button_not_rendered_after_correct_submission(self):
+        """
+        Scenario: Verify that formula problem can not be resetted after an incorrect submission.
+
+        Given I am attempting a formula response problem type
+        When I input a correct answer
+        Then I should be able to see the mathjax generated preview
+        When I submit the answer
+        Then the correct status is visible
+        And reset button is not rendered
+        """
+        problem_page = ProblemPage(self.browser)
+        problem_page.fill_answer_numerical('R_1*R_2/R_3')
+        problem_page.verify_mathjax_rendered_in_preview()
+        problem_page.click_submit()
+        self.assertTrue(problem_page.simpleprob_is_correct())
+        self.assertFalse(problem_page.is_reset_button_present())
+
+    def test_reset_problem_after_changing_correctness(self):
+        """
+        Scenario: Verify that formula problem can be resetted after changing the correctness.
+
+        Given I am attempting a formula problem type
+        When I answer it correctly
+        Then the correctness status should be visible
+        And reset button is not rendered
+        When I change my submission to incorrect
+        Then the reset button appears and is clickable
+        """
+        problem_page = ProblemPage(self.browser)
+        problem_page.fill_answer_numerical('R_1*R_2/R_3')
+        problem_page.verify_mathjax_rendered_in_preview()
+        problem_page.click_submit()
+        self.assertTrue(problem_page.simpleprob_is_correct())
+        self.assertFalse(problem_page.is_reset_button_present())
+        problem_page.fill_answer_numerical('R_1/R_3')
+        problem_page.click_submit()
+        self.assertFalse(problem_page.simpleprob_is_correct())
+        self.assertTrue(problem_page.is_reset_button_present())
+        problem_page.click_reset()
+        self.assertEqual(problem_page.get_numerical_input_value, '')
+
+
+@ddt.ddt
+class FormulaProblemRandomizeTest(ProblemsTest):
+    """
+    Test Class to verify the formula problem on LMS with Randomization enabled.
+    """
+
+    def setUp(self):
+        """
+        Setup the test suite to verify various behaviors involving formula problem type.
+
+        Given a course, setup a formula problem type and view it in courseware
+        Given the MathJax requirement for generating preview, wait for MathJax files to load
+        """
+        super(FormulaProblemRandomizeTest, self).setUp()
+        self.courseware_page.visit()
+        time.sleep(6)
+
+    def get_problem(self):
+        """
+        creating the formula response problem.
+        """
+        xml = dedent("""
+                    <problem>
+    <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="R_1*R_2/R_3">
+        <p>You can use this template as a guide to the OLX markup to use for math expression problems. Edit this component to replace the example with your own assessment.</p>
+        <label>Add the question text, or prompt, here. This text is required. Example: Write an expression for the product of R_1, R_2, and the inverse of R_3.</label>
+        <description>You can add an optional tip or note related to the prompt like this. Example: To test this example, the correct answer is R_1*R_2/R_3</description>
+        <responseparam type="tolerance" default="0.00001"/>
+        <formulaequationinput size="40"/>
+    </formularesponse>
+                    </problem>
+                """)
+
+        # rerandomize:always will show reset button, no matter the submission correctness
+        return XBlockFixtureDesc(
+            'problem', 'TEST PROBLEM', data=xml, metadata={'show_reset_button': True, 'rerandomize': 'always'}
+        )
+
+    @ddt.data(
+        ('R_1*R_2', 'incorrect'),
+        ('R_1/R_3', 'incorrect'),
+        ('R_1*R_2/R_3', 'correct')
+    )
+    @ddt.unpack
+    def test_reset_problem_after_submission(self, input_value, correctness):
+        """
+        Scenario: Test that reset button works regardless the submission correctness status.
+
+        Given I am attempting a formula problem type with randomization:always configuration
+        When I input the answer
+        Then I should be able to see the MathJax generated preview
+        When I submit the problem
+        Then I should be able to see the reset button
+        When reset button is clicked
+        Then the input pane contents should be clear
+        """
+        problem_page = ProblemPage(self.browser)
+        problem_page.fill_answer_numerical(input_value)
+        problem_page.verify_mathjax_rendered_in_preview()
+        problem_page.click_submit()
+        self.assertEqual(problem_page.get_simpleprob_correctness(), correctness)
+        self.assertTrue(problem_page.is_reset_button_present())
+        problem_page.click_reset()
+        self.assertEqual(problem_page.get_numerical_input_value, '')
+
+    @ddt.data(
+        ('R_1*R_2', 'incorrect', '0/1 point (ungraded)', '0/1 point (ungraded)'),
+        ('R_1*R_2/R_3', 'correct', '1/1 point (ungraded)', '0/1 point (ungraded)'),
+        ('R_1/R_2', 'incorrect', '0/1 point (ungraded)', '0/1 point (ungraded)')
+    )
+    @ddt.unpack
+    def test_score_reset_after_resetting_problem(self, input_value, correctness, score_before_reset, score_after_reset):
+        """
+        Scenario: Test that score resets after the formula problem is resetted.
+
+        Given I am attempting a formula problem type with randomization:always configuration
+        When I input the answer
+        Then I should be able to see the MathJax generated preview
+        When I submit the problem
+        Then I should be able to view the score that I received
+        And The reset button should be present and is clickable
+        When the reset button is clicked
+        Then the score resets to zero
+        """
+        problem_page = ProblemPage(self.browser)
+        problem_page.fill_answer_numerical(input_value)
+        problem_page.verify_mathjax_rendered_in_preview()
+        problem_page.click_submit()
+        self.assertEqual(problem_page.get_simpleprob_correctness(), correctness)
+        self.assertIn(score_before_reset, problem_page.problem_progress_graded_value)
+        self.assertTrue(problem_page.is_reset_button_present())
+        problem_page.click_reset()
+        self.assertIn(score_after_reset, problem_page.problem_progress_graded_value)
+
+    @ddt.data(
+        ('R_1*R_2', 'incorrect', 'R_1*R_2/R_3'),
+        ('R_1*R_2/R_3', 'correct', 'R_1/R_3')
+    )
+    @ddt.unpack
+    def test_reset_correctness_after_changing_answer(self, input_value, correctness, next_input):
+        """
+        Scenario: Test that formula problem can be resetted after changing the answer.
+
+        Given I am attempting a formula problem type with randomization:always configuration
+        When I input an answer
+        Then the mathjax generated preview should be visible
+        When I submit the problem, I can see the correctness status
+        When I only input another answer
+        Then the correctness status is no longer visible
+        And I am able to see the reset button
+        And when I click the reset button
+        Then input pane contents are cleared
+        """
+        problem_page = ProblemPage(self.browser)
+        problem_page.fill_answer_numerical(input_value)
+        problem_page.verify_mathjax_rendered_in_preview()
+        problem_page.click_submit()
+        self.assertEqual(problem_page.get_simpleprob_correctness(), correctness)
+        problem_page.fill_answer_numerical(next_input)
+        self.assertIsNone(problem_page.get_simpleprob_correctness())
+        self.assertTrue(problem_page.is_reset_button_present())
+        problem_page.click_reset()
+        self.assertEqual(problem_page.get_numerical_input_value, '')

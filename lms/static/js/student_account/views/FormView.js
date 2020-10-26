@@ -55,10 +55,15 @@
             render: function(html) {
                 var fields = html || '';
 
-                $(this.el).html(_.template(this.tpl)({
-                    fields: fields
-                }));
-
+                HtmlUtils.setHtml(
+                    $(this.el),
+                    HtmlUtils.HTML(
+                        _.template(this.tpl)({
+                            fields: fields,
+                            HtmlUtils: HtmlUtils
+                        })
+                    )
+                )
                 this.postRender();
 
                 return this;
@@ -132,6 +137,12 @@
                 event.preventDefault();
 
                 this.trigger('password-help');
+            },
+
+            accountRecovery: function(event) {
+                event.preventDefault();
+
+                this.trigger('account-recovery-help');
             },
 
             getFormData: function() {

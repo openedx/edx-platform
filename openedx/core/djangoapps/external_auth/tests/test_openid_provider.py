@@ -4,6 +4,7 @@ Created on Jan 18, 2013
 
 @author: brian
 '''
+from __future__ import print_function
 import openid
 from openid.fetchers import HTTPFetcher, HTTPResponse
 from urlparse import parse_qs, urlparse
@@ -470,4 +471,4 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
         try:
             super(OpenIdProviderLiveServerTest, cls).tearDownClass()
         except RuntimeError:
-            print "Warning: Could not shut down test server."
+            print("Warning: Could not shut down test server.")

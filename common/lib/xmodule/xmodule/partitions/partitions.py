@@ -40,6 +40,13 @@ class NoSuchUserPartitionGroupError(UserPartitionError):
     pass
 
 
+class ReadOnlyUserPartitionError(UserPartitionError):
+    """
+    Exception to be raised when attempting to modify a read only partition.
+    """
+    pass
+
+
 class Group(namedtuple("Group", "id name")):
     """
     An id and name for a group of students.  The id should be unique
@@ -199,6 +206,9 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if not scheme:
             raise TypeError("UserPartition dict {0} has unrecognized scheme {1}".format(value, scheme_id))
 
+        if getattr(scheme, 'read_only', False):
+            raise ReadOnlyUserPartitionError("UserPartition dict {0} uses scheme {1} which is read only".format(value, scheme_id))
+
         if hasattr(scheme, "create_user_partition"):
             return scheme.create_user_partition(
                 value["id"],
@@ -255,7 +265,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         """
         return None
 
-    def access_denied_fragment(self, block, user, course_key, user_group, allowed_groups):
+    def access_denied_fragment(self, block, user, user_group, allowed_groups):
         """
         Return an html fragment that should be displayed to the user when they are not allowed to access
         content managed by this partition, or None if there is no applicable message.

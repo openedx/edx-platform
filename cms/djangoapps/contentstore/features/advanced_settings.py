@@ -1,7 +1,7 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 
-from lettuce import step, world
+from lettuce import world
 from cms.djangoapps.contentstore.features.common import press_the_notification_button, type_in_codemirror
 
 KEY_CSS = '.key h3.title'

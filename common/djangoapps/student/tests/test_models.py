@@ -375,8 +375,7 @@ class TestManualEnrollmentAudit(SharedModuleStoreTestCase):
         )
         self.assertTrue(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exists())
         # retire the ManualEnrollmentAudit objects associated with the above enrollments
-        enrollments = CourseEnrollment.objects.filter(user=self.user)
-        ManualEnrollmentAudit.retire_manual_enrollments(enrollments=enrollments, retired_email="xxx")
+        ManualEnrollmentAudit.retire_manual_enrollments(user=self.user, retired_email="xxx")
         self.assertTrue(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exists())
         self.assertFalse(ManualEnrollmentAudit.objects.filter(enrollment=enrollment).exclude(
             enrolled_email="xxx"

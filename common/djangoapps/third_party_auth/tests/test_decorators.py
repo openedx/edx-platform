@@ -1,16 +1,13 @@
 """
 Tests for third_party_auth decorators.
 """
-import json
 import unittest
 
 import ddt
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.test import RequestFactory
-from mock import MagicMock
 
-from six.moves.urllib.parse import urlencode
 from third_party_auth.decorators import xframe_allow_whitelisted
 from third_party_auth.tests.testutil import TestCase
 

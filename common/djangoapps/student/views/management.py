@@ -64,9 +64,8 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_site
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PASSWORD_UNICODE_NORMALIZE_FLAG, PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-)
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInternalError
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
@@ -77,18 +76,15 @@ from openedx.features.journals.api import get_journals_context
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.helpers import (
     DISABLE_UNENROLL_CERT_STATES,
-    auth_pipeline_urls,
     cert_info,
-    create_or_set_user_attribute_created_on_site,
-    do_create_account,
     generate_activation_email_context,
-    get_next_url_for_login_page
 )
 from student.message_types import EmailChange, PasswordReset
 from student.models import (
+    AccountRecovery,
     CourseEnrollment,
-    PasswordHistory,
     PendingEmailChange,
+    PendingSecondaryEmailChange,
     Registration,
     RegistrationCookieConfiguration,
     UserAttribute,
@@ -124,8 +120,6 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
-# used to announce a registration
-REGISTER_USER = Signal(providing_args=["user", "registration"])
 
 
 def csrf_token(context):
@@ -135,8 +129,8 @@ def csrf_token(context):
     token = context.get('csrf_token', '')
     if token == 'NOTPROVIDED':
         return ''
-    return (u'<div style="display:none"><input type="hidden"'
-            ' name="csrfmiddlewaretoken" value="{}" /></div>'.format(token))
+    return (HTML(u'<div style="display:none"><input type="hidden"'
+            ' name="csrfmiddlewaretoken" value="{}" /></div>').format(token))
 
 
 # NOTE: This view is not linked to directly--it is called from
@@ -733,6 +727,60 @@ def password_change_request_handler(request):
         return HttpResponseBadRequest(_("No email address provided."))
 
 
+@require_http_methods(['POST'])
+def account_recovery_request_handler(request):
+    """
+    Handle account recovery requests.
+
+    Arguments:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the email was sent successfully
+        HttpResponse: 400 if there is no 'email' POST parameter
+        HttpResponse: 403 if the client has been rate limited
+        HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 404 if account recovery feature is not enabled
+
+    Example:
+
+        POST /account/account_recovery
+
+    """
+    if not is_secondary_email_feature_enabled():
+        raise Http404
+
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Account recovery rate limit exceeded")
+        return HttpResponseForbidden()
+
+    user = request.user
+    # Prefer logged-in user's email
+    email = request.POST.get('email')
+
+    if email:
+        try:
+            # Send an email with a link to direct user towards account recovery.
+            from openedx.core.djangoapps.user_api.accounts.api import request_account_recovery
+            request_account_recovery(email, request.is_secure())
+
+            # Check if a user exists with the given secondary email, if so then invalidate the existing oauth tokens.
+            user = user if user.is_authenticated else User.objects.get(
+                id=AccountRecovery.objects.get_active(secondary_email__iexact=email).user.id
+            )
+            destroy_oauth_tokens(user)
+        except UserNotFound:
+            AUDIT_LOG.warning(
+                "Account recovery attempt via invalid secondary email '{email}'.".format(email=email)
+            )
+            limiter.tick_bad_request_counter(request)
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseBadRequest(_("No email address provided."))
+
+
 @csrf_exempt
 @require_POST
 def password_reset(request):
@@ -838,16 +886,15 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         )
 
     if request.method == 'POST':
-        if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
-            # We have to make a copy of request.POST because it is a QueryDict object which is immutable until copied.
-            # We have to use request.POST because the password_reset_confirm method takes in the request and a user's
-            # password is set to the request.POST['new_password1'] field. We have to also normalize the new_password2
-            # field so it passes the equivalence check that new_password1 == new_password2
-            # In order to switch out of having to do this copy, we would want to move the normalize_password code into
-            # a custom User model's set_password method to ensure it is always happening upon calling set_password.
-            request.POST = request.POST.copy()
-            request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
-            request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
+        # We have to make a copy of request.POST because it is a QueryDict object which is immutable until copied.
+        # We have to use request.POST because the password_reset_confirm method takes in the request and a user's
+        # password is set to the request.POST['new_password1'] field. We have to also normalize the new_password2
+        # field so it passes the equivalence check that new_password1 == new_password2
+        # In order to switch out of having to do this copy, we would want to move the normalize_password code into
+        # a custom User model's set_password method to ensure it is always happening upon calling set_password.
+        request.POST = request.POST.copy()
+        request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
+        request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
 
         password = request.POST['new_password1']
 
@@ -892,14 +939,135 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         # get the updated user
         updated_user = User.objects.get(id=uid_int)
 
-        # did the password hash change, if so record it in the PasswordHistory
-        if updated_user.password != old_password_hash:
-            entry = PasswordHistory()
-            entry.create(updated_user)
-
     else:
         response = password_reset_confirm(
             request, uidb64=uidb64, token=token, extra_context=platform_name
+        )
+
+        response_was_successful = response.context_data.get('validlink')
+        if response_was_successful and not user.is_active:
+            user.is_active = True
+            user.save()
+
+    return response
+
+
+def account_recovery_confirm_wrapper(request, uidb36=None, token=None):
+    """
+    A wrapper around django.contrib.auth.views.password_reset_confirm.
+    Needed because we want to set the user as active at this step.
+    We also optionally do some additional password policy checks.
+    """
+    # convert old-style base36-encoded user id to base64
+    uidb64 = uidb36_to_uidb64(uidb36)
+    platform_name = {
+        "platform_name": configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    }
+
+    # User can not get this link unless secondary email feature is enabled.
+    if not is_secondary_email_feature_enabled():
+        raise Http404
+
+    try:
+        uid_int = base36_to_int(uidb36)
+        user = User.objects.get(id=uid_int)
+    except (ValueError, User.DoesNotExist):
+        # if there's any error getting a user, just let django's
+        # password_reset_confirm function handle it.
+
+        return password_reset_confirm(
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html'
+        )
+
+    if request.method == 'POST':
+        # We have to make a copy of request.POST because it is a QueryDict object which is immutable until copied.
+        # We have to use request.POST because the password_reset_confirm method takes in the request and a user's
+        # password is set to the request.POST['new_password1'] field. We have to also normalize the new_password2
+        # field so it passes the equivalence check that new_password1 == new_password2
+        # In order to switch out of having to do this copy, we would want to move the normalize_password code into
+        # a custom User model's set_password method to ensure it is always happening upon calling set_password.
+        request.POST = request.POST.copy()
+        request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
+        request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
+
+        password = request.POST['new_password1']
+
+        try:
+            validate_password(password, user=user)
+        except ValidationError as err:
+            # We have a password reset attempt which violates some security
+            # policy, or any other validation. Use the existing Django template to communicate that
+            # back to the user.
+            context = {
+                'validlink': True,
+                'form': None,
+                'title': _('Password creation unsuccessful'),
+                'err_msg': ' '.join(err.messages),
+            }
+            context.update(platform_name)
+
+            return TemplateResponse(
+                request, 'account_recovery/password_create_confirm.html', context
+            )
+
+        # remember what the old password hash is before we call down
+        old_password_hash = user.password
+
+        response = password_reset_confirm(
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html',
+            post_reset_redirect='signin_user',
+        )
+
+        # If password reset was unsuccessful a template response is returned (status_code 200).
+        # Check if form is invalid then show an error to the user.
+        # Note if password reset was successful we get response redirect (status_code 302).
+        if response.status_code == 200:
+            form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
+            if not form_valid:
+                log.warning(
+                    u'Unable to create password for user [%s] because form is not valid. '
+                    u'A possible cause is that the user had an invalid create token',
+                    user.username,
+                )
+                response.context_data['err_msg'] = _('Error in creating your password. Please try again.')
+                return response
+
+        # get the updated user
+        updated_user = User.objects.get(id=uid_int)
+        updated_user.email = updated_user.account_recovery.secondary_email
+        updated_user.save()
+
+        if response.status_code == 302:
+            messages.success(
+                request,
+                HTML(_(
+                    '{html_start}Password Creation Complete{html_end}'
+                    'Your password has been created. {bold_start}{email}{bold_end} is now your primary login email.'
+                )).format(
+                    support_url=configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+                    html_start=HTML('<p class="message-title">'),
+                    html_end=HTML('</p>'),
+                    bold_start=HTML('<b>'),
+                    bold_end=HTML('</b>'),
+                    email=updated_user.email,
+                ),
+                extra_tags='account-recovery aa-icon submission-success'
+            )
+    else:
+        response = password_reset_confirm(
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html',
         )
 
         response_was_successful = response.context_data.get('validlink')
@@ -924,26 +1092,62 @@ def validate_new_email(user, new_email):
         raise ValueError(_('Old email is the same as the new email.'))
 
 
-def do_email_change_request(user, new_email, activation_key=None):
+def validate_secondary_email(account_recovery, new_email):
+    """
+    Enforce valid email addresses.
+    """
+    from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error, \
+        get_email_existence_validation_error, get_secondary_email_validation_error
+
+    if get_email_validation_error(new_email):
+        raise ValueError(_('Valid e-mail address required.'))
+
+    if new_email == account_recovery.secondary_email:
+        raise ValueError(_('Old email is the same as the new email.'))
+
+    # Make sure that secondary email address is not same as user's primary email.
+    if new_email == account_recovery.user.email:
+        raise ValueError(_('Cannot be same as your sign in email address.'))
+
+    # Make sure that secondary email address is not same as any of the primary emails.
+    message = get_email_existence_validation_error(new_email)
+    if message:
+        raise ValueError(message)
+
+    message = get_secondary_email_validation_error(new_email)
+    if message:
+        raise ValueError(message)
+
+
+def do_email_change_request(user, new_email, activation_key=None, secondary_email_change_request=False):
     """
     Given a new email for a user, does some basic verification of the new address and sends an activation message
     to the new address. If any issues are encountered with verification or sending the message, a ValueError will
     be thrown.
     """
-    pec_list = PendingEmailChange.objects.filter(user=user)
-    if len(pec_list) == 0:
-        pec = PendingEmailChange()
-        pec.user = user
-    else:
-        pec = pec_list[0]
-
     # if activation_key is not passing as an argument, generate a random key
     if not activation_key:
         activation_key = uuid.uuid4().hex
 
-    pec.new_email = new_email
-    pec.activation_key = activation_key
-    pec.save()
+    confirm_link = reverse('confirm_email_change', kwargs={'key': activation_key, })
+
+    if secondary_email_change_request:
+        PendingSecondaryEmailChange.objects.update_or_create(
+            user=user,
+            defaults={
+                'new_secondary_email': new_email,
+                'activation_key': activation_key,
+            }
+        )
+        confirm_link = reverse('activate_secondary_email', kwargs={'key': activation_key})
+    else:
+        PendingEmailChange.objects.update_or_create(
+            user=user,
+            defaults={
+                'new_email': new_email,
+                'activation_key': activation_key,
+            }
+        )
 
     use_https = theming_helpers.get_current_request().is_secure()
 
@@ -951,18 +1155,17 @@ def do_email_change_request(user, new_email, activation_key=None):
     message_context = get_base_template_context(site)
     message_context.update({
         'old_email': user.email,
-        'new_email': pec.new_email,
+        'new_email': new_email,
+        'is_secondary_email_change_request': secondary_email_change_request,
         'confirm_link': '{protocol}://{site}{link}'.format(
             protocol='https' if use_https else 'http',
             site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
-            link=reverse('confirm_email_change', kwargs={
-                'key': pec.activation_key,
-            }),
+            link=confirm_link,
         ),
     })
 
     msg = EmailChange().personalize(
-        recipient=Recipient(user.username, pec.new_email),
+        recipient=Recipient(user.username, new_email),
         language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
         user_context=message_context,
     )
@@ -974,18 +1177,42 @@ def do_email_change_request(user, new_email, activation_key=None):
         log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
         raise ValueError(_('Unable to send email activation link. Please try again later.'))
 
-    # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
-    # But because changing the email address is multi-step, we also emit an event here so that we can
-    # track where the request was initiated.
-    tracker.emit(
-        SETTING_CHANGE_INITIATED,
-        {
-            "setting": "email",
-            "old": message_context['old_email'],
-            "new": message_context['new_email'],
-            "user_id": user.id,
-        }
-    )
+    if not secondary_email_change_request:
+        # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
+        # But because changing the email address is multi-step, we also emit an event here so that we can
+        # track where the request was initiated.
+        tracker.emit(
+            SETTING_CHANGE_INITIATED,
+            {
+                "setting": "email",
+                "old": message_context['old_email'],
+                "new": message_context['new_email'],
+                "user_id": user.id,
+            }
+        )
+
+
+@ensure_csrf_cookie
+def activate_secondary_email(request, key):  # pylint: disable=unused-argument
+    """
+    This is called when the activation link is clicked. We activate the secondary email
+    for the requested user.
+    """
+    try:
+        pending_secondary_email_change = PendingSecondaryEmailChange.objects.get(activation_key=key)
+    except PendingSecondaryEmailChange.DoesNotExist:
+        return render_to_response("invalid_email_key.html", {})
+
+    try:
+        account_recovery_obj = AccountRecovery.objects.get(user_id=pending_secondary_email_change.user)
+    except AccountRecovery.DoesNotExist:
+        return render_to_response("secondary_email_change_failed.html", {
+            'secondary_email': pending_secondary_email_change.new_secondary_email
+        })
+
+    account_recovery_obj.is_active = True
+    account_recovery_obj.save()
+    return render_to_response("secondary_email_change_successful.html")
 
 
 @ensure_csrf_cookie

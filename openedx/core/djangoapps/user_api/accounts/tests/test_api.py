@@ -41,7 +41,6 @@ from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
     VALID_USERNAMES_UNICODE
 )
 from openedx.core.djangoapps.user_api.config.waffle import (
-    PASSWORD_UNICODE_NORMALIZE_FLAG,
     PREVENT_AUTH_USER_WRITES,
     SYSTEM_MAINTENANCE_MSG,
     waffle
@@ -58,7 +57,6 @@ from openedx.core.djangoapps.user_api.errors import (
     UserNotAuthorized,
     UserNotFound
 )
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.tests import attr
 from student.models import PendingEmailChange
@@ -359,9 +357,9 @@ class AccountSettingsOnCreationTest(TestCase):
             'account_privacy': PRIVATE_VISIBILITY,
             'accomplishments_shared': False,
             'extended_profile': [],
+            'secondary_email': None
         })
 
-    @override_waffle_flag(PASSWORD_UNICODE_NORMALIZE_FLAG, active=True)
     def test_normalize_password(self):
         """
         Test that unicode normalization on passwords is happening when a user is created.

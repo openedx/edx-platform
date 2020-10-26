@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for validate Internationalization and Module i18n service.
 """
@@ -207,7 +208,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
         resp = self.client.get_html('/home/')
         self.assertContains(resp,
-                            '<h1 class="page-header">Studio Home</h1>',
+                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 
@@ -223,7 +224,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         )
 
         self.assertContains(resp,
-                            '<h1 class="page-header">Studio Home</h1>',
+                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 

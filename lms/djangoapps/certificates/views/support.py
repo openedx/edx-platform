@@ -4,6 +4,7 @@ Certificate end-points used by the student support UI.
 See lms/djangoapps/support for more details.
 
 """
+import bleach
 import logging
 import urllib
 from functools import wraps
@@ -80,7 +81,7 @@ def search_certificates(request):
         ]
 
     """
-    user_filter = urllib.unquote(urllib.quote_plus(request.GET.get("user", "")))
+    user_filter = bleach.clean(urllib.unquote(urllib.quote_plus(request.GET.get("user", ""))))
     if not user_filter:
         msg = _("user is not given.")
         return HttpResponseBadRequest(msg)

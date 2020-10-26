@@ -23,14 +23,9 @@ from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
     NonCompliantPasswordWarning
 )
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PASSWORD_UNICODE_NORMALIZE_FLAG,
-    PREVENT_AUTH_USER_WRITES,
-    waffle
-)
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
-from openedx.core.djangoapps.user_authn.waffle import JWT_COOKIES_FLAG
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -115,8 +110,7 @@ class LoginTest(CacheIsolationTestCase):
                               value='Email or password is incorrect')
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
 
-    @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
-    def test_login_fail_incorrect_email_with_advanced_security(self):
+    def test_login_fail_incorrect_email(self):
         nonexistent_email = u'not_a_user@edx.org'
         response, mock_audit_log = self._login_response(
             nonexistent_email,
@@ -296,18 +290,18 @@ class LoginTest(CacheIsolationTestCase):
         response, _audit_log = self._login_response('test@edx.org', 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
 
+    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_login_refresh(self):
         def _assert_jwt_cookie_present(response):
             self.assertEqual(response.status_code, 200)
             self.assertIn(jwt_cookies.jwt_refresh_cookie_name(), self.client.cookies)
 
         setup_login_oauth_client()
-        with JWT_COOKIES_FLAG.override(True):
-            response, _ = self._login_response('test@edx.org', 'test_password')
-            _assert_jwt_cookie_present(response)
+        response, _ = self._login_response('test@edx.org', 'test_password')
+        _assert_jwt_cookie_present(response)
 
-            response = self.client.post(reverse('login_refresh'))
-            _assert_jwt_cookie_present(response)
+        response = self.client.post(reverse('login_refresh'))
+        _assert_jwt_cookie_present(response)
 
     @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
     def test_single_session(self):
@@ -491,31 +485,23 @@ class LoginTest(CacheIsolationTestCase):
         self.assertTrue(response_content.get('success'))
 
     @ddt.data(
-        ('test_password', 'test_password', True, True),
+        ('test_password', 'test_password', True),
         (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False, True),
+         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False),
         (unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True, True),
+         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True),
         (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False, True),
-        ('test_password', 'test_password', True, False),
-        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False, False),
-        (unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False, False),
-        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True, False),
+         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False),
     )
     @ddt.unpack
-    def test_password_unicode_normalization_login(self, password, password_entered, login_success, waffle_flag):
+    def test_password_unicode_normalization_login(self, password, password_entered, login_success):
         """
         Tests unicode normalization on user's passwords on login.
         """
-        with PASSWORD_UNICODE_NORMALIZE_FLAG.override(active=waffle_flag):
-            self.user.set_password(password)
-            self.user.save()
-            response, _ = self._login_response(self.user.email, password_entered)
-            self._assert_response(response, success=login_success)
+        self.user.set_password(password)
+        self.user.save()
+        response, _ = self._login_response(self.user.email, password_entered)
+        self._assert_response(response, success=login_success)
 
     def _login_response(self, email, password, patched_audit_log=None, extra_post_params=None):
         """

@@ -39,7 +39,7 @@ class Command(BaseCommand):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            logger.error(
+            logger.exception(
                 'Failed to create API client. Service user {username} does not exist.'.format(username=username)
             )
             raise
@@ -108,7 +108,7 @@ class Command(BaseCommand):
             logger.info('Requesting program UUIDs for {domain}.'.format(domain=site.domain))
             uuids = client.programs.get(**querystring)
         except:  # pylint: disable=bare-except
-            logger.error('Failed to retrieve program UUIDs for site: {domain}.'.format(domain=site.domain))
+            logger.exception('Failed to retrieve program UUIDs for site: {domain}.'.format(domain=site.domain))
             failure = True
 
         logger.info('Received {total} UUIDs for site {domain}'.format(
@@ -149,7 +149,9 @@ class Command(BaseCommand):
                 next_page = next_page + 1 if new_pathways['next'] else None
 
         except:  # pylint: disable=bare-except
-            logger.error('Failed to retrieve pathways for site: {domain}.'.format(domain=site.domain))
+            logger.exception(
+                msg='Failed to retrieve pathways for site: {domain}.'.format(domain=site.domain),
+            )
             failure = True
 
         logger.info('Received {total} pathways for site {domain}'.format(
@@ -183,6 +185,6 @@ class Command(BaseCommand):
                 del pathway['programs']
                 pathway['program_uuids'] = uuids
             except:  # pylint: disable=bare-except
-                logger.error('Failed to process pathways for {domain}'.format(domain=site.domain))
+                logger.exception('Failed to process pathways for {domain}'.format(domain=site.domain))
                 failure = True
         return processed_pathways, programs, failure
