@@ -213,7 +213,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
 
         providers = {
             'no_overrides': (),
-            'ccx': ('ccx.overrides.CustomCoursesForEdxOverrideProvider',)
+            'ccx': ('lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',)
         }
         if overrides == 'no_overrides' and view_as_ccx:
             pytest.skip("Can't view a ccx course if field overrides are disabled.")
