@@ -71,6 +71,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',
     'edxval',
     'lms.djangoapps.courseware',
+    'lms.djangoapps.instructor_task',
     'student',
     'openedx.core.djangoapps.site_configuration',
     'lms.djangoapps.grades.apps.GradesConfig',
