@@ -86,9 +86,12 @@ def verification_for_datetime(deadline, candidates):
     # Otherwise, look for a verification that was in effect at the deadline,
     # preferring recent verifications.
     # If no such verification is found, implicitly return `None`
-    for verification in candidates:
-        if verification.active_at_datetime(deadline):
-            return verification
+    verifications_map = {
+        verification: getattr(verification, 'created_at')
+        for verification in candidates
+        if verification.active_at_datetime(deadline)
+    }
+    return max(verifications_map, key=lambda k: verifications_map[k]) if verifications_map else None
 
 
 def most_recent_verification(photo_id_verifications, sso_id_verifications, manual_id_verifications, most_recent_key):
