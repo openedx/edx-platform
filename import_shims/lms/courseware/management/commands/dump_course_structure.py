@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'courseware.management.commands.dump_course_structure')
+warn_deprecated_import('courseware.management.commands.dump_course_structure', 'lms.djangoapps.courseware.management.commands.dump_course_structure')
 
 from lms.djangoapps.courseware.management.commands.dump_course_structure import *

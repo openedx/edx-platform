@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'certificates')
+warn_deprecated_import('certificates', 'lms.djangoapps.certificates')
 
 from lms.djangoapps.certificates import *

@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'instructor.tests.utils')
+warn_deprecated_import('instructor.tests.utils', 'lms.djangoapps.instructor.tests.utils')
 
 from lms.djangoapps.instructor.tests.utils import *

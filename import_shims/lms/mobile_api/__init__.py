@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'mobile_api')
+warn_deprecated_import('mobile_api', 'lms.djangoapps.mobile_api')
 
 from lms.djangoapps.mobile_api import *

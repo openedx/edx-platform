@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'dashboard')
+warn_deprecated_import('dashboard', 'lms.djangoapps.dashboard')
 
 from lms.djangoapps.dashboard import *

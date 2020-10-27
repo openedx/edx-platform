@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'commerce.signals')
+warn_deprecated_import('commerce.signals', 'lms.djangoapps.commerce.signals')
 
 from lms.djangoapps.commerce.signals import *
