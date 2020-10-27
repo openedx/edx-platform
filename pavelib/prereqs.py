@@ -33,7 +33,7 @@ else:
 
 # Developers can have private requirements, for local copies of github repos,
 # or favorite debugging tools, etc.
-PRIVATE_REQS = 'requirements/private.txt'
+PRIVATE_REQS = 'requirements/adg/base.txt'
 if os.path.exists(PRIVATE_REQS):
     PYTHON_REQ_FILES.append(PRIVATE_REQS)
 

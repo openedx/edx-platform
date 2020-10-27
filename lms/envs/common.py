@@ -3928,3 +3928,8 @@ GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
 
 ##################### SUPPORT URL ############################
 SUPPORT_HOW_TO_UNENROLL_LINK = ''
+
+##################### ADG Settings ############################
+
+# Notification email settings
+NOTIFICATION_FROM_EMAIL = 'info@omnipreneurshipacademy.com'

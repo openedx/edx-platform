@@ -40,7 +40,7 @@ jobs:
         with:
           path: /opt/hostedtoolcache/Python/
           key: |
-            ${{ hashFiles('requirements/edx/base.txt') }}-${{
+            ${{ hashFiles('requirements/edx/testing.txt') }}-${{ hashFiles('requirements/adg/base.txt') }}-${{
             hashFiles('philu_actions/scripts/dependency_downloader.sh') }}
         if: env.GIT_DIFF
 
@@ -53,6 +53,7 @@ jobs:
       - name: Install edx-platform requirements
         run: |
           pip install -r requirements/edx/testing.txt
+          pip install -r requirements/adg/base.txt
         if: env.GIT_DIFF && steps.cache-python-requirements.outputs.cache-hit != 'true'
 
       - name: Creating pylint report
