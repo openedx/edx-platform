@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('cms.djangoapps', 'contentstore.storage')
+warn_deprecated_import('contentstore.storage', 'cms.djangoapps.contentstore.storage')
 
 from cms.djangoapps.contentstore.storage import *

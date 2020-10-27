@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('cms.djangoapps', 'pipeline_js')
+warn_deprecated_import('pipeline_js', 'cms.djangoapps.pipeline_js')
 
 from cms.djangoapps.pipeline_js import *

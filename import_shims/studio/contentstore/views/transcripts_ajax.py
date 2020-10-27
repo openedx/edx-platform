@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('cms.djangoapps', 'contentstore.views.transcripts_ajax')
+warn_deprecated_import('contentstore.views.transcripts_ajax', 'cms.djangoapps.contentstore.views.transcripts_ajax')
 
 from cms.djangoapps.contentstore.views.transcripts_ajax import *

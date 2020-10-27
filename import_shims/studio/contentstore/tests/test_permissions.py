@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('cms.djangoapps', 'contentstore.tests.test_permissions')
+warn_deprecated_import('contentstore.tests.test_permissions', 'cms.djangoapps.contentstore.tests.test_permissions')
 
 from cms.djangoapps.contentstore.tests.test_permissions import *
