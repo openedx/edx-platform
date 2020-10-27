@@ -81,9 +81,9 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    COURSE_OUTLINE_PAGE_FLAG,
-    RELATIVE_DATES_FLAG,
-    UNIFIED_COURSE_TAB_FLAG
+    DISABLE_COURSE_OUTLINE_PAGE_FLAG,
+    DISABLE_UNIFIED_COURSE_TAB_FLAG,
+    RELATIVE_DATES_FLAG
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -903,7 +903,7 @@ class ViewsTestCase(BaseViewsTestCase):
             response = self.client.get(url)
             self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     def test_bypass_course_info(self):
         course_id = six.text_type(self.course_key)
 
@@ -917,7 +917,7 @@ class ViewsTestCase(BaseViewsTestCase):
         self.assertEqual(response.status_code, 200)
 
     # TODO: TNL-6387: Remove test
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_accordion(self):
         """
         This needs a response_context, which is not included in the render_accordion's main method
@@ -1083,27 +1083,27 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_backwards_compatibility(self):
         super(TestAccordionDueDate, self).test_backwards_compatibility()
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_defaults(self):
         super(TestAccordionDueDate, self).test_defaults()
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_format_date(self):
         super(TestAccordionDueDate, self).test_format_date()
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_format_invalid(self):
         super(TestAccordionDueDate, self).test_format_invalid()
 
     # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_format_none(self):
         super(TestAccordionDueDate, self).test_format_none()
 

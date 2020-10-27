@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from lms.djangoapps.courseware.courses import get_course_by_id
 from student.models import CourseEnrollment
 
-from . import SHOW_REVIEWS_TOOL_FLAG, UNIFIED_COURSE_TAB_FLAG
+from . import DISABLE_UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
 from .course_tools import CourseTool
 from .views.course_reviews import CourseReviewsModuleFragmentView
 from .views.course_updates import CourseUpdatesFragmentView
@@ -47,7 +47,7 @@ class CourseUpdatesTool(CourseTool):
         """
         Returns True if the user should be shown course updates for this course.
         """
-        if not UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
+        if DISABLE_UNIFIED_COURSE_TAB_FLAG.is_enabled(course_key):
             return False
         if not CourseEnrollment.is_enrolled(request.user, course_key):
             return False
