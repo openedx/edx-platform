@@ -21,7 +21,6 @@ from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date, get_user_course_duration
-from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions_service import get_all_partitions_for_course, get_user_partition_groups
 
@@ -333,7 +332,8 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         user, enrollment, course
     )
 
-    deadline, duration = get_audit_access_expiration(user, course)
+    duration = get_user_course_duration(user, course)
+    deadline = duration and get_user_course_expiration_date(user, course)
 
     return {
         'upgrade_link': upgrade_link,
@@ -353,16 +353,6 @@ def get_base_experiment_metadata_context(course, user, enrollment, user_enrollme
         'program_key_fields': program_key,
         # TODO: clean up as part of REVEM-199 (END)
     }
-
-
-def get_audit_access_expiration(user, course):
-    """
-    Return the expiration date and course duration for the user's audit access to this course.
-    """
-    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
-        return None, None
-
-    return get_user_course_expiration_date(user, course), get_user_course_duration(user, course)
 
 
 # TODO: clean up as part of REVEM-199 (START)

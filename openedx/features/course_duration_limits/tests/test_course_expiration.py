@@ -43,6 +43,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 
 
+# pylint: disable=no-member
 @ddt.ddt
 class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""
@@ -96,6 +97,11 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
             self.course.self_paced = True
         mock_get_course_run_details.return_value = {'weeks_to_complete': weeks_to_complete}
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(self.course.id),
+            enabled_as_of=self.course.start,
+        )
         result = get_user_course_expiration_date(
             self.user,
             CourseOverview.get_from_id(self.course.id),
@@ -114,12 +120,18 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
         start_date = now() - timedelta(weeks=10)
         past_course = CourseFactory(start=start_date)
         enrollment = CourseEnrollment.enroll(self.user, past_course.id, CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(past_course.id),
+            enabled_as_of=past_course.start,
+        )
         result = get_user_course_expiration_date(
             self.user,
             CourseOverview.get_from_id(past_course.id),
         )
         self.assertEqual(result, None)
 
+        add_course_mode(past_course, mode_slug=CourseMode.AUDIT)
         add_course_mode(past_course, upgrade_deadline_expired=False)
         result = get_user_course_expiration_date(
             self.user,
@@ -132,12 +144,18 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
         start_date = now() + timedelta(weeks=10)
         future_course = CourseFactory(start=start_date)
         enrollment = CourseEnrollment.enroll(self.user, future_course.id, CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(future_course.id),
+            enabled_as_of=past_course.start,
+        )
         result = get_user_course_expiration_date(
             self.user,
             CourseOverview.get_from_id(future_course.id),
         )
         self.assertEqual(result, None)
 
+        add_course_mode(future_course, mode_slug=CourseMode.AUDIT)
         add_course_mode(future_course, upgrade_deadline_expired=False)
         result = get_user_course_expiration_date(
             self.user,
@@ -157,6 +175,12 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
         start_date = now() - timedelta(weeks=10)
         course = CourseFactory(start=start_date)
         enrollment = CourseEnrollment.enroll(self.user, course.id, CourseMode.AUDIT)
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(course.id),
+            enabled_as_of=course.start,
+        )
+        add_course_mode(course, mode_slug=CourseMode.AUDIT)
         add_course_mode(course, upgrade_deadline_expired=True)
         result = get_user_course_expiration_date(
             self.user,

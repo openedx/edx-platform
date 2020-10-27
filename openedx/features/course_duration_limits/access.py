@@ -62,6 +62,8 @@ def get_user_course_duration(user, course):
       - Course access duration is bounded by the min and max duration.
       - If course fields are missing, default course access duration to MIN_DURATION.
     """
+    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
+        return None
 
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
     if enrollment is None or enrollment.mode != CourseMode.AUDIT:
@@ -107,9 +109,6 @@ def check_course_expired(user, course):
     if get_course_masquerade(user, course.id):
         return ACCESS_GRANTED
 
-    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
-        return ACCESS_GRANTED
-
     expiration_date = get_user_course_expiration_date(user, course)
     if expiration_date and timezone.now() > expiration_date:
         return AuditExpiredError(user, course, expiration_date)
@@ -127,9 +126,6 @@ def generate_course_expired_message(user, course):
     """
     Generate the message for the user course expiration date if it exists.
     """
-    if not CourseDurationLimitConfig.enabled_for_enrollment(user, course):
-        return
-
     expiration_date = get_user_course_expiration_date(user, course)
     if not expiration_date:
         return

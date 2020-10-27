@@ -41,7 +41,9 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.course_duration_limits.access import generate_course_expired_message
+from openedx.features.course_duration_limits.access import (
+    get_user_course_expiration_date, generate_course_expired_message
+)
 from openedx.features.discounts.utils import generate_offer_html
 from student.models import CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration
 from xmodule.modulestore.django import modulestore
@@ -135,8 +137,7 @@ class CoursewareMeta:
 
     @property
     def can_show_upgrade_sock(self):
-        return (DISPLAY_COURSE_SOCK_FLAG.is_enabled(self.course_key) and
-                can_show_verified_upgrade(self.effective_user, self.enrollment_object))
+        return DISPLAY_COURSE_SOCK_FLAG.is_enabled(self.course_key)
 
     @property
     def license(self):
@@ -181,15 +182,18 @@ class CoursewareMeta:
         """
         Return verified mode information, or None.
         """
+        if not can_show_verified_upgrade(self.effective_user, self.enrollment_object):
+            return None
+
         mode = CourseMode.verified_mode_for_course(self.course_key)
-        if mode:
-            return {
-                'price': mode.min_price,
-                'currency': mode.currency.upper(),
-                'currency_symbol': get_currency_symbol(mode.currency.upper()),
-                'sku': mode.sku,
-                'upgrade_url': verified_upgrade_deadline_link(self.effective_user, self.overview),
-            }
+        return {
+            'access_expiration_date': get_user_course_expiration_date(self.effective_user, self.overview),
+            'price': mode.min_price,
+            'currency': mode.currency.upper(),
+            'currency_symbol': get_currency_symbol(mode.currency.upper()),
+            'sku': mode.sku,
+            'upgrade_url': verified_upgrade_deadline_link(self.effective_user, self.overview),
+        }
 
     @property
     def notes(self):
