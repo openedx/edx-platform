@@ -43,6 +43,8 @@ When refering to XBlocks, we use the entry-point name. For example,
 import importlib.util
 import os
 import sys
+import warnings
+
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from datetime import timedelta
 import lms.envs.common
@@ -115,6 +117,7 @@ from lms.envs.common import (
 from path import Path as path
 from django.urls import reverse_lazy
 
+from import_shims.warn import DeprecatedEdxPlatformImportWarning
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -127,6 +130,13 @@ from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 
 # pylint: enable=useless-suppression
+
+# Filter out DeprecatedEdxPlatformImportWarning instances for now.
+# We will want these to be generally visible eventually, but while there
+# are still a very high number of them, silencing them will be better for
+# developer experience.
+# See /docs/decisions/0007-sys-path-modification-removal.rst for details.
+warnings.filterwarnings("ignore", category=DeprecatedEdxPlatformImportWarning)
 
 ################ Enable credit eligibility feature ####################
 ENABLE_CREDIT_ELIGIBILITY = True

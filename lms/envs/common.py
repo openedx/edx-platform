@@ -32,6 +32,7 @@ Longer TODO:
 import importlib.util
 import sys
 import os
+import warnings
 
 from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
@@ -45,6 +46,7 @@ from enterprise.constants import (
     ENTERPRISE_OPERATOR_ROLE
 )
 
+from import_shims.warn import DeprecatedEdxPlatformImportWarning
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
@@ -53,6 +55,13 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
 from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+
+# Filter out DeprecatedEdxPlatformImportWarning instances for now.
+# We will want these to be generally visible eventually, but while there
+# are still a very high number of them, silencing them will be better for
+# developer experience.
+# See /docs/decisions/0007-sys-path-modification-removal.rst for details.
+warnings.filterwarnings("ignore", category=DeprecatedEdxPlatformImportWarning)
 
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
