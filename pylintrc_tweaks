@@ -1,7 +1,7 @@
 # pylintrc tweaks for use with edx_lint.
 [MASTER]
 ignore+ = ,.git,.tox,migrations,node_modules,.pycharm_helpers
-init-hook="import sys; sys.path.extend(['sys_path_hacks/lms', 'sys_path_hacks/studio', 'common/djangoapps'])"
+init-hook="import sys; sys.path.extend(['import_shims/lms', 'import_shims/studio', 'common/djangoapps'])"
 
 [MESSAGES CONTROL]
 disable+ =
