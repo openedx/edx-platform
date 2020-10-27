@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('cms.djangoapps', 'xblock_config.models')
+warn_deprecated_import('xblock_config.models', 'cms.djangoapps.xblock_config.models')
 
 from cms.djangoapps.xblock_config.models import *

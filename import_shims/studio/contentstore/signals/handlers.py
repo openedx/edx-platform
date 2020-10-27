@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('cms.djangoapps', 'contentstore.signals.handlers')
+warn_deprecated_import('contentstore.signals.handlers', 'cms.djangoapps.contentstore.signals.handlers')
 
 from cms.djangoapps.contentstore.signals.handlers import *

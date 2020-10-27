@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('cms.djangoapps', 'api.v1.tests')
+warn_deprecated_import('api.v1.tests', 'cms.djangoapps.api.v1.tests')
 
 from cms.djangoapps.api.v1.tests import *
