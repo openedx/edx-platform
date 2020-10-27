@@ -706,7 +706,7 @@ DATA_DIR = COURSES_ROOT
 sys.path.append(REPO_ROOT)
 # TODO: The next two path modifications will be removed in an upcoming Open edX release.
 # See docs/decisions/0007-sys-path-modification-removal.rst
-sys.path.append(REPO_ROOT / 'sys_path_hacks' / 'lms')
+sys.path.append(REPO_ROOT / 'import_shims' / 'lms')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For Node.js
