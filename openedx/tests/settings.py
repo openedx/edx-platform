@@ -111,6 +111,7 @@ INSTALLED_APPS = [
     # proctoring models are getting pulled in as a part of `module_render.py`
     # but the proctoring app is not installed as a part of the core.
     'edx_proctoring.apps.EdxProctoringConfig',
+    'oauth2_provider',
 ]
 
 LMS_ROOT_URL = "http://localhost:8000"
