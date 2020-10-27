@@ -375,8 +375,9 @@ def enterprise_customer_from_cache(uuid):
 
 
 def add_enterprise_customer_to_session(request, enterprise_customer):
-    """ Add the given enterprise_customer data to the request's session. """
-    request.session[ENTERPRISE_CUSTOMER_KEY_NAME] = enterprise_customer
+    """ Add the given enterprise_customer data to the request's session if user is authenticated. """
+    if request.user.is_authenticated:
+        request.session[ENTERPRISE_CUSTOMER_KEY_NAME] = enterprise_customer
 
 
 def enterprise_customer_from_session(request):

@@ -21,6 +21,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 from openedx.features.enterprise_support.api import (
     _CACHE_MISS,
     ENTERPRISE_CUSTOMER_KEY_NAME,
+    add_enterprise_customer_to_session,
     ConsentApiClient,
     ConsentApiServiceClient,
     EnterpriseApiClient,
@@ -816,3 +817,26 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         else:
             self.assertFalse(mock_data_from_db.called)
             self.assertNotIn(ENTERPRISE_CUSTOMER_KEY_NAME, mock_request.session)
+
+    def test_enterprise_customer_from_session(self):
+        mock_request = mock.Mock(
+            GET={},
+            COOKIES={},
+            session={},
+        )
+        mock_request.user.is_authenticated = True
+
+        enterprise_customer = {
+            'name': 'abc',
+            'uuid': 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
+        }
+
+        # set enterprise customer info with authenticate user
+        add_enterprise_customer_to_session(mock_request, enterprise_customer)
+        self.assertEqual(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME], enterprise_customer)
+
+        # Now try to set info with un-authenticated user
+        mock_request.user.is_authenticated = False
+        add_enterprise_customer_to_session(mock_request, None)
+        # verify that existing session value should not be updated for un-authenticate user
+        self.assertEqual(mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME], enterprise_customer)
