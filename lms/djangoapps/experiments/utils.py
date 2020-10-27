@@ -410,10 +410,7 @@ def get_program_context(course, user_enrollments):
 # TODO: clean up as part of REVEM-199 (START)
 
 
-from opaque_keys.edx.keys import CourseKey
-import six
-
-def generate_processed_user_metadata(context, user, course, course_id): 
+def generate_processed_user_metadata(context, user, course, course_id):
     user_metadata = {
         key: context.get(key)
         for key in (

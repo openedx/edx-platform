@@ -2,19 +2,24 @@
 Experimentation views
 """
 
-
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from lms.djangoapps.courseware import courses
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from util.json_request import JsonResponse
 
-from lms.djangoapps.experiments import filters, serializers
-from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
-from lms.djangoapps.experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
+from experiments import filters, serializers
+from experiments.models import ExperimentData, ExperimentKeyValue
+from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
+from experiments.utils import get_experiment_user_metadata_context, generate_processed_user_metadata
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from student.models import get_user_by_username_or_email
 
 User = get_user_model()  # pylint: disable=invalid-name
 
@@ -84,3 +89,15 @@ class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
     permission_classes = (IsStaffOrReadOnly,)
     queryset = ExperimentKeyValue.objects.all()
     serializer_class = serializers.ExperimentKeyValueSerializer
+
+
+class UserMetaDataView(APIView):
+
+    def get(self, request, course_id=None, username=None):
+        """ Return user-metadata for the given course and user """
+        user = get_user_by_username_or_email(username)
+        course_key = CourseKey.from_string(course_id)
+        course = courses.get_course_by_id(course_key)
+        data = get_experiment_user_metadata_context(course, user)
+        processed_data = generate_processed_user_metadata(data, user, course, course_id)
+        return JsonResponse(processed_data)
