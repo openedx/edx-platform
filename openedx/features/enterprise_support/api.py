@@ -105,6 +105,12 @@ class ConsentApiClient(object):
 
         # No Enterprise record exists, but we're already enrolled in a course. So, go ahead and proceed.
         if enrollment_exists and not response.get('exists', False):
+            LOGGER.info(
+                '[ENTERPRISE DSC] No Consent Required. APIParams: [%s], APIResponse: [%s], EnrollmentExists: [%s]',
+                kwargs,
+                response,
+                enrollment_exists,
+            )
             return False
 
         # In all other cases, just trust the Consent API.
