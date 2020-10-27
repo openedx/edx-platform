@@ -8,7 +8,7 @@ from mock import MagicMock
 import crum
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -429,3 +429,41 @@ class UtilsTests(ModuleStoreTestCase):
         privacy_path = marketing_urls.get('PRIVACY')
         expected_company_privacy_url = '{}{}'.format(marketing_root_url, privacy_path)
         assert expected_company_privacy_url == current_site_context_data['company_privacy_url']
+    def test_clean_django_settings_override_for_disallowed_settings(self):
+        """
+        Test disallowed settings raise correct validation error.
+        """
+        default_settings = {
+            key: getattr(settings, key, None) for key in settings.ALLOWED_DJANGO_SETTINGS_OVERRIDE
+        }
+        dissallowed_test_settings = dict(default_settings, HELLO='world')
+        expected_error_message = 'Django settings override(s) "HELLO" is/are not allowed to be overridden.'
+
+        with self.assertRaisesMessage(ValidationError, expected_error_message):
+            site_configuration = SiteConfigurationFactory(
+                site=SiteFactory(),
+                values={
+                    'DJANGO_SETTINGS_OVERRIDE': dissallowed_test_settings
+                }
+            )
+            site_configuration.clean()
+
+    def test_clean_django_settings_override_for_missing_settings(self):
+        """
+        Test missing settings raise correct validation error.
+        """
+        default_settings = {
+            key: getattr(settings, key, None) for key in settings.ALLOWED_DJANGO_SETTINGS_OVERRIDE
+        }
+        missing_test_settings = default_settings.copy()
+        missing_test_settings.pop('LMS_BASE')
+        expected_error_message = 'Django settings override(s) "LMS_BASE" is/are missing.'
+
+        with self.assertRaisesMessage(ValidationError, expected_error_message):
+            site_configuration = SiteConfigurationFactory(
+                site=SiteFactory(),
+                values={
+                    'DJANGO_SETTINGS_OVERRIDE': missing_test_settings
+                }
+            )
+            site_configuration.clean()

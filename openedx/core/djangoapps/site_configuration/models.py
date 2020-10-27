@@ -11,6 +11,8 @@ from django.dispatch import receiver
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 
+from openedx.features.edly.utils import clean_django_settings_override
+
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
@@ -59,6 +61,14 @@ class SiteConfiguration(models.Model):
             logger.info("Site Configuration is not enabled for site (%s).", self.site)
 
         return default
+
+    def clean(self):
+        """
+        Add check for allowed django settings override.
+        """
+        super(SiteConfiguration, self).clean()
+        if self.enabled:
+            clean_django_settings_override(self.get_value('DJANGO_SETTINGS_OVERRIDE', None))
 
     @classmethod
     def get_configuration_for_org(cls, org, select_related=None):
