@@ -1,10 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-// babel-polyfill must be imported last because of https://github.com/facebook/react/issues/8379
-// which otherwise causes "Objects are not valid as a react child" errors in IE11.
-import 'babel-polyfill';
-
 class ReactRendererException extends Error {
   constructor(message) {
     super(`ReactRendererException: ${message}`);

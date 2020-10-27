@@ -1,9 +1,9 @@
 """ Tests for DiscussionXBLock"""
+from __future__ import print_function
 from collections import namedtuple
 import ddt
 import itertools
 import mock
-from nose.plugins.attrib import attr
 import random
 import string
 from unittest import TestCase
@@ -53,13 +53,13 @@ def _make_attribute_test_cases():
         )
 
 
-@attr('shard2')
 @ddt.ddt
 class DiscussionXBlockImportExportTests(TestCase):
     """
     Import and export tests
     """
     DISCUSSION_XBLOCK_LOCATION = "openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion.DiscussionXBlock"
+    shard = 2
 
     def setUp(self):
         """
@@ -109,7 +109,7 @@ class DiscussionXBlockImportExportTests(TestCase):
             self.assertEqual(block.discussion_category, category_pair.value)
             self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
-            print xblock_xml
+            print(xblock_xml)
             raise
 
     @mock.patch(DISCUSSION_XBLOCK_LOCATION + ".load_definition_xml")
@@ -141,7 +141,7 @@ class DiscussionXBlockImportExportTests(TestCase):
             self.assertEqual(block.discussion_category, category_pair.value)
             self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
-            print xblock_xml, xblock_definition_xml
+            print(xblock_xml, xblock_definition_xml)
             raise
 
     def test_export_default_discussion_id(self):

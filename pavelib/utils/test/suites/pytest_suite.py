@@ -119,6 +119,18 @@ class SystemTestSuite(PytestSuite):
 
         self.processes = int(self.processes)
 
+    def _under_coverage_cmd(self, cmd):
+        """
+        If self.run_under_coverage is True, it returns the arg 'cmd'
+        altered to be run under coverage. It returns the command
+        unaltered otherwise.
+        """
+        if self.run_under_coverage:
+            cmd.append('--cov')
+            cmd.append('--cov-report=')
+
+        return cmd
+
     @property
     def cmd(self):
         if self.django_toxenv:
@@ -141,19 +153,23 @@ class SystemTestSuite(PytestSuite):
 
         if self.disable_capture:
             cmd.append("-s")
-
         if self.xdist_ip_addresses:
             cmd.append('--dist=loadscope')
-            for ip in self.xdist_ip_addresses.split(' '):
-                xdist_string = '--tx ssh=ubuntu@{}//python="source /edx/app/edxapp/edxapp_env; ' \
-                               'python"//chdir="/edx/app/edxapp/edx-platform"'.format(ip)
+            if self.processes <= 0:
+                xdist_remote_processes = 1
+            else:
+                xdist_remote_processes = self.processes
+            for ip in self.xdist_ip_addresses.split(','):
+                # The django settings runtime command does not propagate to xdist remote workers
+                django_env_var_cmd = 'export DJANGO_SETTINGS_MODULE={}' \
+                                     .format('{}.envs.{}'.format(self.root, self.settings))
+                xdist_string = '--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
+                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                               .format(xdist_remote_processes, ip, django_env_var_cmd)
                 cmd.append(xdist_string)
-            already_synced_dirs = set()
-            for test_path in self.test_id.split():
-                test_root_dir = test_path.split('/')[0]
-                if test_root_dir not in already_synced_dirs:
-                    cmd.append('--rsyncdir {}'.format(test_root_dir))
-                    already_synced_dirs.add(test_root_dir)
+            for rsync_dir in Env.rsync_dirs():
+                cmd.append('--rsyncdir {}'.format(rsync_dir))
         else:
             if self.processes == -1:
                 cmd.append('-n auto')
@@ -226,6 +242,14 @@ class LibTestSuite(PytestSuite):
         self.test_id = kwargs.get('test_id', self.root)
         self.eval_attr = kwargs.get('eval_attr', None)
         self.xdist_ip_addresses = kwargs.get('xdist_ip_addresses', None)
+        self.randomize = kwargs.get('randomize', None)
+        self.processes = kwargs.get('processes', None)
+
+        if self.processes is None:
+            # Don't use multiprocessing by default
+            self.processes = 0
+
+        self.processes = int(self.processes)
 
     @property
     def cmd(self):
@@ -238,8 +262,6 @@ class LibTestSuite(PytestSuite):
             '-Wd',
             '-m',
             'pytest',
-            '-p',
-            'no:randomly',
             '--junitxml={}'.format(self.xunit_report),
         ])
         cmd.extend(self.passthrough_options + self.test_options_flags)
@@ -252,17 +274,33 @@ class LibTestSuite(PytestSuite):
 
         if self.xdist_ip_addresses:
             cmd.append('--dist=loadscope')
-            for ip in self.xdist_ip_addresses.split(' '):
-                xdist_string = '--tx ssh=ubuntu@{}//python="source /edx/app/edxapp/edxapp_env; ' \
-                               'python"//chdir="/edx/app/edxapp/edx-platform"'.format(ip)
+            if self.processes <= 0:
+                xdist_remote_processes = 1
+            else:
+                xdist_remote_processes = self.processes
+            for ip in self.xdist_ip_addresses.split(','):
+                # The django settings runtime command does not propagate to xdist remote workers
+                if 'pavelib/paver_tests' in self.test_id:
+                    django_env_var_cmd = "export DJANGO_SETTINGS_MODULE='lms.envs.test'"
+                else:
+                    django_env_var_cmd = "export DJANGO_SETTINGS_MODULE='openedx.tests.settings'"
+                xdist_string = '--tx {}*ssh="ubuntu@{} -o StrictHostKeyChecking=no"' \
+                               '//python="source /edx/app/edxapp/edxapp_env; {}; python"' \
+                               '//chdir="/edx/app/edxapp/edx-platform"' \
+                               .format(xdist_remote_processes, ip, django_env_var_cmd)
                 cmd.append(xdist_string)
-            already_synced_dirs = set()
-            for test_path in self.test_id.split():
-                test_root_dir = test_path.split('/')[0]
-                if test_root_dir not in already_synced_dirs:
-                    cmd.append('--rsyncdir {}'.format(test_root_dir))
-                    already_synced_dirs.add(test_root_dir)
+            for rsync_dir in Env.rsync_dirs():
+                cmd.append('--rsyncdir {}'.format(rsync_dir))
+        else:
+            if self.processes == -1:
+                cmd.append('-n auto')
+                cmd.append('--dist=loadscope')
+            elif self.processes != 0:
+                cmd.append('-n {}'.format(self.processes))
+                cmd.append('--dist=loadscope')
 
+        if not self.randomize:
+            cmd.append("-p no:randomly")
         if self.eval_attr:
             cmd.append("-a '{}'".format(self.eval_attr))
 

@@ -130,6 +130,11 @@
       padding-bottom: 10px;
     }
 
+    .account-settings-header-subtitle-warning {
+      @extend .account-settings-header-subtitle;
+      color: $alert-color;
+    }
+
     .account-settings-section-message {
       font-size: 16px;
       line-height: 22px;
@@ -198,7 +203,7 @@
             @include appearance(none);
 
             padding: 14px 30px 14px 15px;
-            border: 1px solid $light-gray;
+            border: 1px solid $gray58-border;
             background-color: transparent;
             border-radius: 2px;
             position: relative;
@@ -237,7 +242,7 @@
 
             display: inline-block;
             padding: 0.625rem;
-            border: 1px solid $light-gray;
+            border: 1px solid $gray58-border;
             border-radius: 2px;
             background: $white;
             font-size: $body-font-size;

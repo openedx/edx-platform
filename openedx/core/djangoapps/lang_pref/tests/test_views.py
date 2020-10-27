@@ -26,7 +26,7 @@ class TestLangPrefView(TestCase):
 
     def test_language_session_update(self):
         # test language session updating correctly.
-        self.request.session[LANGUAGE_SESSION_KEY] = 'ar'  # pylint: disable=no-member
+        self.request.session[LANGUAGE_SESSION_KEY] = 'ar'
         response = self.client.patch(reverse("session_language"), json.dumps({'pref-lang': 'eo'}))
         self.assertEqual(response.status_code, 200)
         self.client.get('/')

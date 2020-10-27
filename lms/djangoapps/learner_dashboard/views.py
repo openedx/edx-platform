@@ -6,6 +6,7 @@ from edxmako.shortcuts import render_to_response
 
 from lms.djangoapps.learner_dashboard.programs import ProgramsFragmentView, ProgramDetailsFragmentView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.features.journals.api import journals_enabled
 
 
 @login_required
@@ -21,6 +22,7 @@ def program_listing(request):
         'nav_hidden': True,
         'show_dashboard_tabs': True,
         'show_program_listing': programs_config.enabled,
+        'show_journal_listing': journals_enabled(),  # TODO: Dashboard Plugin required
         'uses_pattern_library': True,
     }
 

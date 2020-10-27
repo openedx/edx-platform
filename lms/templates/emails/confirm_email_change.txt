@@ -1,3 +1,4 @@
+## mako
 <%! from django.urls import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>

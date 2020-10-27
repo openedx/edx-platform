@@ -1476,7 +1476,7 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self.client.get_html('/home/')
         self.assertContains(
             resp,
-            '<h1 class="page-header">Studio Home</h1>',
+            u'<h1 class="page-header">{} Home</h1>'.format(settings.STUDIO_SHORT_NAME),
             status_code=200,
             html=True
         )
@@ -1953,7 +1953,8 @@ class RerunCourseTest(ContentStoreTestCase):
         source_course = CourseFactory.create()
         destination_course_key = self.post_rerun_request(source_course.id)
         self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
-        videos = list(get_videos_for_course(text_type(destination_course_key)))
+        videos, __ = get_videos_for_course(text_type(destination_course_key))
+        videos = list(videos)
         self.assertEqual(0, len(videos))
         self.assertInCourseListing(destination_course_key)
 
@@ -1989,8 +1990,10 @@ class RerunCourseTest(ContentStoreTestCase):
         self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
 
         # Verify that the VAL copies videos to the rerun
-        source_videos = list(get_videos_for_course(text_type(source_course.id)))
-        target_videos = list(get_videos_for_course(text_type(destination_course_key)))
+        videos, __ = get_videos_for_course(text_type(source_course.id))
+        source_videos = list(videos)
+        videos, __ = get_videos_for_course(text_type(destination_course_key))
+        target_videos = list(videos)
         self.assertEqual(1, len(source_videos))
         self.assertEqual(source_videos, target_videos)
 

@@ -2,21 +2,19 @@
 """
 End-to-end tests for the CCX dashboard.
 """
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.ccx_dashboard_page import CoachDashboardPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
 
 
-@attr(shard=7)
 class CreateCCXCoachTest(EventsTestMixin, UniqueCourseTest):
     """
     Test ccx end to end process.
     """
     USERNAME = "coach_tester"
     EMAIL = "coach_tester@example.com"
+    shard = 7
 
     def setUp(self):
         super(CreateCCXCoachTest, self).setUp()

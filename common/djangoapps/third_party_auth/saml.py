@@ -13,6 +13,11 @@ from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from six import text_type
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
 from social_core.exceptions import AuthForbidden
+from enterprise.models import (
+    EnterpriseCustomerUser,
+    EnterpriseCustomerIdentityProvider,
+    PendingEnterpriseCustomerUser
+)
 
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
@@ -110,6 +115,34 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
 
         return super(SAMLAuthBackend, self).auth_url()
 
+    def disconnect(self, *args, **kwargs):
+        """
+        Override of SAMLAuth.disconnect to unlink the learner from enterprise customer if associated.
+        """
+        from . import pipeline, provider
+        running_pipeline = pipeline.get(self.strategy.request)
+        provider_id = provider.Registry.get_from_pipeline(running_pipeline).provider_id
+        try:
+            user_email = kwargs.get('user').email
+        except AttributeError:
+            user_email = None
+
+        try:
+            enterprise_customer_idp = EnterpriseCustomerIdentityProvider.objects.get(provider_id=provider_id)
+        except EnterpriseCustomerIdentityProvider.DoesNotExist:
+            enterprise_customer_idp = None
+
+        if enterprise_customer_idp and user_email:
+            try:
+                # Unlink user email from Enterprise Customer.
+                EnterpriseCustomerUser.objects.unlink_user(
+                    enterprise_customer=enterprise_customer_idp.enterprise_customer, user_email=user_email
+                )
+            except (EnterpriseCustomerUser.DoesNotExist, PendingEnterpriseCustomerUser.DoesNotExist):
+                pass
+
+        return super(SAMLAuthBackend, self).disconnect(*args, **kwargs)
+
     def _check_entitlements(self, idp, attributes):
         """
         Check if we require the presence of any specific eduPersonEntitlement.
@@ -178,6 +211,17 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         })
         return details
 
+    def get_attr(self, attributes, conf_key, default_attribute):
+        """
+        Internal helper method.
+        Get the attribute 'default_attribute' out of the attributes,
+        unless self.conf[conf_key] overrides the default by specifying
+        another attribute to use.
+        """
+        key = self.conf.get(conf_key, default_attribute)
+        default = self.conf['attr_defaults'].get(conf_key) or None
+        return attributes[key][0] if key in attributes else default
+
     @property
     def saml_sp_configuration(self):
         """Get the SAMLConfiguration for this IdP"""
@@ -209,6 +253,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         'country': 'country',
     }
 
+    defaults_value_mapping = {
+        'defaultFullName': 'attr_full_name',
+        'firstName': 'attr_first_name',
+        'lastName': 'attr_last_name',
+        'username': 'attr_username',
+        'email': 'attr_email',
+    }
+
     # Define a simple mapping to relate SAPSF values to Open edX-compatible values for
     # any given field. By default, this only contains the Country field, as SAPSF supplies
     # a country name, which has to be translated to a country code.
@@ -227,7 +279,12 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         Get a dictionary mapping registration field names to default values.
         """
         field_mapping = self.field_mappings
-        registration_fields = {edx_name: response['d'].get(odata_name, '') for odata_name, edx_name in field_mapping.items()}
+        value_defaults = self.conf.get('attr_defaults', {})
+        value_defaults = {key: value_defaults.get(value, '') for key, value in self.defaults_value_mapping.items()}
+        registration_fields = {
+            edx_name: response['d'].get(odata_name, value_defaults.get(odata_name, ''))
+            for odata_name, edx_name in field_mapping.items()
+        }
         value_mapping = self.value_mappings
         for field, value in registration_fields.items():
             if field in value_mapping and value in value_mapping[field]:

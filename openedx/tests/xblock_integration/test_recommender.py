@@ -15,8 +15,8 @@ from django.urls import reverse
 from ddt import data, ddt
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from nose.plugins.attrib import attr
 from six import text_type
+from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -250,7 +250,7 @@ class TestRecommenderResourceBase(TestRecommender):
         """
         resource = {"id": resource_id}
         edited_recommendations = {
-            key: value + " edited" for key, value in self.test_recommendations[self.resource_id].iteritems()
+            key: value + "edited" for key, value in self.test_recommendations[self.resource_id].iteritems()
         }
         resource.update(edited_recommendations)
         return resource

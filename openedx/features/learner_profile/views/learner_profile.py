@@ -20,6 +20,7 @@ from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFo
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.journals.api import journals_enabled
 from student.models import User
 
 from .. import SHOW_PROFILE_MESSAGE
@@ -59,7 +60,7 @@ def learner_profile(request, username):
                 'profile. {learn_more_link_start}Learn more{learn_more_link_end}'
             )).format(
                 learn_more_link_start=HTML(
-                    '<a href="http://edx.readthedocs.io/projects/open-edx-learner-guide/en/'
+                    '<a href="https://edx.readthedocs.io/projects/open-edx-learner-guide/en/'
                     'latest/SFD_dashboard_profile_SectionHead.html#adding-profile-information">'
                 ),
                 learn_more_link_end=HTML('</a>')
@@ -137,6 +138,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
             'social_platforms': settings.SOCIAL_PLATFORMS,
         },
         'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'show_journal_listing': journals_enabled(),
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'nav_hidden': True,

@@ -1,0 +1,21 @@
+{% load i18n %}
+{% load static %}
+<div class="content-paywall" role="group" aria-label="{% trans 'Content available only to verified track learners' %}">
+    <div>
+        <h3>
+            <span class="fa fa-lock" aria-hidden="true"></span>
+            {% trans "Verified Track Access" %}
+        </h3>
+        <span class="certSPAN_1">
+            {% trans "Graded assessments are available to Verified Track learners." %}
+        </span>
+        {% if not mobile_app and ecommerce_checkout_link %}
+        <span class="certDIV_1" style="">
+            <a href="{{ecommerce_checkout_link}}" class="certA_1">
+                {% trans "Upgrade to unlock" %}  (${{min_price}} USD)
+            </a>
+        </span>
+        {% endif %}
+    </div>
+    <img src="/static/images/edx-verified-mini-cert.png">
+</div>

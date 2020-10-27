@@ -1,24 +1,18 @@
 """
 Acceptance tests for the certificate web view feature.
 """
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
-from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
+from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.certificate_page import CertificatePage
-from common.test.acceptance.pages.lms.course_home import CourseHomePage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.progress import ProgressPage
-from common.test.acceptance.pages.lms.tab_nav import TabNavPage
-from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, get_element_padding, load_data_str
+from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
 
 
-@attr(shard=5)
 class CertificateWebViewTest(EventsTestMixin, UniqueCourseTest):
     """
     Tests for verifying certificate web view features
     """
+    shard = 5
 
     def setUp(self):
         super(CertificateWebViewTest, self).setUp()

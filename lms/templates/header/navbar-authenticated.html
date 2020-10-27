@@ -30,26 +30,40 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
   <div class="main">
     % if show_dashboard_tabs:
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
-          ${_("Courses")}
+        <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}"
+             aria-current="${'page' if reverse('dashboard') == request.path else 'false'}">
+             ${_("Courses")}
         </a>
       </div>
       % if show_program_listing:
         <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-          <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
-            ${_("Programs")}
+          <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}"
+             aria-current="${'page' if reverse('program_listing_view') == request.path else 'false'}">
+             ${_("Programs")}
+          </a>
+        </div>
+      % endif
+      % if show_journal_listing:
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="${'active ' if reverse('openedx.journals.dashboard') in request.path else ''}tab-nav-link" href="${reverse('openedx.journals.dashboard')}"
+             aria-current="${'page' if reverse('openedx.journals.dashboard') == request.path else 'false'}">
+             ${_("Journals")}
           </a>
         </div>
       % endif
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="${'active ' if '/u/' in request.path  else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
-          ${_("Profile")}
-        </a>
+          <a class="${'active ' if '/u/' in request.path  else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}"
+             aria-current="${'page' if '/u/' in request.path else 'false'}">
+             ${_("Profile")}
+          </a>
       </div>
     % endif
     % if show_explore_courses:
       <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-        <a class="tab-nav-link" href="${marketing_link('COURSES')}">${_('Discover New')}</a>
+          <a class="tab-nav-link" href="${marketing_link('COURSES')}"
+             aria-current="${'page' if '/courses' in request.path else 'false'}">
+             ${_('Discover New')}
+          </a>
       </div>
     % endif
     % if show_sysadmin_dashboard:

@@ -4,7 +4,7 @@ import mock
 from django.core.management import call_command
 from django.test import TestCase
 
-from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
+from lms.djangoapps.certificates.models import CertificateStatuses
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory

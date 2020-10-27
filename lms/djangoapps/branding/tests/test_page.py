@@ -11,13 +11,13 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from pytz import UTC
 
 from branding.views import index
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.lib.tests import attr
 from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -72,22 +72,22 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
+    @override_settings(X_FRAME_OPTIONS='ALLOW')
     def test_allow_x_frame_options(self):
         """
         Check the x-frame-option response header
         """
 
-        # check to see that the default setting is to ALLOW iframing
+        # check to see that the override value is honored
         resp = self.client.get('/')
         self.assertEquals(resp['X-Frame-Options'], 'ALLOW')
 
-    @override_settings(X_FRAME_OPTIONS='DENY')
     def test_deny_x_frame_options(self):
         """
         Check the x-frame-option response header
         """
 
-        # check to see that the override value is honored
+        # check to see that the default setting is to DENY iframing
         resp = self.client.get('/')
         self.assertEquals(resp['X-Frame-Options'], 'DENY')
 

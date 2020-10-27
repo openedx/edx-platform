@@ -20,7 +20,7 @@ class ZendeskProxyThrottle(SimpleRateThrottle):
         self.rate = '{}/hour'.format(ZENDESK_REQUESTS_PER_HOUR)
         super(ZendeskProxyThrottle, self).__init__()
 
-    def get_cache_key(self, request, view):  # pylint: disable=unused-argument
+    def get_cache_key(self, request, view):
         """
         By providing a static string here, we are limiting *all* users to the same combined limit.
         """
@@ -32,8 +32,8 @@ class ZendeskPassthroughView(APIView):
     An APIView that will take in inputs from an unauthenticated endpoint, and use them to securely create a zendesk
     ticket.
     """
-    throttle_classes = ZendeskProxyThrottle,
-    parser_classes = JSONParser,
+    throttle_classes = (ZendeskProxyThrottle,)
+    parser_classes = (JSONParser,)
 
     def post(self, request):
         """

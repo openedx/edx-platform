@@ -2,7 +2,6 @@
 Test module for Entrance Exams AJAX callback handler workflows
 """
 import json
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
@@ -229,13 +228,14 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
             {'entrance_exam_minimum_score_pct': '50'},
             http_accept='application/json'
         )
+
         self.assertEqual(resp.status_code, 201)
         resp = self.client.get(self.exam_url)
         self.assertEqual(resp.status_code, 200)
         self.course = modulestore().get_course(self.course.id)
-
         # Should raise an ItemNotFoundError and return a 404
         updated_metadata = {'entrance_exam_id': 'i4x://org.4/course_4/chapter/ed7c4c6a4d68409998e2c8554c4629d1'}
+
         CourseMetadata.update_from_dict(
             updated_metadata,
             self.course,
@@ -247,6 +247,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
 
         # Should raise an InvalidKeyError and return a 404
         updated_metadata = {'entrance_exam_id': '123afsdfsad90f87'}
+
         CourseMetadata.update_from_dict(
             updated_metadata,
             self.course,

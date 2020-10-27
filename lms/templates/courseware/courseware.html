@@ -15,7 +15,11 @@ from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import course_home_page_title, COURSE_OUTLINE_PAGE_FLAG
 %>
 <%
-  include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
+   include_special_exams = (
+   request.user.is_authenticated and
+   settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
+   (course.enable_proctored_exams or course.enable_timed_exams)
+   )
 %>
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>

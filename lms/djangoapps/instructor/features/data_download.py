@@ -4,13 +4,15 @@ acceptance tests.
 """
 
 # pylint: disable=missing-docstring
+# pylint: disable=no-member
 # pylint: disable=redefined-outer-name
 
 from django.utils import http
 from lettuce import step, world
-from nose.tools import assert_in, assert_regexp_matches
 
 from terrain.steps import reload_the_page
+
+from openedx.core.lib.tests.tools import assert_in, assert_regexp_matches  # pylint: disable=no-name-in-module
 
 
 @step(u'I see a table of student profiles')

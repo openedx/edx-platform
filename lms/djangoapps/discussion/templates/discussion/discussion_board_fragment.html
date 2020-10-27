@@ -41,6 +41,9 @@ from openedx.core.djangolib.markup import HTML
             <div class="forum-search"></div>
         </div>
     </header>
+    % if course_expiration_fragment:
+        ${HTML(course_expiration_fragment.content)}
+    % endif
     <div class="page-content"
       % if getattr(course, 'language'):
         lang="${course.language}"

@@ -36,6 +36,13 @@ class Command(BaseCommand):
     """
     help = 'Populates the RetirementState table with the states present in settings.'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--dry_run',
+            action='store_true',
+            help='Run checks without making any changes'
+        )
+
     def _validate_new_states(self, new_states):
         """
         Check settings for existence of states, required states
@@ -72,7 +79,7 @@ class Command(BaseCommand):
             raise CommandError('Users exist in a state that is marked for deletion! States to delete'
                                'are: {}'.format(states_to_delete))
 
-    def _delete_old_states_and_create_new(self, new_states):
+    def _delete_old_states_and_create_new(self, new_states, dry_run=False):
         """
         Wipes the RetirementState table and creates new entries based on new_states
         - Note that the state_execution_order is incremented by 10 for each entry
@@ -90,6 +97,10 @@ class Command(BaseCommand):
         states_to_create = set_new_states - set_current_states
         states_remaining = set_current_states.intersection(set_new_states)
         states_to_delete = set_current_states - set_new_states
+
+        # If this is a dry run we have everything we need.
+        if dry_run:
+            return states_to_create, states_remaining, states_to_delete
 
         # In theory this should not happen, this would have failed _check_current_users
         # if the state was not required, and failed _validate_new_states if we're trying
@@ -129,13 +140,18 @@ class Command(BaseCommand):
         """
         Execute the command.
         """
+        dry_run = options['dry_run']
+
+        if dry_run:
+            print("--- Dry run, no changes will be made ---")
+
         new_states = settings.RETIREMENT_STATES
         self._validate_new_states(new_states)
         self._check_current_users()
-        created, existed, deleted = self._delete_old_states_and_create_new(new_states)
+        created, existed, deleted = self._delete_old_states_and_create_new(new_states, dry_run=dry_run)
 
         # Report
-        print("All states removed and new states added. Differences:")
+        print("States have been synchronized. Differences:")
         print("   Added: {}".format(created))
         print("   Removed: {}".format(deleted))
         print("   Remaining: {}".format(existed))

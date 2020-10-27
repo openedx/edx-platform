@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 """
 Tests of XML export
 """
+from __future__ import print_function
 
 import ddt
 import lxml.etree
@@ -10,6 +12,7 @@ import shutil
 import unittest
 
 from datetime import datetime, timedelta, tzinfo
+from django.utils.translation import ugettext_lazy
 from fs.osfs import OSFS
 from path import Path as path
 from six import text_type
@@ -31,7 +34,7 @@ def strip_filenames(descriptor):
     """
     Recursively strips 'filename' from all children's definitions.
     """
-    print "strip filename from {desc}".format(desc=text_type(descriptor.location))
+    print("strip filename from {desc}".format(desc=text_type(descriptor.location)))
     if descriptor._field_data.has(descriptor, 'filename'):
         descriptor._field_data.delete(descriptor, 'filename')
 
@@ -93,12 +96,12 @@ class RoundTripTestCase(unittest.TestCase):
         """).strip()
 
         root_dir = path(self.temp_dir)
-        print "Copying test course to temp dir {0}".format(root_dir)
+        print("Copying test course to temp dir {0}".format(root_dir))
 
         data_dir = path(DATA_DIR)
         shutil.copytree(data_dir / course_dir, root_dir / course_dir)
 
-        print "Starting import"
+        print("Starting import")
         initial_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses = initial_import.get_courses()
@@ -107,7 +110,7 @@ class RoundTripTestCase(unittest.TestCase):
 
         # export to the same directory--that way things like the custom_tags/ folder
         # will still be there.
-        print "Starting export"
+        print("Starting export")
         file_system = OSFS(root_dir)
         initial_course.runtime.export_fs = file_system.makedir(course_dir, recreate=True)
         root = lxml.etree.Element('root')
@@ -116,14 +119,14 @@ class RoundTripTestCase(unittest.TestCase):
         with initial_course.runtime.export_fs.open('course.xml', 'wb') as course_xml:
             lxml.etree.ElementTree(root).write(course_xml, encoding='utf-8')
 
-        print "Starting second import"
+        print("Starting second import")
         second_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses2 = second_import.get_courses()
         self.assertEquals(len(courses2), 1)
         exported_course = courses2[0]
 
-        print "Checking course equality"
+        print("Checking course equality")
 
         # HACK: filenames change when changing file formats
         # during imports from old-style courses.  Ignore them.
@@ -134,15 +137,15 @@ class RoundTripTestCase(unittest.TestCase):
         self.assertEquals(initial_course.id, exported_course.id)
         course_id = initial_course.id
 
-        print "Checking key equality"
+        print("Checking key equality")
         self.assertItemsEqual(
             initial_import.modules[course_id].keys(),
             second_import.modules[course_id].keys()
         )
 
-        print "Checking module equality"
+        print("Checking module equality")
         for location in initial_import.modules[course_id].keys():
-            print("Checking", location)
+            print(("Checking", location))
             self.assertTrue(blocks_are_equivalent(
                 initial_import.modules[course_id][location],
                 second_import.modules[course_id][location]
@@ -212,3 +215,17 @@ class TestEdxJsonEncoder(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             self.encoder.default({})
+
+    def test_encode_unicode_lazy_text(self):
+        """
+        Verify that the encoding is functioning fine with lazy text
+        """
+
+        # Initializing a lazy text object with Unicode
+        unicode_text = u"Your 𝓟𝓵𝓪𝓽𝓯𝓸𝓻𝓶 Name Here"
+        lazy_text = ugettext_lazy(unicode_text)
+
+        self.assertEquals(
+            unicode_text,
+            self.encoder.default(lazy_text)
+        )

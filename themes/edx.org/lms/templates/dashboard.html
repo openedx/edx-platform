@@ -91,6 +91,20 @@ from student.models import CourseEnrollment
         banner.showMessage(${redirect_message | n, dump_js_escaped_json})
     </%static:require_module>
   % endif
+  % if recovery_email_message:
+      <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+        var banner = new MessageBannerView({urgency: 'low', type: 'warning', hideCloseBtn: false, isRecoveryEmailMsg: true});
+        $('#content').prepend(banner.$el);
+        banner.showMessage(${recovery_email_message | n, dump_js_escaped_json})
+      </%static:require_module>
+  % endif
+  % if recovery_email_activation_message:
+      <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+        var banner = new MessageBannerView({urgency: 'low', type: 'warning', isRecoveryEmailMsg: true});
+        $('#content').prepend(banner.$el);
+        banner.showMessage(${recovery_email_activation_message | n, dump_js_escaped_json})
+      </%static:require_module>
+  % endif
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">
@@ -190,7 +204,7 @@ from student.models import CourseEnrollment
               show_email_settings = (enrollment.course_id in show_email_settings_for)
 
             session_id = enrollment.course_id
-            show_courseware_link = (session_id in show_courseware_links_for)
+            show_courseware_link = show_courseware_links_for.get(session_id, False)
             cert_status = cert_statuses.get(session_id)
             can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
             can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False

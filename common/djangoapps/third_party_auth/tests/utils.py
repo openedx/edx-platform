@@ -1,7 +1,10 @@
 """Common utility for testing third party oauth2 features."""
 import json
+from base64 import b64encode
 
 import httpretty
+from onelogin.saml2.utils import OneLogin_Saml2_Utils
+
 from provider.constants import PUBLIC
 from provider.oauth2.models import Client
 from social_core.backends.facebook import FacebookOAuth2, API_VERSION as FACEBOOK_API_VERSION
@@ -96,3 +99,42 @@ class ThirdPartyOAuthTestMixinGoogle(object):
     USER_URL = "https://www.googleapis.com/plus/v1/people/me"
     # In google-oauth2 responses, the "email" field is used as the user's identifier
     UID_FIELD = "email"
+
+
+def read_and_pre_process_xml(file_name):
+    """
+    Read XML file with the name specified in the argument and pre process the xml so that it can be parsed.
+
+    Pre Processing removes line retune characters (i.e. "\n").
+
+    Arguments:
+        file_name (str): Name of the XML file.
+
+    Returns:
+         (str): Pre Processed contents of the file.
+    """
+    with open(file_name, 'r') as xml_file:
+        return xml_file.read().replace('\n', '')
+
+
+def prepare_saml_response_from_xml(xml, relay_state='testshib'):
+    """
+    Pre Process XML so that it can be used as a SAML Response coming from SAML IdP.
+
+    This method will perform the following operations on the XML in given order
+
+    1. base64 encode XML.
+    2. URL encode the base64 encoded data.
+
+    Arguments:
+        xml (string): XML data
+        relay_state (string): Relay State of the SAML Response
+
+    Returns:
+         (str): Base64 and URL encoded XML.
+    """
+    b64encoded_xml = b64encode(xml)
+    return 'RelayState={relay_state}&SAMLResponse={saml_response}'.format(
+        relay_state=OneLogin_Saml2_Utils.case_sensitive_urlencode(relay_state),
+        saml_response=OneLogin_Saml2_Utils.case_sensitive_urlencode(b64encoded_xml)
+    )

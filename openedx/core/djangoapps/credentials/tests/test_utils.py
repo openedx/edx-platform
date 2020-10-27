@@ -3,7 +3,6 @@ import uuid
 
 from edx_oauth2_provider.tests.factories import ClientFactory
 import mock
-from nose.plugins.attrib import attr
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
@@ -18,10 +17,10 @@ UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
 
 
 @skip_unless_lms
-@attr(shard=2)
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
     """ Tests for credentials utility functions. """
+    shard = 2
 
     ENABLED_CACHES = ['default']
 
@@ -46,6 +45,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         querystring = {
             'username': self.user.username,
             'status': 'awarded',
+            'only_visible': 'True',
         }
         cache_key = '{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username)
         self.assertEqual(kwargs['querystring'], querystring)
@@ -67,6 +67,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         querystring = {
             'username': self.user.username,
             'status': 'awarded',
+            'only_visible': 'True',
             'program_uuid': program_uuid,
         }
         cache_key = '{}.{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username, program_uuid)
@@ -85,6 +86,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         querystring = {
             'username': self.user.username,
             'status': 'awarded',
+            'only_visible': 'True',
             'type': 'program',
         }
         self.assertEqual(kwargs['querystring'], querystring)

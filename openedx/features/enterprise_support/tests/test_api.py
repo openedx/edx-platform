@@ -67,7 +67,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         Verify that the provided api client uses the enterprise service user to generate
         JWT token for auth.
         """
-        mocked_jwt_builder.return_value.build_token.return_value = 'test-token'
+        mocked_jwt_builder.return_value = 'test-token'
         enterprise_service_user = User.objects.get(username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME)
         enterprise_api_service_client = api_client()
 
@@ -80,7 +80,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         Verify that the provided api client uses the expected user to generate
         JWT token for auth.
         """
-        mocked_jwt_builder.return_value.build_token.return_value = 'test-token'
+        mocked_jwt_builder.return_value = 'test-token'
         dummy_enterprise_user = UserFactory.create(
             username='dummy-enterprise-user',
             email='dummy-enterprise-user@example.com',
@@ -117,10 +117,10 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self.assertEqual(cached_enterprise_customer, enterprise_customer)
 
     @httpretty.activate
-    @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
+    @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
     def test_enterprise_api_client_with_service_user(self, mock_jwt_builder):
         """
-        Verify that enterprise API service client uses enterprise service user
+        Verify that enterprise API service client uses enterprcreate_jwt_for_userise service user
         by default to authenticate and access enterprise API.
         """
         self._assert_api_service_client(EnterpriseApiServiceClient, mock_jwt_builder)
@@ -138,7 +138,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self._assert_get_enterprise_customer(enterprise_api_client, enterprise_api_data_for_mock_2)
 
     @httpretty.activate
-    @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
+    @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
     def test_enterprise_api_client_with_user(self, mock_jwt_builder):
         """
         Verify that enterprise API client uses the provided user to
@@ -147,7 +147,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self._assert_api_client_with_user(EnterpriseApiClient, mock_jwt_builder)
 
     @httpretty.activate
-    @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
+    @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
     def test_enterprise_consent_api_client_with_service_user(self, mock_jwt_builder):
         """
         Verify that enterprise API consent service client uses enterprise
@@ -156,7 +156,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         self._assert_api_service_client(ConsentApiServiceClient, mock_jwt_builder)
 
     @httpretty.activate
-    @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
+    @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
     def test_enterprise_consent_api_client_with_user(self, mock_jwt_builder):
         """
         Verify that enterprise API consent service client uses the provided
@@ -166,10 +166,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
     @httpretty.activate
     def test_consent_needed_for_course(self):
-        user = mock.MagicMock(
-            username='janedoe',
-            is_authenticated=lambda: True,
-        )
+        user = UserFactory(username='janedoe')
         request = mock.MagicMock(session={}, user=user)
         self.mock_enterprise_learner_api()
         self.mock_consent_missing(user.username, 'fake-course', 'cf246b88-d5f6-4908-a522-fc307e0b0c59')

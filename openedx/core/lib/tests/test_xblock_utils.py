@@ -7,12 +7,16 @@ import uuid
 
 import ddt
 from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
+from mock import patch
 from web_fragments.fragment import Fragment
+from six import text_type
 
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from openedx.core.lib.xblock_utils import (
+    is_xblock_aside,
+    get_aside_from_xblock,
     replace_course_urls,
     replace_jump_to_id_urls,
     replace_static_urls,
@@ -21,17 +25,19 @@ from openedx.core.lib.xblock_utils import (
     wrap_fragment,
     wrap_xblock
 )
+from xblock.core import XBlockAside
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.test_asides import AsideTestType
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestXblockUtils(SharedModuleStoreTestCase):
     """
     Tests for xblock utility functions.
     """
+    shard = 2
 
     @classmethod
     def setUpClass(cls):
@@ -217,3 +223,30 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         with self.settings(PIPELINE_ENABLED=pipeline_enabled, PIPELINE_JS=pipeline_js):
             js_dependencies = get_js_dependencies("js-group")
             self.assertEqual(js_dependencies, expected_js_dependencies)
+
+
+class TestXBlockAside(SharedModuleStoreTestCase):
+    """Test the xblock aside function."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestXBlockAside, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.block = ItemFactory.create(category='aside', parent=cls.course)
+        cls.aside_v2 = AsideUsageKeyV2(cls.block.scope_ids.usage_id, "aside")
+        cls.aside_v1 = AsideUsageKeyV1(cls.block.scope_ids.usage_id, "aside")
+
+    def test_is_xblock_aside(self):
+        """test if xblock is aside"""
+        assert is_xblock_aside(self.aside_v2) is True
+        assert is_xblock_aside(self.aside_v1) is True
+
+    def test_is_not_xblock_aside(self):
+        """test if xblock is not aside"""
+        assert is_xblock_aside(self.block.scope_ids.usage_id) is False
+
+    @patch('xmodule.modulestore.xml.ImportSystem.applicable_aside_types', lambda self, block: ['test_aside'])
+    @XBlockAside.register_temp_plugin(AsideTestType, 'test_aside')
+    def test_get_aside(self):
+        """test get aside success"""
+        assert get_aside_from_xblock(self.block, text_type("test_aside")) is not None

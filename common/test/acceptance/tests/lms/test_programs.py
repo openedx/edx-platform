@@ -1,5 +1,5 @@
 """Acceptance tests for LMS-hosted Programs pages"""
-from nose.plugins.attrib import attr
+import pytest
 
 from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogIntegrationMixin
 from common.test.acceptance.fixtures.course import CourseFixture
@@ -11,6 +11,7 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     CourseRunFactory,
+    PathwayFactory,
     ProgramFactory,
     ProgramTypeFactory
 )
@@ -24,6 +25,14 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         self.set_programs_api_configuration(is_enabled=True)
 
         self.programs = ProgramFactory.create_batch(3)
+        self.pathways = PathwayFactory.create_batch(3)
+        for pathway in self.pathways:
+            self.programs += pathway['programs']
+
+        # add some of the previously created programs to some pathways
+        self.pathways[0]['programs'].extend([self.programs[0], self.programs[1]])
+        self.pathways[1]['programs'].append(self.programs[0])
+
         self.username = None
 
     def auth(self, enroll=True):
@@ -44,15 +53,18 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         program_type = ProgramTypeFactory()
         return ProgramFactory(courses=[course], type=program_type['name'])
 
-    def stub_catalog_api(self, programs):
+    def stub_catalog_api(self, programs, pathways):
         """
-        Stub the discovery service's program list and detail API endpoints.
+        Stub the discovery service's program list and detail API endpoints, as well as
+        the credit pathway list endpoint.
         """
         self.set_catalog_integration(is_enabled=True, service_username=self.username)
         CatalogFixture().install_programs(programs)
 
         program_types = [program['type'] for program in programs]
         CatalogFixture().install_program_types(program_types)
+
+        CatalogFixture().install_pathways(pathways)
 
     def cache_programs(self):
         """
@@ -62,9 +74,10 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         cache_programs_page.visit()
 
 
-@attr(shard=21)
 class ProgramListingPageTest(ProgramPageBase):
     """Verify user-facing behavior of the program listing page."""
+    shard = 21
+
     def setUp(self):
         super(ProgramListingPageTest, self).setUp()
 
@@ -73,7 +86,7 @@ class ProgramListingPageTest(ProgramPageBase):
     def test_no_enrollments(self):
         """Verify that no cards appear when the user has no enrollments."""
         self.auth(enroll=False)
-        self.stub_catalog_api(self.programs)
+        self.stub_catalog_api(self.programs, self.pathways)
         self.cache_programs()
 
         self.listing_page.visit()
@@ -87,7 +100,7 @@ class ProgramListingPageTest(ProgramPageBase):
         but none are included in an active program.
         """
         self.auth()
-        self.stub_catalog_api(self.programs)
+        self.stub_catalog_api(self.programs, self.pathways)
         self.cache_programs()
 
         self.listing_page.visit()
@@ -96,7 +109,7 @@ class ProgramListingPageTest(ProgramPageBase):
         self.assertFalse(self.listing_page.are_cards_present)
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class ProgramListingPageA11yTest(ProgramPageBase):
     """Test program listing page accessibility."""
     def setUp(self):
@@ -108,8 +121,13 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
     def test_empty_a11y(self):
         """Test a11y of the page's empty state."""
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.auth(enroll=False)
-        self.stub_catalog_api(programs=[self.program])
+        self.stub_catalog_api(programs=[self.program], pathways=[])
         self.cache_programs()
 
         self.listing_page.visit()
@@ -120,8 +138,13 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
     def test_cards_a11y(self):
         """Test a11y when program cards are present."""
+        self.listing_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.auth()
-        self.stub_catalog_api(programs=[self.program])
+        self.stub_catalog_api(programs=[self.program], pathways=[])
         self.cache_programs()
 
         self.listing_page.visit()
@@ -131,7 +154,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class ProgramDetailsPageA11yTest(ProgramPageBase):
     """Test program details page accessibility."""
     def setUp(self):
@@ -144,8 +167,13 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
 
     def test_a11y(self):
         """Test the page's a11y compliance."""
+        self.details_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.auth()
-        self.stub_catalog_api(programs=[self.program])
+        self.stub_catalog_api(programs=[self.program], pathways=[])
         self.cache_programs()
 
         self.details_page.visit()

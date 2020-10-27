@@ -3,10 +3,14 @@ Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
 import ddt
+from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
+
+from edx_proctoring.api import create_exam
+from edx_proctoring.backends.tests.test_backend import TestBackendProvider
+
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from student.roles import CourseStaffRole, CourseInstructorRole
@@ -15,13 +19,14 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
 @ddt.ddt
 class TestProctoringDashboardViews(SharedModuleStoreTestCase):
     """
     Check for Proctoring view on the new instructor dashboard
     """
+    shard = 1
+
     @classmethod
     def setUpClass(cls):
         super(TestProctoringDashboardViews, cls).setUpClass()
@@ -65,7 +70,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
 
         # verify that proctoring tab is visible for global staff
-        self._assert_proctoring_tab_is_available()
+        self._assert_proctoring_tab_available(True)
 
     @ddt.data(
         (True, False),
@@ -84,12 +89,12 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         # verify that proctoring tab is visible for course staff
         CourseStaffRole(self.course.id).add_users(self.instructor)
-        self._assert_proctoring_tab_is_available()
+        self._assert_proctoring_tab_available(True)
 
         # verify that proctoring tab is visible for course instructor
         CourseStaffRole(self.course.id).remove_users(self.instructor)
         CourseInstructorRole(self.course.id).add_users(self.instructor)
-        self._assert_proctoring_tab_is_available()
+        self._assert_proctoring_tab_available(True)
 
     @ddt.data(
         (True, False),
@@ -105,10 +110,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         self.instructor.is_staff = False
         self.instructor.save()
-
-        response = self.client.get(self.url)
-        self.assertNotIn(self.proctoring_link, response.content)
-        self.assertNotIn('Allowance Section', response.content)
+        self._assert_proctoring_tab_available(False)
 
     @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
     @ddt.data(
@@ -125,15 +127,35 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         self.instructor.is_staff = True
         self.instructor.save()
+        self._assert_proctoring_tab_available(False)
 
+    def test_review_dashboard(self):
+        """
+        The exam review dashboard will appear for backends that support the feature
+        """
+        self.setup_course(True, True)
         response = self.client.get(self.url)
-        self.assertNotIn(self.proctoring_link, response.content)
-        self.assertNotIn('Allowance Section', response.content)
+        # the default backend does not support the review dashboard
+        self.assertNotIn('Review Dashboard', response.content)
 
-    def _assert_proctoring_tab_is_available(self):
+        backend = TestBackendProvider()
+        config = apps.get_app_config('edx_proctoring')
+        with patch.object(config, 'backends', {'test': backend}):
+            create_exam(
+                course_id=self.course.id,
+                content_id='test_content',
+                exam_name='Final Test Exam',
+                time_limit_mins=10,
+                backend='test',
+            )
+            response = self.client.get(self.url)
+            self.assertIn('Review Dashboard', response.content)
+
+    def _assert_proctoring_tab_available(self, available):
         """
-        Asserts that proctoring tab is available for logged in user.
+        Asserts that proctoring tab is/is not available for logged in user.
         """
+        func = self.assertIn if available else self.assertNotIn
         response = self.client.get(self.url)
-        self.assertIn(self.proctoring_link, response.content)
-        self.assertIn('Allowance Section', response.content)
+        func(self.proctoring_link, response.content)
+        func('proctoring-wrapper', response.content)

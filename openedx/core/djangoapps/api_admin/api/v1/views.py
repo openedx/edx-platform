@@ -3,7 +3,7 @@ API Views.
 """
 from django_filters.rest_framework import DjangoFilterBackend
 
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView

@@ -5,7 +5,6 @@ import tempfile
 import shutil
 import csv
 from collections import defaultdict
-from nose.plugins.attrib import attr
 
 import ddt
 from django.contrib.auth.models import User
@@ -24,12 +23,11 @@ from openedx.core.djangoapps.user_api.management.commands import email_opt_in_li
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-@attr(shard=2)
 @ddt.ddt
 @skip_unless_lms
 class EmailOptInListTest(ModuleStoreTestCase):
     """Tests for the email opt-in list management command. """
-
+    shard = 2
     USER_USERNAME = "test_user"
     USER_FIRST_NAME = u"Ṫëṡẗ"
     USER_LAST_NAME = u"Űśéŕ"
@@ -271,7 +269,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
     def test_file_already_exists(self):
         temp_file = tempfile.NamedTemporaryFile(delete=True)
 
-        def _cleanup():  # pylint: disable=missing-docstring
+        def _cleanup():
             temp_file.close()
 
         with self.assertRaisesRegexp(CommandError, "^File already exists"):

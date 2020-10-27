@@ -11,7 +11,6 @@ from django.db.models import Q
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import UsageKey
 from six import text_type
 
@@ -50,9 +49,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
+    shard = 3
 
     def setUp(self):
         super(TestAnalyticsBasic, self).setUp()

@@ -3,6 +3,7 @@ Views for serving static textbooks.
 """
 
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.http import Http404
 from opaque_keys.edx.keys import CourseKey
 
@@ -10,7 +11,6 @@ from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 from static_replace import replace_static_urls
-from xmodule.annotator_token import retrieve_token
 
 
 @login_required
@@ -60,6 +60,7 @@ def remap_static_url(original_url, course):
 
 
 @login_required
+@xframe_options_exempt
 def pdf_index(request, course_id, book_index, chapter=None, page=None):
     """
     Display a PDF textbook.

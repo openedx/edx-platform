@@ -1,12 +1,14 @@
 # pylint: disable=missing-docstring
 import logging
+import time
 import numpy as np
 from scipy import stats
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
+from contentstore.views.item import highlights_setting
 from edxval.api import get_videos_for_course
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.graph_traversals import traverse_pre_order
 from xmodule.modulestore.django import modulestore
@@ -80,30 +82,47 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
         """
         Returns validation information for the given course.
         """
+        def _execute_method_and_log_time(log_time, func, *args):
+            """
+            Call func passed in method with logging the time it took to complete.
+            Logging is temporary, we will remove this once we get required information.
+            """
+            if log_time:
+                start_time = time.time()
+                output = func(*args)
+                log.info('[%s] completed in [%f]', func.__name__, (time.time() - start_time))
+            else:
+                output = func(*args)
+            return output
+
         all_requested = get_bool_param(request, 'all', False)
 
         store = modulestore()
         with store.bulk_operations(course_key):
             course = store.get_course(course_key, depth=self._required_course_depth(request, all_requested))
+            # Added for EDUCATOR-3660
+            course_key_harvard = str(course_key) == 'course-v1:HarvardX+SW12.1x+2016'
 
             response = dict(
                 is_self_paced=course.self_paced,
             )
             if get_bool_param(request, 'sections', all_requested):
                 response.update(
-                    sections=self._sections_quality(course)
+                    sections=_execute_method_and_log_time(course_key_harvard, self._sections_quality, course)
                 )
             if get_bool_param(request, 'subsections', all_requested):
                 response.update(
-                    subsections=self._subsections_quality(course, request)
+                    subsections=_execute_method_and_log_time(
+                        course_key_harvard, self._subsections_quality, course, request
+                    )
                 )
             if get_bool_param(request, 'units', all_requested):
                 response.update(
-                    units=self._units_quality(course, request)
+                    units=_execute_method_and_log_time(course_key_harvard, self._units_quality, course, request)
                 )
             if get_bool_param(request, 'videos', all_requested):
                 response.update(
-                    videos=self._videos_quality(course)
+                    videos=_execute_method_and_log_time(course_key_harvard, self._videos_quality, course)
                 )
 
         return Response(response)
@@ -122,12 +141,13 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _sections_quality(self, course):
         sections, visible_sections = self._get_sections(course)
-        sections_with_highlights = [s for s in visible_sections if s.highlights]
+        sections_with_highlights = [section for section in visible_sections if section.highlights]
         return dict(
             total_number=len(sections),
             total_visible=len(visible_sections),
             number_with_highlights=len(sections_with_highlights),
-            highlights_enabled=course.highlights_enabled_for_messaging,
+            highlights_active_for_course=course.highlights_enabled_for_messaging,
+            highlights_enabled=highlights_setting.is_enabled(),
         )
 
     def _subsections_quality(self, course, request):
@@ -160,7 +180,8 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _videos_quality(self, course):
         video_blocks_in_course = modulestore().get_items(course.id, qualifiers={'category': 'video'})
-        videos_in_val = list(get_videos_for_course(course.id))
+        videos, __ = get_videos_for_course(course.id)
+        videos_in_val = list(videos)
         video_durations = [video['duration'] for video in videos_in_val]
 
         return dict(
@@ -170,26 +191,27 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
             durations=self._stats_dict(video_durations),
         )
 
-    @request_cached
-    def _get_subsections_and_units(self, course, request):
+    @classmethod
+    @request_cached()
+    def _get_subsections_and_units(cls, course, request):
         """
         Returns {subsection_key: {unit_key: {num_leaf_blocks: <>, leaf_block_types: set(<>) }}}
         for all visible subsections and units.
         """
-        _, visible_sections = self._get_sections(course)
+        _, visible_sections = cls._get_sections(course)
         subsection_dict = {}
         for section in visible_sections:
-            visible_subsections = self._get_visible_children(section)
+            visible_subsections = cls._get_visible_children(section)
 
             if get_bool_param(request, 'exclude_graded', False):
                 visible_subsections = [s for s in visible_subsections if not s.graded]
 
             for subsection in visible_subsections:
                 unit_dict = {}
-                visible_units = self._get_visible_children(subsection)
+                visible_units = cls._get_visible_children(subsection)
 
                 for unit in visible_units:
-                    leaf_blocks = self._get_leaf_blocks(unit)
+                    leaf_blocks = cls._get_leaf_blocks(unit)
                     unit_dict[unit.location] = dict(
                         num_leaf_blocks=len(leaf_blocks),
                         leaf_block_types=set(block.location.block_type for block in leaf_blocks),
@@ -198,39 +220,44 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
                 subsection_dict[subsection.location] = unit_dict
         return subsection_dict
 
-    @request_cached
-    def _get_sections(self, course):
-        return self._get_all_children(course)
+    @classmethod
+    @request_cached()
+    def _get_sections(cls, course):
+        return cls._get_all_children(course)
 
-    def _get_all_children(self, parent):
+    @classmethod
+    def _get_all_children(cls, parent):
         store = modulestore()
-        children = [store.get_item(child_usage_key) for child_usage_key in self._get_children(parent)]
+        children = [store.get_item(child_usage_key) for child_usage_key in cls._get_children(parent)]
         visible_children = [
             c for c in children
             if not c.visible_to_staff_only and not c.hide_from_toc
         ]
         return children, visible_children
 
-    def _get_visible_children(self, parent):
-        _, visible_chidren = self._get_all_children(parent)
+    @classmethod
+    def _get_visible_children(cls, parent):
+        _, visible_chidren = cls._get_all_children(parent)
         return visible_chidren
 
-    def _get_children(self, parent):
+    @classmethod
+    def _get_children(cls, parent):
         if not hasattr(parent, 'children'):
             return []
         else:
             return parent.children
 
-    def _get_leaf_blocks(self, unit):
+    @classmethod
+    def _get_leaf_blocks(cls, unit):
         def leaf_filter(block):
             return (
                 block.location.block_type not in ('chapter', 'sequential', 'vertical') and
-                len(self._get_children(block)) == 0
+                len(cls._get_children(block)) == 0
             )
 
         return [
             block for block in
-            traverse_pre_order(unit, self._get_visible_children, leaf_filter)
+            traverse_pre_order(unit, cls._get_visible_children, leaf_filter)
         ]
 
     def _stats_dict(self, data):

@@ -93,7 +93,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         """
         self.assertGreater(len(expectations), 0)
         # Append our custom message to the default assertEqual error message
-        self.longMessage = True  # pylint: disable=invalid-name
+        self.longMessage = True
         for field in expectations:
             self.assertEqual(
                 expectations[field],

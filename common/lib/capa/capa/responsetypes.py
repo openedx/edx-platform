@@ -38,7 +38,6 @@ from six import text_type
 
 import capa.safe_exec as safe_exec
 import capa.xqueue_interface as xqueue_interface
-import dogstats_wrapper as dog_stats_api
 # specific library imports
 from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
 from cmath import isnan
@@ -182,14 +181,14 @@ class LoncapaResponse(object):
                 msg = "%s: cannot have input field %s" % (
                     unicode(self), abox.tag)
                 msg += "\nSee XML source line %s" % getattr(
-                    xml, 'sourceline', '<unavailable>')
+                    xml, 'sourceline', '[unavailable]')
                 raise LoncapaProblemError(msg)
 
         if self.max_inputfields and len(inputfields) > self.max_inputfields:
             msg = "%s: cannot have more than %s input fields" % (
                 unicode(self), self.max_inputfields)
             msg += "\nSee XML source line %s" % getattr(
-                xml, 'sourceline', '<unavailable>')
+                xml, 'sourceline', '[unavailable]')
             raise LoncapaProblemError(msg)
 
         for prop in self.required_attributes:
@@ -197,7 +196,7 @@ class LoncapaResponse(object):
                 msg = "Error in problem specification: %s missing required attribute %s" % (
                     unicode(self), prop)
                 msg += "\nSee XML source line %s" % getattr(
-                    xml, 'sourceline', '<unavailable>')
+                    xml, 'sourceline', '[unavailable]')
                 raise LoncapaProblemError(msg)
 
         # ordered list of answer_id values for this response
@@ -583,7 +582,7 @@ class LoncapaResponse(object):
         # First try wrapping the text in a <div> and parsing
         # it as an XHTML tree
         try:
-            response_msg_div = etree.XML('<div>%s</div>' % str(response_msg))
+            response_msg_div = etree.XML(HTML('<div>{}</div>').format(HTML(str(response_msg))))
 
         # If we can't do that, create the <div> and set the message
         # as the text of the <div>
@@ -1598,11 +1597,9 @@ class NumericalResponse(LoncapaResponse):
         # Catch a bunch of exceptions and give nicer messages to the student.
         try:
             student_float = evaluator({}, {}, student_answer)
-        except UndefinedVariable as undef_var:
+        except UndefinedVariable as err:
             raise StudentInputError(
-                _(u"You may not use variables ({bad_variables}) in numerical problems.").format(
-                    bad_variables=text_type(undef_var),
-                )
+                err.args[0]
             )
         except UnmatchedParenthesis as err:
             raise StudentInputError(
@@ -2070,7 +2067,7 @@ class StringResponse(LoncapaResponse):
         _ = self.capa_system.i18n.ugettext
         # Translators: Separator used in StringResponse to display multiple answers.
         # Example: "Answer: Answer_1 or Answer_2 or Answer_3".
-        separator = u' <b>{}</b> '.format(_('or'))
+        separator = HTML(' <b>{}</b> ').format(_('or'))
         return {self.answer_id: separator.join(self.correct_answer)}
 
 #-----------------------------------------------------------------------------
@@ -2209,7 +2206,7 @@ class CustomResponse(LoncapaResponse):
             # default to no error message on empty answer (to be consistent with other
             # responsetypes) but allow author to still have the old behavior by setting
             # empty_answer_err attribute
-            msg = (u'<span class="inline-error">{0}</span>'.format(_(u'No answer entered!'))
+            msg = (HTML(u'<span class="inline-error">{0}</span>').format(_(u'No answer entered!'))
                    if self.xml.get('empty_answer_err') else '')
             return CorrectMap(idset[0], 'incorrect', msg=msg)
 
@@ -2464,7 +2461,7 @@ class CustomResponse(LoncapaResponse):
 
             # When we parse *msg* using etree, there needs to be a root
             # element, so we wrap the *msg* text in <html> tags
-            msg = '<html>' + msg + '</html>'
+            msg = HTML('<html>{msg}</html>').format(msg=HTML(msg))
 
             # Replace < characters
             msg = msg.replace('&#60;', '&lt;')
@@ -2754,13 +2751,6 @@ class CodeResponse(LoncapaResponse):
 
         _ = self.capa_system.i18n.ugettext
 
-        dog_stats_api.increment(xqueue_interface.XQUEUE_METRIC_NAME, tags=[
-            'action:update_score',
-            'correct:{}'.format(correct)
-        ])
-
-        dog_stats_api.histogram(xqueue_interface.XQUEUE_METRIC_NAME + '.update_score.points_earned', points)
-
         if not valid_score_msg:
             # Translators: 'grader' refers to the edX automatic code grader.
             error_msg = _('Invalid grader reply. Please contact the course staff.')
@@ -2793,7 +2783,7 @@ class CodeResponse(LoncapaResponse):
         return oldcmap
 
     def get_answers(self):
-        anshtml = '<span class="code-answer"><pre><code>%s</code></pre></span>' % self.answer
+        anshtml = HTML('<span class="code-answer"><pre><code>{}</code></pre></span>').format(self.answer)
         return {self.answer_id: anshtml}
 
     def get_initial_display(self):
@@ -2910,7 +2900,7 @@ class ExternalResponse(LoncapaResponse):
                 msg = '%s: Missing answer script code for externalresponse' % unicode(
                     self)
                 msg += "\nSee XML source line %s" % getattr(
-                    self.xml, 'sourceline', '<unavailable>')
+                    self.xml, 'sourceline', '[unavailable]')
                 raise LoncapaProblemError(msg)
 
         self.tests = xml.get('tests')
@@ -2986,7 +2976,8 @@ class ExternalResponse(LoncapaResponse):
                     self.answer_ids), ['incorrect'] * len(idset))))
                 cmap.set_property(
                     self.answer_ids[0], 'msg',
-                    '<span class="inline-error">%s</span>' % str(err).replace('<', '&lt;'))
+                    Text('<span class="inline-error">{}</span>').format(str(err))
+                )
                 return cmap
 
         awd = rxml.find('awarddetail').text
@@ -3014,8 +3005,7 @@ class ExternalResponse(LoncapaResponse):
         except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
-                msg = '<span class="inline-error">%s</span>' % str(
-                    err).replace('<', '&lt;')
+                msg = HTML('<span class="inline-error">{}</span>').format(err)
                 exans = [''] * len(self.answer_ids)
                 exans[0] = msg
 
@@ -3110,7 +3100,7 @@ class FormulaResponse(LoncapaResponse):
                     cgi.escape(answer)
                 )
                 raise StudentInputError(
-                    _("Invalid input: {bad_input} not permitted in answer.").format(bad_input=text_type(err))
+                    err.args[0]
                 )
             except UnmatchedParenthesis as err:
                 log.debug(

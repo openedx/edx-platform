@@ -80,7 +80,8 @@ def flatten(class_dict):
     Flatten a dict from cls -> [fields, ...] and yields values of the form (cls, fields)
     for each entry in the dictionary value.
     """
-    for cls, fields_list in class_dict.items():
+    for cls in sorted(class_dict, key=lambda err: err.__name__):
+        fields_list = class_dict[cls]
         for fields in fields_list:
             yield (cls, fields)
 

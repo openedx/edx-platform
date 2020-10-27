@@ -15,8 +15,7 @@ from django.urls import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from pytz import UTC
-from nose.plugins.attrib import attr
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
 from dashboard.git_import import GitImportErrorNoDir
@@ -25,7 +24,10 @@ from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    SharedModuleStoreTestCase
+)
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 
 TEST_MONGODB_LOG = {
@@ -47,7 +49,8 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 
     TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
     TEST_BRANCH = 'testing_do_not_delete'
-    TEST_BRANCH_COURSE = CourseKey.from_string('MITx/edx4edx_branch/edx4edx')
+    TEST_BRANCH_COURSE = CourseLocator.from_string('course-v1:MITx+edx4edx_branch+edx4edx')
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """Setup test case by adding primary user."""
@@ -79,7 +82,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
             course = def_ms.courses.get(course_path, None)
         except AttributeError:
             # Using mongo store
-            course = def_ms.get_course(CourseKey.from_string('MITx/edx4edx/edx4edx'))
+            course = def_ms.get_course(CourseLocator('MITx', 'edx4edx', 'edx4edx'))
 
         # Delete git loaded course
         response = self.client.post(
@@ -109,7 +112,6 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
-@attr(shard=1)
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
@@ -120,6 +122,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     """
     Check that importing into the mongo module store works
     """
+    shard = 1
 
     @classmethod
     def tearDownClass(cls):
@@ -169,11 +172,11 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self.assertNotEqual('xml', def_ms.get_modulestore_type(None))
 
         self._add_edx4edx()
-        course = def_ms.get_course(CourseKey.from_string('MITx/edx4edx/edx4edx'))
+        course = def_ms.get_course(CourseLocator('MITx', 'edx4edx', 'edx4edx'))
         self.assertIsNotNone(course)
 
         self._rm_edx4edx()
-        course = def_ms.get_course(CourseKey.from_string('MITx/edx4edx/edx4edx'))
+        course = def_ms.get_course(CourseLocator('MITx', 'edx4edx', 'edx4edx'))
         self.assertIsNone(course)
 
     def test_course_info(self):
@@ -186,10 +189,9 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         table_re = re.compile(r"""
             <tr>\s+
             <td>edX\sAuthor\sCourse</td>\s+  # expected test git course name
-            <td>MITx/edx4edx/edx4edx</td>\s+  # expected test git course_id
+            <td>course-v1:MITx\+edx4edx\+edx4edx</td>\s+  # expected test git course_id
             <td>[a-fA-F\d]{40}</td>  # git sha1 hash
         """, re.VERBOSE)
-
         self._setstaff_login()
         self._mkdir(settings.GIT_REPO_DIR)
 
@@ -213,11 +215,11 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(reverse('gitlogs'))
 
         # Check that our earlier import has a log with a link to details
-        self.assertIn('/gitlogs/MITx/edx4edx/edx4edx', response.content)
+        self.assertIn('/gitlogs/course-v1:MITx+edx4edx+edx4edx', response.content)
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
-                'course_id': 'MITx/edx4edx/edx4edx'}))
+                'course_id': 'course-v1:MITx+edx4edx+edx4edx'}))
 
         self.assertIn('======&gt; IMPORTING course',
                       response.content)
@@ -261,7 +263,10 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'Not/Real/Testing'}))
-        self.assertEqual(404, response.status_code)
+        self.assertIn(
+            'No git import logs have been recorded for this course.',
+            response.content
+        )
 
     def test_gitlog_no_logs(self):
         """
@@ -280,7 +285,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
-                'course_id': 'MITx/edx4edx/edx4edx'
+                'course_id': 'course-v1:MITx+edx4edx+edx4edx'
             })
         )
         self.assertIn(
@@ -302,7 +307,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         for _ in xrange(15):
             CourseImportLog(
-                course_id=CourseKey.from_string("test/test/test"),
+                course_id=CourseLocator.from_string("test/test/test"),
                 location="location",
                 import_log="import_log",
                 git_log="git_log",
@@ -342,13 +347,13 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         self.assertEqual(response.status_code, 404)
         # Or specific logs
         response = self.client.get(reverse('gitlogs_detail', kwargs={
-            'course_id': 'MITx/edx4edx/edx4edx'
+            'course_id': 'course-v1:MITx+edx4edx+edx4edx'
         }))
         self.assertEqual(response.status_code, 404)
 
         # Add user as staff in course team
         def_ms = modulestore()
-        course = def_ms.get_course(CourseKey.from_string('MITx/edx4edx/edx4edx'))
+        course = def_ms.get_course(CourseLocator('MITx', 'edx4edx', 'edx4edx'))
         CourseStaffRole(course.id).add_users(self.user)
 
         self.assertTrue(CourseStaffRole(course.id).has_user(self.user))
@@ -358,7 +363,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
-                'course_id': 'MITx/edx4edx/edx4edx'
+                'course_id': 'course-v1:MITx+edx4edx+edx4edx'
             }))
         self.assertIn('======&gt; IMPORTING course',
                       response.content)

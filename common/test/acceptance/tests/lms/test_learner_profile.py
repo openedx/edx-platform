@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from unittest import skip
 
-from nose.plugins.attrib import attr
+import pytest
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
@@ -79,7 +79,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
         # Reset event tracking so that the tests only see events from
         # loading the profile page.
-        self.start_time = datetime.now()  # pylint: disable=attribute-defined-outside-init
+        self.start_time = datetime.now()
 
         # Load the page
         profile_page.visit()
@@ -182,11 +182,11 @@ class LearnerProfileTestMixin(EventsTestMixin):
         return username, user_id
 
 
-@attr(shard=4)
 class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Tests that verify a student's own profile page.
     """
+    shard = 4
 
     def verify_profile_forced_private_message(self, username, birth_year, message=None):
         """
@@ -611,11 +611,12 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
             profile_page.upload_file(filename='image.jpg', wait_for_upload_button=False)
 
 
-@attr(shard=4)
 class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Tests that verify viewing the profile page of a different user.
     """
+    shard = 4
+
     def test_different_user_private_profile(self):
         """
         Scenario: Verify that desired fields are shown when looking at a different user's private profile.
@@ -678,7 +679,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTes
         badge.close_modal()
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Class to test learner profile accessibility.
@@ -690,7 +691,13 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         (user viewing her own public profile).
         """
         username, _ = self.log_in_as_unique_user()
+
         profile_page = self.visit_profile_page(username)
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         profile_page.a11y_audit.check_for_accessibility_errors()
 
         profile_page.make_field_editable('language_proficiencies')
@@ -710,7 +717,13 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         # only looking at a read-only profile page with a username.
         different_username, _ = self.initialize_different_user(privacy=self.PRIVACY_PUBLIC)
         self.log_in_as_unique_user()
+
         profile_page = self.visit_profile_page(different_username)
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         profile_page.a11y_audit.check_for_accessibility_errors()
 
     def test_badges_accessibility(self):
@@ -718,8 +731,14 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
         Test the accessibility of the badge listings and sharing modal.
         """
         username = 'testcert'
+
         AutoAuthPage(self.browser, username=username).visit()
         profile_page = self.visit_profile_page(username)
+        profile_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         profile_page.display_accomplishments()
         profile_page.a11y_audit.check_for_accessibility_errors()
         profile_page.badges[0].display_modal()

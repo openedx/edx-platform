@@ -136,6 +136,7 @@
               padding-top: $baseline/2;
 
               a, span {
+                font: -apple-system-short-headline !important;
                 @extend %t-title3;
                 @extend %t-regular;
 
@@ -152,6 +153,7 @@
 
             .course-info {
               [class*="info-"] {
+                font: -apple-system-short-subheadline !important;
                 color: $gray-d1;
 
                 @extend %t-title7;
@@ -163,6 +165,7 @@
                 display: block;
 
                 .info-date-block{
+                  font: -apple-system-short-subheadline !important;
                   @extend %t-title7;
 
                   color: $gray; // WCAG 2.0 AA compliant
@@ -178,6 +181,7 @@
 
                 .change-session {
                   @extend %t-title7;
+
                   @include margin(0, 0, 0, $baseline/4);
 
                   padding: 0;
@@ -392,6 +396,7 @@
           }
 
           .enter-course {
+            font: -apple-system-short-subheadline !important;
             @extend %btn-pl-white-base;
 
             @include float(right);
@@ -508,7 +513,6 @@
     max-width: $baseline*20;
     min-width: $baseline*20;
     min-height: $baseline/2;
-
     flex-grow: 1;
     order: 2;
 
@@ -810,6 +814,7 @@
 
       .action-view-consent {
         @extend %btn-pl-white-base;
+
         @include float(right);
 
         &.archived {
@@ -953,7 +958,7 @@
           @include float(right);
 
           .action {
-                    @include margin(0, 0, ($baseline/2), ($baseline*0.75));
+            @include margin(0, 0, ($baseline/2), ($baseline*0.75));
 
             float: none;
             text-align: center;
@@ -969,6 +974,7 @@
 
           .action-certificate .btn {
             @extend %btn-inherited-primary;
+
             @include box-sizing(border-box);
 
             padding: 7px $baseline*0.75;
@@ -1342,7 +1348,7 @@ p.course-block {
 
 .enter-course-blocked {
   @include box-sizing(border-box);
-  @include float(left);
+  @include float(right);
 
   display: block;
   font: normal 15px/1.6rem $font-family-sans-serif;

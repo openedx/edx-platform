@@ -11,14 +11,12 @@ import json
 import ddt
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
-import six
 
 from . import get_test_system
 from .helpers import StubUserService
 from .xml import XModuleXmlImportTest
 from .xml import factories as xml
-from ..x_module import STUDENT_VIEW, AUTHOR_VIEW
-
+from ..x_module import STUDENT_VIEW, AUTHOR_VIEW, PUBLIC_VIEW
 
 COMPLETION_DELAY = 9876
 
@@ -111,34 +109,41 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
     """
     shard = 1
 
-    def assert_bookmark_info_in(self, content):
+    def assert_bookmark_info(self, assertion, content):
         """
-        Assert content has all the bookmark info.
+        Assert content has/hasn't all the bookmark info.
         """
-        self.assertIn('bookmark_id', content)
-        self.assertIn('{},{}'.format(self.username, unicode(self.vertical.location)), content)
-        self.assertIn('bookmarked', content)
-        self.assertIn('show_bookmark_button', content)
+        assertion('bookmark_id', content)
+        assertion('{},{}'.format(self.username, unicode(self.vertical.location)), content)
+        assertion('bookmarked', content)
+        assertion('show_bookmark_button', content)
 
     @ddt.unpack
     @ddt.data(
-        {'context': None},
-        {'context': {}}
+        {'context': None, 'view': STUDENT_VIEW},
+        {'context': {}, 'view': STUDENT_VIEW},
+        {'context': {}, 'view': PUBLIC_VIEW},
     )
-    def test_render_student_view(self, context):
+    def test_render_student_preview_view(self, context, view):
         """
-        Test the rendering of the student view.
+        Test the rendering of the student and public view.
         """
         self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService()
-        self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0.0)
+        if view == STUDENT_VIEW:
+            self.module_system._services['user'] = StubUserService()
+            self.module_system._services['completion'] = StubCompletionService(enabled=True, completion_value=0.0)
+        elif view == PUBLIC_VIEW:
+            self.module_system._services['user'] = StubUserService(is_anonymous=True)
 
         html = self.module_system.render(
-            self.vertical, STUDENT_VIEW, self.default_context if context is None else context
+            self.vertical, view, self.default_context if context is None else context
         ).content
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)
-        self.assert_bookmark_info_in(html)
+        if view == STUDENT_VIEW:
+            self.assert_bookmark_info(self.assertIn, html)
+        else:
+            self.assert_bookmark_info(self.assertNotIn, html)
 
     @ddt.unpack
     @ddt.data(

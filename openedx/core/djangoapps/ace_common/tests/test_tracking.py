@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,no-member
+# pylint: disable=missing-docstring
 from unittest import TestCase
 
 from django.test import override_settings
@@ -99,6 +99,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
             event_action='test_ea',
             event_label='test_el',
             document_path='test_dp',
+            document_host='test_host.com',
             client_id='123456.123456',
         )
         self.assertIsNotNone(pixel.generate_image_url())
@@ -108,7 +109,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
             netloc='www.google-analytics.com',
             path='/collect',
             query='tid=UA-123456-1&v=2&t=ev&cs=test_cs&cm=test_cm&cn=test_cn&ec=test_ec&ea=test_ea&el=test_el'
-                  '&dp=test_dp&cid=123456.123456&cc=test_cc'
+                  '&dp=test_dp&dh=test_host.com&cid=123456.123456&cc=test_cc'
         )
 
     def test_missing_settings(self):

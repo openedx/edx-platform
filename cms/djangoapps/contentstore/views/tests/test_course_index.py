@@ -14,6 +14,7 @@ from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
+from edx_django_utils.monitoring.middleware import _DEFAULT_NAMESPACE as DJANGO_UTILS_NAMESPACE
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
@@ -23,6 +24,7 @@ from contentstore.views.course import (
     course_outline_initial_state,
     reindex_course_and_check_access
 )
+from contentstore.config.waffle import WAFFLE_NAMESPACE as STUDIO_WAFFLE_NAMESPACE
 from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
 from contentstore.views.item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
@@ -31,8 +33,6 @@ from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.auth import has_course_author_access
 from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
 from student.tests.factories import UserFactory
-from util.date_utils import get_default_time_display
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
@@ -368,6 +368,8 @@ class TestCourseIndexArchived(CourseTestCase):
         # Make sure we've cached data which could change the query counts
         # depending on test execution order
         WaffleSwitchNamespace(name=COURSE_WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
+        WaffleSwitchNamespace(name=STUDIO_WAFFLE_NAMESPACE).is_enabled(u'enable_policy_page')
+        WaffleSwitchNamespace(name=DJANGO_UTILS_NAMESPACE).is_enabled(u'enable_memory_middleware')
 
     def check_index_page_with_query_count(self, separate_archived_courses, org, mongo_queries, sql_queries):
         """
@@ -519,38 +521,6 @@ class TestCourseOutline(CourseTestCase):
         expanded_locators = initial_state['expanded_locators']
         self.assertIn(unicode(self.sequential.location), expanded_locators)
         self.assertIn(unicode(self.vertical.location), expanded_locators)
-
-    def test_start_date_on_page(self):
-        """
-        Verify that the course start date is included on the course outline page.
-        """
-        def _get_release_date(response):
-            """Return the release date from the course page"""
-            parsed_html = lxml.html.fromstring(response.content)
-            return parsed_html.find_class('course-status')[0].find_class('status-release-value')[0].text_content()
-
-        def _assert_settings_link_present(response):
-            """
-            Asserts there's a course settings link on the course page by the course release date.
-            """
-            parsed_html = lxml.html.fromstring(response.content)
-            settings_link = parsed_html.find_class('course-status')[0].find_class('action-edit')[0].find('a')
-            self.assertIsNotNone(settings_link)
-            self.assertEqual(settings_link.get('href'), reverse_course_url('settings_handler', self.course.id))
-
-        outline_url = reverse_course_url('course_handler', self.course.id)
-        response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')
-
-        # A course with the default release date should display as "Unscheduled"
-        self.assertEqual(_get_release_date(response), 'Unscheduled')
-        _assert_settings_link_present(response)
-
-        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
-        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
-        response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')
-
-        self.assertEqual(_get_release_date(response), get_default_time_display(self.course.start))
-        _assert_settings_link_present(response)
 
     def _create_test_data(self, course_module, create_blocks=False, publish=True, block_types=None):
         """

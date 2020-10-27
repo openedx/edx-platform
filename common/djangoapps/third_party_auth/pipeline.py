@@ -54,7 +54,7 @@ This is surprising but important behavior, since it allows a single function in
 the pipeline to consolidate all the operations needed to establish invariants
 rather than spreading them across two functions in the pipeline.
 
-See http://python-social-auth.readthedocs.io/en/latest/pipeline.html for more docs.
+See https://python-social-auth.readthedocs.io/en/latest/pipeline.html for more docs.
 """
 
 import base64
@@ -66,7 +66,6 @@ from collections import OrderedDict
 from logging import getLogger
 from smtplib import SMTPException
 
-import analytics
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail.message import EmailMessage
@@ -78,13 +77,13 @@ from social_core.exceptions import AuthException
 from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 
-import student
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from third_party_auth.utils import user_exists
+from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
+from third_party_auth.utils import user_exists
+from track import segment
 
 from . import provider
 
@@ -633,7 +632,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
             # pipeline step once he/she has the cookie set by this step.
-            has_cookie = student.cookies.is_logged_in_cookie_set(request)
+            has_cookie = user_authn_cookies.are_logged_in_cookies_set(request)
             if not has_cookie:
                 try:
                     redirect_url = get_complete_url(current_partial.backend)
@@ -644,7 +643,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
                     pass
                 else:
                     response = redirect(redirect_url)
-                    return student.cookies.set_logged_in_cookies(request, response, user)
+                    return user_authn_cookies.set_logged_in_cookies(request, response, user)
 
 
 @partial.partial
@@ -657,23 +656,12 @@ def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs)
     elif auth_entry in [AUTH_ENTRY_ACCOUNT_SETTINGS]:
         event_name = 'edx.bi.user.account.linked'
 
-    if event_name is not None and hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-        tracking_context = tracker.get_tracker().resolve_context()
-        analytics.track(
-            kwargs['user'].id,
-            event_name,
-            {
-                'category': "conversion",
-                'label': None,
-                'provider': kwargs['backend'].name
-            },
-            context={
-                'ip': tracking_context.get('ip'),
-                'Google Analytics': {
-                    'clientId': tracking_context.get('client_id')
-                }
-            }
-        )
+    if event_name is not None:
+        segment.track(kwargs['user'].id, event_name, {
+            'category': "conversion",
+            'label': None,
+            'provider': kwargs['backend'].name
+        })
 
 
 @partial.partial

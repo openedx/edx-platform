@@ -17,11 +17,12 @@ class BlockOutline(object):
     """
     Serializes course videos, pulling data from VAL and the video modules.
     """
-    def __init__(self, course_id, start_block, block_types, request, video_profiles):
+    def __init__(self, course_id, start_block, block_types, request, video_profiles, api_version):
         """Create a BlockOutline using `start_block` as a starting point."""
         self.start_block = start_block
         self.block_types = block_types
         self.course_id = course_id
+        self.api_version = api_version
         self.request = request  # needed for making full URLS
         self.local_cache = {}
         try:
@@ -81,7 +82,13 @@ class BlockOutline(object):
                         "named_path": [b["name"] for b in block_path],
                         "unit_url": unit_url,
                         "section_url": section_url,
-                        "summary": summary_fn(self.course_id, curr_block, self.request, self.local_cache)
+                        "summary": summary_fn(
+                            self.course_id,
+                            curr_block,
+                            self.request,
+                            self.local_cache,
+                            self.api_version
+                        )
                     }
 
                 if curr_block.has_children:
@@ -104,7 +111,7 @@ def path(block, child_to_parent, start_block):
         if block is not start_block:
             block_path.append({
                 # to be consistent with other edx-platform clients, return the defaulted display name
-                'name': block.display_name_with_default_escaped,
+                'name': block.display_name_with_default_escaped,  # xss-lint: disable=python-deprecated-display-name
                 'category': block.category,
                 'id': unicode(block.location)
             })
@@ -160,7 +167,7 @@ def find_urls(course_id, block, child_to_parent, request):
     return unit_url, section_url
 
 
-def video_summary(video_profiles, course_id, video_descriptor, request, local_cache):
+def video_summary(video_profiles, course_id, video_descriptor, request, local_cache, api_version):
     """
     returns summary dict for the given video module
     """
@@ -224,7 +231,8 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
             kwargs={
                 'course_id': unicode(course_id),
                 'block_id': video_descriptor.scope_ids.usage_id.block_id,
-                'lang': lang
+                'lang': lang,
+                'api_version': api_version
             },
             request=request,
         )

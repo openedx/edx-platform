@@ -16,10 +16,9 @@ from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
 from xmodule.studio_editable import StudioEditableBlock
-from xmodule.x_module import STUDENT_VIEW, XModuleFields
+from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.x_module import STUDENT_VIEW, PUBLIC_VIEW, XModuleFields
 from xmodule.xml_module import XmlParserMixin
-
-import webpack_loader.utils
 
 log = logging.getLogger(__name__)
 
@@ -44,9 +43,9 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
     show_in_read_only_mode = True
 
-    def student_view(self, context):
+    def _student_or_public_view(self, context, view):
         """
-        Renders the student view of the block in the LMS.
+        Renders the requested view type of the block in the LMS.
         """
         fragment = Fragment()
         contents = []
@@ -56,12 +55,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         else:
             child_context = {}
 
-        if 'bookmarked' not in child_context:
-            bookmarks_service = self.runtime.service(self, 'bookmarks')
-            child_context['bookmarked'] = bookmarks_service.is_bookmarked(usage_key=self.location),  # pylint: disable=no-member
-        if 'username' not in child_context:
-            user_service = self.runtime.service(self, 'user')
-            child_context['username'] = user_service.get_current_user().opt_attrs['edx-platform.username']
+        if view == STUDENT_VIEW:
+            if 'bookmarked' not in child_context:
+                bookmarks_service = self.runtime.service(self, 'bookmarks')
+                child_context['bookmarked'] = bookmarks_service.is_bookmarked(
+                    usage_key=self.location),  # pylint: disable=no-member
+            if 'username' not in child_context:
+                user_service = self.runtime.service(self, 'user')
+                child_context['username'] = user_service.get_current_user().opt_attrs['edx-platform.username']
 
         child_blocks = self.get_display_items()
 
@@ -81,7 +82,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
                 child_block_context['wrap_xblock_data'] = {
                     'mark-completed-on-view-after-delay': complete_on_view_delay
                 }
-            rendered_child = child.render(STUDENT_VIEW, child_block_context)
+            rendered_child = child.render(view, child_block_context)
             fragment.add_fragment_resources(rendered_child)
 
             contents.append({
@@ -89,20 +90,38 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
                 'content': rendered_child.content
             })
 
-        fragment.add_content(self.system.render_template('vert_module.html', {
+        fragment_context = {
             'items': contents,
             'xblock_context': context,
             'unit_title': self.display_name_with_default if not is_child_of_vertical else None,
-            'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
-            'bookmarked': child_context['bookmarked'],
-            'bookmark_id': u"{},{}".format(child_context['username'], unicode(self.location)),  # pylint: disable=no-member
-        }))
+        }
 
-        for tag in webpack_loader.utils.get_as_tags('VerticalStudentView'):
-            fragment.add_resource(tag, mimetype='text/html', placement='head')
+        if view == STUDENT_VIEW:
+            fragment_context.update({
+                'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
+                'bookmarked': child_context['bookmarked'],
+                'bookmark_id': u"{},{}".format(
+                    child_context['username'], unicode(self.location)),  # pylint: disable=no-member
+            })
+
+        fragment.add_content(self.system.render_template('vert_module.html', fragment_context))
+
+        add_webpack_to_fragment(fragment, 'VerticalStudentView')
         fragment.initialize_js('VerticalStudentView')
 
         return fragment
+
+    def student_view(self, context):
+        """
+        Renders the student view of the block in the LMS.
+        """
+        return self._student_or_public_view(context, STUDENT_VIEW)
+
+    def public_view(self, context):
+        """
+        Renders the anonymous view of the block in the LMS.
+        """
+        return self._student_or_public_view(context, PUBLIC_VIEW)
 
     def author_view(self, context):
         """

@@ -1,0 +1,8 @@
+{% load i18n %}
+{% autoescape off %}
+{% if is_secondary_email_change_request %}
+    {% blocktrans trimmed %}Request to change {{ platform_name }} account secondary e-mail{% endblocktrans %}
+{% else %}
+    {% blocktrans trimmed %}Request to change {{ platform_name }} account e-mail{% endblocktrans %}
+{% endif %}
+{% endautoescape %}

@@ -5,13 +5,11 @@ from datetime import timedelta
 
 import ddt
 from django.utils.timezone import now
-from nose.plugins.attrib import attr
 
 from ..hidden_content import HiddenContentTransformer
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr(shard=3)
 @ddt.ddt
 class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
     """
@@ -19,13 +17,14 @@ class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
     """
     TRANSFORMER_CLASS_TO_TEST = HiddenContentTransformer
     ALL_BLOCKS = {0, 1, 2, 3, 4, 5, 6}
+    shard = 3
 
     class DueDateType(object):
         """
         Use constant enum types for deterministic ddt test method names (rather than dynamically generated timestamps)
         """
-        none = 1,
-        future = 2,
+        none = 1
+        future = 2
         past = 3
 
         TODAY = now()

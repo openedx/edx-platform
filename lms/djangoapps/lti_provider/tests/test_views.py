@@ -2,12 +2,10 @@
 Tests for the LTI provider views
 """
 
-import pytest
 from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from courseware.testutils import RenderXBlockTestMixin
@@ -181,7 +179,6 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         self.assertEqual(consumer.instance_guid, u'consumer instance guid')
 
 
-@attr(shard=3)
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the rendering returned by lti_launch view.
@@ -189,6 +186,7 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     the tests defined in RenderXBlockTestMixin.
     """
     SUCCESS_ENROLLED_STAFF_MONGO_COUNT = 9
+    shard = 3
 
     def get_response(self, usage_key, url_encoded_params=None):
         """

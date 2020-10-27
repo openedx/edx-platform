@@ -32,6 +32,7 @@
             var studentadmin = this;
             this.$section = $section;
             this.$section.data('wrapper', this);
+            this.$field_student_select_enrollment_status = findAndAssert(this.$section, "input[name='student-select-enrollment-status']");
             this.$field_student_select_progress = findAndAssert(this.$section, "input[name='student-select-progress']");
             this.$field_student_select_grade = findAndAssert(this.$section, "input[name='student-select-grade']");
             this.$progress_link = findAndAssert(this.$section, 'a.progress-link');
@@ -65,16 +66,51 @@
             this.$btn_task_history_all = this.$section.find("input[name='task-history-all']");
             this.$table_task_history_all = this.$section.find('.task-history-all-table');
             this.instructor_tasks = new (PendingInstructorTasks())(this.$section);
-            this.$request_err = findAndAssert(this.$section, '.student-specific-container .request-response-error');
+            this.$request_err_enrollment_status = findAndAssert(this.$section, '.student-enrollment-status-container .request-response-error');
+            this.$request_err_progress = findAndAssert(this.$section, '.student-progress-container .request-response-error');
             this.$request_err_grade = findAndAssert(this.$section, '.student-grade-container .request-response-error');
             this.$request_err_ee = this.$section.find('.entrance-exam-grade-container .request-response-error');
             this.$request_response_error_all = this.$section.find('.course-specific-container .request-response-error');
+            this.$enrollment_status_link = findAndAssert(this.$section, 'a.enrollment-status-link');
+            this.$enrollment_status = findAndAssert(this.$section, '.student-enrollment-status');
+            this.$enrollment_status_link.click(function(e) {
+                var errorMessage, fullErrorMessage, uniqStudentIdentifier;
+                e.preventDefault();
+                uniqStudentIdentifier = studentadmin.$field_student_select_enrollment_status.val();
+                if (!uniqStudentIdentifier) {
+                    studentadmin.$enrollment_status.text('');
+                    return studentadmin.$request_err_enrollment_status.text(
+                        gettext('Please enter a student email address or username.')
+                    );
+                }
+                errorMessage = gettext("Error getting enrollment status for '<%- student_id %>'. Make sure that the student identifier is spelled correctly.");  // eslint-disable-line max-len
+                fullErrorMessage = _.template(errorMessage)({
+                    student_id: uniqStudentIdentifier
+                });
+                studentadmin.$enrollment_status.text(gettext("Retrieving enrollment status..."));
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: studentadmin.$enrollment_status_link.data('endpoint'),
+                    data: {
+                        course_id: studentadmin.$enrollment_status_link.data('course-id'),
+                        unique_student_identifier: uniqStudentIdentifier
+                    },
+                    success: studentadmin.clear_errors_then(function(data) {
+                        return studentadmin.$enrollment_status.text(data.enrollment_status);
+                    }),
+                    error: statusAjaxError(function() {
+                        studentadmin.$enrollment_status.text('');
+                        return studentadmin.$request_err_enrollment_status.text(fullErrorMessage);
+                    })
+                });
+            });
             this.$progress_link.click(function(e) {
                 var errorMessage, fullErrorMessage, uniqStudentIdentifier;
                 e.preventDefault();
                 uniqStudentIdentifier = studentadmin.$field_student_select_progress.val();
                 if (!uniqStudentIdentifier) {
-                    return studentadmin.$request_err.text(
+                    return studentadmin.$request_err_progress.text(
                         gettext('Please enter a student email address or username.')
                     );
                 }
@@ -94,7 +130,7 @@
                         return window.location;
                     }),
                     error: statusAjaxError(function() {
-                        return studentadmin.$request_err.text(fullErrorMessage);
+                        return studentadmin.$request_err_progress.text(fullErrorMessage);
                     })
                 });
             });
@@ -631,7 +667,8 @@
         };
 
         StudentAdmin.prototype.clear_errors_then = function(cb) {
-            this.$request_err.empty();
+            this.$request_err_enrollment_status.empty();
+            this.$request_err_progress.empty();
             this.$request_err_grade.empty();
             this.$request_err_ee.empty();
             this.$request_response_error_all.empty();
@@ -641,7 +678,8 @@
         };
 
         StudentAdmin.prototype.clear_errors = function() {
-            this.$request_err.empty();
+            this.$request_err_enrollment_status.empty();
+            this.$request_err_progress.empty();
             this.$request_err_grade.empty();
             this.$request_err_ee.empty();
             return this.$request_response_error_all.empty();

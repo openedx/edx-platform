@@ -1,3 +1,11 @@
+// +notes:
+// ---------------------
+// * Styling for the program details main view and sidebar view
+
+// +local variables/utilities:
+// ----------------------
+$btn-color-primary: palette(primary, dark);
+
 .program-details {
   .content-wrapper {
     max-width: 100%;
@@ -316,10 +324,10 @@
 
   .course-enroll-view {
     .view-course-button {
-      background: palette(primary, dark);
-      border-color: palette(primary, dark);
+      background: $btn-color-primary;
+      border-color: $btn-color-primary;
       height: 37px;
-      padding: 7px 18.5px 0 18.5px;
+      padding: 7px 18.5px 0;
       width: auto;
       border-radius: 0;
       text-align: center;
@@ -352,7 +360,7 @@
       }
 
       button, .enroll-course-button {
-        background-color: palette(primary, dark);
+        background-color: $btn-color-primary;
         height: 37px;
         width: 128px;
         padding: 0;
@@ -361,7 +369,7 @@
         font-size: 0.9375em;
 
         &:hover {
-          color: palette(primary, dark);
+          color: $btn-color-primary;
           background-color: theme-color("inverse");
         }
 
@@ -372,7 +380,7 @@
       }
 
       .enroll-course-button {
-        padding: 7px 18.5px 0 18.5px;
+        padding: 7px 18.5px 0;
       }
     }
 
@@ -528,10 +536,11 @@
         color: palette(grayscale, base);
         font-weight: bold;
       }
+
       .grade-display {
-          padding-right: 15px;
-          font-size: 1.5em;
-          color: palette(primary, accent);
+        padding-right: 15px;
+        font-size: 1.5em;
+        color: palette(primary, accent);
       }
     }
 
@@ -626,27 +635,91 @@
   }
 }
 
+// CSS for the program sidebar
 .program-sidebar {
-  padding: 30px 10px;
+  padding: $baseline*1.5 $baseline*0.5;
 
   .program-record {
-    text-align: center;
+    text-align: left;
     padding-bottom: 2em;
+  }
+
+  .motivating-section {
+    @include margin-left($baseline*0.75);
+
+    font-size: 0.9375em;
+    width: $baseline*15.5;
+
+    @media (min-width: $bp-screen-sm) {
+      width: auto;
+    }
+
+    .motivating-message {
+      color: #414141;
+    }
+  }
+
+  .divider-heading {
+    font-family: $font-family-sans-serif;
+    font-weight: bold;
+    color: palette(primary, dark);
+    font-size: 0.9375em;
+    line-height: normal;
+    padding-bottom: $baseline*0.25;
+    border-bottom: $baseline*0.15 solid $divider-color;
+    margin: $baseline*0.5 0 $baseline 0;
+  }
+
+  .sidebar-button-wrapper {
+    text-align: right;
+
+    .sidebar-button {
+      font-size: 0.9375em;
+    }
+  }
+
+  .program-credit-pathways {
+    padding-bottom: 2em;
+  }
+
+  .pathway-wrapper {
+    @include margin-left($baseline*0.75);
+
+    width: $baseline*15.5;
+    border-bottom: 1px solid $gray-l4;
+
+    @media (min-width: $bp-screen-sm) {
+        width: auto;
+    }
+    .pathway-info {
+      margin: 15px 0;
+      font-size: 0.9375em;
+      color: #414141;
+
+      .pathway-heading {
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
+    }
+  }
+
+  .pathway-wrapper:last-child {
+    border-bottom: none;
   }
 
   @media (min-width: $bp-screen-md) {
     @include float(right);
 
-    width: 300px;
-    padding-right: 30px;
+    width: $baseline*15;
+    padding-right: $baseline*1.5;
     position: relative;
   }
 
   @media (min-width: $bp-screen-lg) {
-    width: 450px;
+    width: $baseline*22.5;
 
     .program-progress {
-      @include margin-left(50px);
+      @include margin-left($baseline*2.5);
     }
   }
 

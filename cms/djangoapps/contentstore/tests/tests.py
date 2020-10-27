@@ -32,22 +32,21 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         returned json
         """
         resp = self.client.post(
-            reverse('login_post'),
+            reverse('user_api_login_session'),
             {'email': email, 'password': password}
         )
-        self.assertEqual(resp.status_code, 200)
         return resp
 
     def login(self, email, password):
         """Login, check that it worked."""
         resp = self._login(email, password)
-        data = parse_json(resp)
-        self.assertTrue(data['success'])
+        self.assertEqual(resp.status_code, 200)
         return resp
 
     def _create_account(self, username, email, password):
         """Try to create an account.  No error checking"""
-        resp = self.client.post('/create_account', {
+        registration_url = reverse('user_api_registration')
+        resp = self.client.post(registration_url, {
             'username': username,
             'email': email,
             'password': password,
@@ -150,10 +149,9 @@ class AuthTestCase(ContentStoreTestCase):
 
     def test_create_account_errors(self):
         # No post data -- should fail
-        resp = self.client.post('/create_account', {})
+        registration_url = reverse('user_api_registration')
+        resp = self.client.post(registration_url, {})
         self.assertEqual(resp.status_code, 400)
-        data = parse_json(resp)
-        self.assertEqual(data['success'], False)
 
     def test_create_account(self):
         self.create_account(self.username, self.email, self.pw)
@@ -163,7 +161,7 @@ class AuthTestCase(ContentStoreTestCase):
         User.objects.create_user(self.username, self.email, self.pw)
         resp = self._create_account(self.username, "abc@def.com", "password")
         # we have a constraint on unique usernames, so this should fail
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 409)
 
     def test_create_account_pw_already_exists(self):
         User.objects.create_user(self.username, self.email, self.pw)
@@ -176,8 +174,6 @@ class AuthTestCase(ContentStoreTestCase):
 
         # Not activated yet.  Login should fail.
         resp = self._login(self.email, self.pw)
-        data = parse_json(resp)
-        self.assertFalse(data['success'])
 
         self.activate_user(self.email)
 
@@ -189,12 +185,10 @@ class AuthTestCase(ContentStoreTestCase):
         # login attempts in one 5 minute period before the rate gets limited
         for i in xrange(30):
             resp = self._login(self.email, 'wrong_password{0}'.format(i))
-            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.status_code, 403)
         resp = self._login(self.email, 'wrong_password')
-        self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertFalse(data['success'])
-        self.assertIn('Too many failed login attempts.', data['value'])
+        self.assertEqual(resp.status_code, 403)
+        self.assertIn('Too many failed login attempts.', resp.content)
 
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=3)
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS=2)
@@ -208,23 +202,19 @@ class AuthTestCase(ContentStoreTestCase):
 
             for i in xrange(3):
                 resp = self._login(self.email, 'wrong_password{0}'.format(i))
-                self.assertEqual(resp.status_code, 200)
-                data = parse_json(resp)
-                self.assertFalse(data['success'])
+                self.assertEqual(resp.status_code, 403)
                 self.assertIn(
                     'Email or password is incorrect.',
-                    data['value']
+                    resp.content
                 )
 
             # now the account should be locked
 
             resp = self._login(self.email, 'wrong_password')
-            self.assertEqual(resp.status_code, 200)
-            data = parse_json(resp)
-            self.assertFalse(data['success'])
+            self.assertEqual(resp.status_code, 403)
             self.assertIn(
                 'This account has been temporarily locked due to excessive login failures.',
-                data['value']
+                resp.content
             )
 
             with freeze_time('2100-01-01'):
@@ -232,9 +222,11 @@ class AuthTestCase(ContentStoreTestCase):
 
             # make sure the failed attempt counter gets reset on successful login
             resp = self._login(self.email, 'wrong_password')
-            self.assertEqual(resp.status_code, 200)
-            data = parse_json(resp)
-            self.assertFalse(data['success'])
+            self.assertEqual(resp.status_code, 403)
+            self.assertIn(
+                'Email or password is incorrect.',
+                resp.content
+            )
 
             # account should not be locked out after just one attempt
             self.login(self.email, self.pw)
@@ -317,7 +309,7 @@ class AuthTestCase(ContentStoreTestCase):
         resp = self.client.get_html(course_url)
 
         # re-request, and we should get a redirect to login page
-        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=/home/')
+        self.assertRedirects(resp, settings.LOGIN_URL + '?next=/home/')
 
     @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
     def test_signup_button_index_page(self):
@@ -354,19 +346,39 @@ class ForumTestCase(CourseTestCase):
         super(ForumTestCase, self).setUp()
         self.course = CourseFactory.create(org='testX', number='727', display_name='Forum Course')
 
+    def set_blackout_dates(self, blackout_dates):
+        """Helper method to set blackout dates in course."""
+        self.course.discussion_blackouts = [
+            [start_date.isoformat(), end_date.isoformat()] for start_date, end_date in blackout_dates
+        ]
+
     def test_blackouts(self):
         now = datetime.datetime.now(UTC)
         times1 = [
             (now - datetime.timedelta(days=14), now - datetime.timedelta(days=11)),
             (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))
         ]
-        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times1]
+        self.set_blackout_dates(times1)
         self.assertTrue(self.course.forum_posts_allowed)
         times2 = [
             (now - datetime.timedelta(days=14), now + datetime.timedelta(days=2)),
             (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))
         ]
-        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times2]
+        self.set_blackout_dates(times2)
+        self.assertFalse(self.course.forum_posts_allowed)
+
+        # Single date set for allowed forum posts.
+        self.course.discussion_blackouts = [
+            now + datetime.timedelta(days=24),
+            now + datetime.timedelta(days=30)
+        ]
+        self.assertTrue(self.course.forum_posts_allowed)
+
+        # Single date set for restricted forum posts.
+        self.course.discussion_blackouts = [
+            now - datetime.timedelta(days=24),
+            now + datetime.timedelta(days=30)
+        ]
         self.assertFalse(self.course.forum_posts_allowed)
 
         # test if user gives empty blackout date it should return true for forum_posts_allowed

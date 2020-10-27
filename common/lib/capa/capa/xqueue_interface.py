@@ -7,7 +7,6 @@ import logging
 
 import requests
 
-import dogstats_wrapper as dog_stats_api
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
@@ -93,10 +92,6 @@ class XQueueInterface(object):
         # log the send to xqueue
         header_info = json.loads(header)
         queue_name = header_info.get('queue_name', u'')
-        dog_stats_api.increment(XQUEUE_METRIC_NAME, tags=[
-            u'action:send_to_queue',
-            u'queue:{}'.format(queue_name)
-        ])
 
         # Attempt to send to queue
         (error, msg) = self._send_to_queue(header, body, files_to_upload)

@@ -9,6 +9,8 @@ from datetime import datetime
 
 import branding
 import pytz
+from crum import get_current_request
+from openedx.features.course_duration_limits.access import AuditExpiredError
 from courseware.access import has_access
 from courseware.access_response import StartDateError, MilestoneAccessError
 from courseware.date_summary import (
@@ -19,6 +21,7 @@ from courseware.date_summary import (
     VerifiedUpgradeDeadlineDate,
     CertificateAvailableDate
 )
+from courseware.masquerade import check_content_start_date_for_masquerade_user
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from django.conf import settings
@@ -27,6 +30,7 @@ from django.http import Http404, QueryDict
 from enrollment.api import get_course_enrollment_details
 from edxmako.shortcuts import render_to_string
 from fs.errors import ResourceNotFound
+from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from opaque_keys.edx.keys import UsageKey
@@ -133,6 +137,9 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
     if has_access(user, 'staff', course.id):
         return
 
+    request = get_current_request()
+    check_content_start_date_for_masquerade_user(course.id, user, request, course.start)
+
     access_response = has_access(user, action, course, course.id)
     if not access_response:
         # Redirect if StartDateError
@@ -140,6 +147,15 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
             start_date = strftime_localized(course.start, 'SHORT_DATE')
             params = QueryDict(mutable=True)
             params['notlive'] = start_date
+            raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
+                dashboard_url=reverse('dashboard'),
+                params=params.urlencode()
+            ), access_response)
+
+        # Redirect if AuditExpiredError
+        if isinstance(access_response, AuditExpiredError):
+            params = QueryDict(mutable=True)
+            params['access_response_error'] = access_response.additional_context_user_message
             raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
                 dashboard_url=reverse('dashboard'),
                 params=params.urlencode()
@@ -373,14 +389,15 @@ def get_course_date_blocks(course, user):
     Return the list of blocks to display on the course info page,
     sorted by date.
     """
-    block_classes = (
-        CertificateAvailableDate,
+    block_classes = [
         CourseEndDate,
         CourseStartDate,
         TodaysDate,
         VerificationDeadlineDate,
         VerifiedUpgradeDeadlineDate,
-    )
+    ]
+    if certs_api.get_active_web_certificate(course):
+        block_classes.insert(0, CertificateAvailableDate)
 
     blocks = (cls(course, user) for cls in block_classes)
 

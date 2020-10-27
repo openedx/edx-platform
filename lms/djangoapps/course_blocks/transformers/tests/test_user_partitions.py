@@ -6,7 +6,6 @@ import string
 from collections import namedtuple
 
 import ddt
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
@@ -69,12 +68,13 @@ class UserPartitionTestMixin(object):
             self.partition_cohorts.append(partition_cohorts)
 
 
-@attr(shard=3)
 @ddt.ddt
 class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTestCase):
     """
     UserPartitionTransformer Test
     """
+    shard = 3
+
     def setup_partitions_and_course(self, active=True):
         """
         Setup course structure and create user for user partition
@@ -242,12 +242,13 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
         )
 
 
-@attr(shard=3)
 @ddt.ddt
 class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase):
     """
     _MergedGroupAccess Test
     """
+    shard = 3
+
     def setUp(self):
         """
         Setup course structure and create user for user partition

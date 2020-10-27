@@ -1,5 +1,3 @@
-# pylint: disable=no-member
-# pylint: disable=protected-access
 """
 Unit tests for SafeSessionMiddleware
 """
@@ -11,7 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect, SimpleCookie
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
-from nose.plugins.attrib import attr
+from crum import set_current_request
 
 from openedx.core.djangolib.testing.utils import get_mock_request
 
@@ -21,14 +19,16 @@ from ..middleware import SafeSessionMiddleware, SafeCookieData
 from .test_utils import TestSafeSessionsLogMixin
 
 
-@attr(shard=2)
 class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware.process_request
     """
+    shard = 2
+
     def setUp(self):
         super(TestSafeSessionProcessRequest, self).setUp()
         self.user = UserFactory.create()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
 
     def assert_response(self, safe_cookie_data=None, success=True):
@@ -122,15 +122,17 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         self.assert_user_in_session()
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware.process_response
     """
+    shard = 2
+
     def setUp(self):
         super(TestSafeSessionProcessResponse, self).setUp()
         self.user = UserFactory.create()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
         self.request.session = {}
         self.client.response = HttpResponse()
@@ -225,16 +227,18 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         self.assert_response_with_delete_cookie()
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeSessionMiddleware, testing both
     process_request and process_response.
     """
+    shard = 2
+
     def setUp(self):
         super(TestSafeSessionMiddleware, self).setUp()
         self.user = UserFactory.create()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()

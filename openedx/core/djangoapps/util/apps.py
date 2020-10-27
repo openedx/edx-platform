@@ -17,5 +17,4 @@ class UtilConfig(AppConfig):
         """
         Registers signal handlers at startup.
         """
-        # pylint: disable=unused-import
-        import openedx.core.djangoapps.util.signals
+        import openedx.core.djangoapps.util.signals  # pylint: disable=unused-variable

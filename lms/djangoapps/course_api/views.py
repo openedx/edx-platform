@@ -234,7 +234,7 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     pagination_class = NamespacedPageNumberPagination
     pagination_class.max_page_size = 100
     serializer_class = CourseSerializer
-    throttle_classes = CourseListUserThrottle,
+    throttle_classes = (CourseListUserThrottle,)
 
     # Return all the results, 10K is the maximum allowed value for ElasticSearch.
     # We should use 0 after upgrading to 1.1+:

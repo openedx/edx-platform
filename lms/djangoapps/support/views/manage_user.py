@@ -8,11 +8,11 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 from rest_framework.generics import GenericAPIView
-from rest_framework.response import Response
 
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.user_api.accounts.serializers import AccountUserSerializer
+from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from util.json_request import JsonResponse
 
 
@@ -64,7 +64,16 @@ class ManageUserDetailView(GenericAPIView):
         user = get_user_model().objects.get(
             Q(username=username_or_email) | Q(email=username_or_email)
         )
-        user.set_unusable_password()
+        if user.has_usable_password():
+            user.set_unusable_password()
+        else:
+            user.set_password(generate_password(length=25))
         user.save()
-        password_status = _('Usable') if user.has_usable_password() else _('Unusable')
-        return JsonResponse({'success_msg': _('User Disabled Successfully'), 'status': password_status})
+
+        if user.has_usable_password():
+            password_status = _('Usable')
+            msg = _('User Enabled Successfully')
+        else:
+            password_status = _('Unusable')
+            msg = _('User Disabled Successfully')
+        return JsonResponse({'success_msg': msg, 'status': password_status})

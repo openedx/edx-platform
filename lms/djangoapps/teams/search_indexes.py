@@ -11,7 +11,7 @@ from elasticsearch.exceptions import ConnectionError
 from search.search_engine_base import SearchEngine
 
 from lms.djangoapps.teams.models import CourseTeam
-from openedx.core.djangoapps.request_cache import get_request_or_stub
+from openedx.core.lib.request_utils import get_request_or_stub
 
 from .errors import ElasticSearchConnectionError
 from .serializers import CourseTeamSerializer
@@ -143,7 +143,7 @@ def course_team_post_save_callback(**kwargs):
 
 
 @receiver(post_delete, sender=CourseTeam, dispatch_uid='teams.signals.course_team_post_delete_callback')
-def course_team_post_delete_callback(**kwargs):  # pylint: disable=invalid-name
+def course_team_post_delete_callback(**kwargs):
     """
     Reindex object after delete.
     """

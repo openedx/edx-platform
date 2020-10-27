@@ -38,7 +38,7 @@ def get_initializable_thread_fields(context):
     return ret
 
 
-def get_initializable_comment_fields(context):  # pylint: disable=invalid-name
+def get_initializable_comment_fields(context):
     """
     Return the set of fields that the requester can initialize for a comment
 

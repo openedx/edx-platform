@@ -43,8 +43,8 @@ class BaseDiscussionMixin(object):
         """
         Set up multiple threads on the page by passing 'thread_count'.
         """
-        self.thread_ids = []  # pylint: disable=attribute-defined-outside-init
-        threads = []  # pylint: disable=attribute-defined-outside-init
+        self.thread_ids = []
+        threads = []
         for i in range(thread_count):
             thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
             thread_body = "Dummy long text body." * 50

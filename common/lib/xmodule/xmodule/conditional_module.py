@@ -213,11 +213,11 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
                        'message': self.conditional_message}
             html = self.system.render_template('conditional_module.html',
                                                context)
-            return json.dumps({'html': [html], 'message': bool(self.conditional_message)})
+            return json.dumps({'fragments': [{'content': html}], 'message': bool(self.conditional_message)})
 
-        html = [child.render(STUDENT_VIEW).content for child in self.get_display_items()]
+        fragments = [child.render(STUDENT_VIEW).to_dict() for child in self.get_display_items()]
 
-        return json.dumps({'html': html})
+        return json.dumps({'fragments': fragments})
 
     def get_icon_class(self):
         new_class = 'other'

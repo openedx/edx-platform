@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.utils.timezone import now
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -14,6 +14,7 @@ from model_utils.models import TimeStampedModel
 from course_modes.models import CourseMode
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.commerce.utils import refund_entitlement
 from openedx.core.djangoapps.catalog.utils import get_course_uuid_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment, CourseEnrollmentException
@@ -209,8 +210,7 @@ class CourseEntitlement(TimeStampedModel):
         if not self.expired_at:
             if (self.policy.get_days_until_expiration(self) < 0 or
                     (self.enrollment_course_run and not self.is_entitlement_regainable())):
-                self.expired_at = now()
-                self.save()
+                self.expire_entitlement()
 
     def get_days_until_expiration(self):
         """
@@ -266,6 +266,13 @@ class CourseEntitlement(TimeStampedModel):
         Fulfills an entitlement by specifying a session.
         """
         self.enrollment_course_run = enrollment
+        self.save()
+
+    def expire_entitlement(self):
+        """
+        Expire the entitlement.
+        """
+        self.expired_at = now()
         self.save()
 
     @classmethod
@@ -403,6 +410,33 @@ class CourseEntitlement(TimeStampedModel):
         if entitlement:
             return cls.enroll_user_and_fulfill_entitlement(entitlement, course_run_key)
         return False
+
+    @classmethod
+    def unenroll_entitlement(cls, course_enrollment, skip_refund):
+        """
+        Un-enroll the user from entitlement and refund if needed.
+        """
+        course_uuid = get_course_uuid_for_course(course_enrollment.course_id)
+        course_entitlement = cls.get_entitlement_if_active(course_enrollment.user, course_uuid)
+        if course_entitlement and course_entitlement.enrollment_course_run == course_enrollment:
+            course_entitlement.set_enrollment(None)
+            if not skip_refund and course_entitlement.is_entitlement_refundable():
+                course_entitlement.expire_entitlement()
+                course_entitlement.refund()
+
+    def refund(self):
+        """
+        Initiate refund process for the entitlement.
+        """
+        refund_successful = refund_entitlement(course_entitlement=self)
+        if not refund_successful:
+            # This state is achieved in most cases by a failure in the ecommerce service to process the refund.
+            log.warn(
+                'Entitlement Refund failed for Course Entitlement [%s], alert User',
+                self.uuid
+            )
+            # Force Transaction reset with an Integrity error exception, this will revert all previous transactions
+            raise IntegrityError
 
 
 class CourseEntitlementSupportDetail(TimeStampedModel):

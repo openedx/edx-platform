@@ -4,7 +4,6 @@ Tests for the badges API views.
 from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
 from badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
 from openedx.core.lib.api.test_utils import ApiTestCase
@@ -23,8 +22,8 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
     Mixin for badge API tests.
     """
 
-    def setUp(self, *args, **kwargs):
-        super(UserAssertionTestCase, self).setUp(*args, **kwargs)
+    def setUp(self):
+        super(UserAssertionTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         # Password defined by factory.
@@ -102,14 +101,12 @@ class TestUserBadgeAssertions(UserAssertionTestCase):
         for dummy in range(3):
             self.create_badge_class(False)
         response = self.get_json(self.url())
-        # pylint: disable=no-member
         self.assertEqual(len(response['results']), 4)
 
     def test_assertion_structure(self):
         badge_class = self.create_badge_class(False)
         assertion = BadgeAssertionFactory.create(user=self.user, badge_class=badge_class)
         response = self.get_json(self.url())
-        # pylint: disable=no-member
         self.check_assertion_structure(assertion, response['results'][0])
 
 
@@ -133,11 +130,9 @@ class TestUserCourseBadgeAssertions(UserAssertionTestCase):
         for dummy in range(6):
             BadgeAssertionFactory.create(badge_class=badge_class)
         response = self.get_json(self.url(), data={'course_id': course_key})
-        # pylint: disable=no-member
         self.assertEqual(len(response['results']), 3)
         unused_course = CourseFactory.create()
         response = self.get_json(self.url(), data={'course_id': unused_course.location.course_key})
-        # pylint: disable=no-member
         self.assertEqual(len(response['results']), 0)
 
     def test_assertion_structure(self):
@@ -148,16 +143,15 @@ class TestUserCourseBadgeAssertions(UserAssertionTestCase):
         badge_class = BadgeClassFactory.create(course_id=course_key)
         assertion = BadgeAssertionFactory.create(badge_class=badge_class, user=self.user)
         response = self.get_json(self.url())
-        # pylint: disable=no-member
         self.check_assertion_structure(assertion, response['results'][0])
 
 
-@attr(shard=3)
 @ddt
 class TestUserBadgeAssertionsByClass(UserAssertionTestCase):
     """
     Test the Badge Assertions view with the badge class filter.
     """
+    shard = 3
 
     @unpack
     @data((False, False), (True, False), (True, True))
@@ -190,7 +184,6 @@ class TestUserBadgeAssertionsByClass(UserAssertionTestCase):
             expected_length = 4
         else:
             expected_length = 3
-        # pylint: disable=no-member
         self.assertEqual(len(response['results']), expected_length)
         unused_class = self.create_badge_class(check_course, slug='unused_slug', issuing_component='unused_component')
 
@@ -198,7 +191,6 @@ class TestUserBadgeAssertionsByClass(UserAssertionTestCase):
             self.url(),
             data=self.get_qs_args(check_course, wildcard, unused_class),
         )
-        # pylint: disable=no-member
         self.assertEqual(len(response['results']), 0)
 
     def check_badge_class_assertion(self, check_course, wildcard, badge_class):
@@ -210,7 +202,6 @@ class TestUserBadgeAssertionsByClass(UserAssertionTestCase):
             self.url(),
             data=self.get_qs_args(check_course, wildcard, badge_class),
         )
-        # pylint: disable=no-member
         self.check_assertion_structure(assertion, response['results'][0])
 
     @unpack

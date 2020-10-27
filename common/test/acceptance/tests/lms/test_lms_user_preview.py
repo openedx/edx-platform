@@ -3,10 +3,7 @@
 Tests the "preview" selector in the LMS that allows changing between Staff, Learner, and Content Groups.
 """
 
-
 from textwrap import dedent
-
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -14,6 +11,7 @@ from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_partition_json
+from openedx.core.lib.tests import attr
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 
 
@@ -36,7 +34,7 @@ class StaffViewTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         )
 
-        self.populate_course_fixture(self.course_fixture)  # pylint: disable=no-member
+        self.populate_course_fixture(self.course_fixture)
 
         self.course_fixture.install()
 
@@ -437,8 +435,8 @@ def verify_expected_problem_visibility(test, courseware_page, expected_problems)
     """
     Helper method that checks that the expected problems are visible on the current page.
     """
-    test.assertEqual(
-        len(expected_problems), courseware_page.num_xblock_components, "Incorrect number of visible problems"
+    courseware_page.wait_for(
+        lambda: courseware_page.num_xblock_components == len(expected_problems), "Expected number of problems visible"
     )
     for index, expected_problem in enumerate(expected_problems):
         test.assertIn(expected_problem, courseware_page.xblock_components[index].text)

@@ -13,4 +13,4 @@ class CoursegraphConfig(AppConfig):
     """
     name = 'openedx.core.djangoapps.coursegraph'
 
-    from . import tasks  # pylint: disable=unused-variable
+    from . import tasks

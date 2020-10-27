@@ -51,7 +51,7 @@ course_sections = blocks.get('children')
                 completed_prereqs = gated_content[subsection['id']]['completed_prereqs'] if gated_subsection else False
                 subsection_is_auto_opened = subsection.get('resume_block') is True
                 %>
-                      <li class="subsection accordion ${ 'current' if subsection['resume_block'] else '' }">
+                      <li class="subsection accordion ${ 'current' if subsection.get('resume_block') else '' }">
                 % if gated_subsection and not completed_prereqs:
                                 <a href="${ subsection['lms_web_url'] }">
                                     <button class="subsection-text prerequisite-button"
@@ -153,7 +153,11 @@ course_sections = blocks.get('children')
                     % for vertical in subsection.get('children', []):
                                     <li class="vertical outline-item focusable">
                                         <a class="outline-item focusable"
-                                            href="${ vertical['lms_web_url'] }"
+                                            % if enable_links:
+                                                href="${ vertical['lms_web_url'] }"
+                                            % else:
+                                                aria-disabled="true"
+                                            % endif
                                             id="${ vertical['id'] }">
                                             <div class="vertical-details">
                                               <div class="vertical-title">

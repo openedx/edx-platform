@@ -69,7 +69,7 @@ import six
 from opaque_keys.edx.keys import CourseKey
 from waffle import flag_is_active, switch_is_active
 
-from openedx.core.djangoapps.request_cache import get_cache as get_request_cache
+from openedx.core.lib.cache_utils import get_cache as get_request_cache
 
 log = logging.getLogger(__name__)
 
@@ -330,6 +330,14 @@ class WaffleFlag(object):
             self.flag_name,
             flag_undefined_default=self.flag_undefined_default
         )
+
+    @contextmanager
+    def override(self, active=True):
+        # TODO We can move this import to the top of the file once this code is
+        # not all contained within the __init__ module.
+        from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+        with override_waffle_flag(self, active):
+            yield
 
 
 class CourseWaffleFlag(WaffleFlag):

@@ -1,3 +1,4 @@
+/* globals _ */
 // Build StaffDebug object
 var StaffDebug = (function() {
     /* global getCurrentUrl:true */

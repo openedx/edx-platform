@@ -13,12 +13,11 @@ from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.utils import IntegrityError
+from edx_django_utils import monitoring as monitoring_utils
 from edx_user_state_client.interface import XBlockUserState, XBlockUserStateClient
 from xblock.fields import Scope
 
-import dogstats_wrapper as dog_stats_api
 from courseware.models import BaseStudentModuleHistory, StudentModule
-from openedx.core.djangoapps import monitoring_utils
 
 try:
     import simplejson as json
@@ -105,27 +104,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 usage_key = student_module.module_state_key.map_into_course(student_module.course_id)
                 yield (student_module, usage_key)
 
-    def _ddog_increment(self, evt_time, evt_name):
-        """
-        DataDog increment method.
-        """
-        dog_stats_api.increment(
-            'DjangoXBlockUserStateClient.{}'.format(evt_name),
-            timestamp=evt_time,
-            sample_rate=self.API_DATADOG_SAMPLE_RATE,
-        )
-
-    def _ddog_histogram(self, evt_time, evt_name, value):
-        """
-        DataDog histogram method.
-        """
-        dog_stats_api.histogram(
-            'DjangoXBlockUserStateClient.{}'.format(evt_name),
-            value,
-            timestamp=evt_time,
-            sample_rate=self.API_DATADOG_SAMPLE_RATE,
-        )
-
     def _nr_metric_name(self, function_name, stat_name, block_type=None):
         """
         Return a metric name (string) representing the provided descriptors.
@@ -195,21 +173,15 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         self._nr_stat_increment('get_many', 'calls')
 
         # keep track of blocks requested
-        self._ddog_histogram(evt_time, 'get_many.blks_requested', len(block_keys))
         self._nr_stat_accumulate('get_many', 'blocks_requested', len(block_keys))
 
         modules = self._get_student_modules(username, block_keys)
         for module, usage_key in modules:
             if module.state is None:
-                self._ddog_increment(evt_time, 'get_many.empty_state')
                 continue
 
             state = json.loads(module.state)
             state_length = len(module.state)
-
-            # record this metric before the check for empty state, so that we
-            # have some visibility into empty blocks.
-            self._ddog_histogram(evt_time, 'get_many.block_size', state_length)
 
             # If the state is the empty dict, then it has been deleted, and so
             # conformant UserStateClients should treat it as if it doesn't exist.
@@ -233,9 +205,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         # The rest of this method exists only to report metrics.
         finish_time = time()
         duration = (finish_time - evt_time) * 1000  # milliseconds
-
-        self._ddog_histogram(evt_time, 'get_many.blks_out', total_block_count)
-        self._ddog_histogram(evt_time, 'get_many.response_time', duration)
         self._nr_stat_accumulate('get_many', 'duration', duration)
 
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
@@ -325,28 +294,19 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             # Record whether a state row has been created or updated.
             if created:
-                self._ddog_increment(evt_time, 'set_many.state_created')
                 self._nr_block_stat_increment('set_many', usage_key.block_type, 'blocks_created')
             else:
-                self._ddog_increment(evt_time, 'set_many.state_updated')
                 self._nr_block_stat_increment('set_many', usage_key.block_type, 'blocks_updated')
-
-            # Event to record number of fields sent in to set/set_many.
-            self._ddog_histogram(evt_time, 'set_many.fields_in', len(state))
 
             # Event to record number of new fields set in set/set_many.
             num_new_fields_set = num_fields_after - num_fields_before
-            self._ddog_histogram(evt_time, 'set_many.fields_set', num_new_fields_set)
 
             # Event to record number of existing fields updated in set/set_many.
             num_fields_updated = max(0, len(state) - num_new_fields_set)
-            self._ddog_histogram(evt_time, 'set_many.fields_updated', num_fields_updated)
 
         # Events for the entire set_many call.
         finish_time = time()
         duration = (finish_time - evt_time) * 1000  # milliseconds
-        self._ddog_histogram(evt_time, 'set_many.blks_updated', len(block_keys_to_state))
-        self._ddog_histogram(evt_time, 'set_many.response_time', duration)
         self._nr_stat_accumulate('set_many', 'duration', duration)
 
     def delete_many(self, username, block_keys, scope=Scope.user_state, fields=None):
@@ -363,13 +323,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             raise ValueError("Only Scope.user_state is supported")
 
         evt_time = time()
-        if fields is None:
-            self._ddog_increment(evt_time, 'delete_many.empty_state')
-        else:
-            self._ddog_histogram(evt_time, 'delete_many.field_count', len(fields))
-
-        self._ddog_histogram(evt_time, 'delete_many.block_count', len(block_keys))
-
         student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:
             if fields is None:
@@ -387,7 +340,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
         # Event for the entire delete_many call.
         finish_time = time()
-        self._ddog_histogram(evt_time, 'delete_many.response_time', (finish_time - evt_time) * 1000)
 
     def get_history(self, username, block_key, scope=Scope.user_state):
         """

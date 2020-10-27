@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2018 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2018 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2018.
+# EdX Team <info@edx.org>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-18 08:07+0000\n"
-"PO-Revision-Date: 2018-07-18 08:08:06.481578\n"
+"POT-Creation-Date: 2019-01-02 15:30+0000\n"
+"PO-Revision-Date: 2019-01-02 15:30:42.102744\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -78,6 +78,7 @@ msgstr "يثمثفث"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/asset.js cms/static/js/views/course_info_update.js
 #: cms/static/js/views/export.js cms/static/js/views/manage_users_and_roles.js
@@ -88,7 +89,6 @@ msgstr "يثمثفث"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -111,7 +111,6 @@ msgstr "يثمثفث"
 msgid "Cancel"
 msgstr "ذشرذثم"
 
-#. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
 #: cms/static/js/views/video_thumbnail.js lms/static/js/views/image_field.js
 msgid "Uploading"
@@ -120,6 +119,7 @@ msgstr "عحمخشيهرل"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: cms/static/js/views/active_video_upload.js
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
@@ -137,6 +137,7 @@ msgstr "ذمخسث"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
@@ -155,6 +156,7 @@ msgstr "ذاخخسث بهمث"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
@@ -166,6 +168,7 @@ msgstr "خن"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: cms/static/js/views/course_video_settings.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/timed-examination-preference-editor.underscore
@@ -185,6 +188,7 @@ msgstr "قثوخدث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: cms/static/js/views/manage_users_and_roles.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ok"
@@ -207,6 +211,7 @@ msgstr "عحمخشي بهمث"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -228,6 +233,7 @@ msgstr "سشدث"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -247,9 +253,6 @@ msgstr "قثوخدهرل"
 msgid "Your changes have been saved."
 msgstr "غخعق ذاشرلثس اشدث زثثر سشدثي."
 
-#. Translators: This message will be added to the front of messages of type
-#. error,
-#. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_inline_view.js
@@ -313,52 +316,36 @@ msgstr "ذخووثرفشقغ"
 msgid "Reply to Annotation"
 msgstr "قثحمغ فخ شررخفشفهخر"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded, results hidden)"
 msgid_plural "%(num_points)s points possible (graded, results hidden)"
 msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي, قثسعمفس اهييثر)"
 msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي, قثسعمفس اهييثر)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (ungraded, results hidden)"
 msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
 msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي, قثسعمفس اهييثر)"
 msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي, قثسعمفس اهييثر)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
 msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي)"
 msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي)"
 
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
 msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي)"
 msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي)"
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
 msgstr[0] "%(earned)s/%(possible)s حخهرف (لقشيثي)"
 msgstr[1] "%(earned)s/%(possible)s حخهرفس (لقشيثي)"
 
-#. Translators: %(earned)s is the number of points earned. %(possible)s is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
@@ -400,8 +387,6 @@ msgstr "غخع يهي رخف سعزوهف فاث قثضعهقثي بهمثس: {r
 msgid "You did not select any files to submit."
 msgstr "غخع يهي رخف سثمثذف شرغ بهمثس فخ سعزوهف."
 
-#. Translators: This is only translated to allow for reordering of label and
-#. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
 msgstr "{label}: {status}"
@@ -416,6 +401,7 @@ msgstr "عرسعزوهففثي"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paragraph"
 msgstr "حشقشلقشحا"
@@ -426,90 +412,105 @@ msgstr "حقثبخقوشففثي"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 3"
 msgstr "اثشيهرل 3"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 4"
 msgstr "اثشيهرل 4"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 5"
 msgstr "اثشيهرل 5"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 6"
 msgstr "اثشيهرل 6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Add to Dictionary"
 msgstr "شيي فخ يهذفهخرشقغ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align center"
 msgstr "شمهلر ذثرفثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align left"
 msgstr "شمهلر مثبف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align right"
 msgstr "شمهلر قهلاف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alignment"
 msgstr "شمهلروثرف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alternative source"
 msgstr "شمفثقرشفهدث سخعقذث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Anchor"
 msgstr "شرذاخق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Anchors"
 msgstr "شرذاخقس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Author"
 msgstr "شعفاخق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Background color"
 msgstr "زشذنلقخعري ذخمخق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
@@ -517,104 +518,122 @@ msgstr "زمخذنضعخفث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Blocks"
 msgstr "زمخذنس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Body"
 msgstr "زخيغ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bold"
 msgstr "زخمي"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Border color"
 msgstr "زخقيثق ذخمخق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Border"
 msgstr "زخقيثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bottom"
 msgstr "زخففخو"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bullet list"
 msgstr "زعممثف مهسف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Caption"
 msgstr "ذشحفهخر"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell padding"
 msgstr "ذثمم حشييهرل"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell properties"
 msgstr "ذثمم حقخحثقفهثس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell spacing"
 msgstr "ذثمم سحشذهرل"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell type"
 msgstr "ذثمم فغحث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell"
 msgstr "ذثمم"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Center"
 msgstr "ذثرفثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Circle"
 msgstr "ذهقذمث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Clear formatting"
 msgstr "ذمثشق بخقوشففهرل"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Code block"
 msgstr "ذخيث زمخذن"
@@ -622,6 +641,7 @@ msgstr "ذخيث زمخذن"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
@@ -629,102 +649,119 @@ msgstr "ذخيث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Color"
 msgstr "ذخمخق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cols"
 msgstr "ذخمس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Column group"
 msgstr "ذخمعور لقخعح"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Column"
 msgstr "ذخمعور"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Constrain proportions"
 msgstr "ذخرسفقشهر حقخحخقفهخرس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Copy row"
 msgstr "ذخحغ قخص"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Copy"
 msgstr "ذخحغ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Could not find the specified string."
 msgstr "ذخعمي رخف بهري فاث سحثذهبهثي سفقهرل."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom color"
 msgstr "ذعسفخو ذخمخق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom..."
 msgstr "ذعسفخو..."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cut row"
 msgstr "ذعف قخص"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cut"
 msgstr "ذعف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Decrease indent"
 msgstr "يثذقثشسث هريثرف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Default"
 msgstr "يثبشعمف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete column"
 msgstr "يثمثفث ذخمعور"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete row"
 msgstr "يثمثفث قخص"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete table"
 msgstr "يثمثفث فشزمث"
@@ -732,6 +769,7 @@ msgstr "يثمثفث فشزمث"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
@@ -742,30 +780,35 @@ msgstr "يثسذقهحفهخر"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Dimensions"
 msgstr "يهوثرسهخرس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Disc"
 msgstr "يهسذ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Div"
 msgstr "يهد"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Document properties"
 msgstr "يخذعوثرف حقخحثقفهثس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Edit HTML"
 msgstr "ثيهف افوم"
@@ -773,6 +816,7 @@ msgstr "ثيهف افوم"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -788,84 +832,98 @@ msgstr "ثيهف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Embed"
 msgstr "ثوزثي"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Emoticons"
 msgstr "ثوخفهذخرس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Encoding"
 msgstr "ثرذخيهرل"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "File"
 msgstr "بهمث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find and replace"
 msgstr "بهري شري قثحمشذث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find next"
 msgstr "بهري رثطف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find previous"
 msgstr "بهري حقثدهخعس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find"
 msgstr "بهري"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Finish"
 msgstr "بهرهسا"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Font Family"
 msgstr "بخرف بشوهمغ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Font Sizes"
 msgstr "بخرف سهظثس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Footer"
 msgstr "بخخفثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Format"
 msgstr "بخقوشف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Formats"
 msgstr "بخقوشفس"
@@ -873,6 +931,7 @@ msgstr "بخقوشفس"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
 msgid "Fullscreen"
@@ -880,60 +939,70 @@ msgstr "بعممسذقثثر"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "General"
 msgstr "لثرثقشم"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "H Align"
 msgstr "ا شمهلر"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 1"
 msgstr "اثشيثق 1"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 2"
 msgstr "اثشيثق 2"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 3"
 msgstr "اثشيثق 3"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 4"
 msgstr "اثشيثق 4"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 5"
 msgstr "اثشيثق 5"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 6"
 msgstr "اثشيثق 6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header cell"
 msgstr "اثشيثق ذثمم"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Header"
@@ -941,240 +1010,280 @@ msgstr "اثشيثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Headers"
 msgstr "اثشيثقس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 1"
 msgstr "اثشيهرل 1"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 2"
 msgstr "اثشيهرل 2"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Headings"
 msgstr "اثشيهرلس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Height"
 msgstr "اثهلاف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal line"
 msgstr "اخقهظخرفشم مهرث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal space"
 msgstr "اخقهظخرفشم سحشذث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "HTML source code"
 msgstr "افوم سخعقذث ذخيث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ignore all"
 msgstr "هلرخقث شمم"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ignore"
 msgstr "هلرخقث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Image description"
 msgstr "هوشلث يثسذقهحفهخر"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Increase indent"
 msgstr "هرذقثشسث هريثرف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Inline"
 msgstr "هرمهرث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert column after"
 msgstr "هرسثقف ذخمعور شبفثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert column before"
 msgstr "هرسثقف ذخمعور زثبخقث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert date/time"
 msgstr "هرسثقف يشفث/فهوث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert image"
 msgstr "هرسثقف هوشلث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert link"
 msgstr "هرسثقف مهرن"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert row after"
 msgstr "هرسثقف قخص شبفثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert row before"
 msgstr "هرسثقف قخص زثبخقث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert table"
 msgstr "هرسثقف فشزمث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert template"
 msgstr "هرسثقف فثوحمشفث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert video"
 msgstr "هرسثقف دهيثخ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert"
 msgstr "هرسثقف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit image"
 msgstr "هرسثقف/ثيهف هوشلث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit link"
 msgstr "هرسثقف/ثيهف مهرن"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit video"
 msgstr "هرسثقف/ثيهف دهيثخ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Italic"
 msgstr "هفشمهذ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Justify"
 msgstr "تعسفهبغ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Keywords"
 msgstr "نثغصخقيس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Left to right"
 msgstr "مثبف فخ قهلاف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Left"
 msgstr "مثبف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Alpha"
 msgstr "مخصثق شمحاش"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Greek"
 msgstr "مخصثق لقثثن"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Roman"
 msgstr "مخصثق قخوشر"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Match case"
 msgstr "وشفذا ذشسث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Merge cells"
 msgstr "وثقلث ذثممس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Middle"
 msgstr "وهييمث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "New document"
 msgstr "رثص يخذعوثرف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "New window"
 msgstr "رثص صهريخص"
@@ -1182,6 +1291,7 @@ msgstr "رثص صهريخص"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -1191,36 +1301,42 @@ msgstr "رثطف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "No color"
 msgstr "رخ ذخمخق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Nonbreaking space"
 msgstr "رخرزقثشنهرل سحشذث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Numbered list"
 msgstr "رعوزثقثي مهسف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Page break"
 msgstr "حشلث زقثشن"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste as text"
 msgstr "حشسفث شس فثطف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "Paste is now in plain text mode. Contents will now be pasted as plain text "
@@ -1231,42 +1347,49 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste row after"
 msgstr "حشسفث قخص شبفثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste row before"
 msgstr "حشسفث قخص زثبخقث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste your embed code below:"
 msgstr "حشسفث غخعق ثوزثي ذخيث زثمخص:"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste"
 msgstr "حشسفث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Poster"
 msgstr "حخسفثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Pre"
 msgstr "حقث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Prev"
 msgstr "حقثد"
@@ -1274,6 +1397,7 @@ msgstr "حقثد"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js lms/static/js/customwmd.js
 #: cms/templates/js/asset-library.underscore
 msgid "Preview"
@@ -1281,30 +1405,35 @@ msgstr "حقثدهثص"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Print"
 msgstr "حقهرف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Redo"
 msgstr "قثيخ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Remove link"
 msgstr "قثوخدث مهرن"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Replace all"
 msgstr "قثحمشذث شمم"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Replace with"
 msgstr "قثحمشذث صهفا"
@@ -1312,6 +1441,7 @@ msgstr "قثحمشذث صهفا"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video-transcripts.underscore
@@ -1321,12 +1451,14 @@ msgstr "قثحمشذث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Restore last draft"
 msgstr "قثسفخقث مشسف يقشبف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
@@ -1337,180 +1469,210 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Right to left"
 msgstr "قهلاف فخ مثبف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Right"
 msgstr "قهلاف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Robots"
 msgstr "قخزخفس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row group"
 msgstr "قخص لقخعح"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row properties"
 msgstr "قخص حقخحثقفهثس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row type"
 msgstr "قخص فغحث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row"
 msgstr "قخص"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Rows"
 msgstr "قخصس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Scope"
 msgstr "سذخحث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Select all"
 msgstr "سثمثذف شمم"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Show blocks"
 msgstr "ساخص زمخذنس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Show invisible characters"
 msgstr "ساخص هردهسهزمث ذاشقشذفثقس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source code"
 msgstr "سخعقذث ذخيث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source"
 msgstr "سخعقذث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Special character"
 msgstr "سحثذهشم ذاشقشذفثق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Spellcheck"
 msgstr "سحثممذاثذن"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Split cell"
 msgstr "سحمهف ذثمم"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Square"
 msgstr "سضعشقث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Start search"
 msgstr "سفشقف سثشقذا"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Strikethrough"
 msgstr "سفقهنثفاقخعلا"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Style"
 msgstr "سفغمث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Subscript"
 msgstr "سعزسذقهحف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Superscript"
 msgstr "سعحثقسذقهحف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Table properties"
 msgstr "فشزمث حقخحثقفهثس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Table"
 msgstr "فشزمث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Target"
 msgstr "فشقلثف"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Templates"
 msgstr "فثوحمشفثس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Text color"
 msgstr "فثطف ذخمخق"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Text to display"
 msgstr "فثطف فخ يهسحمشغ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "The URL you entered seems to be an email address. Do you want to add the "
@@ -1521,6 +1683,7 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
@@ -1532,6 +1695,7 @@ msgstr ""
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
@@ -1542,54 +1706,63 @@ msgstr "فهفمث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Tools"
 msgstr "فخخمس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Top"
 msgstr "فخح"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Underline"
 msgstr "عريثقمهرث"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Undo"
 msgstr "عريخ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Alpha"
 msgstr "عححثق شمحاش"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Roman"
 msgstr "عححثق قخوشر"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Url"
 msgstr "عقم"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "V Align"
 msgstr "د شمهلر"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Vertical space"
 msgstr "دثقفهذشم سحشذث"
@@ -1597,6 +1770,7 @@ msgstr "دثقفهذشم سحشذث"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 #: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
@@ -1606,36 +1780,42 @@ msgstr "دهثص"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Visual aids"
 msgstr "دهسعشم شهيس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Whole words"
 msgstr "صاخمث صخقيس"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Width"
 msgstr "صهيفا"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Words: {0}"
 msgstr "صخقيس: {0}"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
 msgstr "غخع اشدث عرسشدثي ذاشرلثس شقث غخع سعقث غخع صشرف فخ رشدهلشفث شصشغ?"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
@@ -1646,6 +1826,7 @@ msgstr ""
 
 #. Translators: this is a toolbar button tooltip from the raw HTML editor
 #. displayed in the browser when a user needs to edit HTML
+#. */
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/Edit Image"
 msgstr "هرسثقف/ثيهف هوشلث"
@@ -1767,37 +1948,30 @@ msgstr "شعفخ-شيدشرذث"
 msgid "Volume"
 msgstr "دخمعوث"
 
-#. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Muted"
 msgstr "وعفثي"
 
-#. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very low"
 msgstr "دثقغ مخص"
 
-#. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Low"
 msgstr "مخص"
 
-#. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Average"
 msgstr "شدثقشلث"
 
-#. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Loud"
 msgstr "مخعي"
 
-#. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very loud"
 msgstr "دثقغ مخعي"
 
-#. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Maximum"
 msgstr "وشطهوعو"
@@ -1956,18 +2130,6 @@ msgstr "فعقر خبب فقشرسذقهحفس"
 #: cms/templates/js/move-xblock-list.underscore
 msgid "View child items"
 msgstr "دهثص ذاهمي هفثوس"
-
-#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
-msgid "Navigate up"
-msgstr "رشدهلشفث عح"
-
-#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
-msgid "Browsing"
-msgstr "زقخصسهرل"
-
-#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
-msgid "Select"
-msgstr "سثمثذف"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -2264,13 +2426,11 @@ msgstr "يقخححثي هر سمهيثق"
 msgid "dropped on target"
 msgstr "يقخححثي خر فشقلثف"
 
-#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
 msgstr "%s شلخ"
 
-#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s from now"
@@ -2392,10 +2552,6 @@ msgstr "شيي شففشذاوثرف"
 msgid "(Optional)"
 msgstr "(خحفهخرشم)"
 
-#: lms/djangoapps/support/static/support/jsx/file_upload.jsx
-msgid "Remove file"
-msgstr "قثوخدث بهمث"
-
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Name"
 msgstr "ذخعقسث رشوث"
@@ -2405,21 +2561,8 @@ msgid "Not specific to a course"
 msgstr "رخف سحثذهبهذ فخ ش ذخعقسث"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "صاشف ذشر صث اثمح غخع صهفا, {username}?"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "سعزتثذف"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "يثفشهمس"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
-msgstr "فاث وخقث غخع فثمم عس, فاث وخقث ضعهذنمغ شري اثمحبعممغ صث ذشر قثسحخري!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: common/static/common/templates/discussion/new-post.underscore
@@ -2434,10 +2577,14 @@ msgid "Sign in to {platform} so we can help you better."
 msgstr "سهلر هر فخ {platform} سخ صث ذشر اثمح غخع زثففثق."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr ""
-"هب غخع شقث عرشزمث فخ شذذثسس غخعق شذذخعرف ذخرفشذف عس دهش ثوشهم عسهرل {email}."
+#: lms/templates/student_account/hinted_login.underscore
+#: lms/templates/student_account/login.underscore
+msgid "Sign in"
+msgstr "سهلر هر"
+
+#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
+msgid "Create an {platform} account"
+msgstr "ذقثشفث شر {platform} شذذخعرف"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -2456,17 +2603,8 @@ msgid "Enter some details for your support request."
 msgstr "ثرفثق سخوث يثفشهمس بخق غخعق سعححخقف قثضعثسف."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid "Contact Us"
-msgstr "ذخرفشذف عس"
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Find answers to the top questions asked by learners."
 msgstr "بهري شرسصثقس فخ فاث فخح ضعثسفهخرس شسنثي زغ مثشقرثقس."
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Search the {platform} Help Center"
-msgstr "سثشقذا فاث {platform} اثمح ذثرفثق"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
@@ -2477,14 +2615,8 @@ msgid "Go to {platform} Home"
 msgstr "لخ فخ {platform} اخوث"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid ""
-"Thank you for submitting a request! We will contact you within 24 hours."
-msgstr ""
-"فاشرن غخع بخق سعزوهففهرل ش قثضعثسف! صث صهمم ذخرفشذف غخع صهفاهر 24 اخعقس."
-
-#: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
-msgid "Cancel upload"
-msgstr "ذشرذثم عحمخشي"
+msgid "Contact Us"
+msgstr "ذخرفشذف عس"
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -2498,8 +2630,6 @@ msgstr "خحثر سمخفس"
 msgid "name"
 msgstr "رشوث"
 
-#. Translators: This refers to the number of teams (a count of how many teams
-#. there are)
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 msgid "team count"
 msgstr "فثشو ذخعرف"
@@ -2596,14 +2726,10 @@ msgstr "شر ثققخق خذذعققثي صاهمث قثوخدهرل فاث وث
 msgid "This team does not have any members."
 msgstr "فاهس فثشو يخثس رخف اشدث شرغ وثوزثقس."
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "تخهرثي %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "مشسف شذفهدهفغ %(date)s"
@@ -2640,14 +2766,10 @@ msgstr "فثشو \"{team}\" سعذذثسسبعممغ يثمثفثي."
 msgid "You are not currently a member of any team."
 msgstr "غخع شقث رخف ذعققثرفمغ ش وثوزثق خب شرغ فثشو."
 
-#. Translators: "and others" refers to fact that additional members of a team
-#. exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "شري خفاثقس"
 
-#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
-#. http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "Last activity %(date)s"
 msgstr "مشسف شذفهدهفغ %(date)s"
@@ -2816,14 +2938,6 @@ msgstr "فخحهذ"
 msgid "View Teams in the %(topic_name)s Topic"
 msgstr "دهثص فثشوس هر فاث %(topic_name)s فخحهذ"
 
-#. Translators: this string is shown at the bottom of the teams page
-#. to find a team to join or else to create a new one. There are three
-#. links that need to be included in the message:
-#. 1. Browse teams in other topics
-#. 2. search teams
-#. 3. create a new team
-#. Be careful to start each link with the appropriate start indicator
-#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -2916,7 +3030,6 @@ msgstr "عقم"
 msgid "Please provide a valid URL."
 msgstr "حمثشسث حقخدهيث ش دشمهي عقم."
 
-#. Translators: 'errorCount' is the number of errors found in the form.
 #: lms/static/js/Markdown.Editor.js
 msgid "%(errorCount)s error found in form."
 msgid_plural "%(errorCount)s errors found in form."
@@ -3408,21 +3521,10 @@ msgstr "رخ قثسعمفس بخعري بخق \"%(query_string)s\". حمثشسث
 msgid "Search Results"
 msgstr "سثشقذا قثسعمفس"
 
-#. Translators: this is a title shown before all Notes that have no associated
-#. tags. It is put within
-#. brackets to differentiate it from user-defined tags, but it should still be
-#. translated.
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
 msgstr "[رخ فشلس]"
 
-#. Translators: 'Tags' is the name of the view (noun) within the Student Notes
-#. page that shows all
-#. notes organized by the tags the student has associated with them (if any).
-#. When defining a
-#. note in the courseware, the student can choose to associate 1 or more tags
-#. with the note
-#. in order to group similar notes together and help with search.
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "Tags"
 msgstr "فشلس"
@@ -3792,7 +3894,6 @@ msgstr "شمم شذذخعرفس صثقث ذقثشفثي سعذذثسسبعممغ
 msgid "Error adding/removing users as beta testers."
 msgstr "ثققخق شييهرل/قثوخدهرل عسثقس شس زثفش فثسفثقس."
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
 msgstr "فاثسث عسثقس صثقث سعذذثسسبعممغ شييثي شس زثفش فثسفثقس:"
@@ -3805,17 +3906,14 @@ msgstr ""
 "فاثسث عسثقس ذخعمي رخف زث شييثي شس زثفش فثسفثقس زثذشعسث فاثهق شذذخعرفس شقث "
 "رخف غثف شذفهدشفثي:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
 msgstr "فاثسث عسثقس صثقث سعذذثسسبعممغ قثوخدثي شس زثفش فثسفثقس:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
 msgstr "فاثسث عسثقس صثقث رخف شييثي شس زثفش فثسفثقس:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not removed as beta testers:"
 msgstr "فاثسث عسثقس صثقث رخف قثوخدثي شس زثفش فثسفثقس:"
@@ -3852,12 +3950,10 @@ msgstr "فاث بخممخصهرل ثوشهم شييقثسسثس شري/خق عس
 msgid "Successfully enrolled and sent email to the following users:"
 msgstr "سعذذثسسبعممغ ثرقخممثي شري سثرف ثوشهم فخ فاث بخممخصهرل عسثقس:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following users:"
 msgstr "سعذذثسسبعممغ ثرقخممثي فاث بخممخصهرل عسثقس:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
@@ -3866,12 +3962,10 @@ msgstr ""
 "سعذذثسسبعممغ سثرف ثرقخمموثرف ثوشهمس فخ فاث بخممخصهرل عسثقس. فاثغ صهمم زث "
 "شممخصثي فخ ثرقخمم خرذث فاثغ قثلهسفثق:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be allowed to enroll once they register:"
 msgstr "فاثسث عسثقس صهمم زث شممخصثي فخ ثرقخمم خرذث فاثغ قثلهسفثق:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
@@ -3880,12 +3974,10 @@ msgstr ""
 "سعذذثسسبعممغ سثرف ثرقخمموثرف ثوشهمس فخ فاث بخممخصهرل عسثقس. فاثغ صهمم زث "
 "ثرقخممثي خرذث فاثغ قثلهسفثق:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be enrolled once they register:"
 msgstr "فاثسث عسثقس صهمم زث ثرقخممثي خرذث فاثغ قثلهسفثق:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following users are no longer enrolled in the "
@@ -3894,7 +3986,6 @@ msgstr ""
 "ثوشهمس سعذذثسسبعممغ سثرف. فاث بخممخصهرل عسثقس شقث رخ مخرلثق ثرقخممثي هر فاث "
 "ذخعقسث:"
 
-#. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "The following users are no longer enrolled in the course:"
 msgstr "فاث بخممخصهرل عسثقس شقث رخ مخرلثق ثرقخممثي هر فاث ذخعقسث:"
@@ -3990,6 +4081,18 @@ msgstr "سثري فخ:"
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
 msgstr "حمثشسث ثرفثق ش سفعيثرف ثوشهم شييقثسس خق عسثقرشوث."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting enrollment status for '<%- student_id %>'. Make sure that the "
+"student identifier is spelled correctly."
+msgstr ""
+"ثققخق لثففهرل ثرقخمموثرف سفشفعس بخق '<%- student_id %>'. وشنث سعقث فاشف فاث "
+"سفعيثرف هيثرفهبهثق هس سحثممثي ذخققثذفمغ."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Retrieving enrollment status..."
+msgstr "قثفقهثدهرل ثرقخمموثرف سفشفعس..."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4213,54 +4316,63 @@ msgstr ""
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Type"
 msgstr "فشسن فغحث"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task inputs"
 msgstr "فشسن هرحعفس"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task ID"
 msgstr "فشسن هي"
 
 #. Translators: a "Requester" is a username that requested a task such as
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Requester"
 msgstr "قثضعثسفثق"
 
 #. Translators: A timestamp of when a task (eg, sending email) was submitted
 #. appears after this
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Submitted"
 msgstr "سعزوهففثي"
 
 #. Translators: The length of a task (eg, sending email) in seconds appears
 #. this
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Duration (sec)"
 msgstr "يعقشفهخر (سثذ)"
 
 #. Translators: The state (eg, "In progress") of a task (eg, sending email)
 #. appears after this.
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "State"
 msgstr "سفشفث"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Status"
 msgstr "فشسن سفشفعس"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
+#. */
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task Progress"
 msgstr "فشسن حقخلقثسس"
@@ -4272,6 +4384,10 @@ msgid ""
 msgstr ""
 "شر ثققخق خذذعققثي قثفقهثدهرل غخعق ثوشهم. حمثشسث فقغ شلشهر مشفثق, شري ذخرفشذف"
 " فثذارهذشم سعححخقف هب فاث حقخزمثو حثقسهسفس."
+
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "سعزتثذف"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -4462,29 +4578,8 @@ msgid "Could not override problem score for {user}."
 msgstr "ذخعمي رخف خدثققهيث حقخزمثو سذخقث بخق {user}."
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-#: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Reset Your Password"
-msgstr "قثسثف غخعق حشسسصخقي"
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Enter and confirm your new password."
-msgstr "ثرفثق شري ذخربهقو غخعق رثص حشسسصخقي."
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "New Password"
 msgstr "رثص حشسسصخقي"
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Confirm Password"
-msgstr "ذخربهقو حشسسصخقي"
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Passwords do not match."
-msgstr "حشسسصخقيس يخ رخف وشفذا."
-
-#: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
-msgid "Reset My Password"
-msgstr "قثسثف وغ حشسسصخقي"
 
 #: lms/static/js/student_account/components/PasswordResetInput.jsx
 msgid "Error: "
@@ -4516,18 +4611,26 @@ msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
 msgstr "زثبخقث حقخذثثيهرل, حمثشسث {htmlStart}شذفهدشفث غخعق شذذخعرف{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
-msgstr "صث’قث سخققغ فخ سثث غخع لخ!"
+msgid ""
+"{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
+msgstr ""
+"{htmlStart}صشرف فخ ذاشرلث غخعق ثوشهم, رشوث, خق حشسسصخقي هرسفثشي?{htmlEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
-"Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. EdX will not be able to recover your account or the data "
-"that is deleted."
+"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
+"the above carefully before proceeding. This is an irreversible action, and "
+"{strongStart}you will no longer be able to use the same email on "
+"edX.{strongEnd}"
 msgstr ""
-"حمثشسث رخفث: يثمثفهخر خب غخعق شذذخعرف شري حثقسخرشم يشفش هس حثقوشرثرف شري "
-"ذشررخف زث عريخرث. ثيط صهمم رخف زث شزمث فخ قثذخدثق غخعق شذذخعرف خق فاث يشفش "
-"فاشف هس يثمثفثي."
+"{strongStart}صشقرهرل: شذذخعرف يثمثفهخر هس حثقوشرثرف.{strongEnd} حمثشسث قثشي "
+"فاث شزخدث ذشقثبعممغ زثبخقث حقخذثثيهرل. فاهس هس شر هققثدثقسهزمث شذفهخر, شري "
+"{strongStart}غخع صهمم رخ مخرلثق زث شزمث فخ عسث فاث سشوث ثوشهم خر "
+"ثيط.{strongEnd}"
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
+msgstr "صث’قث سخققغ فخ سثث غخع لخ!"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4584,29 +4687,11 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
-"If you proceed, you will be unable to use this account to take courses on "
-"the edX app, edx.org, or any other site hosted by edX. This includes access "
-"to edx.org from your employer’s or university’s system and access to private"
-" sites offered by MIT Open Learning, Wharton Executive Education, and "
-"Harvard Medical School."
-msgstr ""
-"هب غخع حقخذثثي, غخع صهمم زث عرشزمث فخ عسث فاهس شذذخعرف فخ فشنث ذخعقسثس خر "
-"فاث ثيط شحح, ثيط.خقل, خق شرغ خفاثق سهفث اخسفثي زغ ثيط. فاهس هرذمعيثس شذذثسس "
-"فخ ثيط.خقل بقخو غخعق ثوحمخغثق’س خق عرهدثقسهفغ’س سغسفثو شري شذذثسس فخ حقهدشفث"
-" سهفثس خببثقثي زغ وهف خحثر مثشقرهرل, صاشقفخر ثطثذعفهدث ثيعذشفهخر, شري "
-"اشقدشقي وثيهذشم سذاخخم."
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
 "If you still wish to continue and delete your account, please enter your "
 "account password:"
 msgstr ""
 "هب غخع سفهمم صهسا فخ ذخرفهرعث شري يثمثفث غخعق شذذخعرف, حمثشسث ثرفثق غخعق "
 "شذذخعرف حشسسصخقي:"
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid "Yes, Delete"
-msgstr "غثس, يثمثفث"
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "We're sorry to see you go! Your account will be deleted shortly."
@@ -4650,6 +4735,7 @@ msgstr "شر ثققخق خذذعققثي."
 #. Translators: This string is appended to optional field labels on the
 #. student login, registration, and
 #. profile forms.
+#. */
 #: lms/static/js/student_account/views/FormView.js
 msgid "(optional)"
 msgstr "(خحفهخرشم)"
@@ -4748,6 +4834,14 @@ msgstr ""
 "غخع قثذثهدث وثسسشلثس بقخو {platform_name} شري ذخعقسث فثشوس شف فاهس شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Secondary Email Address"
+msgstr "سثذخريشقغ ثوشهم شييقثسس"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "You may access your account when single-sign on is not available."
+msgstr "غخع وشغ شذذثسس غخعق شذذخعرف صاثر سهرلمث-سهلر خر هس رخف شدشهمشزمث."
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Full Name"
 msgstr "بعمم رشوث"
@@ -4788,6 +4882,10 @@ msgstr ""
 #: lms/templates/student_account/account.underscore
 msgid "Password"
 msgstr "حشسسصخقي"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Reset Your Password"
+msgstr "قثسثف غخعق حشسسصخقي"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Check your email account for instructions to reset your password."
@@ -4845,6 +4943,14 @@ msgstr "غثشق خب زهقفا"
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Preferred Language"
 msgstr "حقثبثققثي مشرلعشلث"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid ""
+"We've sent a confirmation message to {new_secondary_email_address}. Click "
+"the link in the message to update your secondary email address."
+msgstr ""
+"صث'دث سثرف ش ذخربهقوشفهخر وثسسشلث فخ {new_secondary_email_address}. ذمهذن "
+"فاث مهرن هر فاث وثسسشلث فخ عحيشفث غخعق سثذخريشقغ ثوشهم شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -5025,8 +5131,6 @@ msgstr "ذاثذنخعف"
 msgid "Checkout with PayPal"
 msgstr "ذاثذنخعف صهفا حشغحشم"
 
-#. Translators: 'processor' is the name of a third-party payment processing
-#. vendor (example: "PayPal")
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Checkout with {processor}"
 msgstr "ذاثذنخعف صهفا {processor}"
@@ -5355,10 +5459,6 @@ msgstr "فاهس مهرن صهمم خحثر هر ش رثص زقخصسثق صهر
 msgid "This link will open in a modal window"
 msgstr "فاهس مهرن صهمم خحثر هر ش وخيشم صهريخص"
 
-#: cms/static/js/certificates/collections/certificates.js
-msgid "Could not parse certificate JSON. %(message)s"
-msgstr "ذخعمي رخف حشقسث ذثقفهبهذشفث تسخر. %(message)s"
-
 #: cms/static/js/certificates/models/certificate.js
 msgid "Certificate name is required."
 msgstr "ذثقفهبهذشفث رشوث هس قثضعهقثي."
@@ -5383,8 +5483,6 @@ msgstr ""
 msgid "Yes, allow edits to the active Certificate"
 msgstr "غثس, شممخص ثيهفس فخ فاث شذفهدث ذثقفهبهذشفث"
 
-#. Translators: This field pertains to the custom label for a certificate.
-#. Translators: this refers to a collection of certificates.
 #: cms/static/js/certificates/views/certificate_item.js
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "certificate"
@@ -5394,8 +5492,6 @@ msgstr "ذثقفهبهذشفث"
 msgid "Set up your certificate"
 msgstr "سثف عح غخعق ذثقفهبهذشفث"
 
-#. Translators: This line refers to the initial state of the form when no data
-#. has been inserted
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "You have not created any certificates yet."
 msgstr "غخع اشدث رخف ذقثشفثي شرغ ذثقفهبهذشفثس غثف."
@@ -5432,6 +5528,7 @@ msgstr "لقخعح %s"
 #. Translators: Dictionary used for creation ids that are used in
 #. default group names. For example: A, B, AA in Group A,
 #. Group B, ..., Group AA, etc.
+#. */
 #: cms/static/js/collections/group.js
 msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 msgstr "شزذيثبلاهتنمورخحضقسفعدصطغظ"
@@ -5537,47 +5634,25 @@ msgid "There was an error with the upload"
 msgstr "فاثقث صشس شر ثققخق صهفا فاث عحمخشي"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "Organization:"
-msgstr "خقلشرهظشفهخر:"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
 msgstr "ذخعقسث رعوزثق:"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "Course Run:"
-msgstr "ذخعقسث قعر:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
 msgstr "(قثشي-خرمغ)"
 
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "Re-run Course"
-msgstr "قث-قعر ذخعقسث"
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-#: cms/templates/js/show-textbook.underscore
-msgid "View Live"
-msgstr "دهثص مهدث"
-
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
 msgstr "هرفثقرشم سثقدثق ثققخق."
 
-#. Translators: This is the status of a video upload that is queued
-#. waiting for other uploads to complete
 #: cms/static/js/models/active_video_upload.js
 msgid "Queued"
 msgstr "ضعثعثي"
 
-#. Translators: This is the status of a video upload that has
-#. completed successfully
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload completed"
 msgstr "عحمخشي ذخوحمثفثي"
 
-#. Translators: This is the status of a video upload that has failed
 #: cms/static/js/models/active_video_upload.js
 msgid "Upload failed"
 msgstr "عحمخشي بشهمثي"
@@ -5963,6 +6038,7 @@ msgstr "فاثقث اشس زثثر شر ثققخق صهفا غخعق ثطحخق�
 
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
+#. */
 #: cms/static/js/views/group_configuration_details.js
 msgid "Contains {count} group"
 msgid_plural "Contains {count} groups"
@@ -5976,8 +6052,10 @@ msgstr "رخف هر عسث"
 
 #. Translators: 'count' is number of units that the group
 #. configuration is used in.
+#. */
 #. Translators: 'count' is number of locations that the group
 #. configuration is used in.
+#. */
 #: cms/static/js/views/group_configuration_details.js
 #: cms/static/js/views/partition_group_details.js
 msgid "Used in {count} location"
@@ -5985,7 +6063,6 @@ msgid_plural "Used in {count} locations"
 msgstr[0] "عسثي هر {count} مخذشفهخر"
 msgstr[1] "عسثي هر {count} مخذشفهخرس"
 
-#. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/group_configurations_list.js
 msgid "group configuration"
@@ -6081,12 +6158,10 @@ msgstr ""
 "فخ فاث مهذثرسث فاشف لخدثقرس غخعق صخقن. فاهس خحفهخر هس هرذخوحشفهزمث صهفا \"رخ"
 " يثقهدشفهدثس\"."
 
-#. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
 msgid "Delete this %(item_display_name)s?"
 msgstr "يثمثفث فاهس %(item_display_name)s?"
 
-#. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
 msgid "Deleting this %(item_display_name)s is permanent and cannot be undone."
 msgstr ""
@@ -6183,10 +6258,13 @@ msgstr "زشسهذ"
 msgid "Visibility"
 msgstr "دهسهزهمهفغ"
 
-#. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
-msgstr "ثيهفهرل: %(title)s"
+msgid "Editing: {title}"
+msgstr "ثيهفهرل: {title}"
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
+msgstr "حمعلهرس"
 
 #: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
@@ -6256,8 +6334,6 @@ msgstr "ذخعقسث خعفمهرث"
 msgid "Date added"
 msgstr "يشفث شييثي"
 
-#. Translators: "title" is the name of the current component or unit being
-#. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: %(title)s"
 msgstr "ثيهفهرل شذذثسس بخق: %(title)s"
@@ -6331,9 +6407,6 @@ msgstr "اهيث حقثدهثصس"
 msgid "Show Previews"
 msgstr "ساخص حقثدهثصس"
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
@@ -6342,9 +6415,6 @@ msgstr ""
 "ساخصهرل {currentItemRange} خعف خب {totalItemsCount}, بهمفثقثي زغ "
 "{assetType}, سخقفثي زغ {sortName} شسذثريهرل"
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
@@ -6353,8 +6423,6 @@ msgstr ""
 "ساخصهرل {currentItemRange} خعف خب {totalItemsCount}, بهمفثقثي زغ "
 "{assetType}, سخقفثي زغ {sortName} يثسذثريهرل"
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
@@ -6363,8 +6431,6 @@ msgstr ""
 "ساخصهرل {currentItemRange} خعف خب {totalItemsCount}, سخقفثي زغ {sortName} "
 "شسذثريهرل"
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
@@ -6373,14 +6439,10 @@ msgstr ""
 "ساخصهرل {currentItemRange} خعف خب {totalItemsCount}, سخقفثي زغ {sortName} "
 "يثسذثريهرل"
 
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "{totalItems} total"
 msgstr "{totalItems} فخفشم"
 
-#. Translators: This refers to a content group that can be linked to a student
-#. cohort.
 #: cms/static/js/views/partition_group_item.js
 #: cms/static/js/views/partition_group_list.js
 msgid "content group"
@@ -6672,7 +6734,6 @@ msgstr "شيي فاعوزرشهم"
 msgid "Edit Thumbnail"
 msgstr "ثيهف فاعوزرشهم"
 
-#. Translators: This is a 2 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
 "{InstructionsSpanStart}{videoImageResoultion}{lineBreak} "
@@ -6685,7 +6746,6 @@ msgstr ""
 msgid "Image upload failed"
 msgstr "هوشلث عحمخشي بشهمثي"
 
-#. Translators: This is a 3 part text which tells the image requirements.
 #: cms/static/js/views/video_thumbnail.js
 msgid ""
 "{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
@@ -6694,23 +6754,18 @@ msgstr ""
 "{ReqTextSpanStart}قثضعهقثوثرفس{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
 " {videoImageSupportedFileFormats}{spanEnd}"
 
-#. Translators: message will be like 1280x720 pixels
 #: cms/static/js/views/video_thumbnail.js
 msgid "{maxWidth}x{maxHeight} pixels"
 msgstr "{maxWidth}ط{maxHeight} حهطثمس"
 
-#. Translators: message will be like Thumbnail for Arrow.mp4
 #: cms/static/js/views/video_thumbnail.js
 msgid "Thumbnail for {videoName}"
 msgstr "فاعوزرشهم بخق {videoName}"
 
-#. Translators: message will be like Add Thumbnail - Arrow.mp4
 #: cms/static/js/views/video_thumbnail.js
 msgid "Add Thumbnail - {videoName}"
 msgstr "شيي فاعوزرشهم - {videoName}"
 
-#. Translators: humanizeDuration will be like 10 minutes, an hour and 20
-#. minutes etc
 #: cms/static/js/views/video_thumbnail.js
 msgid "Video duration is {humanizeDuration}"
 msgstr "دهيثخ يعقشفهخر هس {humanizeDuration}"
@@ -6723,7 +6778,6 @@ msgstr "وهرعفثس"
 msgid "minute"
 msgstr "وهرعفث"
 
-#. Translators: message will be like 15 minutes, 1 minute
 #: cms/static/js/views/video_thumbnail.js
 msgid "{minutes} {unit}"
 msgstr "{minutes} {unit}"
@@ -6736,13 +6790,10 @@ msgstr "سثذخريس"
 msgid "second"
 msgstr "سثذخري"
 
-#. Translators: message will be like 20 seconds, 1 second
 #: cms/static/js/views/video_thumbnail.js
 msgid "{seconds} {unit}"
 msgstr "{seconds} {unit}"
 
-#. Translators: `and` will be used to combine both miuntes and seconds like
-#. `13 minutes and 45 seconds`
 #: cms/static/js/views/video_thumbnail.js
 msgid " and "
 msgstr " شري "
@@ -6763,12 +6814,10 @@ msgstr ""
 "فاهس هوشلث بهمث فغحث هس رخف سعححخقفثي. سعححخقفثي بهمث فغحثس شقث "
 "{supportedFileFormats}."
 
-#. Translators: maxFileSizeInMB will be like 2 MB.
 #: cms/static/js/views/video_thumbnail.js
 msgid "The selected image must be smaller than {maxFileSizeInMB}."
 msgstr "فاث سثمثذفثي هوشلث وعسف زث سوشممثق فاشر {maxFileSizeInMB}."
 
-#. Translators: minFileSizeInKB will be like 2 KB.
 #: cms/static/js/views/video_thumbnail.js
 msgid "The selected image must be larger than {minFileSizeInKB}."
 msgstr "فاث سثمثذفثي هوشلث وعسف زث مشقلثق فاشر {minFileSizeInKB}."
@@ -6827,9 +6876,6 @@ msgstr "سثففهرلس"
 msgid "New {component_type}"
 msgstr "رثص {component_type}"
 
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
 msgstr "صشقرهرل"
@@ -7419,8 +7465,8 @@ msgid "Password Status"
 msgstr "حشسسصخقي سفشفعس"
 
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
-msgid "Disable Account"
-msgstr "يهسشزمث شذذخعرف"
+msgid "Toggle Account Password (Usable/Unusable)"
+msgstr "فخللمث شذذخعرف حشسسصخقي (عسشزمث/عرعسشزمث)"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 msgid "Your team could not be created."
@@ -8310,8 +8356,36 @@ msgid "Open the certificate you earned for the %(title)s program."
 msgstr "خحثر فاث ذثقفهبهذشفث غخع ثشقرثي بخق فاث %(title)s حقخلقشو."
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Program Record"
+msgstr "حقخلقشو قثذخقي"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Once you complete one of the program requirements you have a program record."
+" This record is marked complete once you meet all program requirements. A "
+"program record can be used to continue your learning journey and demonstrate"
+" your learning to others."
+msgstr ""
+"خرذث غخع ذخوحمثفث خرث خب فاث حقخلقشو قثضعهقثوثرفس غخع اشدث ش حقخلقشو قثذخقي."
+" فاهس قثذخقي هس وشقنثي ذخوحمثفث خرذث غخع وثثف شمم حقخلقشو قثضعهقثوثرفس. ش "
+"حقخلقشو قثذخقي ذشر زث عسثي فخ ذخرفهرعث غخعق مثشقرهرل تخعقرثغ شري يثوخرسفقشفث"
+" غخعق مثشقرهرل فخ خفاثقس."
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "View Program Record"
 msgstr "دهثص حقخلقشو قثذخقي"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Additional Credit Opportunities"
+msgstr "شييهفهخرشم ذقثيهف خححخقفعرهفهثس"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Learn More"
+msgstr "مثشقر وخقث"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Additional Professional Opportunities"
+msgstr "شييهفهخرشم حقخبثسسهخرشم خححخقفعرهفهثس"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Congratulations!"
@@ -8387,6 +8461,22 @@ msgstr "ذاشرلث وغ ثوشهم شييقثسس"
 msgid "Reset Password"
 msgstr "قثسثف حشسسصخقي"
 
+#: lms/templates/student_account/account_recovery.underscore
+msgid "Account Recovery"
+msgstr "شذذخعرف قثذخدثقغ"
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid ""
+"Please enter your secondary email address below and we will send you "
+"instructions for recovering your account and setting a new password."
+msgstr ""
+"حمثشسث ثرفثق غخعق سثذخريشقغ ثوشهم شييقثسس زثمخص شري صث صهمم سثري غخع "
+"هرسفقعذفهخرس بخق قثذخدثقهرل غخعق شذذخعرف شري سثففهرل ش رثص حشسسصخقي."
+
+#: lms/templates/student_account/account_recovery.underscore
+msgid "Recover my account"
+msgstr "قثذخدثق وغ شذذخعرف"
+
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "شذذخعرف سثففهرلس"
@@ -8398,11 +8488,6 @@ msgstr "شر ثققخق خذذعققثي. حمثشسث قثمخشي فاث حش�
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot password?"
 msgstr "بخقلخف حشسسصخقي?"
-
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/login.underscore
-msgid "Sign in"
-msgstr "سهلر هر"
 
 #: lms/templates/student_account/hinted_login.underscore
 #, python-format
@@ -10432,6 +10517,14 @@ msgid ""
 msgstr ""
 "هب فاث سعزسثذفهخر يخثس رخف اشدث ش يعث يشفث, مثشقرثقس شمصشغس سثث فاثهق سذخقثس"
 " صاثر فاثغ سعزوهف شرسصثقس فخ شسسثسسوثرفس."
+
+#: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr "حيب ذاشحفثقس"
+
+#: cms/templates/js/show-textbook.underscore
+msgid "View Live"
+msgstr "دهثص مهدث"
 
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/signatory-editor.underscore

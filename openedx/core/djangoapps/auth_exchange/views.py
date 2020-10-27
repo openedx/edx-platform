@@ -16,12 +16,10 @@ from django.contrib.auth import login
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from edx_oauth2_provider.constants import SCOPE_VALUE_DICT
 from oauth2_provider import models as dot_models
-from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views.base import TokenView as DOTAccessTokenView
-from oauthlib.oauth2.rfc6749.tokens import BearerToken
 from provider import constants
+from provider import scope as dop_scope
 from provider.oauth2.views import AccessTokenView as DOPAccessTokenView
 from rest_framework import permissions
 from rest_framework.exceptions import AuthenticationFailed
@@ -30,6 +28,7 @@ from rest_framework.views import APIView
 
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
+from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 
@@ -43,19 +42,19 @@ class AccessTokenExchangeBase(APIView):
     def dispatch(self, *args, **kwargs):
         return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)
 
-    def get(self, request, _backend):  # pylint: disable=arguments-differ
+    def get(self, request, _backend):
         """
         Pass through GET requests without the _backend
         """
         return super(AccessTokenExchangeBase, self).get(request)
 
-    def post(self, request, _backend):  # pylint: disable=arguments-differ
+    def post(self, request, _backend):
         """
         Handle POST requests to get a first-party access token.
         """
-        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)  # pylint: disable=no-member
+        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
         if not form.is_valid():
-            return self.error_response(form.errors)  # pylint: disable=no-member
+            return self.error_response(form.errors)
 
         user = form.cleaned_data["user"]
         scope = form.cleaned_data["scope"]
@@ -69,10 +68,10 @@ class AccessTokenExchangeBase(APIView):
         serialized access token response.
         """
         if constants.SINGLE_ACCESS_TOKEN:
-            edx_access_token = self.get_access_token(request, user, scope, client)  # pylint: disable=no-member
+            edx_access_token = self.get_access_token(request, user, scope, client)
         else:
             edx_access_token = self.create_access_token(request, user, scope, client)
-        return self.access_token_response(edx_access_token)  # pylint: disable=no-member
+        return self.access_token_response(edx_access_token)
 
 
 class DOPAccessTokenExchangeView(AccessTokenExchangeBase, DOPAccessTokenView):
@@ -111,33 +110,14 @@ class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
         """
         Create and return a new access token.
         """
-        _days = 24 * 60 * 60
-        token_generator = BearerToken(
-            expires_in=settings.OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS * _days,
-            request_validator=oauth2_settings.OAUTH2_VALIDATOR_CLASS(),
-        )
-        self._populate_create_access_token_request(request, user, scope, client)
-        return token_generator.create_token(request, refresh_token=True)
+        scopes = dop_scope.to_names(scope)
+        return create_dot_access_token(request, user, client, scopes=scopes)
 
     def access_token_response(self, token):
         """
         Wrap an access token in an appropriate response
         """
         return Response(data=token)
-
-    def _populate_create_access_token_request(self, request, user, scope, client):
-        """
-        django-oauth-toolkit expects certain non-standard attributes to
-        be present on the request object.  This function modifies the
-        request object to match these expectations
-        """
-        request.user = user
-        request.scopes = [SCOPE_VALUE_DICT[scope]]
-        request.client = client
-        request.state = None
-        request.refresh_token = None
-        request.extra_credentials = None
-        request.grant_type = client.authorization_grant_type
 
     def error_response(self, form_errors, **kwargs):
         """

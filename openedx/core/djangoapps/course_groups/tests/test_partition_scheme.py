@@ -4,7 +4,6 @@ Test the partitions and partitions service
 """
 import django.test
 from mock import patch
-from nose.plugins.attrib import attr
 
 from courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from student.tests.factories import UserFactory
@@ -15,6 +14,7 @@ from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.lib.tests import attr
 from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..models import CourseUserGroupPartitionGroup
 from ..views import link_cohort_to_partition_group, unlink_cohort_partition_group
@@ -346,7 +346,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         """
         Verify that the masquerade works for the specified group id.
         """
-        self.ensure_masquerade_as_group_member(  # pylint: disable=no-member
+        self.ensure_masquerade_as_group_member(
             self.user_partition.id,
             group.id if group is not None else None
         )
@@ -383,7 +383,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         group.
         """
         self.course.cohort_config = {'cohorted': True}
-        modulestore().update_item(self.course, self.test_user.id)  # pylint: disable=no-member
+        modulestore().update_item(self.course, self.test_user.id)
         cohort = CohortFactory.create(course_id=self.course.id, users=[self.test_user])
         CourseUserGroupPartitionGroup(
             course_user_group=cohort,

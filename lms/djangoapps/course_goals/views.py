@@ -2,20 +2,21 @@
 Course Goals Views - includes REST API
 """
 from __future__ import absolute_import
-import analytics
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import JsonResponse
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.api.permissions import IsStaffOrOwner
 from rest_framework import permissions, serializers, viewsets, status
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
+
+from track import segment
 
 from .api import get_course_goal_options
 from .models import CourseGoal, GOAL_KEY_CHOICES
@@ -110,6 +111,7 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
 
 @receiver(post_save, sender=CourseGoal, dispatch_uid="emit_course_goals_event")
 def emit_course_goal_event(sender, instance, **kwargs):
+    """Emit events for both tracking logs and for Segment."""
     name = 'edx.course.goal.added' if kwargs.get('created', False) else 'edx.course.goal.updated'
     tracker.emit(
         name,
@@ -117,21 +119,4 @@ def emit_course_goal_event(sender, instance, **kwargs):
             'goal_key': instance.goal_key,
         }
     )
-    if settings.LMS_SEGMENT_KEY:
-        update_google_analytics(name, instance.user.id)
-
-
-def update_google_analytics(name, user_id):
-    """ Update student course goal for Google Analytics using Segment. """
-    tracking_context = tracker.get_tracker().resolve_context()
-    context = {
-        'ip': tracking_context.get('ip'),
-        'Google Analytics': {
-            'clientId': tracking_context.get('client_id')
-        }
-    }
-    analytics.track(
-        user_id,
-        name,
-        context=context
-    )
+    segment.track(instance.user.id, name)

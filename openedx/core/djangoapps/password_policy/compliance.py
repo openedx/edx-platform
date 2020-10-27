@@ -7,6 +7,7 @@ import pytz
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
+from openedx.core.djangolib.markup import HTML
 from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
 from util.password_policy_validators import validate_password
 
@@ -70,25 +71,35 @@ def enforce_compliance_on_login(user, password):
     now = datetime.now(pytz.UTC)
     if now >= deadline:
         raise NonCompliantPasswordException(
-            _capitalize_first(_(
-                '{platform_name} now requires more complex passwords. Your current password does not meet the new '
-                'requirements. Change your password now using the "Forgot password?" link below to continue using the '
-                'site. Thank you for helping us keep your data safe.'
-            ).format(
-                platform_name=settings.PLATFORM_NAME
-            ))
+            HTML(_(
+                '{strong_tag_open}We recently changed our password requirements{strong_tag_close}{break_line_tag}'
+                'Your current password does not meet the new security requirements. We just sent a password-reset '
+                'message to the email address associated with this account. Thank you for helping us keep your data '
+                'safe.'
+            )).format(
+                strong_tag_open=HTML('<strong>'),
+                strong_tag_close=HTML('</strong>'),
+                break_line_tag=HTML('<br/>'),
+            )
         )
     else:
         raise NonCompliantPasswordWarning(
-            _capitalize_first(_(
-                '{platform_name} now requires more complex passwords. Your current password does not meet the new '
-                'requirements. You must change your password by {deadline} to be able to continue using the site. '
-                'To change your password, select the dropdown menu icon next to your username, then select "Account". '
-                'You can reset your password from this page. Thank you for helping us keep your data safe.'
-            ).format(
+            HTML(_(
+                '{strong_tag_open}Required Action: Please update your password{strong_tag_close}{break_line_tag}'
+                'As of {deadline}, {platform_name} will require all learners to have complex passwords. Your current '
+                'password does not meet these requirements. To reset your password, go to to '
+                '{anchor_tag_open}Account Settings{anchor_tag_close}.'
+            )).format(
+                strong_tag_open=HTML('<strong>'),
+                strong_tag_close=HTML('</strong>'),
+                break_line_tag=HTML('<br/>'),
                 platform_name=settings.PLATFORM_NAME,
-                deadline=strftime_localized(deadline, DEFAULT_SHORT_DATE_FORMAT)
-            ))
+                deadline=strftime_localized(deadline, DEFAULT_SHORT_DATE_FORMAT),
+                anchor_tag_open=HTML('<a href="{account_settings_url}">').format(
+                    account_settings_url=settings.LMS_ROOT_URL + "/account/settings"
+                ),
+                anchor_tag_close=HTML('</a>')
+            )
         )
 
 
@@ -105,7 +116,7 @@ def _check_user_compliance(user, password):
     Returns a boolean indicating whether or not the user is compliant with password policy rules.
     """
     try:
-        validate_password(password, user=user, password_reset=False)
+        validate_password(password, user=user)
         return True
     except Exception:  # pylint: disable=broad-except
         # If anything goes wrong, we should assume the password is not compliant but we don't necessarily

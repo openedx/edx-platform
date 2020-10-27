@@ -18,8 +18,9 @@ from logging import getLogger
 # it to get the correct value
 import lettuce.django
 from lettuce import step, world
-from nose.tools import assert_equals  # pylint: disable=no-name-in-module
 from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.lib.tests.tools import assert_equals  # pylint: disable=no-name-in-module
 
 from .course_helpers import *
 from .ui_helpers import *

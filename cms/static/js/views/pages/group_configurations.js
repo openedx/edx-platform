@@ -7,8 +7,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
     var GroupConfigurationsPage = BasePage.extend({
         initialize: function(options) {
             var currentScheme,
-                i,
-                enrollmentScheme = 'enrollment_track';
+                i;
 
             BasePage.prototype.initialize.call(this);
             this.experimentsEnabled = options.experimentsEnabled;
@@ -26,7 +25,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
                 this.allGroupViewList.push(
                     new PartitionGroupListView({
                         collection: this.allGroupConfigurations[i].get('groups'),
-                        restrictEditing: currentScheme === enrollmentScheme,
+                        restrictEditing: this.allGroupConfigurations[i].get('read_only'),
                         scheme: currentScheme
                     })
                 );

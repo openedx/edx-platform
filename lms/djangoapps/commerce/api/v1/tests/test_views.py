@@ -10,8 +10,6 @@ from django.contrib.auth.models import Permission
 from django.urls import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
-from edx_rest_api_client import exceptions
-from nose.plugins.attrib import attr
 from rest_framework.utils.encoders import JSONEncoder
 
 from course_modes.models import CourseMode
@@ -103,7 +101,6 @@ class CourseListViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
         self.assertListEqual(actual, expected)
 
 
-@attr(shard=3)
 @ddt.ddt
 class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase):
     """ Tests for CourseRetrieveUpdateView. """
@@ -112,6 +109,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         NOW: datetime.now(),
         None: None,
     }
+    shard = 3
 
     def setUp(self):
         super(CourseRetrieveUpdateViewTests, self).setUp()
@@ -394,13 +392,13 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         self.assertDictEqual(expected_dict, json.loads(response.content))
 
 
-@attr(shard=1)
 class OrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce_api:v1:orders:detail'
     ORDER_NUMBER = 'EDX-100001'
     MOCK_ORDER = {'number': ORDER_NUMBER}
     path = reverse_lazy(view_name, kwargs={'number': ORDER_NUMBER})
+    shard = 1
 
     def setUp(self):
         super(OrderViewTests, self).setUp()

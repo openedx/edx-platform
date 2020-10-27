@@ -26,7 +26,7 @@ show_help() {
     echo "For more help using the xss linter, including details on how to"
     echo "understand and fix any violations, read the docs here:"
     echo ""
-    echo "  http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/preventing_xss.html#xss-linter"
+    echo "  https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/preventing_xss.html#xss-linter"
 
 }
 
@@ -60,8 +60,16 @@ done
 current_branch_hash=`git rev-parse HEAD`
 
 if [ -z "${MAIN_COMMIT+x}" ]; then
-    # if commit is not set, get hash of current branch
-    MAIN_COMMIT="origin/master"
+    if [ -z ${TARGET_BRANCH+x} ]; then
+        # if commit is not set and no target branch, get hash of current branch
+        MAIN_COMMIT="origin/master"
+    else
+        if [[ $TARGET_BRANCH == origin/* ]]; then
+            MAIN_COMMIT=$TARGET_BRANCH
+        else
+            MAIN_COMMIT=origin/$TARGET_BRANCH
+        fi
+    fi
 fi
 
 merge_base_command="git merge-base $current_branch_hash $MAIN_COMMIT"

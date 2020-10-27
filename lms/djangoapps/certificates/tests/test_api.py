@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
-from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 import pytz
 
@@ -33,6 +33,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from microsite_configuration import microsite
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.testing import EventTestMixin
@@ -359,6 +360,7 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         cls.student = UserFactory()
         cls.student_no_cert = UserFactory()
         cls.uuid = uuid.uuid4().hex
+        cls.nonexistent_course_id = CourseKey.from_string('course-v1:some+fake+course')
         cls.web_cert_course = CourseFactory.create(
             org='edx',
             number='verified_1',
@@ -390,6 +392,12 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             download_url='www.gmail.com',
             grade="0.99",
             verify_uuid=cls.uuid,
+        )
+        # certificate for a course that will be deleted
+        GeneratedCertificateFactory.create(
+            user=cls.student,
+            course_id=cls.nonexistent_course_id,
+            status=CertificateStatuses.downloadable
         )
 
     @classmethod
@@ -457,21 +465,6 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         """
         Test the get_certificate_url with a web cert course
         """
-        certificates = [
-            {
-                'id': 1,
-                'name': 'Test Certificate Name',
-                'description': 'Test Certificate Description',
-                'course_title': 'tes_course_title',
-                'signatories': [],
-                'version': 1,
-                'is_active': True
-            }
-        ]
-        self.web_cert_course.certificates = {'certificates': certificates}
-        self.web_cert_course.save()
-        self.store.update_item(self.web_cert_course, self.student.id)
-
         expected_url = reverse(
             'certificates:render_cert_by_uuid',
             kwargs=dict(certificate_uuid=self.uuid)
@@ -508,6 +501,17 @@ class CertificateGetTests(SharedModuleStoreTestCase):
             uuid=self.uuid
         )
         self.assertEqual('www.gmail.com', cert_url)
+
+    def test_get_certificate_with_deleted_course(self):
+        """
+        Test the case when there is a certificate but the course was deleted.
+        """
+        self.assertIsNone(
+            certs_api.get_certificate_for_user(
+                self.student.username,
+                self.nonexistent_course_id
+            )
+        )
 
 
 @attr(shard=1)
@@ -570,6 +574,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         will trigger an update to the certificate if the user has since
         verified.
         """
+        self._setup_course_certificate()
         # generate certificate with unverified status.
         GeneratedCertificateFactory.create(
             user=self.student,
@@ -751,8 +756,11 @@ def set_microsite(domain):
             """
             Execute the function after setting up the microsite.
             """
-            microsite.set_by_domain(domain)
-            return func(request, *args, **kwargs)
+            try:
+                microsite.set_by_domain(domain)
+                return func(request, *args, **kwargs)
+            finally:
+                microsite.clear()
         return inner
     return decorator
 

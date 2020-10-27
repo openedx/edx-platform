@@ -6,7 +6,6 @@ import crum
 import datetime
 
 from mock import patch
-from nose.plugins.attrib import attr
 import pytz
 from django.test import RequestFactory
 
@@ -23,8 +22,8 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
+    shard = 3
 
     @classmethod
     def setUpClass(cls):
@@ -57,14 +56,15 @@ class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
 
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
 
+        self.request = RequestFactory().request()
+        crum.set_current_request(self.request)
+        self.addCleanup(crum.set_current_request, None)
         self.enrollment = CourseEnrollmentFactory(
             course_id=self.course.id,
             mode=CourseMode.AUDIT,
             course=self.course_overview,
         )
-        self.request = RequestFactory().request()
         self.request.user = self.enrollment.user
-        crum.set_current_request(self.request)
 
     def test_tool_visible(self):
         self.assertTrue(VerifiedUpgradeTool().is_enabled(self.request, self.course.id))

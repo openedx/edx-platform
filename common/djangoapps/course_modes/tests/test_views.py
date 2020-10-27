@@ -13,7 +13,6 @@ import pytz
 from django.conf import settings
 from django.urls import reverse
 from mock import patch
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode, Mode
 from course_modes.tests.factories import CourseModeFactory
@@ -30,13 +29,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=5)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTestCase, CourseCatalogServiceMockMixin):
     """
     Course Mode View tests
     """
+    shard = 5
     URLCONF_MODULES = ['course_modes.urls']
 
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})

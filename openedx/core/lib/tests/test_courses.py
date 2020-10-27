@@ -4,7 +4,6 @@ Tests for functionality in openedx/core/lib/courses.py.
 
 import ddt
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -13,10 +12,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..courses import course_image_url
 
 
-@attr(shard=2)
 @ddt.ddt
 class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
+    shard = 2
 
     def verify_url(self, expected_url, actual_url):
         """

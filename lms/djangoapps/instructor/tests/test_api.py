@@ -2,6 +2,7 @@
 """
 Unit tests for instructor.api methods.
 """
+from __future__ import print_function
 import datetime
 import functools
 import io
@@ -11,6 +12,7 @@ import shutil
 import tempfile
 
 import ddt
+import pytest
 from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -23,8 +25,6 @@ from django.test.utils import override_settings
 from pytz import UTC
 from django.utils.translation import ugettext as _
 from mock import Mock, NonCallableMock, patch
-from nose.plugins.attrib import attr
-from nose.tools import raises
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from six import text_type
@@ -62,6 +62,7 @@ from lms.djangoapps.instructor_task.api_helper import (
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.lib.tests import attr
 from openedx.core.lib.xblock_utils import grade_histogram
 from shoppingcart.models import (
     Coupon,
@@ -180,6 +181,7 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'get_problem_responses',
     'get_proctored_exam_results',
     'get_registration_codes',
+    'get_student_enrollment_status',
     'get_student_progress_url',
     'get_students_features',
     'get_students_who_may_enroll',
@@ -1027,7 +1029,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Remove white label course price
         self.white_label_course_mode.min_price = 0
         self.white_label_course_mode.suggested_prices = ''
-        self.white_label_course_mode.save()  # pylint: disable=no-member
+        self.white_label_course_mode.save()
 
         # Login Audit Course instructor
         self.client.login(username=self.white_label_course_instructor.username, password='test')
@@ -1226,7 +1228,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'enroll',
                                           'email_students': False})
-        print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
+        print("type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email)))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now enrolled
@@ -1275,7 +1277,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
 
-        print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
+        print("type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email)))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now enrolled
@@ -1314,18 +1316,26 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             mail.outbox[0].subject,
             u'You have been enrolled in {}'.format(self.course.display_name)
         )
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear NotEnrolled Student\n\nYou have been enrolled in {} "
-            "at edx.org by a member of the course staff. "
-            "The course should now appear on your edx.org dashboard.\n\n"
-            "To start accessing course materials, please visit "
-            "{proto}://{site}{course_path}\n\n----\n"
-            "This email was automatically sent from edx.org to NotEnrolled Student".format(
-                self.course.display_name,
-                proto=protocol, site=self.site_name, course_path=self.course_path
-            )
-        )
+
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+
+        assert text_body.startswith('Dear NotEnrolled Student\n\n')
+
+        for body in [text_body, html_body]:
+            self.assertIn('You have been enrolled in {course_name} at edx.org by a member of the course staff.'.format(
+                course_name=self.course.display_name,
+            ), body)
+
+            self.assertIn('This course will now appear on your edx.org dashboard.', body)
+            self.assertIn('{proto}://{site}{course_path}'.format(
+                proto=protocol,
+                site=self.site_name,
+                course_path=self.course_path,
+            ), body)
+
+        self.assertIn("To start accessing course materials, please visit", text_body)
+        self.assertIn("This email was automatically sent from edx.org to NotEnrolled Student\n\n", text_body)
 
     @ddt.data('http', 'https')
     @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
@@ -1345,17 +1355,35 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             mail.outbox[0].subject,
             u'You have been invited to register for {}'.format(self.course.display_name)
         )
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join {} at edx.org by a member of the course staff.\n\n"
-            "To finish your registration, please visit {proto}://{site}/register and fill out the "
-            "registration form making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
-            "Once you have registered and activated your account, "
-            "visit {proto}://{site}{about_path} to join the course.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                self.course.display_name, proto=protocol, site=self.site_name, about_path=self.about_path
-            )
-        )
+
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        register_url = '{proto}://{site}/register'.format(proto=protocol, site=self.site_name)
+
+        assert text_body.startswith('Dear student,')
+        assert 'To finish your registration, please visit {register_url}'.format(
+            register_url=register_url,
+        ) in text_body
+        assert 'Please finish your registration and fill out' in html_body
+        assert register_url in html_body
+
+        for body in [text_body, html_body]:
+            assert 'You have been invited to join {course} at edx.org by a member of the course staff.'.format(
+                course=self.course.display_name
+            ) in body
+
+            assert ('fill out the registration form making sure to use '
+                    'robot-not-an-email-yet@robot.org in the Email field') in body
+
+            assert 'Once you have registered and activated your account,' in body
+
+            assert '{proto}://{site}{about_path}'.format(
+                proto=protocol,
+                site=self.site_name,
+                about_path=self.about_path
+            ) in body
+
+            assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @ddt.data('http', 'https')
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
@@ -1370,17 +1398,32 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ALLOWEDTOENROLL)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join {display_name}"
-            " at edx.org by a member of the course staff.\n\n"
-            "To finish your registration, please visit {proto}://{site}/register and fill out the registration form "
-            "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
-            "You can then enroll in {display_name}.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                display_name=self.course.display_name, proto=protocol, site=self.site_name
-            )
-        )
+
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+
+        assert text_body.startswith('Dear student,')
+        assert 'To finish your registration, please visit' in text_body
+        assert 'Please finish your registration and fill' in html_body
+
+        for body in [text_body, html_body]:
+            assert 'You have been invited to join {display_name} at edx.org by a member of the course staff.'.format(
+                display_name=self.course.display_name
+            ) in body
+
+            assert '{proto}://{site}/register'.format(
+                proto=protocol,
+                site=self.site_name
+            ) in body
+
+            assert ('fill out the registration form making sure to use '
+                    'robot-not-an-email-yet@robot.org in the Email field') in body
+
+            assert 'You can then enroll in {display_name}.'.format(
+                display_name=self.course.display_name
+            ) in body
+
+            assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @ddt.data('http', 'https')
     @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
@@ -1390,7 +1433,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                   'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+        print("type(self.notregistered_email): {}".format(type(self.notregistered_email)))
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -1402,18 +1445,37 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 1)
         self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ALLOWEDTOENROLL)
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join {display_name}"
-            " at edx.org by a member of the course staff.\n\n"
-            "To finish your registration, please visit {proto}://{site}/register and fill out the registration form "
-            "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
-            "Once you have registered and activated your account,"
-            " you will see {display_name} listed on your dashboard.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name, display_name=self.course.display_name
-            )
+
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        register_url = '{proto}://{site}/register'.format(
+            proto=protocol,
+            site=self.site_name,
         )
+
+        assert text_body.startswith('Dear student,')
+        assert 'To finish your registration, please visit {register_url}'.format(
+            register_url=register_url,
+        ) in text_body
+        assert 'Please finish your registration and fill out the registration' in html_body
+        assert 'Finish Your Registration' in html_body
+        assert register_url in html_body
+
+        for body in [text_body, html_body]:
+            assert 'You have been invited to join {display_name} at edx.org by a member of the course staff.'.format(
+                display_name=self.course.display_name
+            ) in body
+
+            assert (' and fill '
+                    'out the registration form making sure to use robot-not-an-email-yet@robot.org '
+                    'in the Email field') in body
+
+            assert ('Once you have registered and activated your account, '
+                    'you will see {display_name} listed on your dashboard.').format(
+                display_name=self.course.display_name
+            ) in body
+
+            assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
     @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
@@ -1422,7 +1484,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': False})
-        print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
+        print("type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email)))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now unenrolled
@@ -1468,7 +1530,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': True})
-        print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
+        print("type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email)))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now unenrolled
@@ -1508,25 +1570,29 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been un-enrolled from {display_name}'.format(display_name=self.course.display_name,)
+            'You have been unenrolled from {display_name}'.format(display_name=self.course.display_name,)
         )
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear Enrolled Student\n\nYou have been un-enrolled in {display_name} "
-            "at edx.org by a member of the course staff. "
-            "The course will no longer appear on your edx.org dashboard.\n\n"
-            "Your other courses have not been affected.\n\n----\n"
-            "This email was automatically sent from edx.org to Enrolled Student".format(
+
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+
+        assert text_body.startswith('Dear Enrolled Student')
+
+        for body in [text_body, html_body]:
+            assert 'You have been unenrolled from {display_name} at edx.org by a member of the course staff.'.format(
                 display_name=self.course.display_name,
-            )
-        )
+            ) in body
+
+            assert 'This course will no longer appear on your edx.org dashboard.' in body
+            assert 'Your other courses have not been affected.' in body
+            assert 'This email was automatically sent from edx.org to Enrolled Student' in body
 
     @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=False))
     def test_unenroll_with_email_allowed_student(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url,
                                     {'identifiers': self.allowed_email, 'action': 'unenroll', 'email_students': True})
-        print "type(self.allowed_email): {}".format(type(self.allowed_email))
+        print("type(self.allowed_email): {}".format(type(self.allowed_email)))
         self.assertEqual(response.status_code, 200)
 
         # test the response data
@@ -1562,16 +1628,20 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been un-enrolled from {display_name}'.format(display_name=self.course.display_name,)
+            'You have been unenrolled from {display_name}'.format(display_name=self.course.display_name,)
         )
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear Student,\n\nYou have been un-enrolled from course {display_name} by a member of the course staff. "
-            "Please disregard the invitation previously sent.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-allowed@robot.org".format(
+
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        assert text_body.startswith('Dear Student,')
+
+        for body in [text_body, html_body]:
+            assert 'You have been unenrolled from the course {display_name} by a member of the course staff.'.format(
                 display_name=self.course.display_name,
-            )
-        )
+            ) in body
+
+            assert 'Please disregard the invitation previously sent.' in body
+            assert 'This email was automatically sent from edx.org to robot-allowed@robot.org' in body
 
     @ddt.data('http', 'https')
     @patch('lms.djangoapps.instructor.enrollment.uses_shib')
@@ -1592,15 +1662,26 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             'You have been invited to register for {display_name}'.format(display_name=self.course.display_name,)
         )
 
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the course staff.\n\n"
-            "To access the course visit {proto}://{site}{about_path} and register for the course.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name, about_path=self.about_path,
-                display_name=self.course.display_name,
-            )
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        course_url = '{proto}://{site}{about_path}'.format(
+            proto=protocol,
+            site=self.site_name,
+            about_path=self.about_path,
         )
+        assert text_body.startswith('Dear student,')
+        assert 'To access this course visit {course_url} and register for this course.'.format(
+            course_url=course_url,
+        ) in text_body
+        assert 'To access this course visit it and register:' in html_body
+        assert course_url in html_body
+
+        for body in [text_body, html_body]:
+            assert 'You have been invited to join {display_name} at edx.org by a member of the course staff.'.format(
+                display_name=self.course.display_name,
+            ) in body
+
+            assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @patch('lms.djangoapps.instructor.enrollment.uses_shib')
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
@@ -1616,13 +1697,17 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                                               'email_students': True})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join {} at edx.org by a member of the course staff.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                self.course.display_name,
-            )
-        )
+
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        assert text_body.startswith('Dear student,')
+
+        for body in [text_body, html_body]:
+            assert 'You have been invited to join {display_name} at edx.org by a member of the course staff.'.format(
+                display_name=self.course.display_name,
+            ) in body
+
+            assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @ddt.data('http', 'https')
     @patch('lms.djangoapps.instructor.enrollment.uses_shib')
@@ -1635,7 +1720,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                   'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+        print("type(self.notregistered_email): {}".format(type(self.notregistered_email)))
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -1645,16 +1730,23 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             'You have been invited to register for {display_name}'.format(display_name=self.course.display_name,)
         )
 
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join {display_name}"
-            " at edx.org by a member of the course staff.\n\n"
-            "To access the course visit {proto}://{site}{course_path} and login.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                display_name=self.course.display_name,
-                proto=protocol, site=self.site_name, course_path=self.course_path
-            )
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        course_url = '{proto}://{site}{course_path}'.format(
+            proto=protocol, site=self.site_name, course_path=self.course_path,
         )
+
+        assert text_body.startswith('Dear student,')
+        assert course_url in html_body
+        assert 'To access this course visit {course_url} and login.'.format(course_url=course_url) in text_body
+        assert 'To access this course click on the button below and login:' in html_body
+
+        for body in [text_body, html_body]:
+            assert 'You have been invited to join {display_name} at edx.org by a member of the course staff.'.format(
+                display_name=self.course.display_name,
+            ) in body
+
+            assert 'This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org' in body
 
     @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
     @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
@@ -1856,6 +1948,65 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.assertEqual(response.status_code, 200)
         return response
 
+    def test_get_enrollment_status(self):
+        """Check that enrollment states are reported correctly."""
+
+        # enrolled, active
+        url = reverse(
+            'get_student_enrollment_status',
+            kwargs={'course_id': self.course.id.to_deprecated_string()},
+        )
+        params = {
+            'unique_student_identifier': 'EnrolledStudent'
+        }
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(
+            res_json['enrollment_status'],
+            'Enrollment status for EnrolledStudent: active'
+        )
+
+        # unenrolled, inactive
+        CourseEnrollment.unenroll(
+            self.enrolled_student,
+            self.course.id
+        )
+
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(
+            res_json['enrollment_status'],
+            'Enrollment status for EnrolledStudent: inactive'
+        )
+
+        # invited, not yet registered
+        params = {
+            'unique_student_identifier': 'robot-allowed@robot.org'
+        }
+
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(
+            res_json['enrollment_status'],
+            'Enrollment status for robot-allowed@robot.org: pending'
+        )
+
+        # never enrolled or invited
+        params = {
+            'unique_student_identifier': 'nonotever@example.com'
+        }
+
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+        self.assertEqual(
+            res_json['enrollment_status'],
+            'Enrollment status for nonotever@example.com: never enrolled'
+        )
+
 
 @attr(shard=5)
 @ddt.ddt
@@ -2000,21 +2151,29 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
             'You have been invited to a beta test for {display_name}'.format(display_name=self.course.display_name,)
         )
 
-        self.assertEqual(
-            mail.outbox[0].body,
-            u"Dear {student_name}\n\nYou have been invited to be a beta tester "
-            "for {display_name} at edx.org by a member of the course staff.\n\n"
-            "Visit {proto}://{site}{about_path} to join "
-            "the course and begin the beta test.\n\n----\n"
-            "This email was automatically sent from edx.org to {student_email}".format(
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        student_name = self.notenrolled_student.profile.name
+        assert text_body.startswith('Dear {student_name}'.format(student_name=student_name))
+        assert 'Visit {display_name}'.format(display_name=self.course.display_name) in html_body
+
+        for body in [text_body, html_body]:
+            assert 'You have been invited to be a beta tester for {display_name} at edx.org'.format(
                 display_name=self.course.display_name,
-                student_name=self.notenrolled_student.profile.name,
-                student_email=self.notenrolled_student.email,
+            ) in body
+
+            assert 'by a member of the course staff.' in body
+            assert 'enroll in this course and begin the beta test' in body
+
+            assert '{proto}://{site}{about_path}'.format(
                 proto=protocol,
                 site=self.site_name,
-                about_path=self.about_path
-            )
-        )
+                about_path=self.about_path,
+            ) in body
+
+            assert 'This email was automatically sent from edx.org to {student_email}'.format(
+                student_email=self.notenrolled_student.email,
+            ) in body
 
     @ddt.data('http', 'https')
     def test_add_notenrolled_with_email_autoenroll(self, protocol):
@@ -2048,21 +2207,28 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
             'You have been invited to a beta test for {display_name}'.format(display_name=self.course.display_name)
         )
 
-        self.assertEqual(
-            mail.outbox[0].body,
-            u"Dear {student_name}\n\nYou have been invited to be a beta tester "
-            "for {display_name} at edx.org by a member of the course staff.\n\n"
-            "To start accessing course materials, please visit "
-            "{proto}://{site}{course_path}\n\n----\n"
-            "This email was automatically sent from edx.org to {student_email}".format(
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        student_name = self.notenrolled_student.profile.name
+        assert text_body.startswith('Dear {student_name}'.format(student_name=student_name))
+
+        for body in [text_body, html_body]:
+            assert 'You have been invited to be a beta tester for {display_name} at edx.org'.format(
                 display_name=self.course.display_name,
-                student_name=self.notenrolled_student.profile.name,
-                student_email=self.notenrolled_student.email,
+            ) in body
+
+            assert 'by a member of the course staff' in body
+
+            assert 'To start accessing course materials, please visit' in body
+            assert '{proto}://{site}{course_path}'.format(
                 proto=protocol,
                 site=self.site_name,
                 course_path=self.course_path
             )
-        )
+
+            assert 'This email was automatically sent from edx.org to {student_email}'.format(
+                student_email=self.notenrolled_student.email,
+            ) in body
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_add_notenrolled_email_mktgsite(self):
@@ -2071,17 +2237,23 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            mail.outbox[0].body,
-            u"Dear {}\n\nYou have been invited to be a beta tester "
-            "for {} at edx.org by a member of the course staff.\n\n"
-            "Visit edx.org to enroll in the course and begin the beta test.\n\n----\n"
-            "This email was automatically sent from edx.org to {}".format(
-                self.notenrolled_student.profile.name,
-                self.course.display_name,
-                self.notenrolled_student.email,
-            )
-        )
+
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        student_name = self.notenrolled_student.profile.name
+        assert text_body.startswith('Dear {student_name}'.format(student_name=student_name))
+
+        for body in [text_body, html_body]:
+            assert 'You have been invited to be a beta tester for {display_name} at edx.org'.format(
+                display_name=self.course.display_name,
+            ) in body
+
+            assert 'by a member of the course staff.' in body
+            assert 'Visit edx.org' in body
+            assert 'enroll in this course and begin the beta test' in body
+            assert 'This email was automatically sent from edx.org to {student_email}'.format(
+                student_email=self.notenrolled_student.email,
+            ) in body
 
     def test_enroll_with_email_not_registered(self):
         # User doesn't exist
@@ -2172,19 +2344,24 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
             mail.outbox[0].subject,
             u'You have been removed from a beta test for {display_name}'.format(display_name=self.course.display_name,)
         )
-        self.assertEqual(
-            mail.outbox[0].body,
-            "Dear {full_name}\n\nYou have been removed as a beta tester for "
-            "{display_name} at edx.org by a member of the course staff. "
-            "The course will remain on your dashboard, but you will no longer "
-            "be part of the beta testing group.\n\n"
-            "Your other courses have not been affected.\n\n----\n"
-            "This email was automatically sent from edx.org to {email_address}".format(
+
+        text_body = mail.outbox[0].body
+        html_body = mail.outbox[0].alternatives[0][0]
+        assert text_body.startswith('Dear {name}'.format(name=self.beta_tester.profile.name))
+
+        for body in [text_body, html_body]:
+            assert 'You have been removed as a beta tester for {display_name} at edx.org'.format(
                 display_name=self.course.display_name,
-                full_name=self.beta_tester.profile.name,
-                email_address=self.beta_tester.email
-            )
-        )
+            ) in body
+
+            assert ('This course will remain on your dashboard, but you will no longer be '
+                    'part of the beta testing group.') in body
+
+            assert 'Your other courses have not been affected.' in body
+
+            assert 'This email was automatically sent from edx.org to {email_address}'.format(
+                email_address=self.beta_tester.email,
+            ) in body
 
 
 @attr(shard=5)
@@ -2293,7 +2470,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def test_modify_access_with_inactive_user(self):
         self.other_user.is_active = False
-        self.other_user.save()  # pylint: disable=no-member
+        self.other_user.save()
         url = reverse('modify_access', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {
             'unique_student_identifier': self.other_user.username,
@@ -4223,10 +4400,10 @@ class TestInstructorAPIHelpers(TestCase):
         output = 'i4x://MITx/6.002x/problem/L2Node1'
         self.assertEqual(unicode(msk_from_problem_urlname(course_id, name)), output)
 
-    @raises(ValueError)
     def test_msk_from_problem_urlname_error(self):
         args = ('notagoodcourse', 'L2Node1')
-        msk_from_problem_urlname(*args)
+        with pytest.raises(ValueError):
+            msk_from_problem_urlname(*args)
 
 
 def get_extended_due(course, unit, user):

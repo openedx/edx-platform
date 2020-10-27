@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.studio import LMS_URL
 from common.test.acceptance.pages.studio.asset_index import AssetIndexPageStudioFrontend
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.pages.studio.edit_tabs import PagesPage
@@ -72,7 +73,7 @@ class SignUpAndSignInTest(UniqueCourseTest):
     """
     shard = 21
 
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         super(SignUpAndSignInTest, self).setUp()
         self.sign_up_page = SignupPage(self.browser)
         self.login_page = LoginPage(self.browser)
@@ -118,15 +119,14 @@ class SignUpAndSignInTest(UniqueCourseTest):
         index_page.visit()
         index_page.click_sign_up()
 
-        unique_number = uuid.uuid4().hex[:4]
-        registration_dic = {
-            '#email': '{}-email@host.com'.format(unique_number),
-            '#name': '{}-name'.format(unique_number),
-            '#username': '{}-username'.format(unique_number),
-            '#password': '{}-password'.format(unique_number),
-        }
         # Register the user.
-        self.sign_up_page.sign_up_user(registration_dic)
+        unique_number = uuid.uuid4().hex[:4]
+        self.sign_up_page.sign_up_user(
+            '{}-email@host.com'.format(unique_number),
+            '{}-name'.format(unique_number),
+            '{}-username'.format(unique_number),
+            '{}-password'.format(unique_number),
+        )
         home = HomePage(self.browser)
         home.wait_for_page()
 
@@ -145,8 +145,8 @@ class SignUpAndSignInTest(UniqueCourseTest):
 
         password_input = self.sign_up_page.input_password('a')  # Arbitrary short password that will fail
         password_input.send_keys(Keys.TAB)  # Focus out of the element
-        index_page.wait_for_element_visibility('#password_error', 'Password Error Message')
-        self.assertIsNotNone(index_page.q(css='#password_error').text)  # Make sure there is an error message
+        index_page.wait_for_element_visibility('#register-password-validation-error', 'Password Error Message')
+        self.assertIsNotNone(index_page.q(css='#register-password-validation-error-msg'))  # Error message should exist
 
     def test_login_with_valid_redirect(self):
         """
@@ -184,9 +184,8 @@ class SignUpAndSignInTest(UniqueCourseTest):
         self.browser.get(self.browser.current_url.split('=')[0] + '=http://www.google.com')
         # Login
         self.course_outline_sign_in_redirect_page.login(self.user['email'], self.user['password'])
-        home = HomePage(self.browser)
-        home.wait_for_page()
-        self.assertEqual(self.browser.current_url, home.url)
+        # Verify that we land in LMS instead of the invalid redirect url
+        self.assertEqual(self.browser.current_url, LMS_URL + "/dashboard")
 
     def test_login_with_mistyped_credentials(self):
         """
@@ -219,15 +218,8 @@ class SignUpAndSignInTest(UniqueCourseTest):
         )
         # Verify that login error is shown
         self.course_outline_sign_in_redirect_page.wait_for_element_visibility(
-            '#login_error',
+            ".js-form-errors.status.submission-error",
             'Login error is visible'
-        )
-        # Change the password
-        self.course_outline_sign_in_redirect_page.fill_field('input#password', 'changed_password')
-        # Login error should not be visible
-        self.course_outline_sign_in_redirect_page.wait_for_element_invisibility(
-            '#login_error',
-            'Login error is not visible'
         )
         # Login with correct credentials
         self.course_outline_sign_in_redirect_page.login(self.user['email'], self.user['password'])

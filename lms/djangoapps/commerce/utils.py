@@ -133,8 +133,7 @@ class EcommerceService(object):
         """
         Returns the URL for the user to upgrade, or None if not applicable.
         """
-        enrollment = CourseEnrollment.get_enrollment(user, course_key)
-        verified_mode = enrollment.verified_mode if enrollment else None
+        verified_mode = CourseMode.verified_mode_for_course(course_key)
         if verified_mode:
             if self.is_enabled(user):
                 return self.get_checkout_page_url(verified_mode.sku)
@@ -340,7 +339,7 @@ def _send_refund_notification(user, refund_ids):
     return create_zendesk_ticket(requester_name, student.email, subject, body, tags)
 
 
-def _generate_refund_notification_body(student, refund_ids):  # pylint: disable=invalid-name
+def _generate_refund_notification_body(student, refund_ids):
     """ Returns a refund notification message body. """
     msg = _(
         'A refund request has been initiated for {username} ({email}). '

@@ -10,10 +10,12 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import Mock, PropertyMock, patch
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
 from pytz import UTC
+from six import text_type
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlockAside
@@ -384,7 +386,7 @@ class GetItemTest(ItemTest):
                 "scheme": "enrollment_track",
                 "groups": [
                     {
-                        "id": settings.COURSE_ENROLLMENT_MODES["audit"],
+                        "id": settings.COURSE_ENROLLMENT_MODES["audit"]["id"],
                         "name": "Audit",
                         "selected": False,
                         "deleted": False,
@@ -1364,7 +1366,7 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
 
             key_store = DictKeyValueStore()
             field_data = KvsFieldData(key_store)
-            runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+            runtime = TestRuntime(services={'field-data': field_data})
 
             def_id = runtime.id_generator.create_definition(block_type)
             usage_id = runtime.id_generator.create_usage(def_id)
@@ -1418,6 +1420,7 @@ class TestEditItemSetup(ItemTest):
         self.course_update_url = reverse_usage_url("xblock_handler", self.usage_key)
 
 
+@ddt.ddt
 class TestEditItem(TestEditItemSetup):
     """
     Test xblock update.
@@ -1473,6 +1476,32 @@ class TestEditItem(TestEditItemSetup):
         sequential = self.get_item_from_modulestore(self.seq_usage_key)
         self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.assertEqual(sequential.start, datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
+
+    @ddt.data(
+        '1000-01-01T00:00Z',
+        '0150-11-21T14:45Z',
+        '1899-12-31T23:59Z',
+        '1789-06-06T22:10Z',
+        '1001-01-15T19:32Z',
+    )
+    def test_xblock_due_date_validity(self, date):
+        """
+        Test due date for the subsection is not pre-1900
+        """
+        self.client.ajax_post(
+            self.seq_update_url,
+            data={'metadata': {'due': date}}
+        )
+        sequential = self.get_item_from_modulestore(self.seq_usage_key)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+            user=self.user
+        )
+        # Both display and actual value should be None
+        self.assertEquals(xblock_info['due_date'], u'')
+        self.assertIsNone(xblock_info['due'])
 
     def test_update_generic_fields(self):
         new_display_name = 'New Display Name'
@@ -2108,6 +2137,7 @@ class TestEditSplitModule(ItemTest):
 
 @ddt.ddt
 class TestComponentHandler(TestCase):
+    """Tests for component handler api"""
     shard = 1
 
     def setUp(self):
@@ -2124,9 +2154,10 @@ class TestComponentHandler(TestCase):
         # of the xBlock descriptor.
         self.descriptor = self.modulestore.return_value.get_item.return_value
 
-        self.usage_key_string = unicode(
-            BlockUsageLocator(CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name')
+        self.usage_key = BlockUsageLocator(
+            CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
         )
+        self.usage_key_string = text_type(self.usage_key)
 
         self.user = UserFactory()
 
@@ -2164,6 +2195,43 @@ class TestComponentHandler(TestCase):
 
         self.assertEquals(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                           status_code)
+
+    @ddt.data((True, True), (False, False),)
+    @ddt.unpack
+    def test_aside(self, is_xblock_aside, is_get_aside_called):
+        """
+        test get_aside_from_xblock called
+        """
+        def create_response(handler, request, suffix):  # pylint: disable=unused-argument
+            """create dummy response"""
+            return Response(status_code=200)
+
+        def get_usage_key():
+            """return usage key"""
+            return (
+                text_type(AsideUsageKeyV2(self.usage_key, "aside"))
+                if is_xblock_aside
+                else self.usage_key_string
+            )
+
+        self.descriptor.handle = create_response
+
+        with patch(
+            'contentstore.views.component.is_xblock_aside',
+            return_value=is_xblock_aside
+        ), patch(
+            'contentstore.views.component.get_aside_from_xblock'
+        ) as mocked_get_aside_from_xblock, patch(
+            "contentstore.views.component.webob_to_django_response"
+        ) as mocked_webob_to_django_response:
+            component_handler(
+                self.request,
+                get_usage_key(),
+                'dummy_handler'
+            )
+            assert mocked_webob_to_django_response.called is True
+
+        assert mocked_get_aside_from_xblock.called is is_get_aside_called
 
 
 class TestComponentTemplates(CourseTestCase):
@@ -2718,7 +2786,8 @@ class TestXBlockInfo(ItemTest):
             self.assertIsNone(xblock_info.get('child_info', None))
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-    def test_proctored_exam_xblock_info(self):
+    @patch('contentstore.views.item.get_exam_configuration_dashboard_url')
+    def test_proctored_exam_xblock_info(self, get_exam_configuration_dashboard_url_patch):
         self.course.enable_proctored_exams = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
@@ -2739,6 +2808,8 @@ class TestXBlockInfo(ItemTest):
             default_time_limit_minutes=100
         )
         sequential = modulestore().get_item(sequential.location)
+
+        get_exam_configuration_dashboard_url_patch.return_value = 'test_url'
         xblock_info = create_xblock_info(
             sequential,
             include_child_info=True,
@@ -2748,6 +2819,8 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['is_proctored_exam'], True)
         self.assertEqual(xblock_info['is_time_limited'], True)
         self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
+        self.assertEqual(xblock_info['proctoring_exam_configuration_link'], 'test_url')
+        get_exam_configuration_dashboard_url_patch.assert_called_with(self.course.id, xblock_info['id'])
 
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):

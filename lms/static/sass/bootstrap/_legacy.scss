@@ -58,11 +58,15 @@ $grid-breakpoints-lg: 992px !default;
     @include margin-right(0);
 
     width: calc(#{cols($cols)} - 0.5 * #{$grid-gutter-width});
-  } @else if ($margin == 'after') {
+  }
+
+  @else if ($margin == 'after') {
     @include margin-left(0);
 
     width: calc(#{cols($cols)} - 0.5 * #{$grid-gutter-width});
-  } @else if ($margin == 'none') {
+  }
+
+  @else if ($margin == 'none') {
     @include margin-left(0);
     @include margin-right(0);
 

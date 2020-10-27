@@ -3,8 +3,8 @@ Tests for the gating API
 """
 import unittest
 
+from completion.models import BlockCompletion
 from mock import patch, Mock
-from nose.plugins.attrib import attr
 from ddt import ddt, data, unpack
 from django.conf import settings
 from lms.djangoapps.gating import api as lms_gating_api
@@ -17,12 +17,12 @@ from openedx.core.lib.gating.exceptions import GatingValidationError
 from student.tests.factories import UserFactory
 
 
-@attr(shard=2)
 @ddt
 class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the gating API
     """
+    shard = 2
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
@@ -59,6 +59,13 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             parent_location=self.chapter1.location,
             category='sequential',
             display_name='untitled sequential 2'
+        )
+
+        # create vertical
+        self.vertical = ItemFactory.create(
+            parent_location=self.seq1.location,
+            category='vertical',
+            display_name='untitled vertical 1'
         )
 
         self.generic_milestone = {
@@ -181,7 +188,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertEqual(gating_api.get_gated_content(self.course, staff), [])
         self.assertEqual(gating_api.get_gated_content(self.course, student), [unicode(self.seq2.location)])
 
-        milestones_api.add_user_milestone({'id': student.id}, milestone)  # pylint: disable=no-member
+        milestones_api.add_user_milestone({'id': student.id}, milestone)
 
         self.assertEqual(gating_api.get_gated_content(self.course, student), [])
 
@@ -221,6 +228,82 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             self.assertEqual(
                 gating_api.is_gate_fulfilled(self.course.id, self.seq1.location, student.id), is_gate_fulfilled
             )
+
+    @data(
+        (1, 1, 100),
+        (0, 0, 0),
+        (1, 0, 100),
+        (0, 1, 0),
+    )
+    @unpack
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_get_subsection_completion_percentage(self, user_problem_completion, user_html_completion,
+                                                  expected_completion_percentage):
+        """
+        Test if gating_api.get_subsection_completion_percentage returns expected completion percentage
+
+        Note:
+            html blocks are ignored in computation of completion_percentage,so it should not affect result.
+
+        """
+        student = UserFactory(is_staff=False)
+        problem_block = ItemFactory.create(
+            parent_location=self.vertical.location,
+            category='problem',
+            display_name='some problem'
+        )
+        html_block = ItemFactory.create(
+            parent_location=self.vertical.location,
+            category='html',
+            display_name='some html block'
+        )
+        with patch.object(BlockCompletion, 'get_course_completions') as course_block_completions_mock:
+            course_block_completions_mock.return_value = {
+                problem_block.location: user_problem_completion,
+                html_block.location: user_html_completion,
+            }
+            completion_percentage = gating_api.get_subsection_completion_percentage(self.seq1.location, student)
+            self.assertEqual(completion_percentage, expected_completion_percentage)
+
+    @data(
+        ('discussion', None, 100),
+        ('html', None, 100),
+        ('html', 1, 100),
+        ('problem', 1, 100),
+        ('problem', 0, 0),
+        ('openassessment', 1, 100),
+        ('openassessment', 0, 0),
+    )
+    @unpack
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_get_subsection_completion_percentage_single_component(
+        self,
+        component_type,
+        completed,
+        expected_completion_percentage
+    ):
+        """
+        Test if gating_api.get_subsection_completion_percentage returns expected completion percentage
+        when only a single component in a vertical/unit
+
+        Note:
+            html blocks and discussion blocks are ignored in calculations so should always return
+            100% complete
+        """
+        student = UserFactory(is_staff=False)
+
+        component = ItemFactory.create(
+            parent_location=self.vertical.location,
+            category=component_type,
+            display_name='{} block'.format(component_type)
+        )
+
+        with patch.object(BlockCompletion, 'get_course_completions') as course_block_completions_mock:
+            course_block_completions_mock.return_value = {
+                component.location: completed,
+            }
+            completion_percentage = gating_api.get_subsection_completion_percentage(self.seq1.location, student)
+            self.assertEqual(completion_percentage, expected_completion_percentage)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_compute_is_prereq_met(self):

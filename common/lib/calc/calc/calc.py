@@ -9,7 +9,6 @@ import numbers
 import operator
 
 import numpy
-import scipy.constants
 from pyparsing import (
     CaselessLiteral,
     Combine,
@@ -458,11 +457,45 @@ class ParseAugmenter(object):
         else:
             casify = lambda x: x.lower()  # Lowercase for case insens.
 
-        # Test if casify(X) is valid, but return the actual bad input (i.e. X)
         bad_vars = set(var for var in self.variables_used
                        if casify(var) not in valid_variables)
-        bad_vars.update(func for func in self.functions_used
-                        if casify(func) not in valid_functions)
 
         if bad_vars:
-            raise UndefinedVariable(' '.join(sorted(bad_vars)))
+            varnames = ", ".join(sorted(bad_vars))
+            message = "Invalid Input: {} not permitted in answer as a variable".format(varnames)
+
+            # Check to see if there is a different case version of the variables
+            caselist = set()
+            if self.case_sensitive:
+                for var2 in bad_vars:
+                    for var1 in valid_variables:
+                        if var2.lower() == var1.lower():
+                            caselist.add(var1)
+                if len(caselist) > 0:
+                    betternames = ', '.join(sorted(caselist))
+                    message += " (did you mean " + betternames + "?)"
+
+            raise UndefinedVariable(message)
+
+        bad_funcs = set(func for func in self.functions_used
+                        if casify(func) not in valid_functions)
+        if bad_funcs:
+            funcnames = ', '.join(sorted(bad_funcs))
+            message = "Invalid Input: {} not permitted in answer as a function".format(funcnames)
+
+            # Check to see if there is a corresponding variable name
+            if any(casify(func) in valid_variables for func in bad_funcs):
+                message += " (did you forget to use * for multiplication?)"
+
+            # Check to see if there is a different case version of the function
+            caselist = set()
+            if self.case_sensitive:
+                for func2 in bad_funcs:
+                    for func1 in valid_functions:
+                        if func2.lower() == func1.lower():
+                            caselist.add(func1)
+                if len(caselist) > 0:
+                    betternames = ', '.join(sorted(caselist))
+                    message += " (did you mean " + betternames + "?)"
+
+            raise UndefinedVariable(message)

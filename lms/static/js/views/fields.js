@@ -11,11 +11,11 @@
         'text!templates/fields/field_textarea.underscore',
         'backbone-super'
     ], function(gettext, $, _, Backbone, HtmlUtils, DateUtils,
-                 field_readonly_template,
-                 field_dropdown_template,
-                 field_link_template,
-                 field_text_template,
-                 field_textarea_template
+                 fieldReadOnlyTemplate,
+                 fieldDropDownTemplate,
+                 fieldLinkTemplate,
+                 fieldTextTemplate,
+                 fieldTextAreaTemplate
     ) {
         var messageRevertDelay = 6000;
         var FieldViews = {};
@@ -143,6 +143,9 @@
                 this.showNotificationMessage(successMessage);
 
                 if (this.options.refreshPageOnSave) {
+                    if ("focusNextID" in this.options) {
+                        $.cookie('focus_id', this.options.focusNextID );
+                    }
                     location.reload(true);
                 }
 
@@ -285,7 +288,7 @@
 
             fieldType: 'readonly',
 
-            fieldTemplate: field_readonly_template,
+            fieldTemplate: fieldReadOnlyTemplate,
 
             initialize: function(options) {
                 this._super(options);
@@ -350,7 +353,7 @@
 
             fieldType: 'text',
 
-            fieldTemplate: field_text_template,
+            fieldTemplate: fieldTextTemplate,
 
             events: {
                 'change input': 'saveValue'
@@ -394,7 +397,7 @@
 
             fieldType: 'dropdown',
 
-            fieldTemplate: field_dropdown_template,
+            fieldTemplate: fieldDropDownTemplate,
 
             events: {
                 click: 'startEditing',
@@ -540,7 +543,7 @@
 
             fieldType: 'textarea',
 
-            fieldTemplate: field_textarea_template,
+            fieldTemplate: fieldTextAreaTemplate,
 
             events: {
                 'keydown .wrapper-u-field': 'startEditing',
@@ -598,10 +601,29 @@
 
             updateCharCount: function() {
                 var curCharCount;
+                var remainingCharCount;
+                var $charCount = $('.u-field-footer .current-char-count');
                 // Update character count for textarea
                 if (this.options.maxCharacters) {
                     curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
-                    $('.u-field-footer .current-char-count').text(curCharCount);
+                    remainingCharCount = this.options.maxCharacters - curCharCount;
+                    if (remainingCharCount < 20) {
+                        $charCount.attr({
+                            'aria-live': 'assertive',
+                            'aria-atomic': true
+                        });
+                    }
+                    else if (remainingCharCount < 60) {
+                        $charCount.attr('aria-atomic', 'false');
+                    }
+                    else if (remainingCharCount < 70) {
+                        $charCount.attr({
+                            'aria-live': 'polite',
+                            'aria-atomic': true
+                        });
+                    }
+                    $charCount.text(curCharCount);
+
                 }
             },
 
@@ -664,7 +686,7 @@
 
             fieldType: 'link',
 
-            fieldTemplate: field_link_template,
+            fieldTemplate: fieldLinkTemplate,
 
             events: {
                 'click a': 'linkClicked'

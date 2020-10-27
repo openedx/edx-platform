@@ -185,6 +185,7 @@ case "$TEST_SUITE" in
     "bok-choy")
 
         PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS"
+        export BOKCHOY_HEADLESS=true
 
         case "$SHARD" in
 
@@ -193,7 +194,7 @@ case "$TEST_SUITE" in
                 ;;
 
             [1-9]|1[0-9]|2[0-1])
-                $TOX paver test_bokchoy --eval-attr="shard==$SHARD" $PAVER_ARGS
+                $TOX paver test_bokchoy --eval-attr="shard==$SHARD and not a11y" $PAVER_ARGS
                 ;;
 
             22|"noshard")

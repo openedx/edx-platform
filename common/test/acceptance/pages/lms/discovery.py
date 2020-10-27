@@ -31,7 +31,7 @@ class CourseDiscoveryPage(PageObject):
         """
         Return search result items.
         """
-        return self.q(css=".courses-listing-item")
+        return self.q(css=".courses-list .courses-listing-item")
 
     @property
     def clear_button(self):
@@ -54,3 +54,12 @@ class CourseDiscoveryPage(PageObject):
         """
         self.clear_button.click()
         self.wait_for_ajax()
+
+    def click_course(self, course_id):
+        """
+        Click on the course
+
+        Args:
+            course_id(string): ID of the course which is to be clicked
+        """
+        self.q(css='.courses-listing-item a').filter(lambda el: course_id in el.get_attribute('href')).click()

@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
+from django.views.decorators.clickjacking import xframe_options_exempt
 from opaque_keys.edx.keys import UsageKey
 from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -29,7 +30,7 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside,
     xblock_local_resource_url
 )
-from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_config.models import StudioConfig
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
@@ -39,8 +40,8 @@ from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService
 from xmodule.studio_editable import has_author_view
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, ModuleSystem, XModule, XModuleDescriptor
-import webpack_loader.utils
 
 from .helpers import render_from_lms
 from .session_kv_store import SessionKeyValueStore
@@ -51,6 +52,7 @@ log = logging.getLogger(__name__)
 
 
 @login_required
+@xframe_options_exempt
 def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     Dispatch an AJAX action to an xblock
@@ -302,11 +304,9 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         if isinstance(xblock, (XModule, XModuleDescriptor)):
             # Add the webpackified asset tags
             class_name = getattr(xblock.__class__, 'unmixed_class', xblock.__class__).__name__
-            for tag in webpack_loader.utils.get_as_tags(class_name):
-                frag.add_resource(tag, mimetype='text/html', placement='head')
+            add_webpack_to_fragment(frag, class_name)
 
-        for tag in webpack_loader.utils.get_as_tags("js/factories/xblock_validation"):
-            frag.add_resource(tag, mimetype='text/html', placement='head')
+        add_webpack_to_fragment(frag, "js/factories/xblock_validation")
 
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)

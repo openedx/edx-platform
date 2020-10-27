@@ -6,7 +6,7 @@ progress page.
 from contextlib import contextmanager
 
 import ddt
-from nose.plugins.attrib import attr
+import pytest
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.logout import LogoutPage
@@ -42,7 +42,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
     def setUp(self):
         super(ProgressPageBaseTest, self).setUp()
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.problem_page = ProblemPage(self.browser)  # pylint: disable=attribute-defined-outside-init
+        self.problem_page = ProblemPage(self.browser)
         self.progress_page = ProgressPage(self.browser, self.course_id)
         self.logout_page = LogoutPage(self.browser)
 
@@ -127,13 +127,14 @@ class ProgressPageBaseTest(UniqueCourseTest):
             self.logout_page.visit()
 
 
-@attr(shard=22)
 @ddt.ddt
 class PersistentGradesTest(ProgressPageBaseTest):
     """
     Test that grades for completed assessments are persisted
     when various edits are made.
     """
+    shard = 22
+
     def setUp(self):
         super(PersistentGradesTest, self).setUp()
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
@@ -275,12 +276,13 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (0, 2))
 
 
-@attr(shard=22)
 class SubsectionGradingPolicyTest(ProgressPageBaseTest):
     """
     Tests changing a subsection's 'graded' field
     and the effect it has on the progress page.
     """
+    shard = 22
+
     def setUp(self):
         super(SubsectionGradingPolicyTest, self).setUp()
         self._set_policy_for_subsection("Homework", 0)
@@ -417,7 +419,7 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class ProgressPageA11yTest(ProgressPageBaseTest):
     """
     Class to test the accessibility of the progress page.
@@ -427,5 +429,10 @@ class ProgressPageA11yTest(ProgressPageBaseTest):
         """
         Test the accessibility of the progress page.
         """
+        self.progress_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.progress_page.visit()
         self.progress_page.a11y_audit.check_for_accessibility_errors()

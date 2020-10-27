@@ -22,7 +22,6 @@ class TestCourseBookmarksTool(SharedModuleStoreTestCase):
         """
         Set up a course to be used for testing.
         """
-        # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
         # pylint: disable=super-method-not-called
         with super(TestCourseBookmarksTool, cls).setUpClassAndTestData():
             with cls.store.default_store(ModuleStoreEnum.Type.split):

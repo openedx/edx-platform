@@ -39,17 +39,6 @@ def HTML(html):                                 # pylint: disable=invalid-name
     return markupsafe.Markup(html)
 
 
-# HTML, Text are temporarily copied from openedx.core.djangolib.markup
-# These libraries need to be moved out of edx-platform to be used by
-# other applications.
-# See LEARNER-5853 for more details.
-Text = markupsafe.escape                        # pylint: disable=invalid-name
-
-
-def HTML(html):                                 # pylint: disable=invalid-name
-    return markupsafe.Markup(html)
-
-
 def _orjoin(l):
     return "'" + "' | '".join(l) + "'"
 

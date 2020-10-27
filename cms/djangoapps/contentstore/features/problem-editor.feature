@@ -2,28 +2,6 @@
 Feature: CMS.Problem Editor
   As a course author, I want to be able to create problems and edit their settings.
 
-  Scenario: User can view metadata
-    Given I have created a Blank Common Problem
-    When I edit and select Settings
-    Then I see the advanced settings and their expected values
-    And Edit High Level Source is not visible
-
-  # Safari is having trouble saving the values on sauce
-  @skip_safari
-  Scenario: User can modify String values
-    Given I have created a Blank Common Problem
-    When I edit and select Settings
-    Then I can modify the display name
-    And my display name change is persisted on save
-
-  # Safari is having trouble saving the values on sauce
-  @skip_safari
-  Scenario: User can specify special characters in String values
-    Given I have created a Blank Common Problem
-    When I edit and select Settings
-    Then I can specify special characters in the display name
-    And my special characters and persisted on save
-
   Scenario: User can revert display name to unset
     Given I have created a Blank Common Problem
     When I edit and select Settings

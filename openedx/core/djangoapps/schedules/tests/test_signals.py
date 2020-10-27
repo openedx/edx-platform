@@ -97,8 +97,8 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         self.assert_schedule_created(experience_type=ScheduleExperience.EXPERIENCES.course_updates)
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
-    @patch('analytics.track')
-    @patch('random.random')
+    @patch('openedx.core.djangoapps.schedules.signals.segment.track')
+    @patch('openedx.core.djangoapps.schedules.signals.random.random', return_value=0.2)
     @ddt.data(
         (0, True),
         (0.1, True),
@@ -113,7 +113,6 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         mock_track,
         mock_get_current_site
     ):
-        mock_random.return_value = 0.2
         schedule_config = ScheduleConfigFactory.create(enabled=True, hold_back_ratio=hold_back_ratio)
         mock_get_current_site.return_value = schedule_config.site
         if expect_schedule_created:
@@ -122,7 +121,7 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         else:
             self.assert_schedule_not_created()
             mock_track.assert_called_once()
-            assert mock_track.call_args[1].get('event') == 'edx.bi.schedule.suppressed'
+            assert mock_track.call_args[1].get('event_name') == 'edx.bi.schedule.suppressed'
 
     @patch('openedx.core.djangoapps.schedules.signals.log.exception')
     @patch('openedx.core.djangoapps.schedules.signals.Schedule.objects.create')

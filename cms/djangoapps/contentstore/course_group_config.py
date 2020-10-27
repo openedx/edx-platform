@@ -1,6 +1,7 @@
 """
 Class for manipulating groups configuration on a course object.
 """
+from collections import defaultdict
 import json
 import logging
 
@@ -10,7 +11,7 @@ from contentstore.utils import reverse_usage_url
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 from util.db import MYSQL_MAX_INT, generate_int_id
-from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, UserPartition
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, ReadOnlyUserPartitionError, UserPartition
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
 from xmodule.split_test_module import get_split_user_partitions
 
@@ -105,10 +106,13 @@ class GroupConfiguration(object):
         """
         Get user partition for saving in course.
         """
-        return UserPartition.from_json(self.configuration)
+        try:
+            return UserPartition.from_json(self.configuration)
+        except ReadOnlyUserPartitionError:
+            raise GroupConfigurationsValidationError(_("unable to load this type of group configuration"))
 
     @staticmethod
-    def _get_usage_info(course, unit, item, usage_info, group_id, scheme_name=None):
+    def _get_usage_dict(course, unit, item, scheme_name=None):
         """
         Get usage info for unit/module.
         """
@@ -142,10 +146,7 @@ class GroupConfiguration(object):
         if scheme_name == RANDOM_SCHEME:
             validation_summary = item.general_validation_message()
             usage_dict.update({'validation': validation_summary.to_json() if validation_summary else None})
-
-        usage_info[group_id].append(usage_dict)
-
-        return usage_info
+        return usage_dict
 
     @staticmethod
     def get_content_experiment_usage_info(store, course):
@@ -189,24 +190,21 @@ class GroupConfiguration(object):
             ],
         }
         """
-        usage_info = {}
+        usage_info = defaultdict(list)
         for split_test in split_tests:
-            if split_test.user_partition_id not in usage_info:
-                usage_info[split_test.user_partition_id] = []
-
             unit = split_test.get_parent()
             if not unit:
                 log.warning("Unable to find parent for split_test %s", split_test.location)
+                # Make sure that this user_partition appears in the output even though it has no content
+                usage_info[split_test.user_partition_id] = []
                 continue
 
-            usage_info = GroupConfiguration._get_usage_info(
+            usage_info[split_test.user_partition_id].append(GroupConfiguration._get_usage_dict(
                 course=course,
                 unit=unit,
                 item=split_test,
-                usage_info=usage_info,
-                group_id=split_test.user_partition_id,
-                scheme_name=RANDOM_SCHEME
-            )
+                scheme_name=RANDOM_SCHEME,
+            ))
         return usage_info
 
     @staticmethod
@@ -215,38 +213,35 @@ class GroupConfiguration(object):
         Returns all units names and their urls.
 
         Returns:
-        {'group_id':
-            [
-                {
-                    'label': 'Unit 1 / Problem 1',
-                    'url': 'url_to_unit_1'
-                },
-                {
-                    'label': 'Unit 2 / Problem 2',
-                    'url': 'url_to_unit_2'
-                }
-            ],
+        {'partition_id':
+            {'group_id':
+                [
+                    {
+                        'label': 'Unit 1 / Problem 1',
+                        'url': 'url_to_unit_1'
+                    },
+                    {
+                        'label': 'Unit 2 / Problem 2',
+                        'url': 'url_to_unit_2'
+                    }
+                ],
+            }
         }
         """
         items = store.get_items(course.id, settings={'group_access': {'$exists': True}}, include_orphans=False)
 
-        usage_info = {}
-        for item, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
-            if group_id not in usage_info:
-                usage_info[group_id] = []
-
+        usage_info = defaultdict(lambda: defaultdict(list))
+        for item, partition_id, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
             unit = item.get_parent()
             if not unit:
                 log.warning("Unable to find parent for component %s", item.location)
                 continue
 
-            usage_info = GroupConfiguration._get_usage_info(
+            usage_info[partition_id][group_id].append(GroupConfiguration._get_usage_dict(
                 course,
                 unit=unit,
                 item=item,
-                usage_info=usage_info,
-                group_id=group_id
-            )
+            ))
 
         return usage_info
 
@@ -264,34 +259,31 @@ class GroupConfiguration(object):
         """
         Returns all items names and their urls.
 
-        This will return only groups for the cohort user partition.
+        This will return only groups for all non-random partitions.
 
         Returns:
-        {'group_id':
-            [
-                {
-                    'label': 'Problem 1 / Problem 1',
-                    'url': 'url_to_item_1'
-                },
-                {
-                    'label': 'Problem 2 / Problem 2',
-                    'url': 'url_to_item_2'
-                }
-            ],
+        {'partition_id':
+            {'group_id':
+                [
+                    {
+                        'label': 'Problem 1 / Problem 1',
+                        'url': 'url_to_item_1'
+                    },
+                    {
+                        'label': 'Problem 2 / Problem 2',
+                        'url': 'url_to_item_2'
+                    }
+                ],
+            }
         }
         """
-        usage_info = {}
-        for item, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
-            if group_id not in usage_info:
-                usage_info[group_id] = []
-
-            usage_info = GroupConfiguration._get_usage_info(
+        usage_info = defaultdict(lambda: defaultdict(list))
+        for item, partition_id, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
+            usage_info[partition_id][group_id].append(GroupConfiguration._get_usage_dict(
                 course,
                 unit=item,
                 item=item,
-                usage_info=usage_info,
-                group_id=group_id
-            )
+            ))
 
         return usage_info
 
@@ -302,7 +294,7 @@ class GroupConfiguration(object):
 
         This will yield group IDs for all user partitions except those with a scheme of random.
 
-        Yields: tuple of (item, group_id)
+        Yields: tuple of (item, partition_id, group_id)
         """
         all_partitions = get_all_partitions_for_course(course)
         for config in all_partitions:
@@ -312,7 +304,7 @@ class GroupConfiguration(object):
                         group_ids = item.group_access.get(config.id, [])
 
                         for group_id in group_ids:
-                            yield item, group_id
+                            yield item, config.id, group_id
 
     @staticmethod
     def update_usage_info(store, course, configuration):
@@ -348,7 +340,7 @@ class GroupConfiguration(object):
         partition_configuration = configuration.to_json()
 
         for group in partition_configuration['groups']:
-            group['usage'] = usage_info.get(group['id'], [])
+            group['usage'] = usage_info[configuration.id].get(group['id'], [])
 
         return partition_configuration
 

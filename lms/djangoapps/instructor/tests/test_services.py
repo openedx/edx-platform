@@ -5,7 +5,6 @@ Tests for the InstructorService
 import json
 
 import mock
-from nose.plugins.attrib import attr
 
 from courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access
@@ -17,11 +16,12 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class InstructorServiceTests(SharedModuleStoreTestCase):
     """
     Tests for the InstructorService
     """
+    shard = 1
+
     @classmethod
     def setUpClass(cls):
         super(InstructorServiceTests, cls).setUpClass()
@@ -147,21 +147,40 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
         requester_name = "edx-proctoring"
         email = "edx-proctoring@edx.org"
-        subject = "Proctored Exam Review: {review_status}".format(review_status="Suspicious")
+        subject = u"Proctored Exam Review: {review_status}".format(review_status="Suspicious")
+
         body = "A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was " \
-               "reviewed as {review_status} by the proctored exam review provider."
-        body = body.format(
-            exam_name="test_exam", course_name=self.course.display_name, student_username="test_student",
-            review_status="Suspicious"
-        )
+               "reviewed as {review_status} by the proctored exam review provider.\n" \
+               "Review link: {url}"
+        args = {
+            'exam_name': 'test_exam',
+            'student_username': 'test_student',
+            'url': 'not available',
+            'course_name': self.course.display_name,
+            'review_status': 'Suspicious',
+        }
+        expected_body = body.format(**args)
         tags = ["proctoring"]
 
         with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
             self.service.send_support_notification(
                 course_id=unicode(self.course.id),
-                exam_name="test_exam",
-                student_username="test_student",
-                review_status="Suspicious"
+                exam_name=args['exam_name'],
+                student_username=args["student_username"],
+                review_status="Suspicious",
+                review_url=None,
             )
 
-        mock_create_zendesk_ticket.assert_called_with(requester_name, email, subject, body, tags)
+        mock_create_zendesk_ticket.assert_called_with(requester_name, email, subject, expected_body, tags)
+        # Now check sending a notification with a review link
+        args['url'] = 'http://review/url'
+        with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
+            self.service.send_support_notification(
+                course_id=unicode(self.course.id),
+                exam_name=args['exam_name'],
+                student_username=args["student_username"],
+                review_status="Suspicious",
+                review_url=args['url'],
+            )
+        expected_body = body.format(**args)
+        mock_create_zendesk_ticket.assert_called_with(requester_name, email, subject, expected_body, tags)

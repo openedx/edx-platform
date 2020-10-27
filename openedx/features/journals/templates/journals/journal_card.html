@@ -1,0 +1,53 @@
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ungettext, ugettext as _
+from django.core.urlresolvers import reverse
+from six import text_type
+from urlparse import urljoin
+from openedx.features.journals.api import get_journal_about_page_url
+%>
+<%page args="journal" expression_filter="h"/>
+<%
+  about_page_id = journal.get('about_page_id')
+  about_page_url = get_journal_about_page_url(about_page_id, False)
+%>
+<article class="journal" id="${about_page_id}" role="region" aria-label="${journal.get('title')}">
+  <a class="journals-listing-item" href="${about_page_url}">
+    <header class="journal-image">
+      <div class="cover-image">
+        <img src="${journal.get('card_image_url')}" alt="${journal.get('title')}" />
+        <div class="learn-more" aria-hidden="true">${_("LEARN MORE")}</div>
+      </div>
+    </header>
+    <div class="banner">
+      ${_("Journal")}
+    </div>
+
+    <div class="journal-info" aria-hidden="true">
+        <span class="journal-org">${journal.get('organization')}</span>
+        <h3 class="journal-title">${journal.get('title')}</h3>
+    </div>
+
+    <span class="journal-footer">
+        <%
+        if journal.get('access_length') is not None:
+          access_length_string = ungettext(
+              '{num_months} month',
+              '{num_months} months',
+              int(journal.get('access_length')/30)
+            ).format(num_months=int(journal.get('access_length')/30))
+        else:
+          access_length_string = _("unlimited")
+        %>
+        <div class="course-date" aria-hidden="true">${_("Access Length")}: ${access_length_string}</div>
+    </span>
+
+    <div class="sr">
+      <ul>
+        <li>${journal.get('organization')}</li>
+        <li>${journal.get('title')}</li>
+        <li>${_("Access Length")}: ${access_length_string}</li>
+      </ul>
+    </div>
+  </a>
+</article>

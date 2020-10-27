@@ -263,8 +263,8 @@ class ProviderConfig(ConfigurationModel):
     def get_register_form_data(cls, pipeline_kwargs):
         """Gets dict of data to display on the register form.
 
-        common.djangoapps.student.views.register_user uses this to populate the
-        new account creation form with values supplied by the user's chosen
+        openedx.core.djangoapps.user_authn.views.deprecated.register_user uses this to populate
+        the new account creation form with values supplied by the user's chosen
         provider, preventing duplicate data entry.
 
         Args:
@@ -543,18 +543,33 @@ class SAMLProviderConfig(ProviderConfig):
     attr_full_name = models.CharField(
         max_length=128, blank=True, verbose_name="Full Name Attribute",
         help_text="URN of SAML attribute containing the user's full name. Leave blank for default.")
+    default_full_name = models.CharField(
+        max_length=255, blank=True, verbose_name="Default Value for Full Name",
+        help_text="Default value for full name to be used if not present in SAML response.")
     attr_first_name = models.CharField(
         max_length=128, blank=True, verbose_name="First Name Attribute",
         help_text="URN of SAML attribute containing the user's first name. Leave blank for default.")
+    default_first_name = models.CharField(
+        max_length=255, blank=True, verbose_name="Default Value for First Name",
+        help_text="Default value for first name to be used if not present in SAML response.")
     attr_last_name = models.CharField(
         max_length=128, blank=True, verbose_name="Last Name Attribute",
         help_text="URN of SAML attribute containing the user's last name. Leave blank for default.")
+    default_last_name = models.CharField(
+        max_length=255, blank=True, verbose_name="Default Value for Last Name",
+        help_text="Default value for last name to be used if not present in SAML response.")
     attr_username = models.CharField(
         max_length=128, blank=True, verbose_name="Username Hint Attribute",
         help_text="URN of SAML attribute to use as a suggested username for this user. Leave blank for default.")
+    default_username = models.CharField(
+        max_length=255, blank=True, verbose_name="Default Value for Username",
+        help_text="Default value for username to be used if not present in SAML response.")
     attr_email = models.CharField(
         max_length=128, blank=True, verbose_name="Email Attribute",
         help_text="URN of SAML attribute containing the user's email address[es]. Leave blank for default.")
+    default_email = models.CharField(
+        max_length=255, blank=True, verbose_name="Default Value for Email",
+        help_text="Default value for email to be used if not present in SAML response.")
     automatic_refresh_enabled = models.BooleanField(
         default=True, verbose_name="Enable automatic metadata refresh",
         help_text="When checked, the SAML provider's metadata will be included "
@@ -643,10 +658,27 @@ class SAMLProviderConfig(ProviderConfig):
         attrs = (
             'attr_user_permanent_id', 'attr_full_name', 'attr_first_name',
             'attr_last_name', 'attr_username', 'attr_email', 'entity_id')
+        attr_defaults = {
+            'attr_full_name': 'default_full_name',
+            'attr_first_name': 'default_first_name',
+            'attr_last_name': 'default_last_name',
+            'attr_username': 'default_username',
+            'attr_email': 'default_email',
+        }
+
+        # Defaults for missing attributes in SAML Response
+        conf['attr_defaults'] = {}
+
         for field in attrs:
+            field_name = attr_defaults.get(field)
             val = getattr(self, field)
             if val:
                 conf[field] = val
+
+            # Default values for SAML attributes
+            default = getattr(self, field_name) if field_name else None
+            conf['attr_defaults'][field] = default
+
         # Now get the data fetched automatically from the metadata.xml:
         data = SAMLProviderData.current(self.entity_id)
         if not data or not data.is_valid():

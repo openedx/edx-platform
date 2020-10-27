@@ -276,7 +276,8 @@
             margin-left: ($baseline/2);
 
             .editor-button,
-            .settings-button {
+            .settings-button,
+            .plugins-button {
               @extend %btn-secondary-gray;
               @extend %t-copy-sub1;
 
@@ -815,6 +816,7 @@
     .edit-settings-access {
       .gating-prereq {
         margin-bottom: 10px;
+
         .list-fields .field {
           display: block;
         }

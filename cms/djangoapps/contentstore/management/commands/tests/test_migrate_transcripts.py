@@ -2,11 +2,19 @@
 """
 Tests for course transcript migration management command.
 """
+import itertools
 import logging
 from datetime import datetime
 import pytz
+
+import ddt
 from django.test import TestCase
 from django.core.management import call_command, CommandError
+from mock import patch
+
+from openedx.core.djangoapps.video_config.models import (
+    TranscriptMigrationSetting, MigrationEnqueuedCourse
+)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -68,6 +76,7 @@ class TestArgParsing(TestCase):
             call_command('migrate_transcripts', '--course-id', 'invalid-course')
 
 
+@ddt.ddt
 class TestMigrateTranscripts(ModuleStoreTestCase):
     """
     Tests migrating video transcripts in courses from contentstore to django storage
@@ -286,3 +295,36 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
             logger.check(
                 *expected_log
             )
+
+    @ddt.data(*itertools.product([1, 2], [True, False], [True, False]))
+    @ddt.unpack
+    @patch('contentstore.management.commands.migrate_transcripts.log')
+    def test_migrate_transcripts_batch_size(self, batch_size, commit, all_courses, mock_logger):
+        """
+        Test that migrations across course batches, is working as expected.
+        """
+        migration_settings = TranscriptMigrationSetting.objects.create(
+            batch_size=batch_size, commit=commit, all_courses=all_courses
+        )
+
+        # Assert the number of job runs and migration enqueued courses.
+        self.assertEqual(migration_settings.command_run, 0)
+        self.assertEqual(MigrationEnqueuedCourse.objects.count(), 0)
+
+        call_command('migrate_transcripts', '--from-settings')
+
+        migration_settings = TranscriptMigrationSetting.current()
+        # Command run is only incremented if commit=True.
+        expected_command_run = 1 if commit else 0
+        self.assertEqual(migration_settings.command_run, expected_command_run)
+
+        if all_courses:
+            mock_logger.info.assert_called_with(
+                ('[Transcript Migration] Courses(total): %s, Courses(migrated): %s, '
+                 'Courses(non-migrated): %s, Courses(migration-in-process): %s'),
+                2, 0, 2, batch_size
+            )
+
+        # enqueued courses are only persisted if commit=True and job is running for all courses.
+        enqueued_courses = batch_size if commit and all_courses else 0
+        self.assertEqual(MigrationEnqueuedCourse.objects.count(), enqueued_courses)

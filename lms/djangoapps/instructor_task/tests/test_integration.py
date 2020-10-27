@@ -15,7 +15,6 @@ from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
 from django.urls import reverse
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from capa.responsetypes import StudentInputError
@@ -66,7 +65,6 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         self.assertEqual(status['message'], expected_message)
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestRescoringTask(TestIntegrationTask):
     """
@@ -74,6 +72,7 @@ class TestRescoringTask(TestIntegrationTask):
 
     Exercises real problems with a minimum of patching.
     """
+    shard = 3
 
     def setUp(self):
         super(TestRescoringTask, self).setUp()

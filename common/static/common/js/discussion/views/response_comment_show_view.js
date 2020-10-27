@@ -72,6 +72,7 @@
 
             ResponseCommentShowView.prototype.convertMath = function() {
                 DiscussionUtil.convertMath(this.$el.find('.response-body'));
+                DiscussionUtil.typesetMathJax(this.$el.find('.response-body'));
             };
 
             ResponseCommentShowView.prototype._delete = function(event) {

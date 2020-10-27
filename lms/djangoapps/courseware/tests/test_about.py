@@ -10,12 +10,12 @@ from django.urls import reverse
 from django.test.utils import override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 from waffle.testutils import override_switch
 
 from course_modes.models import CourseMode
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from openedx.core.lib.tests import attr
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from shoppingcart.models import Order, PaidCourseRegistration
@@ -139,6 +139,34 @@ class AboutTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase, EventTra
         target_url = resp.redirect_chain[-1][0]
         course_home_url = reverse('openedx.course_experience.course_home', args=[text_type(self.course.id)])
         self.assertTrue(target_url.endswith(course_home_url))
+
+    @patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': False})
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
+    def test_logged_in_marketing_without_course_home_redirect(self):
+        """
+        Verify user is not redirected to course home page when
+        ENABLE_COURSE_HOME_REDIRECT is set to False
+        """
+        self.setup_user()
+        url = reverse('about_course', args=[text_type(self.course.id)])
+        resp = self.client.get(url)
+        # should not be redirected
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("OOGIE BLOOGIE", resp.content)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_COURSE_HOME_REDIRECT': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': False})
+    def test_logged_in_marketing_without_mktg_site(self):
+        """
+        Verify user is not redirected to course home page when
+        ENABLE_MKTG_SITE is set to False
+        """
+        self.setup_user()
+        url = reverse('about_course', args=[text_type(self.course.id)])
+        resp = self.client.get(url)
+        # should not be redirected
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("OOGIE BLOOGIE", resp.content)
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course(self):

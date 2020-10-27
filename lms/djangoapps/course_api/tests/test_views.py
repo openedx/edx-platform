@@ -8,11 +8,11 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 
+from openedx.core.lib.tests import attr
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from waffle.testutils import override_switch
 
@@ -98,7 +98,7 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     def test_missing_username(self):
         self.setup_user(self.honor_user)
         response_to_missing_username = self.verify_response(expected_status_code=200)
-        self.assertIsNotNone(response_to_missing_username.data)  # pylint: disable=no-member
+        self.assertIsNotNone(response_to_missing_username.data)
 
     def test_not_logged_in(self):
         self.client.logout()
@@ -167,13 +167,13 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         unfiltered_response = self.verify_response(params={'username': self.staff_user.username})
         for org in [self.course.org, alternate_course.org]:
             self.assertTrue(
-                any(course['org'] == org for course in unfiltered_response.data['results'])  # pylint: disable=no-member
+                any(course['org'] == org for course in unfiltered_response.data['results'])
             )
 
         # With filtering.
         filtered_response = self.verify_response(params={'org': self.course.org, 'username': self.staff_user.username})
         self.assertTrue(
-            all(course['org'] == self.course.org for course in filtered_response.data['results'])  # pylint: disable=no-member
+            all(course['org'] == self.course.org for course in filtered_response.data['results'])
         )
 
     def test_filter(self):
@@ -193,7 +193,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
                 params.update(filter_)
             response = self.verify_response(params=params)
             self.assertEquals(
-                {course['course_id'] for course in response.data['results']},  # pylint: disable=no-member
+                {course['course_id'] for course in response.data['results']},
                 {unicode(course.id) for course in expected_courses},
                 "testing course_api.views.CourseListView with filter_={}".format(filter_),
             )

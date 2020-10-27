@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type, iteritems
@@ -28,7 +28,6 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
     get_pseudo_session_for_entitlement,
@@ -40,13 +39,17 @@ from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramP
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
+from openedx.features.enterprise_support.utils import is_enterprise_learner
+from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
-from student.cookies import set_user_info_cookie
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from student.helpers import cert_info, check_verify_status_by_course
 from student.models import (
+    AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAttribute,
     DashboardConfiguration,
@@ -629,6 +632,30 @@ def student_dashboard(request):
 
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
+    recovery_email_message = recovery_email_activation_message = None
+    if is_secondary_email_feature_enabled_for_user(user=user):
+        try:
+            account_recovery_obj = AccountRecovery.objects.get(user=user)
+        except AccountRecovery.DoesNotExist:
+            recovery_email_message = Text(
+                _(
+                    "Add a recovery email to retain access when single-sign on is not available. "
+                    "Go to {link_start}your Account Settings{link_end}.")
+            ).format(
+                link_start=HTML("<a target='_blank' href='{account_setting_page}'>").format(
+                    account_setting_page=reverse('account_settings'),
+                ),
+                link_end=HTML("</a>")
+            )
+        else:
+            if not account_recovery_obj.is_active:
+                recovery_email_activation_message = Text(
+                    _(
+                        "Recovery email is not activated yet. "
+                        "Kindly visit your email and follow the instructions to activate it."
+                    )
+                )
+
     # Disable lookup of Enterprise consent_required_course due to ENT-727
     # Will re-enable after fixing WL-1315
     consent_required_courses = set()
@@ -647,10 +674,10 @@ def student_dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(
-        enrollment.course_id for enrollment in course_enrollments
-        if has_access(request.user, 'load', enrollment.course_overview)
-    )
+    show_courseware_links_for = {
+        enrollment.course_id: has_access(request.user, 'load', enrollment.course_overview)
+        for enrollment in course_enrollments
+    }
 
     # Find programs associated with course runs being displayed. This information
     # is passed in the template context to allow rendering of program-related
@@ -767,6 +794,9 @@ def student_dashboard(request):
         redirect_message = _("The course you are looking for is closed for enrollment as of {date}.").format(
             date=request.GET['course_closed']
         )
+    elif 'access_response_error' in request.GET:
+        # This can be populated in a generalized way with fields from access response errors
+        redirect_message = request.GET['access_response_error']
     else:
         redirect_message = ''
 
@@ -821,6 +851,7 @@ def student_dashboard(request):
         'nav_hidden': True,
         'inverted_programs': inverted_programs,
         'show_program_listing': ProgramsApiConfig.is_enabled(),
+        'show_journal_listing': journals_enabled(),  # TODO: Dashboard Plugin required
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
@@ -828,6 +859,8 @@ def student_dashboard(request):
         'display_sidebar_account_activation_message': not(user.is_active or hide_dashboard_courses_until_activated),
         'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
         'empty_dashboard_message': empty_dashboard_message,
+        'recovery_email_message': recovery_email_message,
+        'recovery_email_activation_message': recovery_email_activation_message,
     }
 
     if ecommerce_service.is_enabled(request.user):
@@ -837,14 +870,15 @@ def student_dashboard(request):
         })
 
     # Gather urls for course card resume buttons.
-    resume_button_urls = _get_urls_for_resume_buttons(user, course_enrollments)
+    resume_button_urls = ['' for entitlement in course_entitlements]
+    for url in _get_urls_for_resume_buttons(user, course_enrollments):
+        resume_button_urls.append(url)
     # There must be enough urls for dashboard.html. Template creates course
     # cards for "enrollments + entitlements".
-    resume_button_urls += ['' for entitlement in course_entitlements]
     context.update({
         'resume_button_urls': resume_button_urls
     })
 
     response = render_to_response('dashboard.html', context)
-    set_user_info_cookie(response, request)
+    set_logged_in_cookies(request, response, user)
     return response

@@ -24,12 +24,12 @@ from django.core.cache import caches, InvalidCacheBackendError
 import django.dispatch
 import django.utils
 from django.utils.translation import get_language, to_locale
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
-from xmodule.util.django import get_current_request_hostname
+from xmodule.util.xmodule_django import get_current_request_hostname
 
 # We also may not always have the current request user (crum) module available
 try:
@@ -251,7 +251,7 @@ def create_modulestore_instance(
         if key in _options and isinstance(_options[key], basestring):
             _options[key] = load_function(_options[key])
 
-    request_cache = RequestCache.get_request_cache()
+    request_cache = DEFAULT_REQUEST_CACHE
 
     try:
         metadata_inheritance_cache = caches['mongo_metadata_inheritance']
@@ -282,14 +282,9 @@ def create_modulestore_instance(
         if disabled_xblocks is None:
             return []
 
-        if request_cache:
-            if 'disabled_xblock_types' not in request_cache.data:
-                request_cache.data['disabled_xblock_types'] = [block.name for block in disabled_xblocks()]
-            return request_cache.data['disabled_xblock_types']
-        else:
-            disabled_xblock_types = [block.name for block in disabled_xblocks()]
-
-        return disabled_xblock_types
+        if 'disabled_xblock_types' not in request_cache.data:
+            request_cache.data['disabled_xblock_types'] = [block.name for block in disabled_xblocks()]
+        return request_cache.data['disabled_xblock_types']
 
     return class_(
         contentstore=content_store,

@@ -138,8 +138,10 @@ html.video-fullscreen {
       word-wrap: break-word;
       word-break: break-word;
       margin: 0 auto;
+      font: -apple-system-body;
 
-      &.xblock-student_view-vertical {
+      &.xblock-student_view-vertical,
+      &.xblock-public_view-vertical {
         max-width: $text-width-readability-max;
       }
     }
@@ -150,6 +152,12 @@ html.video-fullscreen {
     }
 
     div.timed-exam {
+      color: #555353;
+
+      strong {
+        font-weight: 600;
+      }
+
       h3 {
         margin-bottom: 12px;
         font-size: 22px;
@@ -176,14 +184,6 @@ html.video-fullscreen {
 
         b.failure {
           color: #cb4765;
-        }
-      }
-
-      p {
-        color: #797676;
-
-        strong {
-          font-weight: 600;
         }
       }
 
@@ -256,7 +256,7 @@ html.video-fullscreen {
       background-color: #f2f8fb;
       padding: 30px;
       font-size: 16px;
-      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, .1);
+      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.1);
       border: 1px solid #ddd;
 
       &.critical-time {
@@ -388,7 +388,7 @@ html.video-fullscreen {
     }
 
     .footer-sequence {
-      padding: 30px 0 20px 0;
+      padding: 30px 0 20px;
       border-bottom: ($baseline/10) solid #cfd9dd;
 
       hr {
@@ -581,7 +581,8 @@ html.video-fullscreen {
         padding: 0 0 15px;
       }
 
-      .vert > .xblock-student_view.is-hidden {
+      .vert > .xblock-student_view.is-hidden,
+      .vert > .xblock-public_view.is-hidden {
         display: none;
         border-bottom: 0;
         margin-bottom: 0;
@@ -594,7 +595,8 @@ html.video-fullscreen {
       }
     }
 
-    section.xblock-student_view-wrapper div.vert-mod > div {
+    section.xblock-student_view-wrapper div.vert-mod > div,
+    section.xblock-public_view-wrapper div.vert-mod > div {
       border-bottom: none;
     }
 
@@ -695,7 +697,7 @@ html.video-fullscreen {
 
   &.closed {
     div.course-index {
-      width: flex-grid(.6);
+      width: flex-grid(0.6);
       overflow: hidden;
 
       header#open_close_accordion {

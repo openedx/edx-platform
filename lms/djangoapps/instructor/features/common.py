@@ -3,15 +3,16 @@ Define common steps for instructor dashboard acceptance tests.
 """
 
 # pylint: disable=missing-docstring
+# pylint: disable=no-member
 # pylint: disable=redefined-outer-name
 
 from __future__ import absolute_import
 
 from lettuce import step, world
 from mock import patch
-from nose.tools import assert_in
 
 from courseware.tests.factories import InstructorFactory, StaffFactory
+from openedx.core.lib.tests.tools import assert_in  # pylint: disable=no-name-in-module
 
 
 @step(u'Given I am "([^"]*)" for a very large course')
@@ -122,7 +123,7 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
 
 
 @step(u'I visit the "([^"]*)" tab')
-def click_a_button(step, tab_name):  # pylint: disable=unused-argument
+def click_a_tab(step, tab_name):  # pylint: disable=unused-argument
     # course_info, membership, student_admin, data_download, analytics, send_email
     tab_name_dict = {
         'Course Info': 'course_info',

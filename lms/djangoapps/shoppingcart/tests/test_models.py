@@ -20,7 +20,6 @@ from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, MagicMock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
 from course_modes.models import CourseMode
@@ -56,13 +55,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 @ddt.ddt
 class OrderTest(ModuleStoreTestCase):
     """
     Test shopping cart orders (e.g., cart contains various items,
     order is taken through various pieces of cart state, etc.)
     """
+    shard = 3
 
     def setUp(self):
         super(OrderTest, self).setUp()
@@ -82,7 +81,7 @@ class OrderTest(ModuleStoreTestCase):
         self.cost = 40
 
         # Add mock tracker for event testing.
-        patcher = patch('shoppingcart.models.analytics')
+        patcher = patch('shoppingcart.models.segment')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -271,13 +270,14 @@ class OrderTest(ModuleStoreTestCase):
         self.assertIn(item.additional_instruction_text(), mail.outbox[0].body)
 
         # Verify Google Analytics event fired for purchase
-        self.mock_tracker.track.assert_called_once_with(  # pylint: disable=maybe-no-member
+        self.mock_tracker.track.assert_called_once_with(
             self.user.id,
             'Completed Order',
             {
                 'orderId': 1,
                 'currency': 'usd',
                 'total': '40.00',
+                'revenue': '40.00',        # value for revenue field is same as total.
                 'products': [
                     {
                         'sku': u'CertificateItem.honor',
@@ -289,7 +289,6 @@ class OrderTest(ModuleStoreTestCase):
                     }
                 ]
             },
-            context={'ip': None, 'Google Analytics': {'clientId': None}}
         )
 
     def test_purchase_item_failure(self):
@@ -489,12 +488,13 @@ class OrderItemTest(TestCase):
         self.assertEqual(item.get_list_price(), item.list_price)
 
 
-@attr(shard=3)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
     """
     Paid Course Registration Tests.
     """
+    shard = 3
+
     def setUp(self):
         super(PaidCourseRegistrationTest, self).setUp()
 
@@ -862,7 +862,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
 
-        analytics_patcher = patch('shoppingcart.models.analytics')
+        analytics_patcher = patch('shoppingcart.models.segment')
         self.mock_analytics_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
@@ -870,13 +870,14 @@ class CertificateItemTest(ModuleStoreTestCase):
         """
         Assert that we fired a refund event.
         """
-        self.mock_analytics_tracker.track.assert_called_with(  # pylint: disable=maybe-no-member
+        self.mock_analytics_tracker.track.assert_called_with(
             self.user.id,
             'Refunded Order',
             {
                 'orderId': 1,
                 'currency': 'usd',
                 'total': '40.00',
+                'revenue': '40.00',        # value for revenue field is same as total.
                 'products': [
                     {
                         'sku': u'CertificateItem.verified',
@@ -888,7 +889,6 @@ class CertificateItemTest(ModuleStoreTestCase):
                     }
                 ]
             },
-            context={'ip': None, 'Google Analytics': {'clientId': None}}
         )
 
     def test_existing_enrollment(self):
@@ -912,7 +912,7 @@ class CertificateItemTest(ModuleStoreTestCase):
 
     @override_settings(LMS_SEGMENT_KEY="foobar")
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
-    @patch('lms.djangoapps.course_goals.views.update_google_analytics', Mock(return_value=True))
+    @patch('lms.djangoapps.course_goals.views.segment.track', Mock(return_value=True))
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
     def test_refund_cert_callback_no_expiration(self, cutoff_date):
         # When there is no expiration date on a verified mode, the user can always get a refund
@@ -951,7 +951,7 @@ class CertificateItemTest(ModuleStoreTestCase):
 
     @override_settings(LMS_SEGMENT_KEY="foobar")
     @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
-    @patch('lms.djangoapps.course_goals.views.update_google_analytics', Mock(return_value=True))
+    @patch('lms.djangoapps.course_goals.views.segment.track', Mock(return_value=True))
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
     def test_refund_cert_callback_before_expiration(self, cutoff_date):
         # If the expiration date has not yet passed on a verified mode, the user can be refunded

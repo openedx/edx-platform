@@ -87,7 +87,7 @@ def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _t
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=invalid-name
+def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a CSV file containing
     information about proctored exam results, and store using a `ReportStore`.

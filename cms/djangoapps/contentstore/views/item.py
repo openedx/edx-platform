@@ -23,7 +23,6 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope
 
-import dogstats_wrapper as dog_stats_api
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from contentstore.utils import (
     ancestor_has_staff_lock,
@@ -52,7 +51,7 @@ from models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import request_token, wrap_xblock
+from openedx.core.lib.xblock_utils import request_token, wrap_xblock, wrap_xblock_aside
 from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
@@ -69,6 +68,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.services import ConfigurationService, SettingsService
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW
+from edx_proctoring.api import get_exam_configuration_dashboard_url
 
 __all__ = [
     'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
@@ -324,6 +324,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
             'StudioRuntime',
             usage_id_serializer=unicode,
             request_token=request_token(request),
+        ))
+
+        xblock.runtime.wrappers_asides.append(partial(
+            wrap_xblock_aside,
+            'StudioRuntime',
+            usage_id_serializer=unicode,
+            request_token=request_token(request),
+            extra_classes=['wrapper-comp-plugins']
         ))
 
         if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
@@ -584,6 +592,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
                         field.write_to(xblock, value)
 
+        validate_and_update_xblock_due_date(xblock)
         # update the xblock and call any xblock callbacks
         xblock = _update_with_callback(xblock, user, old_metadata, old_content)
 
@@ -925,15 +934,6 @@ def _delete_item(usage_key, user):
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if usage_key.block_type == 'static_tab':
-
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=(
-                    "location:_delete_item_static_tab",
-                    u"course:{}".format(unicode(usage_key.course_key)),
-                )
-            )
-
             course = store.get_course(usage_key.course_key)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.block_id]
@@ -1052,7 +1052,7 @@ def _get_gating_info(course, xblock):
         if not hasattr(course, 'gating_prerequisites'):
             # Cache gating prerequisites on course module so that we are not
             # hitting the database for every xblock in the course
-            setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))  # pylint: disable=literal-used-as-attribute
+            setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))
         info["is_prereq"] = gating_api.is_prerequisite(course.id, xblock.location)
         info["prereqs"] = [
             p for p in course.gating_prerequisites if unicode(xblock.location) not in p['namespace']
@@ -1221,7 +1221,13 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'enable_timed_exams': xblock.enable_timed_exams
                 })
             elif xblock.category == 'sequential':
-                rules_url = settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('online_proctoring_rules', ""),
+                rules_url = settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('online_proctoring_rules', "")
+
+                proctoring_exam_configuration_link = None
+                if xblock.is_proctored_exam:
+                    proctoring_exam_configuration_link = get_exam_configuration_dashboard_url(
+                        course.id, xblock_info['id'])
+
                 xblock_info.update({
                     'is_proctored_exam': xblock.is_proctored_exam,
                     'online_proctoring_rules': rules_url,
@@ -1229,6 +1235,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
                     'is_time_limited': xblock.is_time_limited,
                     'exam_review_rules': xblock.exam_review_rules,
                     'default_time_limit_minutes': xblock.default_time_limit_minutes,
+                    'proctoring_exam_configuration_link': proctoring_exam_configuration_link,
                 })
 
         # Update with gating info
@@ -1271,7 +1278,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     return xblock_info
 
 
-def add_container_page_publishing_info(xblock, xblock_info):  # pylint: disable=invalid-name
+def add_container_page_publishing_info(xblock, xblock_info):
     """
     Adds information about the xblock's publish state to the supplied
     xblock_info for the container page.
@@ -1405,7 +1412,7 @@ def _create_xblock_ancestor_info(xblock, course_outline=False, include_child_inf
 
 
 def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None,
-                              course=None, is_concise=False):  # pylint: disable=line-too-long
+                              course=None, is_concise=False):
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.
@@ -1451,6 +1458,14 @@ def _get_release_date(xblock, user=None):
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     return get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
+
+
+def validate_and_update_xblock_due_date(xblock):
+    """
+    Validates the due date for the xblock, and set to None if pre-1900 due date provided
+    """
+    if xblock.due and xblock.due.year < 1900:
+        xblock.due = None
 
 
 def _get_release_date_from(xblock):

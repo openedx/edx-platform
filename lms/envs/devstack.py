@@ -3,7 +3,9 @@ Specific overrides to the base prod settings to make development easier.
 """
 from os.path import abspath, dirname, join
 
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from corsheaders.defaults import default_headers as corsheaders_default_headers
+
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
@@ -19,7 +21,7 @@ SITE_NAME = 'localhost:8000'
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
-LMS_ROOT_URL = 'http://localhost:8000'
+LMS_ROOT_URL = "http://localhost:8000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 
@@ -30,7 +32,6 @@ import logging
 LOG_OVERRIDES = [
     ('track.contexts', logging.CRITICAL),
     ('track.middleware', logging.CRITICAL),
-    ('dd.dogapi', logging.CRITICAL),
     ('django_comment_client.utils', logging.CRITICAL),
 ]
 for log_name, log_level in LOG_OVERRIDES:
@@ -141,14 +142,9 @@ FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
 ########################## SECURITY #######################
-FEATURES['ENFORCE_PASSWORD_POLICY'] = False
 FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
-FEATURES['ADVANCED_SECURITY'] = False
-PASSWORD_MIN_LENGTH = None
-PASSWORD_COMPLEXITY = {}
-
 
 ########################### Milestones #################################
 FEATURES['MILESTONES_APP'] = True
@@ -231,42 +227,37 @@ FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+    'use-jwt-cookie',
+)
 
-# JWT settings for devstack
-JWT_PRIVATE_SIGNING_KEY = """\
------BEGIN PRIVATE KEY-----
-MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCkK6N/mhkEYrgx
-p8xEZj37N1FEj1gObWv7zVygMLKxKvCSFOQUjA/Z2ZLqVi8m5DnCJ+5BrdYW/UqH
-02vZdEnWb04vf8mmYzJOL9i7APu0h/rm1pvVI5JFiSjE4pG669m5dAb2dZtesYOd
-yfC5bF97KbBZoisCEAtRLn6cNrt1q6PxWeCxZq4ysQD8xZKETOxHnfAYqVyIRkDW
-v8B9DnldLjYa8GhuGHL1J5ncHoseJoATLCnAWYo+yy6gdI2Fs9rj0tbeBcnoKwUZ
-ENwEUp3En+Xw7zjtDuSDWW9ySkuwrK7nXrs0r1CPVf87dLBUEvdzHHUelDr6rdIY
-tnieCjCHAgMBAAECggEBAJvTiAdQPzq4cVlAilTKLz7KTOsknFJlbj+9t5OdZZ9g
-wKQIDE2sfEcti5O+Zlcl/eTaff39gN6lYR73gMEQ7h0J3U6cnsy+DzvDkpY94qyC
-/ZYqUhPHBcnW3Mm0vNqNj0XGae15yBXjrKgSy9lUknSXJ3qMwQHeNL/DwA2KrfiL
-g0iVjk32dvSSHWcBh0M+Qy1WyZU0cf9VWzx+Q1YLj9eUCHteStVubB610XV3JUZt
-UTWiUCffpo2okHsTBuKPVXK/5BL+BpGplcxRSlnSbMaI611kN3iKlO8KGISXHBz7
-nOPdkfZC9poEXt5SshtINuGGCCc8hDxpg1otYqCLaYECgYEA1MSCPs3pBkEagchV
-g0rxYmDUC8QkeIOBuZFjhkdoUgZ6rFntyRZd1NbCUi3YBbV1YC12ZGohqWUWom1S
-AtNbQ2ZTbqEnDKWbNvLBRwkdp/9cKBce85lCCD6+U2o2Ha8C0+hKeLBn8un1y0zY
-1AQTqLAz9ItNr0aDPb89cs5voWcCgYEAxYdC8vR3t8iYMUnK6LWYDrKSt7YiorvF
-qXIMANcXQrnO0ptC0B56qrUCgKHNrtPi5bGpNBJ0oKMfbmGfwX+ca8sCUlLvq/O8
-S2WZwSJuaHH4lEBi8ErtY++8F4B4l3ENCT84Hyy5jiMpbpkHEnh/1GNcvvmyI8ud
-3jzovCNZ4+ECgYEA0r+Oz0zAOzyzV8gqw7Cw5iRJBRqUkXaZQUj8jt4eO9lFG4C8
-IolwCclrk2Drb8Qsbka51X62twZ1ZA/qwve9l0Y88ADaIBHNa6EKxyUFZglvrBoy
-w1GT8XzMou06iy52G5YkZeU+IYOSvnvw7hjXrChUXi65lRrAFqJd6GEIe5MCgYA/
-0LxDa9HFsWvh+JoyZoCytuSJr7Eu7AUnAi54kwTzzL3R8tE6Fa7BuesODbg6tD/I
-v4YPyaqePzUnXyjSxdyOQq8EU8EUx5Dctv1elTYgTjnmA4szYLGjKM+WtC3Bl4eD
-pkYGZFeqYRfAoHXVdNKvlk5fcKIpyF2/b+Qs7CrdYQKBgQCc/t+JxC9OpI+LhQtB
-tEtwvklxuaBtoEEKJ76P9vrK1semHQ34M1XyNmvPCXUyKEI38MWtgCCXcdmg5syO
-PBXdDINx+wKlW7LPgaiRL0Mi9G2aBpdFNI99CWVgCr88xqgSE24KsOxViMwmi0XB
-Ld/IRK0DgpGP5EJRwpKsDYe/UQ==
------END PRIVATE KEY-----"""
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
+###################### JWTs ######################
 JWT_AUTH.update({
-    'JWT_SECRET_KEY': 'lms-secret',
-    'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
+    'JWT_ISSUER': OAUTH_OIDC_ISSUER,
     'JWT_AUDIENCE': 'lms-key',
+    'JWT_SECRET_KEY': 'lms-secret',
+    'JWT_SIGNING_ALGORITHM': 'RS512',
+    'JWT_PRIVATE_SIGNING_JWK': (
+        '{"e": "AQAB", "d": "RQ6k4NpRU3RB2lhwCbQ452W86bMMQiPsa7EJiFJUg-qBJthN0FMNQVbArtrCQ0xA1BdnQHThFiUnHcXfsTZUwmwvTu'
+        'iqEGR_MI6aI7h5D8vRj_5x-pxOz-0MCB8TY8dcuK9FkljmgtYvV9flVzCk_uUb3ZJIBVyIW8En7n7nV7JXpS9zey1yVLld2AbRG6W5--Pgqr9J'
+        'CI5-bLdc2otCLuen2sKyuUDHO5NIj30qGTaKUL-OW_PgVmxrwKwccF3w5uGNEvMQ-IcicosCOvzBwdIm1uhdm9rnHU1-fXz8VLRHNhGVv7z6mo'
+        'ghjNI0_u4smhUkEsYeshPv7RQEWTdkOQ", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu48BUI5VcVtUWIPqzRK_LDSlZYh'
+        '9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC4Ee9qG5T38LFe8_oAuFCEntimW'
+        'xN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzGy5ZLcTUomo4rZLjghVpq6KZxfS'
+        '6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw", "q": "7KWj7l-ZkfCElyfvwsl7kiosvi-ppOO7Imsv90cribf88Dex'
+        'cO67xdMPesjM9Nh5X209IT-TzbsOtVTXSQyEsy42NY72WETnd1_nAGLAmfxGdo8VV4ZDnRsA8N8POnWjRDwYlVBUEEeuT_MtMWzwIKU94bzkWV'
+        'nHCY5vbhBYLeM", "p": "wPkfnjavNV1Hqb5Qqj2crBS9HQS6GDQIZ7WF9hlBb2ofDNe2K2dunddFqCOdvLXr7ydRcK51ZwSeHjcjgD1aJkHA'
+        '9i1zqyboxgd0uAbxVDo6ohnlVqYLtap2tXXcavKm4C9MTpob_rk6FBfEuq4uSsuxFvCER4yG3CYBBa4gZVU", "kid": "devstack_key", "'
+        'kty": "RSA"}'
+    ),
+    'JWT_PUBLIC_SIGNING_JWK_SET': (
+        '{"keys": [{"kid": "devstack_key", "e": "AQAB", "kty": "RSA", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu'
+        '48BUI5VcVtUWIPqzRK_LDSlZYh9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC'
+        '4Ee9qG5T38LFe8_oAuFCEntimWxN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzG'
+        'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
+    ),
 })
 
 #####################################################################

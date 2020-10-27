@@ -15,8 +15,8 @@ from django.utils.translation import ugettext as _
 from edx_rest_api_client.client import EdxRestApiClient
 from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerError
 
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.lib.token_utils import JwtBuilder
 from openedx.features.enterprise_support.utils import get_cache_key
 from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
@@ -49,7 +49,7 @@ class ConsentApiClient(object):
         Initialize an authenticated Consent service API client by using the
         provided user.
         """
-        jwt = JwtBuilder(user).build_token([])
+        jwt = create_jwt_for_user(user)
         url = configuration_helpers.get_value('ENTERPRISE_CONSENT_API_URL', settings.ENTERPRISE_CONSENT_API_URL)
         self.client = EdxRestApiClient(
             url,
@@ -127,7 +127,7 @@ class EnterpriseApiClient(object):
         provided user.
         """
         self.user = user
-        jwt = JwtBuilder(user).build_token([])
+        jwt = create_jwt_for_user(user)
         self.client = EdxRestApiClient(
             configuration_helpers.get_value('ENTERPRISE_API_URL', settings.ENTERPRISE_API_URL),
             jwt=jwt
@@ -146,7 +146,7 @@ class EnterpriseApiClient(object):
             'course_id': course_id,
             'consent_granted': consent_granted,
         }
-        endpoint = getattr(self.client, 'enterprise-course-enrollment')  # pylint: disable=literal-used-as-attribute
+        endpoint = getattr(self.client, 'enterprise-course-enrollment')
         try:
             endpoint.post(data=data)
         except (HttpClientError, HttpServerError):
@@ -546,9 +546,10 @@ def get_enterprise_learner_data(user):
     """
     Client API operation adapter/wrapper
     """
-    enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
-    if enterprise_learner_data:
-        return enterprise_learner_data['results']
+    if user.is_authenticated:
+        enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
+        if enterprise_learner_data:
+            return enterprise_learner_data['results']
 
 
 @enterprise_is_enabled(otherwise={})

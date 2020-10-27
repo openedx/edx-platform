@@ -1,6 +1,7 @@
 """
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
+from __future__ import print_function
 
 import logging
 from functools import wraps
@@ -17,6 +18,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
@@ -44,7 +46,7 @@ from django_comment_client.utils import (
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.core.djangoapps.monitoring_utils import function_trace
+from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
@@ -149,7 +151,6 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
             )
         )
     )
-
     paginated_results = cc.Thread.search(query_params)
     threads = paginated_results.collection
 
@@ -181,7 +182,7 @@ def use_bulk_ops(view_func):
     the request uri to a CourseKey before passing to the view.
     """
     @wraps(view_func)
-    def wrapped_view(request, course_id, *args, **kwargs):  # pylint: disable=missing-docstring
+    def wrapped_view(request, course_id, *args, **kwargs):
         course_key = CourseKey.from_string(course_id)
         with modulestore().bulk_operations(course_key):
             return view_func(request, course_key, *args, **kwargs)
@@ -248,6 +249,7 @@ def forum_form_discussion(request, course_key):
     Renders the main Discussion page, potentially filtered by a search query
     """
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    request.user.is_community_ta = utils.is_user_community_ta(request.user, course.id)
     if request.is_ajax():
         user = cc.User.from_django_user(request.user)
         user_info = user.to_dict()
@@ -292,7 +294,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
     Depending on the HTTP headers, we'll adjust our response accordingly.
     """
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-
+    request.user.is_community_ta = utils.is_user_community_ta(request.user, course.id)
     if request.is_ajax():
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict()
@@ -350,7 +352,6 @@ def _find_thread(request, course, discussion_id, thread_id):
         )
     except cc.utils.CommentClientRequestError:
         return None
-
     # Verify that the student has access to this thread if belongs to a course discussion module
     thread_context = getattr(thread, "context", "course")
     if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
@@ -582,6 +583,12 @@ def user_profile(request, course_key, user_id):
             })
         else:
             tab_view = CourseTabView()
+
+            # To avoid mathjax loading from 'mathjax_include.html'
+            # as that file causes multiple loadings of Mathjax on
+            # 'user_profile' page
+            context['load_mathjax'] = False
+
             return tab_view.get(request, unicode(course_key), 'discussion', profile_page_context=context)
     except User.DoesNotExist:
         raise Http404
@@ -627,8 +634,8 @@ def followed_threads(request, course_key, user_id):
             query_params['group_id'] = group_id
 
         paginated_results = profiled_user.subscribed_threads(query_params)
-        print "\n \n \n paginated results \n \n \n "
-        print paginated_results
+        print("\n \n \n paginated results \n \n \n ")
+        print(paginated_results)
         query_params['page'] = paginated_results.page
         query_params['num_pages'] = paginated_results.num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -713,6 +720,10 @@ class DiscussionBoardFragmentView(EdxFragmentView):
                 else None
             )
             context = _create_discussion_board_context(request, base_context, thread=thread)
+            course_expiration_fragment = generate_course_expired_fragment(request.user, context['course'])
+            context.update({
+                'course_expiration_fragment': course_expiration_fragment,
+            })
             if profile_page_context:
                 # EDUCATOR-2119: styles are hard to reconcile if the profile page isn't also a fragment
                 html = render_to_string('discussion/discussion_profile_page.html', profile_page_context)

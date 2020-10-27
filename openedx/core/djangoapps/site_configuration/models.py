@@ -60,7 +60,7 @@ class SiteConfiguration(models.Model):
     page_elements = JSONField(blank=True, default=get_initial_page_elements)
 
     def __unicode__(self):
-        return u"<SiteConfiguration: {site} >".format(site=self.site)
+        return u"<SiteConfiguration: {site} >".format(site=self.site)  # xss-lint: disable=python-wrap-html
 
     def __repr__(self):
         return self.__unicode__()
@@ -100,13 +100,36 @@ class SiteConfiguration(models.Model):
         """
         if self.enabled:
             try:
-                return self.values.get(name, default)  # pylint: disable=no-member
+                return self.values.get(name, default)
             except AttributeError as error:
                 logger.exception('Invalid JSON data. \n [%s]', error)
         else:
             logger.info("Site Configuration is not enabled for site (%s).", self.site)
 
         return default
+
+    @classmethod
+    def get_configuration_for_org(cls, org, select_related=None):
+        """
+        This returns a SiteConfiguration object which has an org_filter that matches
+        the supplied org
+
+        Args:
+            org (str): Org to use to filter SiteConfigurations
+            select_related (list or None): A list of values to pass as arguments to select_related
+        """
+        query = cls.objects.filter(values__contains=org, enabled=True).defer('page_elements', 'sass_variables').all()
+        if select_related is not None:
+            query = query.select_related(*select_related)
+        for configuration in query:
+            course_org_filter = configuration.get_value('course_org_filter', [])
+            # The value of 'course_org_filter' can be configured as a string representing
+            # a single organization or a list of strings representing multiple organizations.
+            if not isinstance(course_org_filter, list):
+                course_org_filter = [course_org_filter]
+            if org in course_org_filter:
+                return configuration
+        return None
 
     @classmethod
     def get_value_for_org(cls, org, name, default=None):
@@ -122,15 +145,11 @@ class SiteConfiguration(models.Model):
         Returns:
             Configuration value for the given key.
         """
-        for configuration in cls.objects.filter(values__contains=org, enabled=True).defer('page_elements', 'sass_variables').all():
-            course_org_filter = configuration.get_value('course_org_filter', [])
-            # The value of 'course_org_filter' can be configured as a string representing
-            # a single organization or a list of strings representing multiple organizations.
-            if not isinstance(course_org_filter, list):
-                course_org_filter = [course_org_filter]
-            if org in course_org_filter:
-                return configuration.get_value(name, default)
-        return default
+        configuration = cls.get_configuration_for_org(org)
+        if configuration is None:
+            return default
+        else:
+            return configuration.get_value(name, default)
 
     @classmethod
     def get_all_orgs(cls):
@@ -259,7 +278,8 @@ class SiteConfigurationHistory(TimeStampedModel):
         ordering = ('-modified', '-created',)
 
     def __unicode__(self):
-        return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(
+        # pylint: disable=line-too-long
+        return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(  # xss-lint: disable=python-wrap-html
             modified=self.modified,
             site=self.site,
         )

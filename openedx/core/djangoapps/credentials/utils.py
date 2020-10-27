@@ -1,24 +1,27 @@
 """Helper functions for working with Credentials."""
 from __future__ import unicode_literals
 
-from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_edx_api_data
-from openedx.core.lib.token_utils import JwtBuilder
 
 
 def get_credentials_records_url(program_uuid=None):
     """
     Returns a URL for a given records page (or general records list if given no UUID).
     May return None if this feature is disabled.
+
+    Arguments:
+        program_uuid (str): Optional program uuid to link for a program records URL
     """
     base_url = CredentialsApiConfig.current().public_records_url
     if base_url is None:
         return None
     if program_uuid:
-        return base_url + 'programs/{}/'.format(program_uuid)
+        # Credentials expects the uuid without dashes so we are converting here
+        return base_url + 'programs/{}/'.format(program_uuid.replace('-', ''))
     return base_url
 
 
@@ -31,10 +34,7 @@ def get_credentials_api_client(user, org=None):
         org (str): Optional organization to look up the site config for, rather than the current request
 
     """
-
-    scopes = ['email', 'profile']
-    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-    jwt = JwtBuilder(user).build_token(scopes, expires_in)
+    jwt = create_jwt_for_user(user)
 
     if org is None:
         url = CredentialsApiConfig.current().internal_api_url  # by current request
@@ -60,7 +60,7 @@ def get_credentials(user, program_uuid=None, credential_type=None):
     """
     credential_configuration = CredentialsApiConfig.current()
 
-    querystring = {'username': user.username, 'status': 'awarded'}
+    querystring = {'username': user.username, 'status': 'awarded', 'only_visible': 'True'}
 
     if program_uuid:
         querystring['program_uuid'] = program_uuid

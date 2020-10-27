@@ -1,6 +1,7 @@
 """
 Unit test tasks
 """
+from __future__ import print_function
 import os
 import re
 import sys
@@ -72,7 +73,7 @@ __test__ = False  # do not collect
     make_option(
         '--xdist_ip_addresses',
         dest='xdist_ip_addresses',
-        help="Space separated string of ip addresses to shard tests to via xdist."
+        help="Comma separated string of ip addresses to shard tests to via xdist."
     )
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
@@ -160,8 +161,10 @@ def test_system(options, passthrough_options):
     make_option(
         '--xdist_ip_addresses',
         dest='xdist_ip_addresses',
-        help="Space separated string of ip addresses to shard tests to via xdist."
-    )
+        help="Comma separated string of ip addresses to shard tests to via xdist."
+    ),
+    make_option('-p', '--processes', dest='processes', default=0, help='number of processes to use running tests'),
+    make_option('-r', '--randomize', action='store_true', help='run the tests in a random order'),
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed
@@ -352,4 +355,4 @@ def diff_coverage(options):
             )
         )
 
-        print "\n"
+        print("\n")

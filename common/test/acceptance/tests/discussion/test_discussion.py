@@ -3,11 +3,11 @@ Tests for discussion pages
 """
 
 import datetime
+import time
 from unittest import skip
 from uuid import uuid4
 
-from nose.plugins.attrib import attr
-from nose.tools import nottest
+import pytest
 from pytz import UTC
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -33,6 +33,7 @@ from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, skip_if_browser
+from openedx.core.lib.tests import attr
 
 
 THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
@@ -227,6 +228,7 @@ class DiscussionHomePageTest(BaseDiscussionTestCase):
             "ignore": [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -414,7 +416,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
             Response(id="response1"),
             [Comment(id="comment1")])
         thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
+        self.setup_thread_page(thread.get("id"))
 
         # Verify that `Add a Post` is not visible on course tab nav.
         self.assertFalse(self.tab_nav.has_new_post_button_visible_on_tab())
@@ -464,6 +466,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase, BaseDiscussionMixi
             "ignore": [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
 
@@ -536,6 +539,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -546,6 +550,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -839,6 +844,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
             'ignore': [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         page.visit()
@@ -940,6 +946,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
             'ignore': [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -954,6 +961,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         self.page = DiscussionTabHomePage(self.browser, self.course_id)
         self.page.visit()
         self.page.click_new_post_button()
+
+        # sleep/wait added to allow Major MathJax a11y files to load
+        time.sleep(5)
 
     def test_text_rendering(self):
         """When I type plain text into the editor, it should be rendered as plain text in the preview box"""
@@ -993,6 +1003,21 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         )
         self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
 
+    def test_inline_mathjax_rendering_in_order(self):
+        """
+        Tests the order of Post body content when inline Mathjax is used.
+
+        With inline mathjax expressions, the text content doesn't break into new lines at the places of
+        mathjax expressions.
+        """
+        self.page.set_new_post_editor_value(
+            'Text line 1 \n'
+            '$e[n]=d_1$ \n'
+            'Text line 2 \n'
+            '$e[n]=d_2$'
+        )
+        self.assertEqual(self.page.get_new_post_preview_text('.wmd-preview > p'), 'Text line 1 Text line 2')
+
     def test_mathjax_not_rendered_after_post_cancel(self):
         """
         Tests that mathjax is not rendered when we cancel the post
@@ -1002,9 +1027,9 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
         appear in the preview box
         """
         self.page.set_new_post_editor_value(
-            '\\begin{equation}'
-            '\\tau_g(\omega) = - \\frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
-            '\\end{equation}'
+            r'\begin{equation}'
+            r'\tau_g(\omega) = - \frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
+            r'\end{equation}'
         )
         self.assertIsNotNone(self.page.get_new_post_preview_text())
         self.page.click_element(".cancel")
@@ -1052,9 +1077,8 @@ class InlineDiscussionTest(UniqueCourseTest):
         self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
         self.additional_discussion_page = InlineDiscussionPage(self.browser, self.additional_discussion_id)
 
-    # This test is too flaky to run at all. TNL-6215
     @attr('a11y')
-    @nottest
+    @pytest.mark.skip(reason='This test is too flaky to run at all. TNL-6215')
     def test_inline_a11y(self):
         """
         Tests Inline Discussion for accessibility issues.
@@ -1367,6 +1391,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
             'ignore': [
                 'section',  # TODO: AC-491
                 'aria-required-children',  # TODO: AC-534
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()

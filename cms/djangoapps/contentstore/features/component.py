@@ -1,4 +1,5 @@
 # pylint: disable=missing-docstring
+# pylint: disable=no-member
 # pylint: disable=redefined-outer-name
 
 # Lettuce formats proposed definitions for unimplemented steps with the
@@ -6,7 +7,7 @@
 # pylint: disable=unused-argument
 
 from lettuce import step, world
-from nose.tools import assert_equal, assert_in, assert_true
+from openedx.core.lib.tests.tools import assert_equal, assert_in, assert_true  # pylint: disable=no-name-in-module
 
 DISPLAY_NAME = "Display Name"
 
@@ -110,7 +111,7 @@ def delete_components(step, number):
 
         # Pressing the button via css was not working reliably for the last component
         # when run in Chrome.
-        if world.browser.driver_name is 'Chrome':
+        if world.browser.driver_name == 'Chrome':
             world.browser.execute_script("$('{}').click()".format(btn_css))
         else:
             world.css_click(btn_css)

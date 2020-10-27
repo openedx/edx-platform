@@ -179,6 +179,7 @@ class StaticContentServer(object):
             # "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed
             response['Accept-Ranges'] = 'bytes'
             response['Content-Type'] = content.content_type
+            response['X-Frame-Options'] = 'ALLOW'
 
             # Set any caching headers, and do any response cleanup needed.  Based on how much
             # middleware we have in place, there's no easy way to use the built-in Django

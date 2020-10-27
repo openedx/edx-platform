@@ -3,9 +3,8 @@
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
+from openedx.core.lib.tests import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.bookmarks import BookmarksPage
@@ -137,6 +136,11 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
         """
         course_home_page = CourseHomePage(self.browser, self.course_id)
         course_home_page.visit()
+        course_home_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         course_home_page.a11y_audit.check_for_accessibility_errors()
 
     def test_course_search_a11y(self):
@@ -146,4 +150,9 @@ class CourseHomeA11yTest(CourseHomeBaseTest):
         course_home_page = CourseHomePage(self.browser, self.course_id)
         course_home_page.visit()
         course_search_results_page = course_home_page.search_for_term("Test Search")
+        course_search_results_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         course_search_results_page.a11y_audit.check_for_accessibility_errors()

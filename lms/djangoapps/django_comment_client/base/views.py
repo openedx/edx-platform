@@ -1,3 +1,7 @@
+"""Views for discussion forums."""
+
+from __future__ import print_function
+
 import functools
 import json
 import logging
@@ -11,6 +15,7 @@ from django.core import exceptions
 from django.http import Http404, HttpResponse, HttpResponseServerError
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
@@ -99,7 +104,7 @@ def track_created_event(request, event_name, course, obj, data):
     track_forum_event(request, event_name, course, obj, data)
 
 
-def add_truncated_title_to_event_data(event_data, full_title):  # pylint: disable=invalid-name
+def add_truncated_title_to_event_data(event_data, full_title):
     event_data['title_truncated'] = (len(full_title) > TRACKING_MAX_FORUM_TITLE)
     event_data['title'] = full_title[:TRACKING_MAX_FORUM_TITLE]
 
@@ -742,6 +747,7 @@ def unfollow_commentable(request, course_id, commentable_id):
 @require_POST
 @login_required
 @csrf.csrf_exempt
+@xframe_options_exempt
 def upload(request, course_id):  # ajax upload file to a question or answer
     """view that handles file upload via Ajax
     """
@@ -766,8 +772,8 @@ def upload(request, course_id):  # ajax upload file to a question or answer
 
     except exceptions.PermissionDenied, err:
         error = unicode(err)
-    except Exception, err:
-        print err
+    except Exception, err:      # pylint: disable=broad-except
+        print(err)
         logging.critical(unicode(err))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 

@@ -171,7 +171,6 @@
     margin-right: ($baseline*1.5);
   }
 
-
   // UI: general action list styles (section and subsection)
   // --------------------
   .expand-collapse {
@@ -184,9 +183,8 @@
     margin-bottom: $baseline;
 
     .status-release,
-    .status-pacing,
     .status-highlights-enabled,
-    .status-checklist {
+    .status-studio-frontend {
       @extend %t-copy-base;
 
       display: inline-block;
@@ -202,13 +200,11 @@
     }
 
     .status-highlights-enabled {
-      margin-left: $baseline * 1.6;
+      vertical-align: top;
     }
 
     .status-release-label,
     .status-release-value,
-    .status-pacing-label,
-    .status-pacing-value,
     .status-highlights-enabled-label,
     .status-highlights-enabled-value,
     .status-highlights-enabled-info,
@@ -218,16 +214,10 @@
       margin-bottom: 0;
     }
 
-    .status-release-label,
-    .status-pacing-label,
-    .status-highlights-enabled-label {
-      margin-right: ($baseline/4);
-    }
-
     .status-release-value,
-    .status-pacing-value,
     .status-highlights-enabled-value {
       @extend %t-strong;
+
       font-size: smaller;
     }
 
@@ -236,9 +226,15 @@
       margin-left: $baseline / 2;
     }
 
+    .status-release-label,	
+    .status-highlights-enabled-label {	
+      margin-right: ($baseline/4);	
+    }
+
     .status-highlights-enabled-value.button {
       @extend %btn-primary-blue;
       @extend %sizing;
+
       padding: 5px 8px;
       margin-top: 2px;
     }
@@ -433,7 +429,7 @@
       .subsection-header-details {
         @include float(left);
 
-        width: flex-grid(6, 9);
+        width: flex-grid(5, 9);
 
         .icon, .wrapper-subsection-title {
           display: inline-block;
@@ -463,7 +459,7 @@
       .subsection-header-actions {
         @include float(right);
 
-        width: flex-grid(3, 9);
+        width: flex-grid(4, 9);
         margin-top: -($baseline/4);
 
         @include text-align(right);
@@ -473,6 +469,10 @@
           @extend %t-action2;
 
           margin-right: ($baseline/2);
+
+          .proctoring-configuration-button {
+            @extend %ui-btn-flat-outline;
+          }
         }
       }
 

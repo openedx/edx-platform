@@ -326,7 +326,6 @@ class TestInternalGetScoreFromBlock(TestCase):
         """
         Verifies the result of _get_score_from_persisted_or_latest_block is as expected.
         """
-        # pylint: disable=unbalanced-tuple-unpacking
         (
             raw_earned, raw_possible, weighted_earned, weighted_possible, first_attempted
         ) = scores._get_score_from_persisted_or_latest_block(persisted_block, block, weight)

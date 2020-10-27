@@ -1,106 +1,45 @@
 """ API v0 views. """
 import logging
+from contextlib import contextmanager
 
-from django.contrib.auth import get_user_model
 from rest_framework import status
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from edx_rest_framework_extensions import permissions
-from edx_rest_framework_extensions.authentication import JwtAuthentication
-from enrollment import data as enrollment_data
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationAllowInactiveUser,
-    SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
+from lms.djangoapps.grades.api.v1.utils import (
+    CourseEnrollmentPagination,
+    GradeViewMixin,
+    PaginatedAPIView,
+    get_course_key,
+    verify_course_exists
 )
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
-from student.models import CourseEnrollment
-
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.models import PersistentCourseGrade
+from opaque_keys import InvalidKeyError
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
-USER_MODEL = get_user_model()
 
 
-class GradeViewMixin(DeveloperErrorViewMixin):
+@contextmanager
+def bulk_course_grade_context(course_key, users):
     """
-    Mixin class for Grades related views.
+    Prefetches grades for the given users in the given course
+    within a context, storing in a RequestCache and deleting
+    on context exit.
     """
-    def _get_single_user_grade(self, request, course_key):
-        """
-        Returns a grade response for the user object corresponding to the request's 'username' parameter,
-        or the current request.user if no 'username' was provided.
-        Args:
-            request (Request): django request object to check for username or request.user object
-            course_key (CourseLocator): The course to retrieve user grades for.
-
-        Returns:
-            A serializable list of grade responses
-        """
-        if 'username' in request.GET:
-            username = request.GET.get('username')
-        else:
-            username = request.user.username
-
-        grade_user = USER_MODEL.objects.get(username=username)
-
-        if not enrollment_data.get_course_enrollment(username, str(course_key)):
-            raise CourseEnrollment.DoesNotExist
-
-        course_grade = CourseGradeFactory().read(grade_user, course_key=course_key)
-        return Response([self._make_grade_response(grade_user, course_key, course_grade)])
-
-    def _get_user_grades(self, course_key):
-        """
-        Get paginated grades for users in a course.
-        Args:
-            course_key (CourseLocator): The course to retrieve user grades for.
-
-        Returns:
-            A serializable list of grade responses
-        """
-        enrollments_in_course = enrollment_data.get_user_enrollments(course_key)
-
-        paged_enrollments = self.paginator.paginate_queryset(
-            enrollments_in_course, self.request, view=self
-        )
-        users = (enrollment.user for enrollment in paged_enrollments)
-        grades = CourseGradeFactory().iter(users, course_key=course_key)
-
-        grade_responses = []
-        for user, course_grade, exc in grades:
-            if not exc:
-                grade_responses.append(self._make_grade_response(user, course_key, course_grade))
-
-        return Response(grade_responses)
-
-    def _make_grade_response(self, user, course_key, course_grade):
-        """
-        Serialize a single grade to dict to use in Responses
-        """
-        return {
-            'username': user.username,
-            'email': user.email,
-            'course_id': str(course_key),
-            'passed': course_grade.passed,
-            'percent': course_grade.percent,
-            'letter_grade': course_grade.letter_grade,
-        }
-
-    def perform_authentication(self, request):
-        """
-        Ensures that the user is authenticated (e.g. not an AnonymousUser).
-        """
-        super(GradeViewMixin, self).perform_authentication(request)
-        if request.user.is_anonymous():
-            raise AuthenticationFailed
+    PersistentCourseGrade.prefetch(course_key, users)
+    yield
+    PersistentCourseGrade.clear_prefetched_data(course_key)
 
 
-class CourseGradesView(GradeViewMixin, GenericAPIView):
+class CourseGradesView(GradeViewMixin, PaginatedAPIView):
     """
     **Use Case**
         * Get course grades of all users who are enrolled in a course.
@@ -160,8 +99,11 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
 
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
 
+    pagination_class = CourseEnrollmentPagination
+
     required_scopes = ['grades:read']
 
+    @verify_course_exists
     def get(self, request, course_id=None):
         """
         Gets a course progress status.
@@ -174,42 +116,96 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
         """
         username = request.GET.get('username')
 
-        if not course_id:
-            course_id = request.GET.get('course_id')
+        course_key = get_course_key(request, course_id)
 
-        # Validate course exists with provided course_id
+        if username:
+            # If there is a username passed, get grade for a single user
+            with self._get_user_or_raise(request, course_key) as grade_user:
+                return self._get_single_user_grade(grade_user, course_key)
+        else:
+            # If no username passed, get paginated list of grades for all users in course
+            return self._get_user_grades(course_key)
+
+    def _get_user_grades(self, course_key):
+        """
+        Get paginated grades for users in a course.
+        Args:
+            course_key (CourseLocator): The course to retrieve user grades for.
+
+        Returns:
+            A serializable list of grade responses
+        """
+        user_grades = []
+        users = self._paginate_users(course_key)
+
+        with bulk_course_grade_context(course_key, users):
+            for user, course_grade, exc in CourseGradeFactory().iter(users, course_key=course_key):
+                if not exc:
+                    user_grades.append(self._serialize_user_grade(user, course_key, course_grade))
+
+        return self.get_paginated_response(user_grades)
+
+
+class CourseGradingPolicy(GradeViewMixin, ListAPIView):
+    """
+    **Use Case**
+
+        Get the course grading policy.
+
+    **Example requests**:
+
+        GET /api/grades/v1/policy/courses/{course_id}/
+
+    **Response Values**
+
+        * assignment_type: The type of the assignment, as configured by course
+          staff. For example, course staff might make the assignment types Homework,
+          Quiz, and Exam.
+
+        * count: The number of assignments of the type.
+
+        * dropped: Number of assignments of the type that are dropped.
+
+        * weight: The weight, or effect, of the assignment type on the learner's
+          final grade.
+    """
+    allow_empty = False
+
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    def _get_course(self, request, course_id):
+        """
+        Returns the course after parsing the id, checking access, and checking existence.
+        """
         try:
-            course_key = CourseKey.from_string(course_id)
+            course_key = get_course_key(request, course_id)
         except InvalidKeyError:
             raise self.api_error(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=status.HTTP_400_BAD_REQUEST,
                 developer_message='The provided course key cannot be parsed.',
                 error_code='invalid_course_key'
             )
 
-        if not CourseOverview.get_from_id_if_exists(course_key):
+        if not has_access(request.user, 'staff', course_key):
             raise self.api_error(
-                status_code=status.HTTP_404_NOT_FOUND,
-                developer_message="Requested grade for unknown course {course}".format(course=course_id),
-                error_code='course_does_not_exist'
+                status_code=status.HTTP_403_FORBIDDEN,
+                developer_message='The course does not exist.',
+                error_code='user_or_course_does_not_exist',
             )
 
-        if username:
-            # If there is a username passed, get grade for a single user
-            try:
-                return self._get_single_user_grade(request, course_key)
-            except USER_MODEL.DoesNotExist:
-                raise self.api_error(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    developer_message='The user matching the requested username does not exist.',
-                    error_code='user_does_not_exist'
-                )
-            except CourseEnrollment.DoesNotExist:
-                raise self.api_error(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    developer_message='The user matching the requested username is not enrolled in this course',
-                    error_code='user_not_enrolled'
-                )
-        else:
-            # If no username passed, get paginated list of grades for all users in course
-            return self._get_user_grades(course_key)
+        course = modulestore().get_course(course_key, depth=0)
+        if not course:
+            raise self.api_error(
+                status_code=status.HTTP_404_NOT_FOUND,
+                developer_message='The course does not exist.',
+                error_code='user_or_course_does_not_exist',
+            )
+        return course
+
+    def get(self, request, course_id, *args, **kwargs):  # pylint: disable=arguments-differ
+        course = self._get_course(request, course_id)
+        return Response(GradingPolicySerializer(course.raw_grader, many=True).data)

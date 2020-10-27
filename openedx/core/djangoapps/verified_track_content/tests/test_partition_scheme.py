@@ -2,17 +2,18 @@
 Tests for verified_track_content/partition_scheme.py.
 """
 from datetime import datetime, timedelta
+
 import pytz
 
-from ..partition_scheme import EnrollmentTrackPartitionScheme, EnrollmentTrackUserPartition, ENROLLMENT_GROUP_IDS
-from ..models import VerifiedTrackCohortedCourse
 from course_modes.models import CourseMode
-
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.partitions.partitions import UserPartition, MINIMUM_STATIC_PARTITION_ID
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, UserPartition, ReadOnlyUserPartitionError
+
+from ..models import VerifiedTrackCohortedCourse
+from ..partition_scheme import ENROLLMENT_GROUP_IDS, EnrollmentTrackPartitionScheme, EnrollmentTrackUserPartition
 
 
 class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
@@ -60,8 +61,9 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
         self.assertEqual('Test partition for segmenting users by enrollment track', user_partition_json['description'])
 
     def test_from_json_not_supported(self):
-        with self.assertRaises(TypeError):
-            EnrollmentTrackUserPartition.from_json()
+        user_partition_json = create_enrollment_track_partition(self.course).to_json()
+        with self.assertRaises(ReadOnlyUserPartitionError):
+            UserPartition.from_json(user_partition_json)
 
     def test_group_ids(self):
         """
@@ -69,7 +71,7 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
         with group IDs associated with cohort and random user partitions).
         """
         for mode in ENROLLMENT_GROUP_IDS:
-            self.assertLess(ENROLLMENT_GROUP_IDS[mode], MINIMUM_STATIC_PARTITION_ID)
+            self.assertLess(ENROLLMENT_GROUP_IDS[mode]['id'], MINIMUM_STATIC_PARTITION_ID)
 
     @staticmethod
     def get_group_by_name(partition, name):

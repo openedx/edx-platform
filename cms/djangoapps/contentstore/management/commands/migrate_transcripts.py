@@ -14,7 +14,7 @@ from cms.djangoapps.contentstore.tasks import (
     enqueue_async_migrate_transcripts_tasks
 )
 from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
-from openedx.core.djangoapps.video_config.models import TranscriptMigrationSetting
+from openedx.core.djangoapps.video_config.models import TranscriptMigrationSetting, MigrationEnqueuedCourse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -93,12 +93,36 @@ class Command(BaseCommand):
         elif courses_mode == 'course_ids':
             course_keys = map(self._parse_course_key, options['course_ids'])
         else:
-            if self._latest_settings().all_courses:
-                course_keys = [course.id for course in modulestore().get_course_summaries()]
+            migration_settings = self._latest_settings()
+            if migration_settings.all_courses:
+                all_courses = [course.id for course in modulestore().get_course_summaries()]
+                # Following is to avoid re-rerunning migrations for the already enqueued courses.
+                # Although the migrations job is idempotent, but we need to track if the transcript migration
+                # job was initiated for specific course(s) in order to elevate load from the workers and for
+                # the job to be able identify the past enqueued courses.
+                migrated_courses = MigrationEnqueuedCourse.objects.all().values_list('course_id', flat=True)
+                non_migrated_courses = [
+                    course_key
+                    for course_key in all_courses
+                    if course_key not in migrated_courses
+                ]
+                # Course batch to be migrated.
+                course_keys = non_migrated_courses[:migration_settings.batch_size]
+
+                log.info(
+                    ('[Transcript Migration] Courses(total): %s, '
+                     'Courses(migrated): %s, Courses(non-migrated): %s, '
+                     'Courses(migration-in-process): %s'),
+                    len(all_courses),
+                    len(migrated_courses),
+                    len(non_migrated_courses),
+                    len(course_keys),
+                )
             else:
-                course_keys = parse_course_keys(self._latest_settings().course_ids.split())
-            force_update = self._latest_settings().force_update
-            commit = self._latest_settings().commit
+                course_keys = parse_course_keys(migration_settings.course_ids.split())
+
+            force_update = migration_settings.force_update
+            commit = migration_settings.commit
 
         return course_keys, force_update, commit
 
@@ -112,8 +136,16 @@ class Command(BaseCommand):
         """
         Invokes the migrate transcripts enqueue function.
         """
+        migration_settings = self._latest_settings()
         course_keys, force_update, commit = self._get_migration_options(options)
-        command_run = self._latest_settings().increment_run() if commit else -1
+        command_run = migration_settings.increment_run() if commit else -1
         enqueue_async_migrate_transcripts_tasks(
             course_keys=course_keys, commit=commit, command_run=command_run, force_update=force_update
         )
+
+        if commit and options.get('from_settings') and migration_settings.all_courses:
+            for course_key in course_keys:
+                enqueued_course, created = MigrationEnqueuedCourse.objects.get_or_create(course_id=course_key)
+                if created:
+                    enqueued_course.command_run = command_run
+                    enqueued_course.save()

@@ -27,6 +27,7 @@
     cursor: pointer;
 
     &.active,
+    &:focus,
     &:hover {
       color: theme-color("success");
       background-color: theme-color("inverse");

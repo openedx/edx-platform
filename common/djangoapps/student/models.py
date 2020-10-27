@@ -10,6 +10,7 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
+from __future__ import print_function
 import hashlib
 import json
 import logging
@@ -21,7 +22,6 @@ from functools import total_ordering
 from importlib import import_module
 from urllib import urlencode
 
-import analytics
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -30,7 +30,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import IntegrityError, models, transaction
+from django.db import IntegrityError, models
 from django.db.models import Count, Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
@@ -55,6 +55,7 @@ from openedx.core.djangoapps.theming.helpers import (
     get_current_site,
 )
 
+from edx_django_utils.cache import RequestCache
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -72,12 +73,11 @@ from openedx.core.djangoapps.appsembler.sites.utils import (
     get_current_organization,
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
-from track import contexts
+from track import contexts, segment
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
@@ -244,6 +244,13 @@ def is_username_retired(username):
         raise
 
 
+def username_exists_or_retired(username):
+    """
+    Check a username for existence -or- retirement against the User model.
+    """
+    return User.objects.filter(username=username).exists() or is_username_retired(username)
+
+
 def generate_retired_email_address(email, organization):
     """
     Suffix the email with an unusable suffix with organization short_name.
@@ -351,7 +358,7 @@ def get_retired_email_by_email(email):
     return user_util.get_retired_email(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
 
 
-def get_all_retired_usernames_by_username(username):
+def _get_all_retired_usernames_by_username(username):
     """
     Returns a generator of "retired usernames", one hashed with each
     configured salt. Used for finding out if the given username has
@@ -360,7 +367,7 @@ def get_all_retired_usernames_by_username(username):
     return user_util.get_all_retired_usernames(username, settings.RETIRED_USER_SALTS, settings.RETIRED_USERNAME_FMT)
 
 
-def get_all_retired_emails_by_email(email):
+def _get_all_retired_emails_by_email(email):
     """
     Returns a generator of "retired emails", one hashed with each
     configured salt. Used for finding out if the given email has
@@ -375,7 +382,7 @@ def get_potentially_retired_user_by_username(username):
     does not exist, then any hashed username salted with the historical
     salts.
     """
-    locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
+    locally_hashed_usernames = list(_get_all_retired_usernames_by_username(username))
     locally_hashed_usernames.append(username)
     potential_users = User.objects.filter(username__in=locally_hashed_usernames)
 
@@ -389,11 +396,22 @@ def get_potentially_retired_user_by_username(username):
     if not potential_users:
         raise User.DoesNotExist()
 
-    # If there are 2, one of two things should be true:
-    # - The user we want is un-retired and has the same case-match username
-    # - Or retired one was the case-match
+    # For a brief period, users were able to retire accounts and make another account with
+    # the same differently-cased username, like "testuser" and "TestUser".
+    # If there are two users found, return the one that's the *actual* case-matching username,
+    # whether retired or not.
     if len(potential_users) == 2:
-        return potential_users[0] if potential_users[0].username == username else potential_users[1]
+        # Figure out which user has been retired.
+        if potential_users[0].username.startswith(settings.RETIRED_USERNAME_PREFIX):
+            retired = potential_users[0]
+            active = potential_users[1]
+        else:
+            retired = potential_users[1]
+            active = potential_users[0]
+
+        # If the active (non-retired) user's username doesn't *exactly* match (including case),
+        # then the retired account must be the one that exactly matches.
+        return active if active.username == username else retired
 
     # We should have, at most, a retired username and an active one with a username
     # differing only by case. If there are more we need to disambiguate them by hand.
@@ -409,7 +427,7 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
       does not exist, the any hashed username salted with the historical
       salts.
     """
-    locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
+    locally_hashed_usernames = list(_get_all_retired_usernames_by_username(username))
 
     if hashed_username not in locally_hashed_usernames:
         raise Exception('Mismatched hashed_username, bad salt?')
@@ -799,7 +817,7 @@ class Registration(models.Model):
         has_segment_key = getattr(settings, 'LMS_SEGMENT_KEY', None)
         has_mailchimp_id = hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID')
         if has_segment_key and has_mailchimp_id:
-            identity_args = [
+            segment.identify(
                 self.user.id,  # pylint: disable=no-member
                 {
                     'email': self.user.email,
@@ -811,8 +829,7 @@ class Registration(models.Model):
                         "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
                     }
                 }
-            ]
-            analytics.identify(*identity_args)
+            )
 
 
 class PendingNameChange(DeletableByUserValue, models.Model):
@@ -847,210 +864,18 @@ class PendingEmailChange(DeletableByUserValue, models.Model):
         return self.activation_key
 
 
+class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
+    """
+    This model keeps track of pending requested changes to a user's secondary email address.
+    """
+    user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
+    new_secondary_email = models.CharField(blank=True, max_length=255, db_index=True)
+    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+
+
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
-
-
-class PasswordHistory(models.Model):
-    """
-    This model will keep track of past passwords that a user has used
-    as well as providing contraints (e.g. can't reuse passwords)
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    password = models.CharField(max_length=128)
-    time_set = models.DateTimeField(default=timezone.now)
-
-    def create(self, user):
-        """
-        This will copy over the current password, if any of the configuration has been turned on
-        """
-
-        if not (PasswordHistory.is_student_password_reuse_restricted() or
-                PasswordHistory.is_staff_password_reuse_restricted() or
-                PasswordHistory.is_password_reset_frequency_restricted() or
-                PasswordHistory.is_staff_forced_password_reset_enabled() or
-                PasswordHistory.is_student_forced_password_reset_enabled()):
-
-            return
-
-        self.user = user
-        self.password = user.password
-        self.save()
-
-    @classmethod
-    def is_student_password_reuse_restricted(cls):
-        """
-        Returns whether the configuration which limits password reuse has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_diff_pw = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE', 0
-        )
-        return min_diff_pw > 0
-
-    @classmethod
-    def is_staff_password_reuse_restricted(cls):
-        """
-        Returns whether the configuration which limits password reuse has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_diff_pw = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE', 0
-        )
-        return min_diff_pw > 0
-
-    @classmethod
-    def is_password_reset_frequency_restricted(cls):
-        """
-        Returns whether the configuration which limits the password reset frequency has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_days_between_reset = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS'
-        )
-        return min_days_between_reset
-
-    @classmethod
-    def is_staff_forced_password_reset_enabled(cls):
-        """
-        Returns whether the configuration which forces password resets to occur has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_days_between_reset = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS'
-        )
-        return min_days_between_reset
-
-    @classmethod
-    def is_student_forced_password_reset_enabled(cls):
-        """
-        Returns whether the configuration which forces password resets to occur has been turned on
-        """
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-        min_days_pw_reset = settings.ADVANCED_SECURITY_CONFIG.get(
-            'MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS'
-        )
-        return min_days_pw_reset
-
-    @classmethod
-    def should_user_reset_password_now(cls, user):
-        """
-        Returns whether a password has 'expired' and should be reset. Note there are two different
-        expiry policies for staff and students
-        """
-        assert user
-
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return False
-
-        days_before_password_reset = None
-        if user.is_staff:
-            if cls.is_staff_forced_password_reset_enabled():
-                days_before_password_reset = \
-                    settings.ADVANCED_SECURITY_CONFIG['MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS']
-        elif cls.is_student_forced_password_reset_enabled():
-            days_before_password_reset = \
-                settings.ADVANCED_SECURITY_CONFIG['MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS']
-
-        if days_before_password_reset:
-            history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
-            time_last_reset = None
-
-            if history:
-                # first element should be the last time we reset password
-                time_last_reset = history[0].time_set
-            else:
-                # no history, then let's take the date the user joined
-                time_last_reset = user.date_joined
-
-            now = timezone.now()
-
-            delta = now - time_last_reset
-
-            return delta.days >= days_before_password_reset
-
-        return False
-
-    @classmethod
-    def is_password_reset_too_soon(cls, user):
-        """
-        Verifies that the password is not getting reset too frequently
-        """
-        if not cls.is_password_reset_frequency_restricted():
-            return False
-
-        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')
-
-        if not history:
-            return False
-
-        now = timezone.now()
-
-        delta = now - history[0].time_set
-
-        return delta.days < settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-
-    @classmethod
-    def is_allowable_password_reuse(cls, user, new_password):
-        """
-        Verifies that the password adheres to the reuse policies
-        """
-        assert user
-
-        if not settings.FEATURES['ADVANCED_SECURITY']:
-            return True
-
-        if user.is_staff and cls.is_staff_password_reuse_restricted():
-            min_diff_passwords_required = \
-                settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
-        elif cls.is_student_password_reuse_restricted():
-            min_diff_passwords_required = \
-                settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-        else:
-            min_diff_passwords_required = 0
-
-        # just limit the result set to the number of different
-        # password we need
-        history = PasswordHistory.objects.filter(user=user).order_by('-time_set')[:min_diff_passwords_required]
-
-        for entry in history:
-
-            # be sure to re-use the same salt
-            # NOTE, how the salt is serialized in the password field is dependent on the algorithm
-            # in pbkdf2_sha256 [LMS] it's the 3rd element, in sha1 [unit tests] it's the 2nd element
-            hash_elements = entry.password.split('$')
-            algorithm = hash_elements[0]
-            if algorithm == 'pbkdf2_sha256':
-                hashed_password = make_password(new_password, hash_elements[2])
-            elif algorithm == 'sha1':
-                hashed_password = make_password(new_password, hash_elements[1])
-            else:
-                # This means we got something unexpected. We don't want to throw an exception, but
-                # log as an error and basically allow any password reuse
-                AUDIT_LOG.error('''
-                                Unknown password hashing algorithm "{0}" found in existing password
-                                hash, password reuse policy will not be enforced!!!
-                                '''.format(algorithm))
-                return True
-
-            if entry.password == hashed_password:
-                return False
-
-        return True
-
-    @classmethod
-    def retire_user(cls, user_id):
-        """
-        Updates the password in all rows corresponding to a user
-        to an empty string as part of removing PII for user retirement.
-        """
-        return cls.objects.filter(user_id=user_id).update(password="")
 
 
 class LoginFailures(models.Model):
@@ -1267,7 +1092,7 @@ class CourseEnrollment(models.Model):
     course = models.ForeignKey(
         CourseOverview,
         db_constraint=False,
-        on_delete=models.CASCADE,
+        on_delete=models.DO_NOTHING,
     )
 
     @property
@@ -1371,7 +1196,7 @@ class CourseEnrollment(models.Model):
         return enrollment
 
     @classmethod
-    def get_enrollment(cls, user, course_key):
+    def get_enrollment(cls, user, course_key, select_related=None):
         """Returns a CourseEnrollment object.
 
         Args:
@@ -1386,7 +1211,10 @@ class CourseEnrollment(models.Model):
         if user.is_anonymous:
             return None
         try:
-            return cls.objects.get(
+            query = cls.objects
+            if select_related is not None:
+                query = query.select_related(*select_related)
+            return query.get(
                 user=user,
                 course_id=course_key
             )
@@ -1489,26 +1317,19 @@ class CourseEnrollment(models.Model):
                 'course_id': text_type(self.course_id),
                 'mode': self.mode,
             }
-
+            segment_properties = {
+                'category': 'conversion',
+                'label': text_type(self.course_id),
+                'org': self.course_id.org,
+                'course': self.course_id.course,
+                'run': self.course_id.run,
+                'mode': self.mode,
+            }
+            if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
+                segment_properties['email'] = self.user.email
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
-
-                # Appsembler: Disabled to avoid receiving the event duplicated, with incomplete information the second time
-                if False and hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-                    tracking_context = tracker.get_tracker().resolve_context()
-                    analytics.track(self.user_id, event_name, {
-                        'category': 'conversion',
-                        'label': text_type(self.course_id),
-                        'org': self.course_id.org,
-                        'course': self.course_id.course,
-                        'run': self.course_id.run,
-                        'mode': self.mode,
-                    }, context={
-                        'ip': tracking_context.get('ip'),
-                        'Google Analytics': {
-                            'clientId': tracking_context.get('client_id')
-                        }
-                    })
+                segment.track(self.user_id, event_name, segment_properties)
 
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:
@@ -2035,7 +1856,7 @@ class CourseEnrollment(models.Model):
         if self.dynamic_upgrade_deadline is not None:
             # When course modes expire they aren't found any more and None would be returned.
             # Replicate that behavior here by returning None if the personalized deadline is in the past.
-            if datetime.now(UTC) >= self.dynamic_upgrade_deadline:
+            if self.dynamic_upgrade_deadline <= datetime.now(UTC):
                 log.debug('Schedules: Returning None since dynamic upgrade deadline has already passed.')
                 return None
 
@@ -2082,14 +1903,12 @@ class CourseEnrollment(models.Model):
                 'Schedules: Pulling upgrade deadline for CourseEnrollment %d from Schedule %d.',
                 self.id, self.schedule.id
             )
-            upgrade_deadline = self.schedule.upgrade_deadline
+            return self.schedule.upgrade_deadline
         except ObjectDoesNotExist:
             # NOTE: Schedule has a one-to-one mapping with CourseEnrollment. If no schedule is associated
             # with this enrollment, Django will raise an exception rather than return None.
             log.debug('Schedules: No schedule exists for CourseEnrollment %d.', self.id)
             return None
-
-        return upgrade_deadline
 
     @cached_property
     def course_upgrade_deadline(self):
@@ -2184,7 +2003,7 @@ class CourseEnrollment(models.Model):
         """
         # before populating the cache with another bulk set of data,
         # remove previously cached entries to keep memory usage low.
-        clear_cache(cls.MODE_CACHE_NAMESPACE)
+        RequestCache(cls.MODE_CACHE_NAMESPACE).clear()
 
         records = cls.objects.filter(user__in=users, course_id=course_key).select_related('user')
         cache = cls._get_mode_active_request_cache()
@@ -2195,9 +2014,9 @@ class CourseEnrollment(models.Model):
     @classmethod
     def _get_mode_active_request_cache(cls):
         """
-        Returns the request-specific cache for CourseEnrollment
+        Returns the request-specific cache for CourseEnrollment as dict.
         """
-        return get_cache(cls.MODE_CACHE_NAMESPACE)
+        return RequestCache(cls.MODE_CACHE_NAMESPACE).data
 
     @classmethod
     def _get_enrollment_in_request_cache(cls, user, course_key):
@@ -2276,7 +2095,7 @@ class ManualEnrollmentAudit(models.Model):
     @classmethod
     def get_manual_enrollment(cls, enrollment):
         """
-        if matches returns the most recent entry in the table filtered by enrollment else returns None,
+        Returns the most recent entry for the given enrollment, or None if there are no matches
         """
         try:
             manual_enrollment = cls.objects.filter(enrollment=enrollment).latest('time_stamp')
@@ -2285,12 +2104,17 @@ class ManualEnrollmentAudit(models.Model):
         return manual_enrollment
 
     @classmethod
-    def retire_manual_enrollments(cls, enrollments, retired_email):
+    def retire_manual_enrollments(cls, user, retired_email):
         """
-        Removes PII (enrolled_email and reason) from any rows corresponding to
-        the enrollment passed in. Bubbles up any exceptions.
+        Removes PII (enrolled_email and reason) associated with the User passed in. Bubbles up any exceptions.
         """
-        return cls.objects.filter(enrollment__in=enrollments).update(reason="", enrolled_email=retired_email)
+        # This bit of ugliness is to fix a perfmance issue with Django using a slow
+        # sub-select that caused the original query to take several seconds (PLAT-2371).
+        # It is possible that this could also be bad if a user has thousands of manual
+        # enrollments, but currently that number tends to be very low.
+        manual_enrollment_ids = list(cls.objects.filter(enrollment__user=user).values_list('id', flat=True))
+
+        return cls.objects.filter(id__in=manual_enrollment_ids).update(reason="", enrolled_email=retired_email)
 
 
 class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
@@ -2485,12 +2309,12 @@ def get_user(email):
 
 def user_info(email):
     user, u_prof = get_user(email)
-    print "User id", user.id
-    print "Username", user.username
-    print "E-mail", user.email
-    print "Name", u_prof.name
-    print "Location", u_prof.location
-    print "Language", u_prof.language
+    print("User id", user.id)
+    print("Username", user.username)
+    print("E-mail", user.email)
+    print("Name", u_prof.name)
+    print("Location", u_prof.location)
+    print("Language", u_prof.language)
     return user, u_prof
 
 
@@ -2507,8 +2331,8 @@ def change_name(email, new_name):
 
 
 def user_count():
-    print "All users", User.objects.all().count()
-    print "Active users", User.objects.filter(is_active=True).count()
+    print("All users", User.objects.all().count())
+    print("Active users", User.objects.filter(is_active=True).count())
     return User.objects.all().count()
 
 
@@ -3035,3 +2859,48 @@ class LogoutViewConfiguration(ConfigurationModel):
     def __unicode__(self):
         """Unicode representation of the instance. """
         return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)
+
+
+class AccountRecoveryManager(models.Manager):
+    """
+    Custom Manager for AccountRecovery model
+    """
+
+    def get_active(self, **filters):
+        """
+        Return only active AccountRecovery record after applying the given filters.
+
+        Arguments:
+            filters (**kwargs): Filter parameters for AccountRecovery records.
+
+        Returns:
+            AccountRecovery: AccountRecovery object with is_active=true
+        """
+        filters['is_active'] = True
+        return super(AccountRecoveryManager, self).get_queryset().get(**filters)
+
+    def activate(self):
+        """
+        Set is_active flag to True.
+        """
+        super(AccountRecoveryManager, self).get_queryset().update(is_active=True)
+
+
+class AccountRecovery(models.Model):
+    """
+    Model for storing information for user's account recovery in case of access loss.
+    """
+    user = models.OneToOneField(User, related_name='account_recovery', on_delete=models.CASCADE)
+    secondary_email = models.EmailField(
+        verbose_name=_('Secondary email address'),
+        help_text=_('Secondary email address to recover linked account.'),
+        unique=True,
+        null=False,
+        blank=False,
+    )
+    is_active = models.BooleanField(default=False)
+
+    class Meta(object):
+        db_table = "auth_accountrecovery"
+
+    objects = AccountRecoveryManager()

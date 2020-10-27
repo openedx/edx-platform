@@ -3,7 +3,6 @@ Tests for the Credit xBlock service
 """
 
 import ddt
-from nose.plugins.attrib import attr
 from course_modes.models import CourseMode
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -16,14 +15,14 @@ from openedx.core.djangoapps.credit.api.eligibility import set_credit_requiremen
 from student.models import CourseEnrollment, UserProfile
 
 
-@attr(shard=2)
 @ddt.ddt
 class CreditServiceTests(ModuleStoreTestCase):
     """
     Tests for the Credit xBlock service
     """
+    shard = 2
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(CreditServiceTests, self).setUp()
 
         self.service = CreditService()

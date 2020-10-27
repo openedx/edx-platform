@@ -31,10 +31,13 @@ else
 fi
 
 echo "Running explicit accessibility tests..."
-SELENIUM_BROWSER=phantomjs $TOX paver test_a11y
+SELENIUM_BROWSER=chrome BOKCHOY_HEADLESS=true $TOX paver test_a11y
 
 # The settings that we use are installed with the pa11ycrawler module
 export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
+
+echo "Reset db cache files to remove any changes from running a11y tests"
+git checkout -- common/test/db_cache
 
 echo "Running pa11ycrawler against test course..."
 $TOX paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html

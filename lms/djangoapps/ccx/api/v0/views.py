@@ -9,7 +9,8 @@ from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import Http404
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
@@ -355,7 +356,7 @@ class CCXListView(GenericAPIView):
     authentication_classes = (
         JwtAuthentication,
         authentication.OAuth2AuthenticationAllowInactiveUser,
-        authentication.SessionAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
@@ -611,7 +612,7 @@ class CCXDetailView(GenericAPIView):
     authentication_classes = (
         JwtAuthentication,
         authentication.OAuth2AuthenticationAllowInactiveUser,
-        authentication.SessionAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)
     serializer_class = CCXCourseSerializer

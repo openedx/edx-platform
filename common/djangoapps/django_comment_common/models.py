@@ -14,6 +14,7 @@ from six import text_type
 
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from student.models import CourseEnrollment
+from student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -108,6 +109,13 @@ class Role(models.Model):
 
         return self.permissions.filter(name=permission).exists()
 
+    @staticmethod
+    def user_has_role_for_course(user, course_id, role_names):
+        """
+        Returns True if the user has one of the given roles for the given course
+        """
+        return Role.objects.filter(course_id=course_id, name__in=role_names, users=user).exists()
+
 
 class Permission(models.Model):
     name = models.CharField(max_length=30, null=False, blank=False, primary_key=True)
@@ -145,15 +153,26 @@ def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=inva
     if course is None:
         raise ItemNotFoundError(course_id)
 
-    all_roles = {role.name for role in Role.objects.filter(users=user, course_id=course_id)}
+    roles = Role.objects.filter(users=user, course_id=course_id)
+    role_names = {role.name for role in roles}
 
-    permissions = {
-        permission.name
-        for permission
-        in Permission.objects.filter(roles__users=user, roles__course_id=course_id)
-        if not permission_blacked_out(course, all_roles, permission.name)
-    }
-    return permissions
+    permission_names = set()
+    for role in roles:
+        # Intentional n+1 query pattern to get permissions for each role because
+        # Aurora's query optimizer can't handle the join proplerly on 30M+ row
+        # tables (EDUCATOR-3374). Fortunately, there are very few forum roles.
+        for permission in role.permissions.all():
+            if not permission_blacked_out(course, role_names, permission.name):
+                permission_names.add(permission.name)
+
+    # Prevent a circular import
+    from django_comment_common.utils import GLOBAL_STAFF_ROLE_PERMISSIONS
+
+    if GlobalStaff().has_user(user):
+        for permission in GLOBAL_STAFF_ROLE_PERMISSIONS:
+            permission_names.add(permission)
+
+    return permission_names
 
 
 class ForumsConfig(ConfigurationModel):

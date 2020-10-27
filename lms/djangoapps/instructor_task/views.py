@@ -124,7 +124,7 @@ def get_task_completion_info(instructor_task):
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
         return (succeeded, _("No progress status information available"))
 
-    action_name = _(task_output['action_name'])    # pylint: disable=translation-of-non-string
+    action_name = _(task_output['action_name'])
     num_attempted = task_output['attempted']
     num_total = task_output['total']
 

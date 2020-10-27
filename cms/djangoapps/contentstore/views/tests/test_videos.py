@@ -8,12 +8,12 @@ import re
 from datetime import datetime
 from functools import wraps
 from StringIO import StringIO
+from contextlib import contextmanager
 
 import dateutil.parser
 import ddt
 import pytz
 from django.conf import settings
-from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
 from edxval.api import (
     create_profile,
@@ -29,16 +29,21 @@ from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from contentstore.views.videos import (
     _get_default_video_image_url,
-    validate_video_image,
     VIDEO_IMAGE_UPLOAD_ENABLED,
+    ENABLE_VIDEO_UPLOAD_PAGINATION,
     WAFFLE_SWITCHES,
     TranscriptProvider
 )
 from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+
 from edxval.api import create_or_update_transcript_preferences, get_transcript_preferences
+from waffle.testutils import override_flag
 
 
 def override_switch(switch, active):
@@ -323,6 +328,16 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         # Crude check for presence of data in returned HTML
         for video in self.previous_uploads:
             self.assertIn(video["edx_video_id"], response.content)
+        self.assertNotIn('video_upload_pagination', response.content)
+
+    @override_waffle_flag(ENABLE_VIDEO_UPLOAD_PAGINATION, active=True)
+    def test_get_html_paginated(self):
+        """
+        Tests that response is paginated.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('video_upload_pagination', response.content)
 
     def test_post_non_json(self):
         response = self.client.post(self.url, {"files": []})
@@ -497,10 +512,12 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertIsNotNone(path_match)
             video_id = path_match.group(1)
             mock_key_instance = mock_key_instances[i]
+
             mock_key_instance.set_metadata.assert_any_call(
                 'course_video_upload_token',
                 self.test_token
             )
+
             mock_key_instance.set_metadata.assert_any_call(
                 'client_video_id',
                 file_info['file_name']
@@ -524,6 +541,74 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             response_file = response_obj['files'][i]
             self.assertEqual(response_file['file_name'], file_info['file_name'])
             self.assertEqual(response_file['upload_url'], mock_key_instance.generate_url())
+
+    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    @patch('boto.s3.key.Key')
+    @patch('boto.s3.connection.S3Connection')
+    @ddt.data(
+        {
+            'global_waffle': True,
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off,
+            'expect_token': True
+        },
+        {
+            'global_waffle': False,
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on,
+            'expect_token': False
+        },
+        {
+            'global_waffle': False,
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off,
+            'expect_token': True
+        }
+    )
+    def test_video_upload_token_in_meta(self, data, mock_conn, mock_key):
+        """
+        Test video upload token in s3 metadata.
+        """
+        @contextmanager
+        def proxy_manager(manager, ignore_manager):
+            """
+            This acts as proxy to the original manager in the arguments given
+            the original manager is not set to be ignored.
+            """
+            if ignore_manager:
+                yield
+            else:
+                with manager:
+                    yield
+
+        file_data = {
+            'file_name': 'first.mp4',
+            'content_type': 'video/mp4',
+        }
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=Mock()))
+        mock_key_instance = Mock(
+            generate_url=Mock(
+                return_value='http://example.com/url_{}'.format(file_data['file_name'])
+            )
+        )
+        # If extra calls are made, return a dummy
+        mock_key.side_effect = [mock_key_instance]
+
+        # expected args to be passed to `set_metadata`.
+        expected_args = ('course_video_upload_token', self.test_token)
+
+        DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
+        with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
+            with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['global_waffle']):
+                response = self.client.post(
+                    self.url,
+                    json.dumps({'files': [file_data]}),
+                    content_type='application/json'
+                )
+                self.assertEqual(response.status_code, 200)
+
+                with proxy_manager(self.assertRaises(AssertionError), data['expect_token']):
+                    # if we're not expecting token then following should raise assertion error and
+                    # if we're expecting token then we will be able to find the call to set the token
+                    # in s3 metadata.
+                    mock_key_instance.set_metadata.assert_any_call(*expected_args)
 
     def _assert_video_removal(self, url, edx_video_id, deleted_videos):
         """
@@ -783,26 +868,6 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': 'test1'})
         response = self.client.post(video_image_upload_url, {})
         self.verify_error_message(response, 'An image file is required.')
-
-    def test_invalid_image_file_info(self):
-        """
-        Test that when no file information is provided to validate_video_image, it gives proper error message.
-        """
-        error = validate_video_image({})
-        self.assertEquals(error, 'The image must have name, content type, and size information.')
-
-    def test_corrupt_image_file(self):
-        """
-        Test that when corrupt file is provided to validate_video_image, it gives proper error message.
-        """
-        with open(settings.MEDIA_ROOT + '/test-corrupt-image.png', 'w+') as file:
-            image_file = UploadedFile(
-                file,
-                content_type='image/png',
-                size=settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES']
-            )
-            error = validate_video_image(image_file)
-            self.assertEquals(error, 'There is a problem with this image file. Try to upload a different file.')
 
     @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_no_video_image(self):

@@ -9,7 +9,8 @@ from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 class AccessResponse(object):
     """Class that represents a response from a has_access permission check."""
-    def __init__(self, has_access, error_code=None, developer_message=None, user_message=None):
+    def __init__(self, has_access, error_code=None, developer_message=None, user_message=None,
+                 additional_context_user_message=None, user_fragment=None):
         """
         Creates an AccessResponse object.
 
@@ -21,11 +22,17 @@ class AccessResponse(object):
                 to show the developer
             user_message (String): optional - default is None. Message to
                 show the user
+            additional_context_user_message (String): optional - default is None. Message to
+                show the user when additional context like the course name is necessary
+            user_fragment (:py:class:`~web_fragments.fragment.Fragment`): optional -
+                An html fragment to display to the user if their access is denied
         """
         self.has_access = has_access
         self.error_code = error_code
         self.developer_message = developer_message
         self.user_message = user_message
+        self.additional_context_user_message = additional_context_user_message
+        self.user_fragment = user_fragment
         if has_access:
             assert error_code is None
 
@@ -54,15 +61,32 @@ class AccessResponse(object):
             "has_access": self.has_access,
             "error_code": self.error_code,
             "developer_message": self.developer_message,
-            "user_message": self.user_message
+            "user_message": self.user_message,
+            "additional_context_user_message": self.additional_context_user_message,
+            "user_fragment": self.user_fragment,
         }
 
     def __repr__(self):
-        return "AccessResponse({!r}, {!r}, {!r}, {!r})".format(
+        return "AccessResponse({!r}, {!r}, {!r}, {!r}, {!r}, {!r})".format(
             self.has_access,
             self.error_code,
             self.developer_message,
-            self.user_message
+            self.user_message,
+            self.additional_context_user_message,
+            self.user_fragment,
+        )
+
+    def __eq__(self, other):
+        if not isinstance(other, AccessResponse):
+            return False
+
+        return (
+            self.has_access == other.has_access and
+            self.error_code == other.error_code and
+            self.developer_message == other.developer_message and
+            self.user_message == other.user_message and
+            self.additional_context_user_message == other.additional_context_user_message and
+            self.user_fragment == other.user_fragment
         )
 
 
@@ -72,7 +96,8 @@ class AccessError(AccessResponse):
     denial in has_access. Contains the error code, user and developer
     messages. Subclasses represent specific errors.
     """
-    def __init__(self, error_code, developer_message, user_message):
+    def __init__(self, error_code, developer_message, user_message,
+                 additional_context_user_message=None, user_fragment=None):
         """
         Creates an AccessError object.
 
@@ -83,9 +108,12 @@ class AccessError(AccessResponse):
             error_code (String): unique identifier for the specific type of
             error developer_message (String): message to show the developer
             user_message (String): message to show the user
+            additional_context_user_message (String): message to show user with additional context like the course name
+            user_fragment (:py:class:`~web_fragments.fragment.Fragment`): HTML to show the user
 
         """
-        super(AccessError, self).__init__(False, error_code, developer_message, user_message)
+        super(AccessError, self).__init__(False, error_code, developer_message, user_message,
+                                          additional_context_user_message, user_fragment)
 
 
 class StartDateError(AccessError):
@@ -100,7 +128,7 @@ class StartDateError(AccessError):
             user_message = _("Course has not started")
         else:
             developer_message = "Course does not start until {}".format(start_date)
-            user_message = _("Course does not start until {}"  # pylint: disable=translation-of-non-string
+            user_message = _("Course does not start until {}"
                              .format("{:%B %d, %Y}".format(start_date)))
         super(StartDateError, self).__init__(error_code, developer_message, user_message)
 
@@ -137,3 +165,32 @@ class MobileAvailabilityError(AccessError):
         developer_message = "Course is not available on mobile for this user"
         user_message = _("You do not have access to this course on a mobile device")
         super(MobileAvailabilityError, self).__init__(error_code, developer_message, user_message)
+
+
+class IncorrectPartitionGroupError(AccessError):
+    """
+    Access denied because the user is not in the correct user subset.
+    """
+    def __init__(self, partition, user_group, allowed_groups, user_message=None, user_fragment=None):
+        error_code = "incorrect_user_group"
+        developer_message = u"In partition {}, user was in group {}, but only {} are allowed access".format(
+            partition.name,
+            user_group.name if user_group is not None else user_group,
+            u", ".join(group.name for group in allowed_groups),
+        )
+        super(IncorrectPartitionGroupError, self).__init__(
+            error_code=error_code,
+            developer_message=developer_message,
+            user_message=user_message,
+            user_fragment=user_fragment
+        )
+
+
+class NoAllowedPartitionGroupsError(AccessError):
+    """
+    Access denied because the content is not allowed to any group in a partition.
+    """
+    def __init__(self, partition, user_message=None, user_fragment=None):
+        error_code = "no_allowed_user_groups"
+        developer_message = "Group access for {} excludes all students".format(partition.name)
+        super(NoAllowedPartitionGroupsError, self).__init__(error_code, developer_message, user_message)

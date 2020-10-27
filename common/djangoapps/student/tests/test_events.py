@@ -7,7 +7,7 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
-from student.models import CourseEnrollmentAllowed, PasswordHistory
+from student.models import CourseEnrollmentAllowed
 from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
 from student.tests.tests import UserSettingsEventTestMixin
 
@@ -130,7 +130,7 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         """
         Verify that we don't emit events for related fields.
         """
-        self.user.passwordhistory_set.create(password='new_password')
+        self.user.loginfailures_set.create()
         self.user.save()
         self.assert_no_events_were_emitted()
 

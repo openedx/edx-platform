@@ -2,20 +2,19 @@
 Tests for SplitTestTransformer.
 """
 import ddt
-from nose.plugins.attrib import attr
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.partitions.partitions_service import get_user_partition_groups
 
 from ...api import get_course_blocks
-from ..user_partitions import UserPartitionTransformer, _get_user_partition_groups
+from ..user_partitions import UserPartitionTransformer
 from .helpers import CourseStructureTestCase, create_location
 
 
-@attr(shard=3)
 @ddt.ddt
 class SplitTestTransformerTestCase(CourseStructureTestCase):
     """
@@ -23,6 +22,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
     """
     TEST_PARTITION_ID = 0
     TRANSFORMER_CLASS_TO_TEST = UserPartitionTransformer
+    shard = 3
 
     def setUp(self):
         """
@@ -203,8 +203,8 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
 
     def test_user_randomly_assigned(self):
         # user was randomly assigned to one of the groups
-        user_groups = _get_user_partition_groups(
-            self.course.id, [self.split_test_user_partition], self.user
+        user_groups = get_user_partition_groups(
+            self.course.id, [self.split_test_user_partition], self.user, 'id'
         )
         self.assertEquals(len(user_groups), 1)
 

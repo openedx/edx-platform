@@ -8,7 +8,7 @@ from django.test import TestCase
 from freezegun import freeze_time
 
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.lib.token_utils import JwtBuilder
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from student.tests.factories import UserFactory
 
 JSON = 'application/json'
@@ -57,12 +57,12 @@ class EdxRestApiClientTest(TestCase):
 
             claims = {
                 'tracking_context': {
-                    'lms_user_id': self.user.id,  # pylint: disable=no-member
+                    'lms_user_id': self.user.id,
                     'lms_client_id': self.TEST_CLIENT_ID,
                     'lms_ip': '127.0.0.1',
                 }
             }
-            expected_jwt = JwtBuilder(self.user).build_token(['email', 'profile'], additional_claims=claims)
+            expected_jwt = create_jwt_for_user(self.user, additional_claims=claims)
             expected_header = 'JWT {}'.format(expected_jwt)
             self.assertEqual(actual_header, expected_header)
 

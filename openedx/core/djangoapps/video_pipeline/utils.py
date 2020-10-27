@@ -1,10 +1,9 @@
 """
 Utils for video_pipeline app.
 """
-from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
 
-from openedx.core.lib.token_utils import JwtBuilder
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 
 
 def create_video_pipeline_api_client(user, api_client_id, api_client_secret, api_url):
@@ -17,9 +16,5 @@ def create_video_pipeline_api_client(user, api_client_id, api_client_secret, api
         api_client_secret(unicode): Video pipeline client secret.
         api_url(unicode): It is video pipeline's API URL.
     """
-    jwt_token = JwtBuilder(user, secret=api_client_secret).build_token(
-        scopes=[],
-        expires_in=settings.OAUTH_ID_TOKEN_EXPIRATION,
-        aud=api_client_id
-    )
+    jwt_token = create_jwt_for_user(user, secret=api_client_secret, aud=api_client_id)
     return EdxRestApiClient(api_url, jwt=jwt_token)

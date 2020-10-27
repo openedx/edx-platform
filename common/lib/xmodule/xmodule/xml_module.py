@@ -10,7 +10,6 @@ from xblock.core import XML_NAMESPACES
 from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
 
-import dogstats_wrapper as dog_stats_api
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModuleDescriptor
@@ -233,11 +232,6 @@ class XmlParserMixin(object):
             filepath = ''
             aside_children = []
         else:
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=["location:xmlparser_util_mixin_load_definition_filename"]
-            )
-
             filepath = cls._format_filepath(xml_object.tag, filename)
 
             # VS[compat]
@@ -246,11 +240,6 @@ class XmlParserMixin(object):
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
-                dog_stats_api.increment(
-                    DEPRECATION_VSCOMPAT_EVENT,
-                    tags=["location:xmlparser_util_mixin_load_definition_backcompat"]
-                )
-
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
@@ -289,14 +278,6 @@ class XmlParserMixin(object):
             attr = cls._translate(attr)
 
             if attr in cls.metadata_to_strip:
-                if attr in ('course', 'org', 'url_name', 'filename'):
-                    dog_stats_api.increment(
-                        DEPRECATION_VSCOMPAT_EVENT,
-                        tags=(
-                            "location:xmlparser_util_mixin_load_metadata",
-                            "metadata:{}".format(attr),
-                        )
-                    )
                 # don't load these
                 continue
 
@@ -356,10 +337,6 @@ class XmlParserMixin(object):
         else:
             filepath = None
             definition_xml = node
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=["location:xmlparser_util_mixin_parse_xml"]
-            )
 
         # Note: removes metadata.
         definition, children = cls.load_definition(definition_xml, runtime, def_id, id_generator)
@@ -487,7 +464,11 @@ class XmlParserMixin(object):
         if self.export_to_file():
             # Write the definition to a file
             url_path = name_to_pathname(self.url_name)
-            filepath = self._format_filepath(self.category, url_path)
+            # if folder is course then create file with name {course_run}.xml
+            filepath = self._format_filepath(
+                self.category,
+                self.location.run if self.category == 'course' else url_path,
+            )
             self.runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
             with self.runtime.export_fs.open(filepath, 'wb') as fileobj:
                 ElementTree(xml_object).write(fileobj, pretty_print=True, encoding='utf-8')

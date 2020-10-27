@@ -20,4 +20,4 @@ def delete_quality_junit_xml():
     """
     yield
     if os.path.exists(Env.QUALITY_DIR):
-        rmtree(Env.QUALITY_DIR)
+        rmtree(Env.QUALITY_DIR, ignore_errors=True)

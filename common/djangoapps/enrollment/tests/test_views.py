@@ -16,8 +16,8 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.urls import reverse
 from django.test import Client
 from django.test.utils import override_settings
+from freezegun import freeze_time
 from mock import patch
-from nose.plugins.attrib import attr
 from rest_framework import status
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -25,30 +25,28 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from enrollment import api
+from enrollment import api, data
 from enrollment.errors import CourseEnrollmentError
 from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserRetirementStatus,
     UserOrgTag
 )
 from openedx.core.lib.django_test_client_utils import get_absolute_url
-from openedx.core.lib.token_utils import JwtBuilder
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from student.models import (
-    CourseEnrollment,
-    get_retired_username_by_username,
-    get_retired_email_by_email,
-)
+from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, UserFactory, SuperuserFactory
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
+from six import text_type
 
 
 class EnrollmentTestMixin(object):
@@ -68,6 +66,7 @@ class EnrollmentTestMixin(object):
             min_mongo_calls=0,
             max_mongo_calls=0,
             linked_enterprise_customer=None,
+            cohort=None,
     ):
         """
         Enroll in the course and verify the response's status code. If the expected status is 200, also validates
@@ -96,6 +95,9 @@ class EnrollmentTestMixin(object):
 
         if linked_enterprise_customer is not None:
             data['linked_enterprise_customer'] = linked_enterprise_customer
+
+        if cohort is not None:
+            data['cohort'] = cohort
 
         extra = {}
         if as_server:
@@ -149,7 +151,6 @@ class EnrollmentTestMixin(object):
         return json.loads(resp.content)
 
 
-@attr(shard=3)
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -157,6 +158,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
     """
     Test user enrollment, especially with different course modes.
     """
+    shard = 3
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
@@ -576,6 +578,28 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             throttle.parse_rate(throttle.get_rate())
         except ImproperlyConfigured:
             self.fail("No throttle rate set for {}".format(user_scope))
+
+    def test_create_enrollment_with_cohort(self):
+        """Enroll in the course, and also add to a cohort."""
+        # Create a cohort
+        cohort_name = 'masters'
+        cohorts.set_course_cohorted(self.course.id, True)
+        cohorts.add_cohort(self.course.id, cohort_name, 'test')
+        # Create an enrollment
+
+        self.assert_enrollment_status(cohort=cohort_name)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(cohorts.get_cohort(self.user, self.course.id, assign=False).name, cohort_name)
+
+    def test_create_enrollment_with_wrong_cohort(self):
+        """Enroll in the course, and also add to a cohort."""
+        # Create a cohort
+        cohorts.set_course_cohorted(self.course.id, True)
+        cohorts.add_cohort(self.course.id, 'masters', 'test')
+        # Create an enrollment
+        self.assert_enrollment_status(cohort='missing', expected_status=status.HTTP_400_BAD_REQUEST)
 
     def test_create_enrollment_with_mode(self):
         """With the right API key, create a new enrollment with a mode set other than the default."""
@@ -1314,7 +1338,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         """
         Helper function for creating headers for the JWT authentication.
         """
-        token = JwtBuilder(user).build_token([])
+        token = create_jwt_for_user(user)
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
 
         return headers
@@ -1391,3 +1415,270 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         url = reverse('unenrollment')
         headers = self.build_jwt_headers(submitting_user)
         return self.client.post(url, json.dumps(data), content_type='application/json', **headers)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class UserRoleTest(ModuleStoreTestCase):
+    """
+    Tests the API call to list user roles.
+    """
+    USERNAME = "Bob"
+    EMAIL = "bob@example.com"
+    STAFF_USERNAME = "Bobstaff"
+    STAFF_EMAIL = "bobStaff@example.com"
+    PASSWORD = "edx"
+
+    ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        """ Create a course and user, then log in. """
+        super(UserRoleTest, self).setUp()
+        self.course1 = CourseFactory.create(emit_signals=True, org="org1", course="course1", run="run1")
+        self.course2 = CourseFactory.create(emit_signals=True, org="org2", course="course2", run="run2")
+        self.user = UserFactory.create(
+            username=self.USERNAME,
+            email=self.EMAIL,
+            password=self.PASSWORD,
+        )
+        self.staff_user = UserFactory.create(
+            username=self.STAFF_USERNAME,
+            email=self.STAFF_EMAIL,
+            password=self.PASSWORD,
+            is_staff=True,
+        )
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+
+    def _create_expected_role_dict(self, course, role):
+        """ Creates the expected role dict object that the view should return """
+        return {
+            'course_id': text_type(course.id),
+            'org': course.org,
+            'role': role.ROLE,
+        }
+
+    def _assert_roles(self, expected_roles, is_staff, course_id=None):
+        """ Asserts that the api call is successful and returns the expected roles """
+        if course_id is not None:
+            response = self.client.get(reverse('roles'), {'course_id': course_id})
+        else:
+            response = self.client.get(reverse('roles'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = json.loads(response.content)
+        sort_by_role_id = lambda r: r['course_id']
+        response_data['roles'] = sorted(response_data['roles'], key=sort_by_role_id)
+        expected_roles = sorted(expected_roles, key=sort_by_role_id)
+        expected = {'roles': expected_roles, 'is_staff': is_staff}
+        self.assertEqual(response_data, expected)
+
+    def _login(self, is_staff):
+        """ If is_staff is true, logs in the staff user. Otherwise, logs in the non-staff user """
+        logged_in_user = self.staff_user if is_staff else self.user
+        self.client.login(username=logged_in_user.username, password=self.PASSWORD)
+        return logged_in_user
+
+    def test_not_logged_in(self):
+        self.client.logout()
+        response = self.client.get(reverse('roles'))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @ddt.data(True, False)
+    def test_roles_no_roles(self, is_staff):
+        self._login(is_staff)
+        self._assert_roles([], is_staff)
+
+    @ddt.data(True, False)
+    def test_roles(self, is_staff):
+        logged_in_user = self._login(is_staff)
+        role1 = CourseStaffRole(self.course1.id)
+        role1.add_users(logged_in_user)
+        expected_role1 = self._create_expected_role_dict(self.course1, role1)
+        expected_roles = [expected_role1]
+        self._assert_roles(expected_roles, is_staff)
+        role2 = CourseStaffRole(self.course2.id)
+        role2.add_users(logged_in_user)
+        expected_role2 = self._create_expected_role_dict(self.course2, role2)
+        expected_roles.append(expected_role2)
+        self._assert_roles(expected_roles, is_staff)
+
+    def test_roles_filter(self):
+        role1 = CourseStaffRole(self.course1.id)
+        role1.add_users(self.user)
+        expected_role1 = self._create_expected_role_dict(self.course1, role1)
+        role2 = CourseStaffRole(self.course2.id)
+        role2.add_users(self.user)
+        expected_role2 = self._create_expected_role_dict(self.course2, role2)
+        self._assert_roles([expected_role1], False, course_id=text_type(self.course1.id))
+        self._assert_roles([expected_role2], False, course_id=text_type(self.course2.id))
+
+    def test_roles_exception(self):
+        with patch('enrollment.api.get_user_roles') as mock_get_user_roles:
+            mock_get_user_roles.side_effect = Exception()
+            response = self.client.get(reverse('roles'))
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            expected_response = {
+                "message": (
+                    u"An error occurred while retrieving roles for user '{username}"
+                ).format(username=self.user.username)
+            }
+            response_data = json.loads(response.content)
+            self.assertEqual(response_data, expected_response)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
+    """
+    Test the course enrollments list API.
+    """
+    shard = 3
+    CREATED_DATA = datetime.datetime(2018, 1, 1, 0, 0, 1, tzinfo=pytz.UTC)
+
+    def setUp(self):
+        super(CourseEnrollmentsApiListTest, self).setUp()
+        self.rate_limit_config = RateLimitConfiguration.current()
+        self.rate_limit_config.enabled = False
+        self.rate_limit_config.save()
+
+        throttle = EnrollmentUserThrottle()
+        self.rate_limit, __ = throttle.parse_rate(throttle.rate)
+
+        self.course = CourseFactory.create(org='e', number='d', run='X', emit_signals=True)
+        self.course2 = CourseFactory.create(org='x', number='y', run='Z', emit_signal=True)
+
+        for mode_slug in ('honor', 'verified', 'audit'):
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode_slug,
+                mode_display_name=mode_slug
+            )
+
+        self.staff_user = AdminFactory(
+            username='staff',
+            email='staff@example.com',
+            password='edx'
+        )
+
+        self.student1 = UserFactory(
+            username='student1',
+            email='student1@example.com',
+            password='edx'
+        )
+
+        self.student2 = UserFactory(
+            username='student2',
+            email='student2@example.com',
+            password='edx'
+        )
+
+        self.student3 = UserFactory(
+            username='student3',
+            email='student3@example.com',
+            password='edx'
+        )
+
+        with freeze_time(self.CREATED_DATA):
+            data.create_course_enrollment(
+                self.student1.username,
+                unicode(self.course.id),
+                'honor',
+                True
+            )
+            data.create_course_enrollment(
+                self.student2.username,
+                unicode(self.course.id),
+                'honor',
+                True
+            )
+            data.create_course_enrollment(
+                self.student3.username,
+                unicode(self.course2.id),
+                'verified',
+                True
+            )
+            data.create_course_enrollment(
+                self.student2.username,
+                unicode(self.course2.id),
+                'honor',
+                True
+            )
+            data.create_course_enrollment(
+                self.staff_user.username,
+                unicode(self.course2.id),
+                'verified',
+                True
+            )
+        self.url = reverse('courseenrollmentsapilist')
+
+    def _login_as_staff(self):
+        self.client.login(username=self.staff_user.username, password='edx')
+
+    def _make_request(self, query_params=None):
+        return self.client.get(self.url, query_params)
+
+    def _assert_list_of_enrollments(self, query_params=None, expected_status=status.HTTP_200_OK, error_fields=None):
+        """
+        Make a request to the CourseEnrolllmentApiList endpoint and run assertions on the response
+        using the optional parameters 'query_params', 'expected_status' and 'error_fields'.
+        """
+        response = self._make_request(query_params)
+        self.assertEqual(response.status_code, expected_status)
+        content = json.loads(response.content)
+        if error_fields is not None:
+            self.assertIn('field_errors', content)
+            for error_field in error_fields:
+                self.assertIn(error_field, content['field_errors'])
+        return content
+
+    def test_user_not_authenticated(self):
+        self.client.logout()
+        response = self.client.get(self.url, {'course_id': self.course.id})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_user_not_authorized(self):
+        self.client.login(username=self.student1.username, password='edx')
+        response = self.client.get(self.url, {'course_id': self.course.id})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    @ddt.data(
+        ({'course_id': '1'}, ['course_id', ]),
+        ({'course_id': '1', 'username': 'staff'}, ['course_id', ]),
+        ({'username': '1*2'}, ['username', ]),
+        ({'username': '1*2', 'course_id': 'org.0/course_0/Run_0'}, ['username', ]),
+        ({'username': '1*2', 'course_id': '1'}, ['username', 'course_id']),
+        ({'username': ','.join(str(x) for x in range(101))}, ['username', ])
+    )
+    @ddt.unpack
+    def test_query_string_parameters_invalid_errors(self, query_params, error_fields):
+        self._login_as_staff()
+        self._assert_list_of_enrollments(query_params, status.HTTP_400_BAD_REQUEST, error_fields)
+
+    @ddt.data(
+        # Non-existent user
+        ({'username': 'nobody'}, ),
+        ({'username': 'nobody', 'course_id': 'e/d/X'}, ),
+
+        # Non-existent course
+        ({'course_id': 'a/b/c'}, ),
+        ({'course_id': 'a/b/c', 'username': 'student1'}, ),
+
+        # Non-existent course and user
+        ({'course_id': 'a/b/c', 'username': 'dummy'}, )
+    )
+    @ddt.unpack
+    def test_non_existent_course_user(self, query_params):
+        self._login_as_staff()
+        content = self._assert_list_of_enrollments(query_params, status.HTTP_200_OK)
+        self.assertEqual(len(content['results']), 0)
+
+    @ddt.file_data('fixtures/course-enrollments-api-list-valid-data.json')
+    @ddt.unpack
+    def test_response_valid_queries(self, args):
+        query_params = args[0]
+        expected_results = args[1]
+
+        self._login_as_staff()
+        content = self._assert_list_of_enrollments(query_params, status.HTTP_200_OK)
+        results = content['results']
+
+        self.assertItemsEqual(results, expected_results)

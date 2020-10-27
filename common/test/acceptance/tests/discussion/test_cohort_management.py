@@ -9,7 +9,6 @@ from datetime import datetime
 
 import unicodecsv
 from bok_choy.promise import EmptyPromise
-from nose.plugins.attrib import attr
 from pytz import UTC, utc
 
 from common.test.acceptance.fixtures.course import CourseFixture
@@ -18,6 +17,7 @@ from common.test.acceptance.pages.lms.instructor_dashboard import DataDownloadPa
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, create_user_partition_json
+from openedx.core.lib.tests import attr
 from xmodule.partitions.partitions import Group
 
 
@@ -690,6 +690,11 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         Run accessibility audit for cohort management.
         """
+        self.cohort_management_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.cohort_management_page.a11y_audit.check_for_accessibility_errors()
 
 

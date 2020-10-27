@@ -24,10 +24,10 @@ from courseware.tests.factories import InstructorFactory
 from django.conf import settings
 from django.urls import reverse
 from django.test.utils import override_settings
+from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from mock import MagicMock, Mock, patch, ANY
-from nose.plugins.attrib import attr
 from pytz import UTC
 from shoppingcart.models import (
     Coupon,
@@ -86,7 +86,6 @@ from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVer
 from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from ..models import ReportStore
@@ -412,9 +411,9 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             CourseEnrollment.enroll(user, course.id, mode='verified')
             SoftwareSecurePhotoVerificationFactory.create(user=user, status='approved')
 
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
-        expected_query_count = 43
+        expected_query_count = 50
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -1004,12 +1003,11 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
 
-@attr(shard=3)
 class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent, InstructorTaskModuleTestCase):
     """
     Test the problem report on a course that has split tests.
     """
-
+    shard = 3
     OPTION_1 = 'Option 1'
     OPTION_2 = 'Option 2'
 
@@ -1193,7 +1191,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
             self.assertDictContainsSubset(
-                {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
+                {'action_name': 'graded', 'attempted': 5, 'succeeded': 5, 'failed': 0}, result
             )
         problem_names = [u'Homework 1: Subsection - Problem0', u'Homework 1: Subsection - Problem1']
         header_row = [u'Student ID', u'Email', u'Username', u'Enrollment Status', u'Grade']
@@ -1220,6 +1218,11 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
                 'user': self.non_cohorted_user,
                 'enrollment_status': ENROLLED_IN_COURSE,
                 'grade': [u'0.0', u'Not Available', u'Not Available', u'Not Available', u'Not Available'],
+            },
+            {
+                'user': self.community_ta,
+                'enrollment_status': ENROLLED_IN_COURSE,
+                'grade': [u'0.0', u'Not Attempted', u'2.0', u'Not Available', u'Not Available'],
             },
         ]
 
@@ -1422,14 +1425,14 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         header_row = ",".join(['User ID', 'User Name', 'Email', self.question1, self.question2, self.question3])
         student1_row = ",".join([
-            str(self.student1.id),  # pylint: disable=no-member
+            str(self.student1.id),
             self.student1.username,
             self.student1.email,
             self.answer1,
             self.answer2
         ])
         student2_row = ",".join([
-            str(self.student2.id),  # pylint: disable=no-member
+            str(self.student2.id),
             self.student2.username,
             self.student2.email,
             self.answer3,
@@ -2122,13 +2125,13 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         self._verify_csv_data(user.username, expected_output)
 
 
-@attr(shard=3)
 @ddt.ddt
 @override_settings(CERT_QUEUE='test-queue')
 class TestCertificateGeneration(InstructorTaskModuleTestCase):
     """
     Test certificate generation task works.
     """
+    shard = 3
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
@@ -2731,7 +2734,6 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                 ) as mock_store_rows:
                     return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
 
-                    # pylint: disable=maybe-no-member
                     timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
                     course_id_string = urllib.quote(text_type(self.course.id).replace('/', '_'))
                     filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)

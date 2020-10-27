@@ -111,10 +111,26 @@
     }
   }
 
+  &.recovery-email-alert {
+    &#banner-msg {
+      background: $state-info-bg ;
+      box-shadow: none;
+      border-top: 1px solid #579cc5;
+      padding: 20px 20px 20px 40px;
+      margin-top: -16px;
+    }
+    .fa-close {
+      position: relative;
+      float: right;
+    }
+    .fa-close:hover {
+      cursor: pointer;
+    }
+  }
+
   &.urgency-low {
     background: $notify-banner-bg-3;
     box-shadow: 0 1px 2px $shadow;
-
     .msg {
       color: $black;
     }
@@ -773,7 +789,6 @@
   margin: 0 auto;
   width: flex-grid(12);
   max-width: $fg-max-width;
-  min-width: $fg-min-width;
   color: $white;
 
   strong {
@@ -1102,7 +1117,7 @@ body.uxdesign.alerts {
     .alert-message {
       @include float(left);
 
-      margin: 4px 0 0 0;
+      margin: 4px 0 0;
       color: $gray-d3;
     }
 

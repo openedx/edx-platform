@@ -1,3 +1,7 @@
+"""Management command to migrate a course's xblock's group_access from Verified Track Cohorts to Enrollment Tracks"""
+
+from __future__ import print_function
+
 from contentstore.course_group_config import GroupConfiguration
 from django.conf import settings
 from course_modes.models import CourseMode
@@ -27,7 +31,7 @@ class Command(BaseCommand):
 
         module_store = modulestore()
 
-        print "Starting Swap from Auto Track Cohort Pilot command"
+        print("Starting Swap from Auto Track Cohort Pilot command")
 
         verified_track_cohorts_setting = self._latest_settings()
 
@@ -54,8 +58,8 @@ class Command(BaseCommand):
             raise CommandError("No audit_cohort_names set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
                                % verified_track_cohorts_setting.id)
 
-        print "Running for MigrateVerifiedTrackCohortsSetting with old_course_key='%s' and rerun_course_key='%s'" % \
-              (verified_track_cohorts_setting.old_course_key, verified_track_cohorts_setting.rerun_course_key)
+        print("Running for MigrateVerifiedTrackCohortsSetting with old_course_key='%s' and rerun_course_key='%s'" %
+              (verified_track_cohorts_setting.old_course_key, verified_track_cohorts_setting.rerun_course_key))
 
         # Get the CourseUserGroup IDs for the audit course names from the old course
         audit_course_user_group_ids = CourseUserGroup.objects.filter(
@@ -170,7 +174,7 @@ class Command(BaseCommand):
                     )
                     if (audit_partition_group_access
                             and audit_course_user_group_partition_group.group_id in audit_partition_group_access):
-                        print "Queueing XBlock at location: '%s' for Audit Content Group update " % item.location
+                        print("Queueing XBlock at location: '%s' for Audit Content Group update " % item.location)
                         set_audit_enrollment_track = True
 
                 # Check the partition and group IDs for the verified course group, if it exists in
@@ -191,15 +195,15 @@ class Command(BaseCommand):
                             % (item.location, non_verified_track_access_groups)
                         )
                     if verified_course_user_group_partition_group.group_id in verified_partition_group_access:
-                        print "Queueing XBlock at location: '%s' for Verified Content Group update " % item.location
+                        print("Queueing XBlock at location: '%s' for Verified Content Group update " % item.location)
                         set_verified_enrollment_track = True
 
                 # Add the enrollment track ids to a group access array
                 enrollment_track_group_access = []
                 if set_audit_enrollment_track:
-                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['audit'])
+                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['audit']['id'])
                 if set_verified_enrollment_track:
-                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['verified'])
+                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['verified']['id'])
 
                 # If there are no errors, and either the audit track, or verified
                 #  track needed an update, set the access, update and publish
@@ -223,7 +227,7 @@ class Command(BaseCommand):
             for item in items_to_update:
                 module_store.update_item(item, ModuleStoreEnum.UserID.mgmt_command)
                 module_store.publish(item.location, ModuleStoreEnum.UserID.mgmt_command)
-                print "Updated and published XBlock at location: '%s'" % item.location
+                print("Updated and published XBlock at location: '%s'" % item.location)
 
         # Check if we should delete any partition groups if there are no errors.
         # If there are errors, none of the xblock items will have been updated,
@@ -242,7 +246,7 @@ class Command(BaseCommand):
                     # since they should have been converted to use enrollment tracks instead.
                     # Taken from contentstore/views/course.py.remove_content_or_experiment_group
                     usages = GroupConfiguration.get_partitions_usage_info(module_store, course)
-                    used = group_id in usages
+                    used = group_id in usages[partition.id]
                     if used:
                         errors.append("Content group '%s' is in use and cannot be deleted."
                                       % partition_to_delete.group_id)
@@ -269,7 +273,7 @@ class Command(BaseCommand):
                 "\t\n".join(errors)
             )
 
-        print "Finished for MigrateVerifiedTrackCohortsSetting with ID='%s" % verified_track_cohorts_setting.id
+        print("Finished for MigrateVerifiedTrackCohortsSetting with ID='%s" % verified_track_cohorts_setting.id)
 
     def _latest_settings(self):
         """

@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
-from nose.plugins.attrib import attr
 from pytz import UTC
 from six import text_type
 import unittest
@@ -21,8 +20,10 @@ from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
+from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from pyquery import PyQuery as pq
 from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
 from student.models import CourseEnrollment
@@ -47,12 +48,12 @@ def intercept_renderer(path, context):
     return response
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
     """
     Tests for the instructor dashboard (not legacy).
     """
+    shard = 3
 
     def setUp(self):
         """
@@ -216,6 +217,22 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertNotIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
         self.assertIn('<h4 class="hd hd-4">View a specific learner&#39;s grades and progress', response.content)
+
+    @patch(
+        'lms.djangoapps.instructor.views.instructor_dashboard.settings.WRITABLE_GRADEBOOK_URL',
+        'http://gradebook.local.edx.org'
+    )
+    def test_staff_can_see_writable_gradebook(self):
+        """
+        Test that, when the writable gradebook featue is enabled, a staff member can see it.
+        """
+        waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
+        with override_waffle_flag(waffle_flag, active=True):
+            response = self.client.get(self.url)
+
+        expected_gradebook_url = 'http://gradebook.local.edx.org/{}'.format(self.course.id)
+        self.assertIn(expected_gradebook_url, response.content)
+        self.assertIn('View Gradebook', response.content)
 
     def test_default_currency_in_the_html_response(self):
         """
@@ -410,7 +427,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
-        self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
+        self.assertEqual(len(response.mako_context['students']), 1)
 
     def test_open_response_assessment_page(self):
         """

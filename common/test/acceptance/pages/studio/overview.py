@@ -38,7 +38,7 @@ class CourseOutlineItem(object):
         # Check for the existence of a locator so that errors when navigating to the course outline page don't show up
         # as errors in the repr method instead.
         try:
-            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)  # pylint: disable=no-member
+            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)
         except AttributeError:
             return "{}(<browser>)".format(self.__class__.__name__)
 
@@ -498,6 +498,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             self.q(css='div.ui-loading.is-hidden').present
         ])
 
+    def click_course_status_section_start_date_link(self):
+        self.course_start_date_link.click()
+
+    def click_course_status_section_checklists_link(self):
+        self.course_checklists_link.click()
+
     def view_live(self):
         """
         Clicks the "View Live" link and switches to the new tab
@@ -761,6 +767,20 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 
         # The Prerequisites dropdown is visible
         return self.q(css="#prereq_min_score").visible
+
+    @property
+    def has_course_status_section(self):
+        # SFE and SFE-wrapper classes come from studio-frontend and
+        # wrap content provided by the studio-frontend package
+        return self.q(css='.course-status .SFE .SFE-wrapper').is_present()
+
+    @property
+    def course_start_date_link(self):
+        return self.q(css='.status-link').first
+
+    @property
+    def course_checklists_link(self):
+        return self.q(css='.status-link').nth(1)
 
     @property
     def bottom_add_section_button(self):
@@ -1159,7 +1179,7 @@ class SubsectionOutlineModal(CourseOutlineModal):
         return self.find_css('input[name=content-visibility]:checked').first.attrs('value')[0]
 
     @is_explicitly_locked.setter
-    def is_explicitly_locked(self, value):  # pylint: disable=arguments-differ
+    def is_explicitly_locked(self, value):
         """
         Override - sets visibility to staff_only if True, else 'visible'.
 

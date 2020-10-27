@@ -9,19 +9,9 @@ from django.contrib.auth.views import password_reset_complete
 from . import views
 
 urlpatterns = [
-    url(r'^logout$', views.LogoutView.as_view(), name='logout'),
-
-    # TODO: standardize login
-
-    # login endpoint used by cms.
-    url(r'^login_post$', views.login_user, name='login_post'),
-    # login endpoints used by lms.
-    url(r'^login_ajax$', views.login_user, name="login"),
-    url(r'^login_ajax/(?P<error>[^/]*)$', views.login_user),
 
     url(r'^email_confirm/(?P<key>[^/]*)$', views.confirm_email_change, name='confirm_email_change'),
 
-    url(r'^create_account$', views.create_account, name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', views.activate_account, name="activate"),
 
     url(r'^accounts/disable_account_ajax$', views.disable_account_ajax, name="disable_account_ajax"),
@@ -31,25 +21,31 @@ urlpatterns = [
     url(r'^change_email_settings$', views.change_email_settings, name='change_email_settings'),
 
     # password reset in views (see below for password reset django views)
+    url(r'^account/password$', views.password_change_request_handler, name='password_change_request'),
+    url(r'^account/account_recovery', views.account_recovery_request_handler, name='account_recovery'),
     url(r'^password_reset/$', views.password_reset, name='password_reset'),
     url(
         r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         views.password_reset_confirm_wrapper,
         name='password_reset_confirm',
     ),
-
-    url(r'accounts/verify_password', views.verify_user_password, name='verify_password'),
+    url(
+        r'^account_recovery_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        views.account_recovery_confirm_wrapper,
+        name='account_recovery_confirm',
+    ),
 
     url(r'^course_run/{}/refund_status$'.format(settings.COURSE_ID_PATTERN),
         views.course_run_refund_status,
         name="course_run_refund_status"),
-]
 
-# enable automatic login
-if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
-    urlpatterns += [
-        url(r'^auto_auth$', views.auto_auth),
-    ]
+    url(
+        r'^activate_secondary_email/(?P<key>[^/]*)$',
+        views.activate_secondary_email,
+        name='activate_secondary_email'
+    ),
+
+]
 
 # password reset django views (see above for password reset views)
 urlpatterns += [

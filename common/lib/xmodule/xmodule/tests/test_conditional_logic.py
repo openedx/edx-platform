@@ -17,6 +17,6 @@ class ConditionalModuleTest(LogicTest):
         self.xmodule.descriptor.get_children = lambda: []
 
         response = self.ajax_request('No', {})
-        html = response['html']
+        fragments = response['fragments']
 
-        self.assertEqual(html, [])
+        self.assertEqual(fragments, [])

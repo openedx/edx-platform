@@ -172,6 +172,7 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
             modified=score_modified_time,
             score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
             score_deleted=kwargs.get('score_deleted', False),
+            grader_response=kwargs.get('grader_response', False)
         )
     return update_score
 
@@ -202,6 +203,7 @@ def problem_raw_score_changed_handler(sender, **kwargs):  # pylint: disable=unus
         score_deleted=kwargs.get('score_deleted', False),
         modified=kwargs['modified'],
         score_db_table=kwargs['score_db_table'],
+        grader_response=kwargs.get('grader_response', False)
     )
 
 
@@ -225,6 +227,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             event_transaction_id=unicode(get_event_transaction_id()),
             event_transaction_type=unicode(get_event_transaction_type()),
             score_db_table=kwargs['score_db_table'],
+            force_update_subsections=kwargs.get('force_update_subsections', False),
         ),
         countdown=RECALCULATE_GRADE_DELAY_SECONDS,
     )

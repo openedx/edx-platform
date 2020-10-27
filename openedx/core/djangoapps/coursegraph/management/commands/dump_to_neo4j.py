@@ -50,7 +50,7 @@ class Command(BaseCommand):
             help='dump all--or all specified--courses, ignoring cache',
         )
 
-    def handle(self, *args, **options):  # pylint: disable=unused-argument
+    def handle(self, *args, **options):
         """
         Iterates through each course, serializes them into graphs, and saves
         those graphs to neo4j.

@@ -1,7 +1,6 @@
 import datetime
 import logging
 
-import analytics
 from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -15,13 +14,16 @@ from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
+from edx_django_utils.monitoring import set_custom_metric
+from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.monitoring_utils import set_custom_metric
 from openedx.core.djangoapps.schedules import message_types
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules import resolvers
 from openedx.core.lib.celery.task_utils import emulate_http_request
+from track import segment
+
 
 LOG = logging.getLogger(__name__)
 
@@ -49,7 +51,7 @@ def update_course_schedules(self, **kwargs):
             start=new_start_date,
             upgrade_deadline=new_upgrade_deadline
         )
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
             LOG.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
         raise self.retry(kwargs=kwargs, exc=exc)
@@ -224,11 +226,24 @@ def _track_message_sent(site, user, msg):
         properties['course_ids'] = course_ids[:10]
         properties['primary_course_id'] = course_ids[0]
 
-    analytics.track(
-        user_id=user.id,
-        event='edx.bi.email.sent',
-        properties=properties
-    )
+    tracking_context = {
+        'host': site.domain,
+        'path': '/',  # make up a value, in order to allow the host to be passed along.
+    }
+    # I wonder if the user of this event should be the recipient, as they are not the ones
+    # who took an action.  Rather, the system is acting, and they are the object.
+    # Admittedly that may be what 'nonInteraction' is meant to address.  But sessionization may
+    # get confused by these events if they're attributed in this way, because there's no way for
+    # this event to get context that would match with what the user might be doing at the moment.
+    # But the events do show up in GA being joined up with existing sessions (i.e. within a half
+    # hour in the past), so they don't always break sessions.  Not sure what happens after these.
+    # We can put the recipient_user_id into the properties, and then export as a custom dimension.
+    with tracker.get_tracker().context(msg.app_label, tracking_context):
+        segment.track(
+            user_id=user.id,
+            event_name='edx.bi.email.sent',
+            properties=properties,
+        )
 
 
 def _is_delivery_enabled(site, delivery_config_var, log_prefix):

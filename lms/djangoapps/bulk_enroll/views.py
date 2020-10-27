@@ -1,8 +1,10 @@
 """
 API views for Bulk Enrollment
 """
+import itertools
 import json
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,6 +12,13 @@ from rest_framework.views import APIView
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from enrollment.views import EnrollmentUserThrottle
 from instructor.views.api import students_update_enrollment
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.course_groups.cohorts import (
+    get_cohort_by_name,
+    add_user_to_cohort,
+)
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.lib.api.authentication import OAuth2Authentication
 from openedx.core.lib.api.permissions import IsStaff
 from util.disable_rate_limit import can_disable_rate_limit
@@ -29,6 +38,7 @@ class BulkEnrollView(APIView):
             "email_students": true,
             "action": "enroll",
             "courses": "course-v1:edX+Demo+123,course-v1:edX+Demo2+456",
+            "cohorts": "cohortA,cohortA",
             "identifiers": "brandon@example.com,yamilah@example.com"
         }
 
@@ -40,7 +50,10 @@ class BulkEnrollView(APIView):
             as they register.
           * email_students: When set to `true`, students will be sent email
             notifications upon enrollment.
-          * action: Can either be set to "enroll" or "unenroll". This determines the behabior
+          * action: Can either be set to "enroll" or "unenroll". This determines the behavior
+          * cohorts: Optional. If provided, the number of items in the list should be equal to
+            the number of courses. first cohort coressponds with the first course and so on.
+            The learners will be added to the corresponding cohort.
 
     **Response Values**
 
@@ -51,11 +64,14 @@ class BulkEnrollView(APIView):
         enrollment. (See the `instructor.views.api.students_update_enrollment`
         docstring for the specifics of the response data available for each
         enrollment)
+
+        If a cohorts list is provided, additional 'cohort' keys will be added
+        to the 'before' and 'after' states.
     """
 
     authentication_classes = JwtAuthentication, OAuth2Authentication
-    permission_classes = IsStaff,
-    throttle_classes = EnrollmentUserThrottle,
+    permission_classes = (IsStaff,)
+    throttle_classes = (EnrollmentUserThrottle,)
 
     def post(self, request):
         serializer = BulkEnrollmentSerializer(data=request.data)
@@ -72,9 +88,37 @@ class BulkEnrollView(APIView):
                 'action': serializer.data.get('action'),
                 'courses': {}
             }
-            for course in serializer.data.get('courses'):
-                response = students_update_enrollment(self.request, course_id=course)
-                response_dict['courses'][course] = json.loads(response.content)
+            for course_id, cohort_name in itertools.izip_longest(serializer.data.get('courses'),
+                                                                 serializer.data.get('cohorts', [])):
+                response = students_update_enrollment(self.request, course_id=course_id)
+                response_content = json.loads(response.content)
+
+                if cohort_name:
+                    try:
+                        course_key = CourseKey.from_string(course_id)
+                        cohort = get_cohort_by_name(course_key=course_key, name=cohort_name)
+                    except (CourseUserGroup.DoesNotExist, InvalidKeyError) as exc:
+                        return Response(exc.message, status=status.HTTP_400_BAD_REQUEST)
+
+                    for user_data in response_content['results']:
+                        if "after" in user_data and (
+                            user_data["after"].get("enrollment", False) is True or
+                            user_data["after"].get("allowed", False) is True
+                        ):
+                            user_id = user_data['identifier']
+                            try:
+                                _user_obj, previous_cohort, _pre_assigned = add_user_to_cohort(cohort, user_id)
+                            except ValueError:
+                                # User already present in cohort
+                                previous_cohort = cohort_name
+
+                            if previous_cohort:
+                                user_data['before']['cohort'] = previous_cohort
+                            else:
+                                user_data['before']['cohort'] = None
+                            user_data['after']['cohort'] = cohort_name
+
+                response_dict['courses'][course_id] = response_content
             return Response(data=response_dict, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

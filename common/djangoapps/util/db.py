@@ -9,7 +9,7 @@ from functools import wraps
 
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction
 
-from openedx.core.djangoapps.request_cache import get_cache
+from openedx.core.lib.cache_utils import get_cache
 
 OUTER_ATOMIC_CACHE_NAME = 'db.outer_atomic'
 

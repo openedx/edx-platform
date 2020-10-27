@@ -63,29 +63,33 @@ username = get_enterprise_learner_generic_name(request) or student.username
                 <h2 class="hd hd-2 progress-certificates-title">
                     ${_("Course Progress for Student '{username}' ({email})").format(username=username, email=student.email)}
                 </h2>
-
+                % if course_expiration_fragment:
+                    ${HTML(course_expiration_fragment.content)}
+                % endif
                 <div class="wrapper-msg wrapper-auto-cert">
                     <div id="errors-info" class="errors-info"></div>
-                    %if certificate_data:
-                    <div class="auto-cert-message" id="course-success">
-                        <div class="has-actions">
-                            <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
-                            <div class="msg-content">
-                                <h4 class="hd hd-4 title">${certificate_data.title}</h4>
-                                <p class="copy">${certificate_data.msg}</p>
-                            </div>
-                            <div class="msg-actions">
-                                %if certificate_data.cert_web_view_url:
-                                <a class="btn" href="${certificate_data.cert_web_view_url}" target="_blank">${_("View Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
-                                %elif certificate_data.cert_status == CertificateStatuses.downloadable and certificate_data.download_url:
-                                <a class="btn" href="${certificate_data.download_url}" target="_blank">${_("Download Your Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
-                                %elif certificate_data.cert_status == CertificateStatuses.requesting:
-                                <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert">${_('Request Certificate')}</button>
-                                %endif
+                    <%block name="certificate_block">
+                        %if certificate_data:
+                        <div class="auto-cert-message" id="course-success">
+                            <div class="has-actions">
+                                <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
+                                <div class="msg-content">
+                                    <h4 class="hd hd-4 title">${_(certificate_data.title)}</h4>
+                                    <p class="copy">${_(certificate_data.msg)}</p>
+                                </div>
+                                <div class="msg-actions">
+                                    %if certificate_data.cert_web_view_url:
+                                    <a class="btn" href="${certificate_data.cert_web_view_url}" target="_blank">${_("View Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
+                                    %elif certificate_data.cert_status == CertificateStatuses.downloadable and certificate_data.download_url:
+                                    <a class="btn" href="${certificate_data.download_url}" target="_blank">${_("Download Your Certificate")} <span class="sr">${_("Opens in a new browser window")}</span></a>
+                                    %elif certificate_data.cert_status == CertificateStatuses.requesting:
+                                    <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert">${_('Request Certificate')}</button>
+                                    %endif
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    %endif
+                        %endif
+                    </%block>
                 </div>
 
                 %if not course.disable_progress_graph:

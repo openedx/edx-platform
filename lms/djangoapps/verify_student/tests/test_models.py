@@ -11,11 +11,6 @@ from django.conf import settings
 from django.test import TestCase
 from freezegun import freeze_time
 from mock import patch
-from nose.tools import (  # pylint: disable=no-name-in-module
-    assert_equals,
-    assert_raises,
-    assert_true
-)
 from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
 
@@ -68,10 +63,7 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
         "UserPhoto", "UserPhotoKey",
     ]
     for key in EXPECTED_KEYS:
-        assert_true(
-            data_dict.get(key),
-            "'{}' must be present and not blank in JSON submitted to Software Secure".format(key)
-        )
+        assert data_dict.get(key)
 
     # The keys should be stored as Base64 strings, i.e. this should not explode
     data_dict["PhotoIDKey"].decode("base64")
@@ -151,20 +143,20 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         """
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
-        assert_equals(attempt.status, "created")
+        self.assertEqual(attempt.status, "created")
 
         # These should all fail because we're in the wrong starting state.
-        assert_raises(VerificationException, attempt.submit)
-        assert_raises(VerificationException, attempt.approve)
-        assert_raises(VerificationException, attempt.deny)
+        self.assertRaises(VerificationException, attempt.submit)
+        self.assertRaises(VerificationException, attempt.approve)
+        self.assertRaises(VerificationException, attempt.deny)
 
         # Now let's fill in some values so that we can pass the mark_ready() call
         attempt.mark_ready()
-        assert_equals(attempt.status, "ready")
+        self.assertEqual(attempt.status, "ready")
 
         # ready (can't approve or deny unless it's "submitted")
-        assert_raises(VerificationException, attempt.approve)
-        assert_raises(VerificationException, attempt.deny)
+        self.assertRaises(VerificationException, attempt.approve)
+        self.assertRaises(VerificationException, attempt.deny)
 
         DENY_ERROR_MSG = '[{"photoIdReasons": ["Not provided"]}]'
 
@@ -182,13 +174,13 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         attempt.approve()
 
         # approved
-        assert_raises(VerificationException, attempt.submit)
+        self.assertRaises(VerificationException, attempt.submit)
         attempt.approve()  # no-op
         attempt.system_error("System error")  # no-op, something processed it without error
         attempt.deny(DENY_ERROR_MSG)
 
         # denied
-        assert_raises(VerificationException, attempt.submit)
+        self.assertRaises(VerificationException, attempt.submit)
         attempt.deny(DENY_ERROR_MSG)  # no-op
         attempt.system_error("System error")  # no-op, something processed it without error
         attempt.approve()
@@ -209,7 +201,7 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
 
         user.profile.name = u"Rusty \u01B4"
 
-        assert_equals(u"Clyde \u01B4", attempt.name)
+        self.assertEqual(u"Clyde \u01B4", attempt.name)
 
     def create_and_submit(self):
         """Helper method to create a generic submission and send it."""
@@ -228,18 +220,18 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         """Test that we set our status correctly after a submission."""
         # Basic case, things go well.
         attempt = self.create_and_submit()
-        assert_equals(attempt.status, "submitted")
+        self.assertEqual(attempt.status, "submitted")
 
         # We post, but Software Secure doesn't like what we send for some reason
         with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_error):
             attempt = self.create_and_submit()
-            assert_equals(attempt.status, "must_retry")
+            self.assertEqual(attempt.status, "must_retry")
 
         # We try to post, but run into an error (in this case a network connection error)
         with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
             with LogCapture('lms.djangoapps.verify_student.models') as logger:
                 attempt = self.create_and_submit()
-                assert_equals(attempt.status, "must_retry")
+                self.assertEqual(attempt.status, "must_retry")
                 logger.check(
                     ('lms.djangoapps.verify_student.models', 'ERROR',
                      'Software Secure submission failed for user %s, setting status to must_retry'
@@ -349,10 +341,10 @@ class TestPhotoVerification(TestVerification, MockS3Mixin, ModuleStoreTestCase):
         attempt.approve()
 
         # Validate data before retirement
-        assert_equals(attempt.name, user.profile.name)
-        assert_equals(attempt.photo_id_image_url, 'https://example.com/test/image/img.jpg')
-        assert_equals(attempt.face_image_url, 'https://example.com/test/face/img.jpg')
-        assert_equals(attempt.photo_id_key, 'there_was_an_attempt')
+        self.assertEqual(attempt.name, user.profile.name)
+        self.assertEqual(attempt.photo_id_image_url, 'https://example.com/test/image/img.jpg')
+        self.assertEqual(attempt.face_image_url, 'https://example.com/test/face/img.jpg')
+        self.assertEqual(attempt.photo_id_key, 'there_was_an_attempt')
 
         # Retire User
         attempt_again = SoftwareSecurePhotoVerification(user=user)

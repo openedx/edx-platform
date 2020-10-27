@@ -5,7 +5,7 @@ Django users, set/unset permission bits, and associate groups by name.
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import is_password_usable
-from django.contrib.auth.models import Group, BaseUserManager
+from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils.translation import gettext as _

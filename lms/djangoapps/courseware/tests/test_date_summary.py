@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.test import RequestFactory
 from freezegun import freeze_time
 from mock import patch
-from nose.plugins.attrib import attr
 from pytz import utc
 
 from course_modes.models import CourseMode
@@ -37,6 +36,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.lib.tests import attr
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, UPGRADE_DEADLINE_MESSAGE, CourseHomeMessages
 from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

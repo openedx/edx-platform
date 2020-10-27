@@ -4,36 +4,40 @@ Video xmodule tests in mongo.
 """
 
 import json
+import shutil
 from collections import OrderedDict
+from tempfile import mkdtemp
 from uuid import uuid4
 
-from tempfile import mkdtemp
-import shutil
 import ddt
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.test import TestCase
 from django.test.utils import override_settings
-from fs.osfs import OSFS
-from fs.path import combine
 from edxval.api import (
     ValCannotCreateError,
     ValVideoNotFoundError,
-    create_video_transcript,
     create_or_update_video_transcript,
     create_profile,
     create_video,
+    create_video_transcript,
     get_video_info,
     get_video_transcript,
     get_video_transcript_data
 )
 from edxval.utils import create_file_in_fs
+from fs.osfs import OSFS
+from fs.path import combine
 from lxml import etree
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 from path import Path as path
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.lib.tests import attr
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
+from waffle.testutils import override_flag
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
@@ -41,10 +45,13 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.tests.test_import import DummySystem
 from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
-from xmodule.video_module import VideoDescriptor, bumper_utils, rewrite_video_url, video_utils
+from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
 from xmodule.video_module.transcripts_utils import Transcript, save_to_store, subs_filename
-from xmodule.video_module.video_module import EXPORT_IMPORT_STATIC_DIR, EXPORT_IMPORT_COURSE_DIR
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.video_module.video_module import (
+    EXPORT_IMPORT_COURSE_DIR,
+    EXPORT_IMPORT_STATIC_DIR,
+)
+from xmodule.x_module import STUDENT_VIEW, PUBLIC_VIEW
 
 from .helpers import BaseTestXmodule
 from .test_video_handlers import TestVideo
@@ -90,6 +97,7 @@ class TestVideoYouTube(TestVideo):
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
+                'saveStateEnabled': True,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
@@ -116,6 +124,7 @@ class TestVideoYouTube(TestVideo):
                 'completionEnabled': False,
                 'completionPercentage': 0.95,
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
+                'prioritizeHls': False,
             })),
             'track': None,
             'transcript_download_format': u'srt',
@@ -171,6 +180,7 @@ class TestVideoNonYouTube(TestVideo):
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
+                'saveStateEnabled': True,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '1.00:3_yD_cEKoCk',
@@ -197,6 +207,7 @@ class TestVideoNonYouTube(TestVideo):
                 'completionEnabled': False,
                 'completionPercentage': 0.95,
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
+                'prioritizeHls': False,
             })),
             'track': None,
             'transcript_download_format': u'srt',
@@ -219,6 +230,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
     '''
     Make sure that `get_html` works correctly.
     '''
+    maxDiff = None
     CATEGORY = "video"
     DATA = SOURCE_XML
     METADATA = {}
@@ -228,6 +240,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         self.setup_course()
         self.default_metadata_dict = OrderedDict({
             'autoAdvance': False,
+            'saveStateEnabled': True,
             'saveStateUrl': '',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'streams': '1.00:3_yD_cEKoCk',
@@ -254,6 +267,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'completionEnabled': False,
             'completionPercentage': 0.95,
             'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
+            'prioritizeHls': False,
         })
 
     def get_handler_url(self, handler, suffix):
@@ -960,6 +974,22 @@ class TestGetHtmlMethod(BaseTestXmodule):
         context = self.item_descriptor.render(STUDENT_VIEW).content
         self.assertIn("'download_video_link': None", context)
 
+    def test_html_student_public_view(self):
+        """
+        Test the student and public views
+        """
+        video_xml = """
+        <video display_name="Video" download_video="true" source="https://hls.com/hls.m3u8">
+        ["https://hls.com/hls2.m3u8", "https://hls.com/hls3.m3u8"]
+        </video>
+        """
+
+        self.initialize_module(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        self.assertIn('"saveStateEnabled": true', context)
+        context = self.item_descriptor.render(PUBLIC_VIEW).content
+        self.assertIn('"saveStateEnabled": false', context)
+
     @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url')
     def test_poster_image(self, get_course_video_image_url):
         """
@@ -985,6 +1015,71 @@ class TestGetHtmlMethod(BaseTestXmodule):
         context = self.item_descriptor.render(STUDENT_VIEW).content
 
         self.assertIn("\'poster\': \'null\'", context)
+
+    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=False))
+    def test_hls_primary_playback_on_toggling_hls_feature(self):
+        """
+        Verify that `prioritize_hls` is set to `False` if `HLSPlaybackEnabledFlag` is disabled.
+        """
+        video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
+        self.initialize_module(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        self.assertIn('"prioritizeHls": false', context)
+
+    @ddt.data(
+        {
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on,
+            'waffle_enabled': False,
+            'youtube': '3_yD_cEKoCk',
+            'hls': ['https://hls.com/hls.m3u8'],
+            'result': 'true'
+        },
+        {
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on,
+            'waffle_enabled': False,
+            'youtube': '',
+            'hls': ['https://hls.com/hls.m3u8'],
+            'result': 'false'
+        },
+        {
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on,
+            'waffle_enabled': False,
+            'youtube': '',
+            'hls': [],
+            'result': 'false'
+        },
+        {
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on,
+            'waffle_enabled': False,
+            'youtube': '3_yD_cEKoCk',
+            'hls': [],
+            'result': 'false'
+        },
+        {
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off,
+            'waffle_enabled': True,
+            'youtube': '3_yD_cEKoCk',
+            'hls': ['https://hls.com/hls.m3u8'],
+            'result': 'false'
+        },
+    )
+    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    def test_deprecate_youtube_course_waffle_flag(self, data):
+        """
+        Tests various combinations of a `prioritize_hls` flag being set in waffle and overridden for a course.
+        """
+        metadata = {
+            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'] + data['hls'],
+        }
+        video_xml = '<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
+            data['youtube']
+        )
+        DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
+        with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
+            with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['waffle_enabled']):
+                self.initialize_module(data=video_xml, metadata=metadata)
+                context = self.item_descriptor.render(STUDENT_VIEW).content
+                self.assertIn('"prioritizeHls": {}'.format(data['result']), context)
 
 
 @attr(shard=7)
@@ -1252,7 +1347,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
 
 
 @ddt.ddt
-class TestVideoDescriptorStudentViewJson(TestCase):
+class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
     """
     Tests for the student_view_data method on VideoDescriptor.
     """
@@ -1809,7 +1904,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.assertNotEqual(video.edx_video_id, u'')
 
         video_data = get_video_info(video.edx_video_id)
-        self.assertEqual(video_data['status'], 'imported')
+        self.assertEqual(video_data['status'], 'external')
 
         # Verify that VAL transcript is imported.
         self.assertDictContainsSubset(
@@ -1950,7 +2045,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.assertNotEqual(video.edx_video_id, u'')
 
         video_data = get_video_info(video.edx_video_id)
-        self.assertEqual(video_data['status'], 'imported')
+        self.assertEqual(video_data['status'], 'external')
 
         # Verify that correct transcripts are imported.
         self.assertDictContainsSubset(
@@ -2059,6 +2154,7 @@ class TestVideoWithBumper(TestVideo):
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
+                'saveStateEnabled': True,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
@@ -2085,6 +2181,7 @@ class TestVideoWithBumper(TestVideo):
                 'completionEnabled': False,
                 'completionPercentage': 0.95,
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
+                'prioritizeHls': False,
             })),
             'track': None,
             'transcript_download_format': u'srt',
@@ -2107,6 +2204,7 @@ class TestAutoAdvanceVideo(TestVideo):
     """
     Tests the server side of video auto-advance.
     """
+    maxDiff = None
     CATEGORY = "video"
     METADATA = {}
     # Use temporary FEATURES in this test without affecting the original
@@ -2130,6 +2228,7 @@ class TestAutoAdvanceVideo(TestVideo):
             'bumper_metadata': 'null',
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': autoadvance_flag,
+                'saveStateEnabled': True,
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
@@ -2160,6 +2259,7 @@ class TestAutoAdvanceVideo(TestVideo):
                 'completionEnabled': False,
                 'completionPercentage': 0.95,
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
+                'prioritizeHls': False,
             })),
             'track': None,
             'transcript_download_format': u'srt',

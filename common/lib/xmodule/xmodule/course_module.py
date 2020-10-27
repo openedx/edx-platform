@@ -20,7 +20,7 @@ from six import text_type
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
 from xmodule import course_metadata_utils
-from xmodule.course_metadata_utils import DEFAULT_START_DATE
+from xmodule.course_metadata_utils import DEFAULT_START_DATE, DEFAULT_GRADING_POLICY
 from xmodule.graders import grader_from_conf
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.tabs import CourseTabList, InvalidTabsException
@@ -43,6 +43,10 @@ DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
 )
 
 DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
+
+COURSE_VISIBILITY_PRIVATE = 'private'
+COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
+COURSE_VISIBILITY_PUBLIC = 'public'
 
 
 class StringOrDate(Date):
@@ -179,6 +183,89 @@ class TextbookList(List):
         return json_data
 
 
+class ProctoringProvider(String):
+    """
+    ProctoringProvider field, which includes validation of the provider
+    and default that pulls from edx platform settings.
+    """
+    def from_json(self, value):
+        """
+        Return ProctoringProvider as full featured Python type. Perform validation on the provider
+        and include any inherited values from the platform default.
+        """
+        errors = []
+        value = super(ProctoringProvider, self).from_json(value)
+
+        provider_errors = self._validate_proctoring_provider(value)
+        errors.extend(provider_errors)
+
+        if errors:
+            raise ValueError(errors)
+
+        value = self._get_proctoring_value(value)
+
+        return value
+
+    def _get_proctoring_value(self, value):
+        """
+        Return a proctoring value that includes any inherited attributes from the platform defaults
+        for the provider.
+        """
+        # if provider is missing from the value, return the default
+        if value is None:
+            return self.default
+
+        return value
+
+    def _validate_proctoring_provider(self, value):
+        """
+        Validate the value for the proctoring provider. If the proctoring provider value is
+        specified, and it is not one of the providers configured at the platform level, return
+        a list of error messages to the caller.
+        """
+        errors = []
+
+        available_providers = get_available_providers()
+
+        if value and value not in available_providers:
+            errors.append(
+                _('The selected proctoring provider, {proctoring_provider}, is not a valid provider. '
+                    'Please select from one of {available_providers}.')
+                .format(
+                    proctoring_provider=value,
+                    available_providers=available_providers
+                )
+            )
+
+        return errors
+
+    @property
+    def default(self):
+        """
+        Return default value for ProctoringProvider.
+        """
+        default = super(ProctoringProvider, self).default
+
+        proctoring_backend_settings = getattr(settings, 'PROCTORING_BACKENDS', None)
+
+        if proctoring_backend_settings:
+            return proctoring_backend_settings.get('DEFAULT', None)
+
+        return default
+
+
+def get_available_providers():
+    proctoring_backend_settings = getattr(
+        settings,
+        'PROCTORING_BACKENDS',
+        {}
+    )
+
+    available_providers = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
+    available_providers.sort()
+    return available_providers
+
+
 class CourseFields(object):
     lti_passports = List(
         display_name=_("LTI Passports"),
@@ -229,40 +316,7 @@ class CourseFields(object):
     )
     grading_policy = Dict(
         help=_("Grading policy definition for this class"),
-        default={
-            "GRADER": [
-                {
-                    "type": "Homework",
-                    "min_count": 12,
-                    "drop_count": 2,
-                    "short_label": "HW",
-                    "weight": 0.15,
-                },
-                {
-                    "type": "Lab",
-                    "min_count": 12,
-                    "drop_count": 2,
-                    "weight": 0.15,
-                },
-                {
-                    "type": "Midterm Exam",
-                    "short_label": "Midterm",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "weight": 0.3,
-                },
-                {
-                    "type": "Final Exam",
-                    "short_label": "Final",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "weight": 0.4,
-                }
-            ],
-            "GRADE_CUTOFFS": {
-                "Pass": 0.5,
-            },
-        },
+        default=DEFAULT_GRADING_POLICY,
         scope=Scope.content
     )
     show_calculator = Boolean(
@@ -677,6 +731,8 @@ class CourseFields(object):
     catalog_visibility = String(
         display_name=_("Course Visibility In Catalog"),
         help=_(
+            # Translators: the quoted words 'both', 'about', and 'none' must be
+            # left untranslated.  Leave them as English words.
             "Defines the access permissions for showing the course in the course catalog. This can be set to one "
             "of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "
             "to about page), 'none' (do not show in catalog and do not allow access to an about page)."
@@ -684,9 +740,10 @@ class CourseFields(object):
         default=DEFAULT_COURSE_VISIBILITY_IN_CATALOG,
         scope=Scope.settings,
         values=[
-            {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
-            {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},
-            {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]
+            {"display_name": "Both", "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
+            {"display_name": "About", "value": CATALOG_VISIBILITY_ABOUT},
+            {"display_name": "None", "value": CATALOG_VISIBILITY_NONE},
+        ],
     )
 
     entrance_exam_enabled = Boolean(
@@ -769,6 +826,21 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    proctoring_provider = ProctoringProvider(
+        display_name=_("Proctoring Provider"),
+        help=_(
+            "Enter the proctoring provider you want to use for this course run. "
+            "Choose from the following options: {available_providers}."),
+        help_format_args=dict(
+            # Put the available providers into a format variable so that translators
+            # don't translate them.
+            available_providers=(
+                ', '.join(get_available_providers())
+            ),
+        ),
+        scope=Scope.settings,
+    )
+
     allow_proctoring_opt_out = Boolean(
         display_name=_("Allow Opting Out of Proctored Exams"),
         help=_(
@@ -849,6 +921,24 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    course_visibility = String(
+        display_name=_("Course Visibility For Unenrolled Learners"),
+        help=_(
+            # Translators: the quoted words 'private', 'public_outline', and 'public'
+            # must be left untranslated.  Leave them as English words.
+            "Defines the access permissions for unenrolled learners. This can be set to one of three values: "
+            "'private' (default visibility, only allowed for enrolled students), 'public_outline' "
+            "(allow access to course outline) and 'public' (allow access to both outline and course content)."
+        ),
+        default=COURSE_VISIBILITY_PRIVATE,
+        scope=Scope.settings,
+        values=[
+            {"display_name": "private", "value": COURSE_VISIBILITY_PRIVATE},
+            {"display_name": "public_outline", "value": COURSE_VISIBILITY_PUBLIC_OUTLINE},
+            {"display_name": "public", "value": COURSE_VISIBILITY_PUBLIC},
+        ],
+    )
+
     """
     instructor_info dict structure:
     {
@@ -887,6 +977,15 @@ class CourseFields(object):
             "to learners at their scheduled time."
         ),
         scope=Scope.settings, default=False
+    )
+    other_course_settings = Dict(
+        display_name=_("Other Course Settings"),
+        help=_(
+            "Any additional information about the course that the platform needs or that allows integration with "
+            "external systems such as CRM software. Enter a dictionary of values in JSON format, such as "
+            "{ \"my_custom_setting\": \"value\", \"other_setting\": \"value\" }"
+        ),
+        scope=Scope.settings
     )
 
 
@@ -1056,7 +1155,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
     def definition_to_xml(self, resource_fs):
         xml_object = super(CourseDescriptor, self).definition_to_xml(resource_fs)
 
-        if len(self.textbooks) > 0:
+        if self.textbooks:
             textbook_xml_object = etree.Element('textbook')
             for textbook in self.textbooks:
                 textbook_xml_object.set('title', textbook.title)
@@ -1110,7 +1209,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
     @raw_grader.setter
     def raw_grader(self, value):
-        # NOTE WELL: this change will not update the processed graders. If we need that, this needs to call grader_from_conf
+        # NOTE WELL: this change will not update the processed graders.
+        # If we need that, this needs to call grader_from_conf.
         self._grading_policy['RAW_GRADER'] = value
         self.grading_policy['GRADER'] = value
 
@@ -1275,12 +1375,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Get a list of dicts with start and end fields with datetime values from
         the discussion_blackouts setting
         """
+
+        blackout_dates = self.discussion_blackouts
         date_proxy = Date()
+        if blackout_dates and type(blackout_dates[0]) not in (list, tuple):
+            blackout_dates = [blackout_dates]
+
         try:
             ret = [
                 {"start": date_proxy.from_json(start), "end": date_proxy.from_json(end)}
                 for start, end
-                in filter(None, self.discussion_blackouts)
+                in filter(None, blackout_dates)
             ]
             for blackout in ret:
                 if not blackout["start"] or not blackout["end"]:
@@ -1289,7 +1394,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         except (TypeError, ValueError):
             log.info(
                 "Error parsing discussion_blackouts %s for course %s",
-                self.discussion_blackouts,
+                blackout_dates,
                 self.id
             )
             return []

@@ -108,6 +108,7 @@ def _get_google_analytics_tracking_url(context):
             message.send_uuid,
             message.uuid,
         ),
+        document_host=site.domain.rstrip('/')
     )
     course_ids = context.get('course_ids')
     if course_ids is not None and len(course_ids) > 0:
@@ -134,7 +135,7 @@ def modify_url_to_track_clicks(url, campaign=None):
     if campaign is None:
         campaign = CampaignTrackingInfo()
     modified_url = parsed_url._replace(query=campaign.to_query_string(parsed_url.query))
-    return modified_url.geturl()  # pylint: disable=no-member
+    return modified_url.geturl()
 
 
 def ensure_url_is_absolute(site, relative_path):

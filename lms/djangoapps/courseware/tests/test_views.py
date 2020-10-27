@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
 from urllib import quote, urlencode
 from uuid import uuid4
+from crum import set_current_request
+from markupsafe import escape
 
 from completion.test_utils import CompletionWaffleTestMixin
 import ddt
@@ -17,12 +19,11 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse, reverse_lazy
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
-from django.test.client import Client, RequestFactory
+from django.test.client import Client
 from django.test.utils import override_settings
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, PropertyMock, create_autospec, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
@@ -39,7 +40,8 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.access_utils import check_course_open_for_learner
 from courseware.model_data import FieldDataCache, set_score
 from courseware.module_render import get_module, handle_xblock_callback
-from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, RequestFactoryNoCsrf
+from courseware.tests.helpers import get_expiration_banner_text
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
@@ -49,7 +51,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -58,25 +60,34 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from openedx.features.course_experience import (
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    COURSE_OUTLINE_PAGE_FLAG,
+    UNIFIED_COURSE_TAB_FLAG,
+)
 from student.models import CourseEnrollment
 from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase
+    SharedModuleStoreTestCase,
+    CourseUserType,
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
@@ -204,11 +215,13 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 147),
-        (ModuleStoreEnum.Type.split, 4, 147),
+        (ModuleStoreEnum.Type.mongo, 10, 179),
+        (ModuleStoreEnum.Type.split, 4, 173),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
+        # TODO: decrease query count as part of REVO-28
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with self.store.default_store(store_type):
             course = CourseFactory.create()
             with self.store.bulk_operations(course.id):
@@ -317,7 +330,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         url = reverse('courseware', kwargs={'course_id': unicode(self.course_key)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
-        response = self.client.get(response.url)  # pylint: disable=no-member
+        response = self.client.get(response.url)
         self.assertNotIn(unicode(self.problem.location), response.content.decode("utf-8"))
         self.assertIn(unicode(self.problem2.location), response.content.decode("utf-8"))
 
@@ -920,7 +933,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         self.course.bypass_home = True
-        self.store.update_item(self.course, self.user.id)  # pylint: disable=no-member
+        self.store.update_item(self.course, self.user.id)
         self.assertTrue(self.course.bypass_home)
 
         response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
@@ -965,7 +978,7 @@ class TestProgramMarketingView(SharedModuleStoreTestCase):
         super(TestProgramMarketingView, cls).setUpClass()
 
         modulestore_course = CourseFactory()
-        course_run = CourseRunFactory(key=unicode(modulestore_course.id))  # pylint: disable=no-member
+        course_run = CourseRunFactory(key=unicode(modulestore_course.id))
         course = CatalogCourseFactory(course_runs=[course_run])
 
         cls.data = ProgramFactory(
@@ -1167,7 +1180,6 @@ class StartDateTests(ModuleStoreTestCase):
         self.assertContains(response, "2013-09-16T07:17:28+0000")
 
 
-# pylint: disable=protected-access, no-member
 @attr(shard=5)
 class ProgressPageBaseTests(ModuleStoreTestCase):
     """
@@ -1225,7 +1237,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
         return resp
 
 
-# pylint: disable=protected-access, no-member
+# pylint: disable=protected-access
 @attr(shard=5)
 @ddt.ddt
 class ProgressPageTests(ProgressPageBaseTests):
@@ -1327,6 +1339,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
 
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_view_certificate_link(self):
         """
@@ -1385,9 +1398,10 @@ class ProgressPageTests(ProgressPageBaseTests):
             resp = self._get_progress_page()
             self.assertNotContains(resp, u"View Your Certificate")
             self.assertNotContains(resp, u"You can now view your certificate")
-            self.assertContains(resp, "working on it...")
-            self.assertContains(resp, "creating your certificate")
+            self.assertContains(resp, "Your certificate is available")
+            self.assertContains(resp, "earned a certificate for this course.")
 
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_view_certificate_link_hidden(self):
         """
@@ -1417,23 +1431,26 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 38),
-        (False, 37)
+        (True, 56),
+        (False, 55)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
+        # TODO: decrease query count as part of REVO-28
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course(self_paced=self_paced)
         with self.assertNumQueries(query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 45, 29),
-        (True, 37, 24)
+        (False, 63, 43),
+        (True, 55, 39)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
             with self.assertNumQueries(
@@ -1448,6 +1465,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 ), check_mongo_calls(1):
                     self._get_progress_page()
 
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @ddt.data(
         *itertools.product(
             (
@@ -1569,6 +1587,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u"View Certificate")
             self.assert_invalidate_certificate(generated_certificate)
 
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
         Verify that for pdf certs if certificate is marked as invalidated than
@@ -1587,7 +1606,71 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, u'Download Your Certificate')
             self.assert_invalidate_certificate(generated_certificate)
 
+    @ddt.data(
+        *itertools.product(
+            (
+                CourseMode.AUDIT,
+                CourseMode.HONOR,
+                CourseMode.VERIFIED,
+                CourseMode.PROFESSIONAL,
+                CourseMode.NO_ID_PROFESSIONAL_MODE,
+                CourseMode.CREDIT_MODE
+            )
+        )
+    )
+    @ddt.unpack
+    def test_progress_with_course_duration_limits(self, course_mode):
+        """
+        Verify that expired banner message appears on progress page, if learner is enrolled
+        in audit mode.
+        """
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        user = UserFactory.create()
+        self.assertTrue(self.client.login(username=user.username, password='test'))
+        add_course_mode(self.course, upgrade_deadline_expired=False)
+        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
+
+        response = self._get_progress_page()
+        bannerText = get_expiration_banner_text(user, self.course)
+
+        if course_mode == CourseMode.AUDIT:
+            self.assertContains(response, bannerText, html=True)
+        else:
+            self.assertNotContains(response, bannerText, html=True)
+
+    @ddt.data(
+        *itertools.product(
+            (
+                CourseMode.AUDIT,
+                CourseMode.HONOR,
+                CourseMode.VERIFIED,
+                CourseMode.PROFESSIONAL,
+                CourseMode.NO_ID_PROFESSIONAL_MODE,
+                CourseMode.CREDIT_MODE
+            )
+        )
+    )
+    @ddt.unpack
+    def test_progress_without_course_duration_limits(self, course_mode):
+        """
+        Verify that expired banner message never appears on progress page, regardless
+        of course_mode
+        """
+        CourseDurationLimitConfig.objects.create(enabled=False)
+        user = UserFactory.create()
+        self.assertTrue(self.client.login(username=user.username, password='test'))
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=course_mode
+        )
+        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
+
+        response = self._get_progress_page()
+        bannerText = get_expiration_banner_text(user, self.course)
+        self.assertNotContains(response, bannerText, html=True)
+
     @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     def test_message_for_audit_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled
          in audit mode.
@@ -1725,7 +1808,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         }
 
 
-# pylint: disable=protected-access, no-member
 @attr(shard=5)
 @ddt.ddt
 class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
@@ -1813,6 +1895,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
             self.course,
             depth=2
         )
+        self.addCleanup(set_current_request, None)
         # pylint: disable=protected-access
         module = get_module(
             self.user,
@@ -2014,7 +2097,7 @@ class VerifyCourseKeyDecoratorTests(TestCase):
     def setUp(self):
         super(VerifyCourseKeyDecoratorTests, self).setUp()
 
-        self.request = RequestFactory().get("foo")
+        self.request = RequestFactoryNoCsrf().get("foo")
         self.valid_course_id = "edX/test/1"
         self.invalid_course_id = "edX/"
 
@@ -2064,9 +2147,9 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     def test_user_with_passing_grade(self, mock_is_course_passed):
         # If user has above passing grading then json will return cert generating message and
         # status valid code
-        # mocking xqueue and analytics
+        # mocking xqueue and Segment analytics
 
-        analytics_patcher = patch('courseware.views.views.analytics')
+        analytics_patcher = patch('courseware.views.views.segment')
         mock_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
@@ -2077,18 +2160,13 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             self.assertEqual(resp.status_code, 200)
 
             # Verify Google Analytics event fired after generating certificate
-            mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
-                self.student.id,  # pylint: disable=no-member
+            mock_tracker.track.assert_called_once_with(
+                self.student.id,
                 'edx.bi.user.certificate.generate',
                 {
                     'category': 'certificates',
                     'label': unicode(self.course.id)
                 },
-
-                context={
-                    'ip': '127.0.0.1',
-                    'Google Analytics': {'clientId': None}
-                }
             )
             mock_tracker.reset_mock()
 
@@ -2201,7 +2279,6 @@ class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
     """
-    SEO_WAFFLE_FLAG = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
 
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -2271,11 +2348,48 @@ class TestIndexView(ModuleStoreTestCase):
         )
         self.assertIn("Activate Block ID: test_block_id", response.content)
 
-    def test_anonymous_access(self):
-        course = CourseFactory()
+    @ddt.data(
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False],
+        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, False],
+        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, False],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, False],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, False],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, False],
+        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, False],
+        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, False],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, False],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, False],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ENROLLED, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ENROLLED, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED_STAFF, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED_STAFF, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.GLOBAL_STAFF, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.GLOBAL_STAFF, True],
+    )
+    @ddt.unpack
+    def test_courseware_access(self, waffle_override, course_visibility, user_type, expected_course_content):
+
+        course = CourseFactory(course_visibility=course_visibility)
         with self.store.bulk_operations(course.id):
             chapter = ItemFactory(parent=course, category='chapter')
             section = ItemFactory(parent=chapter, category='sequential')
+            vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
+            ItemFactory.create(parent=vertical, category='html', display_name='HTML block')
+            ItemFactory.create(parent=vertical, category='video', display_name='Video')
+
+        self.create_user_for_course(course, user_type)
 
         url = reverse(
             'courseware_section',
@@ -2285,13 +2399,27 @@ class TestIndexView(ModuleStoreTestCase):
                 'section': section.url_name,
             }
         )
-        response = self.client.get(url, follow=False)
-        assert response.status_code == 302
 
-        waffle_flag = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
-        with override_waffle_flag(waffle_flag, active=True):
+        with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=waffle_override):
+
             response = self.client.get(url, follow=False)
-            assert response.status_code == 200
+            assert response.status_code == (200 if expected_course_content else 302)
+
+            if expected_course_content:
+                if user_type in (CourseUserType.ANONYMOUS, CourseUserType.UNENROLLED):
+                    self.assertIn('data-save-position="false"', response.content)
+                    self.assertIn('data-show-completion="false"', response.content)
+                    self.assertIn('xblock-public_view-sequential', response.content)
+                    self.assertIn('xblock-public_view-vertical', response.content)
+                    self.assertIn('xblock-public_view-html', response.content)
+                    self.assertIn('xblock-public_view-video', response.content)
+                else:
+                    self.assertIn('data-save-position="true"', response.content)
+                    self.assertIn('data-show-completion="true"', response.content)
+                    self.assertIn('xblock-student_view-sequential', response.content)
+                    self.assertIn('xblock-student_view-vertical', response.content)
+                    self.assertIn('xblock-student_view-html', response.content)
+                    self.assertIn('xblock-student_view-video', response.content)
 
 
 @attr(shard=5)
@@ -2307,7 +2435,7 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         """
         # pylint:disable=attribute-defined-outside-init
 
-        self.request_factory = RequestFactory()
+        self.request_factory = RequestFactoryNoCsrf()
         self.user = UserFactory()
 
         with modulestore().default_store(default_store):
@@ -2546,9 +2674,77 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
                 }
             )
         )
-
         self.assertEquals(response.status_code, 200)
         self.assertIn("Content Locked", response.content)
+
+
+@attr(shard=5)
+class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
+    """
+    Test the index view for a course with course duration limits enabled.
+    """
+
+    def setUp(self):
+        """
+        Set up the initial test data.
+        """
+        super(TestIndexViewWithCourseDurationLimits, self).setUp()
+
+        self.user = UserFactory()
+        self.course = CourseFactory.create(start=datetime.now() - timedelta(weeks=1))
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(parent=self.course, category="chapter")
+            self.sequential = ItemFactory.create(parent=self.chapter, category='sequential')
+            self.vertical = ItemFactory.create(parent=self.sequential, category="vertical")
+
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    def test_index_with_course_duration_limits(self):
+        """
+        Test that the courseware contains the course expiration banner
+        when course_duration_limits are enabled.
+        """
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        add_course_mode(self.course, upgrade_deadline_expired=False)
+        response = self.client.get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.sequential.url_name,
+                }
+            )
+        )
+        bannerText = get_expiration_banner_text(self.user, self.course)
+        # Banner is XBlock wrapper, so it is escaped in raw response. Since
+        # it's escaped, ignoring the whitespace with assertContains doesn't
+        # work. Instead we remove all whitespace to verify content is correct.
+        bannerText_no_spaces = escape(bannerText).replace(' ', '')
+        response_no_spaces = response.content.decode('utf-8').replace(' ', '')
+        self.assertIn(bannerText_no_spaces, response_no_spaces)
+
+    def test_index_without_course_duration_limits(self):
+        """
+        Test that the courseware does not contain the course expiration banner
+        when course_duration_limits are disabled.
+        """
+        CourseDurationLimitConfig.objects.create(enabled=False)
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        add_course_mode(self.course, upgrade_deadline_expired=False)
+        response = self.client.get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.sequential.url_name,
+                }
+            )
+        )
+        bannerText = get_expiration_banner_text(self.user, self.course)
+        self.assertNotContains(response, bannerText, html=True)
 
 
 @attr(shard=5)
@@ -2605,7 +2801,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         self.assertIn('data-enable-completion-on-view-service="true"', response.content)
         self.assertIn('data-mark-completed-on-view-after-delay', response.content)
 
-        request = RequestFactory().post(
+        request = RequestFactoryNoCsrf().post(
             '/',
             data=json.dumps({"completion": 1}),
             content_type='application/json',

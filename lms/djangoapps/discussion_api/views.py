@@ -2,8 +2,7 @@
 Discussion API views
 """
 from django.core.exceptions import ValidationError
-from django.contrib.auth import get_user_model
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions
 from rest_framework import status

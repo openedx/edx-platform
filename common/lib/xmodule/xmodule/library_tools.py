@@ -150,7 +150,7 @@ class LibraryToolsService(object):
             library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
         library = self._get_library(library_key)
         if library is None:
-            raise ValueError("Requested library not found.")
+            raise ValueError("Requested library {0} not found.".format(library_key))
         if user_perms and not user_perms.can_read(library_key):
             raise PermissionDenied()
         filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)

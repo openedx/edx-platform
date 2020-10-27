@@ -1,7 +1,9 @@
 """
 Helper classes and methods for running modulestore tests without Django.
 """
-import random
+from uuid import uuid4
+import io
+import os
 
 from contextlib import contextmanager, nested
 from importlib import import_module
@@ -72,6 +74,27 @@ def mock_tab_from_json(tab_dict):
     return tab_dict
 
 
+def add_temp_files_from_dict(file_dict, dir):
+    """
+    Takes in a dict formatted as: { file_name: content }, and adds files to directory
+    """
+    for file_name in file_dict:
+        with io.open("{}/{}".format(dir, file_name), "w") as opened_file:
+            content = file_dict[file_name]
+            if content:
+                opened_file.write(unicode(content))
+
+
+def remove_temp_files_from_list(file_list, dir):
+    """
+    Takes in a list of file names and removes them from dir if they exist
+    """
+    for file_name in file_list:
+        file_path = "{}/{}".format(dir, file_name)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+
 class MixedSplitTestCase(TestCase):
     """
     Stripped-down version of ModuleStoreTestCase that can be used without Django
@@ -87,7 +110,7 @@ class MixedSplitTestCase(TestCase):
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_mongo_libs',
+        'db': 'test_mongo_libs_{0}'.format(os.getpid()),
         'collection': 'modulestore',
         'asset_collection': 'assetstore',
     }
@@ -205,7 +228,7 @@ class MongoContentstoreBuilder(object):
         when the context closes.
         """
         contentstore = MongoContentStore(
-            db='contentstore{}'.format(random.randint(0, 10000)),
+            db='contentstore{}'.format(THIS_UUID),
             collection='content',
             **COMMON_DOCSTORE_CONFIG
         )
@@ -263,7 +286,7 @@ class MongoModulestoreBuilder(StoreBuilderBase):
                 all of its assets.
         """
         doc_store_config = dict(
-            db='modulestore{}'.format(random.randint(0, 10000)),
+            db='modulestore{}'.format(THIS_UUID),
             collection='xmodule',
             asset_collection='asset_metadata',
             **COMMON_DOCSTORE_CONFIG
@@ -311,7 +334,7 @@ class VersioningModulestoreBuilder(StoreBuilderBase):
                 all of its assets.
         """
         doc_store_config = dict(
-            db='modulestore{}'.format(random.randint(0, 10000)),
+            db='modulestore{}'.format(THIS_UUID),
             collection='split_module',
             **COMMON_DOCSTORE_CONFIG
         )
@@ -432,6 +455,8 @@ class MixedModulestoreBuilder(StoreBuilderBase):
             return store.db_connection.structures
 
 
+THIS_UUID = uuid4().hex
+
 COMMON_DOCSTORE_CONFIG = {
     'host': MONGO_HOST,
     'port': MONGO_PORT_NUM,
@@ -469,6 +494,14 @@ MODULESTORE_SHORTNAMES = DIRECT_MS_SETUPS_SHORT + MIXED_MS_SETUPS_SHORT
 SHORT_NAME_MAP = dict(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES))
 
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
+
+DOT_FILES_DICT = {
+    ".DS_Store": None,
+    ".example.txt": "BLUE",
+}
+TILDA_FILES_DICT = {
+    "example.txt~": "RED"
+}
 
 
 class PureModulestoreTestCase(TestCase):

@@ -2,19 +2,21 @@
 """
 Unit tests for instructor.enrollment methods.
 """
+from __future__ import print_function
 
 import json
 from abc import ABCMeta
 
+import ddt
 import mock
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.utils.translation import override as override_language
 from django.utils.translation import get_language
 from mock import patch, Mock
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
+from crum import set_current_request
 import unittest
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -32,7 +34,9 @@ from lms.djangoapps.instructor.enrollment import (
     send_beta_role_email,
     unenroll_email
 )
+from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import AdminFactory, UserFactory
@@ -91,17 +95,17 @@ class TestEnrollmentChangeBase(CacheIsolationTestCase):
                 `email` is an email string
         """
         # initialize & check before
-        print "checking initialization..."
+        print("checking initialization...")
         eobjs = before_ideal.create_user(self.course_key)
         before = EmailEnrollmentState(self.course_key, eobjs.email)
         self.assertEqual(before, before_ideal)
 
         # do action
-        print "running action..."
+        print("running action...")
         action(eobjs.email)
 
         # check after
-        print "checking effects..."
+        print("checking effects...")
         after = EmailEnrollmentState(self.course_key, eobjs.email)
         self.assertEqual(after, after_ideal)
 
@@ -320,7 +324,6 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             org='course',
             run='id',
         )
-        # pylint: disable=no-member
         cls.course_key = cls.course.location.course_key
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             cls.parent = ItemFactory(
@@ -549,6 +552,11 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         cls.user = cls.request.user
         cls.instructor = UserFactory(username='staff', is_staff=True)
 
+    @classmethod
+    def tearDownClass(cls):
+        super(TestStudentModuleGrading, cls).tearDownClass()
+        set_current_request(None)
+
     def _get_subsection_grade_and_verify(self, all_earned, all_possible, graded_earned, graded_possible):
         """
         Retrieves the subsection grade and verifies that
@@ -764,7 +772,8 @@ class TestGetEmailParams(SharedModuleStoreTestCase):
 
 
 @attr(shard=1)
-class TestRenderMessageToString(SharedModuleStoreTestCase):
+@ddt.ddt
+class TestRenderMessageToString(EmailTemplateTagMixin, SharedModuleStoreTestCase):
     """
     Test that email templates can be rendered in a language chosen manually.
     Test CCX enrollmet email.
@@ -775,8 +784,8 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestRenderMessageToString, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.subject_template = 'emails/enroll_email_allowedsubject.txt'
-        cls.message_template = 'emails/enroll_email_allowedmessage.txt'
+        cls.subject_template = 'instructor/edx_ace/allowedenroll/email/subject.txt'
+        cls.message_template = 'instructor/edx_ace/allowedenroll/email/body.txt'
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
     def setUp(self):
@@ -794,6 +803,7 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         email_params = get_email_params(self.course, True)
         email_params["email_address"] = "user@example.com"
         email_params["full_name"] = "Jean Reno"
+        email_params["course_name"] = email_params["display_name"]
 
         return email_params
 
@@ -809,6 +819,8 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         )
         email_params["email_address"] = "user@example.com"
         email_params["full_name"] = "Jean Reno"
+        email_params["course_name"] = email_params["display_name"]
+        email_params.update(self.context)
 
         return email_params
 
@@ -834,12 +846,12 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         )
 
     def test_subject_and_message_translation(self):
-        subject, message = self.get_subject_and_message('fr')
+        subject, message = self.get_subject_and_message('eo')
         language_after_rendering = get_language()
 
-        you_have_been_invited_in_french = u"Vous avez été invité"
-        self.assertIn(you_have_been_invited_in_french, subject)
-        self.assertIn(you_have_been_invited_in_french, message)
+        you_have_been_invited_in_esperanto = u"Ýöü hävé ßéén"
+        self.assertIn(you_have_been_invited_in_esperanto, subject)
+        self.assertIn(you_have_been_invited_in_esperanto, message)
         self.assertEqual(settings.LANGUAGE_CODE, language_after_rendering)
 
     def test_platform_language_is_used_for_logged_in_user(self):
@@ -849,15 +861,19 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
             self.assertIn("You have been", message)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
-    def test_render_enrollment_message_ccx_members(self):
+    @ddt.data('body.txt', 'body.html')
+    def test_render_enrollment_message_ccx_members(self, body_file_name):
         """
         Test enrollment email template renders for CCX.
         For EDX members.
         """
-        subject_template = 'emails/enroll_email_enrolledsubject.txt'
-        message_template = 'emails/enroll_email_enrolledmessage.txt'
+        subject_template = 'instructor/edx_ace/enrollenrolled/email/subject.txt'
+        body_template = 'instructor/edx_ace/enrollenrolled/email/{body_file_name}'.format(
+            body_file_name=body_file_name,
+        )
 
-        subject, message = self.get_subject_and_message_ccx(subject_template, message_template)
+        subject, message = self.get_subject_and_message_ccx(subject_template, body_template)
+
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)
         site = settings.SITE_NAME
@@ -868,28 +884,34 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         self.assertIn(course_url, message)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
-    def test_render_unenrollment_message_ccx_members(self):
+    @ddt.data('body.txt', 'body.html')
+    def test_render_unenrollment_message_ccx_members(self, body_file_name):
         """
         Test unenrollment email template renders for CCX.
         For EDX members.
         """
-        subject_template = 'emails/unenroll_email_subject.txt'
-        message_template = 'emails/unenroll_email_enrolledmessage.txt'
+        subject_template = 'instructor/edx_ace/enrolledunenroll/email/subject.txt'
+        body_template = 'instructor/edx_ace/enrolledunenroll/email/{body_file_name}'.format(
+            body_file_name=body_file_name,
+        )
 
-        subject, message = self.get_subject_and_message_ccx(subject_template, message_template)
+        subject, message = self.get_subject_and_message_ccx(subject_template, body_template)
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
-    def test_render_enrollment_message_ccx_non_members(self):
+    @ddt.data('body.txt', 'body.html')
+    def test_render_enrollment_message_ccx_non_members(self, body_file_name):
         """
         Test enrollment email template renders for CCX.
         For non EDX members.
         """
-        subject_template = 'emails/enroll_email_allowedsubject.txt'
-        message_template = 'emails/enroll_email_allowedmessage.txt'
+        subject_template = 'instructor/edx_ace/allowedenroll/email/subject.txt'
+        body_template = 'instructor/edx_ace/allowedenroll/email/{body_file_name}'.format(
+            body_file_name=body_file_name,
+        )
 
-        subject, message = self.get_subject_and_message_ccx(subject_template, message_template)
+        subject, message = self.get_subject_and_message_ccx(subject_template, body_template)
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)
         site = settings.SITE_NAME
@@ -897,14 +919,17 @@ class TestRenderMessageToString(SharedModuleStoreTestCase):
         self.assertIn(registration_url, message)
 
     @patch.dict('django.conf.settings.FEATURES', {'CUSTOM_COURSES_EDX': True})
-    def test_render_unenrollment_message_ccx_non_members(self):
+    @ddt.data('body.txt', 'body.html')
+    def test_render_unenrollment_message_ccx_non_members(self, body_file_name):
         """
         Test unenrollment email template renders for CCX.
         For non EDX members.
         """
-        subject_template = 'emails/unenroll_email_subject.txt'
-        message_template = 'emails/unenroll_email_allowedmessage.txt'
+        subject_template = 'instructor/edx_ace/allowedunenroll/email/subject.txt'
+        body_template = 'instructor/edx_ace/allowedunenroll/email/{body_file_name}'.format(
+            body_file_name=body_file_name,
+        )
 
-        subject, message = self.get_subject_and_message_ccx(subject_template, message_template)
+        subject, message = self.get_subject_and_message_ccx(subject_template, body_template)
         self.assertIn(self.ccx.display_name, subject)
         self.assertIn(self.ccx.display_name, message)

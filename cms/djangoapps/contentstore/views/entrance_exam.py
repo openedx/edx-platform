@@ -27,7 +27,6 @@ __all__ = ['entrance_exam', ]
 log = logging.getLogger(__name__)
 
 
-# pylint: disable=invalid-name
 def _get_default_entrance_exam_minimum_pct():
     """
     Helper method to return the default value from configuration

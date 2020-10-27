@@ -22,7 +22,7 @@ class CreateUserMgmtTests(SharedModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.user_model = get_user_model()
         self.default_email = 'testuser555@test.edx.org'
-        self.default_password = 'testuser@555@password'
+        self.default_password = 'b3TT3rPa$$w0rd!'
 
         # This is the default mode that the create_user commands gives a user enrollment
         self.default_course_mode = CourseMode.HONOR

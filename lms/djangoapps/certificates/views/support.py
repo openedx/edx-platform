@@ -4,6 +4,7 @@ Certificate end-points used by the student support UI.
 See lms/djangoapps/support for more details.
 
 """
+import bleach
 import logging
 import urllib
 from functools import wraps
@@ -33,7 +34,7 @@ def require_certificate_permission(func):
     View decorator that requires permission to view and regenerate certificates.
     """
     @wraps(func)
-    def inner(request, *args, **kwargs):  # pylint:disable=missing-docstring
+    def inner(request, *args, **kwargs):
         if has_access(request.user, "certificates", "global"):
             return func(request, *args, **kwargs)
         else:
@@ -80,7 +81,7 @@ def search_certificates(request):
         ]
 
     """
-    user_filter = urllib.unquote(urllib.quote_plus(request.GET.get("user", "")))
+    user_filter = bleach.clean(urllib.unquote(urllib.quote_plus(request.GET.get("user", ""))))
     if not user_filter:
         msg = _("user is not given.")
         return HttpResponseBadRequest(msg)
@@ -285,5 +286,5 @@ def _deactivate_invalidation(certificate):
         )
         # Deactivate certificate invalidation if it was fetched successfully.
         certificate_invalidation.deactivate()
-    except CertificateInvalidation.DoesNotExist:  # pylint: disable=bare-except
+    except CertificateInvalidation.DoesNotExist:
         pass

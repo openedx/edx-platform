@@ -65,7 +65,7 @@ def setup_retirement_states(scope="module"):  # pylint: disable=unused-argument
     RetirementState.objects.all().delete()
 
 
-def create_retirement_status(state=None, create_datetime=None):
+def create_retirement_status(user, state=None, create_datetime=None):
     """
     Helper method to create a RetirementStatus with useful defaults.
     Assumes that retirement states have been setup before calling.
@@ -73,7 +73,6 @@ def create_retirement_status(state=None, create_datetime=None):
     if create_datetime is None:
         create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=8)
 
-    user = UserFactory()
     retirement = UserRetirementStatus.create_retirement(user)
     if state:
         retirement.current_state = state
@@ -84,9 +83,15 @@ def create_retirement_status(state=None, create_datetime=None):
     return retirement
 
 
-def _fake_logged_out_user(user):
-    # Simulate the initial logout retirement endpoint.
-    user.username = get_retired_username_by_username(user.username)
+def _fake_logged_out_user(user, retire_username=False):
+    """
+    Simulate the initial logout retirement endpoint.
+    """
+    # By default, do not change the username to the retired hash version because
+    # that is not what happens upon actual retirement requests immediately after
+    # logout.
+    if retire_username:
+        user.username = get_retired_username_by_username(user.username)
     user.email = get_retired_email_by_email(user.email)
     user.set_unusable_password()
     user.save()
@@ -98,8 +103,7 @@ def logged_out_retirement_request():
     Returns a UserRetirementStatus test fixture object that has been logged out and email-changed,
     which is the first step which happens to a user being added to the retirement queue.
     """
-    retirement = create_retirement_status()
-    _fake_logged_out_user(retirement.user)
+    retirement = fake_requested_retirement(UserFactory())
     return retirement
 
 
@@ -149,13 +153,23 @@ class RetirementTestCase(TestCase):
         return retirement_dict
 
     def _create_users_all_states(self):
-        return [create_retirement_status(state) for state in RetirementState.objects.all()]
+        return [create_retirement_status(UserFactory(), state=state) for state in RetirementState.objects.all()]
 
     def _get_non_dead_end_states(self):
         return [state for state in RetirementState.objects.filter(is_dead_end_state=False)]
 
     def _get_dead_end_states(self):
         return [state for state in RetirementState.objects.filter(is_dead_end_state=True)]
+
+
+def fake_requested_retirement(user):
+    """
+    Attempt to make the given user appear to have requested retirement, and
+    nothing more.  Among other things, this will only land the user in PENDING.
+    """
+    _fake_logged_out_user(user, retire_username=False)
+    retirement = create_retirement_status(user)
+    return retirement
 
 
 def fake_completed_retirement(user):
@@ -169,7 +183,7 @@ def fake_completed_retirement(user):
     """
     # Deactivate / logout and hash username & email
     UserSocialAuth.objects.filter(user_id=user.id).delete()
-    _fake_logged_out_user(user)
+    _fake_logged_out_user(user, retire_username=True)
     user.first_name = ''
     user.last_name = ''
     user.is_active = False

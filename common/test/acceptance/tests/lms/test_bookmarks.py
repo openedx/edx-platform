@@ -5,8 +5,8 @@ End-to-end tests for the courseware unit bookmarks.
 import json
 from unittest import skip
 
+import pytest
 import requests
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common import BASE_URL
@@ -67,7 +67,7 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
         Arguments:
             num_chapters: number of chapters to create
         """
-        self.course_fixture = CourseFixture(  # pylint: disable=attribute-defined-outside-init
+        self.course_fixture = CourseFixture(
             self.course_info['org'], self.course_info['number'],
             self.course_info['run'], self.course_info['display_name']
         )
@@ -127,11 +127,11 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
             self._bookmark_unit(xblocks[index].locator)
 
 
-@attr(shard=8)
 class BookmarksTest(BookmarksTestMixin):
     """
     Tests to verify bookmarks functionality.
     """
+    shard = 8
 
     def _breadcrumb(self, num_units, modified_name=None):
         """
@@ -586,7 +586,7 @@ class BookmarksTest(BookmarksTestMixin):
         )
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class BookmarksA11yTests(BookmarksTestMixin):
     """
     Tests for checking the a11y of the bookmarks page.
@@ -595,6 +595,11 @@ class BookmarksA11yTests(BookmarksTestMixin):
         """
         Verify the basic accessibility of the bookmarks page while paginated.
         """
+        self.bookmarks_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.setup_test(num_chapters=11)
         self.bookmark_units(num_units=11)
         self.bookmarks_page.visit()

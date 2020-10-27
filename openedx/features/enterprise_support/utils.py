@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import hashlib
+import json
 
 import six
 from django.conf import settings
@@ -8,8 +9,9 @@ from django.utils.translation import ugettext as _
 
 import third_party_auth
 from third_party_auth import pipeline
-from student.cookies import set_experiments_is_enterprise_cookie
+from enterprise.models import EnterpriseCustomerUser
 
+from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
 
@@ -188,12 +190,27 @@ def handle_enterprise_cookies_for_logistration(request, response, context):
     # This cookie can be used for tests or minor features,
     # but should not be used for payment related or other critical work
     # since users can edit their cookies
-    set_experiments_is_enterprise_cookie(request, response, context['enable_enterprise_sidebar'])
+    _set_experiments_is_enterprise_cookie(request, response, context['enable_enterprise_sidebar'])
 
     # Remove enterprise cookie so that subsequent requests show default login page.
     response.delete_cookie(
         configuration_helpers.get_value('ENTERPRISE_CUSTOMER_COOKIE_NAME', settings.ENTERPRISE_CUSTOMER_COOKIE_NAME),
         domain=configuration_helpers.get_value('BASE_COOKIE_DOMAIN', settings.BASE_COOKIE_DOMAIN),
+    )
+
+
+def _set_experiments_is_enterprise_cookie(request, response, experiments_is_enterprise):
+    """ Sets the experiments_is_enterprise cookie on the response.
+    This cookie can be used for tests or minor features,
+    but should not be used for payment related or other critical work
+    since users can edit their cookies
+    """
+    cookie_settings = standard_cookie_settings(request)
+
+    response.set_cookie(
+        'experiments_is_enterprise',
+        json.dumps(experiments_is_enterprise),
+        **cookie_settings
     )
 
 
@@ -241,3 +258,16 @@ def get_enterprise_learner_generic_name(request):
         if enterprise_customer and enterprise_customer['replace_sensitive_sso_username']
         else ''
     )
+
+
+def is_enterprise_learner(user):
+    """
+    Check if the given user belongs to an enterprise.
+
+    Arguments:
+        user (User): Django User object.
+
+    Returns:
+        (bool): True if given user is an enterprise learner.
+    """
+    return EnterpriseCustomerUser.objects.filter(user_id=user.id).exists()

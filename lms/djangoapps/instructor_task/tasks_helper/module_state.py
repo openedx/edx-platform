@@ -5,17 +5,16 @@ import json
 import logging
 from time import time
 
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import UsageKey
 
-import dogstats_wrapper as dog_stats_api
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.grades.events import GRADES_OVERRIDE_EVENT_TYPE, GRADES_RESCORE_EVENT_TYPE
+from student.models import get_user_by_username_or_email
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from track.views import task_track
 from util.db import outer_atomic
@@ -92,18 +91,17 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
         module_descriptor = problems[unicode(module_to_update.module_state_key)]
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
-        with dog_stats_api.timer('instructor_tasks.module.time.step', tags=[u'action:{name}'.format(name=action_name)]):
-            update_status = update_fcn(module_descriptor, module_to_update, task_input)
-            if update_status == UPDATE_STATUS_SUCCEEDED:
-                # If the update_fcn returns true, then it performed some kind of work.
-                # Logging of failures is left to the update_fcn itself.
-                task_progress.succeeded += 1
-            elif update_status == UPDATE_STATUS_FAILED:
-                task_progress.failed += 1
-            elif update_status == UPDATE_STATUS_SKIPPED:
-                task_progress.skipped += 1
-            else:
-                raise UpdateProblemModuleStateError("Unexpected update_status returned: {}".format(update_status))
+        update_status = update_fcn(module_descriptor, module_to_update, task_input)
+        if update_status == UPDATE_STATUS_SUCCEEDED:
+            # If the update_fcn returns true, then it performed some kind of work.
+            # Logging of failures is left to the update_fcn itself.
+            task_progress.succeeded += 1
+        elif update_status == UPDATE_STATUS_FAILED:
+            task_progress.failed += 1
+        elif update_status == UPDATE_STATUS_SKIPPED:
+            task_progress.skipped += 1
+        else:
+            raise UpdateProblemModuleStateError("Unexpected update_status returned: {}".format(update_status))
 
     return task_progress.update_task_state()
 
@@ -409,12 +407,7 @@ def _get_modules_to_update(course_id, usage_keys, student_identifier, filter_fcn
     """
     def get_student():
         """ Fetches student instance if an identifier is provided, else return None """
-        if student_identifier is None:
-            return None
-
-        student_identifier_type = 'email' if '@' in student_identifier else 'username'
-        student_query_params = {student_identifier_type: student_identifier}
-        return User.objects.get(**student_query_params)
+        return None if not student_identifier else get_user_by_username_or_email(student_identifier)
 
     module_query_params = {'course_id': course_id, 'module_state_keys': usage_keys}
 

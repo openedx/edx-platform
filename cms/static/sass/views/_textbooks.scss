@@ -36,7 +36,7 @@
         }
 
         .ui-toggle-expansion {
-          @include transition(rotate .15s ease-in-out .25s);
+          @include transition(rotate 0.15s ease-in-out 0.25s);
 
           @extend %t-action1;
 
@@ -85,7 +85,7 @@
         }
 
         .actions {
-          @include transition(opacity .15s .25s ease-in-out);
+          @include transition(opacity 0.15s 0.25s ease-in-out);
 
           opacity: 0;
           position: absolute;
@@ -156,7 +156,7 @@
 
           .action-primary {
             @include blue-button;
-            @include transition(all .15s);
+            @include transition(all 0.15s);
 
             @extend %t-action2;
             @extend %t-strong;
@@ -168,7 +168,7 @@
 
           .action-secondary {
             @include grey-button;
-            @include transition(all .15s);
+            @include transition(all 0.15s);
 
             @extend %t-action2;
             @extend %t-strong;

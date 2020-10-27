@@ -5,30 +5,36 @@ Tests for course_info
 import ddt
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
-from nose.plugins.attrib import attr
 
 from xmodule.html_module import CourseInfoModule
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
-from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
+from mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
+from mobile_api.utils import API_V05, API_V1
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
-    Tests for /api/mobile/v0.5/course_info/{course_id}/updates
+    Tests for /api/mobile/{api_version}/course_info/{course_id}/updates
     """
-    REVERSE_INFO = {'name': 'course-updates-list', 'params': ['course_id']}
+    REVERSE_INFO = {'name': 'course-updates-list', 'params': ['course_id', 'api_version']}
+    shard = 3
 
     def verify_success(self, response):
         super(TestUpdates, self).verify_success(response)
         self.assertEqual(response.data, [])
 
-    @ddt.data(True, False)
-    def test_updates(self, new_format):
+    @ddt.data(
+        (True, API_V05),
+        (True, API_V1),
+        (False, API_V05),
+        (False, API_V1),
+    )
+    @ddt.unpack
+    def test_updates(self, new_format, api_version):
         """
         Tests updates endpoint with /static in the content.
         Tests both new updates format (using "items") and old format (using "data").
@@ -65,7 +71,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
         modulestore().update_item(course_updates, self.user.id)
 
         # call API
-        response = self.api_response()
+        response = self.api_response(api_version=api_version)
 
         # verify static URLs are replaced in the content returned by the API
         self.assertNotIn("\"/static/", response.content)
@@ -83,23 +89,35 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
             self.assertIn("Update" + str(num), update_data['content'])
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
-    Tests for /api/mobile/v0.5/course_info/{course_id}/handouts
+    Tests for /api/mobile/{api_version}/course_info/{course_id}/handouts
     """
-    REVERSE_INFO = {'name': 'course-handouts-list', 'params': ['course_id']}
+    REVERSE_INFO = {'name': 'course-handouts-list', 'params': ['course_id', 'api_version']}
+    shard = 3
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_handouts(self, default_ms):
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, API_V05),
+        (ModuleStoreEnum.Type.mongo, API_V1),
+        (ModuleStoreEnum.Type.split, API_V05),
+        (ModuleStoreEnum.Type.split, API_V1),
+    )
+    @ddt.unpack
+    def test_handouts(self, default_ms, api_version):
         with self.store.default_store(default_ms):
             self.add_mobile_available_toy_course()
-            response = self.api_response(expected_response_code=200)
+            response = self.api_response(expected_response_code=200, api_version=api_version)
             self.assertIn("Sample", response.data['handouts_html'])
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_no_handouts(self, default_ms):
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, API_V05),
+        (ModuleStoreEnum.Type.mongo, API_V1),
+        (ModuleStoreEnum.Type.split, API_V05),
+        (ModuleStoreEnum.Type.split, API_V1),
+    )
+    @ddt.unpack
+    def test_no_handouts(self, default_ms, api_version):
         with self.store.default_store(default_ms):
             self.add_mobile_available_toy_course()
 
@@ -108,11 +126,17 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
                 self.store.delete_item(handouts_usage_key, self.user.id)
 
-            response = self.api_response(expected_response_code=200)
+            response = self.api_response(expected_response_code=200, api_version=api_version)
             self.assertIsNone(response.data['handouts_html'])
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_empty_handouts(self, default_ms):
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, API_V05),
+        (ModuleStoreEnum.Type.mongo, API_V1),
+        (ModuleStoreEnum.Type.split, API_V05),
+        (ModuleStoreEnum.Type.split, API_V1),
+    )
+    @ddt.unpack
+    def test_empty_handouts(self, default_ms, api_version):
         with self.store.default_store(default_ms):
             self.add_mobile_available_toy_course()
 
@@ -121,11 +145,17 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
             underlying_handouts = self.store.get_item(handouts_usage_key)
             underlying_handouts.data = "<ol></ol>"
             self.store.update_item(underlying_handouts, self.user.id)
-            response = self.api_response(expected_response_code=200)
+            response = self.api_response(expected_response_code=200, api_version=api_version)
             self.assertIsNone(response.data['handouts_html'])
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_handouts_static_rewrites(self, default_ms):
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, API_V05),
+        (ModuleStoreEnum.Type.mongo, API_V1),
+        (ModuleStoreEnum.Type.split, API_V05),
+        (ModuleStoreEnum.Type.split, API_V1),
+    )
+    @ddt.unpack
+    def test_handouts_static_rewrites(self, default_ms, api_version):
         with self.store.default_store(default_ms):
             self.add_mobile_available_toy_course()
 
@@ -135,11 +165,17 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
             self.assertIn('\'/static/', underlying_handouts.data)
 
             # but shouldn't finish with any
-            response = self.api_response()
+            response = self.api_response(api_version=api_version)
             self.assertNotIn('\'/static/', response.data['handouts_html'])
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_jump_to_id_handout_href(self, default_ms):
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, API_V05),
+        (ModuleStoreEnum.Type.mongo, API_V1),
+        (ModuleStoreEnum.Type.split, API_V05),
+        (ModuleStoreEnum.Type.split, API_V1),
+    )
+    @ddt.unpack
+    def test_jump_to_id_handout_href(self, default_ms, api_version):
         with self.store.default_store(default_ms):
             self.add_mobile_available_toy_course()
 
@@ -150,11 +186,17 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
             self.store.update_item(underlying_handouts, self.user.id)
 
             # but shouldn't finish with any
-            response = self.api_response()
+            response = self.api_response(api_version=api_version)
             self.assertIn("/courses/{}/jump_to_id/".format(self.course.id), response.data['handouts_html'])
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_url_handout_href(self, default_ms):
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, API_V05),
+        (ModuleStoreEnum.Type.mongo, API_V1),
+        (ModuleStoreEnum.Type.split, API_V05),
+        (ModuleStoreEnum.Type.split, API_V1),
+    )
+    @ddt.unpack
+    def test_course_url_handout_href(self, default_ms, api_version):
         with self.store.default_store(default_ms):
             self.add_mobile_available_toy_course()
 
@@ -165,7 +207,7 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
             self.store.update_item(underlying_handouts, self.user.id)
 
             # but shouldn't finish with any
-            response = self.api_response()
+            response = self.api_response(api_version=api_version)
             self.assertIn("/courses/{}/".format(self.course.id), response.data['handouts_html'])
 
     def add_mobile_available_toy_course(self):

@@ -3,9 +3,8 @@ Tests for waffle utils models.
 """
 from ddt import data, ddt, unpack
 from django.test import TestCase
+from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
-
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 
 from ..models import WaffleFlagCourseOverrideModel
 
@@ -26,7 +25,7 @@ class WaffleFlagCourseOverrideTests(TestCase):
           (False, OVERRIDE_CHOICES.on, OVERRIDE_CHOICES.unset))
     @unpack
     def test_setting_override(self, is_enabled, override_choice, expected_result):
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
         self.set_waffle_course_override(override_choice, is_enabled)
         override_value = WaffleFlagCourseOverrideModel.override_value(
             self.WAFFLE_TEST_NAME, self.TEST_COURSE_KEY
@@ -34,7 +33,7 @@ class WaffleFlagCourseOverrideTests(TestCase):
         self.assertEqual(override_value, expected_result)
 
     def test_setting_override_multiple_times(self):
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
         self.set_waffle_course_override(self.OVERRIDE_CHOICES.on)
         self.set_waffle_course_override(self.OVERRIDE_CHOICES.off)
         override_value = WaffleFlagCourseOverrideModel.override_value(

@@ -1,0 +1,62 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% blocktrans %}You have been invited to {{ course_name }}{% endblocktrans %}
+            </h1>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% blocktrans %}You have been invited to join {{ course_name }} at {{ site_name }} by a member of the course staff.{% endblocktrans %}
+                <br />
+            </p>
+
+        {% if is_shib_course %}
+            {% if auto_enroll %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% blocktrans %}To access this course click on the button below and login:{% endblocktrans %}
+                    <br />
+                </p>
+
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_name course_cta_url=course_url %}
+            {% elif course_about_url is not None %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% blocktrans %}To access this course visit it and register:{% endblocktrans %}
+                    <br />
+                </p>
+
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_name course_cta_url=course_about_url %}
+            {% endif %}
+        {% else %}
+            <p style="color: rgba(0,0,0,.75);">
+                {% blocktrans %}Please finish your registration and fill out the registration form making sure to use {{ email_address }} in the Email field:{% endblocktrans %}
+                <br />
+            </p>
+
+            {% trans "Finish Your Registration" as button_cta_text %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=button_cta_text course_cta_url=registration_url %}
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% if auto_enroll %}
+                    {% blocktrans %}Once you have registered and activated your account, you will see {{ course_name }} listed on your dashboard.{% endblocktrans %}
+                {% elif course_about_url is not None %}
+                    {% blocktrans %}Once you have registered and activated your account, you will be able to access this course:{% endblocktrans %}
+                    {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_name course_cta_url=course_about_url %}
+                {% else %}
+                    {% blocktrans %}You can then enroll in {{ course_name }}.{% endblocktrans %}
+                {% endif %}
+                <br />
+            </p>
+        {% endif %}
+            <p style="color: rgba(0,0,0,.75);">
+                {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ email_address }}{% endblocktrans %}
+                <br />
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}

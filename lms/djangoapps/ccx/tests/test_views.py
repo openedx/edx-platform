@@ -15,7 +15,6 @@ from django.test.utils import override_settings
 from pytz import UTC
 from django.utils.translation import ugettext as _
 from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
@@ -27,6 +26,7 @@ from courseware.testutils import FieldOverrideTestMixin
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from django_comment_common.utils import are_permissions_roles_seeded
+from edx_django_utils.cache import RequestCache
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
@@ -37,7 +37,7 @@ from lms.djangoapps.ccx.views import get_date
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -229,7 +229,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         progress_page_response = self.client.get(
             reverse('progress', kwargs={'course_id': ccx_course_key})
         )
-        grade_summary = progress_page_response.mako_context['courseware_summary']  # pylint: disable=no-member
+        grade_summary = progress_page_response.mako_context['courseware_summary']
         chapter = grade_summary[0]
         section = chapter['sections'][0]
         progress_page_due_date = section.due.strftime("%Y-%m-%d %H:%M")
@@ -250,7 +250,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_course_key})
         response = self.client.get(url)
 
-        schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        schedule = json.loads(response.mako_context['schedule'])
         self.assertEqual(len(schedule), 1)
 
         unhide(schedule[0])
@@ -283,6 +283,10 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
 
 
 @attr(shard=7)
+@override_settings(
+    XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+)
 @ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
@@ -375,7 +379,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
 
         response = self.client.post(url, {'name': ccx_name})
         self.assertEqual(response.status_code, 302)
-        url = response.get('location')  # pylint: disable=no-member
+        url = response.get('location')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -393,6 +397,13 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         ccx = CustomCourseForEdX.objects.get()
         course_enrollments = get_override_for_ccx(ccx, self.course, 'max_student_enrollments_allowed')
         self.assertEqual(course_enrollments, settings.CCX_MAX_STUDENTS_ALLOWED)
+        # check if the course display name is properly set
+        course_display_name = get_override_for_ccx(ccx, self.course, 'display_name')
+        self.assertEqual(course_display_name, ccx_name)
+
+        # check if the course display name is properly set in modulestore
+        course_display_name = self.mstore.get_course(ccx.locator).display_name
+        self.assertEqual(course_display_name, ccx_name)
 
         # assert ccx creator has role=staff
         role = CourseStaffRole(course_key)
@@ -473,7 +484,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             'ccx_coach_dashboard',
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
         response = self.client.get(url)
-        schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        schedule = json.loads(response.mako_context['schedule'])
 
         self.assertEqual(len(schedule), 2)
         self.assertEqual(schedule[0]['hidden'], False)
@@ -587,7 +598,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
             kwargs={'course_id': course_id}
         )
         response = self.client.get(coach_dashboard_url)
-        schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        schedule = json.loads(response.mako_context['schedule'])
         response = self.client.post(
             save_ccx_url, json.dumps(schedule), content_type='application/json'
         )
@@ -900,7 +911,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         # the schedule contains chapters
-        chapters = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+        chapters = json.loads(response.mako_context['schedule'])
         sequentials = flatten([chapter.get('children', []) for chapter in chapters])
         verticals = flatten([sequential.get('children', []) for sequential in sequentials])
         # check that the numbers of nodes at different level are the expected ones
@@ -1051,7 +1062,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         CourseOverview.load_from_module_store(self.course.id)
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
-        self.addCleanup(RequestCache.clear_request_cache)
+        self.addCleanup(RequestCache.clear_all_namespaces)
         from xmodule.modulestore.django import SignalHandler
 
         # using CCX object as sender here.
@@ -1064,7 +1075,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_gradebook(self):
         self.course.enable_ccx = True
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         url = reverse(
             'ccx_gradebook',
@@ -1073,15 +1084,15 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
-        self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
-        student_info = response.mako_context['students'][0]  # pylint: disable=no-member
+        self.assertEqual(len(response.mako_context['students']), 1)
+        student_info = response.mako_context['students'][0]
         self.assertEqual(student_info['grade_summary']['percent'], 0.5)
         self.assertEqual(student_info['grade_summary']['grade_breakdown'].values()[0]['percent'], 0.5)
         self.assertEqual(len(student_info['grade_summary']['section_breakdown']), 4)
 
     def test_grades_csv(self):
         self.course.enable_ccx = True
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         url = reverse(
             'ccx_grades_csv',
@@ -1120,7 +1131,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        grades = response.mako_context['grade_summary']  # pylint: disable=no-member
+        grades = response.mako_context['grade_summary']
         self.assertEqual(grades['percent'], 0.5)
         self.assertEqual(grades['grade_breakdown'].values()[0]['percent'], 0.5)
         self.assertEqual(len(grades['section_breakdown']), 4)

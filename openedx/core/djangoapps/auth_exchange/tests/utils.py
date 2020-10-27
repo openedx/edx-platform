@@ -19,7 +19,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
     * _assert_error(data, expected_error, expected_error_description)
     * _assert_success(data, expected_scopes)
     """
-    def setUp(self):  # pylint: disable=arguments-differ
+    def setUp(self):
         super(AccessTokenExchangeTestMixin, self).setUp()
 
         # Initialize to minimal data
@@ -82,7 +82,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
 
     def test_inactive_user(self):
         self.user.is_active = False
-        self.user.save()  # pylint: disable=no-member
+        self.user.save()
         self._setup_provider_response(success=True)
         self._assert_success(self.data, expected_scopes=[])
 
@@ -107,5 +107,5 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         Partial.objects.all().delete()
         self._setup_provider_response(success=True, email=self.user.email)
         self.user.is_active = False
-        self.user.save()  # pylint: disable=no-member
+        self.user.save()
         self._assert_error(self.data, "invalid_grant", "access_token is not valid")

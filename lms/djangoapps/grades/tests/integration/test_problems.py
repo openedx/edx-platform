@@ -3,6 +3,7 @@ import itertools
 
 import ddt
 import pytz
+from crum import set_current_request
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -42,6 +43,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.student)
         self.course_structure = get_course_blocks(self.student, self.course.location)
 
@@ -134,6 +136,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
               </optionresponse>
             </problem>
         '''
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         CourseEnrollment.enroll(self.request.user, self.course.id)
@@ -232,6 +235,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
     def setUp(self):
         super(TestWeightedProblems, self).setUp()
         self.user = UserFactory()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.user)
 
     @classmethod
@@ -250,7 +254,6 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         Verifies the computed grades are as expected.
         """
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            # pylint: disable=no-member
             for problem in self.problems:
                 problem.weight = weight
                 self.store.update_item(problem, self.user.id)

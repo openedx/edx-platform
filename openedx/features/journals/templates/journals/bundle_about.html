@@ -1,0 +1,169 @@
+## mako
+<%page expression_filter="h"/>
+
+<%inherit file="/main.html" />
+<%!
+from datetime import datetime
+
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from mako import exceptions
+
+from urlparse import urljoin
+
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.journals.api import get_journal_about_page_url
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main.css" %>
+
+
+<%
+%>
+
+<%block name="js_extra">
+  <script src="${static.url('js/leanModal.js')}"></script>
+  <script src="${static.url('js/program_marketing.js')}"></script>
+</%block>
+
+<%block name="pagetitle">${bundle['title']}</%block>
+<%block name="marketing_hero">
+  <%
+    banner_image = bundle.get('banner_image', {}).get('large', {}).get('url', '')
+    price_format = '{0:.0f}' if bundle['pricing_data']['total_incl_tax'].is_integer() else '{0:.2f}'
+  %>
+  <div id="program-details-hero">
+    <div class="main-banner"
+      style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url(${banner_image});">
+      <div class="container" >
+        <div class="row">
+          <div class="col col-12 col-md-8">
+            <div>
+              <h1 class="program_title">${bundle.get('title', '')}</h1>
+            </div>
+            <div>
+              ## Note: Weird formatting to fix the inline spacing issue.
+              <a href="${bundle['pricing_data']['purchase_url']}" class="btn btn-success">
+              <span>${_('Purchase the Bundle (')}</span
+              % if bundle['pricing_data']['is_discounted']:
+                ><span aria-label="${_('Original Price')}" class="original-price"
+                >${Text('${oldPrice}').format(
+                    oldPrice=price_format.format(bundle['pricing_data']['total_incl_tax_excl_discounts'])
+                  )}</span
+                ><span aria-label="${_('Discounted Price')}" class="discount">
+                    ${Text('${newPrice}').format(
+                      newPrice=price_format.format(bundle['pricing_data']['total_incl_tax']),
+                    )}
+                </span
+                ><span class="savings">
+                  ${Text('{discount_value} {currency})').format(
+                    discount_value=price_format.format(bundle['pricing_data']['discount_value']),
+                    currency=bundle['pricing_data']['currency']
+                  )}
+                </span>
+              % else:
+              ><span>${Text('${price})').format(
+                      price=price_format.format(bundle['pricing_data']['total_incl_tax']),
+                  )}
+                </span>
+              % endif
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="quick-nav">
+      <div class="container">
+        <div class="row">
+
+            <ul class="nav nav-fill col-lg-12">
+            </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</%block>
+
+<div id="program-details-page" class="container">
+  % if bundle.get('courses') or bundle.get('journals'):
+  <hr class="thick_rule">
+  <div id="courses">
+    <div class="row">
+      <div class="col-12">
+        <h2>
+          ${_('Courses included')}
+        </h2>
+      </div>
+    </div>
+    % for course in bundle.get('courses'):
+      <%
+        course_run = course['course_runs'][0]
+        course_img = course.get('image', {}).get('src', '') if course.get('image') else ''
+        course_about_url = reverse('about_course', args=[course_run['key']])
+      %>
+      <div class="row course">
+        <div class="col-3 col-lg-2 course-image">
+          % if course_img:
+            <img alt="" src="${course_img}" alt=""/>
+          % endif
+        </div>
+        <div class="col-9 col-lg-6">
+          <div>
+            <a href="${course_about_url}">${course_run['title']}</a>
+          </div>
+          <div>${course['short_description'] or ''}</div>
+        </div>
+        <div class="col-12 col-lg-4 course-enroll">
+          <div>
+            ${Text(_('Starts on {}')).format(
+              datetime.strptime(course_run['start'], '%Y-%m-%dT%H:%M:%SZ').strftime('%B %-d, %Y')
+            )}
+          </div>
+          <div>
+            <a class="btn btn-primary btn-block btn-success" href="${course_about_url}">${_("View Course")}</a>
+          </div>
+        </div>
+      </div>
+    % endfor
+    % for journal in bundle.get('journals'):
+      <%
+        about_page_id = journal['about_page_id']
+        about_page_url = get_journal_about_page_url(about_page_id, False)
+      %>
+      <div class="row">
+        <div class="col-12">
+          <h2>
+            ${_('Journals included')}
+          </h2>
+        </div>
+      </div>
+      <div class="row course">
+        <div class="col-3 col-lg-2 course-image">
+          % if journal.get('card_image_url'):
+            <img alt="" src="${journal['card_image_url']}" alt=""/>
+          % endif
+        </div>
+        <div class="col-9 col-lg-6">
+          <div>
+            <a href="${about_page_url}">${journal['title']}</a>
+          </div>
+          <div>${journal['short_description'] or ''}</div>
+        </div>
+        <div class="col-12 col-lg-4 course-enroll">
+          <div>
+            ${_('{access_length} Day Access').format(
+              access_length=journal['access_length']
+            )}
+          </div>
+          <div>
+            <a class="btn btn-primary btn-block btn-success" href="${about_page_url}">${_("View Journal")}</a>
+          </div>
+        </div>
+      </div>
+    % endfor
+  </div>
+  % endif
+</div>

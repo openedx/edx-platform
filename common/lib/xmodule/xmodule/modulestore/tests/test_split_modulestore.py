@@ -8,14 +8,14 @@ from path import Path as path
 import random
 import re
 import unittest
-import uuid
+import os
 
 import ddt
 from contracts import contract
-from nose.plugins.attrib import attr
 from django.core.cache import caches, InvalidCacheBackendError
 
 from openedx.core.lib import tempdir
+from openedx.core.lib.tests import attr
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -53,9 +53,9 @@ class SplitModuleTest(unittest.TestCase):
     # Snippets of what would be in the django settings envs file
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,
-        'db': 'test_xmodule',
+        'db': 'test_xmodule_{0}'.format(os.getpid()),
         'port': MONGO_PORT_NUM,
-        'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
+        'collection': 'modulestore',
     }
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',

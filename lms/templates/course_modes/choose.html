@@ -86,19 +86,37 @@ from openedx.core.djangolib.markup import HTML, Text
                                 <div class="wrapper-copy">
                                     <span class="deco-ribbon"></span>
                                     % if has_credit_upsell:
-                                    <h4 class="title">${_("Pursue Academic Credit with a Verified Certificate")}</h4>
+                                    % if content_gating_enabled or course_duration_limit_enabled:
+                                        <h4 class="title">${_("Pursue Academic Credit with the Verified Track")}</h4>
+                                    % else:
+                                        <h4 class="title">${_("Pursue Academic Credit with a Verified Certificate")}</h4>
+                                    % endif
 
                                     <div class="copy">
                                         <p>${_("Become eligible for academic credit and highlight your new skills and knowledge with a verified certificate. Use this valuable credential to qualify for academic credit, advance your career, or strengthen your school applications.")}</p>
                                         <p>
                                             <div class="wrapper-copy-inline">
                                                 <div class="copy-inline">
-                                                    <h4>${_("Benefits of a Verified Certificate")}</h4>
-                                                    <ul>
-                                                        <li>${Text(_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course")).format(**b_tag_kwargs)}</li>
-                                                        <li>${Text(_("{b_start}Official:{b_end} Receive an instructor-signed certificate with the institution's logo")).format(**b_tag_kwargs)}</li>
-                                                        <li>${Text(_("{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, or post it directly on LinkedIn")).format(**b_tag_kwargs)}</li>
-                                                    </ul>
+                                                    % if content_gating_enabled or course_duration_limit_enabled:
+                                                        <h4>${_("Benefits of the Verified Track")}</h4>
+                                                        <ul>
+                                                            <li>${Text(_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course")).format(**b_tag_kwargs)}</li>
+                                                            % if course_duration_limit_enabled:
+                                                                <li>${Text(_("{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access materials anytime to brush up on what you've learned.")).format(**b_tag_kwargs)}</li>
+                                                            % endif
+                                                            % if content_gating_enabled:
+                                                                <li>${Text(_("{b_start}Graded Assignments: {b_end}Build your skills through graded assignments and projects.")).format(**b_tag_kwargs)}</li>
+                                                            % endif
+                                                            <li>${Text(_("{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn.")).format(**b_tag_kwargs)}</li>
+                                                        </ul>
+                                                    % else:
+                                                        <h4>${_("Benefits of a Verified Certificate")}</h4>
+                                                        <ul>
+                                                            <li>${Text(_("{b_start}Eligible for credit:{b_end} Receive academic credit after successfully completing the course")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Official:{b_end} Receive an instructor-signed certificate with the institution's logo")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Easily shareable:{b_end} Add the certificate to your CV or resume, or post it directly on LinkedIn")).format(**b_tag_kwargs)}</li>
+                                                        </ul>
+                                                    % endif
                                                 </div>
                                                 <div class="copy-inline list-actions">
                                                     <ul class="list-actions">
@@ -112,25 +130,47 @@ from openedx.core.djangolib.markup import HTML, Text
                                         </p>
                                     </div>
                                     % else:
-                                    <h4 class="title">${_("Pursue a Verified Certificate")}</h4>
+                                        % if content_gating_enabled or course_duration_limit_enabled:
+                                            <h4 class="title">${_("Pursue the Verified Track")}</h4>
+                                        % else:
+                                            <h4 class="title">${_("Pursue a Verified Certificate")}</h4>
+                                        % endif
+
 
                                     <div class="copy">
                                         <p>${_("Highlight your new knowledge and skills with a verified certificate. Use this valuable credential to improve your job prospects and advance your career, or highlight your certificate in school applications.")}</p>
                                         <p>
                                             <div class="wrapper-copy-inline">
                                                 <div class="copy-inline">
-                                                    <h4>${_("Benefits of a Verified Certificate")}</h4>
-                                                    <ul>
-                                                        <li>${Text(_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo")).format(**b_tag_kwargs)}</li>
-                                                        <li>${Text(_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn")).format(**b_tag_kwargs)}</li>
-                                                        <li>${Text(_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course")).format(**b_tag_kwargs)}</li>
-                                                    </ul>
+                                                    % if content_gating_enabled or course_duration_limit_enabled:
+                                                        <h4>${_("Benefits of the Verified Track")}</h4>
+                                                        <ul>
+                                                            % if course_duration_limit_enabled:
+                                                                <li>${Text(_("{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access materials anytime to brush up on what you've learned.")).format(**b_tag_kwargs)}</li>
+                                                            % endif
+                                                            % if content_gating_enabled:
+                                                                <li>${Text(_("{b_start}Graded Assignments: {b_end}Build your skills through graded assignments and projects.")).format(**b_tag_kwargs)}</li>
+                                                            % endif
+                                                            <li>${Text(_("{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn.")).format(**b_tag_kwargs)}</li>
+                                                        </ul>
+                                                    % else:
+                                                        <h4>${_("Benefits of a Verified Certificate")}</h4>
+                                                        <ul>
+                                                            <li>${Text(_("{b_start}Official: {b_end}Receive an instructor-signed certificate with the institution's logo")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Easily shareable: {b_end}Add the certificate to your CV or resume, or post it directly on LinkedIn")).format(**b_tag_kwargs)}</li>
+                                                            <li>${Text(_("{b_start}Motivating: {b_end}Give yourself an additional incentive to complete the course")).format(**b_tag_kwargs)}</li>
+                                                        </ul>
+                                                    % endif
                                                 </div>
                                                 <div class="copy-inline list-actions">
                                                     <ul class="list-actions">
                                                         <li class="action action-select">
                                                             <input type="hidden" name="contribution" value="${min_price}" />
-                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
+                                                            % if content_gating_enabled or course_duration_limit_enabled:
+                                                                <input type="submit" name="verified_mode" value="${_('Pursue the Verified Track')} ($${min_price} USD)" />
+                                                            % else:
+                                                                <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
+                                                            % endif
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -173,7 +213,15 @@ from openedx.core.djangolib.markup import HTML, Text
                                     <h4 class="title">${_("Audit This Course (No Certificate)")}</h4>
                                     <div class="copy">
                                         ## Translators: b_start notes the beginning of a section of text bolded for emphasis, and b_end marks the end of the bolded text.
-                                        <p>${Text(_("Audit this course for free and have complete access to all the course material, activities, tests, and forums.  {b_start}Please note that this track does not offer a certificate for learners who earn a passing grade.{b_end}")).format(**b_tag_kwargs)}</p>
+                                        % if content_gating_enabled and course_duration_limit_enabled:
+                                            <p>${Text(_("Audit this course for free and have access to course materials and discussions forums. {b_start}This track does not include graded assignments, or unlimited course access.{b_end}")).format(**b_tag_kwargs)}</p>
+                                        % elif content_gating_enabled and not course_duration_limit_enabled:
+                                            <p>${Text(_("Audit this course for free and have access to course materials and discussions forums. {b_start}This track does not include graded assignments.{b_end}")).format(**b_tag_kwargs)}</p>
+                                        % elif not content_gating_enabled and course_duration_limit_enabled:
+                                            <p>${Text(_("Audit this course for free and have access to course materials and discussions forums. {b_start}This track does not include unlimited course access.{b_end}")).format(**b_tag_kwargs)}</p>
+                                        % else:
+                                            <p>${Text(_("Audit this course for free and have complete access to all the course material, activities, tests, and forums.  {b_start}Please note that this track does not offer a certificate for learners who earn a passing grade.{b_end}")).format(**b_tag_kwargs)}</p>
+                                        % endif
                                     </div>
                                 </div>
 

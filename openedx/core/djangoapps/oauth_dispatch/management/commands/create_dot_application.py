@@ -40,12 +40,30 @@ class Command(BaseCommand):
                             dest='redirect_uris',
                             default='',
                             help='The redirect URI(s) for this application.  Multiple URIs should be space separated.')
+        parser.add_argument('--public',
+                            action='store_true',
+                            dest='public',
+                            default=False,
+                            help='Make the application public?  Confidential by default.')
+        parser.add_argument('--client-id',
+                            action='store',
+                            dest='client_id',
+                            default='',
+                            help='The client_id for this application. If omitted, one will be generated.')
+        parser.add_argument('--client-secret',
+                            action='store',
+                            dest='client_secret',
+                            default='',
+                            help='The client_secret for this application. If omitted, one will be generated.')
 
     def handle(self, *args, **options):
         app_name = options['name']
         username = options['username']
         grant_type = options['grant_type']
         redirect_uris = options['redirect_uris']
+        client_type = Application.CLIENT_PUBLIC if options['public'] else Application.CLIENT_CONFIDENTIAL
+        client_id = options['client_id']
+        client_secret = options['client_secret']
 
         user = User.objects.get(username=username)
 
@@ -56,13 +74,19 @@ class Command(BaseCommand):
             ))
             return
 
-        application = Application.objects.create(
+        create_kwargs = dict(
             name=app_name,
             user=user,
             redirect_uris=redirect_uris,
-            client_type=Application.CLIENT_CONFIDENTIAL,
+            client_type=client_type,
             authorization_grant_type=grant_type
         )
+        if client_id:
+            create_kwargs['client_id'] = client_id
+        if client_secret:
+            create_kwargs['client_secret'] = client_secret
+
+        application = Application.objects.create(**create_kwargs)
         application.save()
         logger.info('Created {} application with id: {}, client_id: {}, and client_secret: {}'.format(
             app_name,

@@ -1,3 +1,4 @@
+/* globals _ */
 /**
  * View for the "review photos" step of the payment/verification flow.
  */

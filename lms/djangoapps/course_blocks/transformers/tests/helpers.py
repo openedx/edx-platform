@@ -77,7 +77,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
 
         if block_type != 'course':
             kwargs['category'] = block_type
-            kwargs['publish_item'] = True,
+            kwargs['publish_item'] = True
         if parent:
             kwargs['parent'] = parent
 
@@ -216,8 +216,8 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
     # children.
     parents_map = [[], [0], [0], [1], [1], [2], [2, 4]]
 
-    def setUp(self, **kwargs):
-        super(BlockParentsMapTestCase, self).setUp(**kwargs)
+    def setUp(self):
+        super(BlockParentsMapTestCase, self).setUp()
 
         # create the course
         self.course = CourseFactory.create()

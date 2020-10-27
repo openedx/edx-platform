@@ -2,19 +2,45 @@
 <%! from django.utils.translation import ugettext as _ %>
 %if section_data['access']['staff'] or section_data['access']['instructor']:
 <div class="action-type-container">
-    %if section_data['is_small_course']:
+    %if section_data.get('writable_gradebook_url') or section_data.get('is_small_course'):
         <br><br>
         <h4 class="hd hd-4">${_("View gradebook for enrolled learners")}</h4>
         <br>
         <label for="gradebook-link">${_("Note: This feature is available only to courses with a small number of enrolled learners.")}</label>
         <br><br>
+    %if section_data.get('writable_gradebook_url'):
+        <span name="gradebook-link"><a href="${ section_data['writable_gradebook_url'] }" class="gradebook-link"> ${_("View Gradebook")} </a></span>
+    %elif section_data.get('is_small_course'):
         <span name="gradebook-link"><a href="${ section_data['spoc_gradebook_url'] }" class="gradebook-link"> ${_("View Gradebook")} </a></span>
+    %endif
         <br><br>
         <hr>
     %endif
 </div>
 
-<div class="student-specific-container action-type-container">
+<div class="student-enrollment-status-container action-type-container">
+    <h4 class="hd hd-4">${_("View a specific learner's enrollment status")}</h4>
+    <div class="request-response-error"></div>
+    <label for="student-select-enrollment-status">
+        ${_("Learner's {platform_name} email address or username *").format(platform_name=settings.PLATFORM_NAME)}
+    </label>
+    <br>
+    <input type="text" name="student-select-enrollment-status" placeholder="${_('Learner email address or username')}" >
+
+    <blockquote class="student-enrollment-status"></blockquote>
+
+    <br><br>
+    <div class="enrollment-status-link-wrapper">
+        <span name="enrollment-status-link">
+            <a href="" class="enrollment-status-link" data-endpoint="${ section_data['get_student_enrollment_status_url'] }">
+                ${_("View Enrollment Status")}
+            </a>
+        </span>
+    </div>
+    <hr>
+</div>
+
+<div class="student-progress-container action-type-container">
     <h4 class="hd hd-4">${_("View a specific learner's grades and progress")}</h4>
     <div class="request-response-error"></div>
     <label for="student-select-progress">

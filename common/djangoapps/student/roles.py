@@ -10,7 +10,7 @@ from collections import defaultdict
 from django.contrib.auth.models import User
 from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.request_cache import get_cache
+from openedx.core.lib.cache_utils import get_cache
 from student.models import CourseAccessRole
 
 log = logging.getLogger(__name__)
@@ -120,7 +120,7 @@ class GlobalStaff(AccessRole):
     The global staff role
     """
     def has_user(self, user):
-        return user.is_staff
+        return bool(user and user.is_staff)
 
     def add_users(self, *users):
         for user in users:

@@ -5,7 +5,6 @@ Tests for CourseDetails
 import datetime
 import ddt
 from pytz import UTC
-from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -14,12 +13,13 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.models.course_details import CourseDetails, ABOUT_ATTRIBUTES
 
 
-@attr(shard=2)
 @ddt.ddt
 class CourseDetailsTestCase(ModuleStoreTestCase):
     """
     Tests the first course settings page (course dates, overview, etc.).
     """
+    shard = 2
+
     def setUp(self):
         super(CourseDetailsTestCase, self).setUp()
         self.course = CourseFactory.create()

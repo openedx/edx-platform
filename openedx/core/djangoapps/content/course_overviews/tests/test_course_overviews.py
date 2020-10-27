@@ -7,7 +7,6 @@ import ddt
 import itertools
 import math
 import mock
-from nose.plugins.attrib import attr
 import pytz
 
 from django.conf import settings
@@ -20,6 +19,7 @@ from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.courses import course_image_url
 from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
@@ -41,13 +41,12 @@ from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImage
 from .factories import CourseOverviewFactory
 
 
-@attr(shard=3)
 @ddt.ddt
-class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
+class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, CacheIsolationTestCase):
     """
     Tests for CourseOverview model.
     """
-
+    shard = 3
     TODAY = timezone.now()
     LAST_MONTH = 'last_month'
     LAST_WEEK = 'last_week'
@@ -559,13 +558,13 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
         self.assertEqual(course_id_to_overview, None)
 
 
-@attr(shard=3)
 @ddt.ddt
 class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     """
     Course thumbnail generation tests.
     """
     ENABLED_SIGNALS = ['course_published']
+    shard = 3
 
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
@@ -1038,12 +1037,12 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             return course_overview
 
 
-@attr(shard=3)
 @ddt.ddt
 class CourseOverviewTabTestCase(ModuleStoreTestCase):
     """
     Tests for CourseOverviewTab model.
     """
+    shard = 3
 
     ENABLED_SIGNALS = ['course_published']
 

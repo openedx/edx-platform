@@ -316,7 +316,6 @@
       margin: 0 (-1 * $baseline) 0 ($baseline);
       width: calc(100% + (2));
       padding: 0;
-
       border-bottom: 1px solid $border-color;
 
       .section-name {
@@ -357,6 +356,7 @@
               color: theme-color("secondary");
               margin-left: 34px;
             }
+
             .prerequisite {
               color: theme-color("secondary");
               font-weight: $font-bold;
@@ -419,7 +419,7 @@ button.accordion-trigger, button.prerequisite-button {
   border: none;
   width: 100%;
   text-align: left;
-  margin: 0px;
+  margin: 0;
   background: none;
   cursor: pointer;
 
@@ -437,7 +437,7 @@ button.accordion-trigger, button.prerequisite-button {
 
 // extra padding for expand/collapse text change
 .expand-collapse-outline-all-extra-padding {
-  padding: 0 4px 0 4px;
+  padding: 0 4px;
 }
 
 .accordion-panel.is-hidden {
@@ -463,6 +463,7 @@ button.accordion-trigger, button.prerequisite-button {
 
     .heading {
       font-size: 0.9rem;
+      font: -apple-system-body;
       line-height: 1;
       font-weight: $font-bold;
       color: theme-color("dark");
@@ -485,6 +486,7 @@ button.accordion-trigger, button.prerequisite-button {
 
     .date {
       color: theme-color("dark");
+      font: -apple-system-body;
     }
 
     &-todays-date {

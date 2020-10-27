@@ -38,7 +38,7 @@ from openedx.core.djangolib.markup import HTML
 
 <%def name="render_category(categories, category, topic_list)">
     <li class="forum-nav-browse-menu-item"
-        id='${category | u}'
+        id='${category | n, decode.utf8}'
         role="option"
     >
         <span class="forum-nav-browse-title">${category}</span>
@@ -52,8 +52,8 @@ from openedx.core.djangolib.markup import HTML
 
 <div class="forum-nav-browse-menu-wrapper" style="display: none" aria-label="${_("Discussion topics list")}">
     <form class="forum-nav-browse-filter" autocomplete="off">
-        <label>
-            <span class="sr">${_("Filter Topics")}</span>
+        <label for="forum-nav-browse-filter-input" aria-label='${_("Filter Topics")}' class="field-label">
+            <span class="field-label-text">${_("Filter Topics")}</span>
             <input type="text" id="forum-nav-browse-filter-input" role="combobox" aria-expanded="true" aria-owns="discussion_topics_listbox" aria-autocomplete="list" class="forum-nav-browse-filter-input" placeholder="${_("filter topics")}">
             <span class="icon fa fa-filter" aria-hidden="true"></span>
         </label>

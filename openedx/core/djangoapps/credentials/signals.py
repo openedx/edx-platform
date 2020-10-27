@@ -8,6 +8,8 @@ from django.contrib.sites.models import Site
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.site_configuration import helpers
 
 from .tasks.v1.tasks import send_grade_to_credentials
 
@@ -15,7 +17,7 @@ log = getLogger(__name__)
 
 
 # "interesting" here means "credentials will want to know about it"
-INTERESTING_MODES = CourseMode.VERIFIED_MODES + CourseMode.CREDIT_MODES
+INTERESTING_MODES = CourseMode.CREDIT_ELIGIBLE_MODES + CourseMode.CREDIT_MODES
 INTERESTING_STATUSES = [
     CertificateStatuses.notpassing,
     CertificateStatuses.downloadable,
@@ -40,8 +42,43 @@ def is_course_run_in_a_program(course_run_key):
     return False
 
 
-def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, percent_grade):
+def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, percent_grade, verbose=False):
     """ Checks if grade is interesting to Credentials and schedules a Celery task if so. """
+
+    if verbose:
+        msg = "Starting send_grade_if_interesting with params: "\
+            "user [{username}], "\
+            "course_run_key [{key}], "\
+            "mode [{mode}], "\
+            "status [{status}], "\
+            "letter_grade [{letter_grade}], "\
+            "percent_grade [{percent_grade}], "\
+            "verbose [{verbose}]"\
+            .format(
+                username=getattr(user, 'username', None),
+                key=str(course_run_key),
+                mode=mode,
+                status=status,
+                letter_grade=letter_grade,
+                percent_grade=percent_grade,
+                verbose=verbose
+            )
+        log.info(msg)
+    # Avoid scheduling new tasks if certification is disabled. (Grades are a part of the records/cert story)
+    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+        if verbose:
+            log.info("Skipping send grade: is_learner_issuance_enabled False")
+        return
+
+    # Avoid scheduling new tasks if learner records are disabled for this site.
+    if not helpers.get_value_for_org(course_run_key.org, 'ENABLE_LEARNER_RECORDS', True):
+        if verbose:
+            log.info(
+                "Skipping send grade: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
+                    org=course_run_key.org
+                )
+            )
+        return
 
     # Grab mode/status if we don't have them in hand
     if mode is None or status is None:
@@ -51,23 +88,48 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
             status = cert.status
         except GeneratedCertificate.DoesNotExist:
             # We only care about grades for which there is a certificate.
+            if verbose:
+                log.info(
+                    "Skipping send grade: no cert for user [{username}] & course_id [{course_id}]".format(
+                        username=getattr(user, 'username', None),
+                        course_id=str(course_run_key)
+                    )
+                )
             return
 
     # Don't worry about whether it's available as well as awarded. Just awarded is good enough to record a verified
     # attempt at a course. We want even the grades that didn't pass the class because Credentials wants to know about
     # those too.
     if mode not in INTERESTING_MODES or status not in INTERESTING_STATUSES:
+        if verbose:
+            log.info(
+                "Skipping send grade: mode/status uninteresting for mode [{mode}] & status [{status}]".format(
+                    mode=mode,
+                    status=status
+                )
+            )
         return
 
     # If the course isn't in any program, don't bother telling Credentials about it. When Credentials grows support
     # for course records as well as program records, we'll need to open this up.
     if not is_course_run_in_a_program(course_run_key):
+        if verbose:
+            log.info(
+                "Skipping send grade: course run not in a program. [{course_id}]".format(course_id=str(course_run_key))
+            )
         return
 
     # Grab grades if we don't have them in hand
     if letter_grade is None or percent_grade is None:
         grade = CourseGradeFactory().read(user, course_key=course_run_key, create_if_needed=False)
         if grade is None:
+            if verbose:
+                log.info(
+                    "Skipping send grade: No grade found for user [{username}] & course_id [{course_id}]".format(
+                        username=getattr(user, 'username', None),
+                        course_id=str(course_run_key)
+                    )
+                )
             return
         letter_grade = grade.letter_grade
         percent_grade = grade.percent
@@ -75,15 +137,23 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
     send_grade_to_credentials.delay(user.username, str(course_run_key), True, letter_grade, percent_grade)
 
 
-def handle_grade_change(user, course_grade, course_key, **_kwargs):
+def handle_grade_change(user, course_grade, course_key, **kwargs):
     """
     Notifies the Credentials IDA about certain grades it needs for its records, when a grade changes.
     """
-    send_grade_if_interesting(user, course_key, None, None, course_grade.letter_grade, course_grade.percent)
+    send_grade_if_interesting(
+        user,
+        course_key,
+        None,
+        None,
+        course_grade.letter_grade,
+        course_grade.percent,
+        verbose=kwargs.get('verbose', False)
+    )
 
 
-def handle_cert_change(user, course_key, mode, status, **_kwargs):
+def handle_cert_change(user, course_key, mode, status, **kwargs):
     """
     Notifies the Credentials IDA about certain grades it needs for its records, when a cert changes.
     """
-    send_grade_if_interesting(user, course_key, mode, status, None, None)
+    send_grade_if_interesting(user, course_key, mode, status, None, None, verbose=kwargs.get('verbose', False))

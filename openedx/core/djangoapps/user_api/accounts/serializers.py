@@ -14,6 +14,7 @@ from six import text_type
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserPreference,
@@ -81,7 +82,7 @@ class UserReadOnlySerializer(serializers.Serializer):
 
     def to_representation(self, user):
         """
-        Overwrite to_native to handle custom logic since we are serializing two models as one here
+        Overwrite to_native to handle custom logic since we are serializing three models as one here
         :param user: User object
         :return: Dict serialized account
         """
@@ -90,6 +91,11 @@ class UserReadOnlySerializer(serializers.Serializer):
         except ObjectDoesNotExist:
             user_profile = None
             LOGGER.warning("user profile for the user [%s] does not exist", user.username)
+
+        try:
+            account_recovery = user.account_recovery
+        except ObjectDoesNotExist:
+            account_recovery = None
 
         accomplishments_shared = badges_enabled()
 
@@ -149,6 +155,14 @@ class UserReadOnlySerializer(serializers.Serializer):
                     "extended_profile": get_extended_profile(user_profile),
                 }
             )
+
+        if account_recovery:
+            if is_secondary_email_feature_enabled_for_user(user):
+                data.update(
+                    {
+                        "secondary_email": account_recovery.secondary_email,
+                    }
+                )
 
         if self.custom_fields:
             fields = self.custom_fields
@@ -400,10 +414,12 @@ class UserRetirementPartnerReportSerializer(serializers.Serializer):
     """
     Perform serialization for the UserRetirementPartnerReportingStatus model
     """
+    user_id = serializers.IntegerField()
     original_username = serializers.CharField()
     original_email = serializers.EmailField()
     original_name = serializers.CharField()
     orgs = serializers.ListField(child=serializers.CharField())
+    created = serializers.DateTimeField()
 
     # Required overrides of abstract base class methods, but we don't use them
     def create(self, validated_data):

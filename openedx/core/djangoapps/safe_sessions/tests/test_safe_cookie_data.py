@@ -7,19 +7,19 @@ import ddt
 from django.test import TestCase
 import itertools
 from mock import patch
-from nose.plugins.attrib import attr
 from time import time
 
 from ..middleware import SafeCookieData, SafeCookieError
 from .test_utils import TestSafeSessionsLogMixin
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     """
     Test class for SafeCookieData
     """
+    shard = 2
+
     def setUp(self):
         super(TestSafeCookieData, self).setUp()
         self.session_id = 'test_session_id'
@@ -200,7 +200,7 @@ class TestSafeCookieData(TestSafeSessionsLogMixin, TestCase):
     )
     @ddt.unpack
     def test_digest_incorrect_field_value(self, field_name, incorrect_field_value):
-        digest = self.safe_cookie_data._compute_digest(self.user_id),
+        digest = self.safe_cookie_data._compute_digest(self.user_id)
         setattr(self.safe_cookie_data, field_name, incorrect_field_value)
         self.assertNotEqual(
             digest,

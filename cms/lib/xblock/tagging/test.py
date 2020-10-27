@@ -123,7 +123,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
                         usage_id="usage-id")
         key_store = DictKeyValueStore()
         field_data = KvsFieldData(key_store)
-        runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+        runtime = TestRuntime(services={'field-data': field_data})
         xblock_aside = StructuredTagsAside(scope_ids=sids, runtime=runtime)
         available_tags = xblock_aside.get_available_tags()
         self.assertEquals(len(available_tags), 2, "StructuredTagsAside should contains two tag categories")

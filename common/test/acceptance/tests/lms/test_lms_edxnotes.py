@@ -6,8 +6,6 @@ from datetime import datetime
 from unittest import skip
 from uuid import uuid4
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.edxnotes import EdxNotesFixture, Note, Range
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -15,6 +13,7 @@ from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.edxnotes import EdxNotesPage, EdxNotesPageNoContent, EdxNotesUnitPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest
+from openedx.core.lib.tests import attr
 
 
 class EdxNotesTestMixin(UniqueCourseTest):
@@ -1500,12 +1499,12 @@ class EdxNotesToggleNotesTest(EdxNotesTestMixin):
         """
         # Disable all notes
         self.note_unit_page.toggle_visibility()
-        self.assertEqual(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, u"Notes are hidden")
         self.courseware_page.go_to_sequential_position(2)
-        self.assertEqual(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, u"Notes are hidden")
         self.course_home_page.visit()
         self.course_home_page.outline.go_to_section(u"Test Section 1", u"Test Subsection 2")
-        self.assertEqual(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) == 0, u"Notes are hidden")
 
     def test_can_reenable_all_notes(self):
         """
@@ -1527,9 +1526,9 @@ class EdxNotesToggleNotesTest(EdxNotesTestMixin):
         # Enable notes to make sure that I can enable notes without refreshing
         # the page.
         self.note_unit_page.toggle_visibility()
-        self.assertGreater(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, u"Notes are visible")
         self.courseware_page.go_to_sequential_position(2)
-        self.assertGreater(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, u"Notes are visible")
         self.course_home_page.visit()
         self.course_home_page.outline.go_to_section(u"Test Section 1", u"Test Subsection 2")
-        self.assertGreater(len(self.note_unit_page.notes), 0)
+        self.note_unit_page.wait_for(lambda: len(self.note_unit_page.notes) > 0, u"Notes are visible")

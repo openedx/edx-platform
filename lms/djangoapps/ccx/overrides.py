@@ -9,8 +9,8 @@ from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from openedx.core.djangoapps.request_cache import get_cache
-from courseware.field_overrides import FieldOverrideProvider
+from openedx.core.lib.cache_utils import get_cache
+from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 
 log = logging.getLogger(__name__)
@@ -195,7 +195,7 @@ def clear_override_for_ccx(ccx, block, name):
         pass
 
 
-def clear_ccx_field_info_from_ccx_map(ccx, block, name):  # pylint: disable=invalid-name
+def clear_ccx_field_info_from_ccx_map(ccx, block, name):
     """
     Remove field information from ccx overrides mapping dictionary
     """

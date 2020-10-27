@@ -6,8 +6,8 @@ import random
 import uuid
 
 import mock
-from nose.plugins.attrib import attr
 
+from openedx.core.lib.tests import attr
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, UNIQUE_ID
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBootstrapper

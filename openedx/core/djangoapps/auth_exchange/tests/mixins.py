@@ -3,9 +3,7 @@ Mixins to facilitate testing OAuth connections to Django-OAuth-Toolkit or
 Django-OAuth2-Provider.
 """
 
-# pylint: disable=protected-access
-
-from unittest import skip, expectedFailure
+from unittest import expectedFailure
 from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.oauth_dispatch import adapters
@@ -105,7 +103,3 @@ class DOTAdapterMixin(object):
     def test_single_access_token(self):
         # TODO: Single access tokens not supported yet for DOT (See MA-2122)
         super(DOTAdapterMixin, self).test_single_access_token()
-
-    @skip("Not supported yet (See MA-2123)")
-    def test_scopes(self):
-        super(DOTAdapterMixin, self).test_scopes()

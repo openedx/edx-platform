@@ -169,7 +169,7 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
     def test_team_discussion_id_not_cohorted(self, mock_request):
         team = CourseTeamFactory(course_id=self.course.id)
 
-        team.add_user(self.student)  # pylint: disable=no-member
+        team.add_user(self.student)
         self.call_view(mock_request, team.discussion_topic_id, self.student, None)
 
         self._assert_comments_service_called_without_group_id(mock_request)

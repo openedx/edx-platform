@@ -8,10 +8,10 @@ from django.core.cache import cache
 from django.http import HttpResponse
 from pytz import UTC
 
-from openedx.core.djangoapps.request_cache import get_cache
 from mobile_api.mobile_platform import MobilePlatform
 from mobile_api.models import AppVersionConfig
 from mobile_api.utils import parsed_version
+from openedx.core.lib.cache_utils import get_cache
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 

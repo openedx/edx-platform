@@ -8,8 +8,7 @@ import textwrap
 from abc import ABCMeta, abstractmethod
 
 import ddt
-from nose import SkipTest
-from nose.plugins.attrib import attr
+import pytest
 from selenium.webdriver import ActionChains
 
 from capa.tests.response_xml_factory import (
@@ -31,6 +30,7 @@ from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, select_option_by_text
 from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
+from openedx.core.lib.tests import attr
 
 
 class ProblemTypeTestBaseMeta(ABCMeta):
@@ -243,7 +243,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         And The "<ProblemType>" problem displays a "blank" answer
         """
         if not self.can_submit_blank:
-            raise SkipTest("Test incompatible with the current problem type")
+            pytest.skip("Test incompatible with the current problem type")
 
         self.problem_page.wait_for(
             lambda: self.problem_page.problem_name == self.problem_name,
@@ -263,7 +263,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
         Then I can't submit a problem
         """
         if self.can_submit_blank:
-            raise SkipTest("Test incompatible with the current problem type")
+            pytest.skip("Test incompatible with the current problem type")
 
         self.problem_page.wait_for(
             lambda: self.problem_page.problem_name == self.problem_name,
@@ -372,7 +372,7 @@ class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
 
         # Not all problems have partially correct solutions configured
         if not self.partially_correct:
-            raise SkipTest("Test incompatible with the current problem type")
+            pytest.skip("Test incompatible with the current problem type")
 
         self.problem_page.wait_for(
             lambda: self.problem_page.problem_name == self.problem_name,
@@ -412,7 +412,7 @@ class ProblemNeverShowCorrectnessMixin(object):
 
         # Not all problems have partially correct solutions configured
         if correctness == 'partially-correct' and not self.partially_correct:
-            raise SkipTest("Test incompatible with the current problem type")
+            pytest.skip("Test incompatible with the current problem type")
 
         # Problem progress text depends on points possible
         possible = 'possible (ungraded, results hidden)'

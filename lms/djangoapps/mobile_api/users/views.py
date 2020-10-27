@@ -2,6 +2,7 @@
 Views for user API
 """
 
+import json
 from django.shortcuts import redirect
 from django.utils import dateparse
 from opaque_keys import InvalidKeyError
@@ -17,14 +18,17 @@ from courseware.courses import get_current_child
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.views.index import save_positions_recursively_up
-from experiments.models import ExperimentData
+from experiments.models import ExperimentData, ExperimentKeyValue
+from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
+from mobile_api.utils import API_V05
+from openedx.features.course_duration_limits.access import check_course_expired
 from student.models import CourseEnrollment, User
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .. import errors
 from ..decorators import mobile_course_access, mobile_view
-from .serializers import CourseEnrollmentSerializer, UserSerializer
+from .serializers import CourseEnrollmentSerializer, CourseEnrollmentSerializerv05, UserSerializer
 
 
 @mobile_view(is_user=True)
@@ -42,7 +46,7 @@ class UserDetail(generics.RetrieveAPIView):
 
     **Example Request**
 
-        GET /api/mobile/v0.5/users/{username}
+        GET /api/mobile/{version}/users/{username}
 
     **Response Values**
 
@@ -63,6 +67,11 @@ class UserDetail(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     lookup_field = 'username'
 
+    def get_serializer_context(self):
+        context = super(UserDetail, self).get_serializer_context()
+        context['api_version'] = self.kwargs.get('api_version')
+        return context
+
 
 @mobile_view(is_user=True)
 class UserCourseStatus(views.APIView):
@@ -74,9 +83,9 @@ class UserCourseStatus(views.APIView):
 
     **Example Requests**
 
-        GET /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
+        GET /api/mobile/{version}/users/{username}/course_status_info/{course_id}
 
-        PATCH /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
+        PATCH /api/mobile/{version}/users/{username}/course_status_info/{course_id}
 
         **PATCH Parameters**
 
@@ -208,9 +217,14 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         Get information about the courses that the currently signed in user is
         enrolled in.
 
+        v1 differs from v0.5 version by returning ALL enrollments for
+        a user rather than only the enrollments the user has access to (that haven't expired).
+        An additional attribute "expiration" has been added to the response, which lists the date
+        when access to the course will expire or null if it doesn't expire.
+
     **Example Request**
 
-        GET /api/mobile/v0.5/users/{username}/course_enrollments/
+        GET /api/mobile/v1/users/{username}/course_enrollments/
 
     **Response Values**
 
@@ -219,6 +233,8 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
         The HTTP 200 response has the following values.
 
+        * expiration: The course expiration date for given user course pair
+          or null if the course does not expire.
         * certificate: Information about the user's earned certificate in the
           course.
         * course: A collection of the following data about the course.
@@ -257,7 +273,6 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         * url: URL to the downloadable version of the certificate, if exists.
     """
     queryset = CourseEnrollment.objects.all()
-    serializer_class = CourseEnrollmentSerializer
     lookup_field = 'username'
 
     # In Django Rest Framework v3, there is a default pagination
@@ -274,10 +289,24 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         """
         return check_org is None or (check_org.lower() == course_org.lower())
 
-    def hide_course_for_enrollment_fee_experiment(self, user, course_key, experiment_id=9):
+    def hide_course_for_enrollment_fee_experiment(self, user, enrollment, experiment_id=9):
         """
         Hide enrolled courses from mobile app as part of REV-73/REV-19
         """
+        course_key = enrollment.course_overview.id
+        try:
+            courses_excluded_from_mobile = ExperimentKeyValue.objects.get(
+                experiment_id=10,
+                key="mobile_app_exclusion"
+            ).value
+            courses_excluded_from_mobile = json.loads(courses_excluded_from_mobile.replace('\r', '').replace('\n', ''))
+            if enrollment.mode == 'audit' and str(course_key) in courses_excluded_from_mobile.keys():
+                activationTime = dateparse.parse_datetime(courses_excluded_from_mobile[str(course_key)])
+                if activationTime and enrollment.created and enrollment.created > activationTime:
+                    return True
+        except (ExperimentKeyValue.DoesNotExist, AttributeError):
+            pass
+
         try:
             ExperimentData.objects.get(
                 user=user,
@@ -298,24 +327,54 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 
         return False
 
+    def get_serializer_context(self):
+        context = super(UserCourseEnrollmentsList, self).get_serializer_context()
+        context['api_version'] = self.kwargs.get('api_version')
+        return context
+
+    def get_serializer_class(self):
+        api_version = self.kwargs.get('api_version')
+        if api_version == API_V05:
+            return CourseEnrollmentSerializerv05
+        return CourseEnrollmentSerializer
+
     def get_queryset(self):
+        api_version = self.kwargs.get('api_version')
         enrollments = self.queryset.filter(
             user__username=self.kwargs['username'],
             is_active=True
         ).order_by('created').reverse()
         org = self.request.query_params.get('org', None)
-        return [
+
+        same_org = (
             enrollment for enrollment in enrollments
-            if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org) and
-            is_mobile_available_for_user(self.request.user, enrollment.course_overview) and
-            not self.hide_course_for_enrollment_fee_experiment(self.request.user, enrollment.course_overview.id)
-        ]
+            if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org)
+        )
+        mobile_available = (
+            enrollment for enrollment in same_org
+            if is_mobile_available_for_user(self.request.user, enrollment.course_overview)
+        )
+        not_hidden_for_experiments = (
+            enrollment for enrollment in mobile_available
+            if not self.hide_course_for_enrollment_fee_experiment(self.request.user, enrollment)
+        )
+        not_duration_limited = (
+            enrollment for enrollment in not_hidden_for_experiments
+            if check_course_expired(self.request.user, enrollment.course) == ACCESS_GRANTED
+        )
+
+        if api_version == API_V05:
+            # for v0.5 don't return expired courses
+            return list(not_duration_limited)
+        else:
+            # return all courses, with associated expiration
+            return list(mobile_available)
 
 
 @api_view(["GET"])
 @mobile_view()
-def my_user_info(request):
+def my_user_info(request, api_version):
     """
     Redirect to the currently-logged-in user's info page
     """
-    return redirect("user-detail", username=request.user.username)
+    return redirect("user-detail", api_version=api_version, username=request.user.username)

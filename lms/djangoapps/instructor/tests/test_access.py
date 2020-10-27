@@ -3,11 +3,12 @@ Test instructor.access
 """
 
 from mock import patch, Mock
-from nose.plugins.attrib import attr
-from nose.tools import raises
+import pytest
 
 from django_comment_common.models import FORUM_ROLE_MODERATOR, Role
 from lms.djangoapps.instructor.access import allow_access, list_with_level, revoke_access, update_forum_role
+from openedx.core.lib.tests import attr
+from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from student.roles import CourseBetaTesterRole, CourseCcxCoachRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -44,7 +45,7 @@ class TestInstructorAccessList(SharedModuleStoreTestCase):
 @patch('lms.djangoapps.instructor.enrollment.get_organization_for_site', Mock())
 @patch('lms.djangoapps.instructor.enrollment.user_exists_in_organization', Mock(return_value=True))
 @patch('lms.djangoapps.instructor.enrollment.get_user_in_organization_by_email')
-class TestInstructorAccessAllow(SharedModuleStoreTestCase):
+class TestInstructorAccessAllow(EmailTemplateTagMixin, SharedModuleStoreTestCase):
     """ Test access allow. """
     @classmethod
     def setUpClass(cls):
@@ -82,17 +83,17 @@ class TestInstructorAccessAllow(SharedModuleStoreTestCase):
         allow_access(self.course, user, 'beta')
         self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(user))
 
-    @raises(ValueError)
     def test_allow_badlevel(self, mock_get_user):
         user = UserFactory()
         mock_get_user.return_value = user
-        allow_access(self.course, user, 'robot-not-a-level')
+        with pytest.raises(ValueError):
+            allow_access(self.course, user, 'robot-not-a-level')
 
-    @raises(Exception)
     def test_allow_noneuser(self, mock_get_user):
         user = None
         mock_get_user.return_value = user
-        allow_access(self.course, user, 'staff')
+        with pytest.raises(Exception):
+            allow_access(self.course, user, 'staff')
 
 
 @attr(shard=1)
@@ -127,10 +128,10 @@ class TestInstructorAccessRevoke(SharedModuleStoreTestCase):
         revoke_access(self.course, user, 'beta')
         self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(user))
 
-    @raises(ValueError)
     def test_revoke_badrolename(self):
         user = UserFactory()
-        revoke_access(self.course, user, 'robot-not-a-level')
+        with pytest.raises(ValueError):
+            revoke_access(self.course, user, 'robot-not-a-level')
 
 
 @attr(shard=1)
@@ -165,10 +166,10 @@ class TestInstructorAccessForum(SharedModuleStoreTestCase):
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
         self.assertIn(user, self.mod_role.users.all())
 
-    @raises(Role.DoesNotExist)
     def test_allow_badrole(self):
         user = UserFactory.create()
-        update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
+        with pytest.raises(Role.DoesNotExist):
+            update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
 
     def test_revoke(self):
         user = self.moderators[0]
@@ -187,12 +188,12 @@ class TestInstructorAccessForum(SharedModuleStoreTestCase):
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
         self.assertNotIn(user, self.mod_role.users.all())
 
-    @raises(Role.DoesNotExist)
     def test_revoke_badrole(self):
         user = self.moderators[0]
-        update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
+        with pytest.raises(Role.DoesNotExist):
+            update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
 
-    @raises(ValueError)
     def test_bad_mode(self):
         user = UserFactory()
-        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'robot-not-a-mode')
+        with pytest.raises(ValueError):
+            update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'robot-not-a-mode')

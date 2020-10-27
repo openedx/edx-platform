@@ -6,7 +6,6 @@ import urlparse
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import skipUnless
-import mock
 
 import ddt
 import jwt
@@ -18,7 +17,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import ClientFactory
 from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 from provider.oauth2.models import Client
 
 from courseware.model_data import FieldDataCache
@@ -29,8 +27,9 @@ from edxnotes import helpers
 from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from openedx.core.lib.token_utils import JwtBuilder
+from openedx.core.lib.tests import attr
 from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -534,16 +533,16 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
     @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
     @patch("edxnotes.helpers.anonymous_id_for_user", autospec=True)
     @patch("edxnotes.helpers.get_edxnotes_id_token", autospec=True)
-    @patch("edxnotes.helpers.requests.delete")
-    def test_delete_all_notes_for_user(self, mock_delete, mock_get_id_token, mock_anonymous_id_for_user):
+    @patch("edxnotes.helpers.requests.post")
+    def test_delete_all_notes_for_user(self, mock_post, mock_get_id_token, mock_anonymous_id_for_user):
         """
         Test GDPR data deletion for Notes user_id
         """
         mock_anonymous_id_for_user.return_value = "anonymous_id"
         mock_get_id_token.return_value = "test_token"
         helpers.delete_all_notes_for_user(self.user)
-        mock_delete.assert_called_with(
-            url='http://example.com/annotations/',
+        mock_post.assert_called_with(
+            url='http://example.com/retire_annotations/',
             headers={
                 'x-annotator-auth-token': 'test_token'
             },
@@ -914,7 +913,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Verify that `construct_url` works correctly.
         """
         # make absolute url
-        # pylint: disable=no-member
         if self.request.is_secure():
             host = 'https://' + self.request.get_host()
         else:
@@ -1187,17 +1185,17 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
         """
         Helper function for creating headers for the JWT authentication.
         """
-        token = JwtBuilder(user).build_token([])
+        token = create_jwt_for_user(user)
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         return headers
 
-    @patch("edxnotes.helpers.requests.delete", autospec=True)
-    def test_retire_user_success(self, mock_get):
+    @patch("edxnotes.helpers.requests.post", autospec=True)
+    def test_retire_user_success(self, mock_post):
         """
         Tests that 204 response is received on success.
         """
-        mock_get.return_value.content = ''
-        mock_get.return_value.status_code = 204
+        mock_post.return_value.content = ''
+        mock_post.return_value.status_code = 204
         headers = self._build_jwt_headers(self.superuser)
         response = self.client.post(
             self.retire_user_url,

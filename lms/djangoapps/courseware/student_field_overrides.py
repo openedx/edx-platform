@@ -4,8 +4,10 @@ by the individual due dates feature.
 """
 import json
 
+from courseware.models import StudentFieldOverride
+from openedx.core.lib.xblock_utils import is_xblock_aside
+
 from .field_overrides import FieldOverrideProvider
-from .models import StudentFieldOverride
 
 
 class IndividualStudentOverrideProvider(FieldOverrideProvider):
@@ -43,9 +45,18 @@ def _get_overrides_for_user(user, block):
     Gets all of the individual student overrides for given user and block.
     Returns a dictionary of field override values keyed by field name.
     """
+    if (
+        hasattr(block, "scope_ids") and
+        hasattr(block.scope_ids, "usage_id") and
+        is_xblock_aside(block.scope_ids.usage_id)
+    ):
+        location = block.scope_ids.usage_id.usage_key
+    else:
+        location = block.location
+
     query = StudentFieldOverride.objects.filter(
         course_id=block.runtime.course_id,
-        location=block.location,
+        location=location,
         student_id=user.id,
     )
     overrides = {}

@@ -38,5 +38,22 @@
             "name": "course_experience.gdpr",
             "everyone": false
         }
+    },
+    {
+        "pk": 4,
+        "model": "waffle.switch",
+        "fields": {
+            "name": "studio.enable_checklists_page",
+            "active": true
+        }
+    },
+    {
+        "pk": 5,
+        "model": "waffle.flag",
+        "fields": {
+            "name": "studio.enable_checklists_quality",
+            "staff": true,
+            "superusers": true
+        }
     }
 ]

@@ -25,7 +25,7 @@ import os
 if 'BOK_CHOY_HOSTNAME' in os.environ:
     from .devstack_docker import *  # pylint: disable=wildcard-import, unused-wildcard-import
 else:
-    from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
+    from .devstack import *  # pylint: disable=wildcard-import
 
 TEST_ROOT = REPO_ROOT / "test_root"
 

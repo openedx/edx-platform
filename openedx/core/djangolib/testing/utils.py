@@ -19,13 +19,13 @@ from django.core.cache import caches
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
+from edx_django_utils.cache import RequestCache
 
 
 class CacheIsolationMixin(object):
     """
     This class can be used to enable specific django caches for
-    specific the TestCase that it's mixed into.
+    the specific TestCase that it's mixed into.
 
     Usage:
 
@@ -118,7 +118,7 @@ class CacheIsolationMixin(object):
         # Clear that.
         sites.models.SITE_CACHE.clear()
 
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
 
 class CacheIsolationTestCase(CacheIsolationMixin, TestCase):

@@ -23,6 +23,11 @@ admin.site.site_title = admin.site.site_header
 if password_policy_compliance.should_enforce_compliance_on_login():
     admin.site.login_form = PasswordPolicyAwareAdminAuthForm
 
+# Custom error pages
+# These are used by Django to render these error codes. Do not remove.
+# pylint: disable=invalid-name
+handler404 = contentstore.views.render_404
+handler500 = contentstore.views.render_500
 
 # Pattern to match a course key or a library key
 COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
@@ -33,6 +38,7 @@ COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
 LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
 urlpatterns = [
+    url(r'', include('openedx.core.djangoapps.user_authn.urls_common')),
     url(r'', include('student.urls')),
     url(r'^transcripts/upload$', contentstore.views.upload_transcripts, name='upload_transcripts'),
     url(r'^transcripts/download$', contentstore.views.download_transcripts, name='download_transcripts'),
@@ -77,6 +83,7 @@ urlpatterns = [
     url(r'^howitworks$', contentstore.views.howitworks, name='howitworks'),
     url(r'^signup$', contentstore.views.signup, name='signup'),
     url(r'^signin$', contentstore.views.login_page, name='login'),
+    url(r'^signin_redirect_to_lms$', contentstore.views.login_redirect_to_lms, name='login_redirect_to_lms'),
     url(r'^request_course_creator$', contentstore.views.request_course_creator, name='request_course_creator'),
     url(r'^course_team/{}(?:/(?P<email>.+))?$'.format(COURSELIKE_KEY_PATTERN),
         contentstore.views.course_team_handler, name='course_team_handler'),
@@ -199,7 +206,10 @@ if settings.FEATURES.get('AUTH_USE_CAS'):
         url(r'^cas-auth/login/$', openedx.core.djangoapps.external_auth.views.cas_login, name="cas-login"),
         url(r'^cas-auth/logout/$', django_cas.views.logout, {'next_page': '/'}, name="cas-logout"),
     ]
-
+# The password pages in the admin tool are disabled so that all password
+# changes go through our user portal and follow complexity requirements.
+urlpatterns.append(url(r'^admin/password_change/$', handler404))
+urlpatterns.append(url(r'^admin/auth/user/\d+/password/$', handler404))
 urlpatterns.append(url(r'^admin/', include(admin.site.urls)))
 
 # enable entrance exams
@@ -257,12 +267,6 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
 # UX reference templates
 urlpatterns.append(url(r'^template/(?P<template>.+)$', openedx.core.djangoapps.debug.views.show_reference_template,
                        name='openedx.core.djangoapps.debug.views.show_reference_template'))
-
-# Custom error pages
-# These are used by Django to render these error codes. Do not remove.
-# pylint: disable=invalid-name
-handler404 = contentstore.views.render_404
-handler500 = contentstore.views.render_500
 
 # display error page templates, for testing purposes
 urlpatterns += [

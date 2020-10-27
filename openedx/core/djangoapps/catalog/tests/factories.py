@@ -4,7 +4,10 @@ from functools import partial
 
 import factory
 import uuid
+from factory.fuzzy import FuzzyChoice
 from faker import Faker
+
+from openedx.core.djangoapps.catalog.constants import PathwayType
 
 
 fake = Faker()
@@ -211,3 +214,14 @@ class ProgramFactory(DictFactoryBase):
 class ProgramTypeFactory(DictFactoryBase):
     name = factory.Faker('word')
     logo_image = factory.LazyFunction(generate_sized_stdimage)
+
+
+class PathwayFactory(DictFactoryBase):
+    id = factory.Sequence(lambda x: x)
+    description = factory.Faker('sentence')
+    destination_url = factory.Faker('url')
+    email = factory.Faker('email')
+    name = factory.Faker('sentence')
+    org_name = factory.Faker('company')
+    programs = factory.LazyFunction(partial(generate_instances, ProgramFactory))
+    pathway_type = FuzzyChoice((path_type.value for path_type in PathwayType))

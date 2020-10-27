@@ -12,6 +12,7 @@ django-extensions that we were actually using.
 
 originally from http://www.djangosnippets.org/snippets/828/ by dnordberg
 """
+from __future__ import print_function
 import logging
 
 import django

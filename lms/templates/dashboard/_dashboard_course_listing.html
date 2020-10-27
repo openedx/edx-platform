@@ -33,6 +33,8 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
   if cert_name_long == "":
     cert_name_long = settings.CERT_NAME_LONG
   billing_email = settings.PAYMENT_SUPPORT_EMAIL
+
+  is_course_expired = hasattr(show_courseware_link, 'error_code') and show_courseware_link.error_code == 'audit_expired'
 %>
 
 <%namespace name='static' file='../static_content.html'/>
@@ -65,8 +67,8 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
       <h2 class="hd hd-2 sr" id="details-heading-${enrollment.course_id}">${_('Course details')}</h2>
     <div class="wrapper-course-image" aria-hidden="true">
       % if show_courseware_link and not is_unfulfilled_entitlement:
-        % if not is_course_blocked:
-            <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover" tabindex="-1">
+        % if not is_course_blocked and not is_course_expired:
+            <a href="${course_target}" data-course-key="${enrollment.course_id}" class="cover course-target-link" tabindex="-1">
               <img src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Home Page').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
             </a>
         % else:
@@ -92,8 +94,8 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
       <div class="wrapper-course-details">
         <h3 class="course-title" id="course-title-${enrollment.course_id}">
           % if show_courseware_link and not is_unfulfilled_entitlement:
-            % if not is_course_blocked:
-              <a data-course-key="${enrollment.course_id}" href="${course_target}">${course_overview.display_name_with_default}</a>
+            % if not is_course_blocked and not is_course_expired:
+              <a data-course-key="${enrollment.course_id}" href="${course_target}" class="course-target-link">${course_overview.display_name_with_default}</a>
             % else:
               <a class="disable-look" data-course-key="${enrollment.course_id}">${course_overview.display_name_with_default}</a>
             % endif
@@ -128,7 +130,14 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
           %>
 
             <span class="info-date-block-container">
-                % if is_unfulfilled_entitlement:
+                % if not is_unfulfilled_entitlement and is_course_expired:
+                  <span class="info-date-block" data-course-key="${enrollment.course_id}">
+                    ${show_courseware_link.user_message}
+                    <span class="sr">
+                      &nbsp;${_('for {course_display_name}').format(course_display_name=course_overview.display_name_with_default)}
+                    </span>
+                  </span>
+                % elif is_unfulfilled_entitlement:
                     <span class="info-date-block" aria-live="polite">
                         <span class="icon fa fa-warning" aria-hidden="true"></span>
                         % if not entitlement_expired_at:
@@ -165,18 +174,18 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
         </div>
         <div class="wrapper-course-actions">
           <div class="course-actions">
-            % if show_courseware_link or is_unfulfilled_entitlement:
+            % if (show_courseware_link or is_unfulfilled_entitlement) and not is_course_expired:
               % if course_overview.has_ended():
                 % if not is_course_blocked:
-                  <a href="${course_target}" class="enter-course archived" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                  <a href="${course_target}" class="enter-course archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % else:
-                  <a class="enter-course-blocked archived" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                  <a class="enter-course-blocked archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
                 % endif
 
               % else:
                 % if resume_button_url != '':
                   <a href="${resume_button_url}"
-                     class="enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
+                     class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
                      data-course-key="${enrollment.course_id}">
                     ${_('Resume Course')}
                     <span class="sr">
@@ -184,8 +193,8 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     </span>
                   </a>
                 % elif not is_course_blocked:
-                  <a href="${course_target}" 
-                     class="enter-course ${'hidden' if is_unfulfilled_entitlement else ''}" 
+                  <a href="${course_target}"
+                     class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
                      data-course-key="${enrollment.course_id}">
                     ${_('View Course')}
                     <span class="sr">

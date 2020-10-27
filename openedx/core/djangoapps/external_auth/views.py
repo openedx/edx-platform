@@ -5,9 +5,7 @@ import fnmatch
 import functools
 import json
 import logging
-import random
 import re
-import string
 import unicodedata
 import urllib
 from textwrap import dedent
@@ -282,7 +280,9 @@ def _signup(request, eamap, retfun=None):
     retfun is a function to execute for the return value, if immediate
     signup is used.  That allows @ssl_login_shortcut() to work.
     """
-    # save this for use by student.views.create_account
+    from openedx.core.djangoapps.user_authn.views.deprecated import create_account, register_user
+
+    # save this for use by create_account
     request.session['ExternalAuthMap'] = eamap
 
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP', ''):
@@ -294,7 +294,7 @@ def _signup(request, eamap, retfun=None):
                          honor_code=u'true',
                          terms_of_service=u'true')
         log.info(u'doing immediate signup for %s, params=%s', username, post_vars)
-        student.views.create_account(request, post_vars)
+        create_account(request, post_vars)
         # should check return content for successful completion before
         if retfun is not None:
             return retfun()
@@ -335,7 +335,7 @@ def _signup(request, eamap, retfun=None):
 
     log.info(u'EXTAUTH: Doing signup for %s', eamap.external_id)
 
-    return student.views.register_user(request, extra_context=context)
+    return register_user(request, extra_context=context)
 
 
 # -----------------------------------------------------------------------------

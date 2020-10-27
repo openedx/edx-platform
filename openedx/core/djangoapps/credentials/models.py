@@ -11,8 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.site_configuration import helpers
 
-from . import STUDENT_RECORDS_FLAG
-
 API_VERSION = 'v2'
 
 
@@ -93,8 +91,8 @@ class CredentialsApiConfig(ConfigurationModel):
         """
         Publicly-accessible Records URL root.
         """
-        # Temporarily disable this feature while we work on it
-        if not STUDENT_RECORDS_FLAG.is_enabled():
+        # Not every site wants the Learner Records feature, so we allow opting out.
+        if not helpers.get_value('ENABLE_LEARNER_RECORDS', True):
             return None
         root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
         return urljoin(root, '/records/')
@@ -110,3 +108,22 @@ class CredentialsApiConfig(ConfigurationModel):
     def is_cache_enabled(self):
         """Whether responses from the Credentials API will be cached."""
         return self.cache_ttl > 0
+
+
+class NotifyCredentialsConfig(ConfigurationModel):
+    """
+    Manages configuration for a run of the notify_credentials management command.
+    """
+
+    class Meta(object):
+        app_label = 'credentials'
+        verbose_name = 'notify_credentials argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text='Useful for manually running a Jenkins job. Specify like "--start-date=2018 --courses A B".',
+        default='',
+    )
+
+    def __unicode__(self):
+        return unicode(self.arguments)

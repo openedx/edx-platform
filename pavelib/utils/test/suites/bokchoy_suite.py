@@ -1,6 +1,7 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
+from __future__ import print_function
 import os
 from time import sleep
 from textwrap import dedent
@@ -45,7 +46,7 @@ def load_bok_choy_data(options):
     """
     Loads data into database from db_fixtures
     """
-    print 'Loading data from json fixtures in db_fixtures directory'
+    print('Loading data from json fixtures in db_fixtures directory')
     sh(
         "DEFAULT_STORE={default_store}"
         " ./manage.py lms --settings {settings} loaddata --traceback"
@@ -73,7 +74,7 @@ def load_courses(options):
     """
     if 'imports_dir' in options:
         msg = colorize('green', "Importing courses from {}...".format(options.imports_dir))
-        print msg
+        print(msg)
 
         sh(
             "DEFAULT_STORE={default_store}"
@@ -84,7 +85,7 @@ def load_courses(options):
             )
         )
     else:
-        print colorize('blue', "--imports-dir not set, skipping import")
+        print(colorize('blue', "--imports-dir not set, skipping import"))
 
 
 @task
@@ -96,7 +97,7 @@ def update_fixtures():
     and Jenkins.
     """
     msg = colorize('green', "Updating the Site fixture domains...")
-    print msg
+    print(msg)
 
     sh(
         " ./manage.py lms --settings={settings} update_fixtures".format(
@@ -114,11 +115,11 @@ def get_test_course(options):
     """
 
     if options.get('imports_dir'):
-        print colorize("green", "--imports-dir specified, skipping fetch of test course")
+        print(colorize("green", "--imports-dir specified, skipping fetch of test course"))
         return
 
     if not options.get('should_fetch_course', False):
-        print colorize("green", "--skip-fetch specified, skipping fetch of test course")
+        print(colorize("green", "--skip-fetch specified, skipping fetch of test course"))
         return
 
     # Set the imports_dir for use by other tasks
@@ -128,7 +129,7 @@ def get_test_course(options):
     zipped_course = options.imports_dir + 'demo_course.tar.gz'
 
     msg = colorize('green', "Fetching the test course from github...")
-    print msg
+    print(msg)
 
     sh(
         'wget {tar_gz_file} -O {zipped_course}'.format(
@@ -138,7 +139,7 @@ def get_test_course(options):
     )
 
     msg = colorize('green', "Uncompressing the test course...")
-    print msg
+    print(msg)
 
     sh(
         'tar zxf {zipped_course} -C {courses_dir}'.format(
@@ -171,7 +172,7 @@ def prepare_bokchoy_run(options):
     """
     if not options.get('fasttest', False):
 
-        print colorize('green', "Generating optimized static assets...")
+        print(colorize('green', "Generating optimized static assets..."))
         if options.get('log_dir') is None:
             call_task('update_assets', args=['--settings', 'test_static_optimized'])
         else:
@@ -182,7 +183,7 @@ def prepare_bokchoy_run(options):
 
     # Ensure the test servers are available
     msg = colorize('green', "Confirming servers are running...")
-    print msg
+    print(msg)
     start_servers()  # pylint: disable=no-value-for-parameter
 
 
@@ -246,7 +247,7 @@ class BokChoyTestSuite(TestSuite):
             test_utils.clean_test_files()
 
         msg = colorize('green', "Checking for mongo, memchache, and mysql...")
-        print msg
+        print(msg)
         check_services()
 
         if not self.testsonly:
@@ -257,7 +258,7 @@ class BokChoyTestSuite(TestSuite):
             update_fixtures()
 
         msg = colorize('green', "Confirming servers have started...")
-        print msg
+        print(msg)
         wait_for_test_servers()
         try:
             # Create course in order to seed forum data underneath. This is
@@ -267,7 +268,7 @@ class BokChoyTestSuite(TestSuite):
                 "Installing course fixture for forums",
                 CourseFixture('foobar_org', '1117', 'seed_forum', 'seed_foo').install
             )
-            print 'Forums permissions/roles data has been seeded'
+            print('Forums permissions/roles data has been seeded')
         except FixtureError:
             # this means it's already been done
             pass
@@ -281,11 +282,11 @@ class BokChoyTestSuite(TestSuite):
         # Using testsonly will leave all fixtures in place (Note: the db will also be dirtier.)
         if self.testsonly:
             msg = colorize('green', 'Running in testsonly mode... SKIPPING database cleanup.')
-            print msg
+            print(msg)
         else:
             # Clean up data we created in the databases
             msg = colorize('green', "Cleaning up databases...")
-            print msg
+            print(msg)
             sh("./manage.py lms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
             clear_mongo()
 
@@ -315,14 +316,14 @@ class BokChoyTestSuite(TestSuite):
         """
         Infinite loop. Servers will continue to run in the current session unless interrupted.
         """
-        print 'Bok-choy servers running. Press Ctrl-C to exit...\n'
-        print 'Note: pressing Ctrl-C multiple times can corrupt system state. Just press it once.\n'
+        print('Bok-choy servers running. Press Ctrl-C to exit...\n')
+        print('Note: pressing Ctrl-C multiple times can corrupt system state. Just press it once.\n')
 
         while True:
             try:
                 sleep(10000)
             except KeyboardInterrupt:
-                print "Stopping bok-choy servers.\n"
+                print("Stopping bok-choy servers.\n")
                 break
 
     @property

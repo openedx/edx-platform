@@ -143,7 +143,16 @@ class TaskTestCase(ModuleStoreTestCase):
             'username': cls.comment_author.username,
         }
         cls.thread['children'] = [cls.comment, cls.comment2]
-        cls.comment['child_count'] = 1,
+        cls.comment['child_count'] = 1
+        cls.thread2 = {
+            'id': cls.discussion_id,
+            'course_id': unicode(cls.course.id),
+            'created_at': date.serialize(TWO_HOURS_AGO),
+            'title': 'thread-title',
+            'user_id': cls.thread_author.id,
+            'username': cls.thread_author.username,
+            'commentable_id': 'thread-commentable-id-2',
+        }
 
     def setUp(self):
         super(TaskTestCase, self).setUp()
@@ -229,11 +238,14 @@ class TaskTestCase(ModuleStoreTestCase):
             self.assertTrue(self.mock_permalink in rendered_email.body_html)
             self.assertTrue(message.context['site'].domain in rendered_email.body_html)
 
-    def run_should_not_send_email_test(self, comment_dict):
+    def run_should_not_send_email_test(self, thread, comment_dict):
+        """
+        assert email is not sent
+        """
         self.mock_request.side_effect = make_mock_responder(
             subscribed_thread_ids=[self.discussion_id],
             comment_data=comment_dict,
-            thread_data=self.thread,
+            thread_data=thread,
         )
         user = mock.Mock()
         comment = cc.Comment.find(id=comment_dict['id']).retrieve()
@@ -243,16 +255,23 @@ class TaskTestCase(ModuleStoreTestCase):
             'thread_author_id': self.thread_author.id,
             'course_id': self.course.id,
             'comment_id': comment_dict['id'],
-            'thread_id': self.thread['id'],
+            'thread_id': thread['id'],
         })
         self.assertEqual(actual_result, False)
         self.assertFalse(self.mock_ace_send.called)
 
     def test_subcomment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.subcomment)
+        self.run_should_not_send_email_test(self.thread, self.subcomment)
 
     def test_second_comment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.comment2)
+        self.run_should_not_send_email_test(self.thread, self.comment2)
+
+    def test_thread_without_children_should_not_send_email(self):
+        """
+        test that email notification will not be sent for the thread
+        that doesn't have attribute 'children'
+        """
+        self.run_should_not_send_email_test(self.thread2, self.comment)
 
     @ddt.data((
         {
@@ -269,6 +288,7 @@ class TaskTestCase(ModuleStoreTestCase):
             'uuid': 'uuid1',
             'send_uuid': 'uuid2',
             'thread_id': 'dummy_discussion_id',
+            'course_id': 'fake_course_edx',
             'thread_created_at': datetime(2000, 1, 1, 0, 0, 0)
         }
     ), (
@@ -286,6 +306,7 @@ class TaskTestCase(ModuleStoreTestCase):
             'uuid': 'uuid3',
             'send_uuid': 'uuid4',
             'thread_id': 'dummy_discussion_id2',
+            'course_id': 'fake_course_edx2',
             'thread_created_at': datetime(2000, 1, 1, 0, 0, 0)
         }
 
@@ -299,12 +320,13 @@ class TaskTestCase(ModuleStoreTestCase):
                 setattr(message, key, entry)
 
             test_props['nonInteraction'] = True
-
-            with mock.patch('analytics.track') as mock_analytics_track:
+            # Also augment context with site object, for setting segment context.
+            site = Site.objects.get_current()
+            context['site'] = site
+            with mock.patch('lms.djangoapps.discussion.tasks.segment.track') as mock_segment_track:
                 _track_notification_sent(message, context)
-                mock_analytics_track.assert_called_once_with(
+                mock_segment_track.assert_called_once_with(
                     user_id=context['thread_author_id'],
-                    event='edx.bi.email.sent',
-                    course_id=context['course_id'],
-                    properties=test_props
+                    event_name='edx.bi.email.sent',
+                    properties=test_props,
                 )

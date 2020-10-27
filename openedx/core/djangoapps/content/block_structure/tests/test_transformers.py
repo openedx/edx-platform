@@ -2,7 +2,6 @@
 Tests for transformers.py
 """
 from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 from unittest import TestCase
 
 from ..block_structure import BlockStructureModulestoreData
@@ -13,11 +12,12 @@ from .helpers import (
 )
 
 
-@attr(shard=2)
 class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
     """
     Test class for testing BlockStructureTransformers
     """
+    shard = 2
+
     class UnregisteredTransformer(MockTransformer):
         """
         Mock transformer that is not registered.

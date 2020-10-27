@@ -7,7 +7,6 @@ import datetime
 import pytz
 from django.test import override_settings
 from django.urls import reverse
-from nose.plugins.attrib import attr
 from six import text_type
 import unittest
 
@@ -20,12 +19,12 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
 class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard
     """
+    shard = 1
+
     @classmethod
     def setUpClass(cls):
         super(TestECommerceDashboardViews, cls).setUpClass()

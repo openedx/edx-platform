@@ -2,7 +2,6 @@ import datetime
 import logging
 import random
 
-import analytics
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -17,6 +16,7 @@ from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from student.models import CourseEnrollment
+from track import segment
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG
 from .models import Schedule, ScheduleConfig
 from .tasks import update_course_schedules
@@ -53,7 +53,7 @@ def create_schedule(sender, **kwargs):  # pylint: disable=unused-argument
         ))
 
 
-def update_schedules_on_course_start_changed(sender, updated_course_overview, previous_start_date, **kwargs):
+def update_schedules_on_course_start_changed(sender, updated_course_overview, previous_start_date, **kwargs):   # pylint: disable=unused-argument
     """
     Updates all course schedules start and upgrade_deadline dates based off of
     the new course overview start date.
@@ -136,9 +136,9 @@ def _should_randomly_suppress_schedule_creation(
         upgrade_deadline_str = None
         if upgrade_deadline:
             upgrade_deadline_str = upgrade_deadline.isoformat()
-        analytics.track(
+        segment.track(
             user_id=enrollment.user.id,
-            event='edx.bi.schedule.suppressed',
+            event_name='edx.bi.schedule.suppressed',
             properties={
                 'course_id': unicode(enrollment.course_id),
                 'experience_type': experience_type,

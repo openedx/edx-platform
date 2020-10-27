@@ -76,24 +76,24 @@ class TestXSSLinter(TestCase):
 
         output = self.out.getvalue()
         # Assert violation details are displayed.
-        self.assertIsNotNone(re.search('test\.html.*{}'.format(self.ruleset.mako_missing_default.rule_id), output))
-        self.assertIsNotNone(re.search('test\.js.*{}'.format(self.ruleset.javascript_concat_html.rule_id), output))
-        self.assertIsNotNone(re.search('test\.js.*{}'.format(self.ruleset.underscore_not_escaped.rule_id), output))
+        self.assertIsNotNone(re.search(r'test\.html.*{}'.format(self.ruleset.mako_missing_default.rule_id), output))
+        self.assertIsNotNone(re.search(r'test\.js.*{}'.format(self.ruleset.javascript_concat_html.rule_id), output))
+        self.assertIsNotNone(re.search(r'test\.js.*{}'.format(self.ruleset.underscore_not_escaped.rule_id), output))
         lines_with_rule = 0
         lines_without_rule = 0  # Output with verbose setting only.
-        for underscore_match in re.finditer('test\.underscore:.*\n', output):
+        for underscore_match in re.finditer(r'test\.underscore:.*\n', output):
             if re.search(self.ruleset.underscore_not_escaped.rule_id, underscore_match.group()) is not None:
                 lines_with_rule += 1
             else:
                 lines_without_rule += 1
         self.assertGreaterEqual(lines_with_rule, 1)
         self.assertEquals(lines_without_rule, 0)
-        self.assertIsNone(re.search('test\.py.*{}'.format(self.ruleset.python_parse_error.rule_id), output))
-        self.assertIsNotNone(re.search('test\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output))
+        self.assertIsNone(re.search(r'test\.py.*{}'.format(self.ruleset.python_parse_error.rule_id), output))
+        self.assertIsNotNone(re.search(r'test\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output))
         # Assert no rule totals.
-        self.assertIsNone(re.search('{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
+        self.assertIsNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
         # Assert final total
-        self.assertIsNotNone(re.search('{} violations total'.format(7), output))
+        self.assertIsNotNone(re.search(r'{} violations total'.format(7), output))
 
     def test_lint_with_verbose(self):
         """
@@ -115,7 +115,7 @@ class TestXSSLinter(TestCase):
         output = self.out.getvalue()
         lines_with_rule = 0
         lines_without_rule = 0  # Output with verbose setting only.
-        for underscore_match in re.finditer('test\.underscore:.*\n', output):
+        for underscore_match in re.finditer(r'test\.underscore:.*\n', output):
             if re.search(self.ruleset.underscore_not_escaped.rule_id, underscore_match.group()) is not None:
                 lines_with_rule += 1
             else:
@@ -123,9 +123,9 @@ class TestXSSLinter(TestCase):
         self.assertGreaterEqual(lines_with_rule, 1)
         self.assertGreaterEqual(lines_without_rule, 1)
         # Assert no rule totals.
-        self.assertIsNone(re.search('{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
+        self.assertIsNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
         # Assert final total
-        self.assertIsNotNone(re.search('{} violations total'.format(7), output))
+        self.assertIsNotNone(re.search(r'{} violations total'.format(7), output))
 
     def test_lint_with_rule_totals(self):
         """
@@ -145,12 +145,12 @@ class TestXSSLinter(TestCase):
         )
 
         output = self.out.getvalue()
-        self.assertIsNotNone(re.search('test\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output))
+        self.assertIsNotNone(re.search(r'test\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output))
 
         # Assert totals output.
-        self.assertIsNotNone(re.search('{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
-        self.assertIsNotNone(re.search('{}:\s*{} violations'.format(self.ruleset.python_wrap_html.rule_id, 1), output))
-        self.assertIsNotNone(re.search('{} violations total'.format(7), output))
+        self.assertIsNotNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
+        self.assertIsNotNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_wrap_html.rule_id, 1), output))
+        self.assertIsNotNone(re.search(r'{} violations total'.format(7), output))
 
     def test_lint_with_list_files(self):
         """
@@ -171,10 +171,10 @@ class TestXSSLinter(TestCase):
 
         output = self.out.getvalue()
         # Assert file with rule is not output.
-        self.assertIsNone(re.search('test\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output))
+        self.assertIsNone(re.search(r'test\.py.*{}'.format(self.ruleset.python_wrap_html.rule_id), output))
         # Assert file is output.
-        self.assertIsNotNone(re.search('test\.py', output))
+        self.assertIsNotNone(re.search(r'test\.py', output))
 
         # Assert no totals.
-        self.assertIsNone(re.search('{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
-        self.assertIsNone(re.search('{} violations total'.format(7), output))
+        self.assertIsNone(re.search(r'{}:\s*{} violations'.format(self.ruleset.python_parse_error.rule_id, 0), output))
+        self.assertIsNone(re.search(r'{} violations total'.format(7), output))

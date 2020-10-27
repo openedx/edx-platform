@@ -13,7 +13,6 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 import dashboard.git_import as git_import
@@ -42,7 +41,6 @@ FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 
 
-@attr(shard=3)
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
@@ -53,7 +51,7 @@ class TestGitAddCourse(SharedModuleStoreTestCase):
     """
     Tests the git_add_course management command for proper functions.
     """
-
+    shard = 3
     TEST_REPO = 'https://github.com/mitocw/edx4edx_lite.git'
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'

@@ -42,9 +42,9 @@ EXPECTED_INDEX_COURSE_COMMAND = (
     u"python manage.py {system} --settings={settings} reindex_course --setup"
 )
 EXPECTED_PRINT_SETTINGS_COMMAND = [
-    u"python manage.py lms --settings={settings} print_setting STATIC_ROOT 2>/dev/null",
-    u"python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>/dev/null",
-    u"python manage.py lms --settings={settings} print_setting WEBPACK_CONFIG_PATH 2>/dev/null"
+    u"python manage.py lms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
+    u"python manage.py cms --settings={settings} print_setting STATIC_ROOT 2>{log_file}",
+    u"python manage.py lms --settings={settings} print_setting WEBPACK_CONFIG_PATH 2>{log_file}"
 ]
 EXPECTED_WEBPACK_COMMAND = (
     u"NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} "
@@ -199,7 +199,6 @@ class TestPaverServerTasks(PaverTestCase):
             ]
         )
 
-    # pylint: disable=too-many-statements
     def verify_server_task(self, task_name, options, contracts_default=False):
         """
         Verify the output of a server task.
@@ -244,10 +243,11 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.extend(
-                [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
+                [c.format(settings=expected_asset_settings,
+                          log_file=Env.PRINT_SETTINGS_LOG_FILE) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
             )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
-                node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
+                node_env="production",
                 static_root_lms=None,
                 static_root_cms=None,
                 webpack_config_path=None
@@ -289,10 +289,11 @@ class TestPaverServerTasks(PaverTestCase):
             expected_messages.append(u"xmodule_assets common/static/xmodule")
             expected_messages.append(u"install npm_assets")
             expected_messages.extend(
-                [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
+                [c.format(settings=expected_asset_settings,
+                          log_file=Env.PRINT_SETTINGS_LOG_FILE) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
             )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
-                node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
+                node_env="production",
                 static_root_lms=None,
                 static_root_cms=None,
                 webpack_config_path=None

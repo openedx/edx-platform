@@ -21,7 +21,7 @@ class NoneToEmptyManager(models.Manager):
         """
         Returns the result of NoneToEmptyQuerySet instead of a regular QuerySet.
         """
-        return NoneToEmptyQuerySet(self.model, using=self._db)  # pylint: disable=no-member
+        return NoneToEmptyQuerySet(self.model, using=self._db)
 
 
 class NoneToEmptyQuerySet(models.query.QuerySet):
@@ -34,7 +34,6 @@ class NoneToEmptyQuerySet(models.query.QuerySet):
     empty value.
     """
     def _filter_or_exclude(self, *args, **kwargs):
-        # pylint: disable=protected-access
         for field_object in self.model._meta.get_fields():
             direct = not field_object.auto_created or field_object.concrete
             if direct and hasattr(field_object, 'Empty'):

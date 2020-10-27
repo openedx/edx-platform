@@ -12,23 +12,18 @@ If true, it:
 
 from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
-_FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
-_MIDDLEWARE_CLASSES = ['third_party_auth.middleware.ExceptionMiddleware']
-_SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
-_SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
-    'msafed': 0
-}
-
 
 def apply_settings(django_settings):
     """Set provider-independent settings."""
 
     # Whitelisted URL query parameters retrained in the pipeline session.
     # Params not in this whitelist will be silently dropped.
-    django_settings.FIELDS_STORED_IN_SESSION = _FIELDS_STORED_IN_SESSION
+    django_settings.FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 
     # Inject exception middleware to make redirects fire.
-    django_settings.MIDDLEWARE_CLASSES.extend(_MIDDLEWARE_CLASSES)
+    django_settings.MIDDLEWARE_CLASSES.extend(
+        ['third_party_auth.middleware.ExceptionMiddleware']
+    )
 
     # Where to send the user if there's an error during social authentication
     # and we cannot send them to a more specific URL
@@ -36,10 +31,14 @@ def apply_settings(django_settings):
     django_settings.SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 
     # Where to send the user once social authentication is successful.
-    django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = _SOCIAL_AUTH_LOGIN_REDIRECT_URL
+    django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+
+    # Disable sanitizing of redirect urls in social-auth since the platform
+    # already does its own sanitization via the LOGIN_REDIRECT_WHITELIST setting.
+    django_settings.SOCIAL_AUTH_SANITIZE_REDIRECTS = False
 
     # Adding extra key value pair in the url query string for microsoft as per request
-    django_settings.SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = _SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS
+    django_settings.SOCIAL_AUTH_AZUREAD_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'msafed': 0}
 
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.

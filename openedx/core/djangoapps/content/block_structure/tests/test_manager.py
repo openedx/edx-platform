@@ -3,7 +3,6 @@ Tests for manager.py
 """
 import ddt
 from django.test import TestCase
-from nose.plugins.attrib import attr
 
 from ..block_structure import BlockStructureBlockData
 from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE, waffle
@@ -89,12 +88,13 @@ class TestTransformer1(MockTransformer):
         return data_key + 't1.val1.' + unicode(block_key)
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, TestCase):
     """
     Test class for BlockStructureManager.
     """
+    shard = 2
+
     def setUp(self):
         super(TestBlockStructureManager, self).setUp()
 

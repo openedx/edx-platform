@@ -72,7 +72,7 @@ UI Acceptance Tests
    in favor of Bok Choy for new tests.  Most of these tests simulate user
    interactions through the browser using `splinter`_.
 
-.. _Bok Choy: http://bok-choy.readthedocs.org/en/latest/tutorial.html
+.. _Bok Choy: https://bok-choy.readthedocs.org/en/latest/tutorial.html
 .. _lettuce: http://lettuce.it/
 .. _splinter: http://splinter.cobrateam.info/
 
@@ -342,6 +342,14 @@ Note: More on the ``--failed`` functionality:
   failing tests for lms or cms, use the ``paver test_system -s lms --failed``
   or ``paver test_system -s cms --failed`` commands.
 
+Debugging Unittest Flakiness
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As we move over to running our unittests with Jenkins Pipelines and pytest-xdist,
+there are new ways for tests to flake, which can sometimes be difficult to debug.
+If you run into flakiness, check (and feel free to contribute to) this
+`confluence document <https://openedx.atlassian.net/wiki/spaces/TE/pages/884998163/Debugging+test+failures+with+pytest-xdist>`__ for help.
+
 Running Javascript Unit Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -463,12 +471,12 @@ Accessibility Developer Tools`_ or `Deque's aXe Core`_.  For more details about
 how to write accessibility tests, please read the `Bok Choy documentation`_ and
 the `Automated Accessibility Tests`_ Open edX Confluence page.
 
-.. _automated accessibility testing: http://bok-choy.readthedocs.org/en/latest/accessibility.html
+.. _automated accessibility testing: https://bok-choy.readthedocs.org/en/latest/accessibility.html
 .. _Selenium: http://docs.seleniumhq.org/
 .. _Python: https://www.python.org/
 .. _Google Accessibility Developer Tools: https://github.com/GoogleChrome/accessibility-developer-tools/
 .. _Deque's aXe Core: https://github.com/dequelabs/axe-core/
-.. _Bok Choy documentation: http://bok-choy.readthedocs.org/en/latest/accessibility.html
+.. _Bok Choy documentation: https://bok-choy.readthedocs.org/en/latest/accessibility.html
 .. _Automated Accessibility Tests: https://openedx.atlassian.net/wiki/display/TE/Automated+Accessibility+Tests
 
 

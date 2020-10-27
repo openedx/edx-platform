@@ -66,7 +66,7 @@ class CodeMirror(BaseEditor):
               "wiki/markitup/sets/admin/set.js",
               )
 
-    class Media(object):  # pylint: disable=missing-docstring
+    class Media(object):
         css = {
             'all': ("js/vendor/CodeMirror/codemirror.css",)
         }

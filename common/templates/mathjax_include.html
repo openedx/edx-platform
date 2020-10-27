@@ -5,8 +5,11 @@
 ## MathJax configuration for Studio lives in
 ## cms/js/require-config.js.
 
+<%page args="disable_fast_preview=True" expression_filter="h"/>
 
-<%page args="disable_fast_preview=True"/>
+## Avoid loading mathjax if already loaded on the page
+
+%if context.get('load_mathjax', True):
 
 %if disable_fast_preview:
 <script type="text/javascript">
@@ -72,8 +75,19 @@
   }
 </script>
 
+<script type="text/javascript">
+    // Activating Mathjax accessibility files
+    window.MathJax = {
+        menuSettings: {
+            collapsible: true,
+            autocollapse: true,
+            explorer: true
+        }
+    };
+</script>
 
 <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
      It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
      MathJax extension libraries -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG"></script>
+%endif

@@ -11,7 +11,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
 
-import dogstats_wrapper as dog_stats_api
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import (
@@ -127,11 +126,6 @@ def update_certificate(request):
                     }),
                     content_type='application/json'
                 )
-
-        dog_stats_api.increment(XQUEUE_METRIC_NAME, tags=[
-            u'action:update_certificate',
-            u'course_id:{}'.format(cert.course_id)
-        ])
 
         cert.save()
         return HttpResponse(json.dumps({'return_code': 0}),

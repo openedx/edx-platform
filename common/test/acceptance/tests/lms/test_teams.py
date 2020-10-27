@@ -8,7 +8,6 @@ from uuid import uuid4
 
 import ddt
 from dateutil.parser import parse
-from nose.plugins.attrib import attr
 from selenium.common.exceptions import TimeoutException
 
 from common.test.acceptance.fixtures import LMS_BASE_URL
@@ -29,6 +28,7 @@ from common.test.acceptance.pages.lms.teams import (
     TeamsPage
 )
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, get_modal_alert
+from openedx.core.lib.tests import attr
 
 TOPICS_PER_PAGE = 12
 
@@ -921,7 +921,6 @@ class TeamFormActions(TeamsTabBase):
 
     def verify_and_navigate_to_edit_team_page(self):
         """Navigates to the edit team page and verifies."""
-        # pylint: disable=no-member
         self.assertEqual(self.team_page.team_name, self.team['name'])
         self.assertTrue(self.team_page.edit_team_button_present)
 
@@ -942,7 +941,6 @@ class TeamFormActions(TeamsTabBase):
 
     def verify_team_info(self, name, description, location, language):
         """Verify the team information on team page."""
-        # pylint: disable=no-member
         self.assertEqual(self.team_page.team_name, name)
         self.assertEqual(self.team_page.team_description, description)
         self.assertEqual(self.team_page.team_location, location)
@@ -1030,7 +1028,7 @@ class CreateTeamTest(TeamFormActions):
         # way to write something that waits for that event handler to be bound
         # to the button element. So I used time.sleep as well, even though
         # the bok choy docs explicitly ask us not to:
-        # http://bok-choy.readthedocs.io/en/latest/guidelines.html
+        # https://bok-choy.readthedocs.io/en/latest/guidelines.html
         # Sorry! For the story to address this anti-pattern, see TNL-5820
         time.sleep(0.5)
         self.team_management_page.submit_form()

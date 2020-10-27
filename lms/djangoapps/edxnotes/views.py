@@ -20,7 +20,7 @@ from rest_framework.views import APIView
 from courseware.courses import get_course_with_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edxmako.shortcuts import render_to_response
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.helpers import (

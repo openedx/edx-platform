@@ -8,8 +8,6 @@ import ddt
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
-from django.test import override_settings
-from nose.plugins.attrib import attr
 from opaque_keys.edx import locator
 from pytz import UTC
 
@@ -25,14 +23,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
 class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
+    shard = 3
     PASSWORD = 'test'
 
     def setUp(self):

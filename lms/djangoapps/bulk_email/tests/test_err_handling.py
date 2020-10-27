@@ -7,13 +7,12 @@ from itertools import cycle
 from smtplib import SMTPConnectError, SMTPDataError, SMTPServerDisconnected
 
 import ddt
-from celery.states import RETRY, SUCCESS  # pylint: disable=no-name-in-module, import-error
+from celery.states import RETRY, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
 from django.urls import reverse
 from django.db import DatabaseError
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
@@ -39,12 +38,12 @@ class EmailTestException(Exception):
 
 
 @ddt.ddt
-@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailErrors(ModuleStoreTestCase):
     """
     Test that errors from sending email are handled properly.
     """
+    shard = 1
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 

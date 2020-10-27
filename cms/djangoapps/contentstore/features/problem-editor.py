@@ -1,14 +1,15 @@
 # disable missing docstring
 # pylint: disable=missing-docstring
+# pylint: disable=no-member
 
 import json
 
 from lettuce import step, world
-from nose.tools import assert_equal, assert_true
+from openedx.core.lib.tests.tools import assert_equal, assert_true  # pylint: disable=no-name-in-module
 
-from advanced_settings import ADVANCED_MODULES_KEY, change_value
-from common import open_new_course, type_in_codemirror
-from course_import import import_file
+from cms.djangoapps.contentstore.features.advanced_settings import ADVANCED_MODULES_KEY, change_value
+from cms.djangoapps.contentstore.features.common import open_new_course, type_in_codemirror
+from cms.djangoapps.contentstore.features.course_import import import_file
 
 DISPLAY_NAME = "Display Name"
 MAXIMUM_ATTEMPTS = "Maximum Attempts"
@@ -57,7 +58,7 @@ def i_create_new_common_problem(step):
 
 
 @step('when I mouseover on "(.*)"')
-def i_mouseover_on_html_component(step, element_class):
+def i_mouseover_on_html_component(_step, element_class):
     action_css = '.{}'.format(element_class)
     world.trigger_event(action_css, event='mouseover')
 
@@ -96,7 +97,7 @@ def i_edit_and_select_settings(_step):
 
 
 @step('I see the advanced settings and their expected values$')
-def i_see_advanced_settings_with_values(step):
+def i_see_advanced_settings_with_values(_step):
     world.verify_all_setting_entries(
         [
             [DISPLAY_NAME, "Blank Common Problem", True],
@@ -126,7 +127,7 @@ def my_display_name_change_is_persisted_on_save(step):
 
 
 @step('the problem display name is "(.*)"$')
-def verify_problem_display_name(step, name):
+def verify_problem_display_name(_step, name):
     """
     name is uppercased because the heading styles are uppercase in css
     """
@@ -277,7 +278,7 @@ def edit_latex_source(_step):
 
 @step('my change to the High Level Source is persisted')
 def high_level_source_persisted(_step):
-    def verify_text(driver):
+    def verify_text(_driver):
         css_sel = '.problem div>span'
         return world.css_text(css_sel) == 'hi'
 
@@ -291,7 +292,7 @@ def high_level_source_in_editor(_step):
 
 
 @step(u'I have an empty course')
-def i_have_empty_course(step):
+def i_have_empty_course(_step):
     open_new_course()
 
 
@@ -370,7 +371,8 @@ def verify_modified_display_name_with_special_chars():
 
 
 def verify_modified_display_name_with_html():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, "<script>alert('test')</script>", True)
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME),
+                               DISPLAY_NAME, "<script>alert('test')</script>", True)
 
 
 def verify_unset_display_name():

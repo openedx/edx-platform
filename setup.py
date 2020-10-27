@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.10",
+    version="0.11",
     install_requires=["setuptools"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
@@ -47,6 +47,7 @@ setup(
             "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
             "verification = openedx.core.djangoapps.user_api.partition_schemes:ReturnGroup1PartitionScheme",
             "enrollment_track = openedx.core.djangoapps.verified_track_content.partition_scheme:EnrollmentTrackPartitionScheme",
+            "content_type_gate = openedx.features.content_type_gating.partitions:ContentTypeGatingPartitionScheme",
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
@@ -54,12 +55,14 @@ setup(
             "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
             "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
             "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
+            "hide_empty = lms.djangoapps.course_blocks.transformers.hide_empty:HideEmptyTransformer",
             "hidden_content = lms.djangoapps.course_blocks.transformers.hidden_content:HiddenContentTransformer",
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
             "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesAndSpecialExamsTransformer",
             "grades = lms.djangoapps.grades.transformer:GradesTransformer",
             "completion = lms.djangoapps.course_api.blocks.transformers.block_completion:BlockCompletionTransformer",
-            "load_override_data = lms.djangoapps.course_blocks.transformers.load_override_data:OverrideDataTransformer"
+            "load_override_data = lms.djangoapps.course_blocks.transformers.load_override_data:OverrideDataTransformer",
+            "content_type_gate = openedx.features.content_type_gating.block_transformers:ContentTypeGateTransformer",
         ],
         "openedx.ace.policy": [
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
@@ -70,6 +73,7 @@ setup(
             "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
             "grades = lms.djangoapps.grades.apps:GradesConfig",
+            "journals = openedx.features.journals.apps:JournalsConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
@@ -77,6 +81,7 @@ setup(
             "zendesk_proxy = openedx.core.djangoapps.zendesk_proxy.apps:ZendeskProxyConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
+            "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig"
         ],
         "cms.djangoapp": [
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
@@ -93,6 +98,7 @@ setup(
             "bookmarks = openedx.core.djangoapps.bookmarks.apps:BookmarksConfig",
             "zendesk_proxy = openedx.core.djangoapps.zendesk_proxy.apps:ZendeskProxyConfig",
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
+            "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig"
         ],
     }
 )

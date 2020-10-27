@@ -21,7 +21,6 @@ from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience.views.course_outline import (
     CourseOutlineFragmentView, DEFAULT_COMPLETION_TRACKING_START
@@ -49,6 +48,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         Set up an array of various courses to be tested.
         """
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
         with super(TestCourseOutlinePage, cls).setUpClassAndTestData():
             cls.courses = []
             course = CourseFactory.create()
@@ -145,6 +145,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
         """
         Creates a test course that can be used for non-destructive tests
         """
+        # pylint: disable=super-method-not-called
 
         cls.PREREQ_REQUIRED = '(Prerequisite required)'
         cls.UNLOCKED = 'Unlocked'
@@ -297,6 +298,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         Creates a test course that can be used for non-destructive tests
         """
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
         with super(TestCourseOutlineResumeCourse, cls).setUpClassAndTestData():
             cls.course = cls.create_test_course()
 
@@ -565,7 +567,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         switches = waffle.waffle()
         # pylint: disable=protected-access
         switch_name = switches._namespaced_name(waffle.ENABLE_COMPLETION_TRACKING)
-        switch, _ = Switch.objects.get_or_create(name=switch_name)  # pylint: disable=unpacking-non-sequence
+        switch, _ = Switch.objects.get_or_create(name=switch_name)
 
         self.assertEqual(switch.created, view._completion_data_collection_start())
 
@@ -639,8 +641,8 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Future Chapter')
 
-        # Verify that staff masquerading as a learner does not see the future chapter.
+        # Verify that staff masquerading as a learner see the future chapter.
         self.update_masquerade(course, role='student')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'Future Chapter')
+        self.assertContains(response, 'Future Chapter')

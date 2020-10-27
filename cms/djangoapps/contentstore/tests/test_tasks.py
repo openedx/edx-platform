@@ -104,7 +104,7 @@ class ExportLibraryTestCase(LibraryTestCase):
         Verify that a routine library export task succeeds
         """
         key = str(self.lib_key)
-        result = export_olx.delay(self.user.id, key, u'en')  # pylint: disable=no-member
+        result = export_olx.delay(self.user.id, key, u'en')
         status = UserTaskStatus.objects.get(task_id=result.id)
         self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
         artifacts = UserTaskArtifact.objects.filter(status=status)

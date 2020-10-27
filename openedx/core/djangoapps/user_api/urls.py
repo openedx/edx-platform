@@ -8,7 +8,6 @@ from django.conf.urls import url
 from ..profile_images.views import ProfileImageView
 from .accounts.views import (
     AccountDeactivationView,
-    AccountRetireMailingsView,
     AccountRetirementPartnerReportView,
     AccountRetirementStatusView,
     AccountRetirementView,
@@ -35,8 +34,11 @@ ACCOUNT_DETAIL = AccountViewSet.as_view({
 
 PARTNER_REPORT = AccountRetirementPartnerReportView.as_view({
     'post': 'retirement_partner_report',
-    'put': 'retirement_partner_status_create',
-    'delete': 'retirement_partner_cleanup'
+    'put': 'retirement_partner_status_create'
+})
+
+PARTNER_REPORT_CLEANUP = AccountRetirementPartnerReportView.as_view({
+    'post': 'retirement_partner_cleanup'
 })
 
 RETIREMENT_QUEUE = AccountRetirementStatusView.as_view({
@@ -53,6 +55,10 @@ RETIREMENT_RETRIEVE = AccountRetirementStatusView.as_view({
 
 RETIREMENT_UPDATE = AccountRetirementStatusView.as_view({
     'patch': 'partial_update',
+})
+
+RETIREMENT_CLEANUP = AccountRetirementStatusView.as_view({
+    'post': 'cleanup',
 })
 
 RETIREMENT_POST = AccountRetirementView.as_view({
@@ -90,11 +96,6 @@ urlpatterns = [
         name='accounts_deactivation'
     ),
     url(
-        r'^v1/accounts/retire_mailings/$',
-        AccountRetireMailingsView.as_view(),
-        name='accounts_retire_mailings'
-    ),
-    url(
         r'^v1/accounts/deactivate_logout/$',
         DeactivateLogoutView.as_view(),
         name='deactivate_logout'
@@ -115,9 +116,19 @@ urlpatterns = [
         name='accounts_retirement_partner_report'
     ),
     url(
+        r'^v1/accounts/retirement_partner_report_cleanup/$',
+        PARTNER_REPORT_CLEANUP,
+        name='accounts_retirement_partner_report_cleanup'
+    ),
+    url(
         r'^v1/accounts/retirement_queue/$',
         RETIREMENT_QUEUE,
         name='accounts_retirement_queue'
+    ),
+    url(
+        r'^v1/accounts/retirement_cleanup/$',
+        RETIREMENT_CLEANUP,
+        name='accounts_retirement_cleanup'
     ),
     url(
         r'^v1/accounts/retirements_by_status_and_date/$',

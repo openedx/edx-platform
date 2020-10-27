@@ -4,9 +4,7 @@ defined in edx_user_state_client.
 """
 
 from collections import defaultdict
-from unittest import skip
 
-from django.test import TestCase
 from edx_user_state_client.tests import UserStateClientTestBase
 
 from courseware.tests.factories import UserFactory

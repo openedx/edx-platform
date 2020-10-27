@@ -5,7 +5,6 @@ End-to-end tests for the LMS Instructor Dashboard.
 
 import ddt
 from bok_choy.promise import EmptyPromise
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -31,6 +30,7 @@ from common.test.acceptance.tests.helpers import (
     disable_animations,
     get_modal_alert
 )
+from openedx.core.lib.tests import attr
 
 
 class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
@@ -54,7 +54,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         )
         auto_auth_page.visit()
         user_info = auto_auth_page.user_info
-        return user_info['username'], user_info['user_id']
+        return user_info['username'], user_info['user_id'], user_info['email'], user_info['password']
 
     def visit_instructor_dashboard(self):
         """
@@ -77,6 +77,11 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
     def test_instructor_dashboard_a11y(self):
+        self.instructor_dashboard_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'aria-valid-attr',  # TODO: LEARNER-6611 & LEARNER-6865
+            ]
+        })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
 
 
@@ -404,7 +409,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self._create_a_timed_exam_and_attempt()
 
         # When I log in as an instructor,
-        __, __ = self.log_in_as_instructor()
+        __, __, __, __ = self.log_in_as_instructor()
 
         # And visit the Student Proctored Exam Attempts Section of Instructor Dashboard's Special Exams tab
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -577,7 +582,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
     def setUp(self):
         super(DataDownloadsTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
-        self.instructor_username, self.instructor_id = self.log_in_as_instructor()
+        self.instructor_username, self.instructor_id, __, __ = self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
         self.data_download_section = instructor_dashboard_page.select_data_download()
 
@@ -687,6 +692,129 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.a11y_audit.check_for_accessibility_errors()
 
 
+@ddt.ddt
+class DataDownloadsWithMultipleRoleTests(BaseInstructorDashboardTest):
+    """
+    Bok Choy tests for the "Data Downloads" tab with multiple user roles.
+    """
+    def setUp(self):
+        super(DataDownloadsWithMultipleRoleTests, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+
+    @ddt.data(['staff'], ['instructor'])
+    def test_list_student_profile_information(self, role):
+        """
+        Scenario: List enrolled students' profile information
+        Given I am "<Role>" for a course
+        When I click "List enrolled students' profile information"
+            Then I see a table of student profiles
+            Examples:
+            | Role          |
+            | instructor    |
+            | staff         |
+        """
+        username, user_id, email, __ = self.log_in_as_instructor(
+            global_staff=False,
+            course_access_roles=role
+        )
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        data_download_section = instructor_dashboard_page.select_data_download()
+
+        data_download_section.enrolled_student_profile_button.click()
+        student_profile_info = data_download_section.student_profile_information
+
+        self.assertNotIn(student_profile_info, [u'', u'Loading'])
+        expected_data = [user_id, username, email]
+        for datum in expected_data:
+            self.assertIn(str(datum), student_profile_info[0].split('\n'))
+
+    @ddt.data(['staff'], ['instructor'])
+    def test_list_student_profile_information_for_large_course(self, role):
+        """
+        Scenario: List enrolled students' profile information for a large course
+        Given I am "<Role>" for a very large course
+        When I visit the "Data Download" tab
+            Then I do not see a button to 'List enrolled students' profile information'
+            Examples:
+            | Role          |
+            | instructor    |
+            | staff         |
+
+        """
+        username, __, email, password = self.log_in_as_instructor(
+            global_staff=False,
+            course_access_roles=role
+        )
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        data_download_section = instructor_dashboard_page.select_data_download()
+
+        self.assertTrue(data_download_section.enrolled_student_profile_button_present)
+        LogoutPage(self.browser).visit()
+        for __ in range(5):
+            learner_username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
+            learner_email = "{user}@example.com".format(user=learner_username)
+
+            # Enroll test users in the course
+            AutoAuthPage(
+                self.browser,
+                username=learner_username,
+                email=learner_email,
+                course_id=self.course_id
+            ).visit()
+
+        # Login again with staff or instructor
+        AutoAuthPage(
+            self.browser,
+            username=username,
+            email=email,
+            password=password,
+            course_id=self.course_id,
+            staff=False,
+            course_access_roles=role
+        ).visit()
+
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        instructor_dashboard_page.select_data_download()
+        self.assertFalse(data_download_section.enrolled_student_profile_button_present)
+
+    @ddt.data(['staff'], ['instructor'])
+    def test_view_grading_configuration(self, role):
+        """
+        Scenario: View the grading configuration
+        Given I am "<Role>" for a course
+        When I click "Grading Configuration"
+            Then I see the grading configuration for the course
+            Examples:
+            | Role          |
+            | instructor    |
+            | staff         |
+        """
+        expected = u"""-----------------------------------------------------------------------------
+Course grader:
+<class 'xmodule.graders.WeightedSubsectionsGrader'>
+
+Graded sections:
+  subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Homework, category=Homework, weight=0.15
+  subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Lab, category=Lab, weight=0.15
+  subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Midterm Exam, category=Midterm Exam, weight=0.3
+  subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Final Exam, category=Final Exam, weight=0.4
+-----------------------------------------------------------------------------
+Listing grading context for course {}
+graded sections:
+[]
+all graded blocks:
+length=0""".format(self.course_id)
+        self.log_in_as_instructor(
+            global_staff=False,
+            course_access_roles=role
+        )
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        data_download_section = instructor_dashboard_page.select_data_download()
+
+        data_download_section.generate_grading_configuration_button.click()
+        self.assertEqual(data_download_section.grading_config_text, expected)
+
+
 @attr(shard=10)
 @ddt.ddt
 class CertificatesTest(BaseInstructorDashboardTest):
@@ -708,7 +836,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         CourseFixture(**self.course_info).install()
         self.cert_fixture = CertificateConfigFixture(self.course_id, self.test_certificate_config)
         self.cert_fixture.install()
-        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.user_name, self.user_id, __, __ = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
         disable_animations(self.certificates_section)
@@ -934,7 +1062,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         # Create a new user who is not enrolled in the course
         AutoAuthPage(self.browser, username=new_user, email=new_email).visit()
         # Login as instructor and visit Certificate Section of Instructor Dashboard
-        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.user_name, self.user_id, __, __ = self.log_in_as_instructor()
         self.instructor_dashboard_page.visit()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
 
@@ -1061,7 +1189,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
         self.cert_fixture = CertificateConfigFixture(self.course_id, self.test_certificate_config)
         self.cert_fixture.install()
-        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.user_name, self.user_id, __, __ = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
 
@@ -1195,7 +1323,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         # Create a new user who is not enrolled in the course
         AutoAuthPage(self.browser, username=new_user, email=new_email).visit()
         # Login as instructor and visit Certificate Section of Instructor Dashboard
-        self.user_name, self.user_id = self.log_in_as_instructor()
+        self.user_name, self.user_id, __, __ = self.log_in_as_instructor()
         self.instructor_dashboard_page.visit()
         self.certificates_section = self.instructor_dashboard_page.select_certificates()
 
@@ -1341,7 +1469,7 @@ class StudentAdminTest(BaseInstructorDashboardTest):
             ),
         ).install()
 
-        self.username, _ = self.log_in_as_instructor()
+        self.username, __, __, __ = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
     def test_rescore_rescorable(self):

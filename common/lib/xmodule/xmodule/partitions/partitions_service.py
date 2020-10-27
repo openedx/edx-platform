@@ -7,8 +7,13 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 import logging
 
-from openedx.core.djangoapps.request_cache.middleware import request_cached
-from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
+from openedx.core.lib.cache_utils import request_cached
+from openedx.features.content_type_gating.partitions import create_content_gating_partition
+from xmodule.partitions.partitions import (
+    UserPartition,
+    UserPartitionError,
+    ENROLLMENT_TRACK_PARTITION_ID,
+)
 from xmodule.modulestore.django import modulestore
 
 
@@ -17,7 +22,7 @@ log = logging.getLogger(__name__)
 FEATURES = getattr(settings, 'FEATURES', {})
 
 
-@request_cached
+@request_cached()
 def get_all_partitions_for_course(course, active_only=False):
     """
     A method that returns all `UserPartitions` associated with a course, as a List.
@@ -37,13 +42,47 @@ def get_all_partitions_for_course(course, active_only=False):
     return all_partitions
 
 
+def get_user_partition_groups(course_key, user_partitions, user, partition_dict_key='name'):
+    """
+    Collect group ID for each partition in this course for this user.
+     Arguments:
+        course_key (CourseKey)
+        user_partitions (list[UserPartition])
+        user (User)
+        partition_dict_key - i.e. 'id', 'name' depending on which partition attribute you want as a key.
+     Returns:
+        dict[partition_dict_key: Group]: Mapping from user partitions to the group to
+            which the user belongs in each partition. If the user isn't
+            in a group for a particular partition, then that partition's
+            ID will not be in the dict.
+    """
+
+    partition_groups = {}
+    for partition in user_partitions:
+        group = partition.scheme.get_group_for_user(
+            course_key,
+            user,
+            partition,
+        )
+
+        if group is not None:
+            partition_groups[getattr(partition, partition_dict_key)] = group
+    return partition_groups
+
+
 def _get_dynamic_partitions(course):
     """
     Return the dynamic user partitions for this course.
     If none exists, returns an empty array.
     """
-    enrollment_partition = _create_enrollment_track_partition(course)
-    return [enrollment_partition] if enrollment_partition else []
+    return [
+        partition
+        for partition in [
+            _create_enrollment_track_partition(course),
+            create_content_gating_partition(course),
+        ]
+        if partition
+    ]
 
 
 def _create_enrollment_track_partition(course):

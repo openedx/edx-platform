@@ -4,6 +4,7 @@
 """
 Generates fake XML for asset metadata.
 """
+from __future__ import print_function
 
 import random
 from lxml import etree
@@ -233,4 +234,4 @@ if __name__ == '__main__':
     if click is not None:
         cli()  # pylint: disable=no-value-for-parameter
     else:
-        print "Aborted! Module 'click' is not installed."
+        print("Aborted! Module 'click' is not installed.")
