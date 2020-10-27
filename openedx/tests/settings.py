@@ -144,3 +144,14 @@ RUN_BLOCKSTORE_TESTS = False
 SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
 # Maximum of 6 retries before giving up.
 SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
+
+# Used with XQueue
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
+XQUEUE_INTERFACE = {
+    'url': 'http://localhost:18040',
+    'basic_auth': ['edx', 'edx'],
+    'django_auth': {
+        'username': 'lms',
+        'password': 'password'
+    }
+}
