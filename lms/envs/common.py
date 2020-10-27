@@ -2406,7 +2406,10 @@ INSTALLED_APPS = [
     'openedx.features.custom_fields',
 
     'channels',
-    'multiselectfield'
+    'multiselectfield',
+
+    # Third party action planner xblock goals tracking application
+    'action_planner.actionplan_manager'
 ]
 
 ######################### CSRF #########################################
