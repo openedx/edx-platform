@@ -263,9 +263,17 @@ class GeneratedCertificate(models.Model):
     # results. Django requires us to explicitly declare this.
     objects = models.Manager()
 
-    MODES = Choices(u'verified', u'honor', u'audit', u'professional', u'no-id-professional', u'masters')
+    MODES = Choices(
+        'verified',
+        'honor',
+        'audit',
+        'professional',
+        'no-id-professional',
+        'masters',
+        'executive-education'
+    )
 
-    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS]
+    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS, CourseMode.EXECUTIVE_EDUCATION]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
