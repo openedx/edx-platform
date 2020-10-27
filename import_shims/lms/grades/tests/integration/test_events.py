@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'grades.tests.integration.test_events')
+warn_deprecated_import('grades.tests.integration.test_events', 'lms.djangoapps.grades.tests.integration.test_events')
 
 from lms.djangoapps.grades.tests.integration.test_events import *

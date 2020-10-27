@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'program_enrollments.admin')
+warn_deprecated_import('program_enrollments.admin', 'lms.djangoapps.program_enrollments.admin')
 
 from lms.djangoapps.program_enrollments.admin import *

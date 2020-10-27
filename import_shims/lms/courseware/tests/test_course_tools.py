@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'courseware.tests.test_course_tools')
+warn_deprecated_import('courseware.tests.test_course_tools', 'lms.djangoapps.courseware.tests.test_course_tools')
 
 from lms.djangoapps.courseware.tests.test_course_tools import *

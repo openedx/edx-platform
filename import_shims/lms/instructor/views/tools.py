@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'instructor.views.tools')
+warn_deprecated_import('instructor.views.tools', 'lms.djangoapps.instructor.views.tools')
 
 from lms.djangoapps.instructor.views.tools import *

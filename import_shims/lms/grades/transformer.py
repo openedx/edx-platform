@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'grades.transformer')
+warn_deprecated_import('grades.transformer', 'lms.djangoapps.grades.transformer')
 
 from lms.djangoapps.grades.transformer import *

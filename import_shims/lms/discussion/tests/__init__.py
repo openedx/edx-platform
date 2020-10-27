@@ -1,5 +1,5 @@
-from sys_path_hacks.warn import warn_deprecated_import
+from import_shims.warn import warn_deprecated_import
 
-warn_deprecated_import('lms.djangoapps', 'discussion.tests')
+warn_deprecated_import('discussion.tests', 'lms.djangoapps.discussion.tests')
 
 from lms.djangoapps.discussion.tests import *
