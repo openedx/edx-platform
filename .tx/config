@@ -1,80 +1,79 @@
 [main]
 host = https://www.transifex.com
 
-[edx-platform.django-partial]
+[adg-edx-platform.django-partial]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django-partial.po
 source_file = conf/locale/en/LC_MESSAGES/django-partial.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/django-partial.po
 
-[edx-platform.django-studio]
+[adg-edx-platform.django-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django-studio.po
 source_file = conf/locale/en/LC_MESSAGES/django-studio.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/django-studio.po
 
-[edx-platform.djangojs-partial]
+[adg-edx-platform.djangojs-partial]
 file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-partial.po
 source_file = conf/locale/en/LC_MESSAGES/djangojs-partial.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/djangojs-partial.po
 
-[edx-platform.djangojs-studio]
+[adg-edx-platform.djangojs-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-studio.po
 source_file = conf/locale/en/LC_MESSAGES/djangojs-studio.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/djangojs-studio.po
 
-[edx-platform.djangojs-account-settings-view]
+[adg-edx-platform.djangojs-account-settings-view]
 file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-account-settings-view.po
 source_file = conf/locale/en/LC_MESSAGES/djangojs-account-settings-view.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/djangojs-account-settings-view.po
 
-[edx-platform.mako]
+[adg-edx-platform.mako]
 file_filter = conf/locale/<lang>/LC_MESSAGES/mako.po
 source_file = conf/locale/en/LC_MESSAGES/mako.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/mako.po
 
-[edx-platform.mako-studio]
+[adg-edx-platform.mako-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/mako-studio.po
 source_file = conf/locale/en/LC_MESSAGES/mako-studio.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/mako-studio.po
 
-[edx-platform.underscore]
+[adg-edx-platform.underscore]
 file_filter = conf/locale/<lang>/LC_MESSAGES/underscore.po
 source_file = conf/locale/en/LC_MESSAGES/underscore.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/underscore.po
 
-[edx-platform.underscore-studio]
+[adg-edx-platform.underscore-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/underscore-studio.po
 source_file = conf/locale/en/LC_MESSAGES/underscore-studio.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/underscore-studio.po
 
-[edx-platform.wiki]
+[adg-edx-platform.wiki]
 file_filter = conf/locale/<lang>/LC_MESSAGES/wiki.po
 source_file = conf/locale/en/LC_MESSAGES/wiki.po
 source_lang = en
 type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/wiki.po
 
-[edx-platform.edx_proctoring_proctortrack]
+[adg-edx-platform.edx_proctoring_proctortrack]
 file_filter = conf/locale/<lang>/LC_MESSAGES/edx_proctoring_proctortrack.po
 source_file = conf/locale/en/LC_MESSAGES/edx_proctoring_proctortrack.po
 source_lang = en
 type = PO
-
-[open-edx-releases.release-juniper]
-file_filter = conf/locale/<lang>/LC_MESSAGES/django.po
-source_file = conf/locale/en/LC_MESSAGES/django.po
-source_lang = en
-type = PO
-
-[open-edx-releases.release-juniper-js]
-file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs.po
-source_file = conf/locale/en/LC_MESSAGES/djangojs.po
-source_lang = en
-type = PO
+trans.ar = conf/locale/ar/LC_MESSAGES/edx_proctoring_proctortrack.po
