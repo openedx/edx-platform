@@ -13,7 +13,8 @@ from mock import patch
 from mock import Mock
 from testfixtures import LogCapture
 
-from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
+from openedx.core.djangoapps.oauth_dispatch.api import destroy_oauth_tokens
+from student.helpers import get_next_url_for_login_page
 from student.tests.factories import UserFactory
 from edx_oauth2_provider.models import TrustedClient
 from edx_oauth2_provider.tests.factories import (
@@ -128,7 +129,7 @@ class TestLoginHelper(TestCase):
         with with_site_configuration_context(configuration=dict(THIRD_PARTY_AUTH_HINT=tpa_hint)):
             validate_login()
 
-    @patch('student.helpers.get_redirect_to', Mock(return_value=None))
+    @patch('student.helpers._get_redirect_to', Mock(return_value=None))
     def test_custom_tahoe_site_redirect_lms(self):
         """
         Allow site admins to customize the default after-login URL.
