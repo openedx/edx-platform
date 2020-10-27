@@ -13,6 +13,7 @@ signals.)
 
 import logging
 import math
+import shlex
 import sys
 import time
 
@@ -28,8 +29,9 @@ from six.moves import range
 from lms.djangoapps.certificates.api import get_recently_modified_certificates
 from lms.djangoapps.grades.api import get_recently_modified_grades
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
+from lms.djangoapps.certificates.models import CertificateStatuses
 from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
-from openedx.core.djangoapps.programs.signals import handle_course_cert_changed
+from openedx.core.djangoapps.programs.signals import handle_course_cert_changed, handle_course_cert_awarded
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 log = logging.getLogger(__name__)
@@ -153,6 +155,11 @@ class Command(BaseCommand):
             action='store_true',
             help='Run grade/cert change signal in verbose mode',
         )
+        parser.add_argument(
+            '--notify_programs',
+            action='store_true',
+            help='Send program award notifications with course notification tasks',
+        )
 
     def get_args_from_database(self):
         """ Returns an options dictionary from the current NotifyCredentialsConfig model. """
@@ -160,9 +167,9 @@ class Command(BaseCommand):
         if not config.enabled:
             raise CommandError('NotifyCredentialsConfig is disabled, but --args-from-database was requested.')
 
-        # We don't need fancy shell-style whitespace/quote handling - none of our arguments are complicated
-        argv = config.arguments.split()
-
+        # This split will allow for quotes to wrap datetimes, like "2020-10-20 04:00:00" and other
+        # arguments as if it were the command line
+        argv = shlex.split(config.arguments)
         parser = self.create_parser('manage.py', 'notify_credentials')
         return parser.parse_args(argv).__dict__   # we want a dictionary, not a non-iterable Namespace object
 
@@ -176,13 +183,14 @@ class Command(BaseCommand):
 
         log.info(
             u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
-            u"from=%s, to=%s, execution=%s",
+            u"from=%s, to=%s, notify_programs=%s, execution=%s",
             options['dry_run'],
             options['site'],
             options['delay'],
             options['page_size'],
             options['start_date'] if options['start_date'] else 'NA',
             options['end_date'] if options['end_date'] else 'NA',
+            options['notify_programs'],
             'auto' if options['auto'] else 'manual',
         )
 
@@ -198,18 +206,28 @@ class Command(BaseCommand):
         certs = get_recently_modified_certificates(course_keys, options['start_date'], options['end_date'])
         grades = get_recently_modified_grades(course_keys, options['start_date'], options['end_date'])
 
+        log.info('notify_credentials Sending notifications for {certs} certificates and {grades} grades'.format(
+            certs=certs.count(),
+            grades=grades.count()
+        ))
         if options['dry_run']:
             self.print_dry_run(certs, grades)
         else:
-            self.send_notifications(certs, grades,
-                                    site_config=site_config,
-                                    delay=options['delay'],
-                                    page_size=options['page_size'],
-                                    verbose=options['verbose'])
+            self.send_notifications(
+                certs,
+                grades,
+                site_config=site_config,
+                delay=options['delay'],
+                page_size=options['page_size'],
+                verbose=options['verbose'],
+                notify_programs=options['notify_programs']
+            )
 
         log.info('notify_credentials finished')
 
-    def send_notifications(self, certs, grades, site_config=None, delay=0, page_size=0, verbose=False):
+    def send_notifications(
+        self, certs, grades, site_config=None, delay=0, page_size=0, verbose=False, notify_programs=False
+    ):
         """ Run actual handler commands for the provided certs and grades. """
 
         course_cert_info = {}
@@ -240,6 +258,8 @@ class Command(BaseCommand):
 
             course_cert_info[(cert.user.id, str(cert.course_id))] = data
             handle_course_cert_changed(**signal_args)
+            if notify_programs and CertificateStatuses.is_passing_status(cert.status):
+                handle_course_cert_awarded(**signal_args)
 
         # Then do grades
         for i, grade in paged_query(grades, delay, page_size):
