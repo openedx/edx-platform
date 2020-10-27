@@ -22,6 +22,10 @@ class ApplicationHub(TimeStampedModel):
     class Meta:
         app_label = 'applications'
 
+    def set_is_prerequisite_courses_passed(self):
+        self.is_prerequisite_courses_passed = True
+        self.save()
+
     def __str__(self):
         return 'User {user_id}, application status id={id}'.format(user_id=self.user.id, id=self.id)
 
