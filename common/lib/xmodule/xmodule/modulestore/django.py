@@ -414,6 +414,9 @@ def _get_modulestore_branch_setting():
         branch = None
         hostname = get_current_request_hostname()
         if hostname:
+            if hostname == settings.FEATURES.get('PREVIEW_LMS_BASE'):
+                return 'draft-preferred'
+
             # get mapping information which is defined in configurations
             mappings = getattr(settings, 'HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', None)
 
