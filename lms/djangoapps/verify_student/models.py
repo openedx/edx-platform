@@ -140,7 +140,7 @@ class IDVerificationAttempt(StatusModel):
 
         """
         return (
-            self.created_at < deadline and
+            self.created_at <= deadline and
             self.expiration_datetime > now()
         )
 
@@ -353,11 +353,11 @@ class PhotoVerification(IDVerificationAttempt):
         return self.error_msg
 
     @status_before_must_be("created")
-    def upload_face_image(self, img):
+    def upload_face_image(self, img_data):
         raise NotImplementedError
 
     @status_before_must_be("created")
-    def upload_photo_id_image(self, img):
+    def upload_photo_id_image(self, img_data):
         raise NotImplementedError
 
     @status_before_must_be("created")
@@ -390,7 +390,7 @@ class PhotoVerification(IDVerificationAttempt):
         # At any point prior to this, they can change their names via their
         # student dashboard. But at this point, we lock the value into the
         # attempt.
-        self.name = self.user.profile.name
+        self.name = self.user.profile.name  # pylint: disable=no-member
         self.status = self.STATUS.ready
         self.save()
 
