@@ -2425,7 +2425,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.common_initialization.apps.CommonInitializationConfig',
 
     # LMS-specific Initialization
-    'lms_initialization.apps.LMSInitializationConfig',
+    'lms.djangoapps.lms_initialization.apps.LMSInitializationConfig',
 
     # Common views
     'openedx.core.djangoapps.common_views',
