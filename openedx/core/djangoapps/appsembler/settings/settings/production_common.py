@@ -81,7 +81,6 @@ def plugin_settings(settings):
     settings.TAHOE_DEFAULT_COURSE_GITHUB_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_NAME', '')
     settings.TAHOE_DEFAULT_COURSE_VERSION = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_VERSION', '')
 
-
     # force S3 v4 (temporary until we can upgrade to django-storages 1.9)
     settings.S3_USE_SIGV4 = True
 
