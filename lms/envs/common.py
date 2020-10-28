@@ -2233,10 +2233,7 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 # Celery's task autodiscovery won't find tasks nested in a tasks package.
 # Tasks are only registered when the module they are defined in is imported.
 CELERY_IMPORTS = (
-    'poll.tasks',
-    'lms.djangoapps.instructor_task.tasks',
-    'lms.djangoapps.bulk_email.tasks',
-    'openedx.core.djangoapps.bookmarks.tasks',
+    'poll.tasks'
 )
 
 # Message configuration
