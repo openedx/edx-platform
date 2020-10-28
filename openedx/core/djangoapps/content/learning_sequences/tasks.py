@@ -10,7 +10,11 @@ from xmodule.modulestore.django import modulestore
 
 from .api import replace_course_outline
 from .data import (
-    CourseOutlineData, CourseSectionData, CourseLearningSequenceData, VisibilityData,
+    CourseOutlineData,
+    CourseSectionData,
+    CourseLearningSequenceData,
+    ExamData,
+    VisibilityData,
     CourseVisibility
 )
 
@@ -39,6 +43,11 @@ def get_outline_from_modulestore(course_key):
                     usage_key=sequence.location,
                     title=sequence.display_name,
                     inaccessible_after_due=sequence.hide_after_due,
+                    exam=ExamData(
+                        is_practice_exam=sequence.is_practice_exam,
+                        is_proctored_enabled=sequence.is_proctored_enabled,
+                        is_time_limited=sequence.is_timed_exam
+                    ),
                     visibility=VisibilityData(
                         hide_from_toc=sequence.hide_from_toc,
                         visible_to_staff_only=sequence.visible_to_staff_only
@@ -71,6 +80,7 @@ def get_outline_from_modulestore(course_key):
             title=course.display_name,
             published_at=course.subtree_edited_on,
             published_version=str(course.course_version),  # .course_version is a BSON obj
+            entrance_exam_id=course.entrance_exam_id,
             days_early_for_beta=course.days_early_for_beta,
             sections=sections_data,
             self_paced=course.self_paced,
