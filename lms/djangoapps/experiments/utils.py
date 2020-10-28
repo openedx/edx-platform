@@ -264,7 +264,7 @@ def get_dashboard_course_info(user, dashboard_enrollments):
 
 def get_experiment_user_metadata_context(course, user):
     """
-    Return a context dictionary with the keys used by the user_metadata.html.
+    Return a context dictionary with the keys used for Optimizely experiments, exposed via user_metadata.html
     """
     enrollment = None
     # TODO: clean up as part of REVO-28 (START)

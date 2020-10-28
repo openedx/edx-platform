@@ -8,10 +8,13 @@ import unittest
 import six.moves.urllib.error
 import six.moves.urllib.parse
 import six.moves.urllib.request
+from datetime import timedelta
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
+from django.utils.timezone import now
 from django.test.utils import override_settings
 from django.urls import reverse
+from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
 from mock import patch
 from rest_framework.test import APITestCase
 
@@ -20,10 +23,12 @@ from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
 from student.tests.factories import UserFactory
 
+from xmodule.modulestore.tests.factories import CourseFactory
+
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
 
-class ExperimentDataViewSetTests(APITestCase):
+class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):
 
     def assert_data_created_for_user(self, user, method='post', status=201):
         url = reverse('api_experiments:v0:data-list')
@@ -288,3 +293,14 @@ class ExperimentKeyValueViewSetTests(APITestCase):
 
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
+
+
+class ExperimentUserMetaDataViewTests(APITestCase, ModuleStoreTestCase):
+
+    def test_UserMetaDataView_get(self):
+        """ Internal user_metadata view/API for use in Optimizely experiments """
+        user = UserFactory()
+        course = CourseFactory.create(start=now() - timedelta(days=30))
+        call_args = [user.username, course.id]
+        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args))
+        self.assertEqual(response.status_code, 200)

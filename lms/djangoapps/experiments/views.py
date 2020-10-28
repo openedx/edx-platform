@@ -2,6 +2,7 @@
 Experimentation views
 """
 
+
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
@@ -92,12 +93,13 @@ class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
 
 
 class UserMetaDataView(APIView):
+    authentication_classes = (JwtAuthentication, ExperimentCrossDomainSessionAuth,)
+    permission_classes = (IsStaffOrReadOnly,)
 
     def get(self, request, course_id=None, username=None):
         """ Return user-metadata for the given course and user """
         user = get_user_by_username_or_email(username)
-        course_key = CourseKey.from_string(course_id)
-        course = courses.get_course_by_id(course_key)
+        course = courses.get_course_by_id(CourseKey.from_string(course_id))
         context = get_experiment_user_metadata_context(course, user)
         user_metadata = context.get('user_metadata')
         return JsonResponse(user_metadata)
