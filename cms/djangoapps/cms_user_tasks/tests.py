@@ -62,7 +62,6 @@ def _data(response):
     return response.data
 
 
-@override_settings(BROKER_URL='memory://localhost/')
 class TestUserTasks(APITestCase):
     """
     Tests of the django-user-tasks REST API endpoints.
@@ -138,7 +137,6 @@ class TestUserTasks(APITestCase):
         assert _data(response)['results'] == serializer.data
 
 
-@override_settings(BROKER_URL='memory://localhost/')
 class TestUserTaskStopped(APITestCase):
     """
     Tests of the django-user-tasks signal handling and email integration.

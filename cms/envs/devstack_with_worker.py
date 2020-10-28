@@ -20,7 +20,7 @@ import os
 from cms.envs.devstack import *
 
 # Require a separate celery worker
-CELERY_ALWAYS_EAGER = False
+CELERY_TASK_ALWAYS_EAGER = False
 
 # Disable transaction management because we are using a worker. Views
 # that request a task and wait for the result will deadlock otherwise.

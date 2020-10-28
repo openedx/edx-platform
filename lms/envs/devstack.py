@@ -31,7 +31,7 @@ CMS_BASE = 'localhost:18010'
 SITE_NAME = LMS_BASE
 
 # By default don't use a worker, execute tasks as if they were local functions
-CELERY_ALWAYS_EAGER = True
+CELERY_TASK_ALWAYS_EAGER = True
 HTTPS = 'off'
 
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)

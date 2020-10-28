@@ -55,7 +55,7 @@ class AlternateEnvironmentRouter(six.with_metaclass(ABCMeta, object)):
 
         If no such queue is defined, default routing logic is used.
         """
-        queues = getattr(settings, 'CELERY_QUEUES', None)
+        queues = getattr(settings, 'CELERY_TASK_QUEUES', None)
         return next(
             (
                 queue
