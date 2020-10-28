@@ -11,6 +11,7 @@ from copy import copy
 from gettext import ngettext
 
 import six
+import bleach
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
@@ -623,7 +624,7 @@ class LibraryContentBlock(
         lib_tools = self.runtime.service(self, 'library_tools')
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
-            (key, name) for key, name in lib_tools.list_available_libraries()
+            (key, bleach.clean(name)) for key, name in lib_tools.list_available_libraries()
             if user_perms.can_read(key) or self.source_library_id == six.text_type(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
