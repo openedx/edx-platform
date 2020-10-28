@@ -972,12 +972,19 @@ urlpatterns += [
     url(r'', include('csrf.urls')),
 ]
 
-urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
 urlpatterns += (
     url(r'^hijack/', include('hijack.urls')),
+)
+
+# Tahoe Tiers URLs
+urlpatterns += (
+    url(r'^', include('lms.djangoapps.appsembler_tiers.urls')),
+)
+
+# appsembler management console endpoint for student enrollment
+urlpatterns += (
+    url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.sites.urls')),
+    url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.tpa_admin.urls')),
 )
 
 # Tahoe API
@@ -986,3 +993,7 @@ urlpatterns += (
         include('openedx.core.djangoapps.appsembler.api.urls',
                 namespace='tahoe-api')),
 )
+
+urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
