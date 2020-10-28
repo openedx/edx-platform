@@ -132,7 +132,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
             self.users_cache = [mapping.user for mapping in found_mappings]
         else:
             self.users_cache = User.objects.filter(email__iexact=email)
-if len(self.users_cache) == 0 and is_secondary_email_feature_enabled():
+        if len(self.users_cache) == 0 and is_secondary_email_feature_enabled():
             # Check if user has entered the secondary email.
             self.users_cache = User.objects.filter(
                 id__in=AccountRecovery.objects.filter(secondary_email__iexact=email, is_active=True).values_list('user')
