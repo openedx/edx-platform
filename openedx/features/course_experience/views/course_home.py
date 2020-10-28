@@ -2,9 +2,9 @@
 Views for the course home page.
 """
 
-import beeline
 from __future__ import absolute_import
 
+import beeline
 import six
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
