@@ -304,6 +304,75 @@ def get_experiment_user_metadata_context(course, user):
     context['has_staff_access'] = has_staff_access
     context['forum_roles'] = forum_roles
     context['partition_groups'] = user_partitions
+
+    user_metadata = {
+        key: context.get(key)
+        for key in (
+            'username',
+            'user_id',
+            'course_id',
+            'enrollment_mode',
+            'upgrade_link',
+            'upgrade_price',
+            'audit_access_deadline',
+            'course_duration',
+            'pacing_type',
+            'has_staff_access',
+            'forum_roles',
+            'partition_groups',
+            # TODO: clean up as part of REVO-28 (START)
+            'has_non_audit_enrollments',
+            # TODO: clean up as part of REVO-28 (END)
+            # TODO: clean up as part of REVEM-199 (START)
+            'program_key_fields',
+            # TODO: clean up as part of REVEM-199 (END)
+        )
+    }
+
+    if user:
+        user_metadata['username'] = user.username
+        user_metadata['user_id'] = user.id
+        if hasattr(user, 'email'):
+            user_metadata['email'] = user.email
+
+    for datekey in (
+            'schedule_start',
+            'enrollment_time',
+            'course_start',
+            'course_end',
+            'dynamic_upgrade_deadline',
+            'course_upgrade_deadline',
+            'audit_access_deadline',
+    ):
+        user_metadata[datekey] = (
+            context.get(datekey).isoformat() if context.get(datekey) else None
+        )
+
+    for timedeltakey in (
+        'course_duration',
+    ):
+        user_metadata[timedeltakey] = (
+            context.get(timedeltakey).total_seconds() if context.get(timedeltakey) else None
+        )
+
+    course_key = context.get('course_key')
+    if course and not course_key:
+        course_key = course.id
+
+    if course_key:
+        if isinstance(course_key, CourseKey):
+            user_metadata['course_key_fields'] = {
+                'org': course_key.org,
+                'course': course_key.course,
+                'run': course_key.run,
+            }
+
+            if not context.get('course_id'):
+                user_metadata['course_id'] = six.text_type(course_key)
+        elif isinstance(course_key, six.string_types):
+            user_metadata['course_id'] = course_key
+
+    context['user_metadata'] = user_metadata
     return context
 
 
@@ -408,74 +477,3 @@ def get_program_context(course, user_enrollments):
             }
     return program_key
 # TODO: clean up as part of REVEM-199 (START)
-
-
-def generate_processed_user_metadata(context, user, course, course_id):
-    user_metadata = {
-        key: context.get(key)
-        for key in (
-            'username',
-            'user_id',
-            'course_id',
-            'enrollment_mode',
-            'upgrade_link',
-            'upgrade_price',
-            'audit_access_deadline',
-            'course_duration',
-            'pacing_type',
-            'has_staff_access',
-            'forum_roles',
-            'partition_groups',
-            # TODO: clean up as part of REVO-28 (START)
-            'has_non_audit_enrollments',
-            # TODO: clean up as part of REVO-28 (END)
-            # TODO: clean up as part of REVEM-199 (START)
-            'program_key_fields',
-            # TODO: clean up as part of REVEM-199 (END)
-        )
-    }
-
-    if user:
-        user_metadata['username'] = user.username
-        user_metadata['user_id'] = user.id
-        if hasattr(user, 'email'):
-            user_metadata['email'] = user.email
-
-    for datekey in (
-            'schedule_start',
-            'enrollment_time',
-            'course_start',
-            'course_end',
-            'dynamic_upgrade_deadline',
-            'course_upgrade_deadline',
-            'audit_access_deadline',
-    ):
-        user_metadata[datekey] = (
-            context.get(datekey).isoformat() if context.get(datekey) else None
-        )
-
-    for timedeltakey in (
-        'course_duration',
-    ):
-        user_metadata[timedeltakey] = (
-            context.get(timedeltakey).total_seconds() if context.get(timedeltakey) else None
-        )
-
-    course_key = context.get('course_key')
-    if course and not course_key:
-        course_key = course.id
-
-    if course_key:
-        if isinstance(course_key, CourseKey):
-            user_metadata['course_key_fields'] = {
-                'org': course_key.org,
-                'course': course_key.course,
-                'run': course_key.run,
-            }
-
-            if not course_id:
-                user_metadata['course_id'] = six.text_type(course_key)
-        elif isinstance(course_key, six.string_types):
-            user_metadata['course_id'] = course_key
-
-    return user_metadata

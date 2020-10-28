@@ -17,7 +17,7 @@ from util.json_request import JsonResponse
 from experiments import filters, serializers
 from experiments.models import ExperimentData, ExperimentKeyValue
 from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
-from experiments.utils import get_experiment_user_metadata_context, generate_processed_user_metadata
+from experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from student.models import get_user_by_username_or_email
 
@@ -98,6 +98,6 @@ class UserMetaDataView(APIView):
         user = get_user_by_username_or_email(username)
         course_key = CourseKey.from_string(course_id)
         course = courses.get_course_by_id(course_key)
-        data = get_experiment_user_metadata_context(course, user)
-        processed_data = generate_processed_user_metadata(data, user, course, course_id)
-        return JsonResponse(processed_data)
+        context = get_experiment_user_metadata_context(course, user)
+        user_metadata = context.get('user_metadata')
+        return JsonResponse(user_metadata)
