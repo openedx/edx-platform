@@ -7,6 +7,7 @@ from itertools import chain
 
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
@@ -16,7 +17,7 @@ from student.models import User
 
 from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from .toggles import redirect_to_idv_microfrontend
-from .utils import earliest_allowed_verification_date, most_recent_verification
+from .utils import earliest_allowed_verification_date, most_recent_verification, active_verifications
 
 log = logging.getLogger(__name__)
 
@@ -80,9 +81,9 @@ class IDVerificationService(object):
         Return a list of all verifications associated with the given user.
         """
         verifications = []
-        for verification in chain(SoftwareSecurePhotoVerification.objects.filter(user=user),
-                                  SSOVerification.objects.filter(user=user),
-                                  ManualVerification.objects.filter(user=user)):
+        for verification in chain(SoftwareSecurePhotoVerification.objects.filter(user=user).order_by('-created_at'),
+                                  SSOVerification.objects.filter(user=user).order_by('-created_at'),
+                                  ManualVerification.objects.filter(user=user).order_by('-created_at')):
             verifications.append(verification)
         return verifications
 
@@ -177,22 +178,22 @@ class IDVerificationService(object):
             'verification_expiry': '',
         }
 
-        # We need to check the user's most recent attempt.
-        try:
-            photo_id_verifications = SoftwareSecurePhotoVerification.objects.filter(user=user).order_by('-updated_at')
-            sso_id_verifications = SSOVerification.objects.filter(user=user).order_by('-updated_at')
-            manual_id_verifications = ManualVerification.objects.filter(user=user).order_by('-updated_at')
+        attempt = None
 
-            attempt = most_recent_verification(
-                photo_id_verifications,
-                sso_id_verifications,
-                manual_id_verifications,
-                'updated_at'
-            )
+        verifications = active_verifications(
+            cls.verifications_for_user(user),
+            timezone.now(),
+        )
 
-        except IndexError:
-            # The user has no verification attempts, return the default set of data.
-            return user_status
+        if verifications:
+            attempt = verifications[0]
+            for verification in verifications:
+                if verification.status == 'approved':
+                    # Always select the LATEST non-expired approved verification if there is such
+                    if attempt.status != 'approved' or (
+                        attempt.expiration_datetime < verification.expiration_datetime
+                    ):
+                        attempt = verification
 
         if not attempt:
             return user_status
