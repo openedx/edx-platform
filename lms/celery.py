@@ -13,6 +13,9 @@ from django.conf import settings
 
 from openedx.core.lib.celery.routers import AlternateEnvironmentRouter
 
+# Force settings to run so that the python path is modified
+settings.INSTALLED_APPS  # pylint: disable=pointless-statement
+
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proj.settings')
 
